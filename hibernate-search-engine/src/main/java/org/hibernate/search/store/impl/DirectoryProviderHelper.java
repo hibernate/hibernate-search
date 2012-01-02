@@ -184,8 +184,8 @@ public final class DirectoryProviderHelper {
 	 * @throws IOException
 	 */
 	public static LockFactory createLockFactory(File indexDir, Properties dirConfiguration) {
-		//For FS-based indexes default to "simple", default to "single" otherwise.
-		String defaultStrategy = indexDir == null ? "single" : "simple";
+		//For FS-based indexes default to "native", default to "single" otherwise.
+		String defaultStrategy = indexDir == null ? "single" : "native";
 		String lockFactoryName = dirConfiguration.getProperty( LOCKING_STRATEGY_PROP_NAME, defaultStrategy );
 		if ( "simple".equals( lockFactoryName ) ) {
 			if ( indexDir == null ) {

@@ -1528,13 +1528,17 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
     <title>LockFactory configuration</title>
 
     <para>Lucene <classname>Directory</classname>s have default locking
-    strategies which work well for most cases, but it's possible to specify
-    for each index managed by Hibernate Search which
-    <classname>LockingFactory</classname> you want to use.</para>
+    strategies which work generally good enough for most cases, but it's possible
+    to specify for each index managed by Hibernate Search a specific
+    <classname>LockingFactory</classname> you want to use. This is generally not
+    needed but could be useful.</para>
 
     <para>Some of these locking strategies require a filesystem level lock and
-    may be used even on RAM based indexes, but this is not recommended and of
-    no practical use.</para>
+    may be used even on RAM based indexes, this combination is valid but in this case
+    the <literal>indexBase</literal> configuration option usually needed only
+    for filesystem based <classname>Directory</classname> instances must be
+    specified to point to a filesystem location where to store the lock marker
+    files.</para>
 
     <para>To select a locking factory, set the
     <literal>hibernate.search.&lt;index&gt;.locking_strategy</literal> option
@@ -1567,11 +1571,7 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
             marks the usage of the index by creating a marker file.</para>
             <para>If for some reason you had to kill your application, you
             will need to remove this file before restarting it.</para>
-            <para>This is the default implementation for the
-            <literal>filesystem</literal>,
-            <literal>filesystem-master</literal> and
-            <literal>filesystem-slave</literal> directory
-            providers.</para></entry>
+            </entry>
           </row>
 
           <row>
@@ -1581,9 +1581,14 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
 
             <entry><para>As does <literal>simple</literal> this also marks the
             usage of the index by creating a marker file, but this one is
-            using native OS file locks so that even if your application
-            crashes the locks will be cleaned up.</para> <para>This
-            implementation has known problems on NFS.</para></entry>
+            using native OS file locks so that even if the JVM is terminated
+            the locks will be cleaned up.</para> <para>This implementation has
+            known problems on NFS, avoid it on network shares.</para>
+            <para><literal>native</literal> is the default implementation for the
+            <literal>filesystem</literal>,
+            <literal>filesystem-master</literal> and
+            <literal>filesystem-slave</literal> directory
+            providers.</para></entry>
           </row>
 
           <row>
@@ -1616,6 +1621,9 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
     <programlisting>hibernate.search.default.locking_strategy simple
 hibernate.search.Animals.locking_strategy native
 hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</programlisting>
+
+	<para>The Infinispan Directory uses a custom implementation; it's still possible to override it
+	but make sure you understand how that will work, especially with clustered indexes.</para>
   </section>
 
   <section>
