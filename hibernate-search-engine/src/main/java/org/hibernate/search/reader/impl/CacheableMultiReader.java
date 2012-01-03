@@ -55,12 +55,6 @@ public class CacheableMultiReader extends MultiReader {
 	}
 
 	@Override
-	public final synchronized IndexReader reopen() {
-		avoidUsingThis();
-		return null; //never reached, make compiler happy
-	}
-
-	@Override
 	public final void incRef() {
 		avoidUsingThis();
 	}

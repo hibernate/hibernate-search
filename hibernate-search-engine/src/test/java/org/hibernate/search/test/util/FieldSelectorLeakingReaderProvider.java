@@ -141,18 +141,6 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			return delegate.toString();
 		}
 
-		public IndexReader reopen() throws CorruptIndexException, IOException {
-			return delegate.reopen();
-		}
-
-		public IndexReader reopen(boolean openReadOnly) throws CorruptIndexException, IOException {
-			return delegate.reopen( openReadOnly );
-		}
-
-		public IndexReader reopen(IndexCommit commit) throws CorruptIndexException, IOException {
-			return delegate.reopen( commit );
-		}
-
 		public Object clone() {
 			return delegate.clone();
 		}
@@ -175,10 +163,6 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 
 		public boolean isCurrent() throws CorruptIndexException, IOException {
 			return delegate.isCurrent();
-		}
-
-		public boolean isOptimized() {
-			return delegate.isOptimized();
 		}
 
 		public TermFreqVector[] getTermFreqVectors(int docNumber) throws IOException {
@@ -240,10 +224,6 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		}
 
 		public void setNorm(int doc, String field, byte value) throws StaleReaderException, CorruptIndexException, LockObtainFailedException, IOException {
-			delegate.setNorm( doc, field, value );
-		}
-
-		public void setNorm(int doc, String field, float value) throws StaleReaderException, CorruptIndexException, LockObtainFailedException, IOException {
 			delegate.setNorm( doc, field, value );
 		}
 
