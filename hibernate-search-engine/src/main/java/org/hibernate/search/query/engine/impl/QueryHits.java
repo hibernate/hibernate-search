@@ -44,6 +44,7 @@ import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.search.Weight;
+import org.apache.lucene.util.Counter;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.collector.impl.FacetCollector;
@@ -288,7 +289,8 @@ public class QueryHits {
 		if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT ) {
 			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
 			if ( timeoutLeft != null ) {
-				maybeTimeLimitingCollector = new TimeLimitingCollector( collector, timeoutLeft );
+				Counter counter = timeoutManager.getLuceneTimeoutCounter();
+				maybeTimeLimitingCollector = new TimeLimitingCollector( collector, counter, timeoutLeft);
 			}
 		}
 		return maybeTimeLimitingCollector;

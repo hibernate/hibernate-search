@@ -42,6 +42,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
+import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -313,6 +314,7 @@ public class SearchFactoryBuilder {
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
 			factoryState.setErrorHandler( createErrorHandler( cfg ) );
 			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
+			factoryState.setTimingSource( new DefaultTimingSource() );
 		}
 	}
 

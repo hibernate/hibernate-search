@@ -36,6 +36,7 @@ import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
@@ -232,6 +233,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public TimeoutExceptionFactory getDefaultTimeoutExceptionFactory() {
 		return delegate.getDefaultTimeoutExceptionFactory();
+	}
+
+	@Override
+	public TimingSource getTimingSource() {
+		return delegate.getTimingSource();
 	}
 
 }
