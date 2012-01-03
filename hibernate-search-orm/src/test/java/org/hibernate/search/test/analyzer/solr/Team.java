@@ -28,7 +28,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.solr.analysis.HTMLStripCharFilterFactory;
-import org.apache.solr.analysis.ISOLatin1AccentFilterFactory;
+import org.apache.solr.analysis.ASCIIFoldingFilterFactory;
 import org.apache.solr.analysis.LengthFilterFactory;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.LowerCaseTokenizerFactory;
@@ -65,7 +65,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 		@AnalyzerDef(name = "customanalyzer",
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
-						@TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
+						@TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
 						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 						@TokenFilterDef(factory = StopFilterFactory.class, params = {
 								@Parameter(name = "words",
