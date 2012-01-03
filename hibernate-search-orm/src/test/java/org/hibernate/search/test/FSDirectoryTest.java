@@ -71,7 +71,7 @@ public class FSDirectoryTest extends SearchTestCase {
 				assertTrue( docs.next() );
 				doc = reader.document( docs.doc() );
 				assertFalse( docs.next() );
-				assertEquals( "1", doc.getField( "id" ).stringValue() );
+				assertEquals( "1", doc.getFieldable( "id" ).stringValue() );
 			}
 			finally {
 				reader.close();
@@ -112,7 +112,7 @@ public class FSDirectoryTest extends SearchTestCase {
 				assertTrue( docs.next() );
 				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
 				assertFalse( docs.next() );
-				assertEquals( "2", doc.getField( "id" ).stringValue() );
+				assertEquals( "2", doc.getFieldable( "id" ).stringValue() );
 			}
 			finally {
 				reader.close();
@@ -142,7 +142,8 @@ public class FSDirectoryTest extends SearchTestCase {
 		s.close();
 
 		FSDirectory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
-		IndexSearcher searcher = new IndexSearcher( dir, true );
+		IndexReader indexReader = IndexReader.open( dir, true );
+		IndexSearcher searcher = new IndexSearcher( indexReader );
 		try {
 			QueryParser qp = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 			Query query = qp.parse( "title:Action OR Abstract:Action" );
@@ -154,6 +155,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		}
 		finally {
 			searcher.close();
+			indexReader.close();
 			dir.close();
 		}
 
@@ -176,7 +178,8 @@ public class FSDirectoryTest extends SearchTestCase {
 		s.close();
 
 		Directory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
-		IndexSearcher searcher = new IndexSearcher( dir, true );
+		IndexReader indexReader = IndexReader.open( dir, true );
+		IndexSearcher searcher = new IndexSearcher( indexReader );
 		// deleting before search, but after IndexSearcher creation:
 		// ( fails when deleting -concurrently- to IndexSearcher initialization! )
 		FileHelper.delete( getBaseIndexDir() );
@@ -186,6 +189,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		org.apache.lucene.document.Document doc = searcher.doc( 0 );
 		assertEquals( "Hibernate Search in Action", doc.get( "title" ) );
 		searcher.close();
+		indexReader.close();
 		dir.close();
 	}
 

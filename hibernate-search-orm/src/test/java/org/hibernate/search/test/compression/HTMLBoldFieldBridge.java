@@ -27,7 +27,7 @@ import java.util.zip.DataFormatException;
 
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
@@ -48,7 +48,7 @@ public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 	}
 
 	public Object get(String name, Document document) {
-		Field field = document.getField( name );
+		Fieldable field = document.getFieldable( name );
 			String stringValue;
 			if ( field.isBinary() ) {
 				try {

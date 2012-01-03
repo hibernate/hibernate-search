@@ -31,6 +31,7 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -68,7 +69,7 @@ public class CompressionTest extends SearchTestCase {
 			ScoreDoc doc = topDocs.scoreDocs[0];
 			Document document = indexReader.document( doc.doc );
 			{
-				Field[] fields = document.getFields( "title" );
+				Fieldable[] fields = document.getFieldables( "title" );
 				assertEquals( 1, fields.length );
 				assertTrue( fields[0].isIndexed() );
 				assertTrue( fields[0].isStored() );
@@ -79,7 +80,7 @@ public class CompressionTest extends SearchTestCase {
 				);
 			}
 			{
-				Field[] fields = document.getFields( "abstract" );
+				Fieldable[] fields = document.getFieldables( "abstract" );
 				assertEquals( 1, fields.length );
 				assertTrue( isCompressed( fields[0] ) );
 				assertEquals(
@@ -88,7 +89,7 @@ public class CompressionTest extends SearchTestCase {
 				);
 			}
 			{
-				Field[] fields = document.getFields( "text" );
+				Fieldable[] fields = document.getFieldables( "text" );
 				assertEquals( 1, fields.length );
 				assertTrue( isCompressed( fields[0] ) );
 				assertEquals(
@@ -161,7 +162,7 @@ public class CompressionTest extends SearchTestCase {
 		}
 	}
 
-	private String restoreValue(Field field) throws DataFormatException {
+	private String restoreValue(Fieldable field) throws DataFormatException {
 		if ( field.isBinary() ) {
 			Assert.assertNull( "we rely on this in the Projection implementation", field.stringValue() );
 			return CompressionTools.decompressString( field.getBinaryValue() );
@@ -171,7 +172,7 @@ public class CompressionTest extends SearchTestCase {
 		}
 	}
 
-	private boolean isCompressed(Field field) {
+	private boolean isCompressed(Fieldable field) {
 		if ( !field.isBinary() ) {
 			return false;
 		}
