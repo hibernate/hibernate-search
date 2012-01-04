@@ -81,7 +81,7 @@
                     <links>
                         <link>http://download.oracle.com/javase/6/docs/api/</link>
                         <link>http://docs.jboss.org/hibernate/stable/core/javadocs/</link>
-                        <link>http://lucene.apache.org/java/3_4_0/api/all</link>
+                        <link>http://lucene.apache.org/java/3_5_0/api/all</link>
                     </links>
                     <packagesheader>Hibernate Search Packages</packagesheader>
                     <doctitle>Hibernate Search ${project.version}</doctitle>
