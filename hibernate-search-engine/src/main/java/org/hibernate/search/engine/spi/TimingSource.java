@@ -20,9 +20,9 @@
  */
 package org.hibernate.search.engine.spi;
 
-import org.apache.lucene.util.Counter;
-import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.TimeLimitingCollector;
+import org.apache.lucene.util.Counter;
 
 /**
  * Lucene delegates responsibility for efficient time tracking to an external service;
@@ -37,7 +37,8 @@ public interface TimingSource {
 	/**
 	 * Returns and approximation of {@link System#nanoTime()}.
 	 * Performance should be preferred over accuracy by the implementation, but the value is monotonic
-	 * and expresses time in milliseconds. So subsequent invocations could return the same value.
+	 * and expresses time in milliseconds, however, subsequent invocations could return the same value.
+	 *
 	 * @return an increasing value related to time in milliseconds. Only meaningful to compare time intervals, with no guarantees of high precision.
 	 */
 	long getMonotonicTimeEstimate();

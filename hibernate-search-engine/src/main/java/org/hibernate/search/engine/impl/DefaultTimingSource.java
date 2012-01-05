@@ -36,14 +36,11 @@ public final class DefaultTimingSource implements TimingSource {
 
 	private static final long INVALID_TIME = -1;
 
-	//lazily initialize it, so we don't start a thread for who doesn't use timeouts
+	//lazily initialize it, so we don't start a thread for those who don't use timeouts
 	//guarded by synchronization on this
 	private Timer timer = null;
 	private volatile long currentTimeApproximation = INVALID_TIME;
 
-	/* (non-Javadoc)
-	 * @see org.hibernate.search.engine.spi.TimingSource#getMonotonicTimeEstimate()
-	 */
 	@Override
 	public long getMonotonicTimeEstimate() {
 		// This method is very performance critical:
@@ -58,9 +55,6 @@ public final class DefaultTimingSource implements TimingSource {
 		return currentValue;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.hibernate.search.engine.spi.TimingSource#ensureInitialized()
-	 */
 	@Override
 	public synchronized void ensureInitialized() {
 		if ( timer == null ) {
@@ -70,9 +64,6 @@ public final class DefaultTimingSource implements TimingSource {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.hibernate.search.engine.spi.TimingSource#stop()
-	 */
 	@Override
 	public synchronized void stop() {
 		if ( timer != null ) {
