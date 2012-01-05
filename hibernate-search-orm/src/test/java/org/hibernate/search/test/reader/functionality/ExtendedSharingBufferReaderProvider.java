@@ -327,7 +327,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 
 		@Override
 		protected void doCommit(Map<String, String> commitUserData) {
-			throw new UnsupportedOperationException();
+			// no-op
 		}
 
 	}

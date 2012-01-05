@@ -24,7 +24,7 @@
 package org.hibernate.search.test.id;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -36,9 +36,9 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 
 	public Object get(String name, Document document) {
 		PersonPK id = new PersonPK();
-		Field field = document.getField( name + ".firstName" );
+		Fieldable field = document.getFieldable( name + ".firstName" );
 		id.setFirstName( field.stringValue() );
-		field = document.getField( name + ".lastName" );
+		field = document.getFieldable( name + ".lastName" );
 		id.setLastName( field.stringValue() );
 		return id;
 	}

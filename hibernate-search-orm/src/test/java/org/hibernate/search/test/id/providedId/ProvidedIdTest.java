@@ -111,7 +111,7 @@ public class ProvidedIdTest {
 		IndexSearcherWithPayload lowLevelSearcher = new IndexSearcherWithPayload( searcher, false, false );
 		QueryHits queryHits = new QueryHits(
 				lowLevelSearcher, luceneQuery, null, null,
-				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY ),
+				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, sf.getTimingSource() ),
 				null,
 				false,
 				null,

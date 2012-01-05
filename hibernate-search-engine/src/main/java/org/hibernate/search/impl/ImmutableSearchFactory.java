@@ -55,6 +55,7 @@ import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -107,6 +108,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final DefaultIndexReaderAccessor indexReaderAccessor;
 	private final InstanceInitializer instanceInitializer;
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
+	private final TimingSource timingSource;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -125,6 +127,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.errorHandler = state.getErrorHandler();
 		this.instanceInitializer = state.getInstanceInitializer();
 		this.timeoutExceptionFactory = state.getDefaultTimeoutExceptionFactory();
+		this.timingSource = state.getTimingSource();
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false
@@ -166,6 +169,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			}
 
 			this.allIndexesManager.stop();
+			this.timingSource.stop();
 
 			serviceManager.stopServices();
 
@@ -357,6 +361,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public TimeoutExceptionFactory getDefaultTimeoutExceptionFactory() {
 		return timeoutExceptionFactory;
+	}
+
+	@Override
+	public TimingSource getTimingSource() {
+		return this.timingSource;
 	}
 
 }

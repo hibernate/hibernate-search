@@ -35,7 +35,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.document.Document;
 
 import org.hibernate.SessionFactory;
@@ -120,7 +119,7 @@ public class SearcherThread implements Runnable {
 		}
 	}
 
-	private Document getDocument(Searcher searcher, int docId ) {
+	private Document getDocument(IndexSearcher searcher, int docId ) {
 		try {
 			return searcher.doc( docId );
 		} catch (IOException ioe) {

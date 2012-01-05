@@ -22,6 +22,7 @@ package org.hibernate.search.test.batchindexing;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
@@ -34,10 +35,10 @@ public class LegacyCarPlantPKBridge implements TwoWayFieldBridge {
 
 	public Object get(String name, Document document) {
 		LegacyCarPlantPK id = new LegacyCarPlantPK();
-		Field field = document.getField( name + PLANT_ID );
+		Fieldable field = document.getFieldable( name + PLANT_ID );
 		id.setPlantId( field.stringValue() );
 
-		field = document.getField( name + CAR_ID );
+		field = document.getFieldable( name + CAR_ID );
 		id.setCarId( field.stringValue() );
 		return id;
 	}

@@ -93,7 +93,7 @@ public enum IndexWriterSetting implements Serializable {
 	 */
 	MERGE_MAX_OPTIMIZE_SIZE( "merge_max_optimize_size" ) {
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
-			logByteSizeMergePolicy.setMaxMergeMBForOptimize( value );
+			logByteSizeMergePolicy.setMaxMergeMBForForcedMerge( value );
 		}
 	},
 	/**

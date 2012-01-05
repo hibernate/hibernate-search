@@ -23,8 +23,10 @@ package org.hibernate.search.query.engine.impl;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.Counter;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 
@@ -40,10 +42,12 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	private Type type;
 	private boolean partialResults;
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
+	private final TimingSource timingSource;
 
-	public TimeoutManagerImpl(Query query, TimeoutExceptionFactory timeoutExceptionFactory) {
+	public TimeoutManagerImpl(Query query, TimeoutExceptionFactory timeoutExceptionFactory, TimingSource timingSource) {
 		this.luceneQuery = query;
 		this.timeoutExceptionFactory = timeoutExceptionFactory;
+		this.timingSource = timingSource;
 	}
 
 	/** we start counting from this method call (if needed) */
@@ -174,4 +178,35 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	public Type getType() {
 		return type;
 	}
+
+	public Counter getLuceneTimeoutCounter() {
+		this.timingSource.ensureInitialized();
+		return new LuceneCounterAdapter( timingSource );
+	}
+
+	/**
+	 * Converts our generic TimingSource so that Lucene can use it as a Counter
+	 */
+	private static final class LuceneCounterAdapter extends org.apache.lucene.util.Counter {
+
+		private final TimingSource timingSource;
+
+		public LuceneCounterAdapter(TimingSource timingSource) {
+			this.timingSource = timingSource;
+		}
+
+		@Override
+		public final long addAndGet(final long delta) {
+			//parameter delta is ignored as we don't use the clock ticking strategy from Lucene's threads
+			//as I don't want to deal with statically referenced threads.
+			return timingSource.getMonotonicTimeEstimate();
+		}
+
+		@Override
+		public final long get() {
+			return timingSource.getMonotonicTimeEstimate();
+		}
+
+	}
+
 }

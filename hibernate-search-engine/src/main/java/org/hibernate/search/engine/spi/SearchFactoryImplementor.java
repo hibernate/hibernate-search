@@ -78,4 +78,6 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * @return returns an instance of {@code InstanceInitializer} for class/object initialization.
 	 */
 	InstanceInitializer getInstanceInitializer();
+
+	TimingSource getTimingSource();
 }

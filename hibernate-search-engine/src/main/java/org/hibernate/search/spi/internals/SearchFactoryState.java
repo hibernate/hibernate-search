@@ -28,6 +28,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
@@ -76,5 +77,7 @@ public interface SearchFactoryState {
 	InstanceInitializer getInstanceInitializer();
 
 	TimeoutExceptionFactory getDefaultTimeoutExceptionFactory();
+
+	TimingSource getTimingSource();
 
 }

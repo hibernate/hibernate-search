@@ -24,7 +24,7 @@
 package org.hibernate.search.test.batchindexing;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
@@ -38,9 +38,9 @@ public class LegacyTirePKBridge implements TwoWayFieldBridge {
 
 	public Object get(String name, Document document) {
 		LegacyTirePK id = new LegacyTirePK();
-		Field field = document.getField( name + CAR_ID );
+		Fieldable field = document.getFieldable( name + CAR_ID );
 		id.setCarId( field.stringValue() );
-		field = document.getField( name + TIRE_ID );
+		field = document.getFieldable( name + TIRE_ID );
 		id.setTireId( field.stringValue() );
 		return id;
 	}

@@ -134,7 +134,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <slf4jVersion>1.6.1</slf4jVersion>
-        <luceneVersion>3.4.0</luceneVersion>
+        <luceneVersion>3.5.0</luceneVersion>
         <infinispanVersion>5.0.1.FINAL</infinispanVersion>
         <hibernateVersion>4.0.0.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.1.Final</hibernateCommonsAnnotationVersion>
@@ -184,7 +184,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.4</version>
+                <version>1.5</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>

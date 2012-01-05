@@ -29,6 +29,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
@@ -66,6 +67,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private ErrorHandler errorHandler;
 	private TimeoutExceptionFactory defaultTimeoutExceptionFactory;
 	private InstanceInitializer instanceInitializer;
+	private TimingSource timingSource;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -84,6 +86,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		errorHandler = oldFactoryState.getErrorHandler();
 		defaultTimeoutExceptionFactory = oldFactoryState.getDefaultTimeoutExceptionFactory();
 		instanceInitializer = oldFactoryState.getInstanceInitializer();
+		timingSource = oldFactoryState.getTimingSource();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -228,6 +231,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setDefaultTimeoutExceptionFactory(TimeoutExceptionFactory defaultTimeoutExceptionFactory) {
 		this.defaultTimeoutExceptionFactory = defaultTimeoutExceptionFactory;
+	}
+
+	@Override
+	public TimingSource getTimingSource() {
+		return this.timingSource;
+	}
+
+	public void setTimingSource(TimingSource timingSource) {
+		this.timingSource = timingSource;
 	}
 
 }

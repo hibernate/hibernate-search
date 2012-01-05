@@ -213,7 +213,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			if ( luceneQuery == null ) {
 				throw new AssertionFailure( "Requesting TimeoutManager before setting luceneQuery()" );
 			}
-			timeoutManager = new TimeoutManagerImpl( luceneQuery, timeoutExceptionFactory );
+			timeoutManager = new TimeoutManagerImpl( luceneQuery, timeoutExceptionFactory, this.searchFactoryImplementor.getTimingSource() );
 		}
 		return timeoutManager;
 	}
