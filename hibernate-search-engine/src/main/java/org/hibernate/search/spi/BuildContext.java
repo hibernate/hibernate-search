@@ -78,14 +78,14 @@ public interface BuildContext {
 	void releaseService(Class<? extends ServiceProvider<?>> provider);
 
 	/**
-	 * @return
+	 * @return a reference to the IndexManagerHolder, storing all IndexManager instances.
 	 */
 	IndexManagerHolder getAllIndexesManager();
 
 	/**
 	 * For backends processing work asynchronously, they should catch all eventual errors in the ErrorHandler
 	 * to avoid losing information about the lost updates.
-	 * @return
+	 * @return the configured ErrorHandler
 	 */
 	ErrorHandler getErrorHandler();
 }

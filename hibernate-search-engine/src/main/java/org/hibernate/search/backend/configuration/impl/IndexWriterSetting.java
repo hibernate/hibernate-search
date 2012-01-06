@@ -73,7 +73,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMinMergeMB(int)
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMinMergeMB(double)
 	 */
 	MERGE_MIN_SIZE( "merge_min_size" ) {
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
@@ -81,7 +81,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeMB(int)
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeMB(double)
 	 */
 	MERGE_MAX_SIZE( "merge_max_size" ) {
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
@@ -89,7 +89,7 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeMB(int)
+	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)
 	 */
 	MERGE_MAX_OPTIMIZE_SIZE( "merge_max_optimize_size" ) {
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {

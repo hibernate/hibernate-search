@@ -5,7 +5,7 @@ import org.apache.lucene.document.Document;
 /**
  * Double numeric field bridge, capable of decoding double values from Field
  *
- * @author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 public class DoubleNumericFieldBridge extends NumericFieldBridge {
 

@@ -5,7 +5,7 @@ import org.apache.lucene.document.Document;
 /**
  * Integer numeric field bridge, capable of decoding integer values from Field
  *
- * @author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 public class IntegerNumericFieldBridge extends NumericFieldBridge {
 

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 public class NumericFieldMapping extends FieldMapping {
 	private final Map<String, Object> numericField = new HashMap<String, Object>();
