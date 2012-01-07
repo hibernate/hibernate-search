@@ -51,16 +51,16 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	private final boolean storeUncompressed;
 	private final Index indexMode;
 	private final TermVector termVector;
-	private final Float boost;
+	private final float boost;
 	private final Store storeType;
 	private final int precisionStep;
 	private final String indexNullAs;
 
-	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost) {
+	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, float boost) {
 		this( store, indexMode, termVector, boost, null, PRECISION_STEP_DEFAULT );
 	}
 
-	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, Float boost, String indexNullAs, int precisionStep) {
+	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, float boost, String indexNullAs, int precisionStep) {
 		this.indexMode = indexMode;
 		this.termVector = termVector;
 		this.boost = boost;
@@ -92,9 +92,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 					fieldName, precisionStep, storeType != Store.NO ? Field.Store.YES : Field.Store.NO, true
 			);
 			NumericFieldUtils.setNumericValue( value, numericField );
-			if ( boost != null ) {
-				numericField.setBoost( boost );
-			}
+			numericField.setBoost( boost );
 
 			if ( numericField.getNumericValue() != null ) {
 				document.add( numericField );
@@ -106,9 +104,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		Field field = new Field(
 				name, false, indexedString, storeUncompressed ? Field.Store.YES : Field.Store.NO, indexMode, termVector
 		);
-		if ( boost != null ) {
-			field.setBoost( boost );
-		}
+		field.setBoost( boost );
 		document.add( field );
 	}
 
@@ -119,13 +115,8 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		document.add( field );
 	}
 
-	public Float getBoost() {
-		if ( boost != null ) {
-			return boost;
-		}
-		else {
-			return 1.0f;
-		}
+	public float getBoost() {
+		return boost;
 	}
 
 	public String indexNullAs() {

@@ -128,7 +128,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	/**
 	 * Boost specified on the document id.
 	 */
-	private Float idBoost;
+	private float idBoost = 1f;
 
 	/**
 	 * The bridge used for the document id.
@@ -260,7 +260,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName()
 					);
 				}
-				idBoost = AnnotationProcessingHelper.getBoost( member, null );
+				Float boost = AnnotationProcessingHelper.getBoost( member, null );
+				if ( boost != null) {
+					idBoost = boost.floatValue();
+				}
 				ReflectionHelper.setAccessible( member );
 				idGetter = member;
 			}
