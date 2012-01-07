@@ -25,6 +25,7 @@ package org.hibernate.search.backend.impl.batch;
 
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.TransactionalSelectionVisitor;
@@ -70,6 +71,15 @@ public class DefaultBatchBackend implements BatchBackend {
 			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE ).performOperation( work, shardingStrategy, workContext );
 			workContext.commitOperations( progressMonitor ); //FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
 		}
+	}
+
+	@Override
+	public void flush(Class<?> entityType) {
+		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
+		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
+		WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
+		FlushLuceneWork flushOperation = new FlushLuceneWork();
+		flushOperation.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE ).performOperation( flushOperation, shardingStrategy, workContext );
 	}
 
 }
