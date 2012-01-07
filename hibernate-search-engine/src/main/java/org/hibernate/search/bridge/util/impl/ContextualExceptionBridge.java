@@ -30,6 +30,7 @@ import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,7 +42,7 @@ import java.util.List;
 public class ContextualExceptionBridge implements FieldBridge {
 	private FieldBridge delegate;
 	protected Class<?> clazz;
-	protected List<XMember> path = new LinkedList<XMember>();
+	protected List<XMember> path = new ArrayList<XMember>( 5 ); //half of usual increment size as I don't expect much
 	protected String fieldName;
 
 	public ContextualExceptionBridge setFieldBridge(FieldBridge delegate) {
