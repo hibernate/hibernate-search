@@ -30,4 +30,6 @@ atlassian-ide-plugin.xml
 
 # Miscellaneous
 *.log
+*.sh
 .clover
+
