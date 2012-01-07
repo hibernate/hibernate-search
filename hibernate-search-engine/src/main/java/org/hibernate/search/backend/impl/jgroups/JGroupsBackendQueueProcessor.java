@@ -34,7 +34,6 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.XMLHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -82,7 +81,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 			channel.connect( clusterName );
 		}
 		catch ( Exception e ) {
-			throw new SearchException( "Unable to connect to: [" + clusterName + "] JGroups channel", e );
+			throw log.unabletoConnectToJGroupsCluster( clusterName, e );
 		}
 		log.jGroupsConnectedToCluster(clusterName, getAddress() );
 
@@ -107,8 +106,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 					channel = new JChannel( ConfigurationParseHelper.locateConfig(cfg) );
 				}
 				catch ( Exception e ) {
-					log.jGroupsChannelCreationUsingFileError( cfg );
-					throw new SearchException( e );
+					throw log.jGroupsChannelCreationUsingFileError( cfg, e );
 				}
 			}
 
@@ -118,8 +116,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 					channel = new JChannel( XMLHelper.elementFromString( cfg ) );
 				}
 				catch ( Exception e ) {
-					log.jGroupsChannelCreationUsingXmlError( cfg );
-					throw new SearchException( e );
+					throw log.jGroupsChannelCreationUsingXmlError( cfg, e );
 				}
 			}
 
@@ -129,8 +126,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 					channel = new JChannel( cfg );
 				}
 				catch ( Exception e ) {
-					log.jGroupsChannelCreationFromStringError( cfg );
-					throw new SearchException( e );
+					throw log.jGroupsChannelCreationFromStringError( cfg, e );
 				}
 			}
 		}
@@ -148,7 +144,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 				}
 			}
 			catch ( Exception e ) {
-				throw new SearchException( "Unable to start JGroups channel", e );
+				throw log.unableToStartJGroupsChannel( e );
 			}
 		}
 	}

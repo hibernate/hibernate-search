@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.jgroups.Message;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -96,10 +95,7 @@ public class JGroupsBackendQueueTask {
 			}
 		}
 		catch ( Exception e ) {
-			throw new SearchException(
-					"Unable to send Lucene work. Channel is not connected to: "
-							+ factory.getClusterName(), e
-			);
+			throw log.unableToSendWorkViaJGroups( factory.getClusterName(), e );
 		}
 	}
 	
