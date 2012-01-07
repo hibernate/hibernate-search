@@ -62,7 +62,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		DocumentBuilderIndexedEntity<?> documentBuilder = workspace.getDocumentBuilder( entityType );
 		Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
 		ScopedAnalyzer analyzer = documentBuilder.getAnalyzer();
-		analyzer = updateAnalyzerMappings( analyzer, fieldToAnalyzerMap );
+		analyzer = updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
 		if ( log.isTraceEnabled() ) {
 			log.trace( "add to Lucene index: " + entityType + "#" + work.getId() + ":" + work.getDocument() );
 		}
@@ -84,6 +84,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 	/**
 	 * Allows to override the otherwise static field to analyzer mapping in <code>scopedAnalyzer</code>.
 	 *
+	 * @param workspace The current work context
 	 * @param scopedAnalyzer The scoped analyzer created at startup time.
 	 * @param fieldToAnalyzerMap A map of <code>Document</code> field names for analyzer names. This map gets creates
 	 * when the Lucene <code>Document</code> gets created and uses the state of the entity to index to determine analyzers
@@ -92,7 +93,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 	 * @return <code>scopedAnalyzer</code> in case <code>fieldToAnalyzerMap</code> is <code>null</code> or empty. Otherwise
 	 *         a clone of <code>scopedAnalyzer</code> is created where the analyzers get overriden according to <code>fieldToAnalyzerMap</code>.
 	 */
-	private ScopedAnalyzer updateAnalyzerMappings(ScopedAnalyzer scopedAnalyzer, Map<String, String> fieldToAnalyzerMap) {
+	static ScopedAnalyzer updateAnalyzerMappings(Workspace workspace, ScopedAnalyzer scopedAnalyzer, Map<String, String> fieldToAnalyzerMap) {
 		// for backwards compatibility
 		if ( fieldToAnalyzerMap == null || fieldToAnalyzerMap.isEmpty() ) {
 			return scopedAnalyzer;
