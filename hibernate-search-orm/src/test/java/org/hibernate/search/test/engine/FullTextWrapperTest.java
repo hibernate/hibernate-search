@@ -25,13 +25,14 @@
 package org.hibernate.search.test.engine;
 
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.junit.Test;
 
 /**
  * @author Emmanuel Bernard
  */
-public class FullTextWrapperTest extends SearchTestCase {
+public class FullTextWrapperTest {
 
+	@Test
 	public void testSearch() throws Exception {
 		try {
 			Search.getFullTextSession( null );
@@ -46,18 +47,5 @@ public class FullTextWrapperTest extends SearchTestCase {
 		catch (IllegalArgumentException e) {
 			//good
 		}
-	}
-
-	// Test setup options - Entities
-	@Override
-	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] { BusLine.class, BusStop.class };
-	}
-
-	// Test setup options - SessionFactory Properties
-	@Override
-	protected void configure(org.hibernate.cfg.Configuration configuration) {
-		super.configure( configuration );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 	}
 }
