@@ -8,7 +8,7 @@ import org.hibernate.search.SearchException;
 /**
  * Utility class to handle Numeric Fields
  *
- * @author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 public class NumericFieldUtils {
 

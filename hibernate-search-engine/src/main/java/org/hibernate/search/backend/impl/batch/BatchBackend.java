@@ -55,4 +55,11 @@ public interface BatchBackend {
 	 */
 	void doWorkInSync(LuceneWork work);
 
+	/**
+	 * Since most work is done async in the backend, we need to flush at the end to
+	 * make sure we don't return control before all work was processed.
+	 * @param indexedRootType flushes all indexes containing entities of this type
+	 */
+	void flush(Class<?> indexedRootType);
+
 }

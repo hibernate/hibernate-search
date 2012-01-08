@@ -5,7 +5,7 @@ import org.apache.lucene.document.Document;
 /**
  * Float numeric field bridge, capable of decoding float values from Field
  *
- * @author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 public class FloatNumericFieldBridge extends NumericFieldBridge {
 

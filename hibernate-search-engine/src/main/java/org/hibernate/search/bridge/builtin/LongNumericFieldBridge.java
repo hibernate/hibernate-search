@@ -25,7 +25,7 @@ import org.apache.lucene.document.Document;
 /**
  * Long numeric field bridge, capable of decoding long values from Field
  *
- * @author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 public class LongNumericFieldBridge extends NumericFieldBridge {
 

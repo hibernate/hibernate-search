@@ -136,6 +136,7 @@ public class BatchIndexingWorkspace implements Runnable {
 			for ( int i = 0; i < luceneWorkerBuildingThreadNum; i++ ) {
 				//from entity to LuceneWork:
 				final EntityConsumerLuceneWorkProducer producer = new EntityConsumerLuceneWorkProducer(
+						indexedType,
 						fromEntityToAddwork, monitor,
 						sessionFactory, producerEndSignal, searchFactory,
 						cacheMode, backend, errorHandler

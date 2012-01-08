@@ -98,7 +98,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public abstract void afterTransactionApplied(boolean someFailureHappened);
+	public abstract void afterTransactionApplied(boolean someFailureHappened, boolean streaming);
 
 	public void shutDownNow() {
 		log.shuttingDownBackend( indexManager.getIndexName() );

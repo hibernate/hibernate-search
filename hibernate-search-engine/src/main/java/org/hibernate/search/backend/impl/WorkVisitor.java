@@ -25,6 +25,7 @@ package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
@@ -48,5 +49,6 @@ public interface WorkVisitor<T> {
 	T getDelegate(OptimizeLuceneWork optimizeLuceneWork);
 	T getDelegate(PurgeAllLuceneWork purgeAllLuceneWork);
 	T getDelegate(UpdateLuceneWork updateLuceneWork);
+	T getDelegate(FlushLuceneWork flushLuceneWork);
 
 }

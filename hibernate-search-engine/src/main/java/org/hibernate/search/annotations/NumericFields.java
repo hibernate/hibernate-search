@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * Numeric extension for Fields annotation
  *
- * @author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( { ElementType.METHOD, ElementType.FIELD} )

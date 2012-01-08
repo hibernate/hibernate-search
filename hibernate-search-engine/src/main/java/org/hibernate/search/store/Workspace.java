@@ -75,7 +75,8 @@ public interface Workspace {
 	 * Invoked after all changes of a transaction are applied
 	 * @param someFailureHappened usually false, set to true if errors
 	 * where caught while using the IndexWriter
+	 * @param streaming if no immediate visibility of the change is required (hint for performance)
 	 */
-	void afterTransactionApplied(boolean someFailureHappened);
+	void afterTransactionApplied(boolean someFailureHappened, boolean streaming);
 
 }

@@ -28,7 +28,7 @@ import org.hibernate.search.engine.BoostStrategy;
 /**
  * @author Hardy Ferentschik
  */
-public class DefaultBoostStrategy implements BoostStrategy {
+public final class DefaultBoostStrategy implements BoostStrategy {
 
 	public float defineBoost(Object value) {
 		return 1.0f;

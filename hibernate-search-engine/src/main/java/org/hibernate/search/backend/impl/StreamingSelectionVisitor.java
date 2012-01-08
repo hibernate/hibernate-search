@@ -25,6 +25,7 @@ package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
@@ -45,7 +46,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
-	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
+	private final AllSelectionDelegate allManagersDelegate = new AllSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
 	
 	public static final StreamingSelectionVisitor INSTANCE = new StreamingSelectionVisitor();
@@ -67,13 +68,17 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	}
 
 	public StreamingOperationSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
-		return optimizeDelegate;
+		return allManagersDelegate;
 	}
 
 	public StreamingOperationSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
 		return purgeDelegate;
 	}
-	
+
+	public StreamingOperationSelectionDelegate getDelegate(FlushLuceneWork flushLuceneWork) {
+		return allManagersDelegate;
+	}
+
 	private static class AddSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		public final void performStreamOperation(LuceneWork work,
@@ -105,7 +110,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 
 	}
 	
-	private static class OptimizeSelectionDelegate implements StreamingOperationSelectionDelegate {
+	private static class AllSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
@@ -116,7 +121,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 		}
 
 	}
-	
+
 	private static class PurgeAllSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		public final void performStreamOperation(LuceneWork work,

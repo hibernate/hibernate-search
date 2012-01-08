@@ -25,6 +25,7 @@ package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
@@ -47,6 +48,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
+	private final FlushSelectionDelegate flushDelegate = new FlushSelectionDelegate();
 	
 	private TransactionalSelectionVisitor() {
 		// use INSTANCE as this delegator is stateless
@@ -71,7 +73,11 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 	public ContextAwareSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
 		return purgeDelegate;
 	}
-	
+
+	public ContextAwareSelectionDelegate getDelegate(FlushLuceneWork flushLuceneWork) {
+		return flushDelegate;
+	}
+
 	private static class AddSelectionDelegate implements ContextAwareSelectionDelegate {
 
 		@Override
@@ -121,7 +127,20 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		}
 
 	}
-	
+
+	private static class FlushSelectionDelegate implements ContextAwareSelectionDelegate {
+
+		@Override
+		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+				WorkQueuePerIndexSplitter context) {
+			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
+			for (IndexManager indexManager : indexManagers) {
+				indexManager.performStreamOperation( work, null, false );
+			}
+		}
+
+	}
+
 	private static class PurgeAllSelectionDelegate implements ContextAwareSelectionDelegate {
 
 		@Override

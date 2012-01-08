@@ -79,17 +79,14 @@ public interface Log extends BasicLogger {
 			value = "FLUSH is not present in your JGroups stack!  FLUSH is needed to ensure messages are not dropped while new nodes join the cluster.  Will proceed, but inconsistencies may arise!")
 	void jGroupsFlushNotPresentInStack();
 
-	@LogMessage(level = ERROR)
 	@Message(id = 8, value = "Error while trying to create a channel using config files: %1$s")
-	void jGroupsChannelCreationUsingFileError(String configuration);
+	SearchException jGroupsChannelCreationUsingFileError(String configuration, @Cause Throwable e);
 
-	@LogMessage(level = ERROR)
 	@Message(id = 9, value = "Error while trying to create a channel using config XML: %1$s")
-	void jGroupsChannelCreationUsingXmlError(String configuration);
+	SearchException jGroupsChannelCreationUsingXmlError(String configuration, @Cause Throwable e);
 
-	@LogMessage(level = ERROR)
 	@Message(id = 10, value = "Error while trying to create a channel using config string: %1$s")
-	void jGroupsChannelCreationFromStringError(String configuration);
+	SearchException jGroupsChannelCreationFromStringError(String configuration, @Cause Throwable e);
 
 	@LogMessage(level = INFO)
 	@Message(id = 11,
@@ -518,4 +515,13 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.WARN)
 	@Message(id = 120, value = "There are multiple properties indexed against the same field name '%1$s', but with different indexing settings. The behaviour is undefined.")
 	void inconsistentFieldConfiguration(String fieldName);
+
+	@Message(id = 121, value = "Unable to connect to: [%1$s] JGroups channel")
+	SearchException unabletoConnectToJGroupsCluster(String clusterName, @Cause Throwable e);
+
+	@Message(id = 122, value = "Unable to start JGroups channel")
+	SearchException unableToStartJGroupsChannel(@Cause Throwable e);
+
+	@Message(id = 123, value = "Unable to send Lucene update work via cluster [%1$s]")
+	SearchException unableToSendWorkViaJGroups(String clusterName, @Cause Throwable e);
 }

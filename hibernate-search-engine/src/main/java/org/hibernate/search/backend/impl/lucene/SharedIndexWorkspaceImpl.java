@@ -38,7 +38,7 @@ public class SharedIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 	}
 
 	@Override
-	public void afterTransactionApplied(boolean someFailureHappened) {
+	public void afterTransactionApplied(boolean someFailureHappened, boolean streaming) {
 		synchronized ( lock ) {
 			openWriterUsers--;
 			if ( openWriterUsers == 0 ) {
@@ -46,11 +46,13 @@ public class SharedIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 					writerHolder.forceLockRelease();
 				}
 				else {
-					writerHolder.closeIndexWriter();
+					if ( ! streaming ) {
+						writerHolder.closeIndexWriter();
+					}
 				}
 			}
 			else {
-				if ( ! someFailureHappened ) {
+				if ( ! someFailureHappened && ! streaming ) {
 					writerHolder.commitIndexWriter();
 				}
 			}

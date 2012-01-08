@@ -67,7 +67,7 @@ public interface BackendQueueProcessor {
 
 	/**
 	 * Applies a single operation on the index, and different operations can be applied in parallel,
-	 * even in parallel to a workList instance being processed by {@link #applyWork(List)}
+	 * even in parallel to a workList instance being processed by {@link #applyWork(List, IndexingMonitor)}
 	 *
 	 * @param singleOperation single Lucene work instance to be applied to the index
 	 */

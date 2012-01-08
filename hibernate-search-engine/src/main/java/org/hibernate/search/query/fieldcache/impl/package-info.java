@@ -24,6 +24,6 @@
 
 /**
  * The classes in this package define a framework for using Lucene's field cache API. It abstract the different
- * method to access data from {@link org.apache.lucene.search.FieldCache.DEFAULT}.
+ * method to access data from {@link org.apache.lucene.search.FieldCache}.
  */
 package org.hibernate.search.query.fieldcache.impl;

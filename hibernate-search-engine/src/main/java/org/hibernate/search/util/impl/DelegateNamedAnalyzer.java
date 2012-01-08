@@ -28,6 +28,7 @@ import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.document.Fieldable;
 
 /**
  * Delegate to a named analyzer. Delegated Analyzers are lazily configured.
@@ -36,6 +37,7 @@ import org.apache.lucene.analysis.TokenStream;
  * @author Hardy Ferentschik
  */
 public final class DelegateNamedAnalyzer extends Analyzer {
+
 	private String name;
 	private Analyzer delegate;
 
@@ -52,6 +54,7 @@ public final class DelegateNamedAnalyzer extends Analyzer {
 		this.name = null; //unique init
 	}
 
+	@Override
 	public TokenStream tokenStream(String fieldName, Reader reader) {
 		return delegate.tokenStream( fieldName, reader );
 	}
@@ -64,5 +67,16 @@ public final class DelegateNamedAnalyzer extends Analyzer {
 	@Override
 	public int getPositionIncrementGap(String fieldName) {
 		return delegate.getPositionIncrementGap( fieldName );
+	}
+
+	@Override
+	public int getOffsetGap(Fieldable field) {
+		return delegate.getOffsetGap( field );
+	}
+
+	@Override
+	public void close() {
+		super.close();
+		delegate.close();
 	}
 }

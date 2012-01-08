@@ -130,7 +130,7 @@ public interface LuceneOptions {
 	 *
 	 * @return Returns the boost factor declared by the user
 	 */
-	Float getBoost();
+	float getBoost();
 
 	/**
 	 * @return Returns the string for indexing {@code null} values. {@code null} is returned in case no null token has

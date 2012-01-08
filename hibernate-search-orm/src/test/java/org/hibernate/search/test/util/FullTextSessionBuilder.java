@@ -108,6 +108,7 @@ public class FullTextSessionBuilder {
 		 }
 		 else {
 			 cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+			 cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.getAbsolutePath() );
 			 usingFileSystem = true;
 		 }
 		return this;

@@ -44,7 +44,7 @@ public class TokenFilterDefMapping {
 	}
 
 	/**
-	 * @TokenFilterDef(, ... params={@Parameter(name="name", value="value"), ...})
+	 * {@code &#064;TokenFilterDef(, ... params={&#064;Parameter(name="name", value="value"), ...} }
 	 */
 	public TokenFilterDefMapping param(String name, String value) {
 		Map<String, Object> param = SearchMapping.addElementToAnnotationArray(filter, "params");
@@ -54,7 +54,7 @@ public class TokenFilterDefMapping {
 	}
 
 	/**
-	 * @TokenFilterDef(factory=factory)
+	 * {@code &#064;TokenFilterDef(factory=factory)}
 	 */
 	public TokenFilterDefMapping filter(Class<? extends TokenFilterFactory> factory) {
 		return new TokenFilterDefMapping(factory, analyzerDef, mapping );

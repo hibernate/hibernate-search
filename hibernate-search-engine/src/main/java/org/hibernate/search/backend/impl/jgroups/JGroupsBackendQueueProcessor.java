@@ -28,14 +28,12 @@ import java.util.Properties;
 
 import org.jgroups.Address;
 import org.jgroups.Channel;
-import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.XMLHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -80,11 +78,10 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 		log.jGroupsStartingChannel();
 		try {
 			buildChannel( props );
-			channel.setOpt( Channel.AUTO_RECONNECT, Boolean.TRUE );
 			channel.connect( clusterName );
 		}
-		catch ( ChannelException e ) {
-			throw new SearchException( "Unable to connect to: [" + clusterName + "] JGroups channel" );
+		catch ( Exception e ) {
+			throw log.unabletoConnectToJGroupsCluster( clusterName, e );
 		}
 		log.jGroupsConnectedToCluster(clusterName, getAddress() );
 
@@ -109,8 +106,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 					channel = new JChannel( ConfigurationParseHelper.locateConfig(cfg) );
 				}
 				catch ( Exception e ) {
-					log.jGroupsChannelCreationUsingFileError( cfg );
-					throw new SearchException( e );
+					throw log.jGroupsChannelCreationUsingFileError( cfg, e );
 				}
 			}
 
@@ -120,8 +116,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 					channel = new JChannel( XMLHelper.elementFromString( cfg ) );
 				}
 				catch ( Exception e ) {
-					log.jGroupsChannelCreationUsingXmlError( cfg );
-					throw new SearchException( e );
+					throw log.jGroupsChannelCreationUsingXmlError( cfg, e );
 				}
 			}
 
@@ -131,8 +126,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 					channel = new JChannel( cfg );
 				}
 				catch ( Exception e ) {
-					log.jGroupsChannelCreationFromStringError( cfg );
-					throw new SearchException( e );
+					throw log.jGroupsChannelCreationFromStringError( cfg, e );
 				}
 			}
 		}
@@ -149,8 +143,8 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 					channel = new JChannel();
 				}
 			}
-			catch ( ChannelException e ) {
-				throw new SearchException( "Unable to start JGroups channel", e );
+			catch ( Exception e ) {
+				throw log.unableToStartJGroupsChannel( e );
 			}
 		}
 	}
@@ -188,7 +182,7 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 	 */
 	public Address getAddress() {
 		if ( address == null && channel != null ) {
-			address = channel.getLocalAddress();
+			address = channel.getAddress();
 		}
 		return address;
 	}

@@ -26,11 +26,8 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jgroups.ChannelClosedException;
-import org.jgroups.ChannelNotConnectedException;
 import org.jgroups.Message;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -97,14 +94,8 @@ public class JGroupsBackendQueueTask {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );
 			}
 		}
-		catch ( ChannelNotConnectedException e ) {
-			throw new SearchException(
-					"Unable to send Lucene work. Channel is not connected to: "
-							+ factory.getClusterName()
-			);
-		}
-		catch ( ChannelClosedException e ) {
-			throw new SearchException( "Unable to send Lucene work. Attempt to send message on closed JGroups channel" );
+		catch ( Exception e ) {
+			throw log.unableToSendWorkViaJGroups( factory.getClusterName(), e );
 		}
 	}
 	
