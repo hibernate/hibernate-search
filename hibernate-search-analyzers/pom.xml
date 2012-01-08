@@ -103,6 +103,14 @@
                     <artifactId>wstx-asl</artifactId>
                     <groupId>org.codehaus.woodstox</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- Apache Commons -->
