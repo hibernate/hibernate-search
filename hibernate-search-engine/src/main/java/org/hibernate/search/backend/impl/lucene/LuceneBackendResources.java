@@ -47,7 +47,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  *
  * @author Sanne Grinovero
  */
-public class LuceneBackendResources {
+public final class LuceneBackendResources {
 	
 	private static final Log log = LoggerFactory.make();
 	
