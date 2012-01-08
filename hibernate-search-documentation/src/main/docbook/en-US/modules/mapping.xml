@@ -752,13 +752,13 @@ public class Essay {
       <para>The <literal>@Boost </literal>annotation used in <xref
       linkend="section-boost-annotation" /> defines a static boost factor
       which is independent of the state of of the indexed entity at runtime.
-      However, there are usecases in which the boost factor may depends on the
+      However, there are usecases in which the boost factor may depend on the
       actual state of the entity. In this case you can use the
       <literal>@DynamicBoost </literal>annotation together with an
       accompanying custom <classname>BoostStrategy</classname>.</para>
 
       <example id="example-dynamic-boosting">
-        <title>Dynamic boost examle</title>
+        <title>Dynamic boost example</title>
 
         <programlisting language="JAVA" role="JAVA">public enum PersonType {
     NORMAL,
@@ -802,7 +802,7 @@ public class VIPBoostStrategy implements BoostStrategy {
           implementation must define a public no-arg constructor.</para>
         </note>Of course you can mix and match <literal>@Boost</literal> and
       <literal>@DynamicBoost</literal> annotations in your entity. All defined
-      boost factors are cummulative.</para>
+      boost factors are cumulative.</para>
     </section>
   </section>
 
