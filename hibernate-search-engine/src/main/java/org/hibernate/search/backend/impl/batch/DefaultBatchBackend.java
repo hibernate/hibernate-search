@@ -23,26 +23,26 @@
  */
 package org.hibernate.search.backend.impl.batch;
 
-import org.hibernate.search.engine.spi.EntityIndexBinder;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * This is not meant to be used as a regular
  * backend, only to apply batch changes to the index. Several threads
  * are used to make changes to each index, so order of Work processing is not guaranteed.
- * 
+ *
  * @author Sanne Grinovero
  * @experimental First {@code BatchBackend}
  */
 public class DefaultBatchBackend implements BatchBackend {
-	
+
 	private final SearchFactoryIntegrator searchFactoryImplementor;
 	private final MassIndexerProgressMonitor progressMonitor;
 
@@ -58,17 +58,19 @@ public class DefaultBatchBackend implements BatchBackend {
 	public void doWorkInSync(LuceneWork work) {
 		sendWorkToShards( work, false );
 	}
-	
+
 	private void sendWorkToShards(LuceneWork work, boolean forceAsync) {
 		final Class<?> entityType = work.getEntityClass();
 		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		if ( forceAsync ) {
-			work.getWorkDelegate( StreamingSelectionVisitor.INSTANCE ).performStreamOperation( work, shardingStrategy, progressMonitor, forceAsync );
+			work.getWorkDelegate( StreamingSelectionVisitor.INSTANCE )
+					.performStreamOperation( work, shardingStrategy, progressMonitor, forceAsync );
 		}
 		else {
 			WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
-			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE ).performOperation( work, shardingStrategy, workContext );
+			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE )
+					.performOperation( work, shardingStrategy, workContext );
 			workContext.commitOperations( progressMonitor ); //FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
 		}
 	}
@@ -79,7 +81,8 @@ public class DefaultBatchBackend implements BatchBackend {
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
 		FlushLuceneWork flushOperation = new FlushLuceneWork();
-		flushOperation.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE ).performOperation( flushOperation, shardingStrategy, workContext );
+		flushOperation.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE )
+				.performOperation( flushOperation, shardingStrategy, workContext );
 	}
 
 }

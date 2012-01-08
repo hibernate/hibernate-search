@@ -30,15 +30,16 @@ import org.hibernate.search.backend.impl.WorkVisitor;
 /**
  * Used to flush and commit asynchronous and other pending operations on the Indexes.
  * Generally not needed, this is mainly used at the end of mass indexing operations.
- * 
- * @since 4.1
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @since 4.1
  */
 public class FlushLuceneWork extends LuceneWork implements Serializable {
 
 	/**
 	 * Flushes all index operations for a specific entity.
-	 * @param entity
+	 *
+	 * @param entity the entity type for which to flush the index
 	 */
 	public FlushLuceneWork(Class<?> entity) {
 		super( null, null, entity );

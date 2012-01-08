@@ -67,7 +67,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 		final String indexName;
 		final IndexManager indexManager;
 		try {
-			BackendMessage decoded = ( BackendMessage ) message.getObject();
+			BackendMessage decoded = (BackendMessage) message.getObject();
 			indexName = decoded.indexName;
 			indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
 			if ( indexManager != null ) {
@@ -90,9 +90,9 @@ public class JGroupsMasterMessageListener implements Receiver {
 		if ( queue != null && !queue.isEmpty() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debugf(
-					"There are %d Lucene docs received from slave node %s to be processed by master",
-					queue.size(),
-					message.getSrc()
+						"There are %d Lucene docs received from slave node %s to be processed by master",
+						queue.size(),
+						message.getSrc()
 				);
 			}
 			perform( indexName, queue );
