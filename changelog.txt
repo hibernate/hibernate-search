@@ -1,6 +1,32 @@
 Hibernate Search Changelog
 ==========================
 
+
+4.1.0.Alpha1 (9-1-2012)
+------------------------
+
+** Bug
+    * [HSEARCH-1004] - Updating a collection does not reindex (Guillaume Smet)
+    * [HSEARCH-1020] - Regression in 3.4: index not updated after updating a collection (Guillaume Smet)
+    * [HSEARCH-1024] - Using timeouts on queries creates a background thread which is never shutdown
+    * [HSEARCH-1027] - Analyzer delegates fail to delegate all methods
+
+** Improvement
+    * [HSEARCH-638] - Limit graph traversal by @ContainedIn to the minimum required path
+    * [HSEARCH-925] - Upgrade to JGroups 3 and Infinispan 5.1
+    * [HSEARCH-981] - Upgrade to Lucene 3.5
+    * [HSEARCH-1007] - Make FullTextIndexEventListener extensible
+    * [HSEARCH-1019] - Profile mass indexer to reduce number of index commits
+    * [HSEARCH-1022] - Default to "native" Lucene LockFactory instead of simple
+
+** Patch
+    * [HSEARCH-1031] - Typos in the "Boosting" section of the documentation
+
+** Task
+    * [HSEARCH-1021] - Typos and errors in documentation (Guillaume Smet)
+    * [HSEARCH-1029] - FullTextSessionBuilder not cleaning up test indexes
+
+
 4.0.0.Final (15-12-2011)
 ------------------------
 
