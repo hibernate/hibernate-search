@@ -86,6 +86,7 @@ import org.hibernate.search.impl.IncrementalSearchConfiguration;
 import org.hibernate.search.impl.MappingModelMetadataProvider;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.impl.MutableSearchFactoryState;
+import org.hibernate.search.impl.ReflectionReplacingSearchConfiguration;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -157,14 +158,13 @@ public class SearchFactoryBuilder {
 
 		final Properties configurationProperties = factoryState.getConfigurationProperties();
 		BuildContext buildContext = new BuildContext();
-
-		//TODO we don't keep the reflectionManager. Is that an issue?
+		
 		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties, factoryState );
-		final ReflectionManager reflectionManager = getReflectionManager( cfg );
 
-		//TODO programmatic mapping support
+		applySearchMappingToMetadata( cfg.getReflectionManager(), cfg.getProgrammaticMapping() );
+
 		//FIXME The current initDocumentBuilders
-		initDocumentBuilders( cfg, reflectionManager, buildContext );
+		initDocumentBuilders( cfg, buildContext );
 		final Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
 		for ( EntityIndexBinder builder : documentBuildersIndexedEntities.values() ) {
@@ -205,24 +205,19 @@ public class SearchFactoryBuilder {
 		createCleanFactoryState( cfg );
 
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
+		if ( reflectionManager != cfg.getReflectionManager() ) {
+			cfg = new ReflectionReplacingSearchConfiguration( reflectionManager, cfg );
+		}
 
 		BuildContext buildContext = new BuildContext();
 
 		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping( cfg );
-		if ( mapping != null ) {
-			if ( !( reflectionManager instanceof MetadataProviderInjector ) ) {
-				throw new SearchException(
-						"Programmatic mapping model used but ReflectionManager does not implement "
-								+ MetadataProviderInjector.class.getName()
-				);
-			}
-			MetadataProviderInjector injector = (MetadataProviderInjector) reflectionManager;
-			MetadataProvider original = injector.getMetadataProvider();
-			injector.setMetadataProvider( new MappingModelMetadataProvider( original, mapping ) );
-		}
+		applySearchMappingToMetadata( reflectionManager, mapping );
+
+		factoryState.setSearchMapping( mapping ); // might be null if feature is not used
 
 		factoryState.setIndexingStrategy( defineIndexingStrategy( cfg ) );//need to be done before the document builds
-		initDocumentBuilders( cfg, reflectionManager, buildContext );
+		initDocumentBuilders( cfg, buildContext );
 
 		final Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
@@ -249,6 +244,27 @@ public class SearchFactoryBuilder {
 		factoryState.setActiveSearchFactory( factory );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
+	}
+
+	/**
+	 * We need to apply the programmatically configured mapping toe the reflectionManager
+	 * to fake the annotations.
+	 *
+	 * @param reflectionManager assumed a MetadataProviderInjector, it's state will be changed
+	 * @param mapping the SearchMapping to apply
+	 */
+	private void applySearchMappingToMetadata(ReflectionManager reflectionManager, SearchMapping mapping) {
+		if ( mapping != null ) {
+			if ( !( reflectionManager instanceof MetadataProviderInjector ) ) {
+				throw new SearchException(
+						"Programmatic mapping model used but ReflectionManager does not implement "
+								+ MetadataProviderInjector.class.getName()
+				);
+			}
+			MetadataProviderInjector injector = (MetadataProviderInjector) reflectionManager;
+			MetadataProvider original = injector.getMetadataProvider();
+			injector.setMetadataProvider( new MappingModelMetadataProvider( original, mapping ) );
+		}
 	}
 
 	private void fillSimilarityMapping() {
@@ -322,16 +338,16 @@ public class SearchFactoryBuilder {
 	 * Initialize the document builder
 	 * This algorithm seems to be safe for incremental search factories.
 	 */
-	private void initDocumentBuilders(SearchConfiguration cfg, ReflectionManager reflectionManager, BuildContext buildContext) {
+	private void initDocumentBuilders(SearchConfiguration cfg, BuildContext buildContext) {
 		ConfigContext context = new ConfigContext( cfg );
 
-		initProgrammaticAnalyzers( context, reflectionManager );
-		initProgrammaticallyDefinedFilterDef( reflectionManager );
+		initProgrammaticAnalyzers( context, cfg.getReflectionManager() );
+		initProgrammaticallyDefinedFilterDef( cfg.getReflectionManager() );
 		final PolymorphicIndexHierarchy indexingHierarchy = factoryState.getIndexHierarchy();
 		final Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = factoryState.getIndexBindingForEntity();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
-		final Map<XClass, Class> classMappings = initializeClassMappings( cfg, reflectionManager );
+		final Map<XClass, Class> classMappings = initializeClassMappings( cfg, cfg.getReflectionManager() );
 		
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
 		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
@@ -355,7 +371,7 @@ public class SearchFactoryBuilder {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
 				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
-						mappedXClass, context, reflectionManager, optimizationBlackListedTypes, cfg.getInstanceInitializer()
+						mappedXClass, context, cfg.getReflectionManager(), optimizationBlackListedTypes, cfg.getInstanceInitializer()
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
@@ -382,7 +398,7 @@ public class SearchFactoryBuilder {
 							mappedXClass,
 							context,
 							mappedEntity.getSimilarity(),
-							reflectionManager,
+							cfg.getReflectionManager(),
 							optimizationBlackListedTypes,
 							cfg.getInstanceInitializer()
 					);
@@ -543,10 +559,10 @@ public class SearchFactoryBuilder {
 
 	private ReflectionManager getReflectionManager(SearchConfiguration cfg) {
 		ReflectionManager reflectionManager = cfg.getReflectionManager();
-		return geReflectionManager( reflectionManager );
+		return getReflectionManager( reflectionManager );
 	}
 
-	private ReflectionManager geReflectionManager(ReflectionManager reflectionManager) {
+	private ReflectionManager getReflectionManager(ReflectionManager reflectionManager) {
 		if ( reflectionManager == null ) {
 			reflectionManager = new JavaReflectionManager();
 		}

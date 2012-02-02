@@ -30,15 +30,15 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
-
-import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
+import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.TimingSource;
-import org.hibernate.search.engine.impl.FilterDef;
-import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexReaderAccessor;
@@ -238,6 +238,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public TimingSource getTimingSource() {
 		return delegate.getTimingSource();
+	}
+
+	@Override
+	public SearchMapping getProgrammaticMapping() {
+		return delegate.getProgrammaticMapping();
 	}
 
 }

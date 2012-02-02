@@ -52,6 +52,10 @@ public class SearchMapping {
 		return entities.get( entityType );
 	}
 
+	public Set<Class<?>> getMappedEntities() {
+		return entities.keySet();
+	}
+
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping(name, tokenizerFactory, this);
 	}

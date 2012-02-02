@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,78 +21,85 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
 package org.hibernate.search.impl;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
-import org.hibernate.search.spi.internals.SearchFactoryState;
 
 /**
- * @author Emmanuel Bernard
+ * Wraps another SearchConfiguration to override it's ReflectionManager
+ * 
+ * @author Sanne Grinovero
+ * @since 4.1
  */
-public class IncrementalSearchConfiguration implements SearchConfiguration {
-	private final List<Class<?>> classes;
-	private final Map<String, Class<?>> classesByName = new HashMap<String, Class<?>>();
-	private final SearchFactoryState state;
-	private final Properties properties;
-	private final ReflectionManager reflectionManager = new JavaReflectionManager();
+public final class ReflectionReplacingSearchConfiguration implements SearchConfiguration {
 
-	public IncrementalSearchConfiguration(List<Class<?>> classes, Properties properties, SearchFactoryState factoryState) {
-		this.properties = properties;
-		this.classes = classes;
-		this.state = factoryState;
-		for ( Class<?> entity : classes ) {
-			classesByName.put( entity.getName(), entity );
-		}
+	private final ReflectionManager reflectionManager;
+	private final SearchConfiguration cfg;
+
+	/**
+	 * Create a new SearchConfiguration which returns the same values as the provided SearchConfiguration
+	 * instance, with the exception of {@link #getReflectionManager()} which will return the constructor
+	 * defined ReflectionManager.
+	 * 
+	 * @param reflectionManager
+	 * @param cfg
+	 */
+	public ReflectionReplacingSearchConfiguration(ReflectionManager reflectionManager, SearchConfiguration cfg) {
+		this.reflectionManager = reflectionManager;
+		this.cfg = cfg;
 	}
 
+	@Override
 	public Iterator<Class<?>> getClassMappings() {
-		return classes.iterator();
+		return cfg.getClassMappings();
 	}
 
+	@Override
 	public Class<?> getClassMapping(String name) {
-		return classesByName.get( name );
+		return cfg.getClassMapping( name );
 	}
 
+	@Override
 	public String getProperty(String propertyName) {
-		return properties.getProperty(propertyName );
+		return cfg.getProperty( propertyName );
 	}
 
+	@Override
 	public Properties getProperties() {
-		return properties;
+		return cfg.getProperties();
 	}
 
+	@Override
 	public ReflectionManager getReflectionManager() {
 		return reflectionManager;
 	}
 
+	@Override
 	public SearchMapping getProgrammaticMapping() {
-		return state.getProgrammaticMapping();
+		return cfg.getProgrammaticMapping();
 	}
 
+	@Override
 	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
-		return Collections.emptyMap();
+		return cfg.getProvidedServices();
 	}
 
 	@Override
 	public boolean isTransactionManagerExpected() {
-		return state.isTransactionManagerExpected();
+		return cfg.isTransactionManagerExpected();
 	}
 
 	@Override
 	public InstanceInitializer getInstanceInitializer() {
-		return state.getInstanceInitializer();
+		return cfg.getInstanceInitializer();
 	}
+
 }

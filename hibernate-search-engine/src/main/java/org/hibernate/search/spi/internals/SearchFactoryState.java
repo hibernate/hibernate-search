@@ -26,6 +26,7 @@ package org.hibernate.search.spi.internals;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.TimingSource;
@@ -67,7 +68,7 @@ public interface SearchFactoryState {
 	PolymorphicIndexHierarchy getIndexHierarchy();
 
 	ServiceManager getServiceManager();
-	
+
 	boolean isTransactionManagerExpected();
 
 	IndexManagerHolder getAllIndexesManager();
@@ -80,4 +81,5 @@ public interface SearchFactoryState {
 
 	TimingSource getTimingSource();
 
+	SearchMapping getProgrammaticMapping();
 }
