@@ -50,7 +50,7 @@ public class SerializationTestHelper {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public static Object duplicateBySerialization(Object o) throws IOException, ClassNotFoundException {
+	public static <T> T duplicateBySerialization(T o) throws IOException, ClassNotFoundException {
 		//Serialize to buffer:
 		java.io.ByteArrayOutputStream outStream = new java.io.ByteArrayOutputStream();
 	    ObjectOutputStream objectOutStream = new ObjectOutputStream( outStream );
@@ -62,7 +62,7 @@ public class SerializationTestHelper {
 	    //deserialize to new instance:
 	    java.io.ByteArrayInputStream inStream = new ByteArrayInputStream( objectBuffer );
 	    ObjectInputStream objectInStream = new ObjectInputStream( inStream );
-	    Object copy = objectInStream.readObject();
+	    T copy = (T) objectInStream.readObject();
 	    return copy;
 	}
 	

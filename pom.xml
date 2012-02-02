@@ -135,13 +135,13 @@
 
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.5.0</luceneVersion>
-        <infinispanVersion>5.1.0.CR2</infinispanVersion>
-        <hibernateVersion>4.0.0.Final</hibernateVersion>
+        <infinispanVersion>5.1.1.CR1</infinispanVersion>
+        <hibernateVersion>4.0.1.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.1.Final</hibernateCommonsAnnotationVersion>
         <bytemanVersion>1.5.2</bytemanVersion>
         <jbossLoggingVersion>3.1.0.CR2</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.0.CR5</jbossLoggingProcessorVersion>
-        <jbossJTAVersion>4.15.3.Final</jbossJTAVersion>
+        <jbossJTAVersion>4.16.2.Final</jbossJTAVersion>
     </properties>
 
     <dependencyManagement>
@@ -245,7 +245,7 @@
             <dependency>
                 <groupId>org.jgroups</groupId>
                 <artifactId>jgroups</artifactId>
-                <version>3.0.1.Final</version>
+                <version>3.0.4.Final</version>
             </dependency>
             <dependency>
                 <groupId>javax.annotation</groupId>

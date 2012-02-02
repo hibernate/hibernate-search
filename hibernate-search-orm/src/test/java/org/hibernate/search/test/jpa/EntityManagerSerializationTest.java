@@ -23,19 +23,13 @@
  */
 package org.hibernate.search.test.jpa;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.test.TestConstants;
 
 /**
@@ -53,52 +47,16 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	 *             in case the test fails.
 	 */
 	public void testSerialization() throws Exception {
-		FullTextEntityManager em = Search.getFullTextEntityManager(factory
-				.createEntityManager());
+		FullTextEntityManager em = Search.getFullTextEntityManager(factory.createEntityManager());
 
 		indexSearchAssert(em);
-		
-		File tmpFile = File.createTempFile("entityManager", "ser", null);
-		serializeEM(em, tmpFile);
-		em = deserializeEM(tmpFile);
-		
-		indexSearchAssert(em);
-		
+
+		FullTextEntityManager clone = SerializationTestHelper.duplicateBySerialization( em );
+
+		indexSearchAssert(clone);
+
+		clone.close();
 		em.close();
-		
-		// cleanup
-		tmpFile.delete();
-	}
-
-	private FullTextEntityManager deserializeEM(File tmpFile) throws ClassNotFoundException {
-		FullTextEntityManager em = null;
-		FileInputStream fis = null;
-		ObjectInputStream in = null;
-		try {
-			fis = new FileInputStream(tmpFile);
-			in = new ObjectInputStream(fis);
-			em = (FullTextEntityManager) in.readObject();
-			in.close();
-		}
-		catch (IOException ex) {
-			ex.printStackTrace();
-			fail();
-		}
-		return em;
-	}
-
-	private void serializeEM(FullTextEntityManager em, File tmpFile) {
-		FileOutputStream fos = null;
-		ObjectOutputStream out = null;
-		try {
-			fos = new FileOutputStream(tmpFile);
-			out = new ObjectOutputStream(fos);
-			out.writeObject(em);
-			out.close();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			fail();
-		}
 	}
 
 	public Class[] getAnnotatedClasses() {
@@ -112,7 +70,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	 * @param em
 	 * @throws Exception
 	 */
-	private void indexSearchAssert(FullTextEntityManager em) throws Exception {
+	private static void indexSearchAssert(FullTextEntityManager em) throws Exception {
 		em.getTransaction().begin();
 		Bretzel bretzel = new Bretzel(23, 34);
 		em.persist(bretzel);
