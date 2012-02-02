@@ -9,6 +9,7 @@ buildSrc/.gradle
 target
 build
 bin
+test-output
 
 # IntelliJ specific files/directories
 /out

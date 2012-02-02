@@ -31,7 +31,13 @@ import org.hibernate.search.spi.InstanceInitializer;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class SimpleInitializer implements InstanceInitializer {
+public final class SimpleInitializer implements InstanceInitializer {
+
+	public static final SimpleInitializer INSTANCE = new SimpleInitializer();
+
+	private SimpleInitializer() {
+		//use INSTANCE as this is stateless
+	}
 
 	@Override
 	public Object unproxy(Object entity) {

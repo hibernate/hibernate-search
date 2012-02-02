@@ -21,53 +21,65 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+package org.hibernate.search.test.util;
 
-package org.hibernate.search.impl;
-
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
+import java.util.Map;
+import java.util.HashMap;
 
-import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
-import org.hibernate.search.spi.internals.SearchFactoryState;
 
 /**
+ * Manually defines the configuration
+ * Classes and properties are the only implemented options at the moment
+ *
  * @author Emmanuel Bernard
  */
-public class IncrementalSearchConfiguration implements SearchConfiguration {
-	private final List<Class<?>> classes;
-	private final Map<String, Class<?>> classesByName = new HashMap<String, Class<?>>();
-	private final SearchFactoryState state;
-	private final Properties properties;
-	private final ReflectionManager reflectionManager = new JavaReflectionManager();
+public class ManualConfiguration implements SearchConfiguration {
 
-	public IncrementalSearchConfiguration(List<Class<?>> classes, Properties properties, SearchFactoryState factoryState) {
-		this.properties = properties;
-		this.classes = classes;
-		this.state = factoryState;
-		for ( Class<?> entity : classes ) {
-			classesByName.put( entity.getName(), entity );
-		}
+	private final Map<String,Class<?>>  classes;
+	private final Properties properties;
+	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
+	private final InstanceInitializer initializer;
+	private SearchMapping programmaticMapping;
+
+	public ManualConfiguration() {
+		this(SimpleInitializer.INSTANCE);
+	}
+
+	public ManualConfiguration(InstanceInitializer init) {
+		initializer = init;
+		classes = new HashMap<String,Class<?>>();
+		properties = new Properties( );
+		providedServices = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
+	}
+
+	public ManualConfiguration addProperty(String key , String value) {
+		properties.setProperty( key, value );
+		return this;
+	}
+
+	public ManualConfiguration addClass(Class<?> indexed) {
+		classes.put( indexed.getName(), indexed );
+		return this;
 	}
 
 	public Iterator<Class<?>> getClassMappings() {
-		return classes.iterator();
+		return classes.values().iterator();
 	}
 
 	public Class<?> getClassMapping(String name) {
-		return classesByName.get( name );
+		return classes.get( name );
 	}
 
 	public String getProperty(String propertyName) {
-		return properties.getProperty(propertyName );
+		return properties.getProperty( propertyName );
 	}
 
 	public Properties getProperties() {
@@ -75,24 +87,28 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	}
 
 	public ReflectionManager getReflectionManager() {
-		return reflectionManager;
+		return null;
 	}
 
 	public SearchMapping getProgrammaticMapping() {
-		return state.getProgrammaticMapping();
+		return programmaticMapping;
+	}
+
+	public void setProgrammaticMapping(SearchMapping programmaticMapping) {
+		this.programmaticMapping = programmaticMapping;
 	}
 
 	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
-		return Collections.emptyMap();
+		return providedServices;
 	}
 
 	@Override
 	public boolean isTransactionManagerExpected() {
-		return state.isTransactionManagerExpected();
+		return true;
 	}
 
 	@Override
 	public InstanceInitializer getInstanceInitializer() {
-		return state.getInstanceInitializer();
+		return initializer;
 	}
 }

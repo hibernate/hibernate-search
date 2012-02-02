@@ -51,6 +51,7 @@ import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -109,6 +110,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final InstanceInitializer instanceInitializer;
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 	private final TimingSource timingSource;
+	private final SearchMapping mapping;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -128,6 +130,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.instanceInitializer = state.getInstanceInitializer();
 		this.timeoutExceptionFactory = state.getDefaultTimeoutExceptionFactory();
 		this.timingSource = state.getTimingSource();
+		this.mapping = state.getProgrammaticMapping();
 		this.statistics = new StatisticsImpl( this );
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false
@@ -366,6 +369,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public TimingSource getTimingSource() {
 		return this.timingSource;
+	}
+
+	@Override
+	public SearchMapping getProgrammaticMapping() {
+		return mapping;
 	}
 
 }

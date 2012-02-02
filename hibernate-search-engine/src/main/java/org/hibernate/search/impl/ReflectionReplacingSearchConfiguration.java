@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,82 +21,85 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
+package org.hibernate.search.impl;
 
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Properties;
 
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
- * Manually defines the configuration
- * Classes and properties are the only implemented options at the moment
- *
- * @author Emmanuel Bernard
+ * Wraps another SearchConfiguration to override it's ReflectionManager
+ * 
+ * @author Sanne Grinovero
+ * @since 4.1
  */
-public class ManualConfiguration implements SearchConfiguration {
-	private final Map<String,Class<?>>  classes;
-	private final Properties properties;
-	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
+public final class ReflectionReplacingSearchConfiguration implements SearchConfiguration {
 
-	public ManualConfiguration() {
-		classes = new HashMap<String,Class<?>>();
-		properties = new Properties( );
-		providedServices = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
+	private final ReflectionManager reflectionManager;
+	private final SearchConfiguration cfg;
+
+	/**
+	 * Create a new SearchConfiguration which returns the same values as the provided SearchConfiguration
+	 * instance, with the exception of {@link #getReflectionManager()} which will return the constructor
+	 * defined ReflectionManager.
+	 * 
+	 * @param reflectionManager
+	 * @param cfg
+	 */
+	public ReflectionReplacingSearchConfiguration(ReflectionManager reflectionManager, SearchConfiguration cfg) {
+		this.reflectionManager = reflectionManager;
+		this.cfg = cfg;
 	}
 
-	public ManualConfiguration addProperty(String key , String value) {
-		properties.setProperty( key, value );
-		return this;
-	}
-
-	public ManualConfiguration addClass(Class<?> indexed) {
-		classes.put( indexed.getName(), indexed );
-		return this;
-	}
-
+	@Override
 	public Iterator<Class<?>> getClassMappings() {
-		return classes.values().iterator();
+		return cfg.getClassMappings();
 	}
 
+	@Override
 	public Class<?> getClassMapping(String name) {
-		return classes.get( name );
+		return cfg.getClassMapping( name );
 	}
 
+	@Override
 	public String getProperty(String propertyName) {
-		return properties.getProperty( propertyName );
+		return cfg.getProperty( propertyName );
 	}
 
+	@Override
 	public Properties getProperties() {
-		return properties;
+		return cfg.getProperties();
 	}
 
+	@Override
 	public ReflectionManager getReflectionManager() {
-		return null;
+		return reflectionManager;
 	}
 
+	@Override
 	public SearchMapping getProgrammaticMapping() {
-		return null;
+		return cfg.getProgrammaticMapping();
 	}
 
+	@Override
 	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
-		return providedServices;
+		return cfg.getProvidedServices();
 	}
 
 	@Override
 	public boolean isTransactionManagerExpected() {
-		return true;
+		return cfg.isTransactionManagerExpected();
 	}
 
 	@Override
 	public InstanceInitializer getInstanceInitializer() {
-		return HibernateStatelessInitializer.INSTANCE;
+		return cfg.getInstanceInitializer();
 	}
+
 }

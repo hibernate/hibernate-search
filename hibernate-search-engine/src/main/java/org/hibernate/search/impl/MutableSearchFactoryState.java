@@ -24,14 +24,18 @@
 
 package org.hibernate.search.impl;
 
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.TimingSource;
-import org.hibernate.search.engine.impl.FilterDef;
-import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -41,15 +45,13 @@ import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 
-import java.util.Map;
-import java.util.Properties;
-
 /**
  * Shared factory state
  *
  * @author Emmanuel Bernard
  */
 public class MutableSearchFactoryState implements SearchFactoryState {
+
 	private Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
 	private Map<Class<?>, EntityIndexBinder> indexBindingsPerEntity;
 	private String indexingStrategy;
@@ -68,6 +70,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private TimeoutExceptionFactory defaultTimeoutExceptionFactory;
 	private InstanceInitializer instanceInitializer;
 	private TimingSource timingSource;
+	private SearchMapping mapping;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -87,6 +90,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		defaultTimeoutExceptionFactory = oldFactoryState.getDefaultTimeoutExceptionFactory();
 		instanceInitializer = oldFactoryState.getInstanceInitializer();
 		timingSource = oldFactoryState.getTimingSource();
+		mapping = oldFactoryState.getProgrammaticMapping();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -240,6 +244,19 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setTimingSource(TimingSource timingSource) {
 		this.timingSource = timingSource;
+	}
+
+	public void setProgrammaticMapping(SearchMapping mapping) {
+		this.mapping = mapping;
+	}
+
+	@Override
+	public SearchMapping getProgrammaticMapping() {
+		return mapping;
+	}
+
+	public void setSearchMapping(SearchMapping mapping) {
+		this.mapping = mapping;
 	}
 
 }
