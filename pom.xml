@@ -141,7 +141,7 @@
         <bytemanVersion>1.5.2</bytemanVersion>
         <jbossLoggingVersion>3.1.0.CR2</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.0.CR5</jbossLoggingProcessorVersion>
-        <jbossJTAVersion>4.15.3.Final</jbossJTAVersion>
+        <jbossJTAVersion>4.16.2.Final</jbossJTAVersion>
     </properties>
 
     <dependencyManagement>

@@ -4,9 +4,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
-import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.arjuna.coordinator.TxControl;
-import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
 import com.arjuna.ats.jdbc.TransactionalDriver;
 
 public class JBossTADataSourceBuilder {
@@ -37,7 +35,6 @@ public class JBossTADataSourceBuilder {
 	}
 
 	public DataSource createDataSource() throws SQLException {
-		arjPropertyManager.getCoordinatorEnvironmentBean().setActionStore( VolatileStore.class.getName() );
 		TxControl.setDefaultTimeout(timeout);
 		DataSourceProvider.initialize( xaDataSource );
 		DataSourceProvider dsProvider = new DataSourceProvider();
