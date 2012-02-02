@@ -35,7 +35,11 @@ public final class SimpleInitializer implements InstanceInitializer {
 
 	public static final SimpleInitializer INSTANCE = new SimpleInitializer();
 
-	private SimpleInitializer(){
+	/**
+	 * @deprecated : constructor will be made private, use {@link #INSTANCE} instead.
+	 */
+	@Deprecated
+	public SimpleInitializer() {
 		//use INSTANCE as this is stateless
 	}
 

@@ -47,6 +47,7 @@ public class ManualConfiguration implements SearchConfiguration {
 	private final Properties properties;
 	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
 	private final InstanceInitializer initializer;
+	private SearchMapping programmaticMapping;
 
 	public ManualConfiguration() {
 		this(SimpleInitializer.INSTANCE);
@@ -90,7 +91,11 @@ public class ManualConfiguration implements SearchConfiguration {
 	}
 
 	public SearchMapping getProgrammaticMapping() {
-		return null;
+		return programmaticMapping;
+	}
+
+	public void setProgrammaticMapping(SearchMapping programmaticMapping) {
+		this.programmaticMapping = programmaticMapping;
 	}
 
 	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
