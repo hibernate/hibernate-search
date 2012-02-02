@@ -3,6 +3,7 @@ package org.hibernate.search.test.service;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.test.util.ManualConfiguration;
 
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class ServiceProviderTest {
 	public void testManagedService() throws Exception {
 		MyServiceProvider.resetActive();
 		assertNull( MyServiceProvider.isActive() );
-		final ManualConfiguration configuration = new ManualConfiguration();
+		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration.addProperty( "hibernate.search.default.directory_provider", ServiceDirectoryProvider.class.getName() )
 				.addClass( Telephone.class );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
@@ -30,7 +31,7 @@ public class ServiceProviderTest {
 	public void testProvidedService() throws Exception {
 		ProvidedServiceProvider.resetActive();
 		assertNull( ProvidedServiceProvider.isActive() );
-		final ManualConfiguration configuration = new ManualConfiguration();
+		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration
 				.addProperty( "hibernate.search.default.directory_provider", ProvidedServiceDirectoryProvider.class.getName() )
 				.addClass( Telephone.class )
@@ -43,7 +44,7 @@ public class ServiceProviderTest {
 
 	@Test
 	public void testServiceNotFound() throws Exception {
-		final ManualConfiguration configuration = new ManualConfiguration();
+		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration.addProperty( "hibernate.search.default.directory_provider", NoServiceDirectoryProvider.class.getName() )
 				.addClass( Telephone.class );
 		boolean exception = false;

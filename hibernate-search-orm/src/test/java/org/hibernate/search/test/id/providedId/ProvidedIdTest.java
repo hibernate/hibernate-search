@@ -49,6 +49,7 @@ import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
 
@@ -62,7 +63,7 @@ public class ProvidedIdTest {
 
 	@Test
 	public void testProvidedId() throws Exception {
-		final ManualConfiguration configuration = new ManualConfiguration()
+		final ManualConfiguration configuration = new HibernateManualConfiguration()
 				.addClass( ProvidedIdPerson.class )
 				.addClass( ProvidedIdPersonSub.class )
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )

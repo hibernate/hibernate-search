@@ -30,7 +30,7 @@ import java.util.HashMap;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
+import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
@@ -42,11 +42,18 @@ import org.hibernate.search.spi.ServiceProvider;
  * @author Emmanuel Bernard
  */
 public class ManualConfiguration implements SearchConfiguration {
+
 	private final Map<String,Class<?>>  classes;
 	private final Properties properties;
 	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
+	private final InstanceInitializer initializer;
 
 	public ManualConfiguration() {
+		this(SimpleInitializer.INSTANCE);
+	}
+
+	public ManualConfiguration(InstanceInitializer init) {
+		initializer = init;
 		classes = new HashMap<String,Class<?>>();
 		properties = new Properties( );
 		providedServices = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
@@ -97,6 +104,6 @@ public class ManualConfiguration implements SearchConfiguration {
 
 	@Override
 	public InstanceInitializer getInstanceInitializer() {
-		return HibernateStatelessInitializer.INSTANCE;
+		return initializer;
 	}
 }

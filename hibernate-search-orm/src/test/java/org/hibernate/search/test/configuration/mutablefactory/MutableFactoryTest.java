@@ -50,6 +50,7 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
+import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.util.logging.impl.Log;
@@ -312,7 +313,7 @@ public class MutableFactoryTest {
 	}
 
 	private static ManualConfiguration getTestConfiguration() {
-		return new ManualConfiguration()
+		return new HibernateManualConfiguration()
 			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 	}

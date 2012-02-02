@@ -86,7 +86,7 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 
 		@Override
 		public InstanceInitializer getInstanceInitializer() {
-			return new SimpleInitializer();
+			return SimpleInitializer.INSTANCE;
 		}
 	}
 
