@@ -2,6 +2,18 @@ Hibernate Search Changelog
 ==========================
 
 
+Version 4.1.0.Beta1 (3-2-2012)
+------------------------
+
+** Bug
+    * [HSEARCH-1034] - Mutable SearchFactory should not drop programmatic SearchMapping
+
+** Task
+    * [HSEARCH-1035] - Update to Hibernate Core version 4.0.1
+    * [HSEARCH-1036] - Update JBoss TransactionManager to 4.16.2.Final
+    * [HSEARCH-1037] - Update Infinispan to 5.1.1 and JGroups to 3.0.4.Final
+
+
 4.1.0.Alpha1 (9-1-2012)
 ------------------------
 
