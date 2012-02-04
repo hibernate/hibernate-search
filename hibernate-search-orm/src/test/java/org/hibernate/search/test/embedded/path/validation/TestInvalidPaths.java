@@ -28,9 +28,7 @@ import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
 /**
- *
  * @author zkurey
- *
  */
 public class TestInvalidPaths {
 
@@ -162,7 +160,6 @@ public class TestInvalidPaths {
 			assertFalse(
 					"Expected search exception to NOT contain information about invalid path emb.e1, instead got error: "
 							+ se.getMessage(), se.getMessage().contains( "emb.e1" ) );
-
 		}
 	}
 
@@ -182,6 +179,22 @@ public class TestInvalidPaths {
 			assertTrue(
 					"Expected search exception to contain information about invalid leaf path c.indexed, instead got error: "
 							+ se.getMessage(), se.getMessage().contains( "c.indexed" ) );
+		}
+	}
+
+	@Test
+	public void testRenamedFieldInPath() {
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		cfg.addAnnotatedClass( FieldRenamedContainerEntity.class );
+		cfg.addAnnotatedClass( FieldRenamedEmbeddedEntity.class );
+		try {
+			cfg.build();
+			fail( "Exception should have been thrown for FieldRenamedContainerEntity having invalid path (attribute instead of field name): embedded.field" );
+		}
+		catch ( SearchException se ) {
+			assertTrue(
+					"Expected search exception to contain information about invalid leaf path embedded.field, instead got error: "
+							+ se.getMessage(), se.getMessage().contains( "embedded.field" ) );
 		}
 	}
 
