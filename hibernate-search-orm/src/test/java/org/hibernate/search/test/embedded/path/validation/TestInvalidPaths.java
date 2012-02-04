@@ -185,6 +185,22 @@ public class TestInvalidPaths {
 		}
 	}
 
+	@Test
+	public void testRenamedFieldInPath() {
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		cfg.addAnnotatedClass( FieldRenamedContainerEntity.class );
+		cfg.addAnnotatedClass( FieldRenamedEmbeddedEntity.class );
+		try {
+			cfg.build();
+			fail( "Exception should have been thrown for FieldRenamedContainerEntity having invalid path (attribute instead of field name): embedded.field" );
+		}
+		catch ( SearchException se ) {
+			assertTrue(
+					"Expected search exception to contain information about invalid leaf path embedded.field, instead got error: "
+							+ se.getMessage(), se.getMessage().contains( "embedded.field" ) );
+		}
+	}
+
 	/**
 	 * Ensures that path still marked as encountered if depth is the cause of the path being
 	 * traversed, and they are the same depth
