@@ -59,9 +59,6 @@ public class ClusterTestHelper {
 			.setProperty( "hibernate.search.default.indexwriter.chunk_size", "13" )
 			// this schema is shared across nodes, so don't drop it on shutdown:
 			.setProperty( Environment.HBM2DDL_AUTO, "create" )
-			.setProperty(
-					CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME,
-					"testing-hibernatesearch-infinispan.xml" )
 			// share the same in-memory database connection pool
 			.setProperty(
 					Environment.CONNECTION_PROVIDER,
