@@ -13,7 +13,7 @@
             <property name="executionType">REMOTE</property>
         </protocol>
         <configuration>
-            <property name="jbossHome">target/jboss-as-7.0.2.Final</property>
+            <property name="jbossHome">target/jboss-as-${version.jboss.as}</property>
         </configuration>
     </container>
 

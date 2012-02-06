@@ -18,8 +18,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-release-version>3.0.6.RELEASE</spring-release-version>
-        <version.jboss.as>7.0.2.Final</version.jboss.as>
-        <version.arquillian>1.0.0.CR5</version.arquillian>
+        <version.jboss.as>7.1.0.CR1b</version.jboss.as>
+        <version.arquillian>1.0.0.CR7</version.arquillian>
     </properties>
 
     <dependencyManagement>
