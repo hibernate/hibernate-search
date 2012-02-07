@@ -456,8 +456,8 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
       configure it to have a <literal>CacheStore</literal> on each node or
       have a single centralized one shared by each node.</para>
 
-      <para>See the <ulink url="http://www.jboss.org/infinispan/">Infinispan
-      documentation</ulink> for all Infinispan configuration options.</para>
+      <para>See the <ulink url="https://docs.jboss.org/author/display/ISPN51/Home">
+      Infinispan documentation</ulink> for all Infinispan configuration options.</para>
 
       <section>
         <title>Requirements</title>
@@ -485,7 +485,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
         <literal>infinispan-lucene-directory.jar</literal> and
         <literal>infinispan-core.jar</literal> to your application classpath.
         These last two jars are distributed by <ulink
-        url="http://sourceforge.net/projects/infinispan/files/">Infinispan</ulink>.</para>
+        url="http://www.jboss.org/infinispan/downloads">Infinispan</ulink>.</para>
       </section>
 
       <section>
