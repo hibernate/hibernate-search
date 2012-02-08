@@ -56,7 +56,7 @@ public class WorkQueuePerIndexSplitter {
 	 * if supported/enabled by each specific backend.
 	 */
 	public void commitOperations(IndexingMonitor monitor) {
-		// move executor here to // work - optionally?
+		// FIXME move executor here to parallel work - optionally? See HSEARCH-826
 		for ( Entry<IndexManager,List<LuceneWork>> entry : queues.entrySet() ) {
 			entry.getKey().performOperations( entry.getValue(), monitor );
 		}
