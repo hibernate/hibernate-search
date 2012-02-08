@@ -23,7 +23,6 @@ package org.hibernate.search.indexes.serialization.javaserialization.impl;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-import org.apache.lucene.document.Field;
 import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.SearchException;
@@ -166,7 +165,6 @@ public class JavaSerializationDeserializer implements Deserializer {
 			}
 			else if ( field instanceof SerializableField ) {
 				SerializableField safeField = ( SerializableField ) field;
-				Field luceneField;
 				if ( field instanceof SerializableBinaryField ) {
 					SerializableBinaryField reallySafeField = ( SerializableBinaryField ) field;
 					hydrator.addFieldWithBinaryData(
