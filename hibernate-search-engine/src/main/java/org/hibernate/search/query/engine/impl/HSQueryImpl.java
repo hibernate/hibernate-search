@@ -105,7 +105,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private Sort sort;
 	private String[] projectedFields;
 	private int firstResult;
-	private Integer maxResults;
+	private int maxResults;
+	private boolean definedMaxResults = false;
 	private transient Set<Class<?>> classesAndSubclasses;
 	//optimization: if we can avoid the filter clause (we can most of the time) do it as it has a significant perf impact
 	private boolean needClassFilterClause;
@@ -182,11 +183,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return this;
 	}
 
-	public HSQuery maxResults(Integer maxResults) {
-		if ( maxResults != null && maxResults < 0 ) {
+	public HSQuery maxResults(int maxResults) {
+		if ( maxResults < 0 ) {
 			throw new IllegalArgumentException( "'max' pagination parameter less than 0" );
 		}
 		this.maxResults = maxResults;
+		this.definedMaxResults = true;
 		return this;
 	}
 
@@ -467,7 +469,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *         returned.
 	 */
 	private Integer calculateTopDocsRetrievalSize() {
-		if ( maxResults == null ) {
+		if ( ! definedMaxResults ) {
 			return null;
 		}
 		else {
@@ -882,7 +884,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	}
 
 	private int max(int first, int totalHits) {
-		if ( maxResults == null ) {
+		if ( ! definedMaxResults ) {
 			return totalHits - 1;
 		}
 		else {

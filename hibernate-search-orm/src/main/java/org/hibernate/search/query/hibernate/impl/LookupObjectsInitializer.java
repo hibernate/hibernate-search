@@ -53,10 +53,12 @@ public class LookupObjectsInitializer implements ObjectsInitializer {
 										 SearchFactoryImplementor searchFactoryImplementor,
 										 TimeoutManager timeoutManager,
 										 Session session) {
+		boolean traceEnabled = log.isTraceEnabled();
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
-			log.tracef("No object to initialize", maxResults);
+			if ( traceEnabled )
+				log.tracef("No object to initialize", maxResults);
 			return;
 		}
 
@@ -64,6 +66,7 @@ public class LookupObjectsInitializer implements ObjectsInitializer {
 		for ( EntityInfo entityInfo : entityInfos ) {
 			ObjectLoaderHelper.load( entityInfo, session );
 		}
-		log.tracef( "Initialized %d objects by lookup method.", maxResults );
+		if ( traceEnabled )
+			log.tracef( "Initialized %d objects by lookup method.", maxResults );
 	}
 }

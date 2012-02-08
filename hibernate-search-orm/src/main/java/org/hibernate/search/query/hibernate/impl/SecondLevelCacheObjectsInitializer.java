@@ -52,10 +52,11 @@ public class SecondLevelCacheObjectsInitializer implements ObjectsInitializer {
 										 SearchFactoryImplementor searchFactoryImplementor,
 										 TimeoutManager timeoutManager,
 										 Session session) {
+		boolean traceEnabled = log.isTraceEnabled();
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
-			log.tracef( "No object to initialize", maxResults );
+			if ( traceEnabled ) log.tracef( "No object to initialize", maxResults );
 			return;
 		}
 
@@ -87,7 +88,7 @@ public class SecondLevelCacheObjectsInitializer implements ObjectsInitializer {
 		//update entityInfos to only contains the remaining ones
 		final int remainingSize = remainingEntityInfos.size();
 
-		log.tracef( "Initialized %d objects out of %d in the second level cache", maxResults - remainingSize, maxResults );
+		if ( traceEnabled ) log.tracef( "Initialized %d objects out of %d in the second level cache", maxResults - remainingSize, maxResults );
 		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(
 					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
