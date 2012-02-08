@@ -82,7 +82,12 @@ public class IncrementalOptimizerStrategy extends ExplicitOnlyOptimizerStrategy 
 			log.debugv( "Optimize {0} after {1} operations and {2} transactions",
 						indexName, operations, transactions );
 			IndexWriter writer = workspace.getIndexWriter();
-			performOptimization( writer );
+			try {
+				performOptimization( writer );
+			}
+			finally {
+				workspace.afterTransactionApplied( false, false );
+			}
 		}
 	}
 

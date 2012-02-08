@@ -32,7 +32,7 @@ import javax.persistence.ManyToOne;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
-@Indexed
+@Indexed(index="DVDS")
 @Entity
 public class Dvd implements TitleAble {
 	

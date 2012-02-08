@@ -51,7 +51,7 @@ class FlushWorkDelegate implements LuceneWorkDelegate {
 
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		log.debug( "performing FlushWorkDelegate" );
-		workspace.afterTransactionApplied( false, false );
+		workspace.flush();
 	}
 
 }

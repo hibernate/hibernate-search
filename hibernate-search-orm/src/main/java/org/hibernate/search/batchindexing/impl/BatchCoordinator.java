@@ -33,6 +33,7 @@ import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
@@ -148,9 +149,21 @@ public class BatchCoordinator implements Runnable {
 	 * @param backend
 	 */
 	private void afterBatch(BatchBackend backend) {
+		Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( rootEntities );
 		if ( this.optimizeAtEnd ) {
-			Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( rootEntities );
 			optimize( backend, targetedClasses );
+		}
+		flush( backend, targetedClasses );
+	}
+
+	/**
+	 * @param backend
+	 * @param targetedClasses
+	 */
+	private void flush(BatchBackend backend, Set<Class<?>> targetedClasses) {
+		for ( Class<?> clazz : targetedClasses ) {
+			//TODO the backend should remove duplicate optimize work to the same DP (as entities might share indexes)
+			backend.doWorkInSync( new FlushLuceneWork( clazz ) );
 		}
 	}
 

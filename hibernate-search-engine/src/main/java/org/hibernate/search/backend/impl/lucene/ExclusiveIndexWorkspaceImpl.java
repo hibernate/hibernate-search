@@ -44,4 +44,9 @@ public class ExclusiveIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 		}
 	}
 
+	@Override
+	public void flush() {
+		writerHolder.commitIndexWriter();
+	}
+
 }
