@@ -907,6 +907,8 @@ public abstract class AbstractDocumentBuilder<T> {
 		String fieldName = null;
 		if( !ann.name().isEmpty() ){
 			fieldName = prefix + ann.name();
+		} else if ( !ann.gridMode() ) {
+			fieldName = prefix + "lat/long";
 		} else {
 			throw log.spatialFieldNameNotDefined( clazz.getName() );
 		}

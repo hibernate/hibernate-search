@@ -26,6 +26,7 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 import org.hibernate.search.spatial.SpatialFieldBridge;
+import org.hibernate.search.query.dsl.QueryBuilder;
 
 import java.util.List;
 
@@ -162,5 +163,50 @@ public abstract class SpatialQueryBuilderFromPoint {
 						fieldName
 				)
 		);
+	}
+
+	/**
+	 * Returns a Lucene Query which rely on double numeric range query
+	 * on Latitude / Longitude
+	 *
+	 * @param center center of the search discus
+	 * @param radius distance max to center in km
+	 * @param queryBuilder a Hibernate Search query builder
+	 * @param entityType the class of the @Spatial annotated entity
+	 *
+	 * @return Lucene Query to be used in a search
+	 *
+	 * @see	Query
+	 * @see	org.hibernate.search.spatial.Coordinates
+	 */
+	public static Query buildSimpleSpatialQuery(Point center, double radius, QueryBuilder queryBuilder, Class<?> entityType) {
+		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
+
+		org.apache.lucene.search.Query query = queryBuilder.bool()
+				.must(
+						queryBuilder.range()
+								.onField( "latitude" )
+								.from( boundingBox.getLowerLeft().getLatitude() )
+								.to( boundingBox.getUpperRight().getLatitude() )
+								.createQuery()
+				)
+				.must(
+						queryBuilder.range()
+								.onField( "longitude" )
+								.from( boundingBox.getLowerLeft().getLongitude() )
+								.to( boundingBox.getUpperRight().getLongitude() )
+								.createQuery()
+				)
+				.createQuery();
+		return new ConstantScoreQuery(
+				buildDistanceFilter(
+						new QueryWrapperFilter( query ),
+						center,
+						radius,
+						"latitude",
+						"longitude"
+				)
+		);
+
 	}
 }

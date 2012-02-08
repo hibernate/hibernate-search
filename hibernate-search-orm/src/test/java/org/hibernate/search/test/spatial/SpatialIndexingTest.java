@@ -1,16 +1,15 @@
 package org.hibernate.search.test.spatial;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.junit.Assert;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -146,12 +145,56 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	public void testSimpleSpatialAnnotationOnClassLevel() throws Exception {
+		SimpleHotel hotel = new SimpleHotel( 1, "PLazza Athénée", 24.0d, 32.0d, "Luxurious" );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( hotel );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
+
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( SimpleHotel.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
+				centerLatitude, centerLongitude, 50,
+				queryBuilder,
+				SimpleHotel.class
+		);
+
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, SimpleHotel.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSimpleSpatialQuery(
+				centerLatitude, centerLongitude, 51,
+				queryBuilder,
+				SimpleHotel.class
+		);
+
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, SimpleHotel.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + SimpleHotel.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				POI.class,
 				Event.class,
-				Hotel.class
+				Hotel.class,
+				SimpleHotel.class
 		};
 	}
 }

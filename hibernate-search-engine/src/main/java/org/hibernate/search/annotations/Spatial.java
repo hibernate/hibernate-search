@@ -39,6 +39,11 @@ public @interface Spatial {
 	/**
 	 * @return top range grid level for spatial indexing
 	 */
+	boolean gridMode() default false;
+	
+	/**
+	 * @return top range grid level for spatial indexing
+	 */
 	int topGridLevel() default SpatialFieldBridge.DEFAULT_TOP_GRID_LEVEL;
 
 	/**
