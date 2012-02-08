@@ -45,7 +45,7 @@ public class ConcatStringBridge implements StringBridge, ParameterizedBridge{
 		return string.substring( 0, maxSize );
 	}
 
-	public void setParameterValues(Map parameters) {
-		size =  Integer.valueOf( (String) parameters.get( SIZE ) );
+	public void setParameterValues(Map<String,String> parameters) {
+		size =  Integer.valueOf( parameters.get( SIZE ) );
 	}
 }

@@ -37,9 +37,8 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
 
 	private String sepChar;
 
-	@SuppressWarnings("unchecked")
-	public void setParameterValues(Map parameters) {
-		this.sepChar = (String) parameters.get( "sepChar" );
+	public void setParameterValues(Map<String,String> parameters) {
+		this.sepChar = parameters.get( "sepChar" );
 	}
 
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {

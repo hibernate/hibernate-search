@@ -37,7 +37,7 @@ import java.util.Map;
 import java.text.ParseException;
 
 public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
-    
+
 	public static final String RESOLUTION_PARAMETER = "resolution";
 	
 	private DateTools.Resolution resolution;
@@ -56,15 +56,9 @@ public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 		this.resolution = DateResolutionUtil.getLuceneResolution( resolution);
 	}
 
-	public void setParameterValues(Map parameters) {
+	public void setParameterValues(Map<String,String> parameters) {
 		Object resolution = parameters.get( RESOLUTION_PARAMETER );
-		Resolution hibResolution;
-		if ( resolution instanceof String ) {
-			hibResolution = Resolution.valueOf( ( (String) resolution ).toUpperCase( Locale.ENGLISH ) );
-		}
-		else {
-			hibResolution = (Resolution) resolution;
-		}
+		Resolution hibResolution = Resolution.valueOf( ( (String) resolution ).toUpperCase( Locale.ENGLISH ) );
 		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
 	}
 

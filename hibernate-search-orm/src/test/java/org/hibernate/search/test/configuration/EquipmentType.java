@@ -34,12 +34,11 @@ import org.hibernate.search.bridge.ParameterizedBridge;
 /**
  * @author John Griffin
  */
-@SuppressWarnings("unchecked")
 public class EquipmentType implements FieldBridge, ParameterizedBridge {
 
-	private Map equips;
+	private Map<String,String> equips;
 
-	public void setParameterValues(Map parameters) {
+	public void setParameterValues(Map<String,String> parameters) {
 		// This map was defined by the parameters of the ClassBridge annotation.
 		this.equips = parameters;
 	}
@@ -53,7 +52,7 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 		String fieldValue = deps.getManufacturer();
 
 		if ( fieldValue != null ) {
-			String indexedString = ( String ) equips.get( fieldValue );
+			String indexedString = equips.get( fieldValue );
 			luceneOptions.addFieldToDocument( name, indexedString, document );
 		}
 	}
