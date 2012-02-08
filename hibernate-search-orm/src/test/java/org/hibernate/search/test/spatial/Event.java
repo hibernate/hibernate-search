@@ -39,7 +39,7 @@ public class Event {
 	double longitude;
 
 	@Field(analyze = Analyze.NO)
-	@Spatial
+	@Spatial(gridMode = true)
 	public Coordinates getLocation() {
 		return new Coordinates() {
 			@Override

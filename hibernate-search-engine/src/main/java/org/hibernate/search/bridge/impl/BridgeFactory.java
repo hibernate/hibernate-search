@@ -77,6 +77,7 @@ import org.hibernate.search.bridge.builtin.StringBridge;
 import org.hibernate.search.bridge.builtin.UUIDBridge;
 import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
+import org.hibernate.search.spatial.SimpleSpatialFieldBridge;
 import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -289,11 +290,15 @@ public final class BridgeFactory {
 	 *
 	 * @return Returns the {@code SpatialFieldBridge} instance
 	 */
-	public static SpatialFieldBridge buildSpatialBridge( Spatial spatial, XClass clazz ) {
-		SpatialFieldBridge bridge = null;
+	public static FieldBridge buildSpatialBridge( Spatial spatial, XClass clazz ) {
+		FieldBridge bridge = null;
 		if( spatial != null )  {
 			try {
-				bridge = new SpatialFieldBridge( spatial.topGridLevel(), spatial.bottomGridLevel() );
+				if( spatial.gridMode() ) {
+					bridge = new SpatialFieldBridge( spatial.topGridLevel(), spatial.bottomGridLevel() );
+				} else {
+					bridge = new SimpleSpatialFieldBridge();
+				}
 			}
 			catch ( Exception e ) {
 				throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
