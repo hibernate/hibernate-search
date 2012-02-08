@@ -35,6 +35,7 @@ import java.util.Map;
  * @author Emmanuel Bernard
  */
 public interface ParameterizedBridge {
-	//TODO inject Properties? since the annotations cannot support Object attribute?
-	void setParameterValues(Map parameters);
+
+	void setParameterValues(Map<String,String> parameters);
+
 }

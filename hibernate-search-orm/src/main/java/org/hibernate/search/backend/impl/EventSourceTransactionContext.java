@@ -66,7 +66,8 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	//postpone it, otherwise doing
 	// " openSession - beginTransaction "
 	//will behave as "out of transaction" in the whole session lifespan.
-	private Boolean realTxInProgress = null;
+	private boolean realTxInProgress = false;
+	private boolean realTxInProgressInitialized = false;
 	
 	public EventSourceTransactionContext(EventSource eventSource) {
 		this.eventSource = eventSource;
@@ -163,8 +164,9 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	}
 	
 	private boolean isRealTransactionInProgress() {
-		if ( realTxInProgress == null ) {
+		if ( ! realTxInProgressInitialized ) {
 			realTxInProgress = eventSource.isTransactionInProgress();
+			realTxInProgressInitialized = true;
 		}
 		return realTxInProgress;
 	}

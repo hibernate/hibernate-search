@@ -60,7 +60,7 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 										 Session session) {
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
-		log.tracef( "Load %d objects using criteria queries", maxResults );
+		if ( log.isTraceEnabled() ) log.tracef( "Load %d objects using criteria queries", maxResults );
 
 		if ( maxResults == 0 ) {
 			return;

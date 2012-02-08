@@ -90,15 +90,9 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 				null;
 	}
 
-	public void setParameterValues(Map parameters) {
-		Object resolution = parameters.get( "resolution" );
-		Resolution hibResolution;
-		if ( resolution instanceof String ) {
-			hibResolution = Resolution.valueOf( ( (String) resolution ).toUpperCase( Locale.ENGLISH ) );
-		}
-		else {
-			hibResolution = (Resolution) resolution;
-		}
+	public void setParameterValues(Map<String,String> parameters) {
+		String resolution = parameters.get( "resolution" );
+		Resolution hibResolution = Resolution.valueOf( resolution.toUpperCase( Locale.ENGLISH ) );
 		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
 	}
 }

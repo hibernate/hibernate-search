@@ -42,7 +42,8 @@ import org.hibernate.transform.ResultTransformer;
  */
 public class ProjectionLoader implements Loader {
 	private Loader objectLoader;
-	private Boolean projectThis;
+	private boolean projectThisIsInitialized = false;//guard for next variable
+	private boolean projectThis;
 	private ResultTransformer transformer;
 	private String[] aliases;
 	private ObjectLoaderBuilder loaderBuilder;
@@ -67,13 +68,12 @@ public class ProjectionLoader implements Loader {
 
 	public Object load(EntityInfo entityInfo) {
 		//no need to timeouManage here, the underlying loader is the real time consumer
-		initThisProjectionFlag(entityInfo);
-		if (projectThis) {
+		if ( projectionEnabledOnThis( entityInfo ) ) {
 			Loader objectLoader = getObjectLoader();
 			final Object entityInstance = objectLoader.load( entityInfo );
 			entityInfo.populateWithEntityInstance( entityInstance );
 		}
-		if (transformer != null) {
+		if ( transformer != null ) {
 			return transformer.transformTuple(entityInfo.getProjection(), aliases);
 		}
 		else {
@@ -85,10 +85,12 @@ public class ProjectionLoader implements Loader {
 		throw new AssertionFailure("This method is not meant to be used on ProjectionLoader");
 	}
 
-	private void initThisProjectionFlag(EntityInfo entityInfo) {
-		if (projectThis == null) {
+	private boolean projectionEnabledOnThis(final EntityInfo entityInfo) {
+		if ( projectThisIsInitialized == false ) {
+			projectThisIsInitialized = true;
 			projectThis = entityInfo.isProjectThis();
 		}
+		return projectThis;
 	}
 
 	public List load(EntityInfo... entityInfos) {
@@ -98,8 +100,7 @@ public class ProjectionLoader implements Loader {
 			return results;
 		}
 
-		initThisProjectionFlag(entityInfos[0]);
-		if (projectThis) {
+		if ( projectionEnabledOnThis( entityInfos[0] ) ) {
 			Loader objectLoader = getObjectLoader();
 			objectLoader.load(entityInfos); // load by batch
 			for (EntityInfo entityInfo : entityInfos) {

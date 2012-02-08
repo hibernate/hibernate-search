@@ -42,7 +42,7 @@ public class TruncateStringBridge implements StringBridge, ParameterizedBridge {
         return object != null ? string.substring( 0, string.length() / div ) : null;
     }
 
-    public void setParameterValues(Map parameters) {
-        div = Integer.valueOf( (String) parameters.get( "dividedBy" ) );
+    public void setParameterValues(Map<String,String> parameters) {
+        div = Integer.parseInt( parameters.get( "dividedBy" ) );
     }
 }

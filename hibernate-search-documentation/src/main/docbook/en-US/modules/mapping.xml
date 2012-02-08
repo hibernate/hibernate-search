@@ -1632,9 +1632,9 @@ private Integer length;                </programlisting>
     public static String PADDING_PROPERTY = "padding";
     private int padding = 5; //default
 
-    <emphasis role="bold">public void setParameterValues(Map parameters)</emphasis> {
-        Object padding = parameters.get( PADDING_PROPERTY );
-        if (padding != null) this.padding = (Integer) padding;
+    <emphasis role="bold">public void setParameterValues(Map&lt;String,String&gt; parameters)</emphasis> {
+        String padding = parameters.get( PADDING_PROPERTY );
+        if (padding != null) this.padding = Integer.parseInt( padding );
     }
 
     public String objectToString(Object object) {

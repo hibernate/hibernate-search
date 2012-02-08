@@ -135,7 +135,8 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
 			totalCount = objectsLimit;
 		}
-		log.debugf( "going to fetch %d primary keys", totalCount);
+		if ( log.isDebugEnabled() )
+			log.debugf( "going to fetch %d primary keys", totalCount);
 		monitor.addToTotalCount( totalCount );
 		
 		Criteria criteria = session
