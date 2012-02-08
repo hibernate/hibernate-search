@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <infinispan
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="urn:infinispan:config:5.0 http://www.infinispan.org/schemas/infinispan-config-5.0.xsd"
-    xmlns="urn:infinispan:config:5.0">
+    xsi:schemaLocation="urn:infinispan:config:5.1 http://www.infinispan.org/schemas/infinispan-config-5.1.xsd"
+    xmlns="urn:infinispan:config:5.1">
 
     <!-- *************************** -->
     <!-- System-wide global settings -->
@@ -18,15 +18,20 @@
             cacheManagerName="HibernateSearch"
             allowDuplicateDomains="true" />
 
-        <!-- If the transport is omitted, there is no way to create distributed or clustered 
-            caches. There is no added cost to defining a transport but not creating a cache that uses one, 
+        <!-- If the transport is omitted, there is no way to create distributed or clustered
+            caches. There is no added cost to defining a transport but not creating a cache that uses one,
             since the transport is created and initialized lazily. -->
         <transport
             clusterName="HibernateSearch-Infinispan-cluster"
-            distributedSyncTimeout="50000">
+            >
+
             <!-- Note that the JGroups transport uses sensible defaults if no configuration 
                 property is defined. See the JGroupsTransport javadocs for more flags -->
         </transport>
+
+        <!-- Note that the JGroups transport uses sensible defaults if no configuration property 
+            is defined. See the Infinispan wiki for more JGroups settings:
+            http://community.jboss.org/wiki/ClusteredConfigurationQuickStart -->
 
         <!-- Used to register JVM shutdown hooks. hookBehavior: DEFAULT, REGISTER, DONT_REGISTER. 
             Hibernate Search takes care to stop the CacheManager so registering is not needed -->
@@ -60,11 +65,9 @@
             mode="replication">
 
             <!-- Prefer loading all data at startup than later -->
-            <stateRetrieval
-                timeout="20000"
-                logFlushTimeout="30000"
-                fetchInMemoryState="true"
-                alwaysProvideInMemoryState="true" />
+            <stateTransfer
+                timeout="480000"
+                fetchInMemoryState="true" />
 
             <!-- Network calls are synchronous by default -->
             <sync
@@ -100,9 +103,8 @@
         name="LuceneIndexesMetadata">
         <clustering
             mode="replication">
-            <stateRetrieval
-                fetchInMemoryState="true"
-                logFlushTimeout="30000" />
+            <stateTransfer
+                fetchInMemoryState="true" />
             <sync
                 replTimeout="25000" />
         </clustering>
@@ -115,9 +117,8 @@
         name="LuceneIndexesData">
         <clustering
             mode="replication">
-            <stateRetrieval
-                fetchInMemoryState="true"
-                logFlushTimeout="30000" />
+            <stateTransfer
+                fetchInMemoryState="true" />
             <sync
                 replTimeout="25000" />
         </clustering>
@@ -130,9 +131,8 @@
         name="LuceneIndexesLocking">
         <clustering
             mode="replication">
-            <stateRetrieval
-                fetchInMemoryState="true"
-                logFlushTimeout="30000" />
+            <stateTransfer
+                fetchInMemoryState="true" />
             <sync
                 replTimeout="25000" />
         </clustering>
