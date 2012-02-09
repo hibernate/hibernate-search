@@ -33,8 +33,6 @@ import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.backend.FlushLuceneWork;
-import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -151,20 +149,9 @@ public class BatchCoordinator implements Runnable {
 	private void afterBatch(BatchBackend backend) {
 		Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( rootEntities );
 		if ( this.optimizeAtEnd ) {
-			optimize( backend, targetedClasses );
+			backend.optimize( targetedClasses );
 		}
-		flush( backend, targetedClasses );
-	}
-
-	/**
-	 * @param backend
-	 * @param targetedClasses
-	 */
-	private void flush(BatchBackend backend, Set<Class<?>> targetedClasses) {
-		for ( Class<?> clazz : targetedClasses ) {
-			//TODO the backend should remove duplicate optimize work to the same DP (as entities might share indexes)
-			backend.doWorkInSync( new FlushLuceneWork( clazz ) );
-		}
+		backend.flush( targetedClasses );
 	}
 
 	/**
@@ -180,15 +167,9 @@ public class BatchCoordinator implements Runnable {
 				backend.doWorkInSync( new PurgeAllLuceneWork( clazz ) );
 			}
 			if ( this.optimizeAfterPurge ) {
-				optimize( backend, targetedClasses );
+				backend.optimize( targetedClasses );
 			}
 		}
 	}
 
-	private void optimize(BatchBackend backend, Set<Class<?>> targetedClasses) {
-		for ( Class<?> clazz : targetedClasses ) {
-			//TODO the backend should remove duplicate optimize work to the same DP (as entities might share indexes)
-			backend.doWorkInSync( new OptimizeLuceneWork( clazz ) );
-		}
-	}
 }

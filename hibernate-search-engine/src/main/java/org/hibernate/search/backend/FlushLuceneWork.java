@@ -36,6 +36,8 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  */
 public class FlushLuceneWork extends LuceneWork implements Serializable {
 
+	public static final FlushLuceneWork INSTANCE = new FlushLuceneWork();
+
 	/**
 	 * Flushes all index operations for a specific entity.
 	 *
@@ -48,7 +50,7 @@ public class FlushLuceneWork extends LuceneWork implements Serializable {
 	/**
 	 * Flushes all index operations
 	 */
-	public FlushLuceneWork() {
+	private FlushLuceneWork() {
 		super( null, null, null );
 	}
 
