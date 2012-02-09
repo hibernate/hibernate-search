@@ -24,6 +24,8 @@
 package org.hibernate.search.backend.impl.batch;
 
 
+import java.util.Set;
+
 import org.hibernate.search.backend.LuceneWork;
 
 /**
@@ -60,6 +62,13 @@ public interface BatchBackend {
 	 * make sure we don't return control before all work was processed.
 	 * @param indexedRootType flushes all indexes containing entities of this type
 	 */
-	void flush(Class<?> indexedRootType);
+	void flush(Set<Class<?>> indexedRootTypes);
+
+	/**
+	 * Triggers optimization of all indexes containing at least one instance of the
+	 * listed targetedClasses.
+	 * @param targetedClasses Used to specify which indexes need optimization.
+	 */
+	void optimize(Set<Class<?>> targetedClasses);
 
 }

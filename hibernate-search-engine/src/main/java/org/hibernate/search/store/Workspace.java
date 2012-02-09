@@ -72,11 +72,19 @@ public interface Workspace {
 	Set<Class<?>> getEntitiesInIndexManager();
 
 	/**
-	 * Invoked after all changes of a transaction are applied
+	 * Invoked after all changes of a transaction are applied.
+	 * Must be invoked strictly once after every {@link #getIndexWriter()} in a finally block
+	 * as implementations might rely on counters to release the IndexWriter.
+	 * 
 	 * @param someFailureHappened usually false, set to true if errors
 	 * where caught while using the IndexWriter
 	 * @param streaming if no immediate visibility of the change is required (hint for performance)
 	 */
 	void afterTransactionApplied(boolean someFailureHappened, boolean streaming);
+
+	/**
+	 * Makes sure eventually pending changes are made visible to IndexReaders.
+	 */
+	void flush();
 
 }

@@ -76,17 +76,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 		}
 		else {
 			if ( ! streaming ) {
-				IndexReader newIndexReader = writerHolder.openNRTIndexReader( true );
-				writeLock.lock();
-				IndexReader oldReader = currentReferenceReader;
-				currentReferenceReader = newIndexReader;
-				writeLock.unlock();
-				try {
-					oldReader.close();
-				}
-				catch ( IOException e ) {
-					log.unableToCLoseLuceneIndexReader( e );
-				}
+				flush();
 			}
 		}
 	}
@@ -167,6 +157,21 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 		}
 		finally {
 			writeLock.unlock();
+		}
+	}
+
+	@Override
+	public void flush() {
+		IndexReader newIndexReader = writerHolder.openNRTIndexReader( true );
+		writeLock.lock();
+		IndexReader oldReader = currentReferenceReader;
+		currentReferenceReader = newIndexReader;
+		writeLock.unlock();
+		try {
+			oldReader.close();
+		}
+		catch ( IOException e ) {
+			log.unableToCLoseLuceneIndexReader( e );
 		}
 	}
 

@@ -57,6 +57,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	private LuceneBackendResources resources;
 	private boolean sync;
 	private AbstractWorkspaceImpl workspaceOverride;
+	private LuceneBackendTaskStreamer streamWorker;
 
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
@@ -67,6 +68,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 			);
 		}
 		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );
+		streamWorker = new LuceneBackendTaskStreamer( resources );
 	}
 
 	public void close() {
@@ -74,28 +76,22 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	@Override
-	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
-		if ( workList == null ) {
-			throw new IllegalArgumentException( "workList should not be null" );
-		}
-		doWork( workList, monitor, false );
-	}
-
-	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		if ( singleOperation == null ) {
 			throw new IllegalArgumentException( "singleOperation should not be null" );
 		}
-		List<LuceneWork> singletonList = Collections.singletonList( singleOperation );
-		doWork( singletonList, monitor, true );
+		streamWorker.doWork( singleOperation, monitor );
 	}
 
-	private void doWork(List<LuceneWork> workList, IndexingMonitor monitor, boolean streaming) {
+	@Override
+	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
+		if ( workList == null ) {
+			throw new IllegalArgumentException( "workList should not be null" );
+		}
 		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask(
 				workList,
 				resources,
-				monitor,
-				streaming
+				monitor
 		);
 		if ( sync ) {
 			Future<?> future = resources.getQueueingExecutor().submit( luceneBackendQueueProcessor );
@@ -103,8 +99,8 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 				future.get();
 			}
 			catch ( InterruptedException e ) {
-				Thread.currentThread().interrupt();
 				log.interruptedWhileWaitingForIndexActivity();
+				Thread.currentThread().interrupt();
 			}
 			catch ( ExecutionException e ) {
 				throw new SearchException( "Error applying updates to the Lucene index", e.getCause() );

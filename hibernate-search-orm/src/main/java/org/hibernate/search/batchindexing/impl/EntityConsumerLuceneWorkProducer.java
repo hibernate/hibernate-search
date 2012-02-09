@@ -142,7 +142,6 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 			// just quit
 			Thread.currentThread().interrupt();
 		}
-		backend.flush( indexedRootType );
 	}
 
 	@SuppressWarnings("unchecked")

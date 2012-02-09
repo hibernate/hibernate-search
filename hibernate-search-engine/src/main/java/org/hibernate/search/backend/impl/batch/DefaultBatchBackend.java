@@ -23,13 +23,19 @@
  */
 package org.hibernate.search.backend.impl.batch;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Set;
+
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -76,13 +82,33 @@ public class DefaultBatchBackend implements BatchBackend {
 	}
 
 	@Override
-	public void flush(Class<?> entityType) {
-		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
-		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-		WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
-		FlushLuceneWork flushOperation = new FlushLuceneWork();
-		flushOperation.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE )
-				.performOperation( flushOperation, shardingStrategy, workContext );
+	public void flush(Set<Class<?>> entityTypes) {
+		Collection<IndexManager> uniqueIndexManagers = uniqueIndexManagerForTypes( entityTypes );
+		for ( IndexManager indexManager : uniqueIndexManagers ) {
+			indexManager.performStreamOperation( FlushLuceneWork.INSTANCE, progressMonitor, false );
+		}
+	}
+
+	@Override
+	public void optimize(Set<Class<?>> entityTypes) {
+		Collection<IndexManager> uniqueIndexManagers = uniqueIndexManagerForTypes( entityTypes );
+		for ( IndexManager indexManager : uniqueIndexManagers ) {
+			indexManager.performStreamOperation( OptimizeLuceneWork.INSTANCE, progressMonitor, false );
+		}
+	}
+
+	private Collection<IndexManager> uniqueIndexManagerForTypes(Collection<Class<?>> entityTypes) {
+		HashMap<String,IndexManager> uniqueBackends = new HashMap<String, IndexManager>( entityTypes.size() );
+		for ( Class<?> type : entityTypes ) {
+			EntityIndexBinder indexBindingForEntity = searchFactoryImplementor.getIndexBindingForEntity( type );
+			if ( indexBindingForEntity != null ) {
+				IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
+				for ( IndexManager im : indexManagers ) {
+					uniqueBackends.put( im.getIndexName(), im );
+				}
+			}
+		}
+		return uniqueBackends.values();
 	}
 
 }

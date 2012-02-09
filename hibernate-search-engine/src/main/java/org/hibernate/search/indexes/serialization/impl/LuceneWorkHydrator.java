@@ -88,7 +88,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addOptimizeAll() {
-		results.add( new OptimizeLuceneWork() );
+		results.add( OptimizeLuceneWork.INSTANCE );
 	}
 
 	@Override

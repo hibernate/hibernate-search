@@ -23,12 +23,16 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import junit.framework.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.Lock;
+import org.apache.lucene.store.LockFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +43,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
@@ -74,6 +80,7 @@ public class IndexingGeneratedCorpusTest {
 				.addAnnotatedClass( Nation.class )
 				.addAnnotatedClass( SecretBook.class )
 				.setProperty( "hibernate.show_sql", "false" ) // too verbose for this test
+				.setProperty( "hibernate.search.DVDS.exclusive_index_use", "false" ) // to test lock release
 				.build();
 		createMany( Book.class, BOOK_NUM );
 		createMany( Dvd.class, DVD_NUM );
@@ -136,7 +143,7 @@ public class IndexingGeneratedCorpusTest {
 	}
 
 	@Test
-	public void testBatchIndexing() throws InterruptedException {
+	public void testBatchIndexing() throws InterruptedException, IOException {
 		verifyResultNumbers(); //initial count of entities should match expectations
 		purgeAll(); // empty indexes
 		verifyIsEmpty();
@@ -144,6 +151,8 @@ public class IndexingGeneratedCorpusTest {
 		verifyResultNumbers(); // verify the count match again
 		reindexAll(); //tests that purgeAll is automatic:
 		verifyResultNumbers(); //..same numbers again
+		verifyIndexIsLocked( false, Dvd.class ); //non exclusive index configured
+		verifyIndexIsLocked( true, Book.class ); //exclusive index enabled
 	}
 
 	private void reindexAll() throws InterruptedException {
@@ -174,6 +183,15 @@ public class IndexingGeneratedCorpusTest {
 		finally {
 			fullTextSession.close();
 		}
+	}
+
+	private void verifyIndexIsLocked(boolean isLocked, Class type) throws IOException {
+		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) builder.getSearchFactory();
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getIndexBindingForEntity( type ).getIndexManagers()[0];
+		Directory directory = indexManager.getDirectoryProvider().getDirectory();
+		LockFactory lockFactory = directory.getLockFactory();
+		Lock writeLock = lockFactory.makeLock( "write.lock" );
+		Assert.assertEquals( isLocked, writeLock.isLocked() );
 	}
 
 	@SuppressWarnings("unchecked")

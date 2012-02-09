@@ -30,6 +30,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.Environment;
@@ -83,6 +84,7 @@ class IndexWriterHolder {
 		if ( similarity != null ) {
 			writerConfig.setSimilarity( similarity );
 		}
+		writerConfig.setOpenMode( OpenMode.APPEND ); //More efficient to open
 		//TODO remove this awful need to set a reference back again to the indexManager:
 		indexManager.setIndexWriterConfig( writerConfig );
 	}
