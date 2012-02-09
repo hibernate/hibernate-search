@@ -240,7 +240,6 @@ transaction.commit();</programlisting>
  .batchSizeToLoadObjects( 25 )
  .cacheMode( CacheMode.NORMAL )
  .threadsToLoadObjects( 5 )
- .threadsForIndexWriter( 3 )
  .idFetchSize( 150 )
  .threadsForSubsequentFetching( 20 )
  .progressMonitor( monitor ) //a MassIndexerProgressMonitor implementation
@@ -251,9 +250,11 @@ transaction.commit();</programlisting>
       and will create 5 parallel threads to load the User instances using
       batches of 25 objects per query; these loaded User instances are then
       pipelined to 20 parallel threads to load the attached lazy collections
-      of User containing some information needed for the index. Finally,
-      3 parallel threads are being used to Analyze the text and write to the
-      index.</para>
+      of User containing some information needed for the index.
+      The number of threads working on actual index writing is defined by the backend
+      configuration of each index.
+      See the option <literal>worker.thread_pool.size</literal> in <xref
+      linkend="table-work-execution-configuration" />.</para>
 
       <para>It is recommended to leave cacheMode to
       <literal>CacheMode.IGNORE</literal> (the default), as in most reindexing

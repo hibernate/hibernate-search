@@ -60,7 +60,6 @@ public class MassIndexerImpl implements MassIndexer {
 	// default settings defined here:
 	private int objectLoadingThreads = 2; //loading the main entity
 	private int collectionLoadingThreads = 4; //also responsible for loading of lazy @IndexedEmbedded collections
-	private Integer writerThreads = null; //could be null: in case global configuration is applied. Also affects number of running Analyzers.
 	private int objectLoadingBatchSize = 10;
 	private long objectsLimit = 0; //means no limit at all
 	private CacheMode cacheMode = CacheMode.IGNORE;
@@ -160,10 +159,9 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
+	@Deprecated
 	public MassIndexer threadsForIndexWriter(int numberOfThreads) {
-		if ( numberOfThreads < 1 )
-			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
-		this.writerThreads = numberOfThreads;
+		log.massIndexerIndexWriterThreadsIgnored();
 		return this;
 	}
 
@@ -213,7 +211,7 @@ public class MassIndexerImpl implements MassIndexer {
 				objectLoadingThreads, collectionLoadingThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor, writerThreads, idFetchSize
+				monitor, idFetchSize
 		);
 	}
 
