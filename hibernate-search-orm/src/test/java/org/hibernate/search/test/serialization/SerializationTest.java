@@ -204,8 +204,8 @@ public class SerializationTest extends SearchTestCase {
 
 	private List<LuceneWork> buildWorks() throws Exception {
 		List<LuceneWork> works = new ArrayList<LuceneWork>();
-		works.add( new OptimizeLuceneWork() );
-		works.add( new OptimizeLuceneWork() );
+		works.add( OptimizeLuceneWork.INSTANCE );
+		works.add( OptimizeLuceneWork.INSTANCE );
 		works.add( new OptimizeLuceneWork( RemoteEntity.class ) ); //class won't be send over
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );

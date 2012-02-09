@@ -93,7 +93,7 @@ public class DefaultBatchBackend implements BatchBackend {
 	public void optimize(Set<Class<?>> entityTypes) {
 		Collection<IndexManager> uniqueIndexManagers = uniqueIndexManagerForTypes( entityTypes );
 		for ( IndexManager indexManager : uniqueIndexManagers ) {
-			indexManager.performStreamOperation( new OptimizeLuceneWork(), progressMonitor, false );
+			indexManager.performStreamOperation( OptimizeLuceneWork.INSTANCE, progressMonitor, false );
 		}
 	}
 

@@ -148,7 +148,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void optimize() {
-		performStreamOperation( new OptimizeLuceneWork(), null, false );
+		performStreamOperation( OptimizeLuceneWork.INSTANCE, null, false );
 	}
 
 	//Not exposed on the IndexManager interface

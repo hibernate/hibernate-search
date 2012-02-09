@@ -36,7 +36,9 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  * @author Emmanuel Bernard
  */
 public class OptimizeLuceneWork extends LuceneWork implements Serializable {
-	
+
+	public static final OptimizeLuceneWork INSTANCE = new OptimizeLuceneWork();
+
 	/**
 	 * Optimizes the index(es) of a specific entity
 	 * @param entity
@@ -48,7 +50,7 @@ public class OptimizeLuceneWork extends LuceneWork implements Serializable {
 	/**
 	 * Optimizes any index
 	 */
-	public OptimizeLuceneWork() {
+	private OptimizeLuceneWork() {
 		super( null, null, null );
 	}
 
