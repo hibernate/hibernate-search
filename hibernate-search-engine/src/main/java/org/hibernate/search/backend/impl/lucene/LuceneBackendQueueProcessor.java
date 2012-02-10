@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
