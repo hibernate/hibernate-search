@@ -524,4 +524,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 123, value = "Unable to send Lucene update work via cluster [%1$s]")
 	SearchException unableToSendWorkViaJGroups(String clusterName, @Cause Throwable e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 124, value = "The option 'threadsForIndexWriter' of the MassIndexer is deprecated and is being ignored! Control the size of worker.thread_pool.size for each index instead.")
+	void massIndexerIndexWriterThreadsIgnored();
+
 }

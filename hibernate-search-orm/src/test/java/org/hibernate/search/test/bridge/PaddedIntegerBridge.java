@@ -41,9 +41,10 @@ public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBri
 	private int padding = 5; //default
 
 	public void setParameterValues(Map<String,String> parameters) {
-		String padding = (String) parameters.get( PADDING_PROPERTY );
-		if ( padding != null )
-			this.padding = Integer.parseInt(padding);
+		String padding = parameters.get( PADDING_PROPERTY );
+		if ( padding != null ) {
+			this.padding = Integer.parseInt( padding );
+		}
 	}
 
 	public String objectToString(Object object) {

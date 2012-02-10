@@ -62,15 +62,11 @@ public interface MassIndexer {
 	MassIndexer threadsForSubsequentFetching(int numberOfThreads);
 	
 	/**
-	 * <p>Sets the number of threads to be used to analyze the documents
-	 * and write to the index.</p><p>This overrides the global property
-	 * <tt>hibernate.search.batchbackend.concurrent_writers</tt>.</p><p>
-	 * Might be ignored by <code>BatchBackend</code> implementations other
-	 * than <code>org.hibernate.search.backend.impl.batchlucene.LuceneBatchBackend</code></p>
-	 * @see org.hibernate.search.backend.impl.batch.DefaultBatchBackend
-	 * @param numberOfThreads
-	 * @return <tt>this</tt> for method chaining
+	 * Deprecated: value is ignored.
+	 * To have more threads working on the IndexWriter, use the worker.thread_pool.size
+	 * option.
 	 */
+	@Deprecated
 	MassIndexer threadsForIndexWriter(int numberOfThreads);
 	
 	/**

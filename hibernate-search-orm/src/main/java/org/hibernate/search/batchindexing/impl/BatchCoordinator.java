@@ -77,7 +77,6 @@ public class BatchCoordinator implements Runnable {
 							boolean purgeAtStart,
 							boolean optimizeAfterPurge,
 							MassIndexerProgressMonitor monitor,
-							Integer writerThreads,
 							int idFetchSize) {
 		this.idFetchSize = idFetchSize;
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
