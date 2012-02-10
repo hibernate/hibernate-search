@@ -103,6 +103,25 @@ hibernate.search.Animal.optimizer.transaction_limit.max = 50</programlisting>
 
     <para>If none of these parameters are defined, no optimization is
     processed automatically.</para>
+
+    <para>The default implementation of OptimizerStrategy can be overriden by implementing
+    <literal>org.hibernate.search.store.optimization.OptimizerStrategy</literal> and
+    setting the <literal>optimizer.implementation</literal> property to the fully qualified name
+    of your implementation. This implementation must implement the interface, be a public class
+    and have a public constructor taking no arguments.</para>
+
+    <example>
+       <title>Loading a custom OptimizerStrategy</title>
+
+      <programlisting>hibernate.search.default.optimizer.implementation = com.acme.worlddomination.SmartOptimizer
+hibernate.search.default.optimizer.SomeOption CustomConfigurationValue
+hibernate.search.humans.optimizer.implementation = default</programlisting>
+    </example>
+
+    <para>The keyword <literal>default</literal> can be used to select the Hibernate Search default
+    implementation; all properties after the <literal>.optimizer</literal> key separator will be
+    passed to the implementation's <methodname>initialize</methodname> method at start.</para>
+
   </section>
 
   <section>

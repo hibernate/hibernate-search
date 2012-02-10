@@ -77,17 +77,24 @@ public class CommonPropertiesParse {
 	}
 
 	public static OptimizerStrategy getOptimizerStrategy(IndexManager callback, Properties indexProps) {
-		boolean incremental = indexProps.containsKey( "optimizer.operation_limit.max" )
-				|| indexProps.containsKey( "optimizer.transaction_limit.max" );
-		OptimizerStrategy optimizerStrategy;
-		if ( incremental ) {
-			optimizerStrategy = new IncrementalOptimizerStrategy();
-			optimizerStrategy.initialize( callback, indexProps );
+		MaskedProperty optimizerCfg = new MaskedProperty(indexProps, "optimizer" );
+		String customImplementation = optimizerCfg.getProperty( "implementation" );
+		if ( customImplementation != null && (! "default".equalsIgnoreCase( customImplementation ) ) ) {
+			return ClassLoaderHelper.instanceFromName( OptimizerStrategy.class, customImplementation, callback.getClass(), "Optimizer Strategy" );
 		}
 		else {
-			optimizerStrategy = new ExplicitOnlyOptimizerStrategy();
+			boolean incremental = optimizerCfg.containsKey( "operation_limit.max" )
+				|| optimizerCfg.containsKey( "transaction_limit.max" );
+			OptimizerStrategy optimizerStrategy;
+			if ( incremental ) {
+				optimizerStrategy = new IncrementalOptimizerStrategy();
+				optimizerStrategy.initialize( callback, optimizerCfg );
+			}
+			else {
+				optimizerStrategy = new ExplicitOnlyOptimizerStrategy();
+			}
+			return optimizerStrategy;
 		}
-		return optimizerStrategy;
 	}
 	
 	/**
