@@ -102,7 +102,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 
 	private void standardFieldAdd(String name, String indexedString, Document document) {
 		Field field = new Field(
-				name, false, indexedString, storeUncompressed ? Field.Store.YES : Field.Store.NO, indexMode, termVector
+				name, true, indexedString, storeUncompressed ? Field.Store.YES : Field.Store.NO, indexMode, termVector
 		);
 		field.setBoost( boost );
 		document.add( field );
