@@ -94,8 +94,8 @@ public class IncrementalOptimizerStrategy extends ExplicitOnlyOptimizerStrategy 
 	@Override
 	public void initialize(IndexManager indexManager, Properties indexProperties) {
 		super.initialize( indexManager, indexProperties );
-		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.operation_limit.max", -1 );
-		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "optimizer.transaction_limit.max", -1 );
+		operationMax = ConfigurationParseHelper.getIntValue( indexProperties, "operation_limit.max", -1 );
+		transactionMax = ConfigurationParseHelper.getIntValue( indexProperties, "transaction_limit.max", -1 );
 	}
 
 	public long getOptimizationsPerformed() {
