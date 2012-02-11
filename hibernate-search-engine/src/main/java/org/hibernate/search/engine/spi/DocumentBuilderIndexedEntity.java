@@ -512,6 +512,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			if ( previousMember != member ) {
 				currentFieldValue = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 				previousMember = member;
+				if ( member.isCollection() ) {
+					Collection collection = objectInitializer.initializeCollection( (Collection) currentFieldValue );
+				}
 			}
 
 			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get( i );
