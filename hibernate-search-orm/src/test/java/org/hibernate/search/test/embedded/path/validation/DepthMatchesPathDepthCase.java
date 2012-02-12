@@ -40,7 +40,7 @@ public class DepthMatchesPathDepthCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(depth = 4, paths = { "a.b.c.indexed" })
+	@IndexedEmbedded(depth = 4, includePaths = { "a.b.c.indexed" })
 	public ReferencesIndexedEmbeddedA e;
 
 }

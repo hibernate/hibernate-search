@@ -39,7 +39,7 @@ public class InvalidShallowPathCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(paths = { "dne" })
+	@IndexedEmbedded(includePaths = { "dne" })
 	public A a;
 
 }

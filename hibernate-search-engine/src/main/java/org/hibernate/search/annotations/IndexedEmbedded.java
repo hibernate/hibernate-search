@@ -56,15 +56,26 @@ public @interface IndexedEmbedded {
 	String prefix() default ".";
 
 	/**
-	 * Defined paths are going to be indexed even if they exceed the depth threshold.
-	 * When paths is not empty, the default value for depth is 0.
+	 * <p>List which <em>paths</em> of the object graph should be included
+	 * in the index, and need to match the field names used to store them in the index, so they will
+	 * also match the field names used to specify full text queries.</p>
+	 * 
+	 * <p>Defined paths are going to be indexed even if they exceed the {@code depth} threshold.
+	 * When {@code includePaths} is not empty, the default value for {@code depth} is 0.</p>
 	 */
-	String[] paths() default {};
-	
+	String[] includePaths() default {};
+
 	/**
-	 * Stop indexing embedded elements when depth is reached
-	 * depth=1 means the associated element is index, but not its embedded elements
-	 * Default: infinite (an exception will be raised if a class circular reference occurs while infinite is chosen)
+	 * <p>Stop indexing embedded elements when depth is reached
+	 * depth=1 means the associated element is indexed, but not its embedded elements.</p>
+	 * 
+	 * <p>The default value depends on the value of the {@code includePaths} attribute: if no paths
+	 * are defined, the default is {@code Integer.MAX_VALUE}; if any {@code includePaths} are
+	 * defined, the default {@code depth} is interpreted as 0 if not specified to a different value
+	 * than it's default.</p>
+	 * 
+	 * <p>Note that when defining any path to the {@code includePaths} attribute the default is zero also
+	 * when explicitly set to {@code Integer.MAX_VALUE}.</p>
 	 */
 	int depth() default Integer.MAX_VALUE;
 

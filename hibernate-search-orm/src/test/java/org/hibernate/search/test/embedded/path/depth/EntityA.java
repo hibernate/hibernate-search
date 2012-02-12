@@ -39,7 +39,7 @@ class EntityA {
 	public int id;
 
 	@OneToOne
-	@IndexedEmbedded(depth = 1, paths = { "indexed.field" })
+	@IndexedEmbedded(depth = 1, includePaths = { "indexed.field" })
 	public EntityB b;
 
 	public EntityA() {

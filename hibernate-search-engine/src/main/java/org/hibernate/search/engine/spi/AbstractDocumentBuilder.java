@@ -818,7 +818,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private int depth(IndexedEmbedded embeddedAnn) {
-		if ( isDepthNotSet( embeddedAnn ) && embeddedAnn.paths().length > 0 )
+		if ( isDepthNotSet( embeddedAnn ) && embeddedAnn.includePaths().length > 0 )
 			return 0;
 
 		return embeddedAnn.depth();
@@ -833,7 +833,7 @@ public abstract class AbstractDocumentBuilder<T> {
 			return pathsContext;
 
 		PathsContext newPathsContext = new PathsContext( embeddedAnn );
-		for ( String path : embeddedAnn.paths() ) {
+		for ( String path : embeddedAnn.includePaths() ) {
 			newPathsContext.addPath( localPrefix + path );
 		}
 		return newPathsContext;

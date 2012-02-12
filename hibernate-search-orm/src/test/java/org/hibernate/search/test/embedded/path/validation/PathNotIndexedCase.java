@@ -40,7 +40,7 @@ public class PathNotIndexedCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(depth = 4, paths = { "c.indexed" })
+	@IndexedEmbedded(depth = 4, includePaths = { "c.indexed" })
 	public ReferencesC e;
 
 }

@@ -36,6 +36,6 @@ class FieldRenamedContainerEntity {
 	Integer id;
 
 	@OneToOne
-	@IndexedEmbedded(depth = 0, paths = {"embedded.field"})
+	@IndexedEmbedded(depth = 0, includePaths = {"embedded.field"})
 	FieldRenamedEmbeddedEntity embedded;
 }

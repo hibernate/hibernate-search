@@ -101,7 +101,7 @@ public class Human {
 	}
 
 	@OneToMany
-	@IndexedEmbedded(depth = 2, paths = { "parents.parents.name" })
+	@IndexedEmbedded(depth = 2, includePaths = { "parents.parents.name" })
 	public Set<Human> getParents() {
 		return parents;
 	}

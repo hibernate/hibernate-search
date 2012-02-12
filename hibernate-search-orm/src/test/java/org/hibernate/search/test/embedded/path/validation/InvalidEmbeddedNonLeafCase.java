@@ -39,7 +39,7 @@ public class InvalidEmbeddedNonLeafCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(paths = { "emb.e1", // valid
+	@IndexedEmbedded(includePaths = { "emb.e1", // valid
 			"emb.e3.c.indexed", // valid
 			"emb.e4", // invalid
 			"emb.e3" // invalid, not a leaf

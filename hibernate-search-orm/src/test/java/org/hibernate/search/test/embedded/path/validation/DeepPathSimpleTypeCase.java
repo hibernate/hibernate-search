@@ -39,7 +39,7 @@ public class DeepPathSimpleTypeCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(paths = { "b.c.indexed", // valid
+	@IndexedEmbedded(includePaths = { "b.c.indexed", // valid
 			"b.c.dne" // invalid path, dne doesn't exist
 	})
 	public A a;

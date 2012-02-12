@@ -39,11 +39,11 @@ public class A {
 	public int id;
 
 	@OneToOne
-	@IndexedEmbedded(depth = 0, paths = { "c.indexed" })
+	@IndexedEmbedded(depth = 0, includePaths = { "c.indexed" })
 	public B b;
 
 	@OneToOne
-	@IndexedEmbedded(prefix = "prefixed", depth = 0, paths = { "c.indexed" })
+	@IndexedEmbedded(prefix = "prefixed", depth = 0, includePaths = { "c.indexed" })
 	public B b2;
 
 }

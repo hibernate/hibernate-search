@@ -39,7 +39,7 @@ public class DepthExceedsPathTestCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(depth = 6, paths = { "a.b.c.indexed" })
+	@IndexedEmbedded(depth = 6, includePaths = { "a.b.c.indexed" })
 	public ReferencesIndexedEmbeddedA e;
 
 }

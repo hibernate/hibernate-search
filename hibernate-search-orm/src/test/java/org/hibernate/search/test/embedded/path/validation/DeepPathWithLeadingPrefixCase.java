@@ -39,7 +39,7 @@ public class DeepPathWithLeadingPrefixCase {
 	public int id;
 
 	@ManyToOne
-	@IndexedEmbedded(prefix="notJustA", paths = { "b.c.indexed", // valid
+	@IndexedEmbedded(prefix="notJustA", includePaths = { "b.c.indexed", // valid
 			"b.c.dne" // invalid path, dne doesn't exist
 	})
 	public A a;
