@@ -177,6 +177,18 @@
                 <version>1.5.1</version>
             </dependency>
             <dependency>
+                <!-- To force testing of Apache Avro integration with the version of Jackson used in AS 7.1 -->
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>1.9.2</version>
+            </dependency>
+            <dependency>
+                <!-- To force testing of Apache Avro integration with the version of Jackson used in AS 7.1 -->
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>1.9.2</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-analyzers</artifactId>
                 <version>${project.version}</version>
