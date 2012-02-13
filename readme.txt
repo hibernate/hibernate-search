@@ -1,6 +1,6 @@
 Hibernate Search
 ==================================================
-Version: 4.1.0.Beta1 3-2-2012
+Version: 4.1.0.Beta2 13-2-2012
 
 Description
 -----------

@@ -2,6 +2,33 @@ Hibernate Search Changelog
 ==========================
 
 
+Version 4.1.0.Beta2 (13-2-2012)
+------------------------
+
+** Bug
+    * [HSEARCH-1038] - MassIndexer doesn't release Write Lock after completion
+    * [HSEARCH-1047] - Inconsistent field name interning
+
+** Deprecation
+    * [HSEARCH-1046] - Remove threadsForIndexWriter option in MassIndexer
+
+** Improvement
+    * [HSEARCH-1041] - Update Infinispan suggested configuration to match requirements of Infinispan 5.1.1
+    * [HSEARCH-1042] - Use generics in ParameterizedBridge
+    * [HSEARCH-1043] - Avoid frequent checking for index existance in backend
+    * [HSEARCH-1044] - Avoid multiple flush and optimize events on the same backend after MassIndexing shutdown
+
+** New Feature
+    * [HSEARCH-886] - Provide the ability to configure specific paths to index within @IndexEmbedded as an alternative to depth
+    * [HSEARCH-972] - Make it possible to plug in custom OptimizerStrategy implementations
+
+** Task
+    * [HSEARCH-682] - Add tests for DSL handling fieldBridge for @IndexEmbedded fields
+    * [HSEARCH-1033] - Verify compatibility with Jackson 1.9.2
+    * [HSEARCH-1039] - Upgrade JBoss Logging and Infinispan dependencies to Final versions of AS7.1
+    * [HSEARCH-1040] - Upgrade integration test to use JBoss AS 7.1
+
+
 Version 4.1.0.Beta1 (3-2-2012)
 ------------------------
 
