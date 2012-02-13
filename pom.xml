@@ -130,9 +130,9 @@
 
     <properties>
         <slf4jVersion>1.6.1</slf4jVersion>
-        <luceneVersion>3.1.0</luceneVersion>
+        <luceneVersion>3.4.0</luceneVersion>
         <infinispanVersion>4.2.1.FINAL</infinispanVersion>
-        <hibernateVersion>3.6.7.Final</hibernateVersion>
+        <hibernateVersion>3.6.10.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>3.2.0.Final</hibernateCommonsAnnotationVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <bytemanVersion>1.5.2</bytemanVersion>
