@@ -62,6 +62,8 @@ public @interface IndexedEmbedded {
 	 * 
 	 * <p>Defined paths are going to be indexed even if they exceed the {@code depth} threshold.
 	 * When {@code includePaths} is not empty, the default value for {@code depth} is 0.</p>
+	 * 
+	 * <p>Defined paths are implicitly prefixed with the {@link IndexedEmbedded#prefix()}.
 	 */
 	String[] includePaths() default {};
 
