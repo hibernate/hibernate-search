@@ -684,6 +684,156 @@ public class Address {
 @Embeddable
 public class Owner implements Person { ... }</programlisting>
       </example>
+
+      <section id="search-mapping-associated-viapaths">
+      <title>Limiting object embedding to specific paths</title>
+
+      <para>The <classname>@IndexedEmbedded</classname> annotation provides also an attribute
+      <methodname>includePaths</methodname> which can be used as an alternative to
+      <methodname>depth</methodname>, or be combined with it.</para>
+
+      <para>When using only <methodname>depth</methodname> all indexed fields of the
+      embedded type will be added recursively at the same depth;
+      this makes it harder to pick only a specific path without adding all other
+      fields as well, which might not be needed.</para>
+
+      <para>To avoid unnecessarily loading and indexing entities you can specify
+      exactly which paths are needed.
+      A typical application might need different depths for different paths,
+      or in other words it might need to specify paths explicitly, as shown in
+      <xref linkend="indexedembedded-includePath" /></para>
+
+<example id="indexedembedded-includePath">
+        <title>Using the <literal>includePaths</literal> property of
+        <classname>@IndexedEmbedded</classname></title>
+        <programlisting language="JAVA" role="JAVA">@Entity
+@Indexed
+public class Person {
+
+   @Id
+   public int getId() {
+      return id;
+   }
+
+   @Field
+   public String getName() {
+      return name;
+   }
+
+   @Field
+   public String getSurname() {
+      return surname;
+   }
+
+   @OneToMany
+   <emphasis role="bold">@IndexedEmbedded(includePaths = { "name" })</emphasis>
+   public Set&lt;Person&gt; getParents() {
+      return parents;
+   }
+
+   @ContainedIn
+   @ManyToOne
+   public Human getChild() {
+      return child;
+   }
+
+    ...//other fields omitted</programlisting>
+      </example>
+
+      <para>Using a mapping as in <xref linkend="indexedembedded-includePath" />, you would be able
+      to search on a <classname>Person</classname> by <literal>name</literal> and/or <literal>surname</literal>,
+      and/or the <literal>name</literal> of the parent.
+      It will not index the <literal>surname</literal> of the parent, so searching on parent's surnames will not be
+      possible but speeds up indexing, saves space and improve overall performance.</para>
+
+      <para>The <classname>@IndexedEmbedded</classname> <methodname>includePaths</methodname>
+      will include the specified paths <emphasis>in addition to</emphasis> what you would
+      index normally specifying a limited value for <methodname>depth</methodname>.
+      When using <methodname>includePaths</methodname>, and leaving <methodname>depth</methodname>
+      undefined, behavior is equivalent to setting <methodname>depth</methodname><literal>=0</literal>:
+      only the included paths are indexed.</para>
+
+      <example id="indexedembedded-includePathsAndDepth">
+        <title>Using the <literal>includePaths</literal> property of
+        <classname>@IndexedEmbedded</classname></title>
+        <programlisting language="JAVA" role="JAVA">@Entity
+@Indexed
+public class Human {
+
+   @Id
+   public int getId() {
+      return id;
+   }
+
+   @Field
+   public String getName() {
+      return name;
+   }
+
+   @Field
+   public String getSurname() {
+      return surname;
+   }
+
+   @OneToMany
+   <emphasis role="bold">@IndexedEmbedded(depth = 2, includePaths = { "parents.parents.name" })</emphasis>
+   public Set&lt;Human&gt; getParents() {
+      return parents;
+   }
+
+   @ContainedIn
+   @ManyToOne
+   public Human getChild() {
+      return child;
+   }
+
+    ...//other fields omitted</programlisting>
+      </example>
+
+      <para>In <xref linkend="indexedembedded-includePathsAndDepth" />, every human will have it's name and surname
+      attributes indexed. The name and surname of parents will be indexed too, recursively up to second line
+      because of the <methodname>depth</methodname> attribute.
+      It will be possible to search by name or surname, of the person directly, his parents or of his grand parents.
+      Beyond the second level, we will in addition index one more level but only the name, not the surname.</para>
+
+      <para>This results in the following fields in the index:</para>
+      <itemizedlist>
+         <listitem>
+            <para><literal>id</literal> - as primary key</para>
+         </listitem>
+         <listitem>
+            <para><literal>_hibernate_class</literal> - stores entity type</para>
+         </listitem>
+         <listitem>
+            <para><literal>name</literal> - as direct field</para>
+         </listitem>
+         <listitem>
+            <para><literal>surname</literal> - as direct field</para>
+         </listitem>
+         <listitem>
+            <para><literal>parents.name</literal> - as embedded field at depth 1</para>
+         </listitem>
+         <listitem>
+            <para><literal>parents.surname</literal> - as embedded field at depth 1</para>
+         </listitem>
+         <listitem>
+            <para><literal>parents.parents.name</literal> - as embedded field at depth 2</para>
+         </listitem>
+         <listitem>
+            <para><literal>parents.parents.surname</literal> - as embedded field at depth 2</para>
+         </listitem>
+         <listitem>
+            <para><literal>parents.parents.parents.name</literal> - as additional path as specifyed by
+            <methodname>includePaths</methodname>. The first <literal>parents.</literal> is inferred from
+            the field name, the remaining path is the attribute of <methodname>includePaths</methodname></para>
+         </listitem>
+      </itemizedlist>
+
+      <para>Having explicit control of the indexed paths might be easier if you're
+      designing your application by defining the needed queries first, as at that point
+      you might know exactly which fields you need, and which other fields are unnecessary to implement
+      your use case.</para>
+      </section>
     </section>
   </section>
 
