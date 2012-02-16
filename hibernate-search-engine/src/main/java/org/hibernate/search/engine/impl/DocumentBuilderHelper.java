@@ -66,12 +66,6 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-	@Deprecated //use the other #getDocumentId
-	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document) {
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
-		return getDocumentId( searchFactoryImplementor, clazz, document, contextualBridge );
-	}
-
 	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, ContextualException2WayBridge contextualBridge) {
 		final DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder(
 				searchFactoryImplementor,
