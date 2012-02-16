@@ -62,7 +62,6 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	
 	private static final Log log = LoggerFactory.make();
 	
-	private final Class<?> indexedRootType;
 	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
 	private final Map<Class<?>, EntityIndexBinder> entityIndexBinders;
@@ -73,14 +72,12 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	private final ErrorHandler errorHandler;
 
 	public EntityConsumerLuceneWorkProducer(
-			Class<?> indexedType,
 			ProducerConsumerQueue<List<?>> entitySource,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CountDownLatch producerEndSignal,
 			SearchFactoryImplementor searchFactory, CacheMode cacheMode,
 			BatchBackend backend, ErrorHandler errorHandler) {
-		this.indexedRootType = indexedType;
 		this.source = entitySource;
 		this.monitor = monitor;
 		this.sessionFactory = sessionFactory;
