@@ -18,23 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.bridge;
+package org.hibernate.search.bridge.util.impl;
 
-import org.hibernate.search.bridge.util.impl.ConversionInvocationContext;
-import org.hibernate.search.bridge.util.impl.OneWayConversionContext;
-import org.hibernate.search.bridge.util.impl.StringConversionContext;
-import org.hibernate.search.bridge.util.impl.TwoWayConversionContext;
+import org.hibernate.search.bridge.FieldBridge;
 
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public interface ConversionContext extends ConversionInvocationContext {
-
-	OneWayConversionContext oneWayConversionContext(FieldBridge delegate);
-
-	TwoWayConversionContext twoWayConversionContext(TwoWayFieldBridge delegate);
-
-	StringConversionContext stringConversionContext(StringBridge delegate);
+public interface OneWayConversionContext extends ConversionInvocationContext, FieldBridge {
 
 }

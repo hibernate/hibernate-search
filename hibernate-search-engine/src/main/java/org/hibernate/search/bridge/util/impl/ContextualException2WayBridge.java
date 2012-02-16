@@ -27,10 +27,8 @@ package org.hibernate.search.bridge.util.impl;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.bridge.BridgeException;
@@ -46,19 +44,22 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class ContextualException2WayBridge implements TwoWayFieldBridge, ConversionContext {
-	
+public final class ContextualException2WayBridge implements ConversionContext {
+
 	private static final NamedVirtualXMember IDENTIFIER = new NamedVirtualXMember( "identifier" );
 
-	private enum OperatingMode { STRING, TWO_WAY, ONE_WAY, NOTSET };
-
+	// Mutable state:
 	private Class<?> clazz;
-	private List<XMember> path = new ArrayList<XMember>( 5 ); //half of usual increment size as I don't expect much
 	private String fieldName;
 	private StringBridge stringBridge;
 	private FieldBridge oneWayBridge;
 	private TwoWayFieldBridge twoWayBridge;
-	private OperatingMode mode = OperatingMode.NOTSET;
+
+	//Reused helpers:
+	private final ArrayList<XMember> path = new ArrayList<XMember>( 5 ); //half of usual increment size as I don't expect much
+	private final OneWayConversionContextImpl oneWayAdapter = new OneWayConversionContextImpl();
+	private final TwoWayConversionContextImpl twoWayAdapter = new TwoWayConversionContextImpl();
+	private final StringConversionContextImpl stringAdapter = new StringConversionContextImpl();
 
 	public ConversionContext setClass(Class<?> clazz) {
 		this.clazz = clazz;
@@ -68,28 +69,6 @@ public class ContextualException2WayBridge implements TwoWayFieldBridge, Convers
 	public ConversionContext setFieldName(String fieldName) {
 		this.fieldName = fieldName;
 		return this;
-	}
-
-	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		if ( mode == OperatingMode.TWO_WAY ) {
-			try {
-				twoWayBridge.set( name, value, document, luceneOptions );
-			}
-			catch (RuntimeException e) {
-				throw buildBridgeException( e, "set" );
-			}
-		}
-		else if ( mode == OperatingMode.ONE_WAY ) {
-			try {
-				oneWayBridge.set( name, value, document, luceneOptions );
-			}
-			catch (RuntimeException e) {
-				throw buildBridgeException( e, "set" );
-			}
-		}
-		else {
-			throw failUnexpectedMode();
-		}
 	}
 
 	public ConversionContext pushMethod(XMember xMember) {
@@ -102,69 +81,9 @@ public class ContextualException2WayBridge implements TwoWayFieldBridge, Convers
 		return this;
 	}
 
-	public Object get(String name, Document document) {
-		if ( mode == OperatingMode.TWO_WAY ) {
-			try {
-				return twoWayBridge.get(name, document);
-			}
-			catch (RuntimeException e) {
-				throw buildBridgeException(e, "get");
-			}
-		}
-		else {
-			throw failUnexpectedMode();
-		}
-	}
-
-	public String objectToString(Object object) {
-		try {
-			if ( mode == OperatingMode.TWO_WAY ) {
-				return twoWayBridge.objectToString(object);
-			}
-			else if ( mode == OperatingMode.STRING ) {
-				return stringBridge.objectToString(object);
-			}
-		}
-		catch (Exception e) {
-			throw buildBridgeException(e, "objectToString");
-		}
-		throw failUnexpectedMode();
-	}
-
-	@Override
-	public ConversionContext setStringBridge(StringBridge bridge) {
-		this.mode = OperatingMode.STRING;
-		this.stringBridge = bridge;
-		this.twoWayBridge = null;
-		this.oneWayBridge = null;
-		return this;
-	}
-
-	@Override
-	public ConversionContext setFieldBridge(FieldBridge fieldBridge) {
-		this.mode = OperatingMode.ONE_WAY;
-		this.stringBridge = null;
-		this.twoWayBridge = null;
-		this.oneWayBridge = fieldBridge;
-		return this;
-	}
-
-	@Override
-	public ContextualException2WayBridge setFieldBridge(TwoWayFieldBridge delegate) {
-		this.mode = OperatingMode.TWO_WAY;
-		this.stringBridge = null;
-		this.twoWayBridge = delegate;
-		this.oneWayBridge = null;
-		return this;
-	}
-
 	public ConversionContext pushIdentifierMethod() {
 		pushMethod( IDENTIFIER );
 		return this;
-	}
-
-	private AssertionFailure failUnexpectedMode() {
-		return new AssertionFailure( "Unexpected invocation in current state " + mode );
 	}
 
 	protected BridgeException buildBridgeException(Exception e, String method) {
@@ -252,7 +171,116 @@ public class ContextualException2WayBridge implements TwoWayFieldBridge, Convers
 		public boolean isTypeResolved() {
 			throw new UnsupportedOperationException();
 		}
-		
+	}
+
+	@Override
+	public OneWayConversionContext oneWayConversionContext(FieldBridge delegate) {
+		this.oneWayBridge = delegate;
+		return oneWayAdapter;
+	}
+
+	@Override
+	public TwoWayConversionContext twoWayConversionContext(TwoWayFieldBridge delegate) {
+		this.twoWayBridge = delegate;
+		return twoWayAdapter;
+	}
+
+	@Override
+	public StringConversionContext stringConversionContext(StringBridge delegate) {
+		this.stringBridge = delegate;
+		return stringAdapter;
+	}
+
+	private abstract class AbstractConversionContextImpl implements ConversionInvocationContext {
+
+		@Override
+		public ConversionInvocationContext setClass(Class<?> beanClass) {
+			ContextualException2WayBridge.this.setClass( beanClass );
+			return this;
+		}
+
+		@Override
+		public ConversionInvocationContext setFieldName(String fieldName) {
+			ContextualException2WayBridge.this.setFieldName( fieldName );
+			return this;
+		}
+
+		@Override
+		public ConversionInvocationContext pushIdentifierMethod() {
+			ContextualException2WayBridge.this.pushIdentifierMethod();
+			return this;
+		}
+
+		@Override
+		public ConversionInvocationContext pushMethod(XMember xmember) {
+			ContextualException2WayBridge.this.pushMethod( xmember );
+			return this;
+		}
+
+		@Override
+		public ConversionInvocationContext popMethod() {
+			ContextualException2WayBridge.this.popMethod();
+			return this;
+		}
+	}
+
+	private final class OneWayConversionContextImpl extends AbstractConversionContextImpl implements OneWayConversionContext {
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			try {
+				oneWayBridge.set( name, value, document, luceneOptions );
+			}
+			catch (RuntimeException e) {
+				throw buildBridgeException( e, "set" );
+			}
+		}
+	}
+
+	private final class TwoWayConversionContextImpl extends AbstractConversionContextImpl implements TwoWayConversionContext {
+
+		@Override
+		public Object get(String name, Document document) {
+			try {
+				return twoWayBridge.get(  name, document );
+			}
+			catch (RuntimeException e) {
+				throw buildBridgeException( e, "get" );
+			}
+		}
+
+		@Override
+		public String objectToString(Object object) {
+			try {
+				return twoWayBridge.objectToString( object );
+			}
+			catch (RuntimeException e) {
+				throw buildBridgeException( e, "objectToString" );
+			}
+		}
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+			try {
+				twoWayBridge.set( name, value, document, luceneOptions );
+			}
+			catch (RuntimeException e) {
+				throw buildBridgeException( e, "set" );
+			}
+		}
+	}
+
+	private final class StringConversionContextImpl extends AbstractConversionContextImpl implements StringConversionContext {
+
+		@Override
+		public String objectToString(Object object) {
+			try {
+				return stringBridge.objectToString( object );
+			}
+			catch (RuntimeException e) {
+				throw buildBridgeException( e, "objectToString" );
+			}
+		}
 	}
 
 }
