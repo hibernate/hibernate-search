@@ -118,6 +118,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
 				(SessionImplementor) session );
 		try {
+			ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
 			while ( true ) {
 				List<?> takeList = source.take();
 				if ( takeList == null ) {
@@ -128,7 +129,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 					for ( Object take : takeList ) {
 						//trick to attach the objects to session:
 						session.buildLockRequest( LockOptions.NONE ).lock( take );
-						index( take, session, sessionInitializer );
+						index( take, session, sessionInitializer, contextualBridge );
 						monitor.documentsBuilt( 1 );
 						session.clear();
 					}
@@ -142,7 +143,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void index( Object entity, Session session, InstanceInitializer sessionInitializer ) throws InterruptedException {
+	private void index( Object entity, Session session, InstanceInitializer sessionInitializer, ContextualException2WayBridge contextualBridge ) throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
 		EntityIndexBinder entityIndexBinding = entityIndexBinders.get( clazz );
@@ -154,7 +155,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		}
 		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
+		contextualBridge
 				.setClass(clazz)
 				.setFieldName(docBuilder.getIdKeywordName())
 				.setFieldBridge(idBridge);
