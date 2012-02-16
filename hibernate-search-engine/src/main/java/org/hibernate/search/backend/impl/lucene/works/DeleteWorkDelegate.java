@@ -76,7 +76,8 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		if ( isIdNumeric( builder ) ) {
 			idQueryTerm = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
 		} else {
-			idQueryTerm = new TermQuery( builder.getTerm( id ) );
+			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+			idQueryTerm = new TermQuery( idTerm );
 		}
 		entityDeletionQuery.add( idQueryTerm, BooleanClause.Occur.MUST );
 

@@ -657,6 +657,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return fieldCacheUsage;
 	}
 
+	@Deprecated //with no replacement: too expensive to create the conversionContext each time this was needed
 	public Term getTerm(Serializable id) {
 		final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
 		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id, conversionContext ) );
