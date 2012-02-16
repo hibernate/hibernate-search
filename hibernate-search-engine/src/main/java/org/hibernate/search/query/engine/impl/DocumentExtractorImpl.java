@@ -33,6 +33,7 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -76,6 +77,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private final Class singleClassIfPossible; //null when not possible
 	private final FieldCacheCollector classTypeCollector; //null when not used
 	private final FieldCacheCollector idsCollector; //null when not used
+	private final ContextualException2WayBridge exceptionWrap = new ContextualException2WayBridge();
 
 	public DocumentExtractorImpl(QueryHits queryHits,
 								 SearchFactoryImplementor searchFactoryImplementor,
@@ -185,7 +187,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
 			projected = DocumentBuilderHelper.getDocumentFields(
-					searchFactoryImplementor, clazz, document, projection
+					searchFactoryImplementor, clazz, document, projection, exceptionWrap
 			);
 		}
 		return new EntityInfoImpl( clazz, idName, id, projected );

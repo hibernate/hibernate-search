@@ -87,12 +87,11 @@ public final class DocumentBuilderHelper {
 		return documentBuilder.getIdentifierName();
 	}
 
-	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields) {
+	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields, ContextualException2WayBridge contextualBridge) {
 		DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder( searchFactoryImplementor, clazz );
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
 		Arrays.fill( result, NOT_SET );
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
 		contextualBridge.setClass( clazz );
 		if ( builderIndexedEntity.getIdKeywordName() != null ) {
 			final XMember member = builderIndexedEntity.getIdGetter();
