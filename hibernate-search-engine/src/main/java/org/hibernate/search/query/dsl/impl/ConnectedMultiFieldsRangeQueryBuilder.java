@@ -35,6 +35,7 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
@@ -109,17 +110,17 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 					!rangeContext.isExcludeFrom()
 			);
 		} else {
-
+			final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
 			final String fromString  = fieldContext.isIgnoreFieldBridge() ?
 					fromObject == null ? null : fromObject.toString() :
-					documentBuilder.objectToString( fieldName, fromObject );
+					documentBuilder.objectToString( fieldName, fromObject, conversionContext );
 			final String lowerTerm = fromString == null ?
 					null :
 					Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
 
 			final String toString  = fieldContext.isIgnoreFieldBridge() ?
 					toObject == null ? null : toObject.toString() :
-					documentBuilder.objectToString( fieldName, toObject );
+					documentBuilder.objectToString( fieldName, toObject, conversionContext );
 			final String upperTerm = toString == null ?
 					null :
 					Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );

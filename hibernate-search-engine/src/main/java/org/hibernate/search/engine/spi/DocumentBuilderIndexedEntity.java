@@ -350,7 +350,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 	
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue) {
-		String idInString = objectToString( idBridge, idKeywordName, id );
+		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
+		String idInString = objectToString( idBridge, idKeywordName, id, contextualBridge );
 		if ( delete && !add ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
@@ -362,16 +363,16 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 	}
 	
-	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value) {
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
+	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value, ContextualException2WayBridge contextualBridge) {
+		contextualBridge
 				.setClass( getBeanClass() )
 				.setFieldBridge( bridge )
 				.setFieldName( fieldName );
 		return contextualBridge.objectToString( value );
 	}
 
-	private String objectToString(StringBridge bridge, String fieldName, Object value) {
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
+	private String objectToString(StringBridge bridge, String fieldName, Object value, ContextualException2WayBridge contextualBridge) {
+		contextualBridge
 				.setClass( getBeanClass() )
 				.setStringBridge( bridge )
 				.setFieldName( fieldName );
@@ -658,7 +659,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public Term getTerm(Serializable id) {
-		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id ) );
+		final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
+		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id, conversionContext ) );
 	}
 
 	public TwoWayFieldBridge getIdBridge() {
@@ -688,22 +690,22 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, idGetter );
 	}
 	
-	public String objectToString(String fieldName, Object value) {
+	public String objectToString(String fieldName, Object value, ContextualException2WayBridge conversionContext) {
 		if ( fieldName == null ) {
 			throw new AssertionFailure( "Field name should not be null" );
 		}
 		if ( fieldName.equals( idKeywordName ) ) {
-			return objectToString( idBridge, idKeywordName, value );
+			return objectToString( idBridge, idKeywordName, value, conversionContext );
 		}
 		else {
 			FieldBridge bridge = getBridge( getMetadata(), fieldName );
 			if ( bridge != null ) {
 				final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
 				if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return objectToString( (TwoWayFieldBridge) bridge, fieldName, value );
+					return objectToString( (TwoWayFieldBridge) bridge, fieldName, value, conversionContext );
 				}
 				else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return objectToString( (StringBridge) bridge, fieldName, value );
+					return objectToString( (StringBridge) bridge, fieldName, value, conversionContext );
 				}
 				throw new SearchException(
 						"FieldBridge " + bridgeClass + " does not have a objectToString method: field "

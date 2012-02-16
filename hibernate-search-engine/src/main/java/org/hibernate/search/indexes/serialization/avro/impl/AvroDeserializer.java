@@ -35,6 +35,7 @@ import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.util.Utf8;
 
+import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorksBuilder;
 import org.hibernate.search.indexes.serialization.spi.SerializableIndex;
@@ -92,7 +93,8 @@ public class AvroDeserializer implements Deserializer {
 		}
 
 		classReferences = asListOfString( result, "classReferences" );
-		List<GenericRecord> operations = asListOfGenericRecords( result, "operations" );
+		final List<GenericRecord> operations = asListOfGenericRecords( result, "operations" );
+		final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
 		for ( GenericRecord operation : operations ) {
 			String schema = operation.getSchema().getName();
 			if ( "OptimizeAll".equals( schema ) ) {
@@ -104,7 +106,7 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "Delete".equals( schema ) ) {
 				processId(operation, hydrator);
 				hydrator.addDeleteLuceneWork(
-						asClass( operation, "class" )
+						asClass( operation, "class" ), conversionContext
 				);
 			}
 			else if ( "Add".equals( schema ) ) {
@@ -113,7 +115,8 @@ public class AvroDeserializer implements Deserializer {
 				processId(operation, hydrator);
 				hydrator.addAddLuceneWork(
 						asClass( operation, "class" ),
-						analyzers
+						analyzers,
+						conversionContext
 				);
 			}
 			else if ( "Update".equals( schema ) ) {
@@ -122,7 +125,8 @@ public class AvroDeserializer implements Deserializer {
 				processId(operation, hydrator);
 				hydrator.addUpdateLuceneWork(
 						asClass( operation, "class" ),
-						analyzers
+						analyzers,
+						conversionContext
 				);
 			}
 			else {

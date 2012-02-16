@@ -41,6 +41,7 @@ import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.TermTermination;
@@ -135,7 +136,8 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		}
 		else {
 			// need to go via the appropriate bridge, because value is an object, eg boolean, and must be converted to a string first
-			return documentBuilder.objectToString( fieldContext.getField(), value );
+			final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
+			return documentBuilder.objectToString( fieldContext.getField(), value, conversionContext );
 		}
 	}
 

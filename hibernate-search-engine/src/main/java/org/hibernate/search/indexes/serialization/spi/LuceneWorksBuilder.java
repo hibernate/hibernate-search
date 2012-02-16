@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.util.AttributeImpl;
+import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -38,11 +39,11 @@ public interface LuceneWorksBuilder {
 
 	void addId(Serializable id);
 
-	void addDeleteLuceneWork(String entityClassName);
+	void addDeleteLuceneWork(String entityClassName, ContextualException2WayBridge conversionContext);
 
-	void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap);
+	void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ContextualException2WayBridge conversionContext);
 
-	void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap);
+	void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ContextualException2WayBridge conversionContext);
 
 	void defineDocument(float boost);
 

@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
@@ -66,6 +67,7 @@ public class JavaSerializationDeserializer implements Deserializer {
 		byte[] newData = new byte[data.length-2];
 		System.arraycopy( data, 2, newData, 0, newData.length );
 		Message message = SerializationHelper.toInstance( newData, Message.class );
+		final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
 		for ( Operation operation : message.getOperations() ) {
 			if ( operation instanceof OptimizeAll ) {
 				hydrator.addOptimizeAll();
@@ -78,7 +80,8 @@ public class JavaSerializationDeserializer implements Deserializer {
 				Delete safeOperation = ( Delete ) operation;
 				hydrator.addId( safeOperation.getId() );
 				hydrator.addDeleteLuceneWork(
-						safeOperation.getEntityClassName()
+						safeOperation.getEntityClassName(),
+						conversionContext
 				);
 			}
 			else if ( operation instanceof Add ) {
@@ -87,7 +90,8 @@ public class JavaSerializationDeserializer implements Deserializer {
 				hydrator.addId( safeOperation.getId() );
 				hydrator.addAddLuceneWork(
 						safeOperation.getEntityClassName(),
-						safeOperation.getFieldToAnalyzerMap()
+						safeOperation.getFieldToAnalyzerMap(),
+						conversionContext
 				);
 			}
 			else if ( operation instanceof Update ) {
@@ -96,7 +100,8 @@ public class JavaSerializationDeserializer implements Deserializer {
 				hydrator.addId( safeOperation.getId() );
 				hydrator.addUpdateLuceneWork(
 						safeOperation.getEntityClassName(),
-						safeOperation.getFieldToAnalyzerMap()
+						safeOperation.getFieldToAnalyzerMap(),
+						conversionContext
 				);
 			}
 		}
