@@ -71,6 +71,7 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.builtin.impl.DefaultStringBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.impl.BridgeFactory;
+import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
@@ -158,7 +159,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 	}
 
-	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue);
+	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ContextualException2WayBridge contextualBridge);
 
 	abstract protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
 

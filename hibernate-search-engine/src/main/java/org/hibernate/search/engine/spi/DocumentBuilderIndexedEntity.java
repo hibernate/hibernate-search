@@ -349,8 +349,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return id;
 	}
 	
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue) {
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ContextualException2WayBridge contextualBridge) {
 		String idInString = objectToString( idBridge, idKeywordName, id, contextualBridge );
 		if ( delete && !add ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
