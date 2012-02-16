@@ -39,6 +39,7 @@ import org.apache.lucene.search.WildcardQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
@@ -70,7 +71,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 	public Query createQuery() {
 		final int size = fieldContexts.size();
-		final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
+		final ConversionContext conversionContext = new ContextualException2WayBridge();
 		if ( size == 1 ) {
 			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ), conversionContext ) ).createQuery();
 		}
@@ -83,7 +84,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		}
 	}
 
-	private Query createQuery(FieldContext fieldContext, ContextualException2WayBridge conversionContext) {
+	private Query createQuery(FieldContext fieldContext, ConversionContext conversionContext) {
 		final Query perFieldQuery;
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
@@ -119,7 +120,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
 
-	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity<?> documentBuilder, ContextualException2WayBridge conversionContext) {
+	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity<?> documentBuilder, ConversionContext conversionContext) {
 		if ( fieldContext.isIgnoreFieldBridge() ) {
 			if ( value == null ) {
 				throw new SearchException(

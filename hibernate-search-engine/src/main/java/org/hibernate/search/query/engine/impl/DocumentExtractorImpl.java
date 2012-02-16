@@ -33,6 +33,7 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -77,7 +78,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private final Class singleClassIfPossible; //null when not possible
 	private final FieldCacheCollector classTypeCollector; //null when not used
 	private final FieldCacheCollector idsCollector; //null when not used
-	private final ContextualException2WayBridge exceptionWrap = new ContextualException2WayBridge();
+	private final ConversionContext exceptionWrap = new ContextualException2WayBridge();
 
 	public DocumentExtractorImpl(QueryHits queryHits,
 								 SearchFactoryImplementor searchFactoryImplementor,
@@ -180,7 +181,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		// else: this.fieldSelector = null; //We need no fields at all
 	}
 
-	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex, ContextualException2WayBridge exceptionWrap) throws IOException {
+	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex, ConversionContext exceptionWrap) throws IOException {
 		Class clazz = extractClass( docId, document, scoreDocIndex );
 		String idName = DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
 		Serializable id = extractId( docId, document, clazz );

@@ -31,6 +31,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -67,7 +68,7 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	}
 
 	@Override
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ContextualException2WayBridge contextualBridge) {
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
 		// nothing to do
 	}
 

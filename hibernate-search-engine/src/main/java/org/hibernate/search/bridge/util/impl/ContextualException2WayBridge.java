@@ -25,11 +25,18 @@
 package org.hibernate.search.bridge.util.impl;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.search.bridge.BridgeException;
+import org.hibernate.search.bridge.ConversionContext;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
@@ -37,76 +44,148 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  * Wrap the exception with an exception provide contextual feedback
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-public class ContextualException2WayBridge extends ContextualExceptionBridge implements TwoWayFieldBridge {
+public class ContextualException2WayBridge implements TwoWayFieldBridge, ConversionContext {
 	
 	private static final NamedVirtualXMember IDENTIFIER = new NamedVirtualXMember( "identifier" );
-	
-	private TwoWayFieldBridge delegate;
+
+	private enum OperatingMode { STRING, TWO_WAY, ONE_WAY, NOTSET };
+
+	private Class<?> clazz;
+	private List<XMember> path = new ArrayList<XMember>( 5 ); //half of usual increment size as I don't expect much
+	private String fieldName;
 	private StringBridge stringBridge;
+	private FieldBridge oneWayBridge;
+	private TwoWayFieldBridge twoWayBridge;
+	private OperatingMode mode = OperatingMode.NOTSET;
 
-	public ContextualException2WayBridge setFieldBridge(TwoWayFieldBridge delegate) {
-		super.setFieldBridge(delegate);
-		this.delegate = delegate;
-		this.stringBridge = null;
+	public ConversionContext setClass(Class<?> clazz) {
+		this.clazz = clazz;
 		return this;
 	}
 
-	public ContextualException2WayBridge setClass(Class<?> clazz) {
-		super.setClass(clazz);
+	public ConversionContext setFieldName(String fieldName) {
+		this.fieldName = fieldName;
 		return this;
 	}
 
-	public ContextualException2WayBridge setFieldName(String fieldName) {
-		super.setFieldName(fieldName);
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+		if ( mode == OperatingMode.TWO_WAY ) {
+			try {
+				twoWayBridge.set( name, value, document, luceneOptions );
+			}
+			catch (RuntimeException e) {
+				throw buildBridgeException( e, "set" );
+			}
+		}
+		else if ( mode == OperatingMode.ONE_WAY ) {
+			try {
+				oneWayBridge.set( name, value, document, luceneOptions );
+			}
+			catch (RuntimeException e) {
+				throw buildBridgeException( e, "set" );
+			}
+		}
+		else {
+			throw failUnexpectedMode();
+		}
+	}
+
+	public ConversionContext pushMethod(XMember xMember) {
+		path.add( xMember );
+		return this;
+	}
+
+	public ConversionContext popMethod() {
+		path.remove( path.size() - 1 );
 		return this;
 	}
 
 	public Object get(String name, Document document) {
-		try {
-			return delegate.get(name, document);
+		if ( mode == OperatingMode.TWO_WAY ) {
+			try {
+				return twoWayBridge.get(name, document);
+			}
+			catch (RuntimeException e) {
+				throw buildBridgeException(e, "get");
+			}
 		}
-		catch (Exception e) {
-			throw buildBridgeException(e, "get");
+		else {
+			throw failUnexpectedMode();
 		}
 	}
 
 	public String objectToString(Object object) {
 		try {
-			if (delegate != null) {
-				return delegate.objectToString(object);
+			if ( mode == OperatingMode.TWO_WAY ) {
+				return twoWayBridge.objectToString(object);
 			}
-			else {
+			else if ( mode == OperatingMode.STRING ) {
 				return stringBridge.objectToString(object);
 			}
 		}
 		catch (Exception e) {
 			throw buildBridgeException(e, "objectToString");
 		}
+		throw failUnexpectedMode();
 	}
 
-	public ContextualException2WayBridge pushMethod(XMember xMember) {
-		super.pushMethod( xMember );
-		return this;
-	}
-
-	public ContextualException2WayBridge popMethod() {
-		super.popMethod();
-		return this;
-	}
-
-	//FIXME yuk, create a cleaner inheritance for a ContextualExceptionStringBridge
-	public ContextualException2WayBridge setStringBridge(StringBridge bridge) {
+	@Override
+	public ConversionContext setStringBridge(StringBridge bridge) {
+		this.mode = OperatingMode.STRING;
 		this.stringBridge = bridge;
-		this.delegate = null;
+		this.twoWayBridge = null;
+		this.oneWayBridge = null;
 		return this;
 	}
 
-	public ContextualException2WayBridge pushIdentifierMethod() {
-		super.pushMethod( IDENTIFIER );
+	@Override
+	public ConversionContext setFieldBridge(FieldBridge fieldBridge) {
+		this.mode = OperatingMode.ONE_WAY;
+		this.stringBridge = null;
+		this.twoWayBridge = null;
+		this.oneWayBridge = fieldBridge;
 		return this;
 	}
-	
+
+	@Override
+	public ContextualException2WayBridge setFieldBridge(TwoWayFieldBridge delegate) {
+		this.mode = OperatingMode.TWO_WAY;
+		this.stringBridge = null;
+		this.twoWayBridge = delegate;
+		this.oneWayBridge = null;
+		return this;
+	}
+
+	public ConversionContext pushIdentifierMethod() {
+		pushMethod( IDENTIFIER );
+		return this;
+	}
+
+	private AssertionFailure failUnexpectedMode() {
+		return new AssertionFailure( "Unexpected invocation in current state " + mode );
+	}
+
+	protected BridgeException buildBridgeException(Exception e, String method) {
+		StringBuilder error = new StringBuilder( "Exception while calling bridge#" );
+		error.append( method );
+		if ( clazz != null ) {
+			error.append( "\n\tclass: " ).append( clazz.getName() );
+		}
+		if ( path.size() > 0 ) {
+			error.append( "\n\tpath: " );
+			for( XMember pathNode : path ) {
+				error.append( pathNode.getName() ).append( "." );
+			}
+			error.deleteCharAt( error.length() - 1 );
+		}
+		if ( fieldName != null ) {
+			error.append( "\n\tfield bridge: " ).append( fieldName );
+		}
+		throw new BridgeException( error.toString(), e );
+	}
+
 	private static class NamedVirtualXMember implements XMember {
 		
 		private final String name;
@@ -175,6 +254,5 @@ public class ContextualException2WayBridge extends ContextualExceptionBridge imp
 		}
 		
 	}
-	
 
 }

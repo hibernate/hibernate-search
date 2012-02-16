@@ -38,6 +38,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -118,7 +119,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
 				(SessionImplementor) session );
 		try {
-			ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
+			ConversionContext contextualBridge = new ContextualException2WayBridge();
 			while ( true ) {
 				List<?> takeList = source.take();
 				if ( takeList == null ) {
@@ -143,7 +144,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void index( Object entity, Session session, InstanceInitializer sessionInitializer, ContextualException2WayBridge contextualBridge ) throws InterruptedException {
+	private void index( Object entity, Session session, InstanceInitializer sessionInitializer, ConversionContext contextualBridge ) throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
 		EntityIndexBinder entityIndexBinding = entityIndexBinders.get( clazz );
@@ -162,7 +163,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		String idInString = contextualBridge.objectToString( id );
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
-		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer );
+		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer, contextualBridge );
 		backend.enqueueAsyncWork( addWork );
 	}
 }

@@ -49,6 +49,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -113,7 +114,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addDeleteLuceneWork(String entityClassName, ContextualException2WayBridge conversionContext) {
+	public void addDeleteLuceneWork(String entityClassName, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				LuceneWorkHydrator.class,
@@ -129,7 +130,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ContextualException2WayBridge conversionContext) {
+	public void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				LuceneWorkHydrator.class,
@@ -148,7 +149,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ContextualException2WayBridge conversionContext) {
+	public void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				LuceneWorkHydrator.class,
@@ -392,7 +393,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		return luceneDocument;
 	}
 
-	private String objectIdInString(Class<?> entityClass, Serializable id, ContextualException2WayBridge conversionContext) {
+	private String objectIdInString(Class<?> entityClass, Serializable id, ConversionContext conversionContext) {
 		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( entityClass );
 		if ( indexBindingForEntity == null ) {
 			throw new SearchException( "Unable to find entity type metadata while deserializing: " + entityClass );

@@ -36,6 +36,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DepthValidator;
@@ -265,7 +266,7 @@ public class WorkPlan {
 		 */
 		public void enqueueLuceneWork(List<LuceneWork> luceneQueue) {
 			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = entityById.entrySet();
-			ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
+			ConversionContext contextualBridge = new ContextualException2WayBridge();
 			if ( purgeAll ) {
 				luceneQueue.add( new PurgeAllLuceneWork( entityClass ) );
 			}
@@ -463,7 +464,7 @@ public class WorkPlan {
 		 * @param luceneQueue the queue collecting all changes
 		 */
 		public void enqueueLuceneWork(Class<T> entityClass, Serializable indexingId, AbstractDocumentBuilder<T> entityBuilder,
-				List<LuceneWork> luceneQueue, ContextualException2WayBridge contextualBridge) {
+				List<LuceneWork> luceneQueue, ConversionContext contextualBridge) {
 			if ( add || delete ) {
 				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue, contextualBridge );
 			}

@@ -71,6 +71,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.impl.BridgeFactory;
+import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
@@ -78,7 +79,6 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
-import org.hibernate.search.bridge.util.impl.ContextualExceptionBridge;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
@@ -349,20 +349,20 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return id;
 	}
 	
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ContextualException2WayBridge contextualBridge) {
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
 		String idInString = objectToString( idBridge, idKeywordName, id, contextualBridge );
 		if ( delete && !add ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		else if ( add && !delete) {
-			queue.add( createAddWork( entityClass, entity, id, idInString, this.instanceInitalizer ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, this.instanceInitalizer, contextualBridge ) );
 		}
 		else if ( add && delete ) {
-			queue.add( createUpdateWork( entityClass, entity, id, idInString, this.instanceInitalizer ) );
+			queue.add( createUpdateWork( entityClass, entity, id, idInString, this.instanceInitalizer, contextualBridge ) );
 		}
 	}
 	
-	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value, ContextualException2WayBridge contextualBridge) {
+	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value, ConversionContext contextualBridge) {
 		contextualBridge
 				.setClass( getBeanClass() )
 				.setFieldBridge( bridge )
@@ -370,7 +370,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return contextualBridge.objectToString( value );
 	}
 
-	private String objectToString(StringBridge bridge, String fieldName, Object value, ContextualException2WayBridge contextualBridge) {
+	private String objectToString(StringBridge bridge, String fieldName, Object value, ConversionContext contextualBridge) {
 		contextualBridge
 				.setClass( getBeanClass() )
 				.setStringBridge( bridge )
@@ -378,9 +378,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return contextualBridge.objectToString( value );
 	}
 
-	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer) {
+	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge );
 		final AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new AddLuceneWork( id, idInString, entityClass, doc );
@@ -391,9 +391,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return addWork;
 	}
 	
-	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer) {
+	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge );
 		final UpdateLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new UpdateLuceneWork( id, idInString, entityClass, doc );
@@ -412,10 +412,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param fieldToAnalyzerMap this maps gets populated while generating the <code>Document</code>.
 	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
 	 * @param objectInitializer used to ensure that all objects are initalized
+	 * @param contextualBridge 
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
-	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer) {
+	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer, ConversionContext contextualBridge) {
 		if ( fieldToAnalyzerMap == null ) {
 			throw new IllegalArgumentException( "fieldToAnalyzerMap cannot be null" );
 		}
@@ -443,7 +444,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				Field.TermVector.NO,
 				idBoost
 		);
-		final ContextualExceptionBridge contextualBridge = new ContextualExceptionBridge()
+		contextualBridge
 				.setFieldBridge( idBridge )
 				.setClass( entityType )
 				.setFieldName( idKeywordName );
@@ -466,7 +467,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									 PropertiesMetadata propertiesMetadata,
 									 Map<String, String> fieldToAnalyzerMap,
 									 Set<String> processedFieldNames,
-									 ContextualExceptionBridge contextualBridge,
+									 ConversionContext contextualBridge,
 									 InstanceInitializer objectInitializer) {
 
 		// needed for field access: I cannot work in the proxied version
@@ -590,7 +591,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 	}
 
-	private void processEmbeddedNullValue(Document doc, PropertiesMetadata propertiesMetadata, ContextualExceptionBridge contextualBridge, int i, XMember member) {
+	private void processEmbeddedNullValue(Document doc, PropertiesMetadata propertiesMetadata, ConversionContext contextualBridge, int i, XMember member) {
 		final String nullMarker = propertiesMetadata.embeddedNullTokens.get( i );
 		if ( nullMarker != null ) {
 			String fieldName = propertiesMetadata.embeddedNullFields.get( i );
@@ -659,7 +660,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	@Deprecated //with no replacement: too expensive to create the conversionContext each time this was needed
 	public Term getTerm(Serializable id) {
-		final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
+		final ConversionContext conversionContext = new ContextualException2WayBridge();
 		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id, conversionContext ) );
 	}
 
@@ -690,7 +691,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, idGetter );
 	}
 	
-	public String objectToString(String fieldName, Object value, ContextualException2WayBridge conversionContext) {
+	public String objectToString(String fieldName, Object value, ConversionContext conversionContext) {
 		if ( fieldName == null ) {
 			throw new AssertionFailure( "Field name should not be null" );
 		}
