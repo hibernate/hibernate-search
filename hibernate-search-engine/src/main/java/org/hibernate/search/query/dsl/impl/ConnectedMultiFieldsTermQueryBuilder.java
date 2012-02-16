@@ -70,19 +70,20 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 	public Query createQuery() {
 		final int size = fieldContexts.size();
+		final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
 		if ( size == 1 ) {
-			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ) ) ).createQuery();
+			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ), conversionContext ) ).createQuery();
 		}
 		else {
 			BooleanQuery aggregatedFieldsQuery = new BooleanQuery();
 			for ( FieldContext fieldContext : fieldContexts ) {
-				aggregatedFieldsQuery.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
+				aggregatedFieldsQuery.add( createQuery( fieldContext, conversionContext ), BooleanClause.Occur.SHOULD );
 			}
 			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
 		}
 	}
 
-	public Query createQuery(FieldContext fieldContext) {
+	private Query createQuery(FieldContext fieldContext, ContextualException2WayBridge conversionContext) {
 		final Query perFieldQuery;
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
@@ -90,7 +91,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
 		}
 
-		String searchTerm = buildSearchTerm( fieldContext, documentBuilder );
+		String searchTerm = buildSearchTerm( fieldContext, documentBuilder, conversionContext );
 
 		if ( fieldContext.isIgnoreAnalyzer() ) {
 			perFieldQuery = createTermQuery( fieldContext, searchTerm );
@@ -118,7 +119,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
 
-	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity<?> documentBuilder) {
+	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity<?> documentBuilder, ContextualException2WayBridge conversionContext) {
 		if ( fieldContext.isIgnoreFieldBridge() ) {
 			if ( value == null ) {
 				throw new SearchException(
@@ -136,7 +137,6 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		}
 		else {
 			// need to go via the appropriate bridge, because value is an object, eg boolean, and must be converted to a string first
-			final ContextualException2WayBridge conversionContext = new ContextualException2WayBridge();
 			return documentBuilder.objectToString( fieldContext.getField(), value, conversionContext );
 		}
 	}
