@@ -180,7 +180,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		// else: this.fieldSelector = null; //We need no fields at all
 	}
 
-	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex) throws IOException {
+	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex, ContextualException2WayBridge exceptionWrap) throws IOException {
 		Class clazz = extractClass( docId, document, scoreDocIndex );
 		String idName = DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
 		Serializable id = extractId( docId, document, clazz );
@@ -201,7 +201,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			return (Serializable) this.idsCollector.getValue( docId );
 		}
 		else {
-			return DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document );
+			return DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document, exceptionWrap );
 		}
 	}
 
@@ -235,7 +235,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		int docId = queryHits.docId( scoreDocIndex );
 		Document document = extractDocument( scoreDocIndex );
 
-		EntityInfo entityInfo = extractEntityInfo( docId, document, scoreDocIndex );
+		EntityInfo entityInfo = extractEntityInfo( docId, document, scoreDocIndex, exceptionWrap );
 		Object[] eip = entityInfo.getProjection();
 
 		if ( eip != null && eip.length > 0 ) {
