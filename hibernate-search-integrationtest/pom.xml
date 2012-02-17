@@ -18,7 +18,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-release-version>3.0.6.RELEASE</spring-release-version>
-        <version.jboss.as>7.1.0.CR1b</version.jboss.as>
+        <version.jboss.as>7.1.0.Final</version.jboss.as>
         <version.arquillian>1.0.0.CR7</version.arquillian>
     </properties>
 
@@ -213,7 +213,7 @@
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-            <version>1.0-PFD-1</version>
+            <version>1</version>
             <scope>test</scope>
         </dependency>
 
@@ -266,7 +266,7 @@
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
-            <version>1.0-SP2</version>
+            <version>1.0-SP4</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

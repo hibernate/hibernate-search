@@ -41,7 +41,6 @@ import java.util.TreeSet;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.search.Similarity;
-
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -71,6 +70,7 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.builtin.impl.DefaultStringBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.impl.BridgeFactory;
+import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
@@ -158,7 +158,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 	}
 
-	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue);
+	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge);
 
 	abstract protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
 
@@ -726,6 +726,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 				ReflectionHelper.setAccessible( member );
 				propertiesMetadata.embeddedGetters.add( member );
+				propertiesMetadata.embeddedFieldNames.add( member.getName() );
 				PropertiesMetadata metadata = new PropertiesMetadata();
 				propertiesMetadata.embeddedPropertiesMetadata.add( metadata );
 				metadata.boost = AnnotationProcessingHelper.getBoost( member, null );
@@ -1212,6 +1213,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
 		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
+		public final List<String> embeddedFieldNames = new ArrayList<String>();
 		public final List<String> embeddedNullTokens = new ArrayList<String>();
 		public final List<String> embeddedNullFields = new ArrayList<String>();
 		public final List<FieldBridge> embeddedNullFieldBridges = new ArrayList<FieldBridge>();
