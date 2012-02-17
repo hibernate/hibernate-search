@@ -31,7 +31,6 @@ import java.util.zip.DataFormatException;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
-
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
@@ -39,7 +38,6 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.util.impl.TwoWayConversionContext;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -74,12 +72,12 @@ public final class DocumentBuilderHelper {
 		);
 		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
 		final String fieldName = builderIndexedEntity.getIdKeywordName();
-		final TwoWayConversionContext contextualBridge = conversionContext.twoWayConversionContext( fieldBridge );
-		contextualBridge
+		return (Serializable) conversionContext
 			.setClass( clazz )
 			.setFieldName( fieldName )
-			.pushIdentifierMethod();
-		return (Serializable) contextualBridge.get( fieldName, document );
+			.pushIdentifierMethod()
+			.twoWayConversionContext( fieldBridge )
+			.get( fieldName, document );
 	}
 
 	public static String getDocumentIdName(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
@@ -130,13 +128,14 @@ public final class DocumentBuilderHelper {
 									  Store store,
 									  Object[] result,
 									  Document document,
-									  ConversionContext contextualBridge,
+									  ConversionContext conversionContext,
 									  int matchingPosition) {
 		//TODO make use of an isTwoWay() method
 		if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
-			TwoWayConversionContext twoWayConversionContext = contextualBridge.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge );
-			twoWayConversionContext.setFieldName( fieldName );
-			result[matchingPosition] = twoWayConversionContext.get( fieldName, document );
+			result[matchingPosition] = conversionContext
+				.setFieldName( fieldName )
+				.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge )
+				.get( fieldName, document );
 			if ( log.isTraceEnabled() ) {
 				log.tracef( "Field %s projected as %s", fieldName, result[matchingPosition] );
 			}

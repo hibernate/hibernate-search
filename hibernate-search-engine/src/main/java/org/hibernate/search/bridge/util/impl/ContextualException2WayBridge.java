@@ -39,7 +39,8 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
- * Wrap the exception with an exception provide contextual feedback
+ * Wrap the exception with an exception provide contextual feedback.
+ * This class is designed to be reused, but is not threadsafe.
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
@@ -174,57 +175,24 @@ public final class ContextualException2WayBridge implements ConversionContext {
 	}
 
 	@Override
-	public OneWayConversionContext oneWayConversionContext(FieldBridge delegate) {
+	public FieldBridge oneWayConversionContext(FieldBridge delegate) {
 		this.oneWayBridge = delegate;
 		return oneWayAdapter;
 	}
 
 	@Override
-	public TwoWayConversionContext twoWayConversionContext(TwoWayFieldBridge delegate) {
+	public TwoWayFieldBridge twoWayConversionContext(TwoWayFieldBridge delegate) {
 		this.twoWayBridge = delegate;
 		return twoWayAdapter;
 	}
 
 	@Override
-	public StringConversionContext stringConversionContext(StringBridge delegate) {
+	public StringBridge stringConversionContext(StringBridge delegate) {
 		this.stringBridge = delegate;
 		return stringAdapter;
 	}
 
-	private abstract class AbstractConversionContextImpl implements ConversionInvocationContext {
-
-		@Override
-		public ConversionInvocationContext setClass(Class<?> beanClass) {
-			ContextualException2WayBridge.this.setClass( beanClass );
-			return this;
-		}
-
-		@Override
-		public ConversionInvocationContext setFieldName(String fieldName) {
-			ContextualException2WayBridge.this.setFieldName( fieldName );
-			return this;
-		}
-
-		@Override
-		public ConversionInvocationContext pushIdentifierMethod() {
-			ContextualException2WayBridge.this.pushIdentifierMethod();
-			return this;
-		}
-
-		@Override
-		public ConversionInvocationContext pushMethod(XMember xmember) {
-			ContextualException2WayBridge.this.pushMethod( xmember );
-			return this;
-		}
-
-		@Override
-		public ConversionInvocationContext popMethod() {
-			ContextualException2WayBridge.this.popMethod();
-			return this;
-		}
-	}
-
-	private final class OneWayConversionContextImpl extends AbstractConversionContextImpl implements OneWayConversionContext {
+	private final class OneWayConversionContextImpl implements FieldBridge {
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
@@ -237,7 +205,7 @@ public final class ContextualException2WayBridge implements ConversionContext {
 		}
 	}
 
-	private final class TwoWayConversionContextImpl extends AbstractConversionContextImpl implements TwoWayConversionContext {
+	private final class TwoWayConversionContextImpl implements TwoWayFieldBridge {
 
 		@Override
 		public Object get(String name, Document document) {
@@ -270,7 +238,7 @@ public final class ContextualException2WayBridge implements ConversionContext {
 		}
 	}
 
-	private final class StringConversionContextImpl extends AbstractConversionContextImpl implements StringConversionContext {
+	private final class StringConversionContextImpl implements StringBridge {
 
 		@Override
 		public String objectToString(Object object) {

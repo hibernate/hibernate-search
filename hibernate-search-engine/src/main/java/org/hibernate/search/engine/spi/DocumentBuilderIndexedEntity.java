@@ -79,9 +79,6 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
-import org.hibernate.search.bridge.util.impl.OneWayConversionContext;
-import org.hibernate.search.bridge.util.impl.StringConversionContext;
-import org.hibernate.search.bridge.util.impl.TwoWayConversionContext;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
@@ -365,19 +362,20 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 	}
 	
-	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value, ConversionContext contextualBridge) {
-		TwoWayConversionContext contextualizedBridge = contextualBridge.twoWayConversionContext( bridge );
-		contextualizedBridge.setClass( getBeanClass() )
-			.setFieldName( fieldName );
-		return contextualizedBridge.objectToString( value );
+	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value, ConversionContext conversionContext) {
+		return conversionContext
+			.setClass( getBeanClass() )
+			.setFieldName( fieldName )
+			.twoWayConversionContext( bridge )
+			.objectToString( value );
 	}
 
-	private String objectToString(StringBridge bridge, String fieldName, Object value, ConversionContext contextualBridge) {
-		StringConversionContext contextualizedBridge = contextualBridge.stringConversionContext( bridge );
-		contextualizedBridge
+	private String objectToString(StringBridge bridge, String fieldName, Object value, ConversionContext conversionContext) {
+		return conversionContext
 			.setClass( getBeanClass() )
-			.setFieldName( fieldName );
-		return contextualizedBridge.objectToString( value );
+			.setFieldName( fieldName )
+			.stringConversionContext( bridge )
+			.objectToString( value );
 	}
 
 	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
@@ -446,15 +444,19 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				Field.TermVector.NO,
 				idBoost
 		);
-		final OneWayConversionContext contextualizedBridge = conversionContext.oneWayConversionContext( idBridge );
-		contextualizedBridge.setClass( entityType )
+		final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( idBridge );
+		conversionContext.setClass( entityType )
 			.setFieldName( idKeywordName );
 		if ( idGetter != null ) {
 			conversionContext.pushMethod( idGetter );
 		}
-		contextualizedBridge.set( idKeywordName, id, doc, luceneOptions );
-		if ( idGetter != null ) {
-			conversionContext.popMethod();
+		try {
+			contextualizedBridge.set( idKeywordName, id, doc, luceneOptions );
+		}
+		finally {
+			if ( idGetter != null ) {
+				conversionContext.popMethod();
+			}
 		}
 
 		// finally add all other document fields
@@ -478,8 +480,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
 			final String fieldName = propertiesMetadata.classNames.get( i );
-			final OneWayConversionContext oneWayConversionContext = contextualBridge.oneWayConversionContext( fb );
-			oneWayConversionContext.setFieldName( fieldName );
+			final FieldBridge oneWayConversionContext = contextualBridge.oneWayConversionContext( fb );
+			contextualBridge.setFieldName( fieldName );
 			oneWayConversionContext.set(
 							fieldName, unproxiedInstance,
 							doc, propertiesMetadata.getClassLuceneOptions( i )
@@ -498,14 +500,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get( i );
 			final String fieldName = propertiesMetadata.fieldNames.get( i );
-			final OneWayConversionContext oneWayConversionContext = contextualBridge.oneWayConversionContext( fieldBridge );
-			oneWayConversionContext.pushMethod( member );
-			oneWayConversionContext.setFieldName( fieldName );
-			oneWayConversionContext.set(
+			final FieldBridge oneWayConversionContext = contextualBridge.oneWayConversionContext( fieldBridge );
+			contextualBridge.setFieldName( fieldName );
+			contextualBridge.pushMethod( member );
+			try {
+				oneWayConversionContext.set(
 							fieldName, currentFieldValue, doc,
 							propertiesMetadata.getFieldLuceneOptions( i, currentFieldValue )
 					);
-			contextualBridge.popMethod();
+			} finally {
+				contextualBridge.popMethod();
+			}
 		}
 
 		// allow analyzer override for the fields added by the class and field bridges
@@ -595,14 +600,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( nullMarker != null ) {
 			String fieldName = propertiesMetadata.embeddedNullFields.get( i );
 			FieldBridge fieldBridge = propertiesMetadata.embeddedNullFieldBridges.get( i );
-			final OneWayConversionContext contextualizedBridge = conversionContext.oneWayConversionContext( fieldBridge );
-			contextualizedBridge.pushMethod( member );
+			final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( fieldBridge );
+			conversionContext.pushMethod( member );
 			try {
-				contextualizedBridge.setFieldName( fieldName );
+				conversionContext.setFieldName( fieldName );
 				contextualizedBridge.set( fieldName, null, doc, NULL_EMBEDDED_MARKER_OPTIONS );
 			}
 			finally {
-				contextualizedBridge.popMethod();
+				conversionContext.popMethod();
 			}
 		}
 	}

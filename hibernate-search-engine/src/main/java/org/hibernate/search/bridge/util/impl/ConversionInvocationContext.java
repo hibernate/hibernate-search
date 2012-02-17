@@ -21,6 +21,7 @@
 package org.hibernate.search.bridge.util.impl;
 
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.search.bridge.ConversionContext;
 
 
 /**
@@ -28,14 +29,14 @@ import org.hibernate.annotations.common.reflection.XMember;
  */
 public interface ConversionInvocationContext {
 
-	ConversionInvocationContext setClass(Class<?> beanClass);
+	ConversionContext setClass(Class<?> beanClass);
 
-	ConversionInvocationContext setFieldName(String fieldName);
+	ConversionContext setFieldName(String fieldName);
 
-	ConversionInvocationContext pushIdentifierMethod();
+	ConversionContext pushIdentifierMethod();
 
-	ConversionInvocationContext pushMethod(XMember idGetter);
+	ConversionContext pushMethod(XMember idGetter);
 
-	ConversionInvocationContext popMethod();
+	ConversionContext popMethod();
 
 }

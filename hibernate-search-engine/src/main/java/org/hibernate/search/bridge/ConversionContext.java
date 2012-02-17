@@ -21,9 +21,6 @@
 package org.hibernate.search.bridge;
 
 import org.hibernate.search.bridge.util.impl.ConversionInvocationContext;
-import org.hibernate.search.bridge.util.impl.OneWayConversionContext;
-import org.hibernate.search.bridge.util.impl.StringConversionContext;
-import org.hibernate.search.bridge.util.impl.TwoWayConversionContext;
 
 
 /**
@@ -31,10 +28,10 @@ import org.hibernate.search.bridge.util.impl.TwoWayConversionContext;
  */
 public interface ConversionContext extends ConversionInvocationContext {
 
-	OneWayConversionContext oneWayConversionContext(FieldBridge delegate);
+	FieldBridge oneWayConversionContext(FieldBridge delegate);
 
-	TwoWayConversionContext twoWayConversionContext(TwoWayFieldBridge delegate);
+	TwoWayFieldBridge twoWayConversionContext(TwoWayFieldBridge delegate);
 
-	StringConversionContext stringConversionContext(StringBridge delegate);
+	StringBridge stringConversionContext(StringBridge delegate);
 
 }

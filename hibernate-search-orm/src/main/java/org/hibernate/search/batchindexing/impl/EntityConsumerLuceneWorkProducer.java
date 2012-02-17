@@ -41,17 +41,15 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
-import org.hibernate.search.bridge.util.impl.TwoWayConversionContext;
+import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.HibernateHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-
 import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Component of batch-indexing pipeline, using chained producer-consumers.
@@ -157,10 +155,11 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		}
 		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
-		TwoWayConversionContext twoWayConversionContext = conversionContext.twoWayConversionContext( idBridge );
-		twoWayConversionContext.setClass(clazz);
-		twoWayConversionContext.setFieldName(docBuilder.getIdKeywordName());
-		String idInString = twoWayConversionContext.objectToString( id );
+		String idInString = conversionContext
+			.setClass(clazz)
+			.setFieldName(docBuilder.getIdKeywordName())
+			.twoWayConversionContext( idBridge )
+			.objectToString( id );
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
 		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer, conversionContext );
