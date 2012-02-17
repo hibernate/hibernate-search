@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.bridge.ConversionContext;
+import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;

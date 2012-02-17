@@ -32,11 +32,11 @@ import org.apache.lucene.document.Document;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.bridge.BridgeException;
-import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.spi.ConversionContext;
 
 /**
  * Wrap the exception with an exception provide contextual feedback.

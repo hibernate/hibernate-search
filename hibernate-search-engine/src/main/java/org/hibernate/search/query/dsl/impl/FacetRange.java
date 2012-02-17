@@ -26,7 +26,7 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.Date;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.bridge.ConversionContext;
+import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 

@@ -31,7 +31,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.bridge.ConversionContext;
+import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.spi.InstanceInitializer;

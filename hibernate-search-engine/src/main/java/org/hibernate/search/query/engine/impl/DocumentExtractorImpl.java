@@ -33,7 +33,7 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
-import org.hibernate.search.bridge.ConversionContext;
+import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;

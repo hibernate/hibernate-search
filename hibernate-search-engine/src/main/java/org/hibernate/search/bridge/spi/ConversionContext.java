@@ -18,9 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.bridge;
+package org.hibernate.search.bridge.spi;
 
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 
 /**

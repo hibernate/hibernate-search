@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.util.AttributeImpl;
-import org.hibernate.search.bridge.ConversionContext;
+import org.hibernate.search.bridge.spi.ConversionContext;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
