@@ -726,6 +726,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 				ReflectionHelper.setAccessible( member );
 				propertiesMetadata.embeddedGetters.add( member );
+				propertiesMetadata.embeddedFieldNames.add( member.getName() );
 				PropertiesMetadata metadata = new PropertiesMetadata();
 				propertiesMetadata.embeddedPropertiesMetadata.add( metadata );
 				metadata.boost = AnnotationProcessingHelper.getBoost( member, null );
@@ -1212,6 +1213,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 		public final List<Field.TermVector> fieldTermVectors = new ArrayList<Field.TermVector>();
 		public final List<XMember> embeddedGetters = new ArrayList<XMember>();
+		public final List<String> embeddedFieldNames = new ArrayList<String>();
 		public final List<String> embeddedNullTokens = new ArrayList<String>();
 		public final List<String> embeddedNullFields = new ArrayList<String>();
 		public final List<FieldBridge> embeddedNullFieldBridges = new ArrayList<FieldBridge>();

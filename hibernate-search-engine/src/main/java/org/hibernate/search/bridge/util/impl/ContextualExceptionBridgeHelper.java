@@ -24,13 +24,10 @@
 
 package org.hibernate.search.bridge.util.impl;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.annotations.common.reflection.XMember;
+
 import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -47,7 +44,7 @@ import org.hibernate.search.bridge.spi.ConversionContext;
  */
 public final class ContextualExceptionBridgeHelper implements ConversionContext {
 
-	private static final NamedVirtualXMember IDENTIFIER = new NamedVirtualXMember( "identifier" );
+	private static final String IDENTIFIER = "identifier";
 
 	// Mutable state:
 	private Class<?> clazz;
@@ -57,7 +54,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	private TwoWayFieldBridge twoWayBridge;
 
 	//Reused helpers:
-	private final ArrayList<XMember> path = new ArrayList<XMember>( 5 ); //half of usual increment size as I don't expect much
+	private final ArrayList<String> path = new ArrayList<String>( 5 ); //half of usual increment size as I don't expect much
 	private final OneWayConversionContextImpl oneWayAdapter = new OneWayConversionContextImpl();
 	private final TwoWayConversionContextImpl twoWayAdapter = new TwoWayConversionContextImpl();
 	private final StringConversionContextImpl stringAdapter = new StringConversionContextImpl();
@@ -72,18 +69,18 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 		return this;
 	}
 
-	public ConversionContext pushMethod(XMember xMember) {
-		path.add( xMember );
+	public ConversionContext pushProperty(String field) {
+		path.add( field );
 		return this;
 	}
 
-	public ConversionContext popMethod() {
+	public ConversionContext popProperty() {
 		path.remove( path.size() - 1 );
 		return this;
 	}
 
 	public ConversionContext pushIdentifierMethod() {
-		pushMethod( IDENTIFIER );
+		pushProperty( IDENTIFIER );
 		return this;
 	}
 
@@ -95,8 +92,8 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 		}
 		if ( path.size() > 0 ) {
 			error.append( "\n\tpath: " );
-			for( XMember pathNode : path ) {
-				error.append( pathNode.getName() ).append( "." );
+			for ( String pathNode : path ) {
+				error.append( pathNode ).append( "." );
 			}
 			error.deleteCharAt( error.length() - 1 );
 		}
@@ -104,74 +101,6 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			error.append( "\n\tfield bridge: " ).append( fieldName );
 		}
 		throw new BridgeException( error.toString(), e );
-	}
-
-	private static class NamedVirtualXMember implements XMember {
-		
-		private final String name;
-
-		NamedVirtualXMember(String name) {
-			this.name = name;
-		}
-
-		public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
-			throw new UnsupportedOperationException();
-		}
-
-		public <T extends Annotation> boolean isAnnotationPresent(Class<T> annotationType) {
-			throw new UnsupportedOperationException();
-		}
-
-		public Annotation[] getAnnotations() {
-			throw new UnsupportedOperationException();
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public boolean isCollection() {
-			return false;
-		}
-
-		public boolean isArray() {
-			return false;
-		}
-
-		public Class<? extends Collection> getCollectionClass() {
-			throw new UnsupportedOperationException();
-		}
-
-		public XClass getType() {
-			throw new UnsupportedOperationException();
-		}
-
-		public XClass getElementClass() {
-			throw new UnsupportedOperationException();
-		}
-
-		public XClass getClassOrElementClass() {
-			throw new UnsupportedOperationException();
-		}
-
-		public XClass getMapKey() {
-			throw new UnsupportedOperationException();
-		}
-
-		public int getModifiers() {
-			throw new UnsupportedOperationException();
-		}
-
-		public void setAccessible(boolean accessible) {
-		}
-
-		public Object invoke(Object target, Object... parameters) {
-			throw new UnsupportedOperationException();
-		}
-
-		public boolean isTypeResolved() {
-			throw new UnsupportedOperationException();
-		}
 	}
 
 	@Override
@@ -199,7 +128,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				oneWayBridge.set( name, value, document, luceneOptions );
 			}
-			catch (RuntimeException e) {
+			catch ( RuntimeException e ) {
 				throw buildBridgeException( e, "set" );
 			}
 		}
@@ -210,9 +139,9 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 		@Override
 		public Object get(String name, Document document) {
 			try {
-				return twoWayBridge.get(  name, document );
+				return twoWayBridge.get( name, document );
 			}
-			catch (RuntimeException e) {
+			catch ( RuntimeException e ) {
 				throw buildBridgeException( e, "get" );
 			}
 		}
@@ -222,7 +151,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				return twoWayBridge.objectToString( object );
 			}
-			catch (RuntimeException e) {
+			catch ( RuntimeException e ) {
 				throw buildBridgeException( e, "objectToString" );
 			}
 		}
@@ -232,7 +161,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				twoWayBridge.set( name, value, document, luceneOptions );
 			}
-			catch (RuntimeException e) {
+			catch ( RuntimeException e ) {
 				throw buildBridgeException( e, "set" );
 			}
 		}
@@ -245,10 +174,9 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				return stringBridge.objectToString( object );
 			}
-			catch (RuntimeException e) {
+			catch ( RuntimeException e ) {
 				throw buildBridgeException( e, "objectToString" );
 			}
 		}
 	}
-
 }

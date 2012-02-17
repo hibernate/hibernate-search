@@ -88,13 +88,13 @@ public interface ConversionContext {
 	 * @param method the property which is being followed for embedded indexing
 	 * @return this for method chaining.
 	 */
-	ConversionContext pushMethod(XMember method);
+	ConversionContext pushProperty(String property);
 
 	/**
 	 * Pops the last pushed method from the stack. See {@link #pushIdentifierMethod()}
 	 * and {@link #pushMethod(XMember)}
 	 * @return this for method chaining.
 	 */
-	ConversionContext popMethod();
+	ConversionContext popProperty();
 
 }

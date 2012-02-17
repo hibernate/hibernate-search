@@ -81,7 +81,7 @@ public final class DocumentBuilderHelper {
 					.get( fieldName, document );
 		}
 		finally {
-			conversionContext.popMethod();
+			conversionContext.popProperty();
 		}
 	}
 
@@ -102,7 +102,7 @@ public final class DocumentBuilderHelper {
 			int matchingPosition = getFieldPosition( fields, fieldName );
 			if ( matchingPosition != -1 ) {
 				if ( member != null ) {
-					conversionContext.pushMethod( member );
+					conversionContext.pushProperty( fieldName );
 				}
 				try {
 					populateResult(
@@ -117,7 +117,7 @@ public final class DocumentBuilderHelper {
 				}
 				finally {
 					if ( member != null ) {
-						conversionContext.popMethod();
+						conversionContext.popProperty();
 					}
 				}
 			}
@@ -162,7 +162,7 @@ public final class DocumentBuilderHelper {
 			final String fieldName = metadata.fieldNames.get( index );
 			int matchingPosition = getFieldPosition( fields, fieldName );
 			if ( matchingPosition != -1 ) {
-				contextualBridge.pushMethod( metadata.fieldGetters.get( index ) );
+				contextualBridge.pushProperty( fieldName );
 				try {
 					populateResult(
 							fieldName,
@@ -175,7 +175,7 @@ public final class DocumentBuilderHelper {
 					);
 				}
 				finally {
-					contextualBridge.popMethod();
+					contextualBridge.popProperty();
 				}
 			}
 		}
@@ -184,16 +184,15 @@ public final class DocumentBuilderHelper {
 		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
 		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
 			//there is nothing we can do for collections
-			if ( metadata.embeddedContainers
-					.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
-				contextualBridge.pushMethod( metadata.embeddedGetters.get( index ) );
+			if ( metadata.embeddedContainers.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
+				contextualBridge.pushProperty( metadata.embeddedFieldNames.get( index ) );
 				try {
 					processFieldsForProjection(
-						metadata.embeddedPropertiesMetadata.get( index ), fields, result, document, contextualBridge
-							);
+							metadata.embeddedPropertiesMetadata.get( index ), fields, result, document, contextualBridge
+					);
 				}
 				finally {
-					contextualBridge.popMethod();
+					contextualBridge.popProperty();
 				}
 			}
 		}

@@ -445,18 +445,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				idBoost
 		);
 		final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( idBridge );
-		conversionContext.setClass( entityType )
-			.setFieldName( idKeywordName );
-		if ( idGetter != null ) {
-			conversionContext.pushMethod( idGetter );
-		}
+		conversionContext.setClass( entityType ).setFieldName( idKeywordName );
+		conversionContext.pushProperty( idKeywordName );
+
 		try {
 			contextualizedBridge.set( idKeywordName, id, doc, luceneOptions );
 		}
 		finally {
-			if ( idGetter != null ) {
-				conversionContext.popMethod();
-			}
+			conversionContext.popProperty();
 		}
 
 		// finally add all other document fields
@@ -502,14 +498,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			final String fieldName = propertiesMetadata.fieldNames.get( i );
 			final FieldBridge oneWayConversionContext = contextualBridge.oneWayConversionContext( fieldBridge );
 			contextualBridge.setFieldName( fieldName );
-			contextualBridge.pushMethod( member );
+			contextualBridge.pushProperty( fieldName );
 			try {
 				oneWayConversionContext.set(
 							fieldName, currentFieldValue, doc,
 							propertiesMetadata.getFieldLuceneOptions( i, currentFieldValue )
 					);
 			} finally {
-				contextualBridge.popMethod();
+				contextualBridge.popProperty();
 			}
 		}
 
@@ -521,7 +517,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// recursively process embedded objects
 		for ( int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++ ) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
-			contextualBridge.pushMethod( member );
+			contextualBridge.pushProperty( propertiesMetadata.embeddedFieldNames.get( i ) );
 			try {
 				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 				//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
@@ -594,7 +590,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				}
 			}
 			finally {
-				contextualBridge.popMethod();
+				contextualBridge.popProperty();
 			}
 		}
 	}
@@ -605,13 +601,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			String fieldName = propertiesMetadata.embeddedNullFields.get( i );
 			FieldBridge fieldBridge = propertiesMetadata.embeddedNullFieldBridges.get( i );
 			final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( fieldBridge );
-			conversionContext.pushMethod( member );
+			conversionContext.pushProperty( fieldName );
 			try {
 				conversionContext.setFieldName( fieldName );
 				contextualizedBridge.set( fieldName, null, doc, NULL_EMBEDDED_MARKER_OPTIONS );
 			}
 			finally {
-				conversionContext.popMethod();
+				conversionContext.popProperty();
 			}
 		}
 	}
