@@ -34,7 +34,7 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.bridge.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -78,7 +78,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private final Class singleClassIfPossible; //null when not possible
 	private final FieldCacheCollector classTypeCollector; //null when not used
 	private final FieldCacheCollector idsCollector; //null when not used
-	private final ConversionContext exceptionWrap = new ContextualException2WayBridge();
+	private final ConversionContext exceptionWrap = new ContextualExceptionBridgeHelper();
 
 	public DocumentExtractorImpl(QueryHits queryHits,
 								 SearchFactoryImplementor searchFactoryImplementor,

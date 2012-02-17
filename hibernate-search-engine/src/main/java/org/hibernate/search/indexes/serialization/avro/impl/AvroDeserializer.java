@@ -36,7 +36,7 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.util.Utf8;
 
 import org.hibernate.search.bridge.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorksBuilder;
 import org.hibernate.search.indexes.serialization.spi.SerializableIndex;
@@ -95,7 +95,7 @@ public class AvroDeserializer implements Deserializer {
 
 		classReferences = asListOfString( result, "classReferences" );
 		final List<GenericRecord> operations = asListOfGenericRecords( result, "operations" );
-		final ConversionContext conversionContext = new ContextualException2WayBridge();
+		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		for ( GenericRecord operation : operations ) {
 			String schema = operation.getSchema().getName();
 			if ( "OptimizeAll".equals( schema ) ) {

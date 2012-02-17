@@ -78,7 +78,7 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
@@ -522,21 +522,62 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		for ( int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++ ) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
 			contextualBridge.pushMethod( member );
-			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-			//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
+			try {
+				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
+				//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
 
-			if ( value == null ) {
-				processEmbeddedNullValue( doc, propertiesMetadata, contextualBridge, i, member );
-				continue;
-			}
+				if ( value == null ) {
+					processEmbeddedNullValue( doc, propertiesMetadata, contextualBridge, i, member );
+					continue;
+				}
 
-			PropertiesMetadata embeddedMetadata = propertiesMetadata.embeddedPropertiesMetadata.get( i );
-			switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
-				case ARRAY:
-					Object[] array = objectInitializer.initializeArray( (Object[]) value );
-					for ( Object arrayValue : array ) {
+				PropertiesMetadata embeddedMetadata = propertiesMetadata.embeddedPropertiesMetadata.get( i );
+				switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
+					case ARRAY:
+						Object[] array = objectInitializer.initializeArray( (Object[]) value );
+						for ( Object arrayValue : array ) {
+							buildDocumentFields(
+									arrayValue,
+									doc,
+									embeddedMetadata,
+									fieldToAnalyzerMap,
+									processedFieldNames,
+									contextualBridge,
+									objectInitializer
+							);
+						}
+						break;
+					case COLLECTION:
+						Collection collection = objectInitializer.initializeCollection( (Collection) value );
+						for ( Object collectionValue : collection ) {
+							buildDocumentFields(
+									collectionValue,
+									doc,
+									embeddedMetadata,
+									fieldToAnalyzerMap,
+									processedFieldNames,
+									contextualBridge,
+									objectInitializer
+							);
+						}
+						break;
+					case MAP:
+						Map map = objectInitializer.initializeMap( (Map) value );
+						for ( Object collectionValue : map.values() ) {
+							buildDocumentFields(
+									collectionValue,
+									doc,
+									embeddedMetadata,
+									fieldToAnalyzerMap,
+									processedFieldNames,
+									contextualBridge,
+									objectInitializer
+							);
+						}
+						break;
+					case OBJECT:
 						buildDocumentFields(
-								arrayValue,
+								value,
 								doc,
 								embeddedMetadata,
 								fieldToAnalyzerMap,
@@ -544,54 +585,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 								contextualBridge,
 								objectInitializer
 						);
-					}
-					break;
-				case COLLECTION:
-					Collection collection = objectInitializer.initializeCollection( (Collection) value );
-					for ( Object collectionValue : collection ) {
-						buildDocumentFields(
-								collectionValue,
-								doc,
-								embeddedMetadata,
-								fieldToAnalyzerMap,
-								processedFieldNames,
-								contextualBridge,
-								objectInitializer
+						break;
+					default:
+						throw new AssertionFailure(
+								"Unknown embedded container: "
+										+ propertiesMetadata.embeddedContainers.get( i )
 						);
-					}
-					break;
-				case MAP:
-					Map map = objectInitializer.initializeMap( (Map) value );
-					for ( Object collectionValue : map.values() ) {
-						buildDocumentFields(
-								collectionValue,
-								doc,
-								embeddedMetadata,
-								fieldToAnalyzerMap,
-								processedFieldNames,
-								contextualBridge,
-								objectInitializer
-						);
-					}
-					break;
-				case OBJECT:
-					buildDocumentFields(
-							value,
-							doc,
-							embeddedMetadata,
-							fieldToAnalyzerMap,
-							processedFieldNames,
-							contextualBridge,
-							objectInitializer
-					);
-					break;
-				default:
-					throw new AssertionFailure(
-							"Unknown embedded container: "
-									+ propertiesMetadata.embeddedContainers.get( i )
-					);
+				}
 			}
-			contextualBridge.popMethod();
+			finally {
+				contextualBridge.popMethod();
+			}
 		}
 	}
 
@@ -667,7 +671,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	@Deprecated //with no replacement: too expensive to create the conversionContext each time this was needed
 	public Term getTerm(Serializable id) {
-		final ConversionContext conversionContext = new ContextualException2WayBridge();
+		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id, conversionContext ) );
 	}
 

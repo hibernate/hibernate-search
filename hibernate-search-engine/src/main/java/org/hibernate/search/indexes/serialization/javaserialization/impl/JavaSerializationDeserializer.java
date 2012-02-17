@@ -27,7 +27,7 @@ import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
@@ -68,7 +68,7 @@ public class JavaSerializationDeserializer implements Deserializer {
 		byte[] newData = new byte[data.length-2];
 		System.arraycopy( data, 2, newData, 0, newData.length );
 		Message message = SerializationHelper.toInstance( newData, Message.class );
-		final ConversionContext conversionContext = new ContextualException2WayBridge();
+		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		for ( Operation operation : message.getOperations() ) {
 			if ( operation instanceof OptimizeAll ) {
 				hydrator.addOptimizeAll();

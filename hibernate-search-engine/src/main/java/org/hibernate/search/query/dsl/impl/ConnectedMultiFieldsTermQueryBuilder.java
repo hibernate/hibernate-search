@@ -42,7 +42,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.ConversionContext;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.TermTermination;
@@ -71,7 +71,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 	public Query createQuery() {
 		final int size = fieldContexts.size();
-		final ConversionContext conversionContext = new ContextualException2WayBridge();
+		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		if ( size == 1 ) {
 			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ), conversionContext ) ).createQuery();
 		}

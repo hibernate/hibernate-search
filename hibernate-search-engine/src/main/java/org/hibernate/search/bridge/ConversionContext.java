@@ -20,18 +20,78 @@
  */
 package org.hibernate.search.bridge;
 
-import org.hibernate.search.bridge.util.impl.ConversionInvocationContext;
+import org.hibernate.annotations.common.reflection.XMember;
 
 
 /**
+ * Setting the context before invoking a conversion bridge will provide
+ * more helpful exceptions in case of errors.
+ * This is especially important as bridge implementations often need to
+ * make assumptions about the data formats and are user provided.
+ * 
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public interface ConversionContext extends ConversionInvocationContext {
+public interface ConversionContext {
 
+	/**
+	 * Decorates a FieldBridge.
+	 * @param delegate set the bridge that shall be used by the decoration.
+	 * @return a decorated FieldBridge which should be used instead of the original delegate.
+	 */
 	FieldBridge oneWayConversionContext(FieldBridge delegate);
 
+	/**
+	 * Decorates a TwoWayFieldBridge.
+	 * @param delegate set the bridge that shall be used by the decoration.
+	 * @return a decorated TwoWayFieldBridge which should be used instead of the original delegate.
+	 */
 	TwoWayFieldBridge twoWayConversionContext(TwoWayFieldBridge delegate);
 
+	/**
+	 * Decorates a StringBridge.
+	 * @param delegate set the bridge that shall be used by the decoration.
+	 * @return a decorated StringBridge which should be used instead of the original delegate.
+	 */
 	StringBridge stringConversionContext(StringBridge delegate);
+
+	/**
+	 * In case the next conversion fails, the error message will point to this type.
+	 * @param beanClass the class type which is going to be converted
+	 * @return this for method chaining.
+	 */
+	ConversionContext setClass(Class<?> beanClass);
+
+	/**
+	 * In case the next conversion fails, the error message will point to this field
+	 * or method name.
+	 * @param fieldName the field which is going to be converted
+	 * @return this for method chaining.
+	 */
+	ConversionContext setFieldName(String fieldName);
+
+	/**
+	 * In case the next conversion fails, the error message will point to the
+	 * document id of the currently indexed type.
+	 * @return this for method chaining.
+	 */
+	ConversionContext pushIdentifierMethod();
+
+	/**
+	 * The context has an internal stack for graph navigation.
+	 * Pushing a method on the stack will make sure we know on which path
+	 * the failure occurred.
+	 * All invocations to a push need to cleanup with a {@link #popMethod()},
+	 * especially after exceptions.
+	 * @param method the property which is being followed for embedded indexing
+	 * @return this for method chaining.
+	 */
+	ConversionContext pushMethod(XMember method);
+
+	/**
+	 * Pops the last pushed method from the stack. See {@link #pushIdentifierMethod()}
+	 * and {@link #pushMethod(XMember)}
+	 * @return this for method chaining.
+	 */
+	ConversionContext popMethod();
 
 }

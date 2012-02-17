@@ -31,7 +31,7 @@ import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.bridge.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.facet.RangeFacet;
 
@@ -76,7 +76,7 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 			);
 		}
 		else if ( minOrMax instanceof Date ) {
-			final ConversionContext conversionContext = new ContextualException2WayBridge();
+			final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 			return createRangeQuery(
 					documentBuilder.objectToString( getFieldName(), range.getMin(), conversionContext ),
 					documentBuilder.objectToString( getFieldName(), range.getMax(), conversionContext ),

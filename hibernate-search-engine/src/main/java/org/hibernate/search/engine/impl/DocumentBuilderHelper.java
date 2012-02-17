@@ -72,12 +72,17 @@ public final class DocumentBuilderHelper {
 		);
 		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
 		final String fieldName = builderIndexedEntity.getIdKeywordName();
-		return (Serializable) conversionContext
-			.setClass( clazz )
-			.setFieldName( fieldName )
-			.pushIdentifierMethod()
-			.twoWayConversionContext( fieldBridge )
-			.get( fieldName, document );
+		try {
+			return (Serializable) conversionContext
+					.setClass( clazz )
+					.setFieldName( fieldName )
+					.pushIdentifierMethod()
+					.twoWayConversionContext( fieldBridge )
+					.get( fieldName, document );
+		}
+		finally {
+			conversionContext.popMethod();
+		}
 	}
 
 	public static String getDocumentIdName(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
@@ -182,10 +187,14 @@ public final class DocumentBuilderHelper {
 			if ( metadata.embeddedContainers
 					.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
 				contextualBridge.pushMethod( metadata.embeddedGetters.get( index ) );
-				processFieldsForProjection(
+				try {
+					processFieldsForProjection(
 						metadata.embeddedPropertiesMetadata.get( index ), fields, result, document, contextualBridge
-				);
-				contextualBridge.popMethod();
+							);
+				}
+				finally {
+					contextualBridge.popMethod();
+				}
 			}
 		}
 

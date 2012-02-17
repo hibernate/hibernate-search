@@ -45,7 +45,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public final class ContextualException2WayBridge implements ConversionContext {
+public final class ContextualExceptionBridgeHelper implements ConversionContext {
 
 	private static final NamedVirtualXMember IDENTIFIER = new NamedVirtualXMember( "identifier" );
 
