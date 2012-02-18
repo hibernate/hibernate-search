@@ -55,13 +55,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Component of batch-indexing pipeline, using chained producer-consumers.
  * This Runnable will consume entities taken one-by-one from the queue
  * and produce for each entity an AddLuceneWork to the output queue.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
 	private final Map<Class<?>, EntityIndexBinder> entityIndexBinders;
@@ -143,7 +143,8 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void index( Object entity, Session session, InstanceInitializer sessionInitializer, ConversionContext conversionContext ) throws InterruptedException {
+	private void index(Object entity, Session session, InstanceInitializer sessionInitializer, ConversionContext conversionContext)
+			throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
 		EntityIndexBinder entityIndexBinding = entityIndexBinders.get( clazz );
@@ -155,14 +156,27 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		}
 		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
-		String idInString = conversionContext
-			.setClass(clazz)
-			.setFieldName(docBuilder.getIdKeywordName())
-			.twoWayConversionContext( idBridge )
-			.objectToString( id );
+		conversionContext.pushProperty( docBuilder.getIdKeywordName() );
+		String idInString = null;
+		try {
+			idInString = conversionContext
+					.setClass( clazz )
+					.twoWayConversionContext( idBridge )
+					.objectToString( id );
+		}
+		finally {
+			conversionContext.popProperty();
+		}
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
-		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer, conversionContext );
+		AddLuceneWork addWork = docBuilder.createAddWork(
+				clazz,
+				entity,
+				id,
+				idInString,
+				sessionInitializer,
+				conversionContext
+		);
 		backend.enqueueAsyncWork( addWork );
 	}
 }

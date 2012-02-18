@@ -266,14 +266,14 @@ public class WorkPlan {
 		 */
 		public void enqueueLuceneWork(List<LuceneWork> luceneQueue) {
 			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = entityById.entrySet();
-			ConversionContext contextualBridge = new ContextualExceptionBridgeHelper();
+			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 			if ( purgeAll ) {
 				luceneQueue.add( new PurgeAllLuceneWork( entityClass ) );
 			}
 			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstances ) {
 				Serializable indexingId = entry.getKey();
 				PerEntityWork<T> perEntityWork = entry.getValue();
-				perEntityWork.enqueueLuceneWork( entityClass, indexingId, documentBuilder, luceneQueue, contextualBridge );
+				perEntityWork.enqueueLuceneWork( entityClass, indexingId, documentBuilder, luceneQueue, conversionContext );
 			}
 		}
 
@@ -464,9 +464,9 @@ public class WorkPlan {
 		 * @param luceneQueue the queue collecting all changes
 		 */
 		public void enqueueLuceneWork(Class<T> entityClass, Serializable indexingId, AbstractDocumentBuilder<T> entityBuilder,
-				List<LuceneWork> luceneQueue, ConversionContext contextualBridge) {
+				List<LuceneWork> luceneQueue, ConversionContext conversionContext) {
 			if ( add || delete ) {
-				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue, contextualBridge );
+				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue, conversionContext );
 			}
 		}
 

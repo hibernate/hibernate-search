@@ -73,16 +73,6 @@ public interface ConversionContext {
 	ConversionContext setClass(Class<?> beanClass);
 
 	/**
-	 * In case the next conversion fails, the error message will point to this field
-	 * or method name.
-	 *
-	 * @param fieldName the field which is going to be converted
-	 *
-	 * @return this for method chaining.
-	 */
-	ConversionContext setFieldName(String fieldName);
-
-	/**
 	 * In case the next conversion fails, the error message will point to the
 	 * document id of the currently indexed type.
 	 *

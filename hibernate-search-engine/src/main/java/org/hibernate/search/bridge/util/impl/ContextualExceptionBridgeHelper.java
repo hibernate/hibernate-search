@@ -41,6 +41,7 @@ import org.hibernate.search.bridge.spi.ConversionContext;
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  */
 public final class ContextualExceptionBridgeHelper implements ConversionContext {
 
@@ -48,7 +49,6 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 
 	// Mutable state:
 	private Class<?> clazz;
-	private String fieldName;
 	private StringBridge stringBridge;
 	private FieldBridge oneWayBridge;
 	private TwoWayFieldBridge twoWayBridge;
@@ -64,17 +64,15 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 		return this;
 	}
 
-	public ConversionContext setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-		return this;
-	}
-
-	public ConversionContext pushProperty(String field) {
-		path.add( field );
+	public ConversionContext pushProperty(String property) {
+		path.add( property );
 		return this;
 	}
 
 	public ConversionContext popProperty() {
+		if ( path.size() == 0 ) {
+			throw new IllegalStateException( "Trying to pop a property from an empty conversion context" );
+		}
 		path.remove( path.size() - 1 );
 		return this;
 	}
@@ -85,8 +83,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	}
 
 	protected BridgeException buildBridgeException(Exception e, String method) {
-		StringBuilder error = new StringBuilder( "Exception while calling bridge#" );
-		error.append( method );
+		StringBuilder error = new StringBuilder( "Exception while calling bridge#" ).append( method );
 		if ( clazz != null ) {
 			error.append( "\n\tclass: " ).append( clazz.getName() );
 		}
@@ -96,9 +93,6 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 				error.append( pathNode ).append( "." );
 			}
 			error.deleteCharAt( error.length() - 1 );
-		}
-		if ( fieldName != null ) {
-			error.append( "\n\tfield bridge: " ).append( fieldName );
 		}
 		throw new BridgeException( error.toString(), e );
 	}
