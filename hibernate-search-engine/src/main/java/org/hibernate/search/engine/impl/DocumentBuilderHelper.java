@@ -31,7 +31,6 @@ import java.util.zip.DataFormatException;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
-import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
@@ -75,8 +74,7 @@ public final class DocumentBuilderHelper {
 		try {
 			return (Serializable) conversionContext
 					.setClass( clazz )
-					.setFieldName( fieldName )
-					.pushIdentifierMethod()
+					.pushIdentifierProperty()
 					.twoWayConversionContext( fieldBridge )
 					.get( fieldName, document );
 		}
@@ -97,13 +95,10 @@ public final class DocumentBuilderHelper {
 		Arrays.fill( result, NOT_SET );
 		conversionContext.setClass( clazz );
 		if ( builderIndexedEntity.getIdKeywordName() != null ) {
-			final XMember member = builderIndexedEntity.getIdGetter();
 			final String fieldName = builderIndexedEntity.getIdKeywordName();
 			int matchingPosition = getFieldPosition( fields, fieldName );
 			if ( matchingPosition != -1 ) {
-				if ( member != null ) {
-					conversionContext.pushProperty( fieldName );
-				}
+				conversionContext.pushProperty( fieldName );
 				try {
 					populateResult(
 							fieldName,
@@ -116,9 +111,7 @@ public final class DocumentBuilderHelper {
 					);
 				}
 				finally {
-					if ( member != null ) {
-						conversionContext.popProperty();
-					}
+					conversionContext.popProperty();
 				}
 			}
 		}
@@ -138,7 +131,6 @@ public final class DocumentBuilderHelper {
 		//TODO make use of an isTwoWay() method
 		if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 			result[matchingPosition] = conversionContext
-				.setFieldName( fieldName )
 				.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge )
 				.get( fieldName, document );
 			if ( log.isTraceEnabled() ) {
