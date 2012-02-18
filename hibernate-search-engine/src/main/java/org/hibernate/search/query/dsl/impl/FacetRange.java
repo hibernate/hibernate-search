@@ -26,6 +26,8 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.Date;
 
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 
 /**
@@ -74,8 +76,9 @@ public class FacetRange<T> {
 		this.rangeType = rangeType;
 
 		if ( Date.class.equals( rangeType ) ) {
-			stringMin = documentBuilder.objectToString( fieldName, min );
-			stringMax = documentBuilder.objectToString( fieldName, max );
+			final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
+			stringMin = documentBuilder.objectToString( fieldName, min, conversionContext );
+			stringMax = documentBuilder.objectToString( fieldName, max, conversionContext );
 		}
 	}
 

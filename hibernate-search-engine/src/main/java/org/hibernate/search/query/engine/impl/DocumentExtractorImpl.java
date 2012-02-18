@@ -33,6 +33,8 @@ import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -76,6 +78,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private final Class singleClassIfPossible; //null when not possible
 	private final FieldCacheCollector classTypeCollector; //null when not used
 	private final FieldCacheCollector idsCollector; //null when not used
+	private final ConversionContext exceptionWrap = new ContextualExceptionBridgeHelper();
 
 	public DocumentExtractorImpl(QueryHits queryHits,
 								 SearchFactoryImplementor searchFactoryImplementor,
@@ -178,14 +181,14 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		// else: this.fieldSelector = null; //We need no fields at all
 	}
 
-	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex) throws IOException {
+	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex, ConversionContext exceptionWrap) throws IOException {
 		Class clazz = extractClass( docId, document, scoreDocIndex );
 		String idName = DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
 		Serializable id = extractId( docId, document, clazz );
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
 			projected = DocumentBuilderHelper.getDocumentFields(
-					searchFactoryImplementor, clazz, document, projection
+					searchFactoryImplementor, clazz, document, projection, exceptionWrap
 			);
 		}
 		return new EntityInfoImpl( clazz, idName, id, projected );
@@ -199,7 +202,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			return (Serializable) this.idsCollector.getValue( docId );
 		}
 		else {
-			return DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document );
+			return DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document, exceptionWrap );
 		}
 	}
 
@@ -233,7 +236,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		int docId = queryHits.docId( scoreDocIndex );
 		Document document = extractDocument( scoreDocIndex );
 
-		EntityInfo entityInfo = extractEntityInfo( docId, document, scoreDocIndex );
+		EntityInfo entityInfo = extractEntityInfo( docId, document, scoreDocIndex, exceptionWrap );
 		Object[] eip = entityInfo.getProjection();
 
 		if ( eip != null && eip.length > 0 ) {

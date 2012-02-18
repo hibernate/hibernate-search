@@ -49,6 +49,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -112,7 +114,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addDeleteLuceneWork(String entityClassName) {
+	public void addDeleteLuceneWork(String entityClassName, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				LuceneWorkHydrator.class,
@@ -120,7 +122,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		LuceneWork result = new DeleteLuceneWork(
 				id,
-				objectIdInString( entityClass, id ),
+				objectIdInString( entityClass, id, conversionContext ),
 				entityClass
 		);
 		results.add( result );
@@ -128,7 +130,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
+	public void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				LuceneWorkHydrator.class,
@@ -136,7 +138,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		LuceneWork result = new AddLuceneWork(
 				id,
-				objectIdInString( entityClass, id ),
+				objectIdInString( entityClass, id, conversionContext ),
 				entityClass,
 				getLuceneDocument(),
 				fieldToAnalyzerMap
@@ -147,7 +149,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
+	public void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				LuceneWorkHydrator.class,
@@ -155,7 +157,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		LuceneWork result = new UpdateLuceneWork(
 				id,
-				objectIdInString( entityClass, id ),
+				objectIdInString( entityClass, id, conversionContext ),
 				entityClass,
 				getLuceneDocument(),
 				fieldToAnalyzerMap
@@ -391,13 +393,13 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		return luceneDocument;
 	}
 
-	private String objectIdInString(Class<?> entityClass, Serializable id) {
+	private String objectIdInString(Class<?> entityClass, Serializable id, ConversionContext conversionContext) {
 		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( entityClass );
 		if ( indexBindingForEntity == null ) {
 			throw new SearchException( "Unable to find entity type metadata while deserializing: " + entityClass );
 		}
 		DocumentBuilderIndexedEntity<?> documentBuilder = indexBindingForEntity.getDocumentBuilder();
-		return documentBuilder.objectToString( documentBuilder.getIdKeywordName(), id );
+		return documentBuilder.objectToString( documentBuilder.getIdKeywordName(), id, conversionContext );
 	}
 
 	private static Field.TermVector getTermVector(SerializableTermVector termVector) {

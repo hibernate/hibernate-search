@@ -77,8 +77,8 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
-import org.hibernate.search.bridge.util.impl.ContextualExceptionBridge;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
@@ -271,6 +271,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				//component should index their document id
 				ReflectionHelper.setAccessible( member );
 				propertiesMetadata.fieldGetters.add( member );
+				propertiesMetadata.fieldGetterNames.add( member.getName() );
 				String fieldName = prefix + attributeName;
 				propertiesMetadata.fieldNames.add( fieldName );
 				propertiesMetadata.fieldStore.add( Store.YES );
@@ -349,38 +350,52 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return id;
 	}
 	
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue) {
-		String idInString = objectToString( idBridge, idKeywordName, id );
+	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
+		String idInString = objectToString( idBridge, idKeywordName, id, contextualBridge );
 		if ( delete && !add ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		else if ( add && !delete) {
-			queue.add( createAddWork( entityClass, entity, id, idInString, this.instanceInitalizer ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, this.instanceInitalizer, contextualBridge ) );
 		}
 		else if ( add && delete ) {
-			queue.add( createUpdateWork( entityClass, entity, id, idInString, this.instanceInitalizer ) );
+			queue.add( createUpdateWork( entityClass, entity, id, idInString, this.instanceInitalizer, contextualBridge ) );
 		}
 	}
-	
-	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value) {
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
-				.setClass( getBeanClass() )
-				.setFieldBridge( bridge )
-				.setFieldName( fieldName );
-		return contextualBridge.objectToString( value );
+
+	private String objectToString(TwoWayFieldBridge bridge, String fieldName, Object value, ConversionContext conversionContext) {
+		conversionContext.pushProperty( fieldName );
+		String stringValue;
+		try {
+			stringValue = conversionContext
+					.setClass( getBeanClass() )
+					.twoWayConversionContext( bridge )
+					.objectToString( value );
+		}
+		finally {
+			conversionContext.popProperty();
+		}
+		return stringValue;
 	}
 
-	private String objectToString(StringBridge bridge, String fieldName, Object value) {
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
-				.setClass( getBeanClass() )
-				.setStringBridge( bridge )
-				.setFieldName( fieldName );
-		return contextualBridge.objectToString( value );
+	private String objectToString(StringBridge bridge, String fieldName, Object value, ConversionContext conversionContext) {
+		conversionContext.pushProperty( fieldName );
+		String stringValue;
+		try {
+			stringValue = conversionContext
+					.setClass( getBeanClass() )
+					.stringConversionContext( bridge )
+					.objectToString( value );
+		}
+		finally {
+			conversionContext.popProperty();
+		}
+		return stringValue;
 	}
 
-	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer) {
+	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext conversionContext) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext );
 		final AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new AddLuceneWork( id, idInString, entityClass, doc );
@@ -391,9 +406,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return addWork;
 	}
 	
-	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer) {
+	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer );
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge );
 		final UpdateLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new UpdateLuceneWork( id, idInString, entityClass, doc );
@@ -412,10 +427,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param fieldToAnalyzerMap this maps gets populated while generating the <code>Document</code>.
 	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
 	 * @param objectInitializer used to ensure that all objects are initalized
+	 * @param conversionContext 
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
-	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer) {
+	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer, ConversionContext conversionContext) {
 		if ( fieldToAnalyzerMap == null ) {
 			throw new IllegalArgumentException( "fieldToAnalyzerMap cannot be null" );
 		}
@@ -443,21 +459,20 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				Field.TermVector.NO,
 				idBoost
 		);
-		final ContextualExceptionBridge contextualBridge = new ContextualExceptionBridge()
-				.setFieldBridge( idBridge )
-				.setClass( entityType )
-				.setFieldName( idKeywordName );
-		if ( idGetter != null ) {
-			contextualBridge.pushMethod( idGetter );
+		final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( idBridge );
+		conversionContext.setClass( entityType );
+		conversionContext.pushProperty( idKeywordName );
+
+		try {
+			contextualizedBridge.set( idKeywordName, id, doc, luceneOptions );
 		}
-		contextualBridge.set( idKeywordName, id, doc, luceneOptions );
-		if ( idGetter != null ) {
-			contextualBridge.popMethod();
+		finally {
+			conversionContext.popProperty();
 		}
 
 		// finally add all other document fields
 		Set<String> processedFieldNames = new HashSet<String>();
-		buildDocumentFields( instance, doc, getMetadata(), fieldToAnalyzerMap, processedFieldNames, contextualBridge, objectInitializer );
+		buildDocumentFields( instance, doc, getMetadata(), fieldToAnalyzerMap, processedFieldNames, conversionContext, objectInitializer );
 		return doc;
 	}
 
@@ -466,7 +481,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									 PropertiesMetadata propertiesMetadata,
 									 Map<String, String> fieldToAnalyzerMap,
 									 Set<String> processedFieldNames,
-									 ContextualExceptionBridge contextualBridge,
+									 ConversionContext conversionContext,
 									 InstanceInitializer objectInitializer) {
 
 		// needed for field access: I cannot work in the proxied version
@@ -476,13 +491,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		for ( int i = 0; i < propertiesMetadata.classBridges.size(); i++ ) {
 			FieldBridge fb = propertiesMetadata.classBridges.get( i );
 			final String fieldName = propertiesMetadata.classNames.get( i );
-			contextualBridge
-					.setFieldBridge( fb )
-					.setFieldName( fieldName )
-					.set(
-							fieldName, unproxiedInstance,
-							doc, propertiesMetadata.getClassLuceneOptions( i )
-					);
+			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fb );
+			conversionContext.pushProperty( fieldName );
+			try {
+				oneWayConversionContext.set(
+						fieldName, unproxiedInstance,
+						doc, propertiesMetadata.getClassLuceneOptions( i )
+				);
+			}
+			finally {
+				conversionContext.popProperty();
+			}
 		}
 
 		// process the indexed fields
@@ -497,15 +516,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get( i );
 			final String fieldName = propertiesMetadata.fieldNames.get( i );
-			contextualBridge
-					.setFieldBridge( fieldBridge )
-					.pushMethod( member )
-					.setFieldName( fieldName )
-					.set(
-							fieldName, currentFieldValue, doc,
-							propertiesMetadata.getFieldLuceneOptions( i, currentFieldValue )
-					);
-			contextualBridge.popMethod();
+			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
+			conversionContext.pushProperty( propertiesMetadata.fieldGetterNames.get( i ) );
+			try {
+				oneWayConversionContext.set(
+						fieldName, currentFieldValue, doc,
+						propertiesMetadata.getFieldLuceneOptions( i, currentFieldValue )
+				);
+			}
+			finally {
+				conversionContext.popProperty();
+			}
 		}
 
 		// allow analyzer override for the fields added by the class and field bridges
@@ -516,91 +537,97 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// recursively process embedded objects
 		for ( int i = 0; i < propertiesMetadata.embeddedGetters.size(); i++ ) {
 			XMember member = propertiesMetadata.embeddedGetters.get( i );
-			contextualBridge.pushMethod( member );
-			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-			//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
+			conversionContext.pushProperty( propertiesMetadata.embeddedFieldNames.get( i ) );
+			try {
+				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
+				//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
 
-			if ( value == null ) {
-				processEmbeddedNullValue( doc, propertiesMetadata, contextualBridge, i, member );
-				continue;
-			}
+				if ( value == null ) {
+					processEmbeddedNullValue( doc, propertiesMetadata, conversionContext, i, member );
+					continue;
+				}
 
-			PropertiesMetadata embeddedMetadata = propertiesMetadata.embeddedPropertiesMetadata.get( i );
-			switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
-				case ARRAY:
-					Object[] array = objectInitializer.initializeArray( (Object[]) value );
-					for ( Object arrayValue : array ) {
+				PropertiesMetadata embeddedMetadata = propertiesMetadata.embeddedPropertiesMetadata.get( i );
+				switch ( propertiesMetadata.embeddedContainers.get( i ) ) {
+					case ARRAY:
+						Object[] array = objectInitializer.initializeArray( (Object[]) value );
+						for ( Object arrayValue : array ) {
+							buildDocumentFields(
+									arrayValue,
+									doc,
+									embeddedMetadata,
+									fieldToAnalyzerMap,
+									processedFieldNames,
+									conversionContext,
+									objectInitializer
+							);
+						}
+						break;
+					case COLLECTION:
+						Collection collection = objectInitializer.initializeCollection( (Collection) value );
+						for ( Object collectionValue : collection ) {
+							buildDocumentFields(
+									collectionValue,
+									doc,
+									embeddedMetadata,
+									fieldToAnalyzerMap,
+									processedFieldNames,
+									conversionContext,
+									objectInitializer
+							);
+						}
+						break;
+					case MAP:
+						Map map = objectInitializer.initializeMap( (Map) value );
+						for ( Object collectionValue : map.values() ) {
+							buildDocumentFields(
+									collectionValue,
+									doc,
+									embeddedMetadata,
+									fieldToAnalyzerMap,
+									processedFieldNames,
+									conversionContext,
+									objectInitializer
+							);
+						}
+						break;
+					case OBJECT:
 						buildDocumentFields(
-								arrayValue,
+								value,
 								doc,
 								embeddedMetadata,
 								fieldToAnalyzerMap,
 								processedFieldNames,
-								contextualBridge,
+								conversionContext,
 								objectInitializer
 						);
-					}
-					break;
-				case COLLECTION:
-					Collection collection = objectInitializer.initializeCollection( (Collection) value );
-					for ( Object collectionValue : collection ) {
-						buildDocumentFields(
-								collectionValue,
-								doc,
-								embeddedMetadata,
-								fieldToAnalyzerMap,
-								processedFieldNames,
-								contextualBridge,
-								objectInitializer
+						break;
+					default:
+						throw new AssertionFailure(
+								"Unknown embedded container: "
+										+ propertiesMetadata.embeddedContainers.get( i )
 						);
-					}
-					break;
-				case MAP:
-					Map map = objectInitializer.initializeMap( (Map) value );
-					for ( Object collectionValue : map.values() ) {
-						buildDocumentFields(
-								collectionValue,
-								doc,
-								embeddedMetadata,
-								fieldToAnalyzerMap,
-								processedFieldNames,
-								contextualBridge,
-								objectInitializer
-						);
-					}
-					break;
-				case OBJECT:
-					buildDocumentFields(
-							value,
-							doc,
-							embeddedMetadata,
-							fieldToAnalyzerMap,
-							processedFieldNames,
-							contextualBridge,
-							objectInitializer
-					);
-					break;
-				default:
-					throw new AssertionFailure(
-							"Unknown embedded container: "
-									+ propertiesMetadata.embeddedContainers.get( i )
-					);
+				}
 			}
-			contextualBridge.popMethod();
+			finally {
+				conversionContext.popProperty();
+			}
 		}
 	}
 
-	private void processEmbeddedNullValue(Document doc, PropertiesMetadata propertiesMetadata, ContextualExceptionBridge contextualBridge, int i, XMember member) {
+	private void processEmbeddedNullValue(Document doc, PropertiesMetadata propertiesMetadata, ConversionContext conversionContext, int i, XMember member) {
 		final String nullMarker = propertiesMetadata.embeddedNullTokens.get( i );
 		if ( nullMarker != null ) {
 			String fieldName = propertiesMetadata.embeddedNullFields.get( i );
 			FieldBridge fieldBridge = propertiesMetadata.embeddedNullFieldBridges.get( i );
-			contextualBridge
-				.setFieldBridge( fieldBridge )
-				.pushMethod( member )
-				.setFieldName( fieldName )
-				.set( fieldName, null, doc, NULL_EMBEDDED_MARKER_OPTIONS );
-			contextualBridge.popMethod();
+			final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( fieldBridge );
+			conversionContext.pushProperty( fieldName );
+			try {
+				contextualizedBridge.set( fieldName, null, doc, NULL_EMBEDDED_MARKER_OPTIONS );
+			}
+			finally {
+				conversionContext.popProperty();
+			}
 		}
 	}
 
@@ -657,8 +684,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return fieldCacheUsage;
 	}
 
+	@Deprecated //with no replacement: too expensive to create the conversionContext each time this was needed
 	public Term getTerm(Serializable id) {
-		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id ) );
+		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
+		return new Term( idKeywordName, objectToString( idBridge, idKeywordName, id, conversionContext ) );
 	}
 
 	public TwoWayFieldBridge getIdBridge() {
@@ -688,22 +717,22 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, idGetter );
 	}
 	
-	public String objectToString(String fieldName, Object value) {
+	public String objectToString(String fieldName, Object value, ConversionContext conversionContext) {
 		if ( fieldName == null ) {
 			throw new AssertionFailure( "Field name should not be null" );
 		}
 		if ( fieldName.equals( idKeywordName ) ) {
-			return objectToString( idBridge, idKeywordName, value );
+			return objectToString( idBridge, idKeywordName, value, conversionContext );
 		}
 		else {
 			FieldBridge bridge = getBridge( getMetadata(), fieldName );
 			if ( bridge != null ) {
 				final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
 				if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return objectToString( (TwoWayFieldBridge) bridge, fieldName, value );
+					return objectToString( (TwoWayFieldBridge) bridge, fieldName, value, conversionContext );
 				}
 				else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return objectToString( (StringBridge) bridge, fieldName, value );
+					return objectToString( (StringBridge) bridge, fieldName, value, conversionContext );
 				}
 				throw new SearchException(
 						"FieldBridge " + bridgeClass + " does not have a objectToString method: field "

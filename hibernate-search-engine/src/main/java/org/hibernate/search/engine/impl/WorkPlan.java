@@ -36,6 +36,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DepthValidator;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -264,13 +266,14 @@ public class WorkPlan {
 		 */
 		public void enqueueLuceneWork(List<LuceneWork> luceneQueue) {
 			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = entityById.entrySet();
+			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 			if ( purgeAll ) {
 				luceneQueue.add( new PurgeAllLuceneWork( entityClass ) );
 			}
 			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstances ) {
 				Serializable indexingId = entry.getKey();
 				PerEntityWork<T> perEntityWork = entry.getValue();
-				perEntityWork.enqueueLuceneWork( entityClass, indexingId, documentBuilder, luceneQueue );
+				perEntityWork.enqueueLuceneWork( entityClass, indexingId, documentBuilder, luceneQueue, conversionContext );
 			}
 		}
 
@@ -460,9 +463,10 @@ public class WorkPlan {
 		 * @param entityBuilder the DocumentBuilder for this type
 		 * @param luceneQueue the queue collecting all changes
 		 */
-		public void enqueueLuceneWork(Class<T> entityClass, Serializable indexingId, AbstractDocumentBuilder<T> entityBuilder, List<LuceneWork> luceneQueue) {
+		public void enqueueLuceneWork(Class<T> entityClass, Serializable indexingId, AbstractDocumentBuilder<T> entityBuilder,
+				List<LuceneWork> luceneQueue, ConversionContext conversionContext) {
 			if ( add || delete ) {
-				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue );
+				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue, conversionContext );
 			}
 		}
 

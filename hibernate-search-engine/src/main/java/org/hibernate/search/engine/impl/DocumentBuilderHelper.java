@@ -31,14 +31,12 @@ import java.util.zip.DataFormatException;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
-
-import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -66,20 +64,23 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document) {
+	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, ConversionContext conversionContext) {
 		final DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder(
 				searchFactoryImplementor,
 				clazz
 		);
 		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
 		final String fieldName = builderIndexedEntity.getIdKeywordName();
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
-		contextualBridge
-				.setClass( clazz )
-				.setFieldName( fieldName )
-				.setFieldBridge( fieldBridge )
-				.pushIdentifierMethod();
-		return (Serializable) contextualBridge.get( fieldName, document );
+		try {
+			return (Serializable) conversionContext
+					.setClass( clazz )
+					.pushIdentifierProperty()
+					.twoWayConversionContext( fieldBridge )
+					.get( fieldName, document );
+		}
+		finally {
+			conversionContext.popProperty();
+		}
 	}
 
 	public static String getDocumentIdName(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
@@ -87,21 +88,17 @@ public final class DocumentBuilderHelper {
 		return documentBuilder.getIdentifierName();
 	}
 
-	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields) {
+	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields, ConversionContext conversionContext) {
 		DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder( searchFactoryImplementor, clazz );
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
 		Arrays.fill( result, NOT_SET );
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge();
-		contextualBridge.setClass( clazz );
+		conversionContext.setClass( clazz );
 		if ( builderIndexedEntity.getIdKeywordName() != null ) {
-			final XMember member = builderIndexedEntity.getIdGetter();
 			final String fieldName = builderIndexedEntity.getIdKeywordName();
 			int matchingPosition = getFieldPosition( fields, fieldName );
 			if ( matchingPosition != -1 ) {
-				if ( member != null ) {
-					contextualBridge.pushMethod( member );
-				}
+				conversionContext.pushProperty( fieldName );
 				try {
 					populateResult(
 							fieldName,
@@ -109,20 +106,18 @@ public final class DocumentBuilderHelper {
 							Store.YES,
 							result,
 							document,
-							contextualBridge,
+							conversionContext,
 							matchingPosition
 					);
 				}
 				finally {
-					if ( member != null ) {
-						contextualBridge.popMethod();
-					}
+					conversionContext.popProperty();
 				}
 			}
 		}
 
 		final AbstractDocumentBuilder.PropertiesMetadata metadata = builderIndexedEntity.getMetadata();
-		processFieldsForProjection( metadata, fields, result, document, contextualBridge );
+		processFieldsForProjection( metadata, fields, result, document, conversionContext );
 		return result;
 	}
 
@@ -131,12 +126,13 @@ public final class DocumentBuilderHelper {
 									  Store store,
 									  Object[] result,
 									  Document document,
-									  ContextualException2WayBridge contextualBridge,
+									  ConversionContext conversionContext,
 									  int matchingPosition) {
 		//TODO make use of an isTwoWay() method
 		if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
-			contextualBridge.setFieldName( fieldName ).setFieldBridge( (TwoWayFieldBridge) fieldBridge );
-			result[matchingPosition] = contextualBridge.get( fieldName, document );
+			result[matchingPosition] = conversionContext
+				.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge )
+				.get( fieldName, document );
 			if ( log.isTraceEnabled() ) {
 				log.tracef( "Field %s projected as %s", fieldName, result[matchingPosition] );
 			}
@@ -151,14 +147,14 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-	private static void processFieldsForProjection(AbstractDocumentBuilder.PropertiesMetadata metadata, String[] fields, Object[] result, Document document, ContextualException2WayBridge contextualBridge) {
+	private static void processFieldsForProjection(AbstractDocumentBuilder.PropertiesMetadata metadata, String[] fields, Object[] result, Document document, ConversionContext contextualBridge) {
 		//process base fields
 		final int nbrFoEntityFields = metadata.fieldNames.size();
 		for ( int index = 0; index < nbrFoEntityFields; index++ ) {
 			final String fieldName = metadata.fieldNames.get( index );
 			int matchingPosition = getFieldPosition( fields, fieldName );
 			if ( matchingPosition != -1 ) {
-				contextualBridge.pushMethod( metadata.fieldGetters.get( index ) );
+				contextualBridge.pushProperty( fieldName );
 				try {
 					populateResult(
 							fieldName,
@@ -171,7 +167,7 @@ public final class DocumentBuilderHelper {
 					);
 				}
 				finally {
-					contextualBridge.popMethod();
+					contextualBridge.popProperty();
 				}
 			}
 		}
@@ -180,13 +176,16 @@ public final class DocumentBuilderHelper {
 		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
 		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
 			//there is nothing we can do for collections
-			if ( metadata.embeddedContainers
-					.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
-				contextualBridge.pushMethod( metadata.embeddedGetters.get( index ) );
-				processFieldsForProjection(
-						metadata.embeddedPropertiesMetadata.get( index ), fields, result, document, contextualBridge
-				);
-				contextualBridge.popMethod();
+			if ( metadata.embeddedContainers.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
+				contextualBridge.pushProperty( metadata.embeddedFieldNames.get( index ) );
+				try {
+					processFieldsForProjection(
+							metadata.embeddedPropertiesMetadata.get( index ), fields, result, document, contextualBridge
+					);
+				}
+				finally {
+					contextualBridge.popProperty();
+				}
 			}
 		}
 

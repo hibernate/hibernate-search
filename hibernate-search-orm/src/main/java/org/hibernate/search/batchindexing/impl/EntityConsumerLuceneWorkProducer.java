@@ -39,30 +39,29 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
-import org.hibernate.search.bridge.util.impl.ContextualException2WayBridge;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
+import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.HibernateHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-
 import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Component of batch-indexing pipeline, using chained producer-consumers.
  * This Runnable will consume entities taken one-by-one from the queue
  * and produce for each entity an AddLuceneWork to the output queue.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
-	private final Class<?> indexedRootType;
+
 	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
 	private final Map<Class<?>, EntityIndexBinder> entityIndexBinders;
@@ -73,14 +72,12 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	private final ErrorHandler errorHandler;
 
 	public EntityConsumerLuceneWorkProducer(
-			Class<?> indexedType,
 			ProducerConsumerQueue<List<?>> entitySource,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CountDownLatch producerEndSignal,
 			SearchFactoryImplementor searchFactory, CacheMode cacheMode,
 			BatchBackend backend, ErrorHandler errorHandler) {
-		this.indexedRootType = indexedType;
 		this.source = entitySource;
 		this.monitor = monitor;
 		this.sessionFactory = sessionFactory;
@@ -121,6 +118,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
 				(SessionImplementor) session );
 		try {
+			ConversionContext contextualBridge = new ContextualExceptionBridgeHelper();
 			while ( true ) {
 				List<?> takeList = source.take();
 				if ( takeList == null ) {
@@ -131,7 +129,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 					for ( Object take : takeList ) {
 						//trick to attach the objects to session:
 						session.buildLockRequest( LockOptions.NONE ).lock( take );
-						index( take, session, sessionInitializer );
+						index( take, session, sessionInitializer, contextualBridge );
 						monitor.documentsBuilt( 1 );
 						session.clear();
 					}
@@ -145,7 +143,8 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void index( Object entity, Session session, InstanceInitializer sessionInitializer ) throws InterruptedException {
+	private void index(Object entity, Session session, InstanceInitializer sessionInitializer, ConversionContext conversionContext)
+			throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
 		EntityIndexBinder entityIndexBinding = entityIndexBinders.get( clazz );
@@ -157,14 +156,27 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		}
 		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
-		ContextualException2WayBridge contextualBridge = new ContextualException2WayBridge()
-				.setClass(clazz)
-				.setFieldName(docBuilder.getIdKeywordName())
-				.setFieldBridge(idBridge);
-		String idInString = contextualBridge.objectToString( id );
+		conversionContext.pushProperty( docBuilder.getIdKeywordName() );
+		String idInString = null;
+		try {
+			idInString = conversionContext
+					.setClass( clazz )
+					.twoWayConversionContext( idBridge )
+					.objectToString( id );
+		}
+		finally {
+			conversionContext.popProperty();
+		}
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
-		AddLuceneWork addWork = docBuilder.createAddWork( clazz, entity, id, idInString, sessionInitializer );
+		AddLuceneWork addWork = docBuilder.createAddWork(
+				clazz,
+				entity,
+				id,
+				idInString,
+				sessionInitializer,
+				conversionContext
+		);
 		backend.enqueueAsyncWork( addWork );
 	}
 }

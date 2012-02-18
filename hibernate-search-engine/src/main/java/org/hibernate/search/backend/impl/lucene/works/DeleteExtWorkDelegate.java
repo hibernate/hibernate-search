@@ -68,7 +68,7 @@ public class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 			if( idIsNumeric ) {
 				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
 			} else {
-				Term idTerm = builder.getTerm( id );
+				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 				writer.deleteDocuments( idTerm );
 			}
 			workspace.incrementModificationCounter( 1 );
