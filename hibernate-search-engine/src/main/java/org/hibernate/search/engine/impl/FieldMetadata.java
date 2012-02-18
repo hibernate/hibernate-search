@@ -120,6 +120,7 @@ public class FieldMetadata {
 		sanityCheckFieldConfiguration( propertiesMetadata );
 
 		propertiesMetadata.fieldGetters.add( fieldGetter );
+		propertiesMetadata.fieldGetterNames.add( fieldGetter.getName() );
 		propertiesMetadata.fieldNames.add( fieldName );
 		propertiesMetadata.fieldNameToPositionMap.put( fieldGetter.getName(), propertiesMetadata.fieldNames.size() );
 		propertiesMetadata.fieldStore.add( store );

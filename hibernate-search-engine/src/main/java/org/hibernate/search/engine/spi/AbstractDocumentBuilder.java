@@ -1203,6 +1203,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 		public final List<String> fieldNames = new ArrayList<String>();
 		public final List<XMember> fieldGetters = new ArrayList<XMember>();
+		public final List<String> fieldGetterNames = new ArrayList<String>();
 		public final List<FieldBridge> fieldBridges = new ArrayList<FieldBridge>();
 		public final List<Store> fieldStore = new ArrayList<Store>();
 		public final List<Field.Index> fieldIndex = new ArrayList<Field.Index>();

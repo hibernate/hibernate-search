@@ -271,6 +271,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				//component should index their document id
 				ReflectionHelper.setAccessible( member );
 				propertiesMetadata.fieldGetters.add( member );
+				propertiesMetadata.fieldGetterNames.add( member.getName() );
 				String fieldName = prefix + attributeName;
 				propertiesMetadata.fieldNames.add( fieldName );
 				propertiesMetadata.fieldStore.add( Store.YES );
@@ -516,7 +517,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			final FieldBridge fieldBridge = propertiesMetadata.fieldBridges.get( i );
 			final String fieldName = propertiesMetadata.fieldNames.get( i );
 			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
-			conversionContext.pushProperty( fieldName );
+			conversionContext.pushProperty( propertiesMetadata.fieldGetterNames.get( i ) );
 			try {
 				oneWayConversionContext.set(
 						fieldName, currentFieldValue, doc,
