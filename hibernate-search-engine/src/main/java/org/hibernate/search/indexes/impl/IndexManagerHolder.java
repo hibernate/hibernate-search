@@ -79,10 +79,6 @@ public class IndexManagerHolder {
 
 	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
 
-	/**
-	 * Multiple IndexManager might be built for the same entity to implement Sharding.
-	 * @return a map of created IndexManagers, having as key the names of each index.
-	 */
 	//I currently think it's easier to not hide sharding implementations in a custom
 	//IndexManager to make it easier to explicitly a)detect duplicates b)start-stop
 	//additional Managers as needed from a dynamic sharding implementation, without having
