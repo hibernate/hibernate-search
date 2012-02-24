@@ -155,7 +155,7 @@ public class IndexManagerHolder {
 		Indexed indexedAnnotation = entity.getAnnotation( Indexed.class );
 		IndexingActionInterceptor<?> interceptor = null;
 		if (indexedAnnotation != null) {
-			Class<IndexingActionInterceptor> interceptorClass = indexedAnnotation.actionInterceptor();
+			Class<? extends IndexingActionInterceptor> interceptorClass = indexedAnnotation.actionInterceptor();
 			if (interceptorClass == IndexingActionInterceptor.class) {
 				interceptor = null;
 			}
