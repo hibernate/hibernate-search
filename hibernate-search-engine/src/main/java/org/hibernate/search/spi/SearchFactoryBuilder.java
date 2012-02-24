@@ -52,6 +52,7 @@ import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
+import org.hibernate.search.interceptor.IndexingActionInterceptor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -278,8 +279,11 @@ public class SearchFactoryBuilder {
 				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
 				entitySimilarity = entityMapping.getDocumentBuilder().getSimilarity();
 				if ( entitySimilarity != null ) {
-					MutableEntityIndexBinding newMapping = new MutableEntityIndexBinding( entityMapping.getSelectionStrategy(), entitySimilarity, entityMapping.getIndexManagers() );
-					newMapping.setDocumentBuilderIndexedEntity( entityMapping.getDocumentBuilder() );
+					MutableEntityIndexBinding newMapping = buildTypeSafeMutableEntityBinder(
+							clazz,
+							entityMapping,
+							entitySimilarity
+					);
 					entityMapping = newMapping;
 					documentBuildersIndexedEntities.put( clazz, entityMapping );
 				}
@@ -299,6 +303,20 @@ public class SearchFactoryBuilder {
 				}
 			}
 		}
+	}
+
+	@SuppressWarnings( "unchecked" )
+	private <T> MutableEntityIndexBinding<T> buildTypeSafeMutableEntityBinder(Class<T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
+		IndexingActionInterceptor<? super T> indexingActionInterceptor = (IndexingActionInterceptor<? super T>) entityMapping.getIndexingActionInterceptor();
+		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
+				entityMapping.getSelectionStrategy(),
+				entitySimilarity,
+				entityMapping.getIndexManagers(),
+				indexingActionInterceptor
+		);
+		DocumentBuilderIndexedEntity<T> documentBuilder = (DocumentBuilderIndexedEntity<T>) entityMapping.getDocumentBuilder();
+		newMapping.setDocumentBuilderIndexedEntity( documentBuilder );
+		return newMapping;
 	}
 
 	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {

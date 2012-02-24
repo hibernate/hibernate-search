@@ -37,6 +37,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.interceptor.IndexingActionInterceptor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -151,9 +152,39 @@ public class IndexManagerHolder {
 			}
 		}
 
-		return new MutableEntityIndexBinding( shardingStrategy, similarityInstance, providers );
+		Indexed indexedAnnotation = entity.getAnnotation( Indexed.class );
+		IndexingActionInterceptor<?> interceptor = null;
+		if (indexedAnnotation != null) {
+			Class<IndexingActionInterceptor> interceptorClass = indexedAnnotation.actionInterceptor();
+			if (interceptorClass == IndexingActionInterceptor.class) {
+				interceptor = null;
+			}
+			else {
+				interceptor = ClassLoaderHelper.instanceFromClass(
+						IndexingActionInterceptor.class,
+						interceptorClass,
+						"IndexingActionInterceptor for " + entity.getName()
+				);
+			}
+		}
+		return buildTypesafeMutableEntityBinder(
+				entity.getClass(),
+				providers,
+				shardingStrategy,
+				similarityInstance,
+				interceptor
+		);
 	}
-	
+
+	@SuppressWarnings( "unchecked" )
+	private <T,U> MutableEntityIndexBinding<T> buildTypesafeMutableEntityBinder(Class<T> type, IndexManager[] providers,
+																			  IndexShardingStrategy shardingStrategy,
+																			  Similarity similarityInstance,
+																			  IndexingActionInterceptor<U> interceptor) {
+		IndexingActionInterceptor<? super T> safeInterceptor = (IndexingActionInterceptor<? super T>) interceptor;
+		return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
+	}
+
 	/**
 	 * Specifies a custom similarity on an index
 	 * @param newSimilarity
