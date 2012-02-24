@@ -29,6 +29,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.interceptor.IndexingActionInterceptor;
+
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
 @Documented
@@ -40,4 +42,11 @@ public @interface Indexed {
 	 * @return The filename of the index
 	 */
 	String index() default "";
+
+	/**
+	 * Custom converter to change operations upon indexing
+	 * Useful for soft deletes and similar patterns
+	 */
+	//FIXME put this option in the  programmatic API
+	Class<? extends IndexingActionInterceptor> actionInterceptor() default IndexingActionInterceptor.class;
 }
