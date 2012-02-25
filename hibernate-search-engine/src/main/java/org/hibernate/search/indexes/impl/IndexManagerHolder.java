@@ -37,6 +37,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.interceptor.indexingaction.DefaultOrInheritedActionInterceptor;
 import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
@@ -155,8 +156,11 @@ public class IndexManagerHolder {
 		Indexed indexedAnnotation = entity.getAnnotation( Indexed.class );
 		IndexingActionInterceptor<?> interceptor = null;
 		if (indexedAnnotation != null) {
-			Class<? extends IndexingActionInterceptor> interceptorClass = indexedAnnotation.actionInterceptor();
-			if (interceptorClass == IndexingActionInterceptor.class) {
+			Class<? extends IndexingActionInterceptor> interceptorClass = getInterceptorClassFromHierarchy(
+					entity,
+					indexedAnnotation
+			);
+			if (interceptorClass == DefaultOrInheritedActionInterceptor.class) {
 				interceptor = null;
 			}
 			else {
@@ -174,6 +178,23 @@ public class IndexManagerHolder {
 				similarityInstance,
 				interceptor
 		);
+	}
+
+	private Class<? extends IndexingActionInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
+		Class<? extends IndexingActionInterceptor> result = indexedAnnotation.actionInterceptor();
+		XClass superEntity = entity;
+		while ( result == DefaultOrInheritedActionInterceptor.class ) {
+			superEntity = superEntity.getSuperclass();
+			//Object.class
+			if (superEntity == null) {
+				return result;
+			}
+			Indexed indexAnnForSuperclass = superEntity.getAnnotation( Indexed.class );
+			result = indexAnnForSuperclass != null ?
+					indexAnnForSuperclass.actionInterceptor() :
+					result;
+		}
+		return result;
 	}
 
 	@SuppressWarnings( "unchecked" )

@@ -40,34 +40,64 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 		blog.setTitle( "Hibernate Search now has soft deletes!" );
 		blog.setStatus( BlogStatus.DRAFT );
 
+		Article article = new Article();
+		article.setTitle( "Hibernate Search: detailed description of soft deletes" );
+		article.setStatus( BlogStatus.DRAFT );
+
+		TotalArticle totalArticle = new TotalArticle();
+		totalArticle.setTitle( "Hibernate Search: the total truth about soft deletes" );
+		totalArticle.setStatus( BlogStatus.DRAFT );
+
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		s.persist( blog );
+		s.persist( article );
+		s.persist( totalArticle );
 		tx.commit();
 
 		s.clear();
 
 		tx = s.beginTransaction();
 		QueryBuilder b = s.getSearchFactory().buildQueryBuilder().forEntity( Blog.class ).get();
-		Query query = b.keyword().onField( "title" ).matching( "deletes" ).createQuery();
-		assertThat( s.createFullTextQuery( query, Blog.class ).list() ).hasSize( 0 );
+		Query blogQuery = b.keyword().onField( "title" ).matching( "now" ).createQuery();
+		Query articleQuery = b.keyword().onField( "title" ).matching( "detailed" ).createQuery();
+		Query totalArticleQuery = b.keyword().onField( "title" ).matching( "truth" ).createQuery();
+		assertThat( s.createFullTextQuery( blogQuery, Blog.class ).list() ).as("Blog is explicit intercepted").hasSize( 0 );
+		assertThat( s.createFullTextQuery( articleQuery, Blog.class ).list() ).as("Article is inherently intercepted").hasSize( 0 );
+		assertThat( s.createFullTextQuery( totalArticleQuery, Blog.class ).list() ).as("TotalArticle is explicit not intercepted").hasSize( 1 );
 		blog = (Blog) s.get( Blog.class, blog.getId() );
 		blog.setStatus( BlogStatus.PUBLISHED );
+		article = (Article) s.get( Article.class, article.getId() );
+		article.setStatus( BlogStatus.PUBLISHED );
+		totalArticle = (TotalArticle) s.get( TotalArticle.class, totalArticle.getId() );
+		totalArticle.setStatus( BlogStatus.PUBLISHED );
 		tx.commit();
 
 		s.clear();
 
 		tx = s.beginTransaction();
-		assertThat( s.createFullTextQuery( query, Blog.class ).list() ).hasSize( 1 );
+		assertThat( s.createFullTextQuery( blogQuery, Blog.class ).list() ).hasSize( 1 );
+		assertThat( s.createFullTextQuery( articleQuery, Blog.class ).list() ).as("Article is inherently intercepted").hasSize( 1 );
+		assertThat( s.createFullTextQuery( totalArticleQuery, Blog.class ).list() ).as("TotalArticle is explicit not intercepted").hasSize( 1 );
 		blog = (Blog) s.get( Blog.class, blog.getId() );
 		blog.setStatus( BlogStatus.REMOVED );
+		article = (Article) s.get( Article.class, article.getId() );
+		article.setStatus( BlogStatus.REMOVED );
+		totalArticle = (TotalArticle) s.get( TotalArticle.class, totalArticle.getId() );
+		totalArticle.setStatus( BlogStatus.REMOVED );
 		tx.commit();
 
 		s.clear();
 
 		tx = s.beginTransaction();
-		assertThat( s.createFullTextQuery( query, Blog.class ).list() ).hasSize( 0 );
+		assertThat( s.createFullTextQuery( blogQuery, Blog.class ).list() ).hasSize( 0 );
+		assertThat( s.createFullTextQuery( articleQuery, Blog.class ).list() ).as("Article is inherently intercepted").hasSize( 0 );
+		assertThat( s.createFullTextQuery( totalArticleQuery, Blog.class ).list() ).as("TotalArticle is explicit not intercepted").hasSize( 1 );
 		blog = (Blog) s.get( Blog.class, blog.getId() );
+		s.delete( blog );
+		blog = (Blog) s.get( Article.class, article.getId() );
+		s.delete( blog );
+		blog = (Blog) s.get( TotalArticle.class, totalArticle.getId() );
 		s.delete( blog );
 		tx.commit();
 
@@ -78,7 +108,9 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
-				Blog.class
+				Blog.class,
+				Article.class,
+				TotalArticle.class
 		};
 	}
 }
