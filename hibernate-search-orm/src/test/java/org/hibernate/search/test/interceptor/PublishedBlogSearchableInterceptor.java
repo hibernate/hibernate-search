@@ -20,8 +20,8 @@
  */
 package org.hibernate.search.test.interceptor;
 
-import org.hibernate.search.interceptor.IndexingActionInterceptor;
-import org.hibernate.search.interceptor.IndexingActionType;
+import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.IndexingActionType;
 
 /**
  * Only index when it's published
