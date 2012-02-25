@@ -29,7 +29,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.interceptor.IndexingActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
 
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )

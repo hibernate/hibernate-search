@@ -31,7 +31,7 @@ import org.apache.solr.analysis.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.BoostStrategy;
-import org.hibernate.search.interceptor.IndexingActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
 
 public class IndexedMapping {
 	

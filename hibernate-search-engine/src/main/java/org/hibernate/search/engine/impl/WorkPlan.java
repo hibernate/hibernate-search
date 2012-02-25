@@ -44,8 +44,8 @@ import org.hibernate.search.engine.spi.DepthValidator;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.interceptor.IndexingActionInterceptor;
-import org.hibernate.search.interceptor.IndexingActionType;
+import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.IndexingActionType;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -360,7 +360,7 @@ public class WorkPlan {
 					entityClass
 			);
 			return indexBindingForEntity!=null ?
-					(IndexingActionInterceptor<? super T>) indexBindingForEntity.getIndexingActionInterceptor() :
+					(IndexingActionInterceptor<? super T> ) indexBindingForEntity.getIndexingActionInterceptor() :
 					null;
 		}
 	}
