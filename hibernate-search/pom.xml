@@ -140,6 +140,7 @@
                 <configuration>
                     <forkMode>once</forkMode>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <runOrder>alphabetical</runOrder>
                     <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -javaagent:${settings.localRepository}/org/jboss/byteman/byteman/${bytemanVersion}/byteman-${bytemanVersion}.jar=script:${project.build.testOutputDirectory}/org/hibernate/search/test/errorhandling/ConcurrentMergeErrorTest.bytemanrules</argLine>
                     <systemProperties>
                         <property>
