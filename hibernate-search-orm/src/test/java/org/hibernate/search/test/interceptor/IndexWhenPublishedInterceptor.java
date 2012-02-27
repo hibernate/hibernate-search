@@ -24,11 +24,11 @@ import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOperationType;
 
 /**
- * Only index when it's published
+ * Only index blog when it is in published state
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class PublishedBlogSearchableInterceptor implements EntityIndexingInterceptor<Blog> {
+public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor<Blog> {
 	@Override
 	public IndexingOperationType onAdd(Blog entity) {
 		if (entity.getStatus() == BlogStatus.PUBLISHED) {
