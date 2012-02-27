@@ -21,11 +21,12 @@
 package org.hibernate.search.interceptor.indexingaction;
 
 /**
- * Do not apply any interception
+ * Do not apply any interception.
+ * Useful to force a subclass not to inherit its superclass interceptor.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class NoActionInterceptor implements EntityIndexingInterceptor<Object> {
+public class DontInterceptEntityInterceptor implements EntityIndexingInterceptor<Object> {
 	@Override
 	public IndexingOperationType onAdd(Object entity) {
 		return IndexingOperationType.DONT_INTERCEPT;

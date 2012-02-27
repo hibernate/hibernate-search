@@ -29,7 +29,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.interceptor.indexingaction.DefaultOrInheritedActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.DefaultEntityInterceptor;
 import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
 
 @Retention( RetentionPolicy.RUNTIME )
@@ -48,5 +48,5 @@ public @interface Indexed {
 	 * Custom converter to change operations upon indexing
 	 * Useful for soft deletes and similar patterns
 	 */
-	Class<? extends EntityIndexingInterceptor> interceptor() default DefaultOrInheritedActionInterceptor.class;
+	Class<? extends EntityIndexingInterceptor> interceptor() default DefaultEntityInterceptor.class;
 }

@@ -23,12 +23,12 @@ package org.hibernate.search.test.interceptor;
 import javax.persistence.Entity;
 
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.interceptor.indexingaction.NoActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.DontInterceptEntityInterceptor;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 @Entity
-@Indexed(interceptor = NoActionInterceptor.class)
+@Indexed(interceptor = DontInterceptEntityInterceptor.class)
 public class TotalArticle extends Article {
 }

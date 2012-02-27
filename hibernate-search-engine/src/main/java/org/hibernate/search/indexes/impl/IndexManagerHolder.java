@@ -37,7 +37,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.interceptor.indexingaction.DefaultOrInheritedActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.DefaultEntityInterceptor;
 import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
@@ -160,7 +160,7 @@ public class IndexManagerHolder {
 					entity,
 					indexedAnnotation
 			);
-			if (interceptorClass == DefaultOrInheritedActionInterceptor.class) {
+			if (interceptorClass == DefaultEntityInterceptor.class) {
 				interceptor = null;
 			}
 			else {
@@ -183,7 +183,7 @@ public class IndexManagerHolder {
 	private Class<? extends EntityIndexingInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
 		Class<? extends EntityIndexingInterceptor> result = indexedAnnotation.interceptor();
 		XClass superEntity = entity;
-		while ( result == DefaultOrInheritedActionInterceptor.class ) {
+		while ( result == DefaultEntityInterceptor.class ) {
 			superEntity = superEntity.getSuperclass();
 			//Object.class
 			if (superEntity == null) {
