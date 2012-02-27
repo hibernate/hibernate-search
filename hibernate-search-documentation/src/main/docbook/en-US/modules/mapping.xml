@@ -2083,6 +2083,187 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
     </section>
   </section>
 
+  <section id="search-mapping-indexinginterceptor">
+    <title>Indexing interceptors: index or not entity based on its
+    state</title>
+
+    <important>
+      <para>This feature is considered experimental. More operation types
+      might be added in the future depending on user feedback.</para>
+    </important>
+
+    <para>In some situation, you want to index an entity only when it is in a
+    given state, for example:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>only index blog entries marked as published</para>
+      </listitem>
+
+      <listitem>
+        <para>no longer index invoices when they are marked archived</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>This serves both functional and technical needs. You don't want your
+    blog readers to find your draft entries and filtering them off the query
+    is a bit annoying. Very few of your entities are actually required to be
+    indexed and you want to limit indexing overhead and keep indexes small and
+    fast.</para>
+
+    <para>Hibernate Search lets you intercept entity indexing operations and
+    override them. It is quite simple:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Write an <classname>EntityIndexingInterceptor</classname> class
+        with your entity state based logic</para>
+      </listitem>
+
+      <listitem>
+        <para>Mark the entity as intercepted by this implementation</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Let's look at the blog example</para>
+
+    <example>
+      <title>Index blog entries only when they are published and remove them
+      when they are in a different state</title>
+
+      <programlisting>/**
+ * Only index blog when it is in published state
+ *
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ */
+public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor&lt;Blog&gt; {
+    @Override
+    public IndexingOperationType onAdd(Blog entity) {
+        if (entity.getStatus() == BlogStatus.PUBLISHED) {
+            return IndexingOperationType.DONT_INTERCEPT;
+        }
+        return IndexingOperationType.SKIP;
+    }
+
+    @Override
+    public IndexingOperationType onUpdate(Blog entity) {
+        if (entity.getStatus() == BlogStatus.PUBLISHED) {
+            return IndexingOperationType.UPDATE;
+        }
+        return IndexingOperationType.REMOVE;
+    }
+
+    @Override
+    public IndexingOperationType onDelete(Blog entity) {
+        return IndexingOperationType.DONT_INTERCEPT;
+    }
+
+    @Override
+    public IndexingOperationType onCollectionUpdate(Blog entity) {
+        return onUpdate(entity);
+    }
+}</programlisting>
+
+      <programlisting>@Entity
+@Indexed(interceptor=IndexWhenPublishedInterceptor.class)
+public class Blog {
+    @Id
+    @GeneratedValue
+    public Integer getId() { return id; }
+    public void setId(Integer id) {  this.id = id; }
+    private Integer id;
+
+    @Field
+    public String getTitle() { return title; }
+    public void setTitle(String title) {  this.title = title; }
+    private String title;
+
+    public BlogStatus getStatus() { return status; }
+    public void setStatus(BlogStatus status) {  this.status = status; }
+    private BlogStatus status;
+
+    [...]
+}</programlisting>
+    </example>
+
+    <para>We mark the <classname>Blog</classname> entity with
+    <methodname>@Indexed.interceptor</methodname>. As you can see,
+    <classname>IndexWhenPublishedInterceptor</classname> implements
+    <classname>EntityIndexingInterceptor</classname> and accepts
+    <classname>Blog</classname> entities (it could have accepted superclasses
+    as well - for example <classname>Object</classname> if you create a
+    generic interceptor.</para>
+
+    <para>You can react to indexing upon several actions:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>when an entity is added to your datastore</para>
+      </listitem>
+
+      <listitem>
+        <para>when an entity is updated in your datastore</para>
+      </listitem>
+
+      <listitem>
+        <para>when an entity is deleted from your datastore</para>
+      </listitem>
+
+      <listitem>
+        <para>when a collection own by this entity is updated in your
+        datastore</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>You can decide to do a few operations:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><literal>DONT_INTERCEPT</literal>: that's the basic operation
+        that lets Hibernate Search update the index as expected - creating,
+        updating or removing the document</para>
+      </listitem>
+
+      <listitem>
+        <para><literal>SKIP</literal>: ask Hibernate Search to not do anything
+        to the index for this event - data will not be created, updated or
+        removed from the index in any way</para>
+      </listitem>
+
+      <listitem>
+        <para><literal>REMOVE</literal>: ask Hibernate Search to remove
+        indexing data about this entity - you can safely ask for
+        <literal>REMOVE</literal> even if the entity has not yet be
+        indexed</para>
+      </listitem>
+
+      <listitem>
+        <para><literal>UPDATE</literal>: ask Hibernate Search to either index
+        or update the index for this entity - it is safe to ask for
+        <literal>UPDATE</literal> even if the entity has never been
+        indexed</para>
+      </listitem>
+    </itemizedlist>
+
+    <note>
+      <para>Be careful, not every combination makes sense: for example, asking
+      to <literal>UPDATE</literal> the index upon
+      <methodname>onDelete</methodname>. Note that you could ask for
+      <literal>SKIP</literal> in this situation if saving indexing time is
+      critical for you. That's rarely the case though.</para>
+    </note>
+
+    <para>By default, no interceptor is applied on an entity. You have to
+    explicitly define an interceptor via the <classname>@Indexed</classname>
+    annotation or programmatically. This class and all its subclasses will
+    then be intercepted. You can stop or change the interceptor used in a
+    subclass by overriding <methodname>@Indexed.interceptor</methodname>.
+    Hibernate Search provides
+    <classname>DontInterceptEntityInterceptor</classname> which will
+    explicitly not intercept any call. This is useful to reset interception
+    within a class hierarchy.</para>
+  </section>
+
   <section id="provided-id">
     <title>Providing your own id</title>
 
@@ -2263,7 +2444,8 @@ EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", pro
 
 mapping.entity(Address.class)
            .indexed()
-               .indexName("Address_Index"); //optional
+               .indexName("Address_Index") //optional
+               .interceptor(IndexWhenPublishedInterceptor.class); //optional
 
 cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programlisting>
       </example>
@@ -2276,14 +2458,16 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       <methodname>indexed()</methodname> method. The <methodname>indexed()
       </methodname>method has an optional <methodname>indexName(String
       indexName)</methodname> which can be used to change the default index
-      name that is created by Hibernate Search. Using the annotation model the
-      above can be achieved as:</para>
+      name that is created by Hibernate Search. Likewise, an
+      <methodname>interceptor(Class&lt;? extends
+      EntityIndexedInterceptor&gt;)</methodname> is available. Using the
+      annotation model the above can be achieved as:</para>
 
       <example>
         <title>Annotation example of indexing entity</title>
 
         <programlisting language="JAVA" role="JAVA">@Entity
-@Indexed(index="Address_Index")
+@Indexed(index="Address_Index", interceptor=IndexWhenPublishedInterceptor.class)
 public class Address {
 ....
 }</programlisting>
