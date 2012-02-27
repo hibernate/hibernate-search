@@ -33,7 +33,7 @@
   <section id="search-mapping-entity" revision="3">
     <title>Mapping an entity</title>
 
-    <para>In <xref linkend="getting-started" /> you have already learned that
+    <para>In <xref linkend="getting-started"/> you have already learned that
     all the metadata information needed to index entities is described through
     annotations. There is no need for xml mapping files. You can still use
     Hibernate mapping files for the basic Hibernate configuration, but the
@@ -44,7 +44,7 @@
       <para>There is no XML configuration available for Hibernate Search but
       we provide a powerful programmatic mapping API that elegantly replaces
       this kind of deployment form (see <xref
-      linkend="hsearch-mapping-programmaticapi" /> for more
+      linkend="hsearch-mapping-programmaticapi"/> for more
       information).</para>
 
       <para>If you want to contribute the XML mapping implementation, see
@@ -80,7 +80,7 @@ public class Essay {
         <para>You can optionially specify the <literal>index</literal>
         attribute of the @Indexed annotation to change the default name of the
         index. For more information see <xref
-        linkend="search-configuration-directory" />.</para>
+        linkend="search-configuration-directory"/>.</para>
       </section>
 
       <section id="field-annotation">
@@ -105,9 +105,9 @@ public class Essay {
             <para><literal>store</literal> : describe whether or not the
             property is stored in the Lucene index. You can store the value
             <literal>Store.YES</literal> (consuming more space in the index
-            but allowing projection, see <xref linkend="projections" />),
-            store it in a compressed way <literal>Store.COMPRESS</literal>
-            (this does consume more CPU), or avoid any storage
+            but allowing projection, see <xref linkend="projections"/>), store
+            it in a compressed way <literal>Store.COMPRESS</literal> (this
+            does consume more CPU), or avoid any storage
             <literal>Store.NO</literal> (this is the default value). When a
             property is stored, you can retrieve its original value from the
             Lucene Document. This is not related to whether the element is
@@ -238,7 +238,7 @@ public class Essay {
             will be used as default. <note>
                 <para>When the <parameter>indexNullAs</parameter> parameter is
                 used it is important to use the same token in the search query
-                (see <xref linkend="search-query" />) to search for
+                (see <xref linkend="search-query"/>) to search for
                 <constant>null</constant> values. It is also advisable to use
                 this feature only with un-analyzed fields
                 (<literal><literal>analyze=</literal>Analyze.NO</literal>).</para>
@@ -299,20 +299,23 @@ public class Essay {
                 </row>
               </tbody>
             </tgroup>
-          </informaltable>
-          <classname>@NumericField</classname> supports only <classname>Double</classname>,
-          <classname>Long</classname>, <classname>Integer</classname> and
-          <classname>Float</classname>. It is not possible to take any advantage
-          from a similar functionality in Lucene for the other numeric types, so
-          remaining types should use the string encoding via the default or
-          custom <classname>TwoWayFieldBridge</classname>.</para>
+          </informaltable> <classname>@NumericField</classname> supports only
+        <classname>Double</classname>, <classname>Long</classname>,
+        <classname>Integer</classname> and <classname>Float</classname>. It is
+        not possible to take any advantage from a similar functionality in
+        Lucene for the other numeric types, so remaining types should use the
+        string encoding via the default or custom
+        <classname>TwoWayFieldBridge</classname>.</para>
 
-        <para>It is possible to use a custom <classname>NumericFieldBridge</classname>
-        assuming you can deal with the approximation during type transformation:</para>
+        <para>It is possible to use a custom
+        <classname>NumericFieldBridge</classname> assuming you can deal with
+        the approximation during type transformation:</para>
 
         <example id="example-custom-numericfieldbridge">
-        <title>Defining a custom <classname>NumericFieldBridge</classname></title>
-        <programlisting language="JAVA" role="JAVA">
+          <title>Defining a custom
+          <classname>NumericFieldBridge</classname></title>
+
+          <programlisting language="JAVA" role="JAVA">
 public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
    private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
 
@@ -333,7 +336,8 @@ public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
     }
 
 }
-</programlisting></example>
+</programlisting>
+        </example>
 
         <note>
           <para>Lucene marks the numeric field API still as experimental and
@@ -380,8 +384,8 @@ public class Essay {
 }</programlisting>
         </example>
 
-        <para><xref linkend="example-annotated-entity" /> defines an index
-        with four fields: <literal>id</literal> , <literal>Abstract</literal>,
+        <para><xref linkend="example-annotated-entity"/> defines an index with
+        four fields: <literal>id</literal> , <literal>Abstract</literal>,
         <literal>text</literal> and <literal>grade</literal> . Note that by
         default the field name is decapitalized, following the JavaBean
         specification. The <literal>grade</literal> field is annotated as
@@ -417,7 +421,7 @@ public class Book {
 }</programlisting>
       </example>
 
-      <para>In <xref linkend="example-fields-annotation" /> the field
+      <para>In <xref linkend="example-fields-annotation"/> the field
       <literal>summary</literal> is indexed twice, once as
       <literal>summary</literal> in a tokenized way, and once as
       <literal>summary_forSort</literal> in an untokenized way. @Field
@@ -445,7 +449,7 @@ public class Book {
       <para>Associated objects as well as embedded objects can be indexed as
       part of the root entity index. This is useful if you expect to search a
       given entity based on properties of associated objects. In <xref
-      linkend="example-indexing-associations" />t the aim is to return places
+      linkend="example-indexing-associations"/>t the aim is to return places
       where the associated city is Atlanta (In the Lucene query parser
       language, it would translate into <code>address.city:Atlanta</code>).
       The place fields will be indexed in the <literal>Place</literal> index.
@@ -508,9 +512,9 @@ public class Address {
         pointing to entities and on embedded (collection of) objects.</para>
       </tip>
 
-      <para>Let's make <xref linkend="example-indexing-associations" /> a bit
+      <para>Let's make <xref linkend="example-indexing-associations"/> a bit
       more complex by nesting @IndexedEmbedded as seen in <xref
-      linkend="example-nested-index-embedded" />.</para>
+      linkend="example-nested-index-embedded"/>.</para>
 
       <example id="example-nested-index-embedded">
         <title>Nested usage of <classname>@IndexedEmbedded</classname> and
@@ -566,7 +570,7 @@ public class Owner {
       <literal>@Embedded</literal> attribute can be annotated with
       <literal>@IndexedEmbedded</literal>. The attributes of the associated
       class will then be added to the main entity index. In <xref
-      linkend="example-nested-index-embedded" /> the index will contain the
+      linkend="example-nested-index-embedded"/> the index will contain the
       following fields</para>
 
       <itemizedlist>
@@ -686,27 +690,29 @@ public class Owner implements Person { ... }</programlisting>
       </example>
 
       <section id="search-mapping-associated-viapaths">
-      <title>Limiting object embedding to specific paths</title>
+        <title>Limiting object embedding to specific paths</title>
 
-      <para>The <classname>@IndexedEmbedded</classname> annotation provides also an attribute
-      <methodname>includePaths</methodname> which can be used as an alternative to
-      <methodname>depth</methodname>, or be combined with it.</para>
+        <para>The <classname>@IndexedEmbedded</classname> annotation provides
+        also an attribute <methodname>includePaths</methodname> which can be
+        used as an alternative to <methodname>depth</methodname>, or be
+        combined with it.</para>
 
-      <para>When using only <methodname>depth</methodname> all indexed fields of the
-      embedded type will be added recursively at the same depth;
-      this makes it harder to pick only a specific path without adding all other
-      fields as well, which might not be needed.</para>
+        <para>When using only <methodname>depth</methodname> all indexed
+        fields of the embedded type will be added recursively at the same
+        depth; this makes it harder to pick only a specific path without
+        adding all other fields as well, which might not be needed.</para>
 
-      <para>To avoid unnecessarily loading and indexing entities you can specify
-      exactly which paths are needed.
-      A typical application might need different depths for different paths,
-      or in other words it might need to specify paths explicitly, as shown in
-      <xref linkend="indexedembedded-includePath" /></para>
+        <para>To avoid unnecessarily loading and indexing entities you can
+        specify exactly which paths are needed. A typical application might
+        need different depths for different paths, or in other words it might
+        need to specify paths explicitly, as shown in <xref
+        linkend="indexedembedded-includePath"/></para>
 
-<example id="indexedembedded-includePath">
-        <title>Using the <literal>includePaths</literal> property of
-        <classname>@IndexedEmbedded</classname></title>
-        <programlisting language="JAVA" role="JAVA">@Entity
+        <example id="indexedembedded-includePath">
+          <title>Using the <literal>includePaths</literal> property of
+          <classname>@IndexedEmbedded</classname></title>
+
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Person {
 
@@ -738,25 +744,31 @@ public class Person {
    }
 
     ...//other fields omitted</programlisting>
-      </example>
+        </example>
 
-      <para>Using a mapping as in <xref linkend="indexedembedded-includePath" />, you would be able
-      to search on a <classname>Person</classname> by <literal>name</literal> and/or <literal>surname</literal>,
-      and/or the <literal>name</literal> of the parent.
-      It will not index the <literal>surname</literal> of the parent, so searching on parent's surnames will not be
-      possible but speeds up indexing, saves space and improve overall performance.</para>
+        <para>Using a mapping as in <xref
+        linkend="indexedembedded-includePath"/>, you would be able to search
+        on a <classname>Person</classname> by <literal>name</literal> and/or
+        <literal>surname</literal>, and/or the <literal>name</literal> of the
+        parent. It will not index the <literal>surname</literal> of the
+        parent, so searching on parent's surnames will not be possible but
+        speeds up indexing, saves space and improve overall
+        performance.</para>
 
-      <para>The <classname>@IndexedEmbedded</classname> <methodname>includePaths</methodname>
-      will include the specified paths <emphasis>in addition to</emphasis> what you would
-      index normally specifying a limited value for <methodname>depth</methodname>.
-      When using <methodname>includePaths</methodname>, and leaving <methodname>depth</methodname>
-      undefined, behavior is equivalent to setting <methodname>depth</methodname><literal>=0</literal>:
-      only the included paths are indexed.</para>
+        <para>The <classname>@IndexedEmbedded</classname>
+        <methodname>includePaths</methodname> will include the specified paths
+        <emphasis>in addition to</emphasis> what you would index normally
+        specifying a limited value for <methodname>depth</methodname>. When
+        using <methodname>includePaths</methodname>, and leaving
+        <methodname>depth</methodname> undefined, behavior is equivalent to
+        setting <methodname>depth</methodname><literal>=0</literal>: only the
+        included paths are indexed.</para>
 
-      <example id="indexedembedded-includePathsAndDepth">
-        <title>Using the <literal>includePaths</literal> property of
-        <classname>@IndexedEmbedded</classname></title>
-        <programlisting language="JAVA" role="JAVA">@Entity
+        <example id="indexedembedded-includePathsAndDepth">
+          <title>Using the <literal>includePaths</literal> property of
+          <classname>@IndexedEmbedded</classname></title>
+
+          <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Human {
 
@@ -788,51 +800,72 @@ public class Human {
    }
 
     ...//other fields omitted</programlisting>
-      </example>
+        </example>
 
-      <para>In <xref linkend="indexedembedded-includePathsAndDepth" />, every human will have it's name and surname
-      attributes indexed. The name and surname of parents will be indexed too, recursively up to second line
-      because of the <methodname>depth</methodname> attribute.
-      It will be possible to search by name or surname, of the person directly, his parents or of his grand parents.
-      Beyond the second level, we will in addition index one more level but only the name, not the surname.</para>
+        <para>In <xref linkend="indexedembedded-includePathsAndDepth"/>, every
+        human will have it's name and surname attributes indexed. The name and
+        surname of parents will be indexed too, recursively up to second line
+        because of the <methodname>depth</methodname> attribute. It will be
+        possible to search by name or surname, of the person directly, his
+        parents or of his grand parents. Beyond the second level, we will in
+        addition index one more level but only the name, not the
+        surname.</para>
 
-      <para>This results in the following fields in the index:</para>
-      <itemizedlist>
-         <listitem>
+        <para>This results in the following fields in the index:</para>
+
+        <itemizedlist>
+          <listitem>
             <para><literal>id</literal> - as primary key</para>
-         </listitem>
-         <listitem>
-            <para><literal>_hibernate_class</literal> - stores entity type</para>
-         </listitem>
-         <listitem>
-            <para><literal>name</literal> - as direct field</para>
-         </listitem>
-         <listitem>
-            <para><literal>surname</literal> - as direct field</para>
-         </listitem>
-         <listitem>
-            <para><literal>parents.name</literal> - as embedded field at depth 1</para>
-         </listitem>
-         <listitem>
-            <para><literal>parents.surname</literal> - as embedded field at depth 1</para>
-         </listitem>
-         <listitem>
-            <para><literal>parents.parents.name</literal> - as embedded field at depth 2</para>
-         </listitem>
-         <listitem>
-            <para><literal>parents.parents.surname</literal> - as embedded field at depth 2</para>
-         </listitem>
-         <listitem>
-            <para><literal>parents.parents.parents.name</literal> - as additional path as specifyed by
-            <methodname>includePaths</methodname>. The first <literal>parents.</literal> is inferred from
-            the field name, the remaining path is the attribute of <methodname>includePaths</methodname></para>
-         </listitem>
-      </itemizedlist>
+          </listitem>
 
-      <para>Having explicit control of the indexed paths might be easier if you're
-      designing your application by defining the needed queries first, as at that point
-      you might know exactly which fields you need, and which other fields are unnecessary to implement
-      your use case.</para>
+          <listitem>
+            <para><literal>_hibernate_class</literal> - stores entity
+            type</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>name</literal> - as direct field</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>surname</literal> - as direct field</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>parents.name</literal> - as embedded field at depth
+            1</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>parents.surname</literal> - as embedded field at
+            depth 1</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>parents.parents.name</literal> - as embedded field
+            at depth 2</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>parents.parents.surname</literal> - as embedded
+            field at depth 2</para>
+          </listitem>
+
+          <listitem>
+            <para><literal>parents.parents.parents.name</literal> - as
+            additional path as specifyed by
+            <methodname>includePaths</methodname>. The first
+            <literal>parents.</literal> is inferred from the field name, the
+            remaining path is the attribute of
+            <methodname>includePaths</methodname></para>
+          </listitem>
+        </itemizedlist>
+
+        <para>Having explicit control of the indexed paths might be easier if
+        you're designing your application by defining the needed queries
+        first, as at that point you might know exactly which fields you need,
+        and which other fields are unnecessary to implement your use
+        case.</para>
       </section>
     </section>
   </section>
@@ -881,27 +914,26 @@ public class Essay {
 }        </programlisting>
       </example>
 
-      <para>In <xref linkend="example-boost" />,
-      <classname>Essay</classname>'s probability to reach the top of the
-      search list will be multiplied by 1.7. The
-      <methodname>summary</methodname> field will be 3.0 (2 * 1.5, because
-      <methodname>@Field.boost</methodname> and <classname>@Boost</classname>
-      on a property are cumulative) more important than the
-      <methodname>isbn</methodname> field. The <methodname>text</methodname>
-      field will be 1.2 times more important than the
-      <methodname>isbn</methodname> field. Note that this explanation is wrong
-      in strictest terms, but it is simple and close enough to reality for all
-      practical purposes. Please check the Lucene documentation or the
-      excellent <citetitle>Lucene In Action </citetitle> from Otis Gospodnetic
-      and Erik Hatcher.</para>
+      <para>In <xref linkend="example-boost"/>, <classname>Essay</classname>'s
+      probability to reach the top of the search list will be multiplied by
+      1.7. The <methodname>summary</methodname> field will be 3.0 (2 * 1.5,
+      because <methodname>@Field.boost</methodname> and
+      <classname>@Boost</classname> on a property are cumulative) more
+      important than the <methodname>isbn</methodname> field. The
+      <methodname>text</methodname> field will be 1.2 times more important
+      than the <methodname>isbn</methodname> field. Note that this explanation
+      is wrong in strictest terms, but it is simple and close enough to
+      reality for all practical purposes. Please check the Lucene
+      documentation or the excellent <citetitle>Lucene In Action </citetitle>
+      from Otis Gospodnetic and Erik Hatcher.</para>
     </section>
 
     <section>
       <title id="section-dynamic-boost">Dynamic index time boosting</title>
 
       <para>The <literal>@Boost </literal>annotation used in <xref
-      linkend="section-boost-annotation" /> defines a static boost factor
-      which is independent of the state of of the indexed entity at runtime.
+      linkend="section-boost-annotation"/> defines a static boost factor which
+      is independent of the state of of the indexed entity at runtime.
       However, there are usecases in which the boost factor may depend on the
       actual state of the entity. In this case you can use the
       <literal>@DynamicBoost </literal>annotation together with an
@@ -937,7 +969,7 @@ public class VIPBoostStrategy implements BoostStrategy {
 }</programlisting>
       </example>
 
-      <para>In <xref linkend="example-dynamic-boosting" /> a dynamic boost is
+      <para>In <xref linkend="example-dynamic-boosting"/> a dynamic boost is
       defined on class level specifying
       <classname>VIPBoostStrategy</classname> as implementation of the
       <classname>BoostStrategy</classname> interface to be used at indexing
@@ -1071,9 +1103,9 @@ public class MyEntity {
         url="http://commons.apache.org/codec">commons-codec</ulink> jar. Your
         distribution of Hibernate Search provides these dependencies in its
         <filename>lib/optional</filename> directory. Have a look at <xref
-        linkend="table-available-tokenizers" /> and <xref
-        linkend="table-available-filters" /> to see which anaylzers and
-        filters have additional dependencies</para>
+        linkend="table-available-tokenizers"/> and <xref
+        linkend="table-available-filters"/> to see which anaylzers and filters
+        have additional dependencies</para>
 
         <para>Prior to Search version 3.3.0.Beta2 it was required to add the
         Solr dependency <emphasis>org.apache.solr:solr-core</emphasis> when
@@ -1089,7 +1121,7 @@ public class MyEntity {
       </note>
 
       <para>Let's have a look at a concrete example now - <xref
-      linkend="example-analyzer-def" />. First a char filter is defined by its
+      linkend="example-analyzer-def"/>. First a char filter is defined by its
       factory. In our example, a mapping char filter is used, and will replace
       characters in the input based on the rules specified in the mapping
       file. Next a tokenizer is defined. This example uses the standard
@@ -1164,7 +1196,7 @@ public class Team {
 
       <para>Once defined, an analyzer definition can be reused by an
       <classname>@Analyzer</classname> declaration as seen in <xref
-      linkend="example-referencing-analyzer-def" />.</para>
+      linkend="example-referencing-analyzer-def"/>.</para>
 
       <example>
         <title id="example-referencing-analyzer-def" remap="">Referencing an
@@ -1451,7 +1483,7 @@ public class Team {
 
       <para>To enable this dynamic analyzer selection Hibernate Search
       introduces the <classname>AnalyzerDiscriminator</classname> annotation.
-      <xref linkend="example-analyzer-discriminator" /> demonstrates the usage
+      <xref linkend="example-analyzer-discriminator"/> demonstrates the usage
       of this annotation.</para>
 
       <example id="example-analyzer-discriminator">
@@ -1529,7 +1561,7 @@ public class BlogEntry {
       <para>An implemention of the <classname>Discriminator</classname>
       interface has to return the name of an existing analyzer definition or
       <classname>null</classname> if the default analyzer should not be
-      overridden. <xref linkend="example-analyzer-discriminator" /> assumes
+      overridden. <xref linkend="example-analyzer-discriminator"/> assumes
       that the language parameter is either 'de' or 'en' which matches the
       specified names in the <classname>@AnalyzerDef</classname>s.</para>
     </section>
@@ -1545,7 +1577,7 @@ public class BlogEntry {
       <note>
         <para>This rule can be broken but you need a good reason for it. If
         you are unsure, use the same analyzers. If you use the Hibernate
-        Search query DSL (see <xref linkend="search-query-querydsl" />), you
+        Search query DSL (see <xref linkend="search-query-querydsl"/>), you
         don't have to think about it. The query DSL does use the right
         analyzer transparently for you.</para>
       </note>
@@ -1618,7 +1650,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
             indexed. Lucene does not support null elements. However, in some
             situation it can be useful to insert a custom token representing
             the <constant>null</constant> value. See <xref lang=""
-            linkend="field-annotation" /> for more information.</para>
+            linkend="field-annotation"/> for more information.</para>
           </listitem>
         </varlistentry>
 
@@ -1684,7 +1716,7 @@ public class Meeting {
               expressed in GMT time. If your requirements are to store dates
               in a fixed time zone you have to implement a custom date bridge.
               Make sure you understand the requirements of your applications
-              regarding to date indexing and searching. </para>
+              regarding to date indexing and searching.</para>
             </important>
           </listitem>
         </varlistentry>
@@ -1756,7 +1788,7 @@ public class PaddedIntegerBridge implements <emphasis role="bold">StringBridge</
         </example>
 
         <para>Given the string bridge defined in <xref
-        linkend="example-custom-string-bridge" />, any property or field can
+        linkend="example-custom-string-bridge"/>, any property or field can
         use this bridge thanks to the <literal>@FieldBridge</literal>
         annotation:</para>
 
@@ -1768,7 +1800,7 @@ private Integer length;                </programlisting>
 
           <para>Parameters can also be passed to the bridge implementation
           making it more flexible. <xref
-          linkend="example-passing-bridge-paremters" /> implements a
+          linkend="example-passing-bridge-paremters"/> implements a
           <classname>ParameterizedBridge</classname> interface and parameters
           are passed through the <literal>@FieldBridge</literal>
           annotation.</para>
@@ -1957,7 +1989,7 @@ public class DateSplitBridge implements FieldBridge {
 private Date date;                </programlisting>
         </example>
 
-        <para>In <xref linkend="example-field-bridge" /> the fields are not
+        <para>In <xref linkend="example-field-bridge"/> the fields are not
         added directly to Document. Instead the addition is delegated to the
         <classname>LuceneOptions</classname> helper; this helper will apply
         the options you have selected on <literal>@Field</literal>, like
@@ -1988,10 +2020,10 @@ private Date date;                </programlisting>
         class level (as opposed to the property level). In this case the
         custom field bridge implementation receives the entity instance as the
         value parameter instead of a particular property. Though not shown in
-        <xref linkend="example-class-bridge" />,
+        <xref linkend="example-class-bridge"/>,
         <classname>@ClassBridge</classname> supports the
         <methodname>termVector</methodname> attribute discussed in section
-        <xref linkend="basic-mapping" />.</para>
+        <xref linkend="basic-mapping"/>.</para>
 
         <example id="example-class-bridge">
           <title>Implementing a class bridge</title>
@@ -2382,8 +2414,8 @@ public class Address {
       text filter definitions which is available via
       <classname>@FullTextFilterDef</classname> and
       <classname>@FullTextFilterDefs</classname> (see <xref
-      linkend="query-filter" />). The next example depicts the creation of
-      full text filter definition using the <methodname>fullTextFilterDef
+      linkend="query-filter"/>). The next example depicts the creation of full
+      text filter definition using the <methodname>fullTextFilterDef
       </methodname>method.</para>
 
       <example>
@@ -2527,11 +2559,11 @@ public class Address {
 
       <para>In this section you will see how to programmatically define
       entities to be embedded into the indexed entity similar to using the
-      <classname>@IndexedEmbedded</classname> model. In order to define this you
-      must mark the property as <methodname>indexEmbedded.</methodname>There
-      is the option to add a prefix to the embedded entity definition which
-      can be done by calling <methodname>prefix</methodname> as seen in the
-      example below:</para>
+      <classname>@IndexedEmbedded</classname> model. In order to define this
+      you must mark the property as
+      <methodname>indexEmbedded.</methodname>There is the option to add a
+      prefix to the embedded entity definition which can be done by calling
+      <methodname>prefix</methodname> as seen in the example below:</para>
 
       <example>
         <title>Programmatically defining embedded entites</title>
