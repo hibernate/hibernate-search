@@ -29,6 +29,6 @@ import org.hibernate.search.interceptor.indexingaction.NoActionInterceptor;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 @Entity
-@Indexed(actionInterceptor = NoActionInterceptor.class)
+@Indexed(interceptor = NoActionInterceptor.class)
 public class TotalArticle extends Article {
 }

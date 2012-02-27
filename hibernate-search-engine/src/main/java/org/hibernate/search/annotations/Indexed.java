@@ -30,7 +30,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.interceptor.indexingaction.DefaultOrInheritedActionInterceptor;
-import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
 
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
@@ -49,5 +49,5 @@ public @interface Indexed {
 	 * Useful for soft deletes and similar patterns
 	 */
 	//FIXME put this option in the  programmatic API
-	Class<? extends IndexingActionInterceptor> actionInterceptor() default DefaultOrInheritedActionInterceptor.class;
+	Class<? extends EntityIndexingInterceptor> interceptor() default DefaultOrInheritedActionInterceptor.class;
 }
