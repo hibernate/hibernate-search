@@ -21,11 +21,15 @@
 package org.hibernate.search.interceptor.indexingaction;
 
 /**
- * Do not apply any interception or inherit the one from superclasses if defined
+ * Default interceptor logic:
+ *
+ * If the hierarchy does not define a specific interceptor, then no interception logic is applied
+ * If the hierarchy defines a specific interceptor, then we inherit the explicit interceptor defined
+ * by the most specific superclass and use it.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DefaultOrInheritedActionInterceptor implements EntityIndexingInterceptor<Object> {
+public class DefaultEntityInterceptor implements EntityIndexingInterceptor<Object> {
 	@Override
 	public IndexingOperationType onAdd(Object entity) {
 		return IndexingOperationType.DONT_INTERCEPT;
