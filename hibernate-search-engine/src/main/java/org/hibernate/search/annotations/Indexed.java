@@ -29,8 +29,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.interceptor.indexingaction.DefaultEntityInterceptor;
-import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )

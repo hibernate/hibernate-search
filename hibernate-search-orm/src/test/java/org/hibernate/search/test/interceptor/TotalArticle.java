@@ -23,7 +23,7 @@ package org.hibernate.search.test.interceptor;
 import javax.persistence.Entity;
 
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.interceptor.indexingaction.DontInterceptEntityInterceptor;
+import org.hibernate.search.indexes.interceptor.DontInterceptEntityInterceptor;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
