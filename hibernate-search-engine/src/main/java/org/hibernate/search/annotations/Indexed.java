@@ -48,6 +48,5 @@ public @interface Indexed {
 	 * Custom converter to change operations upon indexing
 	 * Useful for soft deletes and similar patterns
 	 */
-	//FIXME put this option in the  programmatic API
 	Class<? extends EntityIndexingInterceptor> interceptor() default DefaultOrInheritedActionInterceptor.class;
 }
