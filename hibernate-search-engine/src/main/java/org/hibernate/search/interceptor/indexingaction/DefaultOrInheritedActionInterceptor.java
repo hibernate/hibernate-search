@@ -28,21 +28,21 @@ package org.hibernate.search.interceptor.indexingaction;
 public class DefaultOrInheritedActionInterceptor implements EntityIndexingInterceptor<Object> {
 	@Override
 	public IndexingOperationType onAdd(Object entity) {
-		return IndexingOperationType.UNCHANGED;
+		return IndexingOperationType.DONT_INTERCEPT;
 	}
 
 	@Override
 	public IndexingOperationType onUpdate(Object entity) {
-		return IndexingOperationType.UNCHANGED;
+		return IndexingOperationType.DONT_INTERCEPT;
 	}
 
 	@Override
 	public IndexingOperationType onDelete(Object entity) {
-		return IndexingOperationType.UNCHANGED;
+		return IndexingOperationType.DONT_INTERCEPT;
 	}
 
 	@Override
 	public IndexingOperationType onCollectionUpdate(Object entity) {
-		return IndexingOperationType.UNCHANGED;
+		return IndexingOperationType.DONT_INTERCEPT;
 	}
 }
