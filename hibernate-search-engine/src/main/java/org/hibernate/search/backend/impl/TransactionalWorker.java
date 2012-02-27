@@ -32,8 +32,8 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
-import org.hibernate.search.interceptor.indexingaction.IndexingOperationType;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.interceptor.IndexingOperationType;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;

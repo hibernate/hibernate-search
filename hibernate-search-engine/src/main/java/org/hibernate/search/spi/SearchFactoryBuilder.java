@@ -52,7 +52,7 @@ import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
-import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;

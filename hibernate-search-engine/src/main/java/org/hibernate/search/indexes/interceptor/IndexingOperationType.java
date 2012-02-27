@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.interceptor.indexingaction;
+package org.hibernate.search.indexes.interceptor;
 
 /**
  * Set of possible indexing operations

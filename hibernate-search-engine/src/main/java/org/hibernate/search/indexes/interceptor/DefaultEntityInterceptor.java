@@ -18,32 +18,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.interceptor.indexingaction;
+package org.hibernate.search.indexes.interceptor;
 
 /**
- * Do not apply any interception.
- * Useful to force a subclass not to inherit its superclass interceptor.
+ * Default interceptor logic:
+ *
+ * If the hierarchy does not define a specific interceptor, then no interception logic is applied
+ * If the hierarchy defines a specific interceptor, then we inherit the explicit interceptor defined
+ * by the most specific superclass and use it.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DontInterceptEntityInterceptor implements EntityIndexingInterceptor<Object> {
+public class DefaultEntityInterceptor implements EntityIndexingInterceptor<Object> {
+
+	String EXCEPTION_MESSAGE = "The default interceptor must not be called. This is an Hibernate Search bug.";
+
 	@Override
 	public IndexingOperationType onAdd(Object entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+		throw new IllegalStateException( EXCEPTION_MESSAGE );
 	}
 
 	@Override
 	public IndexingOperationType onUpdate(Object entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+		throw new IllegalStateException( EXCEPTION_MESSAGE );
 	}
 
 	@Override
 	public IndexingOperationType onDelete(Object entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+		throw new IllegalStateException( EXCEPTION_MESSAGE );
 	}
 
 	@Override
 	public IndexingOperationType onCollectionUpdate(Object entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+		throw new IllegalStateException( EXCEPTION_MESSAGE );
 	}
 }
