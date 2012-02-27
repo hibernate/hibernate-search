@@ -44,7 +44,7 @@ public class Blog {
 	public void setTitle(String title) {  this.title = title; }
 	private String title;
 
-	@Field
+	//state used by interceptor but not indexed on purpose to test optimization disablement
 	public BlogStatus getStatus() { return status; }
 	public void setStatus(BlogStatus status) {  this.status = status; }
 	private BlogStatus status;
