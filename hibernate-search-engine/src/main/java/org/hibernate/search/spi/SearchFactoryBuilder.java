@@ -407,7 +407,10 @@ public class SearchFactoryBuilder {
 			
 			Class mappedClass = classMappings.get( mappedXClass );
 			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
-		
+			//interceptor might use non indexed state
+		    if ( mappedEntity.getIndexingActionInterceptor() != null ) {
+				optimizationBlackListedTypes.add( mappedXClass );
+			}
 			// Create all DocumentBuilderIndexedEntity
 			//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 			//XClass unfortunately is not (yet) genericized: TODO?
