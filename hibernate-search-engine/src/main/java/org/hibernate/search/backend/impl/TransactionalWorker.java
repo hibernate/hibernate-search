@@ -130,7 +130,7 @@ public class TransactionalWorker implements Worker {
 			case PURGE:
 			case PURGE_ALL:
 			case INDEX:
-				operation = IndexingOperationType.UNCHANGED;
+				operation = IndexingOperationType.DONT_INTERCEPT;
 				break;
 			default:
 				throw new AssertionFailure( "Unknown work type: " + work.getType() );
@@ -138,7 +138,7 @@ public class TransactionalWorker implements Worker {
 		Work<T> result = work;
 		Class<T> entityClass = work.getEntityClass();
 		switch ( operation ) {
-			case UNCHANGED:
+			case DONT_INTERCEPT:
 				break;
 			case SKIP:
 				result = null;

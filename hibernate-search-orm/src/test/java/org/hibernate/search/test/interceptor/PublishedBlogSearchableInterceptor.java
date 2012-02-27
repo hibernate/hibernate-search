@@ -32,7 +32,7 @@ public class PublishedBlogSearchableInterceptor implements EntityIndexingInterce
 	@Override
 	public IndexingOperationType onAdd(Blog entity) {
 		if (entity.getStatus() == BlogStatus.PUBLISHED) {
-			return IndexingOperationType.UNCHANGED;
+			return IndexingOperationType.DONT_INTERCEPT;
 		}
 		return IndexingOperationType.SKIP;
 	}
@@ -47,7 +47,7 @@ public class PublishedBlogSearchableInterceptor implements EntityIndexingInterce
 
 	@Override
 	public IndexingOperationType onDelete(Blog entity) {
-		return IndexingOperationType.UNCHANGED;
+		return IndexingOperationType.DONT_INTERCEPT;
 	}
 
 	@Override

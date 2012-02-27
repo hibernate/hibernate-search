@@ -319,14 +319,14 @@ public class WorkPlan {
 							operation = entityInterceptor.onUpdate( value );
 						}
 						else {
-							operation = IndexingOperationType.UNCHANGED;
+							operation = IndexingOperationType.DONT_INTERCEPT;
 						}
 						//TODO there is a small duplication with some of TransactionalWorker.interceptWork
 						//     but what would be a proper factored solution?
 						switch ( operation ) {
 							//we are planning an update by default
 							case UPDATE:
-							case UNCHANGED:
+							case DONT_INTERCEPT:
 								entityWork = new PerEntityWork( value );
 								entityById.put( extractedId, entityWork );
 								break;

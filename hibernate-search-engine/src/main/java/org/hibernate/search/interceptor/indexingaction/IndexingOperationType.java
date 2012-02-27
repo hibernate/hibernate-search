@@ -30,7 +30,7 @@ public enum IndexingOperationType {
 	 * Let Hibernate Search engine apply the standard operation
 	 * without overriding it
 	 */
-	UNCHANGED,
+	DONT_INTERCEPT,
 
 	/**
 	 * Skip any indexing operation
