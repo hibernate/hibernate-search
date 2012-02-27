@@ -20,38 +20,38 @@
  */
 package org.hibernate.search.test.interceptor;
 
-import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
-import org.hibernate.search.interceptor.indexingaction.IndexingActionType;
+import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
+import org.hibernate.search.interceptor.indexingaction.IndexingOperationType;
 
 /**
  * Only index when it's published
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class PublishedBlogSearchableInterceptor implements IndexingActionInterceptor<Blog> {
+public class PublishedBlogSearchableInterceptor implements EntityIndexingInterceptor<Blog> {
 	@Override
-	public IndexingActionType onAdd(Blog entity) {
+	public IndexingOperationType onAdd(Blog entity) {
 		if (entity.getStatus() == BlogStatus.PUBLISHED) {
-			return IndexingActionType.UNCHANGED;
+			return IndexingOperationType.UNCHANGED;
 		}
-		return IndexingActionType.SKIP;
+		return IndexingOperationType.SKIP;
 	}
 
 	@Override
-	public IndexingActionType onUpdate(Blog entity) {
+	public IndexingOperationType onUpdate(Blog entity) {
 		if (entity.getStatus() == BlogStatus.PUBLISHED) {
-			return IndexingActionType.UPDATE;
+			return IndexingOperationType.UPDATE;
 		}
-		return IndexingActionType.REMOVE;
+		return IndexingOperationType.REMOVE;
 	}
 
 	@Override
-	public IndexingActionType onDelete(Blog entity) {
-		return IndexingActionType.UNCHANGED;
+	public IndexingOperationType onDelete(Blog entity) {
+		return IndexingOperationType.UNCHANGED;
 	}
 
 	@Override
-	public IndexingActionType onCollectionUpdate(Blog entity) {
+	public IndexingOperationType onCollectionUpdate(Blog entity) {
 		return onUpdate(entity);
 	}
 }

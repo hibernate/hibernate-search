@@ -44,8 +44,8 @@ import org.hibernate.search.engine.spi.DepthValidator;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
-import org.hibernate.search.interceptor.indexingaction.IndexingActionType;
+import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
+import org.hibernate.search.interceptor.indexingaction.IndexingOperationType;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -313,17 +313,17 @@ public class WorkPlan {
 				if ( extractedId != null ) {
 					PerEntityWork<T> entityWork = entityById.get( extractedId );
 					if ( entityWork == null ) {
-						IndexingActionInterceptor<? super T> actionInterceptor = getActionInterceptor();
-						IndexingActionType actionType;
-						if (actionInterceptor!=null) {
-							actionType = actionInterceptor.onUpdate( value );
+						EntityIndexingInterceptor<? super T> entityInterceptor = getEntityInterceptor();
+						IndexingOperationType operation;
+						if (entityInterceptor!=null) {
+							operation = entityInterceptor.onUpdate( value );
 						}
 						else {
-							actionType = IndexingActionType.UNCHANGED;
+							operation = IndexingOperationType.UNCHANGED;
 						}
 						//TODO there is a small duplication with some of TransactionalWorker.interceptWork
 						//     but what would be a proper factored solution?
-						switch ( actionType ) {
+						switch ( operation ) {
 							//we are planning an update by default
 							case UPDATE:
 							case UNCHANGED:
@@ -340,7 +340,7 @@ public class WorkPlan {
 								entityById.put( extractedId, entityWork );
 								break;
 							default:
-								throw new AssertionFailure( "Unknown action type: " + actionType );
+								throw new AssertionFailure( "Unknown action type: " + operation );
 						}
 						// recursion starts
 						documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, depth );
@@ -355,12 +355,12 @@ public class WorkPlan {
 			}
 		}
 
-		private IndexingActionInterceptor<? super T> getActionInterceptor() {
+		private EntityIndexingInterceptor<? super T> getEntityInterceptor() {
 			EntityIndexBinder indexBindingForEntity = searchFactoryImplementor.getIndexBindingForEntity(
 					entityClass
 			);
 			return indexBindingForEntity!=null ?
-					(IndexingActionInterceptor<? super T> ) indexBindingForEntity.getIndexingActionInterceptor() :
+					(EntityIndexingInterceptor<? super T> ) indexBindingForEntity.getEntityIndexingInterceptor() :
 					null;
 		}
 	}

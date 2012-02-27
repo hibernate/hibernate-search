@@ -31,7 +31,7 @@ import org.hibernate.search.annotations.Indexed;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 @Entity
-@Indexed(actionInterceptor = PublishedBlogSearchableInterceptor.class )
+@Indexed(interceptor = PublishedBlogSearchableInterceptor.class )
 public class Blog {
 	@Id
 	@GeneratedValue

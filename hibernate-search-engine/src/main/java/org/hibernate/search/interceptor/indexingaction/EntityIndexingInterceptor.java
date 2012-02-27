@@ -21,33 +21,20 @@
 package org.hibernate.search.interceptor.indexingaction;
 
 /**
- * Set of possible indexing actions
+ * This interceptor is called upon indexing operations to optionally change the behavior.
+ * Implementations must be thread safe and should have a no-arg constructor.
+ *
+ * Typical use case include so called soft deletes.
+ *
+ * Experimental: {@link IndexingOperationType} might be updated
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public enum IndexingActionType {
-	/**
-	 * Let Hibernate Search engine apply the standard operation
-	 * without overriding it
-	 */
-	UNCHANGED,
+public interface EntityIndexingInterceptor<T> {
+	IndexingOperationType onAdd(T entity);
+	IndexingOperationType onUpdate(T entity);
+	IndexingOperationType onDelete(T entity);
+	IndexingOperationType onCollectionUpdate(T entity);
 
-	/**
-	 * Skip any indexing operation
-	 */
-	SKIP,
-
-	/**
-	 * Force an entity to be removed from the index
-	 * This operation can be safely requested regardless
-	 * of the actual presence of the entity in the index
-	 */
-	REMOVE,
-
-	/**
-	 * Update the entity index.
-	 *
-	 * It is safe to update an entity that has not been added yet.
-	 */
-	UPDATE
+	//FIXME should we add onPurge and onIndex?
 }

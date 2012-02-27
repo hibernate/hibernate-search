@@ -31,7 +31,7 @@ import org.apache.solr.analysis.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.BoostStrategy;
-import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
 
 public class IndexedMapping {
 	
@@ -53,8 +53,8 @@ public class IndexedMapping {
 		return this;
 	}
 
-	public IndexedMapping actionInterceptor(Class<? extends IndexingActionInterceptor> interceptor) {
-		this.indexed.put("actionInterceptor", interceptor);
+	public IndexedMapping interceptor(Class<? extends EntityIndexingInterceptor> interceptor) {
+		this.indexed.put("interceptor", interceptor);
 		return this;
 	}
 	

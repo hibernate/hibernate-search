@@ -25,24 +25,24 @@ package org.hibernate.search.interceptor.indexingaction;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DefaultOrInheritedActionInterceptor implements IndexingActionInterceptor<Object> {
+public class DefaultOrInheritedActionInterceptor implements EntityIndexingInterceptor<Object> {
 	@Override
-	public IndexingActionType onAdd(Object entity) {
-		return IndexingActionType.UNCHANGED;
+	public IndexingOperationType onAdd(Object entity) {
+		return IndexingOperationType.UNCHANGED;
 	}
 
 	@Override
-	public IndexingActionType onUpdate(Object entity) {
-		return IndexingActionType.UNCHANGED;
+	public IndexingOperationType onUpdate(Object entity) {
+		return IndexingOperationType.UNCHANGED;
 	}
 
 	@Override
-	public IndexingActionType onDelete(Object entity) {
-		return IndexingActionType.UNCHANGED;
+	public IndexingOperationType onDelete(Object entity) {
+		return IndexingOperationType.UNCHANGED;
 	}
 
 	@Override
-	public IndexingActionType onCollectionUpdate(Object entity) {
-		return IndexingActionType.UNCHANGED;
+	public IndexingOperationType onCollectionUpdate(Object entity) {
+		return IndexingOperationType.UNCHANGED;
 	}
 }

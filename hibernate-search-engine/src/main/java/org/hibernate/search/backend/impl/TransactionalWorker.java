@@ -32,8 +32,8 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
-import org.hibernate.search.interceptor.indexingaction.IndexingActionType;
+import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
+import org.hibernate.search.interceptor.indexingaction.IndexingOperationType;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
@@ -109,35 +109,35 @@ public class TransactionalWorker implements Worker {
 		if (indexBindingForEntity == null) {
 			return work;
 		}
-		IndexingActionInterceptor<? super T> interceptor = (IndexingActionInterceptor<? super T>) indexBindingForEntity.getIndexingActionInterceptor();
+		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) indexBindingForEntity.getEntityIndexingInterceptor();
 		if (interceptor == null) {
 			return work;
 		}
-		IndexingActionType actionType;
+		IndexingOperationType operation;
 		switch ( work.getType() ) {
 			case ADD:
-				actionType = interceptor.onAdd( work.getEntity() );
+				operation = interceptor.onAdd( work.getEntity() );
 				break;
 			case UPDATE:
-				actionType = interceptor.onUpdate( work.getEntity() );
+				operation = interceptor.onUpdate( work.getEntity() );
 				break;
 			case DELETE:
-				actionType = interceptor.onDelete( work.getEntity() );
+				operation = interceptor.onDelete( work.getEntity() );
 				break;
 			case COLLECTION:
-				actionType = interceptor.onCollectionUpdate( work.getEntity() );
+				operation = interceptor.onCollectionUpdate( work.getEntity() );
 				break;
 			case PURGE:
 			case PURGE_ALL:
 			case INDEX:
-				actionType = IndexingActionType.UNCHANGED;
+				operation = IndexingOperationType.UNCHANGED;
 				break;
 			default:
 				throw new AssertionFailure( "Unknown work type: " + work.getType() );
 		}
 		Work<T> result = work;
 		Class<T> entityClass = work.getEntityClass();
-		switch ( actionType ) {
+		switch ( operation ) {
 			case UNCHANGED:
 				break;
 			case SKIP:
@@ -158,7 +158,7 @@ public class TransactionalWorker implements Worker {
 				log.forceRemoveOnIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			default:
-				throw new AssertionFailure( "Unknown action type: " + actionType );
+				throw new AssertionFailure( "Unknown action type: " + operation );
 		}
 		return result;
 	}

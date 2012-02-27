@@ -38,7 +38,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.interceptor.indexingaction.DefaultOrInheritedActionInterceptor;
-import org.hibernate.search.interceptor.indexingaction.IndexingActionInterceptor;
+import org.hibernate.search.interceptor.indexingaction.EntityIndexingInterceptor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -154,9 +154,9 @@ public class IndexManagerHolder {
 		}
 
 		Indexed indexedAnnotation = entity.getAnnotation( Indexed.class );
-		IndexingActionInterceptor<?> interceptor = null;
+		EntityIndexingInterceptor<?> interceptor = null;
 		if (indexedAnnotation != null) {
-			Class<? extends IndexingActionInterceptor> interceptorClass = getInterceptorClassFromHierarchy(
+			Class<? extends EntityIndexingInterceptor> interceptorClass = getInterceptorClassFromHierarchy(
 					entity,
 					indexedAnnotation
 			);
@@ -165,7 +165,7 @@ public class IndexManagerHolder {
 			}
 			else {
 				interceptor = ClassLoaderHelper.instanceFromClass(
-						IndexingActionInterceptor.class,
+						EntityIndexingInterceptor.class,
 						interceptorClass,
 						"IndexingActionInterceptor for " + entity.getName()
 				);
@@ -180,8 +180,8 @@ public class IndexManagerHolder {
 		);
 	}
 
-	private Class<? extends IndexingActionInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
-		Class<? extends IndexingActionInterceptor> result = indexedAnnotation.actionInterceptor();
+	private Class<? extends EntityIndexingInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
+		Class<? extends EntityIndexingInterceptor> result = indexedAnnotation.interceptor();
 		XClass superEntity = entity;
 		while ( result == DefaultOrInheritedActionInterceptor.class ) {
 			superEntity = superEntity.getSuperclass();
@@ -191,7 +191,7 @@ public class IndexManagerHolder {
 			}
 			Indexed indexAnnForSuperclass = superEntity.getAnnotation( Indexed.class );
 			result = indexAnnForSuperclass != null ?
-					indexAnnForSuperclass.actionInterceptor() :
+					indexAnnForSuperclass.interceptor() :
 					result;
 		}
 		return result;
@@ -201,8 +201,8 @@ public class IndexManagerHolder {
 	private <T,U> MutableEntityIndexBinding<T> buildTypesafeMutableEntityBinder(Class<T> type, IndexManager[] providers,
 																			  IndexShardingStrategy shardingStrategy,
 																			  Similarity similarityInstance,
-																			  IndexingActionInterceptor<U> interceptor) {
-		IndexingActionInterceptor<? super T> safeInterceptor = (IndexingActionInterceptor<? super T>) interceptor;
+																			  EntityIndexingInterceptor<U> interceptor) {
+		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T> ) interceptor;
 		return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
 	}
 
