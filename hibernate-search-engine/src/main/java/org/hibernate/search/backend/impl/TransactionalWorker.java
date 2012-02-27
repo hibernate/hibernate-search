@@ -142,9 +142,6 @@ public class TransactionalWorker implements Worker {
 				break;
 			case SKIP:
 				result = null;
-				if (work.getType() == WorkType.DELETE) {
-					log.skippingIndexWorkOnDelete( entityClass );
-				}
 				log.forceSkipIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			case UPDATE:

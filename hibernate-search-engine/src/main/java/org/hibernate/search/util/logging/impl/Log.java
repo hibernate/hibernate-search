@@ -539,10 +539,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 126, value = "Interceptor enforces removal of index data instead of index operation %2$s on instance of class %1$s")
 	void forceRemoveOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
 
-	@LogMessage(level = WARN)
-	@Message(id = 127, value = "Enforcing skipping indexing work upon entity deletion request does not make sense (instance of class %1$s)")
-	void skippingIndexWorkOnDelete(Class<?> entityClass);
-
 	@LogMessage(level = TRACE)
 	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
 	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
