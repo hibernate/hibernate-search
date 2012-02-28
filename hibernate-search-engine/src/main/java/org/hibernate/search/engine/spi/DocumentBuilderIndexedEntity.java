@@ -513,7 +513,12 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				currentFieldValue = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 				previousMember = member;
 				if ( member.isCollection() ) {
-					Collection collection = objectInitializer.initializeCollection( (Collection) currentFieldValue );
+					if ( currentFieldValue instanceof Collection ) {
+						objectInitializer.initializeCollection( (Collection) currentFieldValue );
+					}
+					else if ( currentFieldValue instanceof Map ) {
+						objectInitializer.initializeMap( (Map) currentFieldValue );
+					}
 				}
 			}
 
