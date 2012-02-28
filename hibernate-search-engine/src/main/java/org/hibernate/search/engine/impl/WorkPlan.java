@@ -45,7 +45,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.indexes.interceptor.IndexingOperationType;
+import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -314,19 +314,19 @@ public class WorkPlan {
 					PerEntityWork<T> entityWork = entityById.get( extractedId );
 					if ( entityWork == null ) {
 						EntityIndexingInterceptor<? super T> entityInterceptor = getEntityInterceptor();
-						IndexingOperationType operation;
+						IndexingOverride operation;
 						if (entityInterceptor!=null) {
 							operation = entityInterceptor.onUpdate( value );
 						}
 						else {
-							operation = IndexingOperationType.DONT_INTERCEPT;
+							operation = IndexingOverride.APPLY_DEFAULT;
 						}
 						//TODO there is a small duplication with some of TransactionalWorker.interceptWork
 						//     but what would be a proper factored solution?
 						switch ( operation ) {
 							//we are planning an update by default
 							case UPDATE:
-							case DONT_INTERCEPT:
+							case APPLY_DEFAULT:
 								entityWork = new PerEntityWork( value );
 								entityById.put( extractedId, entityWork );
 								break;

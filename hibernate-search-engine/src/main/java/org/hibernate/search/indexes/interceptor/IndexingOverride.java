@@ -25,12 +25,12 @@ package org.hibernate.search.indexes.interceptor;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public enum IndexingOperationType {
+public enum IndexingOverride {
 	/**
 	 * Let Hibernate Search engine apply the standard operation
 	 * without overriding it
 	 */
-	DONT_INTERCEPT,
+	APPLY_DEFAULT,
 
 	/**
 	 * Skip any indexing operation

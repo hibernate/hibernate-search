@@ -33,7 +33,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.indexes.interceptor.IndexingOperationType;
+import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
@@ -113,7 +113,7 @@ public class TransactionalWorker implements Worker {
 		if (interceptor == null) {
 			return work;
 		}
-		IndexingOperationType operation;
+		IndexingOverride operation;
 		switch ( work.getType() ) {
 			case ADD:
 				operation = interceptor.onAdd( work.getEntity() );
@@ -130,7 +130,7 @@ public class TransactionalWorker implements Worker {
 			case PURGE:
 			case PURGE_ALL:
 			case INDEX:
-				operation = IndexingOperationType.DONT_INTERCEPT;
+				operation = IndexingOverride.APPLY_DEFAULT;
 				break;
 			default:
 				throw new AssertionFailure( "Unknown work type: " + work.getType() );
@@ -138,7 +138,7 @@ public class TransactionalWorker implements Worker {
 		Work<T> result = work;
 		Class<T> entityClass = work.getEntityClass();
 		switch ( operation ) {
-			case DONT_INTERCEPT:
+			case APPLY_DEFAULT:
 				break;
 			case SKIP:
 				result = null;
