@@ -2237,7 +2237,7 @@ public class Blog {
       <listitem>
         <para><literal>REMOVE</literal>: ask Hibernate Search to remove
         indexing data about this entity - you can safely ask for
-        <literal>REMOVE</literal> even if the entity has not yet be
+        <literal>REMOVE</literal> even if the entity has not yet been
         indexed</para>
       </listitem>
 
