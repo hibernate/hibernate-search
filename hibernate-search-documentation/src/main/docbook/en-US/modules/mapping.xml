@@ -81,6 +81,9 @@ public class Essay {
         attribute of the @Indexed annotation to change the default name of the
         index. For more information see <xref
         linkend="search-configuration-directory"/>.</para>
+
+        <para>You can also set the interceptor used upon indexing, see <xref
+        linkend="search-mapping-indexinginterceptor"/>.</para>
       </section>
 
       <section id="field-annotation">
@@ -2084,15 +2087,14 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
   </section>
 
   <section id="search-mapping-indexinginterceptor">
-    <title>Indexing interceptors: index or not entity based on its
-    state</title>
+    <title>Indexing interceptor: to index or not based on entity state</title>
 
     <important>
       <para>This feature is considered experimental. More operation types
       might be added in the future depending on user feedback.</para>
     </important>
 
-    <para>In some situation, you want to index an entity only when it is in a
+    <para>In some situations, you want to index an entity only when it is in a
     given state, for example:</para>
 
     <itemizedlist>
@@ -2125,13 +2127,14 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
       </listitem>
     </itemizedlist>
 
-    <para>Let's look at the blog example</para>
+    <para>Let's look at the blog example at <xref
+    linkend="example-search-mapping-indexinginterceptor-blog"/></para>
 
-    <example>
+    <example id="example-search-mapping-indexinginterceptor-blog">
       <title>Index blog entries only when they are published and remove them
       when they are in a different state</title>
 
-      <programlisting>/**
+      <programlisting language="JAVA" role="JAVA">/**
  * Only index blog when it is in published state
  *
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
@@ -2164,7 +2167,7 @@ public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor&
     }
 }</programlisting>
 
-      <programlisting>@Entity
+      <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed(interceptor=IndexWhenPublishedInterceptor.class)
 public class Blog {
     @Id
@@ -2194,7 +2197,7 @@ public class Blog {
     as well - for example <classname>Object</classname> if you create a
     generic interceptor.</para>
 
-    <para>You can react to indexing upon several actions:</para>
+    <para>You can react to several planned indexing events:</para>
 
     <itemizedlist>
       <listitem>
@@ -2215,7 +2218,8 @@ public class Blog {
       </listitem>
     </itemizedlist>
 
-    <para>You can decide to do a few operations:</para>
+    <para>For each occurring event you can respond with one of the following
+    actions:</para>
 
     <itemizedlist>
       <listitem>
@@ -2255,13 +2259,22 @@ public class Blog {
 
     <para>By default, no interceptor is applied on an entity. You have to
     explicitly define an interceptor via the <classname>@Indexed</classname>
-    annotation or programmatically. This class and all its subclasses will
-    then be intercepted. You can stop or change the interceptor used in a
-    subclass by overriding <methodname>@Indexed.interceptor</methodname>.
-    Hibernate Search provides
+    annotation (see <xref linkend="indexed-annotation"/>) or programmatically
+    (see <xref linkend="hsearch-mapping-programmaticapi"/>). This class and
+    all its subclasses will then be intercepted. You can stop or change the
+    interceptor used in a subclass by overriding
+    <methodname>@Indexed.interceptor</methodname>. Hibernate Search provides
     <classname>DontInterceptEntityInterceptor</classname> which will
     explicitly not intercept any call. This is useful to reset interception
     within a class hierarchy.</para>
+
+    <note>
+      <para>Dirty checking optimization is disabled when interceptors are
+      used. Dirty checking optimization does check what has changed in an
+      entity and only triggers an index update if indexed properties are
+      changed. The reason is simple, your interceptor might depend on a non
+      indexed property which would be ignored by this optimization.</para>
+    </note>
   </section>
 
   <section id="provided-id">
