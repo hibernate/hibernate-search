@@ -37,6 +37,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -79,10 +81,6 @@ public class IndexManagerHolder {
 
 	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
 
-	/**
-	 * Multiple IndexManager might be built for the same entity to implement Sharding.
-	 * @return a map of created IndexManagers, having as key the names of each index.
-	 */
 	//I currently think it's easier to not hide sharding implementations in a custom
 	//IndexManager to make it easier to explicitly a)detect duplicates b)start-stop
 	//additional Managers as needed from a dynamic sharding implementation, without having
@@ -155,9 +153,59 @@ public class IndexManagerHolder {
 			}
 		}
 
-		return new MutableEntityIndexBinding( shardingStrategy, similarityInstance, providers );
+		Indexed indexedAnnotation = entity.getAnnotation( Indexed.class );
+		EntityIndexingInterceptor<?> interceptor = null;
+		if (indexedAnnotation != null) {
+			Class<? extends EntityIndexingInterceptor> interceptorClass = getInterceptorClassFromHierarchy(
+					entity,
+					indexedAnnotation
+			);
+			if (interceptorClass == DefaultEntityInterceptor.class) {
+				interceptor = null;
+			}
+			else {
+				interceptor = ClassLoaderHelper.instanceFromClass(
+						EntityIndexingInterceptor.class,
+						interceptorClass,
+						"IndexingActionInterceptor for " + entity.getName()
+				);
+			}
+		}
+		return buildTypesafeMutableEntityBinder(
+				entity.getClass(),
+				providers,
+				shardingStrategy,
+				similarityInstance,
+				interceptor
+		);
 	}
-	
+
+	private Class<? extends EntityIndexingInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
+		Class<? extends EntityIndexingInterceptor> result = indexedAnnotation.interceptor();
+		XClass superEntity = entity;
+		while ( result == DefaultEntityInterceptor.class ) {
+			superEntity = superEntity.getSuperclass();
+			//Object.class
+			if (superEntity == null) {
+				return result;
+			}
+			Indexed indexAnnForSuperclass = superEntity.getAnnotation( Indexed.class );
+			result = indexAnnForSuperclass != null ?
+					indexAnnForSuperclass.interceptor() :
+					result;
+		}
+		return result;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	private <T,U> MutableEntityIndexBinding<T> buildTypesafeMutableEntityBinder(Class<T> type, IndexManager[] providers,
+																			  IndexShardingStrategy shardingStrategy,
+																			  Similarity similarityInstance,
+																			  EntityIndexingInterceptor<U> interceptor) {
+		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T> ) interceptor;
+		return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
+	}
+
 	/**
 	 * Specifies a custom similarity on an index
 	 * @param newSimilarity

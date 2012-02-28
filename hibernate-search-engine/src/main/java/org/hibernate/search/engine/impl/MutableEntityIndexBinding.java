@@ -26,6 +26,7 @@ import org.apache.lucene.search.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -38,16 +39,22 @@ public class MutableEntityIndexBinding<T> implements EntityIndexBinder {
 	private final Similarity similarityInstance;
 	private DocumentBuilderIndexedEntity<T> documentBuilder;
 	private final IndexManager[] indexManagers;
+	private final EntityIndexingInterceptor entityIndexingInterceptor;
 
 	/**
 	 * @param shardingStrategy
 	 * @param similarityInstance
 	 * @param providers
 	 */
-	public MutableEntityIndexBinding(IndexShardingStrategy shardingStrategy, Similarity similarityInstance, IndexManager[] providers) {
+	public MutableEntityIndexBinding(
+			IndexShardingStrategy shardingStrategy,
+			Similarity similarityInstance,
+			IndexManager[] providers,
+			EntityIndexingInterceptor<? super T> entityIndexingInterceptor) {
 				this.shardingStrategy = shardingStrategy;
 				this.similarityInstance = similarityInstance;
 				this.indexManagers = providers;
+				this.entityIndexingInterceptor = entityIndexingInterceptor;
 	}
 
 	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder) {
@@ -83,6 +90,11 @@ public class MutableEntityIndexBinding<T> implements EntityIndexBinder {
 	@Override
 	public IndexManager[] getIndexManagers() {
 		return indexManagers;
+	}
+
+	@Override
+	public EntityIndexingInterceptor getEntityIndexingInterceptor() {
+		return entityIndexingInterceptor;
 	}
 
 }

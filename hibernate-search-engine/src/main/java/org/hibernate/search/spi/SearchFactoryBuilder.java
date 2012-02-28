@@ -52,6 +52,7 @@ import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -278,8 +279,11 @@ public class SearchFactoryBuilder {
 				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
 				entitySimilarity = entityMapping.getDocumentBuilder().getSimilarity();
 				if ( entitySimilarity != null ) {
-					MutableEntityIndexBinding newMapping = new MutableEntityIndexBinding( entityMapping.getSelectionStrategy(), entitySimilarity, entityMapping.getIndexManagers() );
-					newMapping.setDocumentBuilderIndexedEntity( entityMapping.getDocumentBuilder() );
+					MutableEntityIndexBinding newMapping = buildTypeSafeMutableEntityBinder(
+							clazz,
+							entityMapping,
+							entitySimilarity
+					);
 					entityMapping = newMapping;
 					documentBuildersIndexedEntities.put( clazz, entityMapping );
 				}
@@ -299,6 +303,20 @@ public class SearchFactoryBuilder {
 				}
 			}
 		}
+	}
+
+	@SuppressWarnings( "unchecked" )
+	private <T> MutableEntityIndexBinding<T> buildTypeSafeMutableEntityBinder(Class<T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
+		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) entityMapping.getEntityIndexingInterceptor();
+		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
+				entityMapping.getSelectionStrategy(),
+				entitySimilarity,
+				entityMapping.getIndexManagers(),
+				interceptor
+		);
+		DocumentBuilderIndexedEntity<T> documentBuilder = (DocumentBuilderIndexedEntity<T>) entityMapping.getDocumentBuilder();
+		newMapping.setDocumentBuilderIndexedEntity( documentBuilder );
+		return newMapping;
 	}
 
 	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {
@@ -389,7 +407,10 @@ public class SearchFactoryBuilder {
 			
 			Class mappedClass = classMappings.get( mappedXClass );
 			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
-		
+			//interceptor might use non indexed state
+		    if ( mappedEntity.getEntityIndexingInterceptor() != null ) {
+				optimizationBlackListedTypes.add( mappedXClass );
+			}
 			// Create all DocumentBuilderIndexedEntity
 			//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 			//XClass unfortunately is not (yet) genericized: TODO?

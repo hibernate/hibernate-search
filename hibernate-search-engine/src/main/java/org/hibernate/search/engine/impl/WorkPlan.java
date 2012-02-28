@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -43,6 +44,8 @@ import org.hibernate.search.engine.spi.DepthValidator;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -310,8 +313,35 @@ public class WorkPlan {
 				if ( extractedId != null ) {
 					PerEntityWork<T> entityWork = entityById.get( extractedId );
 					if ( entityWork == null ) {
-						entityWork = new PerEntityWork( value );
-						entityById.put( extractedId, entityWork );
+						EntityIndexingInterceptor<? super T> entityInterceptor = getEntityInterceptor();
+						IndexingOverride operation;
+						if (entityInterceptor!=null) {
+							operation = entityInterceptor.onUpdate( value );
+						}
+						else {
+							operation = IndexingOverride.APPLY_DEFAULT;
+						}
+						//TODO there is a small duplication with some of TransactionalWorker.interceptWork
+						//     but what would be a proper factored solution?
+						switch ( operation ) {
+							//we are planning an update by default
+							case UPDATE:
+							case APPLY_DEFAULT:
+								entityWork = new PerEntityWork( value );
+								entityById.put( extractedId, entityWork );
+								break;
+							case SKIP:
+								log.forceSkipIndexOperationViaInterception( entityClass, WorkType.UPDATE );
+								break;
+							case REMOVE:
+								log.forceRemoveOnIndexOperationViaInterception( entityClass, WorkType.UPDATE );
+								Work<T> work = new Work<T>(value, extractedId, WorkType.DELETE);
+								entityWork = new PerEntityWork( work );
+								entityById.put( extractedId, entityWork );
+								break;
+							default:
+								throw new AssertionFailure( "Unknown action type: " + operation );
+						}
 						// recursion starts
 						documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, depth );
 					}
@@ -323,6 +353,15 @@ public class WorkPlan {
 					documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, depth );
 				}
 			}
+		}
+
+		private EntityIndexingInterceptor<? super T> getEntityInterceptor() {
+			EntityIndexBinder indexBindingForEntity = searchFactoryImplementor.getIndexBindingForEntity(
+					entityClass
+			);
+			return indexBindingForEntity!=null ?
+					(EntityIndexingInterceptor<? super T> ) indexBindingForEntity.getEntityIndexingInterceptor() :
+					null;
 		}
 	}
 

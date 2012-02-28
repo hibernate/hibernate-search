@@ -26,9 +26,14 @@ package org.hibernate.search.backend.impl;
 import java.util.Properties;
 import javax.transaction.Synchronization;
 
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.SearchException;
@@ -64,9 +69,15 @@ public class TransactionalWorker implements Worker {
 
 	public void performWork(Work<?> work, TransactionContext transactionContext) {
 		final Class<?> entityType = instanceInitializer.getClassFromWork( work );
-		if ( factory.getIndexBindingForEntity( entityType ) == null
+		EntityIndexBinder indexBindingForEntity = factory.getIndexBindingForEntity( entityType );
+		if ( indexBindingForEntity == null
 				&& factory.getDocumentBuilderContainedEntity( entityType ) == null ) {
 			throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityType );
+		}
+		work = interceptWork(indexBindingForEntity, work);
+		if (work == null) {
+			//nothing to do
+			return;
 		}
 		if ( transactionContext.isTransactionInProgress() ) {
 			Object transactionIdentifier = transactionContext.getTransactionIdentifier();
@@ -92,6 +103,61 @@ public class TransactionalWorker implements Worker {
 			queueingProcessor.prepareWorks( queue );
 			queueingProcessor.performWorks( queue );
 		}
+	}
+
+	private <T> Work<T> interceptWork(EntityIndexBinder indexBindingForEntity, Work<T> work) {
+		if (indexBindingForEntity == null) {
+			return work;
+		}
+		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) indexBindingForEntity.getEntityIndexingInterceptor();
+		if (interceptor == null) {
+			return work;
+		}
+		IndexingOverride operation;
+		switch ( work.getType() ) {
+			case ADD:
+				operation = interceptor.onAdd( work.getEntity() );
+				break;
+			case UPDATE:
+				operation = interceptor.onUpdate( work.getEntity() );
+				break;
+			case DELETE:
+				operation = interceptor.onDelete( work.getEntity() );
+				break;
+			case COLLECTION:
+				operation = interceptor.onCollectionUpdate( work.getEntity() );
+				break;
+			case PURGE:
+			case PURGE_ALL:
+			case INDEX:
+				operation = IndexingOverride.APPLY_DEFAULT;
+				break;
+			default:
+				throw new AssertionFailure( "Unknown work type: " + work.getType() );
+		}
+		Work<T> result = work;
+		Class<T> entityClass = work.getEntityClass();
+		switch ( operation ) {
+			case APPLY_DEFAULT:
+				break;
+			case SKIP:
+				result = null;
+				log.forceSkipIndexOperationViaInterception( entityClass, work.getType() );
+				break;
+			case UPDATE:
+				 result = new Work<T>( work.getEntity(), work.getId(), WorkType.UPDATE );
+				log.forceUpdateOnIndexOperationViaInterception( entityClass, work.getType() );
+				break;
+			case REMOVE:
+				//This works because other Work constructors are never used from WorkType ADD, UPDATE, REMOVE, COLLECTION
+				//TODO should we force isIdentifierRollback to false if the operation is not a delete?
+				result = new Work<T>( work.getEntity(), work.getId(), WorkType.DELETE, work.isIdentifierWasRolledBack() );
+				log.forceRemoveOnIndexOperationViaInterception( entityClass, work.getType() );
+				break;
+			default:
+				throw new AssertionFailure( "Unknown action type: " + operation );
+		}
+		return result;
 	}
 
 	public void initialize(Properties props, WorkerBuildContext context, QueueingProcessor queueingProcessor) {

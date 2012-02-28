@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 
@@ -65,4 +66,5 @@ public interface EntityIndexBinder {
 	 */
 	IndexManager[] getIndexManagers();
 
+	EntityIndexingInterceptor<?> getEntityIndexingInterceptor();
 }

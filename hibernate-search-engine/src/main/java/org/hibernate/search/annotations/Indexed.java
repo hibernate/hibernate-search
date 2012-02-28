@@ -29,6 +29,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
 @Documented
@@ -40,4 +43,10 @@ public @interface Indexed {
 	 * @return The filename of the index
 	 */
 	String index() default "";
+
+	/**
+	 * Custom converter to change operations upon indexing
+	 * Useful for soft deletes and similar patterns
+	 */
+	Class<? extends EntityIndexingInterceptor> interceptor() default DefaultEntityInterceptor.class;
 }

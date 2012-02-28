@@ -35,10 +35,12 @@ import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.spi.WorkType;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
+import static org.jboss.logging.Logger.Level.TRACE;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -529,4 +531,15 @@ public interface Log extends BasicLogger {
 	@Message(id = 124, value = "The option 'threadsForIndexWriter' of the MassIndexer is deprecated and is being ignored! Control the size of worker.thread_pool.size for each index instead.")
 	void massIndexerIndexWriterThreadsIgnored();
 
+	@LogMessage(level = TRACE)
+	@Message(id = 125, value = "Interceptor enforces skip index operation %2$s on instance of class %1$s")
+	void forceSkipIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+
+	@LogMessage(level = TRACE)
+	@Message(id = 126, value = "Interceptor enforces removal of index data instead of index operation %2$s on instance of class %1$s")
+	void forceRemoveOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+
+	@LogMessage(level = TRACE)
+	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
+	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
 }
