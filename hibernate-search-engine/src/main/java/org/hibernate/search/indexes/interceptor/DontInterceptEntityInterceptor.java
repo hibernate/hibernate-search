@@ -28,22 +28,22 @@ package org.hibernate.search.indexes.interceptor;
  */
 public class DontInterceptEntityInterceptor implements EntityIndexingInterceptor<Object> {
 	@Override
-	public IndexingOperationType onAdd(Object entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+	public IndexingOverride onAdd(Object entity) {
+		return IndexingOverride.APPLY_DEFAULT;
 	}
 
 	@Override
-	public IndexingOperationType onUpdate(Object entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+	public IndexingOverride onUpdate(Object entity) {
+		return IndexingOverride.APPLY_DEFAULT;
 	}
 
 	@Override
-	public IndexingOperationType onDelete(Object entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+	public IndexingOverride onDelete(Object entity) {
+		return IndexingOverride.APPLY_DEFAULT;
 	}
 
 	@Override
-	public IndexingOperationType onCollectionUpdate(Object entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+	public IndexingOverride onCollectionUpdate(Object entity) {
+		return IndexingOverride.APPLY_DEFAULT;
 	}
 }

@@ -34,22 +34,22 @@ public class DefaultEntityInterceptor implements EntityIndexingInterceptor<Objec
 	String EXCEPTION_MESSAGE = "The default interceptor must not be called. This is an Hibernate Search bug.";
 
 	@Override
-	public IndexingOperationType onAdd(Object entity) {
+	public IndexingOverride onAdd(Object entity) {
 		throw new IllegalStateException( EXCEPTION_MESSAGE );
 	}
 
 	@Override
-	public IndexingOperationType onUpdate(Object entity) {
+	public IndexingOverride onUpdate(Object entity) {
 		throw new IllegalStateException( EXCEPTION_MESSAGE );
 	}
 
 	@Override
-	public IndexingOperationType onDelete(Object entity) {
+	public IndexingOverride onDelete(Object entity) {
 		throw new IllegalStateException( EXCEPTION_MESSAGE );
 	}
 
 	@Override
-	public IndexingOperationType onCollectionUpdate(Object entity) {
+	public IndexingOverride onCollectionUpdate(Object entity) {
 		throw new IllegalStateException( EXCEPTION_MESSAGE );
 	}
 }

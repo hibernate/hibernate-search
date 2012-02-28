@@ -21,7 +21,7 @@
 package org.hibernate.search.test.interceptor;
 
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.indexes.interceptor.IndexingOperationType;
+import org.hibernate.search.indexes.interceptor.IndexingOverride;
 
 /**
  * Only index blog when it is in published state
@@ -30,28 +30,28 @@ import org.hibernate.search.indexes.interceptor.IndexingOperationType;
  */
 public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor<Blog> {
 	@Override
-	public IndexingOperationType onAdd(Blog entity) {
+	public IndexingOverride onAdd(Blog entity) {
 		if (entity.getStatus() == BlogStatus.PUBLISHED) {
-			return IndexingOperationType.DONT_INTERCEPT;
+			return IndexingOverride.APPLY_DEFAULT;
 		}
-		return IndexingOperationType.SKIP;
+		return IndexingOverride.SKIP;
 	}
 
 	@Override
-	public IndexingOperationType onUpdate(Blog entity) {
+	public IndexingOverride onUpdate(Blog entity) {
 		if (entity.getStatus() == BlogStatus.PUBLISHED) {
-			return IndexingOperationType.UPDATE;
+			return IndexingOverride.UPDATE;
 		}
-		return IndexingOperationType.REMOVE;
+		return IndexingOverride.REMOVE;
 	}
 
 	@Override
-	public IndexingOperationType onDelete(Blog entity) {
-		return IndexingOperationType.DONT_INTERCEPT;
+	public IndexingOverride onDelete(Blog entity) {
+		return IndexingOverride.APPLY_DEFAULT;
 	}
 
 	@Override
-	public IndexingOperationType onCollectionUpdate(Blog entity) {
+	public IndexingOverride onCollectionUpdate(Blog entity) {
 		return onUpdate(entity);
 	}
 }

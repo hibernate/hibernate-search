@@ -2141,28 +2141,28 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
  */
 public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor&lt;Blog&gt; {
     @Override
-    public IndexingOperationType onAdd(Blog entity) {
+    public IndexingOverride onAdd(Blog entity) {
         if (entity.getStatus() == BlogStatus.PUBLISHED) {
-            return IndexingOperationType.DONT_INTERCEPT;
+            return IndexingOverride.APPLY_DEFAULT;
         }
-        return IndexingOperationType.SKIP;
+        return IndexingOverride.SKIP;
     }
 
     @Override
-    public IndexingOperationType onUpdate(Blog entity) {
+    public IndexingOverride onUpdate(Blog entity) {
         if (entity.getStatus() == BlogStatus.PUBLISHED) {
-            return IndexingOperationType.UPDATE;
+            return IndexingOverride.UPDATE;
         }
-        return IndexingOperationType.REMOVE;
+        return IndexingOverride.REMOVE;
     }
 
     @Override
-    public IndexingOperationType onDelete(Blog entity) {
-        return IndexingOperationType.DONT_INTERCEPT;
+    public IndexingOverride onDelete(Blog entity) {
+        return IndexingOverride.APPLY_DEFAULT;
     }
 
     @Override
-    public IndexingOperationType onCollectionUpdate(Blog entity) {
+    public IndexingOverride onCollectionUpdate(Blog entity) {
         return onUpdate(entity);
     }
 }</programlisting>
@@ -2223,7 +2223,7 @@ public class Blog {
 
     <itemizedlist>
       <listitem>
-        <para><literal>DONT_INTERCEPT</literal>: that's the basic operation
+        <para><literal>APPLY_DEFAULT</literal>: that's the basic operation
         that lets Hibernate Search update the index as expected - creating,
         updating or removing the document</para>
       </listitem>

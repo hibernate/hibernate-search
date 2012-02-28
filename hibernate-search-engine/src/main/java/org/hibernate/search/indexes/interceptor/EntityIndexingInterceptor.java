@@ -26,15 +26,15 @@ package org.hibernate.search.indexes.interceptor;
  *
  * Typical use case include so called soft deletes.
  *
- * Experimental: {@link IndexingOperationType} might be updated
+ * Experimental: {@link IndexingOverride} might be updated
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public interface EntityIndexingInterceptor<T> {
-	IndexingOperationType onAdd(T entity);
-	IndexingOperationType onUpdate(T entity);
-	IndexingOperationType onDelete(T entity);
-	IndexingOperationType onCollectionUpdate(T entity);
+	IndexingOverride onAdd(T entity);
+	IndexingOverride onUpdate(T entity);
+	IndexingOverride onDelete(T entity);
+	IndexingOverride onCollectionUpdate(T entity);
 
 	//FIXME should we add onPurge and onIndex?
 }
