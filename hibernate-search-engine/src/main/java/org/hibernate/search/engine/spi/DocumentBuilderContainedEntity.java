@@ -63,7 +63,7 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 		}
 	}
 
-	protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
+	protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context, PathsContext pathsContext) {
 	}
 
 	@Override

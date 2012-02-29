@@ -160,7 +160,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge);
 
-	abstract protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context);
+	abstract protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context, PathsContext pathsContext);
 
 	/**
 	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId;
@@ -459,7 +459,7 @@ public abstract class AbstractDocumentBuilder<T> {
 				pathsContext
 		);
 		checkForContainedIn( classHostingMember, member, propertiesMetadata );
-		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context );
+		documentBuilderSpecificChecks( member, propertiesMetadata, isRoot, prefix, context, pathsContext );
 	}
 
 	private void checkForAnalyzerDefs(XAnnotatedElement annotatedElement, ConfigContext context) {
@@ -1152,7 +1152,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * well as tracking which paths have been encountered to validate the
 	 * existence of all configured paths.
 	 */
-	private static class PathsContext {
+	static class PathsContext {
 
 		private final IndexedEmbedded embeddedAnn;
 		private final Map<String, Boolean> pathsEncounteredState = new HashMap<String, Boolean>();
