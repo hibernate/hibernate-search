@@ -1,6 +1,6 @@
 Hibernate Search
 ==================================================
-Version: 3.4.1.Final, 25-08-2011
+Version: 3.4.2.Final, 29-02-2012
 
 Description
 -----------
@@ -33,7 +33,7 @@ Latest Documentation:
 
 Bug Reports:
 
-   Hibernate JIRA (preferred): http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH
+   Hibernate JIRA (preferred): https://hibernate.onjira.com/browse/HSEARCH
    hibernate-dev@lists.jboss.org
 
 Free Technical Support:

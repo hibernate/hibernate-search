@@ -1,6 +1,21 @@
 Hibernate Search Changelog
 ==========================
 
+3.4.2.Final (29-02-2012)
+------------------------
+
+** Bug
+    * [HSEARCH-883] - Index out of bound exception on range facets when IncludeZeroCount = false, maxCount > actual count (Elmer van Chastelet)
+    * [HSEARCH-901] - ClassCastException during creation of index: Hibernate (Search) assumes varchar entity field called "id" is an Integer but it isn't
+    * [HSEARCH-926] - Duplicate InfinispanDirectoryProviders created when multiple sub-classes share the same index directory (Zach Kurey)
+    * [HSEARCH-961] - ObjectNotFoundException not caught in FullTextSession for deleted objects
+    * [HSEARCH-1020] - Regression in 3.4: index not updated after updating a collection (Guillaume Smet)
+    * [HSEARCH-1023] - HibernateSearch DSL - backport fix for excludeLimit() to v 3.4.x
+
+** Task
+    * [HSEARCH-906] - Revise warning about Java7 as the bugs where fixed in b2
+
+
 3.4.1.Final (25-08-2011)
 ------------------------
 
