@@ -47,6 +47,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
+import org.hibernate.search.engine.spi.AbstractDocumentBuilder.PathsContext;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -233,15 +234,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		return idFieldCacheCollectorFactory;
 	}
 
-	protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
-		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context );
+	protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context, PathsContext pathsContext) {
+		checkDocumentId( member, propertiesMetadata, isRoot, prefix, context, pathsContext );
 	}
 
-	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context) {
+	protected void checkDocumentId(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context, PathsContext pathsContext) {
 		Annotation idAnnotation = getIdAnnotation( member, context );
 		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
 		if ( idAnnotation != null ) {
 			String attributeName = getIdAttributeName( member, idAnnotation );
+			if ( pathsContext != null )
+				pathsContext.markEncounteredPath( prefix + attributeName );
 			if ( isRoot ) {
 				if ( explicitDocumentId ) {
 					throw new SearchException( "More than one @DocumentId specified on entity " + getBeanClass().getName() );
