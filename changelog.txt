@@ -2,6 +2,19 @@ Hibernate Search Changelog
 ==========================
 
 
+Version 4.1.0.CR1 (29-2-2012)
+------------------------
+
+** Bug
+    * [HSEARCH-1030] - Reindexing embedded Collection FieldBridge throws a LazyInitializationException and stop reindexation
+
+** Improvement
+    * [HSEARCH-1045] - Avoid frequent construction of a ContextualException2WayBridge
+
+** New Feature
+    * [HSEARCH-471] - Ability to selectively index an entity based on its state
+
+
 Version 4.1.0.Beta2 (13-2-2012)
 ------------------------
 
