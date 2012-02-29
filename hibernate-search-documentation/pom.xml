@@ -170,7 +170,7 @@
             <plugin>
                 <groupId>org.zanata</groupId>
                 <artifactId>zanata-maven-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.5.0</version>
                 <configuration>
                     <srcDir>${basedir}/src/main/docbook</srcDir>
                     <srcDirPot>${basedir}/src/main/docbook/pot</srcDirPot>
