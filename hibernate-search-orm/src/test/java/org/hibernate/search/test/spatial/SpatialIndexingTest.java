@@ -105,7 +105,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 	}
 
 	public void testSpatialAnnotationOnClassLevel() throws Exception {
-		Hotel hotel = new Hotel( 1, "PLazza Athénée", 24.0d, 32.0d, "Luxurious" );
+		Hotel hotel = new Hotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
 		Transaction tx = fullTextSession.beginTransaction();
@@ -146,7 +146,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 	}
 
 	public void testSimpleSpatialAnnotationOnClassLevel() throws Exception {
-		SimpleHotel hotel = new SimpleHotel( 1, "PLazza Athénée", 24.0d, 32.0d, "Luxurious" );
+		SimpleHotel hotel = new SimpleHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
 		Transaction tx = fullTextSession.beginTransaction();
