@@ -212,7 +212,7 @@
 
     <files>
         <file>
-            <source>readme.txt</source>
+            <source>README.md</source>
             <outputDirectory>/</outputDirectory>
             <filtered>true</filtered>
         </file>
