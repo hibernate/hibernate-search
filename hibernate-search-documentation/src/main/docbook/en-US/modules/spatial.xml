@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  ~  indicated by the @author tags or express copyright attribution
+  ~  statements applied by the authors.  All third-party contributions are
+  ~  distributed under license by Red Hat, Inc.
+  ~
+  ~  This copyrighted material is made available to anyone wishing to use, modify,
+  ~  copy, or redistribute it subject to the terms and conditions of the GNU
+  ~  Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~  for more details.
+  ~
+  ~  You should have received a copy of the GNU Lesser General Public License
+  ~  along with this distribution; if not, write to:
+  ~  Free Software Foundation, Inc.
+  ~  51 Franklin Street, Fifth Floor
+  ~  Boston, MA  02110-1301  USA
+  -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../hsearch.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="spatial">
+  <title>Spatial</title>
+
+  <para>The spatial functionalities of Hibernate enable indexed entities with
+  latitude and longitude fields to be spatialy indexed then searched and
+  filtered by defining a search discus, providing a center and a radius.</para>
+  <para>Typical usage is to find nearby hotels (between 500m and 5 km) in a 5
+  millions worldwide data set.</para>
+
+  <section id="spatial-goals">
+    <title>Goals</title>
+
+    <para>The spatial support of Hibernate Search has a few goals :</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Enable spatial search on entities (find entities within x km
+        from location (latitude, longitude) on earth)</para>
+      </listitem>
+      <listitem>
+        <para>Provide simple method for spatial index via annotations</para>
+      </listitem>
+      <listitem>
+        <para>Provide simple methods for querying (QueryBuilder + DSL)</para>
+      </listitem>
+      <listitem>
+        <para>Hide geographical complexity</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section id="spatial-strategy">
+    <title>Choosing an indexing strategy</title>
+
+    <para>There are two strategy you can choose in HS spatial to index the
+    latitude,longitude) properties of your entities :</para>
+    
+    <itemizedlist>
+      <listitem>
+        <para>like numbers formatted for range queries</para>
+      </listitem>
+      <listitem>
+        <para>in a grid (Quad-Tree) for two stage spatial queries</para>
+      </listitem>
+    </itemizedlist>
+
+    <section id="spatial-strategy-range">
+      <title>Double range queries</title>
+
+      <para>Pros :</para>
+      <itemizedlist>
+        <listitem>
+          <para>Quick on small data sets (&lt; 100k entities)</para>
+        </listitem>
+        <listitem>
+          <para>Straigh forward to debug/analyze</para>
+        </listitem>
+        <listitem>
+          <para>Index size is moderate</para>
+        </listitem>
+      </itemizedlist>
+      
+      <para>Cons :</para>
+      <itemizedlist>
+        <listitem>
+          <para>Poor performance on large data sets</para>
+        </listitem>
+        <listitem>
+          <para>Poor performance on worldwide data set (when data on US 
+          / Europe / Asia collide because of same latitude)</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section id="spatial-strategy-grid">
+      <title>Two stages spatial queries on grid</title>
+
+      <para>Pros :</para>
+      <itemizedlist>
+        <listitem>
+          <para>Good performance even with large data sets</para>
+        </listitem>
+        <listitem>
+          <para>World wide data distribution independant</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Cons :</para>
+      <itemizedlist>
+        <listitem>
+          <para>Index size is big (de normalization)</para>
+        </listitem>
+        <listitem>
+          <para>Index size is big (de normalization)</para>
+        </listitem>
+      </itemizedlist>
+      
+    </section>
+  </section>
+  
+  <section id="spatial-range-queries">
+    <title>Range query indexing and querying</title>
+    
+    <para>To index your entities for range querying you :</para>
+    <itemizedlist>
+      <listitem>
+        <para>have two double properties latitude and longitude marked with @Field</para>
+      </listitem>
+      <listitem>
+        <para>implement the Coordinates interface </para>
+      </listitem>
+      <listitem>
+        <para>add the @Spatial annotation at class level</para>
+      </listitem>
+    </itemizedlist>
+    
+    <example>
+      <title>Coordinates interface</title>
+
+      <programlisting language="JAVA" role="JAVA">public interface Coordinates {
+  double getLatitude();
+  double getLongitude();
+}
+      </programlisting>
+    </example>
+    
+    <example>
+      <title>SimpleHotel class sample</title>
+
+      <programlisting language="JAVA" role="JAVA">@Entity
+@Indexed
+@Spatial
+public class SimpleHotel implements Coordinates {
+	@Field
+	double latitude;
+	@Field
+	double longitude;
+  [..]</programlisting>
+    </example>
+      
+    <para>To query your entities, you :</para>
+    <itemizedlist>
+      <listitem>
+        <para>get a queryBuilder for your entity</para>
+      </listitem>
+      <listitem>
+        <para>pass it to SpatialQueryBuilder.buildSimpleSpatialQuery()
+        with your search center and radius</para>
+      </listitem>
+      <listitem>
+        <para>eventually combine the resulting Qiuery with other filters</para>
+      </listitem>
+      <listitem>
+        <para>call the createFullTextQuery() and use the results</para>
+      </listitem>
+    </itemizedlist>
+    
+    <example>
+      <title>SimpleHotel class sample</title>
+
+      <programlisting language="JAVA" role="JAVA">QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( SimpleHotel.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
+				centerLatitude, centerLongitude, radius,
+				queryBuilder,
+				SimpleHotel.class
+		);</programlisting>
+    </example>
+    
+    <para>Sample code is at SpatialIndexingTest.testSimpleSpatialAnnotationOnClassLevel()
+    and in SimpleHotel class in tests.</para>
+
+  </section>
+  
+  <section id="spatial-two-stages-grid">
+    <title>Two stages spatial queries with grid</title>
+    
+    <para>To index your entities you :</para>
+    <itemizedlist>
+      <listitem>
+        <para>implement the Coordinates interface </para>
+      </listitem>
+      <listitem>
+        <para>add the @Spatial annotation at class level with a name for referencing the grid
+        field in the index and with gridmode set to true : @Spatial(name = "location", gridMode = true)</para>
+      </listitem>
+    </itemizedlist>
+    
+    <example>
+      <title>Querying range queries indexed entities</title>
+
+      <programlisting language="JAVA" role="JAVA">@Entity
+@Indexed
+@Spatial(name = "location", gridMode = true)
+public class Hotel implements Coordinates {
+	double latitude;
+	double longitude;
+  [...]
+</programlisting>
+    </example>
+      
+    <para>To query your entities, you :</para>
+    <itemizedlist>
+      <listitem>
+        <para>call SpatialQueryBuilder.buildSpatialQuery with your center, radius and the name
+        of the grid fields (location passed above)</para>
+      </listitem>
+      <listitem>
+        <para>eventually combine the resulting Qiuery with other filters</para>
+      </listitem>
+      <listitem>
+        <para>call the createFullTextQuery() and use the results</para>
+      </listitem>
+    </itemizedlist>
+    
+    <example>
+      <title>Querying grid indexed entities</title>
+
+      <programlisting language="JAVA" role="JAVA">		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQuery(
+				centerLatitude,
+				centerLongitude,
+				50,
+				"location"
+		);
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Hotel.class );
+		List results = hibQuery.list();</programlisting>
+    </example>
+    
+    <para>Sample code is at SpatialIndexingTest.testSpatialAnnotationOnClassLevel() and in Hotel class.</para>
+    
+  </section>
+  
+  <section id="spatial-behind -curtain">
+    <title>Grid - Behind the curtain</title>
+    
+    <para>Here comes the gory details of the grid based indexation.</para>
+    
+    <section>
+      <title>At indexation level</title>
+      
+      <para>When Hibernate search index the entity annotated with @Spatial, it instantiate a SpatialFieldBridge
+      to transform the latitude and longitude fields accessed via the Coordiantes interface to the multiple index
+      fields stored in the Lucene index.</para>
+      
+      <para>Principle of the spatial index : the spatial index used in Hibernate Search is a QuadTree type
+      (http://en.wikipedia.org/wiki/Quadtree).</para>
+      
+      <para>To make computation in a flat coordinates system the latitude and longitude field values will be projected
+      with a sinusoidal projection (http://en.wikipedia.org/wiki/Sinusoidal_projection).
+      Origin values space is :</para>
+      <para>[-90 -> +90],]-180 -> 180]</para>
+      <para>for latitude,longitude coordinates and projected space is :</para>
+      <para>]-pi -> +pi],[-pi/2 -> +pi/2]</para>
+      <para>for cartesian x,y coordinates (beware of fields order inversion : x is longitude and y is latitude).</para>
+      
+      <para>The index is divided into n levels labeled from 0 to n-1.</para>
+      
+      <para>At the 0 level the projected space is the whole earth.
+      At the 1 level the projected space is devided into 4 rectangles ( called boxes as in bouding box):</para>
+      
+      <para>[-pi,-pi/2]->[0,0], [-pi,0]->[0,+pi/2], [0,-pi/2]->[+pi,0] and [0,0]->[+pi,+pi/2]</para>
+      
+      <para>At level n+1 each box of level n is divided into 4 new boxes and so on. The numbers of boxes at a
+      given level is 4^n.</para>
+      
+      <para>Each box is given an id, in this format : [Box index on the X axis]|[Box index on the Y axis]
+      To calculate the index of a box on an axis we divide the axis range in 2^n slots and find the slot the box
+      belongs to.
+      At the n level the indexes on an axis are from -(2^n)/2 to (2^n)/2.
+      For instance, the 5th level has 4^5 = 1024 boxes with 32 indexes on each axis (32x32 is 1024) and the box of
+      Id "0|8" is covering the [0,8/32*pi/2]->[1/32*pi,9/32*pi/2] rectangle is projected space.</para>
+      
+      <para>Beware ! The boxes are rectangles in projected space but the related area on earth is not !</para>
+      
+      <para>Now that we have all these boxes at all these levels will be indexing points "into" them.</para>
+      
+      <para>For a point (lat,long) we calculate its projection (x,y) and then we calculate for each level of the
+      spatial index, the ids of the boxes it belongs to.</para>
+      
+      <para>At each level the point is in one and only one box. For points on the edges the box are considered exclusive
+      n the left side and inclusive on the right i-e ]start,end] (the points are normalized before projection to
+      [-90,+90],]-180,+180]).</para>
+      
+      <para>We store in the lucene document corresponding to the entity to index one field for each level of the grid.
+      The field is named : [spatial index fields name]_HSSI_[n] where [spatial index fields name] is the name given
+      either by the parameter at class level annotation or derived from the name of the spatial annoted method of
+      he entitiy, HSSI stands for Hibernate Search Spatial Index and n is the level of the grid.</para>
+      
+      <para>We also store the latitude and longitude in numeric field under [spatial index fields name]_HSSI_Latitude
+      and [spatial index fields name]_HSSI_Longitude fields.
+      They will be used to filter precisly results by distance in the second stage of the search.</para>
+    </section>
+    
+    <section>
+      <title>At search level</title>
+      
+      <para>Now that we have all these fields, what are they here for ?</para>
+      
+      <para>When you ask for a spatial search by providing a search discus (center+radius) we will calculate the boxes
+      ids that do cover the search discus in the projected space, fetch all the documents that belong to there boxes
+      (thus narrowing the number of documents for which we will have to calculate distance to the center) and then
+      filter this subset with a real distance calculation. This is called two level spatial filtering.</para>
+      
+      <section>
+        <title>Step 1 : compute the best grid level for the search discus</title>
+        
+        <para>For a given search radius there is an optimal grid level where the number of boxes to retrieve
+        hall be minimal without bringing back to many documents (level 0 has only 1 box but retrieve all documents).
+        he optimal grid level is maximum level where the boxes width (on the X axis) is larger than the search area.
+        Near the equator line where projection deformation is minimal, this will lead to the retrieval of at most
+        4 boxes. Towards the poles with deformation, it may bring more boxes but as the sinusoidal projection has a
+        Tissot's indicatrix quite simple (see http://en.wikipedia.org/wiki/Sinusoidal_projection) in populated area,
+        the overhead is minimal. (This should be tested, sampled and benchmarked).</para>
+        
+      </section>
+      
+      <section>
+        <title>Step 2 : compute the corresponding covering boCellIds at that level</title>
+        
+        <para>Now we have the optimal level chosen, we can compute the ids of the boxes covering the search
+        iscus (which is not a discus in projected space anymore).</para>
+        
+        <para>This is done by org.hibernate.search.spatial.impl.GridHelper.getGridCellsIds(Point center, double
+        radius, int gridLevel)</para>
+        
+        <para>It will calculate the bouding box of the search discus and then call
+        org.hibernate.search.spatial.impl.GridHelper.getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel)
+        that will do the actual computation. If the bouding box crosses the merdian line it will cut the search in two
+        and make two calls to getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel) with left and right
+        parts of the bouding box.</para>
+        
+        <para>There are some geo related hacks (search radius too large, search radius crossing the poles) that are
+        handled in bounding box computations done by Rectangle.fromBoundingCircle(Point center, double radius) (see
+        http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates for reference on those subjects).</para>
+        
+        <para>The GridHelper.getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel) project the defining
+        points of the bouding box and compute the boxes they belong to. It returns all the box Ids between the lower
+        eft to the upper right corners, thus covering the area.</para>
+        
+      </section>
+      
+      <section>
+        <title>Step 3 : Lucene index lookup</title>
+        
+        <para>The Query is build with theses Ids to lookup for documents having a [spatial index fields name]_HSSI_[n]
+        (n the level found at Step 1) field valued with one of the ids of Step 2. </para>
+        
+        <para>See org.hibernate.search.spatial.impl.GridFilter implentation.</para>
+        
+        <para>This Query will return all documents in the boxes covering the projected bouding box of the search
+        discus. So it is too large and need refining. But we have narrowed the distance calculation problems to
+        a subet of our datas.</para>
+        
+      </section>
+
+      <section>
+        <title>Step 4 : refine </title>
+        
+        <para>A distance calulation filter is set after the Lucene index lookup query of Step 3 to exclude false
+        candidate from the result list.</para>
+        
+        <para>See SpatialQueryBuilderFromPoint.buildSpatialQuery(Point center, double radius, String fieldName)</para>
+        
+      </section>
+      
+    </section>
+  </section>
+</chapter>
+
