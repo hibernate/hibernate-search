@@ -10,16 +10,12 @@ Hibernate Search addresses these shortcomings - it indexes your domain model wit
 
 Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the cover.
 
-----
-
 ## Requirements
 
 This version of Hibernate Search requires:
 
 * Hibernate Core 4.0 and above
 * Apache Lucene 3.5
-
-----
 
 ## Instructions
 
@@ -45,8 +41,6 @@ Download the distribution bundle from [SourceForge](http://sourceforge.net/proje
     
 If you want to contribute, read [Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
 
-----
-
 ## Contact
 
 ### Latest Documentation:
@@ -61,8 +55,6 @@ If you want to contribute, read [Contributing to Hibernate Search](http://commun
 ### Free Technical Support:
 
 * [Hibernate Forum](http://forum.hibernate.org/viewforum.php?f=9)
-
-----
 
 ## License
 
