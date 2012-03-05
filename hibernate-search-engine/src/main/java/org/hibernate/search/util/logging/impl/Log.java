@@ -561,43 +561,43 @@ public interface Log extends BasicLogger {
 			+ GeometricConstants.LATITUDE_DEGREE_MIN + " and " + GeometricConstants.LATITUDE_DEGREE_MAX + ".")
 	IllegalArgumentException illegalLatitude();
 
-	@Message(id = 123, value = "@ClassBridge implementation implements none of the field bridge interfaces: %1$s")
+	@Message(id = 131, value = "@ClassBridge implementation implements none of the field bridge interfaces: %1$s")
 	SearchException noFieldBridgeInterfaceImplementedByClassBridge(String implName);
 
-	@Message(id = 124, value = "Unable to instantiate ClassBridge of type %1$s defined on %2$s")
+	@Message(id = 132, value = "Unable to instantiate ClassBridge of type %1$s defined on %2$s")
 	SearchException cannotInstantiateClassBridgeOfType(String implName, String className, @Cause Throwable e);
 
-	@Message(id = 125, value = "Unable to guess FieldBridge for  %1$s")
+	@Message(id = 133, value = "Unable to guess FieldBridge for  %1$s")
 	SearchException unableToGuessFieldBridge(String classBridgeName);
 
-	@Message(id = 126, value = "Unable to instantiate Spatial defined on %1$s")
+	@Message(id = 134, value = "Unable to instantiate Spatial defined on %1$s")
 	SearchException unableToInstantiateSpatial(String className, @Cause Throwable e);
 
-	@Message(id = 127, value = "@FieldBridge with no implementation class defined in: %1$s")
+	@Message(id = 135, value = "@FieldBridge with no implementation class defined in: %1$s")
 	SearchException noImplementationClassInFieldBridge(String className);
 
-	@Message(id = 128, value = "@FieldBridge implementation implements none of the field bridge interfaces: %1$s in %2$s")
+	@Message(id = 136, value = "@FieldBridge implementation implements none of the field bridge interfaces: %1$s in %2$s")
 	SearchException noFieldBridgeInterfaceImplementedByFieldBridge(String implName, String appliedOnName);
 
-	@Message(id = 129, value = "Unable to instantiate FieldBridge for %1$s of class %2$s")
+	@Message(id = 137, value = "Unable to instantiate FieldBridge for %1$s of class %2$s")
 	SearchException unableToInstantiateFieldBridge(String appliedOnName, String appliedOnTypeName, @Cause Throwable e);
 
-	@Message(id = 130, value = "Unknown Resolution: %1$s")
+	@Message(id = 138, value = "Unknown Resolution: %1$s")
 	AssertionFailure unknownResolution(String resolution);
 
-	@Message(id = 131, value = "Unknown ArrayBridge for resolution: %1$s")
+	@Message(id = 139, value = "Unknown ArrayBridge for resolution: %1$s")
 	AssertionFailure unknownArrayBridgeForResolution(String resolution);
 
-	@Message(id = 132, value = "Unknown MapBridge for resolution: %1$s")
+	@Message(id = 140, value = "Unknown MapBridge for resolution: %1$s")
 	AssertionFailure unknownMapBridgeForResolution(String resolution);
 
-	@Message(id = 133, value = "Unknown IterableBridge for resolution: %1$s")
+	@Message(id = 141, value = "Unknown IterableBridge for resolution: %1$s")
 	AssertionFailure unknownIterableBridgeForResolution(String resolution);
 
-	@Message(id = 134, value = "FieldBridge passed in is not an instance of %1$s")
+	@Message(id = 142, value = "FieldBridge passed in is not an instance of %1$s")
 	SearchException fieldBridgeNotAnInstanceof(String className);
 
-	@Message(id = 135, value = "Spatial field name not defined for class level annotation on class %1$s")
+	@Message(id = 143, value = "Spatial field name not defined for class level annotation on class %1$s")
 	SearchException spatialFieldNameNotDefined( String className );
 
 }
