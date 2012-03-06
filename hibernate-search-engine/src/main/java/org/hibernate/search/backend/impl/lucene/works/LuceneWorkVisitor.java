@@ -46,7 +46,7 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	
 	public LuceneWorkVisitor(Workspace workspace) {
 		this.addDelegate = new AddWorkDelegate( workspace );
-		if ( workspace.getEntitiesInIndexManager().size() == 1 ) {
+		if ( workspace.areSingleTermDeletesSafe() ) {
 			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
 			this.updateDelegate = new UpdateExtWorkDelegate( workspace, addDelegate );
 		}

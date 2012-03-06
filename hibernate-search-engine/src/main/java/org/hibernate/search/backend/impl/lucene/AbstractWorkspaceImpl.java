@@ -114,4 +114,10 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 		return writerHolder.getIndexWriter( errorContextBuilder );
 	}
 
+	@Override
+	public boolean areSingleTermDeletesSafe() {
+		// TODO initially be safe:
+		return false;
+	}
+
 }
