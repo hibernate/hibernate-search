@@ -95,4 +95,9 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	public InstanceInitializer getInstanceInitializer() {
 		return state.getInstanceInitializer();
 	}
+
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return state.isIndexMetadataComplete();
+	}
 }

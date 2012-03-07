@@ -111,4 +111,9 @@ public class ManualConfiguration implements SearchConfiguration {
 	public InstanceInitializer getInstanceInitializer() {
 		return initializer;
 	}
+
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return true;
+	}
 }

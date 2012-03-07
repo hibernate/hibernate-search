@@ -22,9 +22,9 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.Properties;
 
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.CommonPropertiesParse;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -36,16 +36,16 @@ class WorkspaceFactory {
 	private static final Log log = LoggerFactory.make();
 
 	static AbstractWorkspaceImpl createWorkspace(DirectoryBasedIndexManager indexManager,
-			ErrorHandler errorHandler, Properties cfg) {
+			WorkerBuildContext context, Properties cfg) {
 		final String indexName = indexManager.getIndexName();
 		final boolean exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( cfg );
 		if ( exclusiveIndexUsage ) {
 			log.debugf( "Starting workspace for index " + indexName + " using an exclusive index strategy" );
-			return new ExclusiveIndexWorkspaceImpl( indexManager, errorHandler, cfg );
+			return new ExclusiveIndexWorkspaceImpl( indexManager, context, cfg );
 		}
 		else {
 			log.debugf( "Starting workspace for index " + indexName + " using a shared index strategy" );
-			return new SharedIndexWorkspaceImpl( indexManager, errorHandler, cfg );
+			return new SharedIndexWorkspaceImpl( indexManager, context, cfg );
 		}
 	}
 

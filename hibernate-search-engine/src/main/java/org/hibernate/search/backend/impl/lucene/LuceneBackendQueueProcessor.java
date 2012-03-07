@@ -62,8 +62,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		sync = BackendFactory.isConfiguredAsSync( props );
 		if ( workspaceOverride == null ) {
 			workspaceOverride = WorkspaceFactory.createWorkspace(
-					indexManager,
-					context.getErrorHandler(), props
+					indexManager, context, props
 			);
 		}
 		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );

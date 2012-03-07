@@ -27,8 +27,10 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.ExplicitOnlyOptimizerStrategy;
@@ -52,8 +54,16 @@ public class CommonPropertiesParse {
 		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.EXCLUSIVE_INDEX_USE, true );
 	}
 
-	public static boolean isIndexMetadataComplete(Properties indexProps) {
-		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.INDEX_METADATA_COMPLETE, true );
+	/**
+	 * Returns the configured value of {@link Environment#INDEX_METADATA_COMPLETE} for this specific index.
+	 * If no value is set, the default is defined by {@link SearchConfiguration#isIndexMetadataComplete()}.
+	 * 
+	 * @param indexProps The index configuration properties
+	 * @param context The WorkerBuildContext provides a view of the default setting
+	 * @return {@code true} when the index metadata is fully defined.
+	 */
+	public static boolean isIndexMetadataComplete(Properties indexProps, WorkerBuildContext context) {
+		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.INDEX_METADATA_COMPLETE, context.isIndexMetadataComplete() );
 	}
 
 	/**

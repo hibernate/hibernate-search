@@ -30,10 +30,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.impl.CommonPropertiesParse;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.Log;
@@ -63,12 +63,12 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	private final AtomicLong operations = new AtomicLong( 0L );
 
 
-	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
+	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties cfg) {
 		this.indexManager = indexManager;
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
 		this.entitiesInIndexManager = indexManager.getContainedTypes();
-		this.writerHolder = new IndexWriterHolder( errorHandler, indexManager );
-		this.indexMetadataIsComplete = CommonPropertiesParse.isIndexMetadataComplete( cfg );
+		this.writerHolder = new IndexWriterHolder( context.getErrorHandler(), indexManager );
+		this.indexMetadataIsComplete = CommonPropertiesParse.isIndexMetadataComplete( cfg, context );
 	}
 
 	@Override

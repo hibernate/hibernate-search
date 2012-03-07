@@ -22,16 +22,16 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.Properties;
 
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class ExclusiveIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 
-	public ExclusiveIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
-		super( indexManager, errorHandler, cfg );
+	public ExclusiveIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties cfg) {
+		super( indexManager, context, cfg );
 	}
 
 	@Override

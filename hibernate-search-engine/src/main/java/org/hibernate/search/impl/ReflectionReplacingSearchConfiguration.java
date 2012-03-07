@@ -102,4 +102,9 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 		return cfg.getInstanceInitializer();
 	}
 
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return cfg.isIndexMetadataComplete();
+	}
+
 }

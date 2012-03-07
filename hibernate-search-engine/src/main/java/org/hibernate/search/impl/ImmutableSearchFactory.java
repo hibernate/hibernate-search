@@ -111,6 +111,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 	private final TimingSource timingSource;
 	private final SearchMapping mapping;
+	private final boolean indexMetadataIsComplete;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -132,6 +133,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.timingSource = state.getTimingSource();
 		this.mapping = state.getProgrammaticMapping();
 		this.statistics = new StatisticsImpl( this );
+		this.indexMetadataIsComplete = state.isIndexMetadataComplete();
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false
 		);
@@ -374,6 +376,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public SearchMapping getProgrammaticMapping() {
 		return mapping;
+	}
+
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return this.indexMetadataIsComplete;
 	}
 
 }

@@ -139,4 +139,9 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 		return HibernateStatelessInitializer.INSTANCE;
 	}
 
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return true;
+	}
+
 }

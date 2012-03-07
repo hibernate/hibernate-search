@@ -71,6 +71,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private InstanceInitializer instanceInitializer;
 	private TimingSource timingSource;
 	private SearchMapping mapping;
+	private boolean indexMetadataIsComplete;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -91,6 +92,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		instanceInitializer = oldFactoryState.getInstanceInitializer();
 		timingSource = oldFactoryState.getTimingSource();
 		mapping = oldFactoryState.getProgrammaticMapping();
+		indexMetadataIsComplete= oldFactoryState.isIndexMetadataComplete();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -257,6 +259,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setSearchMapping(SearchMapping mapping) {
 		this.mapping = mapping;
+	}
+
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return this.indexMetadataIsComplete;
+	}
+
+	public void setIndexMetadataComplete(boolean indexMetadataIsComplete) {
+		this.indexMetadataIsComplete = indexMetadataIsComplete;
 	}
 
 }

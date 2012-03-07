@@ -23,9 +23,9 @@ package org.hibernate.search.backend.impl.lucene;
 import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -36,8 +36,8 @@ public class SharedIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 	private int openWriterUsers = 0;
 	private boolean lastExitCloses = false;
 
-	public SharedIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
-		super( indexManager, errorHandler, cfg );
+	public SharedIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties cfg) {
+		super( indexManager, context, cfg );
 	}
 
 	@Override
