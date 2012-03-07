@@ -30,23 +30,23 @@
 <chapter>
   <title id="chapter-further-reading">Further reading</title>
 
-  <para>Last but not least, a few pointers to further information. He highly
+  <para>Last but not least, a few pointers to further information. We highly
   recommend you to get a copy <ulink
   url="http://www.manning.com/bernard/">Hibernate Search in Action</ulink>.
   This excellent book covers Hibernate Search in much more depth than this
   online documentation can and has a great range of additional examples. If
-  you want to increase your knowledge in Lucene we recommend <ulink
+  you want to increase your knowledge of Lucene we recommend <ulink
   url="http://www.manning.com/hatcher3/">Lucene in Action (Second
   Edition)</ulink>. Because Hibernate Search's functionality is tightly
-  coupled to Hibernate Core is it a good idea to understand Hibernate in more
-  detail. Start with the <ulink url="http://www.hibernate.org/docs">online
+  coupled to Hibernate Core it is a good idea to understand Hibernate.
+  Start with the <ulink url="http://www.hibernate.org/docs">online
   documentation</ulink> or get hold of a copy of <ulink
   url="http://www.manning.com/bauer2/">Java Persistence with
   Hibernate</ulink>.</para>
 
   <para>If you have any further questions regarding Hibernate Search or want
   to share some of your use cases have a look at the <ulink
-  url="http://community.jboss.org/en/hibernate/search">Hibernate Search
+  url="https://community.jboss.org/en/hibernate/search">Hibernate Search
   Wiki</ulink> and the <ulink
   url="https://forum.hibernate.org/viewforum.php?f=9">Hibernate Search
   Forum</ulink>. We are looking forward hearing from you.</para>
