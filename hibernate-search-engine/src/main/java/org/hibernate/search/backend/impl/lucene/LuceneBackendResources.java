@@ -58,10 +58,9 @@ public final class LuceneBackendResources {
 	private final ExecutorService workersExecutor;
 	private final int maxQueueLength;
 	private final String indexName;
-	private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
-	private final ReadLock readLock = readWriteLock.readLock();
-	private final WriteLock writeLock = readWriteLock.writeLock();
+	private final ReadLock readLock;
+	private final WriteLock writeLock;
 	
 	LuceneBackendResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, Properties props, AbstractWorkspaceImpl workspace) {
 		this.indexName = indexManager.getIndexName();
@@ -71,6 +70,21 @@ public final class LuceneBackendResources {
 		this.maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
 		this.queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
 		this.workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
+		ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+		readLock = readWriteLock.readLock();
+		writeLock = readWriteLock.writeLock();
+	}
+
+	private LuceneBackendResources(LuceneBackendResources previous) {
+		this.indexName = previous.indexName;
+		this.errorHandler = previous.errorHandler;
+		this.workspace = previous.workspace;
+		this.visitor = new LuceneWorkVisitor( workspace );
+		this.maxQueueLength = previous.maxQueueLength;
+		this.queueingExecutor = previous.queueingExecutor;
+		this.workersExecutor = previous.workersExecutor;
+		this.readLock = previous.readLock;
+		this.writeLock = previous.writeLock;
 	}
 
 	public ExecutorService getQueueingExecutor() {
@@ -132,6 +146,19 @@ public final class LuceneBackendResources {
 
 	public Lock getExclusiveModificationLock() {
 		return writeLock;
+	}
+
+	/**
+	 * Creates a replacement for this same LuceneBackendResources:
+	 * reuses the existing locks and executors (which can't be reconfigured on the fly),
+	 * reuses the same Workspace and ErrorHandler, but will use a new LuceneWorkVisitor.
+	 * The LuceneWorkVisitor contains the strategies we use to apply update operations on the index,
+	 * and we might need to change them after the backend is started.
+	 * 
+	 * @return the new LuceneBackendResources to replace this one.
+	 */
+	public LuceneBackendResources onTheFlyRebuild() {
+		return new LuceneBackendResources( this );
 	}
 
 }

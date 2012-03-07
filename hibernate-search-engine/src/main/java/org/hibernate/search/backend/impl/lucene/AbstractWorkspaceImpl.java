@@ -117,7 +117,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	@Override
 	public boolean areSingleTermDeletesSafe() {
 		// TODO initially be safe:
-		return false;
+		return entitiesInIndexManager.size() == 1;
 	}
 
 }
