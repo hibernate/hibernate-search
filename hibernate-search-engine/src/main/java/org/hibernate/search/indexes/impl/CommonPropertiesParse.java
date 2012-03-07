@@ -48,8 +48,12 @@ public class CommonPropertiesParse {
 		// no need to create instances
 	}
 	
-	public static boolean isExclusiveIndexUsageEnabled(String indexName, Properties indexProps) {
+	public static boolean isExclusiveIndexUsageEnabled(Properties indexProps) {
 		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.EXCLUSIVE_INDEX_USE, true );
+	}
+
+	public static boolean isIndexMetadataComplete(Properties indexProps) {
+		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.INDEX_METADATA_COMPLETE, true );
 	}
 
 	/**

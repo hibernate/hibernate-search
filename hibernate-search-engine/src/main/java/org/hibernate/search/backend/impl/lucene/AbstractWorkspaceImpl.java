@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -31,6 +32,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
+import org.hibernate.search.indexes.impl.CommonPropertiesParse;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -53,17 +55,20 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	private final DirectoryBasedIndexManager indexManager;
 
 	protected final IndexWriterHolder writerHolder;
+	private boolean indexMetadataIsComplete;
 
 	/**
 	 * Keeps a count of modification operations done on the index.
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 
-	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler) {
+
+	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
 		this.indexManager = indexManager;
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
 		this.entitiesInIndexManager = indexManager.getContainedTypes();
 		this.writerHolder = new IndexWriterHolder( errorHandler, indexManager );
+		this.indexMetadataIsComplete = CommonPropertiesParse.isIndexMetadataComplete( cfg );
 	}
 
 	@Override
@@ -116,8 +121,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 
 	@Override
 	public boolean areSingleTermDeletesSafe() {
-		// TODO initially be safe:
-		return entitiesInIndexManager.size() == 1;
+		return indexMetadataIsComplete && entitiesInIndexManager.size() == 1;
 	}
 
 }

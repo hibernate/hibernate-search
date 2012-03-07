@@ -65,7 +65,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	private IndexReader currentReferenceReader = null;
 
 	public NRTWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
-		super( indexManager, errorHandler );
+		super( indexManager, errorHandler, cfg );
 		indexName = indexManager.getIndexName();
 	}
 

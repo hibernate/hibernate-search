@@ -38,14 +38,14 @@ class WorkspaceFactory {
 	static AbstractWorkspaceImpl createWorkspace(DirectoryBasedIndexManager indexManager,
 			ErrorHandler errorHandler, Properties cfg) {
 		final String indexName = indexManager.getIndexName();
-		final boolean exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( indexName, cfg );
+		final boolean exclusiveIndexUsage = CommonPropertiesParse.isExclusiveIndexUsageEnabled( cfg );
 		if ( exclusiveIndexUsage ) {
 			log.debugf( "Starting workspace for index " + indexName + " using an exclusive index strategy" );
-			return new ExclusiveIndexWorkspaceImpl( indexManager, errorHandler );
+			return new ExclusiveIndexWorkspaceImpl( indexManager, errorHandler, cfg );
 		}
 		else {
 			log.debugf( "Starting workspace for index " + indexName + " using a shared index strategy" );
-			return new SharedIndexWorkspaceImpl( indexManager, errorHandler );
+			return new SharedIndexWorkspaceImpl( indexManager, errorHandler, cfg );
 		}
 	}
 
