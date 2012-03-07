@@ -350,6 +350,7 @@ public class SearchFactoryBuilder {
 			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
 			factoryState.setTimingSource( new DefaultTimingSource() );
 			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );
+			factoryState.setTransactionManagerExpected( cfg.isTransactionManagerExpected() );
 		}
 	}
 

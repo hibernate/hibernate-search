@@ -64,7 +64,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private Properties configurationProperties;
 	private PolymorphicIndexHierarchy indexHierarchy;
 	private ServiceManager serviceManager;
-	private boolean transactionManagerExpected = true;
+	private boolean transactionManagerExpected;
 	private IndexManagerHolder allIndexesManager;
 	private ErrorHandler errorHandler;
 	private TimeoutExceptionFactory defaultTimeoutExceptionFactory;
