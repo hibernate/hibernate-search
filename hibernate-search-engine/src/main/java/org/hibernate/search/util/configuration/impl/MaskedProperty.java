@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
@@ -352,7 +353,13 @@ public class MaskedProperty extends Properties implements Serializable {
 
 	@Override
 	public synchronized String toString() {
-		return masked.toString();
+		HashMap fake = new HashMap();
+		Enumeration<?> names = propertyNames();
+		while ( names.hasMoreElements() ) {
+			Object nextElement = names.nextElement();
+			fake.put( nextElement, this.getProperty( nextElement.toString() ) );
+		}
+		return fake.toString();
 	}
 
 	/**
