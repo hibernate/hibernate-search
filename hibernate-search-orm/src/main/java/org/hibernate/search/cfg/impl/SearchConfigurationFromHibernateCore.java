@@ -32,6 +32,7 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
@@ -43,7 +44,8 @@ import org.hibernate.search.spi.ServiceProvider;
  *
  * @author Emmanuel Bernard
  */
-public class SearchConfigurationFromHibernateCore implements SearchConfiguration {
+public class SearchConfigurationFromHibernateCore extends SearchConfigurationBase implements SearchConfiguration {
+
 	private final org.hibernate.cfg.Configuration cfg;
 	private ReflectionManager reflectionManager;
 
@@ -127,11 +129,6 @@ public class SearchConfigurationFromHibernateCore implements SearchConfiguration
 		public void remove() {
 			throw new UnsupportedOperationException( "Cannot modify Hibernate Core metadata" );
 		}
-	}
-
-	@Override
-	public boolean isTransactionManagerExpected() {
-		return true;
 	}
 
 	@Override

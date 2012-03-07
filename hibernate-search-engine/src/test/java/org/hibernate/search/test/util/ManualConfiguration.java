@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.impl.SimpleInitializer;
@@ -41,7 +42,7 @@ import org.hibernate.search.spi.ServiceProvider;
  *
  * @author Emmanuel Bernard
  */
-public class ManualConfiguration implements SearchConfiguration {
+public class ManualConfiguration extends SearchConfigurationBase implements SearchConfiguration {
 
 	private final Map<String,Class<?>>  classes;
 	private final Properties properties;
