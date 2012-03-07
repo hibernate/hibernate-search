@@ -145,4 +145,9 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 		return new ReentrantLock(); // keep the invoker happy, still it's useless
 	}
 
+	@Override
+	public void indexMappingChanged() {
+		// no-op
+	}
+
 }

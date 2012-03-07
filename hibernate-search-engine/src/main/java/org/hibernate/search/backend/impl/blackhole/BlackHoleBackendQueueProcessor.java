@@ -80,4 +80,10 @@ public class BlackHoleBackendQueueProcessor implements BackendQueueProcessor {
 		return backendLock;
 	}
 
+	@Override
+	public void indexMappingChanged() {
+		// no-op
+		log.debug( "BlackHoleBackend reconfigured" );
+	}
+
 }

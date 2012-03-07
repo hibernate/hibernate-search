@@ -78,4 +78,10 @@ public interface BackendQueueProcessor {
 	 */
 	Lock getExclusiveWriteLock();
 
+	/**
+	 * Used to notify the backend that the number or type of indexed entities being indexed
+	 * in this backend changed. This could trigger some needed reconfiguration.
+	 */
+	void indexMappingChanged();
+
 }

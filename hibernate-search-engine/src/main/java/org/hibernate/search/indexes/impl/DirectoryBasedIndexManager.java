@@ -110,6 +110,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.similarity = newSimilarity;
 		//TODO fix similarity: it's currently being set multiple times before reaching the final
 		// configuration, possibly *after* the backend was created, so we have to fix the backend too.
+		triggerWorkspaceReconfiguration();
 		if ( writerConfig != null ) {
 			writerConfig.setSimilarity( similarity );
 		}
@@ -139,11 +140,13 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void setSearchFactory(SearchFactoryImplementor boundSearchFactory) {
 		this.boundSearchFactory = boundSearchFactory;
+		triggerWorkspaceReconfiguration();
 	}
 	
 	@Override
 	public void addContainedEntity(Class<?> entity) {
 		containedEntityTypes.add( entity );
+		triggerWorkspaceReconfiguration();
 	}
 
 	@Override
@@ -191,6 +194,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		return serializer;
 	}
 
+	private void triggerWorkspaceReconfiguration() {
+		if ( boundSearchFactory != null ) { //otherwise it's too early
+			backend.indexMappingChanged();
+		}
+	}
 
 	/**
 	 * extensions points from {@link #initialize(String, Properties, WorkerBuildContext)}

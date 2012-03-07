@@ -87,4 +87,13 @@ public interface Workspace {
 	 */
 	void flush();
 
+	/**
+	 * Return true if it's safe to perform index delete operations using only the identifier term.
+	 * This can be more efficient but can not work if there are multiple indexed types in the same
+	 * index possibly sharing the same id term, or if the index might contain entity types we don't
+	 * know.
+	 * @return true if it's safe to do the single term operation.
+	 */
+	boolean areSingleTermDeletesSafe();
+
 }

@@ -88,6 +88,11 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		public InstanceInitializer getInstanceInitializer() {
 			return SimpleInitializer.INSTANCE;
 		}
+
+		@Override
+		public boolean isIndexMetadataComplete() {
+			return true;
+		}
 	}
 
 }

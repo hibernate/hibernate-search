@@ -245,4 +245,9 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getProgrammaticMapping();
 	}
 
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return delegate.isIndexMetadataComplete();
+	}
+
 }

@@ -349,6 +349,8 @@ public class SearchFactoryBuilder {
 			factoryState.setErrorHandler( createErrorHandler( cfg ) );
 			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
 			factoryState.setTimingSource( new DefaultTimingSource() );
+			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );
+			factoryState.setTransactionManagerExpected( cfg.isTransactionManagerExpected() );
 		}
 	}
 
@@ -655,6 +657,11 @@ public class SearchFactoryBuilder {
 		@Override
 		public InstanceInitializer getInstanceInitializer() {
 			return factoryState.getInstanceInitializer();
+		}
+
+		@Override
+		public boolean isIndexMetadataComplete() {
+			return factoryState.isIndexMetadataComplete();
 		}
 
 	}

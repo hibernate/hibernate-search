@@ -53,7 +53,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private LuceneBackendResources resources;
+	private volatile LuceneBackendResources resources;
 	private boolean sync;
 	private AbstractWorkspaceImpl workspaceOverride;
 	private LuceneBackendTaskStreamer streamWorker;
@@ -62,8 +62,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		sync = BackendFactory.isConfiguredAsSync( props );
 		if ( workspaceOverride == null ) {
 			workspaceOverride = WorkspaceFactory.createWorkspace(
-					indexManager,
-					context.getErrorHandler(), props
+					indexManager, context, props
 			);
 		}
 		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );
@@ -127,6 +126,11 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	 */
 	public void setCustomWorkspace(AbstractWorkspaceImpl workspace) {
 		this.workspaceOverride = workspace;
+	}
+
+	@Override
+	public void indexMappingChanged() {
+		resources = resources.onTheFlyRebuild();
 	}
 
 }

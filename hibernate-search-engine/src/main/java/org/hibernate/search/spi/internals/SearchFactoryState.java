@@ -82,4 +82,6 @@ public interface SearchFactoryState {
 	TimingSource getTimingSource();
 
 	SearchMapping getProgrammaticMapping();
+
+	boolean isIndexMetadataComplete();
 }

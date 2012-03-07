@@ -108,6 +108,18 @@ public final class Environment {
 	public static final String EXCLUSIVE_INDEX_USE = "exclusive_index_use";
 
 	/**
+	 * Boolean setting, defaults to <code>true</code>.
+	 * Unless it's disabled Hibernate Search will assume it knows all entities mapped
+	 * to this index and will enable all optimizations which are considered safe
+	 * in the known schema.
+	 * For example it will delete indexed entities from the index using only the
+	 * identifier if there is only one type in the index; when multiple types share
+	 * the same index or this option is disabled it will need to delete entities
+	 * using both the id and the classname.
+	 */
+	public static final String INDEX_METADATA_COMPLETE = "index_metadata_complete";
+
+	/**
 	 * Number of times we retry the logic looking for marker files in master's directory before
 	 * giving up and raising an exception.
 	 * This setting is the suffix of an index using FSSlaveDirectoryProvider

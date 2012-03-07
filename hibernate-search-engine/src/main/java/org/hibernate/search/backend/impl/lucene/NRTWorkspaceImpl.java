@@ -28,9 +28,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -64,8 +64,8 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	//guardedBy readLock/writeLok
 	private IndexReader currentReferenceReader = null;
 
-	public NRTWorkspaceImpl(DirectoryBasedIndexManager indexManager, ErrorHandler errorHandler, Properties cfg) {
-		super( indexManager, errorHandler );
+	public NRTWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext buildContext, Properties cfg) {
+		super( indexManager, buildContext, cfg );
 		indexName = indexManager.getIndexName();
 	}
 

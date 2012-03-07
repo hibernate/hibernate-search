@@ -48,6 +48,8 @@ public class ManualConfiguration implements SearchConfiguration {
 	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
 	private final InstanceInitializer initializer;
 	private SearchMapping programmaticMapping;
+	private boolean transactionsExpected = true;
+	private boolean indexMetadataComplete = true;
 
 	public ManualConfiguration() {
 		this(SimpleInitializer.INSTANCE);
@@ -104,11 +106,25 @@ public class ManualConfiguration implements SearchConfiguration {
 
 	@Override
 	public boolean isTransactionManagerExpected() {
-		return true;
+		return this.transactionsExpected;
+	}
+
+	public void setTransactionsExpected(boolean transactionsExpected) {
+		this.transactionsExpected = transactionsExpected;
 	}
 
 	@Override
 	public InstanceInitializer getInstanceInitializer() {
 		return initializer;
 	}
+
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return indexMetadataComplete;
+	}
+
+	public void setIndexMetadataComplete(boolean indexMetadataComplete) {
+		this.indexMetadataComplete = indexMetadataComplete;
+	}
+
 }

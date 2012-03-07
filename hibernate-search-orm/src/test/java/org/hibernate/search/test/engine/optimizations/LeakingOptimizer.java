@@ -2,7 +2,7 @@
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
  * JBoss, Home of Professional Open Source
- * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -18,37 +18,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.backend.impl.lucene;
+package org.hibernate.search.test.engine.optimizations;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicLong;
 
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.WorkerBuildContext;
+import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.store.Workspace;
+import org.hibernate.search.store.optimization.OptimizerStrategy;
 
-/**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
- */
-public class ExclusiveIndexWorkspaceImpl extends AbstractWorkspaceImpl {
+public class LeakingOptimizer implements OptimizerStrategy {
 
-	public ExclusiveIndexWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties cfg) {
-		super( indexManager, context, cfg );
+	private static final AtomicLong totalOperations = new AtomicLong();
+
+	@Override
+	public boolean performOptimization(IndexWriter writer) {
+		return false;
 	}
 
 	@Override
-	public void afterTransactionApplied(boolean someFailureHappened, boolean streaming) {
-		if ( someFailureHappened ) {
-			writerHolder.forceLockRelease();
-		}
-		else {
-			if ( ! streaming ) {
-				writerHolder.commitIndexWriter();
-			}
-		}
+	public void addOperationWithinTransactionCount(long increment) {
+		totalOperations.addAndGet( increment );
 	}
 
 	@Override
-	public void flush() {
-		writerHolder.commitIndexWriter();
+	public void optimize(Workspace workspace) {
+	}
+
+	@Override
+	public void initialize(IndexManager indexManager, Properties indexProperties) {
+	}
+
+	public static long getTotalOperations() {
+		return totalOperations.get();
+	}
+
+	public static void reset() {
+		totalOperations.set( 0l );
 	}
 
 }

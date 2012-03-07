@@ -22,27 +22,25 @@ package org.hibernate.search.backend.impl.lucene.works;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.store.Workspace;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class UpdateWorkDelegate extends AddWorkDelegate implements LuceneWorkDelegate {
+public class UpdateWorkDelegate implements LuceneWorkDelegate {
 
 	private final DeleteWorkDelegate deleteDelegate;
+	private final AddWorkDelegate addDelegate;
 
-	UpdateWorkDelegate(Workspace workspace, DeleteWorkDelegate deleteDelegate) {
-		super(workspace);
+	UpdateWorkDelegate(DeleteWorkDelegate deleteDelegate, AddWorkDelegate addDelegate) {
 		this.deleteDelegate = deleteDelegate;
+		this.addDelegate = addDelegate;
 	}
 
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
-		//TODO optimize this operation:
-		// - make use of update API when possible
-		// - avoid possibility of an IW flush between remove and add
-		this.deleteDelegate.performWork(work, writer, monitor);
-		super.performWork(work, writer, monitor);
-		workspace.incrementModificationCounter( 1 );
+		// This is the slowest implementation, needing to remove and then add to the index;
+		// see also org.hibernate.search.backend.impl.lucene.works.UpdateExtWorkDelegate
+		this.deleteDelegate.performWork( work, writer, monitor );
+		this.addDelegate.performWork( work, writer, monitor );
 	}
 
 }

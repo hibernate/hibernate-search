@@ -186,4 +186,9 @@ public abstract class JGroupsBackendQueueProcessor implements BackendQueueProces
 		}
 		return address;
 	}
+
+	@Override
+	public void indexMappingChanged() {
+		// no-op
+	}
 }
