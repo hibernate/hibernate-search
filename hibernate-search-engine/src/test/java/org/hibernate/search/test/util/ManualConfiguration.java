@@ -49,6 +49,7 @@ public class ManualConfiguration implements SearchConfiguration {
 	private final InstanceInitializer initializer;
 	private SearchMapping programmaticMapping;
 	private boolean transactionsExpected = true;
+	private boolean indexMetadataComplete = true;
 
 	public ManualConfiguration() {
 		this(SimpleInitializer.INSTANCE);
@@ -119,6 +120,11 @@ public class ManualConfiguration implements SearchConfiguration {
 
 	@Override
 	public boolean isIndexMetadataComplete() {
-		return true;
+		return indexMetadataComplete;
 	}
+
+	public void setIndexMetadataComplete(boolean indexMetadataComplete) {
+		this.indexMetadataComplete = indexMetadataComplete;
+	}
+
 }
