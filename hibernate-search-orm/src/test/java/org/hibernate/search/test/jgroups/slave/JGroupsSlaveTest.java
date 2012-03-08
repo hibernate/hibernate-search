@@ -25,6 +25,8 @@ package org.hibernate.search.test.jgroups.slave;
 
 import java.util.UUID;
 
+import junit.framework.Assert;
+
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
 
@@ -75,10 +77,17 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		tx.commit();
 
 		//need to sleep for the message consumption
-		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
+		Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
 
-		assertEquals( 1, JGroupsReceiver.queues );
-		assertEquals( 2, JGroupsReceiver.works );
+		boolean failed = true;
+		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
+			Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
+			if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 2 ) { //the condition we're waiting for
+				failed = false;
+				break; //enough time wasted
+			}
+		}
+		if ( failed ) Assert.fail( "Message not received after waiting for long!" );
 
 		JGroupsReceiver.reset();
 		s = openSession();
@@ -87,11 +96,15 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 
-		//need to sleep for the message consumption
-		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
-
-		assertEquals( 1, JGroupsReceiver.queues );
-		assertEquals( 1, JGroupsReceiver.works );
+		failed = true;
+		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
+			Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
+			if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 ) { //the condition we're waiting for
+				failed = false;
+				break; //enough time wasted
+			}
+		}
+		if ( failed ) Assert.fail( "Message not received after waiting for long!" );
 
 		JGroupsReceiver.reset();
 		s = openSession();
@@ -99,11 +112,16 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		s.delete( s.get( TShirt.class, ts.getId() ) );
 		tx.commit();
 
-		//Need to sleep for the message consumption
-		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
+		failed = true;
+		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
+			Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
+			if ( JGroupsReceiver.queues == 1 && JGroupsReceiver.works == 1 ) { //the condition we're waiting for
+				failed = false;
+				break; //enough time wasted
+			}
+		}
+		if ( failed ) Assert.fail( "Message not received after waiting for long!" );
 
-		assertEquals( 1, JGroupsReceiver.queues );
-		assertEquals( 1, JGroupsReceiver.works );
 		s.close();
 	}
 
