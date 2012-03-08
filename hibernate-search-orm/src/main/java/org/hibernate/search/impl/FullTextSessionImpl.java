@@ -112,7 +112,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 *
 	 * @param entities must be immutable for the lifetime of the query object
 	 */
-	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class... entities) {
+	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
 		return new FullTextQueryImpl(
 				luceneQuery,
 				entities,
