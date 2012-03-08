@@ -4,9 +4,13 @@
 
 ## Description
 
-Full text search engines like Apache Lucene are very powerful technologies to add efficient free text search capabilities to applications. However, Lucene suffers several mismatches when dealing with object domain models. Amongst other things indexes have to be kept up to date and mismatches between index structure and domain model as well as query mismatches have to be avoided.
+Full text search engines like Apache Lucene are very powerful technologies to add efficient free text search
+capabilities to applications. However, Lucene suffers several mismatches when dealing with object domain models.
+Amongst other things indexes have to be kept up to date and mismatches between index structure and domain model
+as well as query mismatches have to be avoided.
 
-Hibernate Search addresses these shortcomings - it indexes your domain model with the help of a few annotations, takes care of database/index synchronization and brings back regular managed objects from free text queries.
+Hibernate Search addresses these shortcomings - it indexes your domain model with the help of a few annotations,
+takes care of database/index synchronization and brings back regular managed objects from free text queries.
 
 Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the cover.
 
@@ -38,6 +42,10 @@ Download the distribution bundle from [SourceForge](http://sourceforge.net/proje
     > git clone git@github.com:hibernate/hibernate-search.git
     > cd hibernate-search
     > mvn clean install -s settings-example.xml
+
+If you want to also build the documentation, use
+
+    > mvn clean install -Pdocs -s settings-example.xml
     
 If you want to contribute, read [Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
 
