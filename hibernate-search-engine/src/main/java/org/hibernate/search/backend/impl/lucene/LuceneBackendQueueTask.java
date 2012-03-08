@@ -66,8 +66,8 @@ final class LuceneBackendQueueTask implements Runnable {
 		try {
 			applyUpdates();
 		} catch ( InterruptedException e ) {
+			log.interruptedWhileWaitingForIndexActivity( e );
 			Thread.currentThread().interrupt();
-			log.interruptedWhileWaitingForIndexActivity();
 			handleException( e );
 		} catch ( Exception e ) {
 			log.backendError( e );

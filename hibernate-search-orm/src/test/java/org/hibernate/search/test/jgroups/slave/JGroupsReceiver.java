@@ -39,8 +39,8 @@ import org.hibernate.search.indexes.spi.IndexManager;
  */
 public class JGroupsReceiver extends ReceiverAdapter {
 
-	public static int queues;
-	public static int works;
+	public static volatile int queues;
+	public static volatile int works;
 	private SearchFactoryImplementor searchFactory;
 
 	public JGroupsReceiver(SearchFactoryImplementor searchFactory) {

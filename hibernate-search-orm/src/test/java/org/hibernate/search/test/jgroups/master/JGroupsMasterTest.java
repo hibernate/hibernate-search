@@ -27,9 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import junit.framework.Assert;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.jgroups.JChannel;
@@ -65,6 +68,8 @@ import org.hibernate.search.test.jms.master.TShirt;
  */
 public class JGroupsMasterTest extends SearchTestCase {
 
+	private final QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+
 	/**
 	 * Name of the JGroups channel used in test
 	 */
@@ -74,23 +79,40 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 	public void testMessageSending() throws Exception {
 
+		assertEquals( 0, countByQuery( "logo:jboss" ) );
+
 		TShirt shirt = createObjectWithSQL();
 		List<LuceneWork> queue = createDocumentAndWorkQueue( shirt );
-
 		sendMessage( queue );
 
-		Thread.sleep( JGroupsCommonTest.NETWORK_TIMEOUT );
+		boolean failed = true;
+		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
+			Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
+			if ( countByQuery( "logo:jboss" ) == 1 ) { //the condition we're waiting for
+				failed = false;
+				break; //enough time wasted
+			}
+		}
+		if ( failed ) Assert.fail( "Message not received after waiting for long!" );
+	}
 
+	private int countByQuery(String luceneQueryString) throws ParseException {
 		FullTextSession ftSess = Search.getFullTextSession( openSession() );
-		ftSess.getTransaction().begin();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
-		Query luceneQuery = parser.parse( "logo:jboss" );
-		org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
-		List result = query.list();
-		assertEquals( 1, result.size() );
-		ftSess.delete( result.get( 0 ) );
-		ftSess.getTransaction().commit();
-		ftSess.close();
+		try {
+			ftSess.getTransaction().begin();
+			try {
+				Query luceneQuery = parser.parse( luceneQueryString );
+				org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
+				List result = query.list();
+				return result.size();
+			}
+			finally {
+				ftSess.getTransaction().commit();
+			}
+		}
+		finally {
+			ftSess.close();
+		}
 	}
 
 	private void prepareJGroupsChannel() throws Exception {

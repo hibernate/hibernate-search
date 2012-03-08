@@ -26,6 +26,8 @@ package org.hibernate.search.test.jgroups.common;
 import java.util.List;
 import java.util.UUID;
 
+import junit.framework.Assert;
+
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 
@@ -47,12 +49,14 @@ import org.hibernate.search.test.jgroups.master.TShirt;
  * </code>
  *
  * @author Lukasz Moren
+ * @author Sanne Grinovero
  */
 public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
-	public static final long NETWORK_TIMEOUT = 400;
-	
+	public static final long NETWORK_WAIT_MILLISECONDS = 100;
+	public static final int MAX_WAITS = 100;
+
 	/**
 	 * Name of the JGroups channel used in test
 	 */
@@ -61,8 +65,8 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	public void testJGroupsBackend() throws Exception {
 
 		//get slave session
-		Session s = getSlaveSession();
-		Transaction tx = s.beginTransaction();
+		Session slaveSession = getSlaveSession();
+		Transaction tx = slaveSession.beginTransaction();
 		TShirt ts = new TShirt();
 		ts.setLogo( "Boston" );
 		ts.setSize( "XXL" );
@@ -71,52 +75,80 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		ts2.setLogo( "Mapple leaves" );
 		ts2.setSize( "L" );
 		ts2.setLength( 23.42d );
-		s.persist( ts );
-		s.persist( ts2 );
+		slaveSession.persist( ts );
+		slaveSession.persist( ts2 );
 		tx.commit();
 
-		Thread.sleep( NETWORK_TIMEOUT );
-
-		FullTextSession ftSess = Search.getFullTextSession( openSession() );
-		ftSess.getTransaction().begin();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
-		Query luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
-		org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
-		List result = query.list();
+		FullTextSession masterSession = Search.getFullTextSession( openSession() ); //this is the master Session
 
-		assertEquals( 2, result.size() );
+		// since this is an async backend, we expect to see
+		// the values in the index *eventually*.
+		boolean failed = true;
+		for ( int i = 0; i < MAX_WAITS; i++ ) {
+			Thread.sleep( NETWORK_WAIT_MILLISECONDS );
 
-		s = getSlaveSession();
-		tx = s.beginTransaction();
-		ts = ( TShirt ) s.get( TShirt.class, ts.getId() );
+			masterSession.getTransaction().begin();
+			Query luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
+			org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
+			List result = query.list();
+			masterSession.getTransaction().commit();
+
+			if ( result.size() == 2 ) { //the condition we're waiting for
+				failed = false;
+				break; //enough time wasted
+			}
+		}
+
+		if ( failed ) Assert.fail( "Lots of time waited and still the two documents are not indexed yet!" );
+
+		slaveSession = getSlaveSession();
+		tx = slaveSession.beginTransaction();
+		ts = ( TShirt ) slaveSession.get( TShirt.class, ts.getId() );
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 
-		//need to sleep for the message consumption
-		Thread.sleep( NETWORK_TIMEOUT );
+		failed = true;
+		for ( int i = 0; i < MAX_WAITS; i++ ) {
+			//need to sleep for the message consumption
+			Thread.sleep( NETWORK_WAIT_MILLISECONDS );
 
-		luceneQuery = parser.parse( "logo:Peter pan" );
-		query = ftSess.createFullTextQuery( luceneQuery );
-		result = query.list();
-		assertEquals( 1, result.size() );
+			Query luceneQuery = parser.parse( "logo:Peter pan" );
+			masterSession.getTransaction().begin();
+			org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
+			List result = query.list();
+			masterSession.getTransaction().commit();
+			if ( result.size() == 1 ) { //the condition we're waiting for
+				failed = false;
+				break; //enough time wasted
+			}
+		}
 
-		s = getSlaveSession();
-		tx = s.beginTransaction();
-		s.delete( s.get( TShirt.class, ts.getId() ) );
-		s.delete( s.get( TShirt.class, ts2.getId() ) );
+		if ( failed ) Assert.fail( "Waited for long and still Peter Pan didn't fly in!" );
+
+		slaveSession = getSlaveSession();
+		tx = slaveSession.beginTransaction();
+		slaveSession.delete( slaveSession.get( TShirt.class, ts.getId() ) );
+		slaveSession.delete( slaveSession.get( TShirt.class, ts2.getId() ) );
 		tx.commit();
 
-		//Need to sleep for the message consumption
-		Thread.sleep( NETWORK_TIMEOUT );
+		failed = true;
+		for ( int i = 0; i < MAX_WAITS; i++ ) {
+			//need to sleep for the message consumption
+			Thread.sleep( NETWORK_WAIT_MILLISECONDS );
 
-		luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
-		query = ftSess.createFullTextQuery( luceneQuery );
-		result = query.list();
-		assertEquals( 0, result.size() );
-		ftSess.getTransaction().commit();
-		ftSess.close();
-		s.close();
+			Query luceneQuery = parser.parse( "logo:Boston or logo:Mapple leaves" );
+			masterSession.getTransaction().begin();
+			org.hibernate.Query query = masterSession.createFullTextQuery( luceneQuery );
+			List result = query.list();
+			masterSession.getTransaction().commit();
+			if ( result.size() == 0 ) { //the condition we're waiting for
+				failed = false;
+				break; //enough time wasted
+			}
+		}
 
+		if ( failed ) Assert.fail( "Waited for long and elements where still not deleted!" );
 	}
 
 	@Override

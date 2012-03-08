@@ -97,7 +97,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 				future.get();
 			}
 			catch ( InterruptedException e ) {
-				log.interruptedWhileWaitingForIndexActivity();
+				log.interruptedWhileWaitingForIndexActivity( e );
 				Thread.currentThread().interrupt();
 			}
 			catch ( ExecutionException e ) {

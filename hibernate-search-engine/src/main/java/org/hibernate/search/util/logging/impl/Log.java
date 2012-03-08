@@ -254,7 +254,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 49,
 			value = "Was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
-	void interruptedWhileWaitingForIndexActivity();
+	void interruptedWhileWaitingForIndexActivity(@Cause InterruptedException e);
 
 	@LogMessage(level = WARN)
 	@Message(id = 50, value = "It appears changes are being pushed to the index out of a transaction. " +
