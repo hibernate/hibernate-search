@@ -46,8 +46,8 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.jgroups.BackendMessage;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.MessageSerializationHelper;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
@@ -125,8 +125,8 @@ public class JGroupsMasterTest extends SearchTestCase {
 		IndexManager indexManager = getSearchFactoryImpl().getAllIndexesManager().getIndexManager( indexManagerName );
 		//send message to all listeners
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
-		BackendMessage wrapper = new BackendMessage( indexManagerName, data);
-		Message message = new Message( null, null, wrapper );
+		data = MessageSerializationHelper.prependString( indexManagerName, data );
+		Message message = new Message( null, null, data );
 		channel.send( message );
 	}
 
