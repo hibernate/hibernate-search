@@ -24,13 +24,9 @@
 package org.hibernate.search.backend.impl.jgroups;
 
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.util.List;
-
-import org.jgroups.Address;
-import org.jgroups.Message;
-import org.jgroups.Receiver;
-import org.jgroups.View;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
@@ -39,6 +35,11 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.jgroups.Address;
+import org.jgroups.Message;
+import org.jgroups.Receiver;
+import org.jgroups.View;
+import org.jgroups.util.ExposedByteArrayInputStream;
 
 
 /**
@@ -46,6 +47,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Ales Justin
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
  * @see org.jgroups.Receiver
@@ -67,7 +69,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 		final String indexName;
 		final IndexManager indexManager;
 		try {
-			BackendMessage decoded = (BackendMessage) message.getObject();
+			BackendMessage decoded = readMessage(message);
 			indexName = decoded.indexName;
 			indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
 			if ( indexManager != null ) {
@@ -102,6 +104,18 @@ public class JGroupsMasterMessageListener implements Receiver {
 		}
 	}
 
+    private BackendMessage readMessage(Message message) {
+        byte[] buffer = message.getRawBuffer();
+        try {
+            // few impl details from JGroups Utils class
+            InputStream is = new ExposedByteArrayInputStream(buffer, message.getOffset() + 1, message.getLength() - 1);
+            ObjectInputStream ois = new ObjectInputStream(is);
+            return (BackendMessage) ois.readObject(); // no need for close, as the actual IS is BAIS
+        } catch (Exception e) {
+            throw new SearchException(e);
+        }
+    }
+    
 	private void perform(String indexName, List<LuceneWork> queue) {
 		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
 		IndexManager indexManager = allIndexesManager.getIndexManager( indexName );

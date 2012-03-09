@@ -27,7 +27,10 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.util.Version;
@@ -43,25 +46,44 @@ import org.hibernate.search.SearchException;
  *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
+ * @author Ales Justin
  */
 public class ClassLoaderHelper {
 
 	private ClassLoaderHelper() {
 	}
 
+    /**
+     * Get resources.
+     * 
+     * @param resourceName the resource name
+     * @param caller the caller
+     * @return found resources
+     */
 	public static Enumeration<URL> getResources(String resourceName, Class<?> caller) {
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		if (loader == null) {
-			loader = caller.getClassLoader();
-		}
-		try {
-			return loader.getResources( resourceName );
-		}
-		catch ( IOException e) {
-			throw new SearchException( "Unable to load resource " + resourceName, e );
-		}
+        if (resourceName == null)
+            throw new SearchException("Null resource name!");
+        if (caller == null)
+            throw new SearchException("Null caller!");
+        
+        final Set<URL> urls = new HashSet<URL>();
+        getResources(resourceName, Thread.currentThread().getContextClassLoader(), urls);
+        getResources(resourceName, caller.getClassLoader(), urls);
+        return Collections.enumeration(urls);
 	}
 
+    private static void getResources(String resourceName, ClassLoader cl, Set<URL> urls) {
+        if (cl == null)
+            return;
+
+        try {
+            Enumeration<URL> e = cl.getResources(resourceName);
+            urls.addAll(Collections.list(e));
+        } catch (IOException ioe) {
+            throw new SearchException( "Unable to load resource " + resourceName, ioe );
+        }
+    }
+    
 	/**
 	 * Creates an instance of a target class designed by fully qualified name
 	 *
