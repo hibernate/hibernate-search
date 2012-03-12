@@ -28,6 +28,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -43,6 +44,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
@@ -64,7 +66,7 @@ public class MemberRegistrationIT {
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		String currentVersion = Version.getVersionString();
-		return ShrinkWrap
+		WebArchive archive = ShrinkWrap
 				.create( WebArchive.class, MemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
@@ -76,8 +78,12 @@ public class MemberRegistrationIT {
 								.exclusion( "org.hibernate:hibernate-search-analyzers" )
 								.exclusion( "org.hibernate.common:hibernate-commons-annotations" )
 								.exclusion( "org.jboss.logging:jboss-logging" )
+								.goOffline()
 								.resolveAs( JavaArchive.class ) )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+		// To debug dependencies, have it dump a zip export:
+		//archive.as( ZipExporter.class ).exportTo( new File("test-app.war"), true );
+		return archive;
 	}
 
 	private static Asset persistenceXml() {
