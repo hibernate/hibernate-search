@@ -30,7 +30,7 @@ import org.jgroups.ReceiverAdapter;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.jgroups.BackendMessage;
+import org.hibernate.search.backend.impl.jgroups.MessageSerializationHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 
@@ -53,14 +53,13 @@ public class JGroupsReceiver extends ReceiverAdapter {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void receive(Message message) {
-
-		final BackendMessage received;
 		try {
-			received = ( BackendMessage ) message.getObject();
-			IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( received.indexName );
-			List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( received.queue );
+			byte[] rawBuffer = message.getRawBuffer();
+			String indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
+			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
+			IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
+			List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
 			queues++;
 			works += queue.size();
 		}

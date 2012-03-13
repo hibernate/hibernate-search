@@ -60,18 +60,18 @@ public class JGroupsMasterMessageListener implements Receiver {
 		this.searchFactory = searchFactory;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void receive(Message message) {
 		final List<LuceneWork> queue;
 		final String indexName;
 		final IndexManager indexManager;
 		try {
-			BackendMessage decoded = (BackendMessage) message.getObject();
-			indexName = decoded.indexName;
+			byte[] rawBuffer = message.getRawBuffer();
+			indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
+			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
 			indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
 			if ( indexManager != null ) {
-				queue = indexManager.getSerializer().toLuceneWorks( decoded.queue );
+				queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
 			}
 			else {
 				log.messageReceivedForUndefinedIndex( indexName );

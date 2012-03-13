@@ -54,7 +54,6 @@ public class JGroupsBackendQueueTask {
 		this.indexName = indexManager.getIndexName();
 	}
 
-	@SuppressWarnings("unchecked")
 	public void sendLuceneWorkList(List<LuceneWork> queue) {
 		boolean trace = log.isTraceEnabled();
 		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>( queue );
@@ -82,13 +81,13 @@ public class JGroupsBackendQueueTask {
 			return;
 		}
 		byte[] data = indexManager.getSerializer().toSerializedModel( filteredQueue );
-		BackendMessage toSend = new BackendMessage( indexName, data );
+		data = MessageSerializationHelper.prependString( indexName, data );
 
 		/* Creates and send message with lucene works to master.
 		 * As long as message destination address is null, Lucene works will be received by all listeners that implements
 		 * org.jgroups.MessageListener interface, multiple master nodes in cluster are allowed. */
 		try {
-			Message message = new Message( null, factory.getAddress(), toSend );
+			Message message = new Message( null, factory.getAddress(), data );
 			factory.getChannel().send( message );
 			if ( trace ) {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );
@@ -98,5 +97,5 @@ public class JGroupsBackendQueueTask {
 			throw log.unableToSendWorkViaJGroups( factory.getClusterName(), e );
 		}
 	}
-	
+
 }
