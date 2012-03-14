@@ -34,7 +34,6 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**

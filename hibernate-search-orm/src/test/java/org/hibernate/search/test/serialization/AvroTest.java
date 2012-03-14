@@ -23,7 +23,6 @@ package org.hibernate.search.test.serialization;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;

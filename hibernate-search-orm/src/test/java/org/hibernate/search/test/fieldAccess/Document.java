@@ -26,8 +26,6 @@ package org.hibernate.search.test.fieldAccess;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Lob;
-
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;

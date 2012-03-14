@@ -39,7 +39,6 @@ import javax.persistence.Version;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Store;
 
 /**
  * @author Emmanuel Bernard

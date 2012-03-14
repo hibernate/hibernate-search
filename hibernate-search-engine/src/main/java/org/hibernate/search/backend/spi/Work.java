@@ -25,8 +25,6 @@ package org.hibernate.search.backend.spi;
 
 import java.io.Serializable;
 
-import org.hibernate.annotations.common.reflection.XMember;
-
 /**
  * A unit of work. Only make sense inside the same session since it uses the scope principle.
  *
