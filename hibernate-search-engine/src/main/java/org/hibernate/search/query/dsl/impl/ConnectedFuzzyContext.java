@@ -47,6 +47,10 @@ class ConnectedFuzzyContext implements FuzzyContext {
 		return new ConnectedTermMatchingContext(termContext, field, queryCustomizer, queryContext);
 	}
 
+	public TermMatchingContext onFields(String... fields) {
+		return new ConnectedTermMatchingContext(termContext, fields, queryCustomizer, queryContext);
+	}
+
 	public ConnectedFuzzyContext withThreshold(float threshold) {
 		termContext.setThreshold( threshold );
 		return this;

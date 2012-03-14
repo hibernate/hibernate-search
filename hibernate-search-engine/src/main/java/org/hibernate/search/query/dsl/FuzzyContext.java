@@ -34,6 +34,11 @@ public interface FuzzyContext extends QueryCustomization<FuzzyContext> {
 	TermMatchingContext onField(String field);
 
 	/**
+	 * fields / properties the term query is executed on
+	 */
+	TermMatchingContext onFields(String... fields);
+
+	/**
 	 * Threshold above which two terms are considered similar enough.
 	 * Value between 0 and 1 (1 excluded)
 	 * Defaults to .5
