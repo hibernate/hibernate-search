@@ -237,7 +237,7 @@ public class Address implements Serializable {
 		if ( o1 == null || o2 == null ) {
 			return false;
 		}
-		return o1.equals( o1.equals( o2 ) );
+		return o1.equals( o2 );
 	}
 
 	private int hashCode(Object o) {

@@ -55,7 +55,9 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
-			log.tracef( "No object to initialize", maxResults );
+			if ( log.isTraceEnabled() ) {
+				log.tracef( "No object to initialize", maxResults );
+			}
 			return;
 		}
 
@@ -81,7 +83,9 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		}
 		//update entityInfos to only contains the remaining ones
 		final int remainingSize = remainingEntityInfos.size();
-		log.tracef( "Initialized %d objects out of %d in the persistence context", maxResults - remainingSize, maxResults );
+		if ( log.isTraceEnabled() ) {
+			log.tracef( "Initialized %d objects out of %d in the persistence context", maxResults - remainingSize, maxResults );
+		}
 		if (remainingSize > 0) {
 			delegate.initializeObjects(
 					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
