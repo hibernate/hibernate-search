@@ -1,6 +1,26 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.1.0.CR1 (15-3-2012)
+------------------------
+
+** Bug
+    * [HSEARCH-1055] - Configuration setting isTransactionManagerExpected() is not applied
+    * [HSEARCH-1059] - JGroups backend should not serialize custom objects
+    * [HSEARCH-1060] - ClassLoaderHelper should look in both classloaders when enumerating multiple matches for a resource name
+
+** Improvement
+    * [HSEARCH-1028] - Use index update operations when possible
+    * [HSEARCH-1053] - Hibernate Search Maven should compile out of the box
+    * [HSEARCH-1062] - Add missing FuzzyContext.onFields(String... fields) method
+
+** Task
+    * [HSEARCH-1052] - Maven plugins need an update
+    * [HSEARCH-1054] - Create a base SearchConfiguration implementation
+    * [HSEARCH-1056] - Wrong timing assumption in JGroupsCommonTest
+    * [HSEARCH-1058] - Upgrade to Infinispan 5.1.2.FINAL and JGroups 3.0.6.Final
+    * [HSEARCH-1061] - Upgrade integration test to use JBoss AS 7.1.1
+
 
 Version 4.1.0.CR1 (29-2-2012)
 ------------------------
