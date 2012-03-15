@@ -60,6 +60,7 @@ public class DSLTest extends SearchTestCase {
 	private FullTextSession fullTextSession;
 	private Date january;
 	private Date february;
+	private Date march;
 
 	public void setUp() throws Exception {
 		super.setUp();
@@ -142,6 +143,18 @@ public class DSLTest extends SearchTestCase {
 
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
+		//fuzzy search on multiple fields
+		query = monthQb
+				.keyword()
+				.fuzzy()
+				.withThreshold( .8f )
+				.withPrefixLength( 1 )
+				.onFields( "mythology", "history" )
+				.matching( "showboarding" )
+				.createQuery();
+
+		assertEquals( 2, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
 		//wildcard query
 		query = monthQb
 				.keyword()
@@ -150,7 +163,7 @@ public class DSLTest extends SearchTestCase {
 				.matching( "mon*" )
 				.createQuery();
 
-		assertEquals( 2, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+		assertEquals( 3, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
 		transaction.commit();
 	}
@@ -258,8 +271,9 @@ public class DSLTest extends SearchTestCase {
 				.createQuery();
 
 		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
-		assertEquals( 1, results.size() );
+		assertEquals( 2, results.size() );
 		assertEquals( "February", results.get( 0 ).getName() );
+		assertEquals( "March", results.get( 1 ).getName() );
 
 		//implicit must not + all (not recommended)
 		query = monthQb
@@ -268,8 +282,9 @@ public class DSLTest extends SearchTestCase {
 				.not()
 				.createQuery();
 		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
-		assertEquals( 1, results.size() );
+		assertEquals( 2, results.size() );
 		assertEquals( "February", results.get( 0 ).getName() );
+		assertEquals( "March", results.get( 1 ).getName() );
 
 		//all except (recommended)
 		query = monthQb
@@ -278,8 +293,9 @@ public class DSLTest extends SearchTestCase {
 				.createQuery();
 
 		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
-		assertEquals( 1, results.size() );
+		assertEquals( 2, results.size() );
 		assertEquals( "February", results.get( 0 ).getName() );
+		assertEquals( "March", results.get( 1 ).getName() );
 
 
 		transaction.commit();
@@ -326,7 +342,7 @@ public class DSLTest extends SearchTestCase {
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-		calendar.set( 10 + 1900, 2, 12, 0, 0, 0 );
+		calendar.set( 10 + 1800, 2, 12, 0, 0, 0 );
 		Date to = calendar.getTime();
 
 		Query query = monthQb.
@@ -339,7 +355,7 @@ public class DSLTest extends SearchTestCase {
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
-		assertEquals( "January", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+		assertEquals( "March", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
 		query = monthQb.
 				range()
@@ -352,7 +368,7 @@ public class DSLTest extends SearchTestCase {
 
 		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
-		assertEquals( "January", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+		assertEquals( "March", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
 		query = monthQb.range()
 				.onField( "raindropInMm" )
@@ -570,6 +586,18 @@ public class DSLTest extends SearchTestCase {
 						0.435d
 				)
 		);
+		calendar.set( 1800, 2, 12, 0, 0, 0 );
+		march = calendar.getTime();
+		fullTextSession.persist(
+				new Month(
+						"March",
+						3,
+						"Month of fake spring",
+						"Historically, the month in which we actually find time to go snowboarding.",
+						march,
+						0.435d
+				)
+		);
 		tx.commit();
 		fullTextSession.clear();
 	}
@@ -578,9 +606,14 @@ public class DSLTest extends SearchTestCase {
 		if ( !fullTextSession.isOpen() ) {
 			return;
 		}
-		Transaction tx = fullTextSession.beginTransaction();
+		Transaction tx = fullTextSession.getTransaction();
+		if ( tx.isActive() ) {
+			//to not hide reason for test failures, as it otherwise causes a nested transaction not supported exception
+			tx.commit();
+		}
+		tx = fullTextSession.beginTransaction();
 		final List<Month> results = fullTextSession.createQuery( "from " + Month.class.getName() ).list();
-		assertEquals( 2, results.size() );
+		assertEquals( 3, results.size() );
 
 		for ( Month entity : results ) {
 			fullTextSession.delete( entity );

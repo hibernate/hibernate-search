@@ -30,7 +30,6 @@ import junit.framework.Assert;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.ParseException;

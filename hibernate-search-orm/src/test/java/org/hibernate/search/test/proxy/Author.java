@@ -32,7 +32,6 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.Proxy;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 
 /**

@@ -24,7 +24,6 @@
 package org.hibernate.search.test.analyzer;
 
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Analyzer;
 
 /**

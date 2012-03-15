@@ -49,8 +49,6 @@ import org.hibernate.search.Version;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A concurrent implementation of the {@code Statistics} interface.
@@ -58,8 +56,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class StatisticsImpl implements Statistics, StatisticsImplementor {
-	
-	private static final Log log = LoggerFactory.make();
 	
 	private AtomicLong searchQueryCount = new AtomicLong();
 	private AtomicLong searchExecutionTotalTime = new AtomicLong();

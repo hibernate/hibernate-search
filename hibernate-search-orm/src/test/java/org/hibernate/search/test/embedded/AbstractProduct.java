@@ -34,7 +34,6 @@ import javax.persistence.OneToMany;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Store;
 
 /**
  * Abstract base class for products, having e.g. abstract getCode()

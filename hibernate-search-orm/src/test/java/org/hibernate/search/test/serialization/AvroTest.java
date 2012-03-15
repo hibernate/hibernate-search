@@ -23,7 +23,6 @@ package org.hibernate.search.test.serialization;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -288,14 +287,14 @@ public class AvroTest {
 				field = ( GenericRecord ) fields.get( 5 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "BinaryField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( ByteBuffer.class );
-				asserField( field );
+				assertField( field );
 
 				field = ( GenericRecord ) fields.get( 6 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "StringField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( Utf8.class );
 				assertTermVector( field );
 				assertIndexAndStore( field );
-				asserField( field );
+				assertField( field );
 
 				field = ( GenericRecord ) fields.get( 7 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "TokenStreamField" );
@@ -305,13 +304,13 @@ public class AvroTest {
 				Object object = l1.get( 0 ).get( 0 );
 				assertThat( object ).isNotNull();
 				assertTermVector( field );
-				asserField( field );
+				assertField( field );
 
 				field = ( GenericRecord ) fields.get( 8 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "ReaderField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( ByteBuffer.class );
 				assertTermVector( field );
-				asserField( field );
+				assertField( field );
 			}
 			catch ( EOFException eof ) {
 				break;
@@ -335,7 +334,7 @@ public class AvroTest {
 		assertThat( field.get( "store" ).toString() ).isEqualTo( "YES" );
 	}
 
-	private void asserField(GenericRecord field) {
+	private void assertField(GenericRecord field) {
 		assertThat( field.get( "name" ) ).isInstanceOf( Utf8.class );
 		assertThat( field.get( "name" ).toString() ).isEqualTo( field.getSchema().getName() );
 		assertThat( field.get( "boost" ) ).isEqualTo( 2.3f );
