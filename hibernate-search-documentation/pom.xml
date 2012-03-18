@@ -149,6 +149,20 @@
                         <docbookVersion>1.72.0</docbookVersion>
                         <localeSeparator>-</localeSeparator>
                     </options>
+                    <injections>
+                        <injection>
+                            <name>hibernateVersion</name>
+                            <value>${hibernateVersion}</value>
+                        </injection>
+                        <injection>
+                            <name>luceneVersion</name>
+                            <value>${luceneVersion}</value>
+                        </injection>
+                        <injection>
+                            <name>infinispanVersion</name>
+                            <value>${infinispanVersion}</value>
+                        </injection>
+                    </injections>
                     <profiling>
                         <enabled>true</enabled>
                     </profiling>
