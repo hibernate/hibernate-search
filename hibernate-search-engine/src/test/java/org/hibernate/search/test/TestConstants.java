@@ -51,17 +51,15 @@ public class TestConstants {
 
 	static {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-		// get a URL reference to something we now is part of the classpath (us)
-		//The caller is SearchTestCase but the caller's caller is the actual test in the right directory
-		//This code is fragile as the above assumption is not guaranteed :(
-		String currentTestName = new RuntimeException().getStackTrace()[2].getClassName();
-		int hopsToRoot = currentTestName.split("\\.").length + 1;
+		// get a URL reference to something we now is part of the classpath (our own classes)
+		String currentTestName = new RuntimeException().getStackTrace()[1].getClassName();
+		int hopsToRoot = currentTestName.split("\\.").length;
 		URL myUrl = contextClassLoader.getResource( currentTestName.replace( '.', '/' ) + ".class" );
 		File myPath = new File( myUrl.getFile() );
 		// navigate back to '/target'
 		targetDir = myPath;
-		for ( int i = 0; i < hopsToRoot + 2; i++ ) { // target/classes == +2
-			targetDir = myPath.getParentFile();
+		for ( int i = 0; i < hopsToRoot + 3; i++ ) { // target/classes == +2, +1 to root module
+			targetDir = targetDir.getParentFile();
 		}
 
 		indexDirPath = targetDir.getAbsolutePath() + File.separator + "indextemp";
