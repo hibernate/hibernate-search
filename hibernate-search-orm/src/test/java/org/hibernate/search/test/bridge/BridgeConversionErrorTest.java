@@ -28,6 +28,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
@@ -157,6 +158,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 
 	@Entity
 	@Indexed
+	@Table(name="CLASSBRIDGED")
 	@ClassBridge(impl = ExceptionThrowingBridge.class, name = "test")
 	public static class ClassBridged {
 		@Id
@@ -166,6 +168,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 
 	@Entity
 	@Indexed
+	@Table(name="SIMPLEENTITY")
 	public static class SimpleEntity {
 		@Id
 		@GeneratedValue
@@ -189,7 +192,8 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 	}
 
 	@Entity
-		 public static class EmbeddedEntity {
+	@Table(name="EMBEDDEDENTITY")
+	public static class EmbeddedEntity {
 		@Id
 		@GeneratedValue
 		private long id;
@@ -212,6 +216,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 	}
 
 	@Entity
+	@Table(name="EMBEDDEDTWICEENTITY")
 	public static class EmbeddedEmbeddedEntity {
 		@Id
 		@GeneratedValue

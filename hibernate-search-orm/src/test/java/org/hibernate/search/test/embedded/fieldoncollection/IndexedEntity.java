@@ -62,12 +62,12 @@ public class IndexedEntity {
 	private String name;
 
 	@ManyToMany(targetEntity = CollectionItem.class)
-	@JoinTable(name = "indexedentity_collectionitem_field")
+	@JoinTable(name = "ent_collection_field")
 	@Field(bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO)
 	private List<CollectionItem> itemsWithFieldAnnotation = new ArrayList<CollectionItem>();
 	
 	@ManyToMany(targetEntity = CollectionItem.class)
-	@JoinTable(name = "indexedentity_collectionitem_fields")
+	@JoinTable(name = "ent_collection_fields")
 	@Fields({
 			@Field(name = FIELD1_FIELD_NAME, bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO),
 			@Field(name = FIELD2_FIELD_NAME, bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO)
