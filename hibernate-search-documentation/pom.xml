@@ -149,6 +149,20 @@
                         <docbookVersion>1.72.0</docbookVersion>
                         <localeSeparator>-</localeSeparator>
                     </options>
+                    <injections>
+                        <injection>
+                            <name>hibernateVersion</name>
+                            <value>${hibernateVersion}</value>
+                        </injection>
+                        <injection>
+                            <name>luceneVersion</name>
+                            <value>${luceneVersion}</value>
+                        </injection>
+                        <injection>
+                            <name>infinispanVersion</name>
+                            <value>${infinispanVersion}</value>
+                        </injection>
+                    </injections>
                     <profiling>
                         <enabled>true</enabled>
                     </profiling>
@@ -177,5 +191,36 @@
                 </configuration>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.jboss.maven.plugins</groupId>
+                                        <artifactId>maven-jdocbook-plugin</artifactId>
+                                        <versionRange>[2.3.5,)</versionRange>
+                                        <goals>
+                                            <goal>resources</goal>
+                                            <goal>generate</goal>
+                                            <goal>translate</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>
