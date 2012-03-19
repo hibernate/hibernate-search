@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.test.query.dsl.embedded;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 import org.hibernate.search.annotations.Analyze;
@@ -39,6 +40,7 @@ public class EmbeddedEntity {
 		impl = PaddedIntegerBridge.class,
 		params = { @Parameter(name = "padding", value = "4") }
 	)
+	@Column(name="num")
 	private Integer number;
 
 	public String getEmbeddedField() {
