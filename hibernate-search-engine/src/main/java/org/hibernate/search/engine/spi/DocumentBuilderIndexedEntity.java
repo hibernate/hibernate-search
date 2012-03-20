@@ -243,8 +243,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
 		if ( idAnnotation != null ) {
 			String attributeName = getIdAttributeName( member, idAnnotation );
-			if ( pathsContext != null )
+			if ( pathsContext != null ) {
 				pathsContext.markEncounteredPath( prefix + attributeName );
+			}
 			if ( isRoot ) {
 				if ( explicitDocumentId ) {
 					throw new SearchException( "More than one @DocumentId specified on entity " + getBeanClass().getName() );
