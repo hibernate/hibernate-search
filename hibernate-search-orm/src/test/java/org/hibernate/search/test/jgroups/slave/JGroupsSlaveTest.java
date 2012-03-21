@@ -34,7 +34,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.impl.XMLHelper;
@@ -154,8 +154,8 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.JG_CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.CONFIGURATION_XML, prepareXmlJGroupsConfiguration() );
+		cfg.setProperty( JGroupsChannelProvider.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_XML, prepareXmlJGroupsConfiguration() );
 	}
 
 	private String prepareXmlJGroupsConfiguration() {

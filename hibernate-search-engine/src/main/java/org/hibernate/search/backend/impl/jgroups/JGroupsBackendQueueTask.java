@@ -94,7 +94,7 @@ public class JGroupsBackendQueueTask {
 			}
 		}
 		catch ( Exception e ) {
-			throw log.unableToSendWorkViaJGroups( factory.getClusterName(), e );
+			throw log.unableToSendWorkViaJGroups( e );
 		}
 	}
 
