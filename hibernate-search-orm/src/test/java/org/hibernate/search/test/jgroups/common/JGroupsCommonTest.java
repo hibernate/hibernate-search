@@ -37,7 +37,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jgroups.master.TShirt;
 
@@ -158,7 +158,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
 		forceChannelName( cfg );
 		cfg.setProperty( "hibernate.search.default." +
-				JGroupsBackendQueueProcessor.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
+				JGroupsChannelProvider.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
 		forceChannelName( cfg );
 		cfg.setProperty( "hibernate.search.default." +
-				JGroupsBackendQueueProcessor.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
+				JGroupsChannelProvider.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
 	}
 	
 	/**
@@ -177,7 +177,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	 */
 	private static void forceChannelName(Configuration cfg) {
 		cfg.setProperty( "hibernate.search.default." +
-				JGroupsBackendQueueProcessor.JG_CLUSTER_NAME, CHANNEL_NAME );
+				JGroupsChannelProvider.JG_CLUSTER_NAME, CHANNEL_NAME );
 	}
 
 	@Override
