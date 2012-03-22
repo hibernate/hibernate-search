@@ -78,7 +78,6 @@ public class MemberRegistrationIT {
 								.exclusion( "org.hibernate:hibernate-search-analyzers" )
 								.exclusion( "org.hibernate.common:hibernate-commons-annotations" )
 								.exclusion( "org.jboss.logging:jboss-logging" )
-								.goOffline()
 								.resolveAs( JavaArchive.class ) )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		// To debug dependencies, have it dump a zip export:
