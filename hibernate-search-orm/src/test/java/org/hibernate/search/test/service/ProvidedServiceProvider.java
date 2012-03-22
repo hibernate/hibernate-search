@@ -2,6 +2,7 @@ package org.hibernate.search.test.service;
 
 import java.util.Properties;
 
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
@@ -10,7 +11,7 @@ import org.hibernate.search.spi.ServiceProvider;
 public class ProvidedServiceProvider implements ServiceProvider<ProvidedService> {
 	private static volatile Boolean active = null;
 
-	public void start(Properties properties) {
+	public void start(Properties properties, BuildContext context) {
 		throw new RuntimeException( "should not be started" );
 	}
 

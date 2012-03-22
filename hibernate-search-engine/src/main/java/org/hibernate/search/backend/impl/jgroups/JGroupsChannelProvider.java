@@ -26,6 +26,7 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.net.URL;
 import java.util.Properties;
 
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.XMLHelper;
@@ -57,7 +58,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	private volatile Channel channel;
 
 	@Override
-	public void start(Properties props) {
+	public void start(Properties props, BuildContext context) {
 		this.clusterName = props.getProperty( JGroupsChannelProvider.JG_CLUSTER_NAME, "HSearchCluster" );
 		prepareJGroupsChannel( props );
 	}

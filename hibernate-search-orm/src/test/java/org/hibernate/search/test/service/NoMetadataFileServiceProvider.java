@@ -2,6 +2,7 @@ package org.hibernate.search.test.service;
 
 import java.util.Properties;
 
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
@@ -11,7 +12,7 @@ public class NoMetadataFileServiceProvider implements ServiceProvider<MyService>
 	private static volatile Boolean active = null;
 	private MyService foo;
 
-	public void start(Properties properties) {
+	public void start(Properties properties, BuildContext context) {
 		foo = new MyService();
 		active = Boolean.TRUE;
 	}

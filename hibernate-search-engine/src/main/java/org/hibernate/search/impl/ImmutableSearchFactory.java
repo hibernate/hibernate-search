@@ -283,7 +283,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
-		return serviceManager.requestService( provider );
+		return serviceManager.requestService( provider, this );
 	}
 
 	public void releaseService(Class<? extends ServiceProvider<?>> provider) {
