@@ -34,6 +34,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.infinispan.logging.impl.Log;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.JNDIHelper;
@@ -80,7 +81,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 	private boolean manageCacheManager = false;
 
 	@Override
-	public void start(Properties properties) {
+	public void start(Properties properties, BuildContext context) {
 		String name = ConfigurationParseHelper.getString( properties, CACHE_MANAGER_RESOURCE_PROP, null );
 		if ( name == null ) {
 			// No JNDI lookup configured: start the CacheManager

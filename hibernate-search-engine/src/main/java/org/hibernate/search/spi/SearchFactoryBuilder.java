@@ -632,7 +632,7 @@ public class SearchFactoryBuilder {
 		}
 
 		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
-			return factoryState.getServiceManager().requestService( provider );
+			return factoryState.getServiceManager().requestService( provider, this );
 		}
 
 		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
