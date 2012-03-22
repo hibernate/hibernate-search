@@ -23,8 +23,14 @@
  */
 package org.hibernate.search.backend.impl.jgroups;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
 
+import org.hibernate.search.backend.IndexingMonitor;
+import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -32,12 +38,16 @@ import org.jgroups.Address;
 import org.jgroups.Channel;
 
 /**
- * Common base class for Master and Slave BackendQueueProcessorFactories
+ * This index backend is able to switch dynamically between a standard
+ * Lucene index writing backend and one which send work remotely over
+ * a JGroups channel.
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-abstract class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
+public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
+
+	private final NodeSelectorStrategy selectionStrategy;
 
 	protected Channel channel;
 	protected String indexName;
@@ -46,19 +56,32 @@ abstract class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	private Address address;
 	private WorkerBuildContext context;
 
+	private JGroupsBackendQueueTask jgroupsProcessor;
+	private LuceneBackendQueueProcessor luceneBackendQueueProcessor;
+
+	public JGroupsBackendQueueProcessor(NodeSelectorStrategy selectionStrategy) {
+		this.selectionStrategy = selectionStrategy;
+	}
+
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		this.indexManager = indexManager;
 		this.context = context;
 		this.indexName = indexManager.getIndexName();
 		this.channel = context.requestService( JGroupsChannelProvider.class );
+		GlobalMasterSelector masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
+		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager );
+		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
+		luceneBackendQueueProcessor.initialize( props, context, indexManager );
 	}
 
 	public void close() {
 		context.releaseService( JGroupsChannelProvider.class );
+		luceneBackendQueueProcessor.close();
 	}
 
-	public Channel getChannel() {
+	Channel getChannel() {
 		return channel;
 	}
 
@@ -77,5 +100,34 @@ abstract class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	@Override
 	public void indexMappingChanged() {
 		// no-op
+	}
+
+	@Override
+	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
+		if ( selectionStrategy.isIndexOwnerLocal() ) {
+			luceneBackendQueueProcessor.applyWork( workList, monitor );
+		}
+		else {
+			if ( workList == null ) {
+				throw new IllegalArgumentException( "workList should not be null" );
+			}
+			jgroupsProcessor.sendLuceneWorkList( workList );
+		}
+	}
+
+	@Override
+	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
+		if ( selectionStrategy.isIndexOwnerLocal() ) {
+			luceneBackendQueueProcessor.applyStreamWork( singleOperation, monitor );
+		}
+		else {
+			//TODO optimize for single operation?
+			jgroupsProcessor.sendLuceneWorkList( Collections.singletonList( singleOperation ) );
+		}
+	}
+
+	@Override
+	public Lock getExclusiveWriteLock() {
+		return luceneBackendQueueProcessor.getExclusiveWriteLock();
 	}
 }
