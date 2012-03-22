@@ -56,7 +56,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	protected String clusterName = "HSearchCluster";
 
 	private Channel channel;
-	private JGroupsMasterMessageListener masterListener;
+	private MessageListener masterListener;
 
 	@Override
 	public void start(Properties props, BuildContext context) {
@@ -89,7 +89,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 		try {
 			buildChannel( props );
 			GlobalMasterSelector masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
-			masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
+			masterListener = new MessageListener( context, masterNodeSelector );
 			channel.setReceiver( masterListener );
 			channel.connect( clusterName );
 			masterNodeSelector.setLocalAddress( channel.getAddress() );

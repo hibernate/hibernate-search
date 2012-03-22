@@ -49,13 +49,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
  * @see org.jgroups.Receiver
  */
-public class JGroupsMasterMessageListener implements Receiver {
+public class MessageListener implements Receiver {
 
 	private static final Log log = LoggerFactory.make();
 	private final BuildContext context;
 	private final GlobalMasterSelector selector;
 
-	public JGroupsMasterMessageListener(BuildContext context, GlobalMasterSelector masterNodeSelector) {
+	public MessageListener(BuildContext context, GlobalMasterSelector masterNodeSelector) {
 		this.context = context;
 		this.selector = masterNodeSelector;
 	}

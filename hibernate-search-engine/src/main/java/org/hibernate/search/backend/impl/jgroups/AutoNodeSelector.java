@@ -27,7 +27,7 @@ import org.jgroups.View;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class AutoNodeSelectorSelector implements NodeSelectorStrategy {
+public class AutoNodeSelector implements NodeSelectorStrategy {
 
 	private Address localAddress;
 
