@@ -34,9 +34,8 @@ import org.jgroups.View;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -53,11 +52,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class JGroupsMasterMessageListener implements Receiver {
 
 	private static final Log log = LoggerFactory.make();
+	private final BuildContext context;
 
-	private SearchFactoryImplementor searchFactory;
-
-	public JGroupsMasterMessageListener(SearchFactoryImplementor searchFactory) {
-		this.searchFactory = searchFactory;
+	public JGroupsMasterMessageListener(BuildContext context) {
+		this.context = context;
 	}
 
 	@Override
@@ -69,7 +67,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 			byte[] rawBuffer = message.getRawBuffer();
 			indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
 			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
-			indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
+			indexManager = context.getAllIndexesManager().getIndexManager( indexName );
 			if ( indexManager != null ) {
 				queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
 			}
@@ -103,8 +101,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 	}
 
 	private void perform(String indexName, List<LuceneWork> queue) {
-		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
-		IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
+		IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
 		indexManager.performOperations( queue, null );
 	}
 

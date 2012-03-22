@@ -36,7 +36,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 
 /**
@@ -59,14 +58,14 @@ public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProce
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		super.initialize( props, context, indexManager );
 		initLuceneBackendQueueProcessor( props, context );
-		registerMasterListener( context.getUninitializedSearchFactory() );
+		registerMasterListener( context );
 	}
 
-	private void registerMasterListener(SearchFactoryImplementor searchFactory) {
+	private void registerMasterListener(WorkerBuildContext context) {
 		//register JGroups receiver in master node to get Lucene docs from slave nodes
 		//FIXME same listener type is currently registered multiple times, once per backend initialize.
 		// No harm is done, and the object is "lightweight", still it's pointless.
-		masterListener = new JGroupsMasterMessageListener( searchFactory );
+		masterListener = new JGroupsMasterMessageListener( context );
 		channel.setReceiver( masterListener );
 	}
 
