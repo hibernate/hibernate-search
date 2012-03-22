@@ -20,6 +20,8 @@
  */
 package org.hibernate.search.backend.impl.jgroups;
 
+import java.util.List;
+
 import org.jgroups.Address;
 import org.jgroups.View;
 
@@ -29,12 +31,20 @@ import org.jgroups.View;
  */
 public class AutoNodeSelector implements NodeSelectorStrategy {
 
+	private final String indexName;
 	private Address localAddress;
+	private Address masterAddress;
+
+	/**
+	 * @param indexName
+	 */
+	public AutoNodeSelector(String indexName) {
+		this.indexName = indexName;
+	}
 
 	@Override
 	public boolean isIndexOwnerLocal() {
-		// TODO Auto-generated method stub
-		return false;
+		return localAddress == null || localAddress.equals( masterAddress );
 	}
 
 	@Override
@@ -44,7 +54,20 @@ public class AutoNodeSelector implements NodeSelectorStrategy {
 
 	@Override
 	public void viewAccepted(View view) {
-		// TODO Auto-generated method stub
+		List<Address> members = view.getMembers();
+		if ( members.size() == 1 ) {
+			masterAddress = members.get( 0 );
+		}
+		else if ( members.size() == 2 ) {
+			// pick the non-coordinator
+			masterAddress = members.get( 1 );
+		}
+		else {
+			// exclude cluster coordinator (the first)
+			int selectionRange = members.size() - 1;
+			int selected = ( indexName.hashCode() % selectionRange) + 1;
+			masterAddress = members.get( selected );
+		}
 	}
 
 }
