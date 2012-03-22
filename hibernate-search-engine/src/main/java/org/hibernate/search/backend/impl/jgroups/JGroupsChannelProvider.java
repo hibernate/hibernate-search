@@ -55,12 +55,13 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 
 	protected String clusterName = "HSearchCluster";
 
-	private volatile Channel channel;
+	private Channel channel;
+	private JGroupsMasterMessageListener masterListener;
 
 	@Override
 	public void start(Properties props, BuildContext context) {
 		this.clusterName = props.getProperty( JGroupsChannelProvider.JG_CLUSTER_NAME, "HSearchCluster" );
-		prepareJGroupsChannel( props );
+		prepareJGroupsChannel( props, context );
 	}
 
 	@Override
@@ -83,10 +84,12 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 		}
 	}
 
-	private void prepareJGroupsChannel(Properties props) {
+	private void prepareJGroupsChannel(Properties props, BuildContext context) {
 		log.jGroupsStartingChannel();
 		try {
 			buildChannel( props );
+			masterListener = new JGroupsMasterMessageListener( context );
+			channel.setReceiver( masterListener );
 			channel.connect( clusterName );
 		}
 		catch ( Exception e ) {

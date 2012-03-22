@@ -28,15 +28,13 @@ import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.jgroups.Receiver;
-
-import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Backend factory used in JGroups clustering mode in master node.
@@ -52,21 +50,11 @@ public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProce
 	private static final Log log = LoggerFactory.make();
 
 	private LuceneBackendQueueProcessor luceneBackendQueueProcessor;
-	private Receiver masterListener;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		super.initialize( props, context, indexManager );
 		initLuceneBackendQueueProcessor( props, context );
-		registerMasterListener( context );
-	}
-
-	private void registerMasterListener(WorkerBuildContext context) {
-		//register JGroups receiver in master node to get Lucene docs from slave nodes
-		//FIXME same listener type is currently registered multiple times, once per backend initialize.
-		// No harm is done, and the object is "lightweight", still it's pointless.
-		masterListener = new JGroupsMasterMessageListener( context );
-		channel.setReceiver( masterListener );
 	}
 
 	private void initLuceneBackendQueueProcessor(Properties props, WorkerBuildContext context) {
