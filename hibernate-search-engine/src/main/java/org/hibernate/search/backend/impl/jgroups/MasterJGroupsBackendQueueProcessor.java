@@ -64,6 +64,8 @@ public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProce
 
 	private void registerMasterListener(SearchFactoryImplementor searchFactory) {
 		//register JGroups receiver in master node to get Lucene docs from slave nodes
+		//FIXME same listener type is currently registered multiple times, once per backend initialize.
+		// No harm is done, and the object is "lightweight", still it's pointless.
 		masterListener = new JGroupsMasterMessageListener( searchFactory );
 		channel.setReceiver( masterListener );
 	}
@@ -71,10 +73,6 @@ public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProce
 	private void initLuceneBackendQueueProcessor(Properties props, WorkerBuildContext context) {
 		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 		luceneBackendQueueProcessor.initialize( props, context, indexManager );
-	}
-
-	public Receiver getMasterListener() {
-		return masterListener;
 	}
 
 	@Override
