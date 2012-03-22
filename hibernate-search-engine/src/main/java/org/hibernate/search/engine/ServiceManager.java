@@ -7,27 +7,30 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
-
-import org.hibernate.search.SearchException;
-import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class ServiceManager {
 	private static final String SERVICES_FILE = "META-INF/services/" + ServiceProvider.class.getName();
 	private static final Log log = LoggerFactory.make();
 
 	//barrier protected by the Hibernate Search instantiation
-	private final Map<Class<ServiceProvider<?>>,ServiceProviderWrapper> managedProviders = new HashMap<Class<ServiceProvider<?>>,ServiceProviderWrapper>();
+	private final HashSet<Class<?>> availableProviders = new HashSet<Class<?>>();
+	private final ConcurrentHashMap<Class<?>,ServiceProviderWrapper> managedProviders = new ConcurrentHashMap<Class<?>,ServiceProviderWrapper>();
 	private final Map<Class<? extends ServiceProvider<?>>,Object> providedProviders = new HashMap<Class<? extends ServiceProvider<?>>,Object>();
 	private final Properties properties;
 
@@ -51,13 +54,8 @@ public class ServiceManager {
 					while ( name != null ) {
 						name = name.trim();
 						if ( !name.startsWith( "#" ) ) {
-							final ServiceProvider<?> serviceProvider = ClassLoaderHelper.instanceFromName(
-									ServiceProvider.class, name, ServiceManager.class, "service provider"
-							);
-							@SuppressWarnings( "unchecked")
-							final Class<ServiceProvider<?>> serviceProviderClass =
-									( Class<ServiceProvider<?>> ) serviceProvider.getClass();
-							managedProviders.put( serviceProviderClass, new ServiceProviderWrapper(serviceProvider) );
+							final Class<?> serviceProviderClass = ClassLoaderHelper.classForName( name, ServiceManager.class, "service provider" );
+							availableProviders.add( serviceProviderClass );
 						}
 						name = reader.readLine();
 					}
@@ -80,11 +78,18 @@ public class ServiceManager {
 			return (T) providedProviders.get( serviceProviderClass );
 		}
 
-		@SuppressWarnings( "unchecked")
-		final ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
-		if (wrapper == null) {
-			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
+		ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
+		if ( wrapper == null ) {
+			if ( availableProviders.contains( serviceProviderClass ) ) {
+				ServiceProvider<?> serviceProvider = ClassLoaderHelper.instanceFromClass( ServiceProvider.class, serviceProviderClass, "service provider" );
+				wrapper = new ServiceProviderWrapper( serviceProvider );
+				managedProviders.putIfAbsent( serviceProviderClass, wrapper );
+			}
+			else {
+				throw new SearchException( "Unable to find service related to " + serviceProviderClass );
+			}
 		}
+		wrapper = managedProviders.get( serviceProviderClass );
 		wrapper.increaseCounter();
 		return (T) wrapper.getServiceProvider().getService();
 	}
