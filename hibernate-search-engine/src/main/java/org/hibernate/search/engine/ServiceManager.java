@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -93,7 +94,7 @@ public class ServiceManager {
 		}
 	}
 
-	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass) {
+	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass, BuildContext context) {
 		//provided services have priority over managed services
 		if ( providedProviders.containsKey( serviceProviderClass ) ) {
 			//we use containsKey as the service itself might be null
@@ -105,7 +106,7 @@ public class ServiceManager {
 		if ( wrapper == null ) {
 			if ( availableProviders.contains( serviceProviderClass ) ) {
 				ServiceProvider<?> serviceProvider = ClassLoaderHelper.instanceFromClass( ServiceProvider.class, serviceProviderClass, "service provider" );
-				wrapper = new ServiceProviderWrapper( serviceProvider );
+				wrapper = new ServiceProviderWrapper( serviceProvider, context );
 				managedProviders.putIfAbsent( serviceProviderClass, wrapper );
 			}
 			else {
@@ -147,10 +148,11 @@ public class ServiceManager {
 	private class ServiceProviderWrapper {
 		private final ServiceProvider<?> serviceProvider;
 		private final AtomicInteger counter = new AtomicInteger( 0 );
+		private final BuildContext context;
 
-
-		public ServiceProviderWrapper(ServiceProvider<?> serviceProvider) {
+		public ServiceProviderWrapper(ServiceProvider<?> serviceProvider, BuildContext context) {
 			this.serviceProvider = serviceProvider;
+			this.context = context;
 		}
 
 		public ServiceProvider<?> getServiceProvider() {
@@ -160,7 +162,7 @@ public class ServiceManager {
 		synchronized void increaseCounter() {
 			final int oldValue = counter.getAndIncrement();
 			if ( oldValue == 0 ) {
-				serviceProvider.start( properties );
+				serviceProvider.start( properties, context );
 			}
 		}
 
