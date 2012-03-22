@@ -49,17 +49,14 @@ public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProce
 
 	private static final Log log = LoggerFactory.make();
 
-	private LuceneBackendQueueProcessor luceneBackendQueueProcessor;
+	private final LuceneBackendQueueProcessor luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		super.initialize( props, context, indexManager );
-		initLuceneBackendQueueProcessor( props, context );
-	}
-
-	private void initLuceneBackendQueueProcessor(Properties props, WorkerBuildContext context) {
-		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 		luceneBackendQueueProcessor.initialize( props, context, indexManager );
+		GlobalMasterSelector masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+		masterNodeSelector.setNodeSelectorStrategy( indexName, new MasterNodeSelector() );
 	}
 
 	@Override
@@ -70,9 +67,6 @@ public class MasterJGroupsBackendQueueProcessor extends JGroupsBackendQueueProce
 
 	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
-		if ( workList == null ) {
-			throw new IllegalArgumentException( "workList should not be null" );
-		}
 		luceneBackendQueueProcessor.applyWork( workList, monitor );
 	}
 

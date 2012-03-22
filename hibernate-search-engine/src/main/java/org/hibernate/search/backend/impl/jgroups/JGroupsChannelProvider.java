@@ -88,9 +88,11 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 		log.jGroupsStartingChannel();
 		try {
 			buildChannel( props );
-			masterListener = new JGroupsMasterMessageListener( context );
+			GlobalMasterSelector masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+			masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
 			channel.setReceiver( masterListener );
 			channel.connect( clusterName );
+			masterNodeSelector.setLocalAddress( channel.getAddress() );
 		}
 		catch ( Exception e ) {
 			throw log.unabletoConnectToJGroupsCluster( clusterName, e );

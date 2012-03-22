@@ -48,6 +48,8 @@ public class SlaveJGroupsBackendQueueProcessor extends JGroupsBackendQueueProces
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		super.initialize( props, context, indexManager );
+		GlobalMasterSelector masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+		masterNodeSelector.setNodeSelectorStrategy( indexName, new SlaveNodeSelector() );
 		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager );
 	}
 
