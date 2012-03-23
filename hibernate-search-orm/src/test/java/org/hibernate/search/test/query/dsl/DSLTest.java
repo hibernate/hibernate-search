@@ -501,7 +501,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
-	@TestForIssue( jiraKey = "HSEARCH-1074")
+	@TestForIssue(jiraKey = "HSEARCH-1074")
 	public void testPhraseQueryWithNoTermsAfterAnalyzerApplication() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
