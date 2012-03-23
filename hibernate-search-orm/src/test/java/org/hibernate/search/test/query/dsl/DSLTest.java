@@ -694,7 +694,7 @@ public class DSLTest extends SearchTestCase {
 		tx = fullTextSession.beginTransaction();
 		@SuppressWarnings("unchecked")
 		final List<Object> results = fullTextSession.createQuery( "from " + Object.class.getName() ).list();
-		assertEquals( 4, results.size() );
+		assertEquals( 5, results.size() );
 
 		for ( Object entity : results ) {
 			fullTextSession.delete( entity );
