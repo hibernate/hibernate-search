@@ -32,7 +32,8 @@ import org.hibernate.search.test.SearchTestCase;
 public class DuplicateDocumentIdTest extends SearchTestCase {
 
 	public void setUp() {
-		// don't call super.setUp - we want to build the configuration in the test
+		// don't call super.setUp - we want to initialize the SessionFactory in the test
+		buildConfiguration();
 	}
 
 	/**
@@ -42,8 +43,8 @@ public class DuplicateDocumentIdTest extends SearchTestCase {
 	 */
 	public void testDuplicateDocumentId() throws Exception {
 		try {
-			buildConfiguration();
-			fail( "Building of configuration should fail, because Foo defines multiple document ids." );
+			openSessionFactory();
+			fail( "Building the SessionFactory should fail, because Foo defines multiple document ids." );
 		}
 		catch ( SearchException e ) { // getting a HibernateException here, because the listener registration fails
 			assertEquals(
@@ -51,6 +52,11 @@ public class DuplicateDocumentIdTest extends SearchTestCase {
 					e.getMessage()
 			);
 		}
+	}
+
+	@Override
+	protected void closeSessionFactory() {
+		// don't fail because it can't close the SessionFactory: that's expected
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {

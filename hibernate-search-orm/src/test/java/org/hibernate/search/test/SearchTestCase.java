@@ -72,19 +72,42 @@ public abstract class SearchTestCase extends TestCase {
 
 	private static final Log log = LoggerFactory.make();
 
-	protected static SessionFactory sessions;
+	private SessionFactory sessions;
 	protected Session session;
 
 	private SearchFactoryImplementor searchFactory;
 
-	protected static Configuration cfg;
+	protected Configuration cfg;
 	private static Class<?> lastTestClass;
 
 	@Before
 	public void setUp() throws Exception {
 		if ( cfg == null || lastTestClass != getClass() ) {
 			buildConfiguration();
-			lastTestClass = getClass();
+		}
+		lastTestClass = getClass();
+		openSessionFactory();
+	}
+
+	protected void openSessionFactory() {
+		if ( sessions == null ) {
+			if ( cfg == null ) {
+				throw new IllegalStateException( "configuration was not built" );
+			}
+			setSessions( cfg.buildSessionFactory( /*new TestInterceptor()*/ ) );
+		}
+		else {
+			throw new IllegalStateException( "there should be no SessionFactory initialized at this point" );
+		}
+	}
+
+	protected void closeSessionFactory() {
+		if ( sessions == null ) {
+			throw new IllegalStateException( "there is no SessionFactory to close" );
+		}
+		else {
+			sessions.close();
+			sessions = null;
 		}
 	}
 
@@ -109,11 +132,11 @@ public abstract class SearchTestCase extends TestCase {
 		return new String[] { };
 	}
 
-	protected static void setCfg(Configuration cfg) {
-		SearchTestCase.cfg = cfg;
+	protected void setCfg(Configuration cfg) {
+		this.cfg = cfg;
 	}
 
-	protected static Configuration getCfg() {
+	protected Configuration getCfg() {
 		return cfg;
 	}
 
@@ -123,12 +146,15 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	protected void setSessions(SessionFactory sessions) {
-		SearchTestCase.sessions = sessions;
+		this.sessions = sessions;
 	}
 
 	protected SessionFactory getSessions() {
+		if ( cfg == null ) {
+			throw new IllegalStateException( "Configuration should be already defined at this point" );
+		}
 		if ( sessions == null ) {
-			buildConfiguration();
+			throw new IllegalStateException( "SessionFactory should be already defined at this point" );
 		}
 		return sessions;
 	}
@@ -155,11 +181,7 @@ public abstract class SearchTestCase extends TestCase {
 		//runSchemaDrop();
 		handleUnclosedResources();
 		closeResources();
-
-		if ( sessions != null ) {
-			sessions.close();
-			sessions = null;
-		}
+		closeSessionFactory();
 		ensureIndexesAreEmpty();
 	}
 
@@ -211,6 +233,9 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	protected void buildConfiguration() {
+		if ( cfg != null ) {
+			throw new IllegalStateException( "Configuration was already built" );
+		}
 		try {
 			setCfg( new Configuration() );
 			configure( cfg );
@@ -227,7 +252,6 @@ public abstract class SearchTestCase extends TestCase {
 				InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );
 				getCfg().addInputStream( is );
 			}
-			setSessions( getCfg().buildSessionFactory( /*new TestInterceptor()*/ ) );
 		}
 		catch ( HibernateException e ) {
 			e.printStackTrace();
