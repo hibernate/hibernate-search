@@ -542,4 +542,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = TRACE)
 	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
 	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+
+	@Message(id = 129, value = "Injected object for JGroups Channel is not assignable to org.jgroups.JChannel")
+	SearchException jGroupsChannelInjectionError(@Cause Exception e);
 }

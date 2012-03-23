@@ -51,12 +51,14 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	public static final String CONFIGURATION_XML = JGROUPS_PREFIX + "configurationXml";
 	public static final String CONFIGURATION_FILE = JGROUPS_PREFIX + "configurationFile";
 	public static final String JG_CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
+	public static final String JG_CHANNEL_INJECT = JGROUPS_PREFIX + "providedChannel";
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 
 	protected String clusterName = "HSearchCluster";
 
 	private Channel channel;
 	private MessageListener masterListener;
+	private boolean channelIsManaged = true;
 
 	@Override
 	public void start(Properties props, BuildContext context) {
@@ -72,7 +74,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	@Override
 	public void stop() {
 		try {
-			if ( channel != null && channel.isOpen() ) {
+			if ( channelIsManaged && channel != null && channel.isOpen() ) {
 				log.jGroupsDisconnectingAndClosingChannel();
 				channel.disconnect();
 				channel.close();
@@ -91,7 +93,9 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 			GlobalMasterSelector masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
 			masterListener = new MessageListener( context, masterNodeSelector );
 			channel.setReceiver( masterListener );
-			channel.connect( clusterName );
+			if ( channelIsManaged ) {
+				channel.connect( clusterName );
+			}
 			masterNodeSelector.setLocalAddress( channel.getAddress() );
 		}
 		catch ( Exception e ) {
@@ -114,6 +118,17 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	private void buildChannel(Properties props) {
 		String cfg;
 		if ( props != null ) {
+			if ( props.containsKey( JGroupsChannelProvider.JG_CHANNEL_INJECT ) ) {
+				Object channelObject = props.get( JGroupsChannelProvider.JG_CHANNEL_INJECT );
+				try {
+					channel = (org.jgroups.JChannel) channelObject;
+					channelIsManaged = false;
+				}
+				catch ( ClassCastException e ) {
+					throw log.jGroupsChannelInjectionError( e );
+				}
+			}
+
 			if ( props.containsKey( JGroupsChannelProvider.CONFIGURATION_FILE ) ) {
 				cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_FILE );
 				try {

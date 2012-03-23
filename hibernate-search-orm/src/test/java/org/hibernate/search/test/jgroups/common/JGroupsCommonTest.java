@@ -53,7 +53,7 @@ import org.hibernate.search.test.jgroups.master.TShirt;
  */
 public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
-	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
+	public static final String TESTING_JGROUPS_CONFIGURATION_FILE = "testing-flush-loopback.xml";
 	public static final long NETWORK_WAIT_MILLISECONDS = 100;
 	public static final int MAX_WAITS = 100;
 
@@ -156,9 +156,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		//master jgroups configuration
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
-		forceChannelName( cfg );
-		cfg.setProperty( "hibernate.search.default." +
-				JGroupsChannelProvider.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
+		applyJGroupsChannelConfiguration( cfg );
 	}
 
 	@Override
@@ -166,18 +164,16 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		//slave jgroups configuration
 		super.commonConfigure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		forceChannelName( cfg );
-		cfg.setProperty( "hibernate.search.default." +
-				JGroupsChannelProvider.CONFIGURATION_FILE, DEFAULT_JGROUPS_CONFIGURATION_FILE );
+		applyJGroupsChannelConfiguration( cfg );
 	}
 	
 	/**
 	 * Used to isolate the JGroups channel name from other potentially running tests
 	 * @param cfg the configuration to isolate
 	 */
-	private static void forceChannelName(Configuration cfg) {
-		cfg.setProperty( "hibernate.search.default." +
-				JGroupsChannelProvider.JG_CLUSTER_NAME, CHANNEL_NAME );
+	protected void applyJGroupsChannelConfiguration(Configuration cfg) {
+		cfg.setProperty( "hibernate.search.default." + JGroupsChannelProvider.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( "hibernate.search.default." + JGroupsChannelProvider.CONFIGURATION_FILE, TESTING_JGROUPS_CONFIGURATION_FILE );
 	}
 
 	@Override
