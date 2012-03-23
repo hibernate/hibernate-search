@@ -49,6 +49,7 @@ import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.testing.TestForIssue;
 
 /**
  * @author Emmanuel Bernard
@@ -307,9 +308,9 @@ public class DSLTest extends SearchTestCase {
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-		calendar.set( 0 + 1900, 2, 12, 0, 0, 0 );
+		calendar.set( 1900, 2, 12, 0, 0, 0 );
 		Date from = calendar.getTime();
-		calendar.set( 10 + 1900, 2, 12, 0, 0, 0 );
+		calendar.set( 1910, 2, 12, 0, 0, 0 );
 		Date to = calendar.getTime();
 
 		Query query = monthQb.
@@ -500,6 +501,26 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@TestForIssue(jiraKey = "HSEARCH-1074")
+	public void testPhraseQueryWithNoTermsAfterAnalyzerApplication() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb.
+				phrase()
+				.onField( "mythology" )
+				.sentence( "and" )
+				.createQuery();
+
+		assertEquals(
+				"there should be no results, since all terms are stop words",
+				0,
+				fullTextSession.createFullTextQuery( query, Month.class ).getResultSize()
+		);
+		transaction.commit();
+	}
+
 	public void testNumericRangeQueries() {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -562,7 +583,7 @@ public class DSLTest extends SearchTestCase {
 		Transaction tx = fullTextSession.beginTransaction();
 		final Calendar calendar = Calendar.getInstance();
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-		calendar.set( 0 + 1900, 2, 12, 0, 0, 0 );
+		calendar.set( 1900, 2, 12, 0, 0, 0 );
 		january = calendar.getTime();
 		fullTextSession.persist(
 				new Month(
@@ -612,6 +633,7 @@ public class DSLTest extends SearchTestCase {
 			tx.commit();
 		}
 		tx = fullTextSession.beginTransaction();
+		@SuppressWarnings("unchecked")
 		final List<Month> results = fullTextSession.createQuery( "from " + Month.class.getName() ).list();
 		assertEquals( 3, results.size() );
 

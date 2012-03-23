@@ -44,7 +44,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.PhraseTermination;
 
 /**
@@ -143,9 +142,8 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		 */
 		final int size = termsPerPosition.size();
 		if ( size == 0 ) {
-			throw new SearchException( "phrase query returns no term. Is there a problem with your analyzers? " + sentence);
-		}
-		if ( size == 1 ) {
+			perFieldQuery = new BooleanQuery( );
+		} else if ( size <= 1 ) {
 			final List<Term> terms = termsPerPosition.values().iterator().next();
 			if ( terms.size() == 1 ) {
 				perFieldQuery = new TermQuery( terms.get( 0 ) );
