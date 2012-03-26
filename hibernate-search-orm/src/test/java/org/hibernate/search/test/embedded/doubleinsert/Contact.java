@@ -26,7 +26,6 @@ package org.hibernate.search.test.embedded.doubleinsert;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -41,9 +40,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.ContainedIn;
@@ -147,7 +143,6 @@ public class Contact implements Serializable {
 		this.phoneNumbers = phoneNumbers;
 	}
 
-
 	public String getNotes() {
 		return notes;
 	}
@@ -197,62 +192,4 @@ public class Contact implements Serializable {
 			this.addresses.remove( address );
 		}
 	}
-
-	@SuppressWarnings("unchecked")
-	protected List<Phone> filterPhoneNumbersByType(final String phoneType) {
-//    	Assert.notNull(phoneType, "Phone type cannot be null");
-//    	Assert.hasText(phoneType, "Phone type cannot be empty");
-		return (List<Phone>) CollectionUtils.select(
-				this.phoneNumbers, new Predicate() {
-			public boolean evaluate(Object object) {
-				Phone phone = (Phone) object;
-				return phoneType.equals( phone.getType() );
-			}
-		}
-		);
-	}
-
-
-	@SuppressWarnings("unchecked")
-	protected List<Address> showActiveAddresses() {
-		return (List<Address>) CollectionUtils.select(
-				this.addresses, new Predicate() {
-			public boolean evaluate(Object object) {
-				Address address = (Address) object;
-				return address.isActive();
-			}
-		}
-		);
-	}
-
-	@SuppressWarnings("unchecked")
-	protected List<Address> showInactiveAddresses() {
-		return (List<Address>) CollectionUtils.select(
-				this.addresses, new Predicate() {
-			public boolean evaluate(Object object) {
-				Address address = (Address) object;
-				return !address.isActive();
-			}
-		}
-		);
-	}
-
-	protected void displayPhonesAndAddresses(StringBuilder buf) {
-//		buf.append(Constants.NEW_LINE);
-//		buf.append("Phone Detail(s):" + Constants.NEW_LINE);
-//		if (null != this.getPhoneNumbers() && 0 != this.getPhoneNumbers().size()) {
-//			for (Phone phone:  this.getPhoneNumbers()) {
-//				buf.append(phone);
-//			}
-//		}
-//		buf.append(Constants.NEW_LINE);
-//		buf.append("Address Details:" + Constants.NEW_LINE );
-//		if (null != this.getAddresses() && 0 != this.getAddresses().size()) {
-//			for (Address address: this.getAddresses()) {
-//				buf.append(address);
-//			}
-//		}
-	}
-
-
 }

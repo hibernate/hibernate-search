@@ -25,7 +25,6 @@ package org.hibernate.search.bridge.builtin;
 
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 
 public class UUIDBridge implements TwoWayStringBridge {
@@ -38,9 +37,9 @@ public class UUIDBridge implements TwoWayStringBridge {
 	}
 
 	public UUID stringToObject(String stringValue) {
-		if ( StringUtils.isEmpty( stringValue ) )
+		if ( stringValue == null || stringValue.isEmpty() ) {
 			return null;
+		}
 		return UUID.fromString( stringValue );
 	}
-
 }
