@@ -301,7 +301,9 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
             </para><para><literal>refresh</literal>: refresh period in second
             (the copy will take place every refresh
-            seconds).</para><para><literal>buffer_size_on_copy</literal>: The
+            seconds). If a copy is still in progress when this triggers again,
+            the second copy operation will be skipped.</para>
+            <para><literal>buffer_size_on_copy</literal>: The
             amount of MegaBytes to move in a single low level copy
             instruction; defaults to
             16MB.</para><para><literal>locking_strategy</literal> : optional,
@@ -334,7 +336,9 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             (at least) 50% higher that the time to copy the information
             (default 3600 seconds - 60 minutes).</para><para>Note that the
             copy is based on an incremental copy mechanism reducing the
-            average copy time.</para><para>DirectoryProvider typically used on
+            average copy time. If a copy is still in progress when this triggers
+            again, the second copy operation will be skipped.</para>
+            <para>DirectoryProvider typically used on
             slave nodes using a JMS back end.</para><para>The <literal>
             buffer_size_on_copy</literal> optimum depends on your operating
             system and available RAM; most people reported good results using
@@ -877,10 +881,6 @@ hibernate.search.default.worker.jms.queue = queue/hibernatesearch
           results.</para>
         </tip>
 
-        <tip>
-          <para>The refresh period should be higher that the expected copy
-          time.</para>
-        </tip>
       </section>
 
       <section>
@@ -910,11 +910,6 @@ hibernate.search.default.directory_provider = filesystem-master
 ## Backend configuration
 #Backend is the default lucene one</programlisting>
         </example>
-
-        <tip>
-          <para>The refresh period should be higher that the expected time
-          copy.</para>
-        </tip>
 
         <para>In addition to the Hibernate Search framework configuration, a
         Message Driven Bean has to be written and set up to process the index
