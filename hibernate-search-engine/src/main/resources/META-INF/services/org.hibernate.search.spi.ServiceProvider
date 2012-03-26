@@ -1,0 +1,2 @@
+org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider
+org.hibernate.search.backend.impl.jgroups.MasterSelectorServiceProvider

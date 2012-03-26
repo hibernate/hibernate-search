@@ -37,17 +37,17 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 
-	private static final String masterCopy = "/master/copy";
+	protected static final String masterCopy = "/master/copy";
 
 	/**
 	 * The lucene index directory which is specific to the master node.
 	 */
-	private static final String masterMain = "/master/main";
+	protected static final String masterMain = "/master/main";
 
 	/**
 	 * The lucene index directory which is specific to the slave node.
 	 */
-	private static final String slave = "/slave";
+	protected static final String slave = "/slave";
 
 
 	protected static SessionFactory slaveSessionFactory;
@@ -85,7 +85,7 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		buildCommonSessionFactory();
+		buildSlaveSessionFactory();
 	}
 
 	@Override
@@ -93,15 +93,15 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		//close session factories
 		if ( slaveSessionFactory != null ) {
 			slaveSessionFactory.close();
+			slaveSessionFactory = null;
 		}
 		super.tearDown();
 	}
 
-	private void buildCommonSessionFactory() throws Exception {
-		if ( getSlaveSessionFactory() != null ) {
-			getSlaveSessionFactory().close();
+	private void buildSlaveSessionFactory() throws Exception {
+		if ( slaveSessionFactory != null ) {
+			throw new IllegalStateException( "slaveSessionFactory already created" );
 		}
-
 		setCommonCfg( new Configuration() );
 		commonConfigure( commonCfg );
 		if ( recreateSchema() ) {

@@ -15,7 +15,7 @@ import java.util.Properties;
  * @author Emmanuel Bernard
  */
 public interface ServiceProvider<T> {
-	void start(Properties properties);
+	void start(Properties properties, BuildContext context);
 	T getService();
 	void stop();
 }

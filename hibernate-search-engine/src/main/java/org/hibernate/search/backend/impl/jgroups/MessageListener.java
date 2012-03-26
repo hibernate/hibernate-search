@@ -34,9 +34,8 @@ import org.jgroups.View;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -50,32 +49,37 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
  * @see org.jgroups.Receiver
  */
-public class JGroupsMasterMessageListener implements Receiver {
+public class MessageListener implements Receiver {
 
 	private static final Log log = LoggerFactory.make();
+	private final BuildContext context;
+	private final GlobalMasterSelector selector;
 
-	private SearchFactoryImplementor searchFactory;
-
-	public JGroupsMasterMessageListener(SearchFactoryImplementor searchFactory) {
-		this.searchFactory = searchFactory;
+	public MessageListener(BuildContext context, GlobalMasterSelector masterNodeSelector) {
+		this.context = context;
+		this.selector = masterNodeSelector;
 	}
 
 	@Override
 	public void receive(Message message) {
-		final List<LuceneWork> queue;
-		final String indexName;
-		final IndexManager indexManager;
+		final byte[] rawBuffer = message.getRawBuffer();
+		final String indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
+		final NodeSelectorStrategy nodeSelector = selector.getMasterNodeSelector( indexName );
 		try {
-			byte[] rawBuffer = message.getRawBuffer();
-			indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
-			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
-			indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
-			if ( indexManager != null ) {
-				queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
+			if ( nodeSelector.isIndexOwnerLocal() ) {
+				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
+				final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
+				if ( indexManager != null ) {
+					final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
+					applyLuceneWorkLocally( queue, indexManager, message );
+				}
+				else {
+					log.messageReceivedForUndefinedIndex( indexName );
+					return;
+				}
 			}
 			else {
-				log.messageReceivedForUndefinedIndex( indexName );
-				return;
+				//TODO forward to new owner or log error
 			}
 		}
 		catch ( ClassCastException e ) {
@@ -86,7 +90,9 @@ public class JGroupsMasterMessageListener implements Receiver {
 			log.illegalObjectRetrievedFromMessage( e );
 			return;
 		}
+	}
 
+	private void applyLuceneWorkLocally(List<LuceneWork> queue, IndexManager indexManager, Message message) {
 		if ( queue != null && !queue.isEmpty() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debugf(
@@ -95,17 +101,11 @@ public class JGroupsMasterMessageListener implements Receiver {
 						message.getSrc()
 				);
 			}
-			perform( indexName, queue );
+			indexManager.performOperations( queue, null );
 		}
 		else {
 			log.receivedEmptyLuceneWOrksInMessage();
 		}
-	}
-
-	private void perform(String indexName, List<LuceneWork> queue) {
-		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
-		IndexManager indexManager = allIndexesManager.getIndexManager( indexName );
-		indexManager.performOperations( queue, null );
 	}
 
 	// ------------------------------------------------------------------------------------------------------------------
@@ -115,6 +115,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 	@Override
 	public void viewAccepted(View view) {
 		log.jGroupsReceivedNewClusterView( view );
+		selector.viewAccepted( view );
 	}
 
 	@Override

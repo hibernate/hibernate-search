@@ -27,8 +27,10 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
-import org.hibernate.search.backend.impl.jgroups.MasterJGroupsBackendQueueProcessor;
-import org.hibernate.search.backend.impl.jgroups.SlaveJGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.AutoNodeSelector;
+import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.MasterNodeSelector;
+import org.hibernate.search.backend.impl.jgroups.SlaveNodeSelector;
 import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
@@ -66,11 +68,16 @@ public class BackendFactory {
 			backendQueueProcessor = new BlackHoleBackendQueueProcessor();
 		}
 		else if ( "jgroupsMaster".equals( backend ) ) {
-				backendQueueProcessor = new MasterJGroupsBackendQueueProcessor();
+				backendQueueProcessor = new JGroupsBackendQueueProcessor( new MasterNodeSelector() );
 		}
 		else if ( "jgroupsSlave".equals( backend ) ) {
-				backendQueueProcessor = new SlaveJGroupsBackendQueueProcessor();
+				backendQueueProcessor = new JGroupsBackendQueueProcessor( new SlaveNodeSelector() );
 		}
+		//TODO: enable it when considered less experimental:
+		//else if ( "jgroups".equals( backend ) ) {
+		//	backendQueueProcessor = new JGroupsBackendQueueProcessor(
+		//			new AutoNodeSelector( indexManager.getIndexName() ) );
+		//}
 		else {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
 					BackendQueueProcessor.class,

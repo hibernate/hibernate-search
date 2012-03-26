@@ -1,3 +1,26 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ *
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+ */
 package org.hibernate.search.engine;
 
 import java.io.BufferedReader;
@@ -7,27 +30,31 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
-
-import org.hibernate.search.SearchException;
-import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class ServiceManager {
 	private static final String SERVICES_FILE = "META-INF/services/" + ServiceProvider.class.getName();
 	private static final Log log = LoggerFactory.make();
 
 	//barrier protected by the Hibernate Search instantiation
-	private final Map<Class<ServiceProvider<?>>,ServiceProviderWrapper> managedProviders = new HashMap<Class<ServiceProvider<?>>,ServiceProviderWrapper>();
+	private final HashSet<Class<?>> availableProviders = new HashSet<Class<?>>();
+	private final ConcurrentHashMap<Class<?>,ServiceProviderWrapper> managedProviders = new ConcurrentHashMap<Class<?>,ServiceProviderWrapper>();
 	private final Map<Class<? extends ServiceProvider<?>>,Object> providedProviders = new HashMap<Class<? extends ServiceProvider<?>>,Object>();
 	private final Properties properties;
 
@@ -51,13 +78,8 @@ public class ServiceManager {
 					while ( name != null ) {
 						name = name.trim();
 						if ( !name.startsWith( "#" ) ) {
-							final ServiceProvider<?> serviceProvider = ClassLoaderHelper.instanceFromName(
-									ServiceProvider.class, name, ServiceManager.class, "service provider"
-							);
-							@SuppressWarnings( "unchecked")
-							final Class<ServiceProvider<?>> serviceProviderClass =
-									( Class<ServiceProvider<?>> ) serviceProvider.getClass();
-							managedProviders.put( serviceProviderClass, new ServiceProviderWrapper(serviceProvider) );
+							final Class<?> serviceProviderClass = ClassLoaderHelper.classForName( name, ServiceManager.class, "service provider" );
+							availableProviders.add( serviceProviderClass );
 						}
 						name = reader.readLine();
 					}
@@ -72,7 +94,7 @@ public class ServiceManager {
 		}
 	}
 
-	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass) {
+	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass, BuildContext context) {
 		//provided services have priority over managed services
 		if ( providedProviders.containsKey( serviceProviderClass ) ) {
 			//we use containsKey as the service itself might be null
@@ -80,11 +102,18 @@ public class ServiceManager {
 			return (T) providedProviders.get( serviceProviderClass );
 		}
 
-		@SuppressWarnings( "unchecked")
-		final ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
-		if (wrapper == null) {
-			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
+		ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
+		if ( wrapper == null ) {
+			if ( availableProviders.contains( serviceProviderClass ) ) {
+				ServiceProvider<?> serviceProvider = ClassLoaderHelper.instanceFromClass( ServiceProvider.class, serviceProviderClass, "service provider" );
+				wrapper = new ServiceProviderWrapper( serviceProvider, context );
+				managedProviders.putIfAbsent( serviceProviderClass, wrapper );
+			}
+			else {
+				throw new SearchException( "Unable to find service related to " + serviceProviderClass );
+			}
 		}
+		wrapper = managedProviders.get( serviceProviderClass );
 		wrapper.increaseCounter();
 		return (T) wrapper.getServiceProvider().getService();
 	}
@@ -96,14 +125,14 @@ public class ServiceManager {
 		}
 		
 		final ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
-		if (wrapper == null) {
+		if ( wrapper == null ) {
 			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
 		}
 		wrapper.decreaseCounter();
 	}
 
 	public void stopServices() {
-		for (ServiceProviderWrapper wrapper :  managedProviders.values() ) {
+		for ( ServiceProviderWrapper wrapper :  managedProviders.values() ) {
 			if ( wrapper.getCounter() != 0 ) {
 				log.serviceProviderNotReleased( wrapper.getServiceProvider().getClass() );
 			}
@@ -119,10 +148,11 @@ public class ServiceManager {
 	private class ServiceProviderWrapper {
 		private final ServiceProvider<?> serviceProvider;
 		private final AtomicInteger counter = new AtomicInteger( 0 );
+		private final BuildContext context;
 
-
-		public ServiceProviderWrapper(ServiceProvider<?> serviceProvider) {
+		public ServiceProviderWrapper(ServiceProvider<?> serviceProvider, BuildContext context) {
 			this.serviceProvider = serviceProvider;
+			this.context = context;
 		}
 
 		public ServiceProvider<?> getServiceProvider() {
@@ -131,8 +161,8 @@ public class ServiceManager {
 
 		synchronized void increaseCounter() {
 			final int oldValue = counter.getAndIncrement();
-			if (oldValue == 0) {
-				serviceProvider.start( properties );
+			if ( oldValue == 0 ) {
+				serviceProvider.start( properties, context );
 			}
 		}
 

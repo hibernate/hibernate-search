@@ -51,6 +51,7 @@ public class TimeoutTest extends SearchTestCase {
 	private Query matchAllQuery;
 
 	public void setUp() throws Exception {
+		super.setUp();
 		fts = Search.getFullTextSession( openSession() );
 		QueryBuilder builder = fts.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
 		allSeikoClocksQuery = builder.keyword().onField( "brand" ).matching( "Seiko" ).createQuery();
@@ -61,14 +62,19 @@ public class TimeoutTest extends SearchTestCase {
 	}
 
 	public void tearDown() throws Exception {
-		Transaction tx = fts.getTransaction();
-		if ( !tx.isActive() ) {
-			tx = fts.beginTransaction();
+		try {
+			Transaction tx = fts.getTransaction();
+			if ( !tx.isActive() ) {
+				tx = fts.beginTransaction();
+			}
+			assertEquals( 1000, fts.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
+			fts.purgeAll( Clock.class );
+			tx.commit();
+			fts.close();
 		}
-		assertEquals( 1000, fts.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );
-		fts.purgeAll( Clock.class );
-		tx.commit();
-		fts.close();
+		finally {
+			super.tearDown();
+		}
 	}
 
 	public void testTimeout() {
