@@ -23,6 +23,7 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.util.List;
 
 import org.jgroups.Address;
+import org.jgroups.Message;
 import org.jgroups.View;
 
 
@@ -68,6 +69,11 @@ public class AutoNodeSelector implements NodeSelectorStrategy {
 			int selected = ( indexName.hashCode() % selectionRange) + 1;
 			masterAddress = members.get( selected );
 		}
+	}
+
+	@Override
+	public Message createMessage(byte[] data) {
+		return new Message( masterAddress, localAddress, data );
 	}
 
 }

@@ -21,6 +21,7 @@
 package org.hibernate.search.backend.impl.jgroups;
 
 import org.jgroups.Address;
+import org.jgroups.Message;
 import org.jgroups.View;
 
 
@@ -51,5 +52,11 @@ public interface NodeSelectorStrategy {
 	 * @param view
 	 */
 	void viewAccepted(View view);
+
+	/**
+	 * @param data
+	 * @return
+	 */
+	Message createMessage(byte[] data);
 
 }

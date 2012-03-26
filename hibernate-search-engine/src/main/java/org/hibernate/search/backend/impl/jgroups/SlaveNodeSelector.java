@@ -21,6 +21,7 @@
 package org.hibernate.search.backend.impl.jgroups;
 
 import org.jgroups.Address;
+import org.jgroups.Message;
 import org.jgroups.View;
 
 
@@ -29,6 +30,8 @@ import org.jgroups.View;
  */
 public class SlaveNodeSelector implements NodeSelectorStrategy {
 
+	private Address localAddress;
+
 	@Override
 	public boolean isIndexOwnerLocal() {
 		return false;
@@ -36,12 +39,17 @@ public class SlaveNodeSelector implements NodeSelectorStrategy {
 
 	@Override
 	public void setLocalAddress(Address address) {
-		//not needed
+		this.localAddress = address;
 	}
 
 	@Override
 	public void viewAccepted(View view) {
 		//nothing to do
+	}
+
+	@Override
+	public Message createMessage(byte[] data) {
+		return new Message( null, localAddress, data );
 	}
 
 }

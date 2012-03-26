@@ -47,11 +47,13 @@ public class JGroupsBackendQueueTask {
 	private final JGroupsBackendQueueProcessor factory;
 	private final String indexName;
 	private final IndexManager indexManager;
+	private final NodeSelectorStrategy masterNodeSelector;
 
-	public JGroupsBackendQueueTask(JGroupsBackendQueueProcessor factory, IndexManager indexManager) {
+	public JGroupsBackendQueueTask(JGroupsBackendQueueProcessor factory, IndexManager indexManager, GlobalMasterSelector masterNodeSelector) {
 		this.factory = factory;
 		this.indexManager = indexManager;
 		this.indexName = indexManager.getIndexName();
+		this.masterNodeSelector = masterNodeSelector.getMasterNodeSelector( indexName );
 	}
 
 	public void sendLuceneWorkList(List<LuceneWork> queue) {
@@ -87,7 +89,7 @@ public class JGroupsBackendQueueTask {
 		 * As long as message destination address is null, Lucene works will be received by all listeners that implements
 		 * org.jgroups.MessageListener interface, multiple master nodes in cluster are allowed. */
 		try {
-			Message message = new Message( null, factory.getAddress(), data );
+			Message message =  masterNodeSelector.createMessage( data );
 			factory.getChannel().send( message );
 			if ( trace ) {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );

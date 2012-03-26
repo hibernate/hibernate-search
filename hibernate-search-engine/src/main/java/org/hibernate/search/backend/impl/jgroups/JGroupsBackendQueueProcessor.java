@@ -71,7 +71,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		this.channel = context.requestService( JGroupsChannelProvider.class );
 		GlobalMasterSelector masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
-		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager );
+		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector );
 		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 		luceneBackendQueueProcessor.initialize( props, context, indexManager );
 	}
