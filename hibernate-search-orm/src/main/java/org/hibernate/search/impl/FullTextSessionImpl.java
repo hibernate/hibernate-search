@@ -35,10 +35,12 @@ import org.hibernate.Criteria;
 import org.hibernate.Filter;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
+import org.hibernate.IdentifierLoadAccess;
 import org.hibernate.Interceptor;
 import org.hibernate.LobHelper;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
+import org.hibernate.NaturalIdLoadAccess;
 import org.hibernate.Query;
 import org.hibernate.ReplicationMode;
 import org.hibernate.SQLQuery;
@@ -46,6 +48,7 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.SharedSessionBuilder;
+import org.hibernate.SimpleNaturalIdLoadAccess;
 import org.hibernate.Transaction;
 import org.hibernate.TypeHelper;
 import org.hibernate.UnknownProfileException;
@@ -760,4 +763,35 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	public <T> T execute(Callback<T> callback) {
 		return sessionImplementor.execute( callback );
 	}
+
+	@Override
+	public IdentifierLoadAccess byId(String entityName) {
+		return session.byId( entityName );
+	}
+
+	@Override
+	public IdentifierLoadAccess byId(Class entityClass) {
+		return session.byId( entityClass );
+	}
+
+	@Override
+	public NaturalIdLoadAccess byNaturalId(String entityName) {
+		return session.byNaturalId( entityName );
+	}
+
+	@Override
+	public NaturalIdLoadAccess byNaturalId(Class entityClass) {
+		return session.byNaturalId( entityClass );
+	}
+
+	@Override
+	public SimpleNaturalIdLoadAccess bySimpleNaturalId(String entityName) {
+		return session.bySimpleNaturalId( entityName );
+	}
+
+	@Override
+	public SimpleNaturalIdLoadAccess bySimpleNaturalId(Class entityClass) {
+		return session.bySimpleNaturalId( entityClass );
+	}
+
 }

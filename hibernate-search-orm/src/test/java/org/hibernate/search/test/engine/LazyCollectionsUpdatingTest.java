@@ -53,7 +53,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	
 	public void testUpdatingInTransaction() {
 		assertFindsByRoadName( "buonarroti" );
-		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
 			resetFieldSelector();
@@ -76,7 +76,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	
 	public void testUpdatingOutOfTransaction() {
 		assertFindsByRoadName( "buonarroti" );
-		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			List list = fullTextSession.createCriteria( BusStop.class ).list();
 			assertNotNull( list );
@@ -95,7 +95,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	}
 	
 	public void assertFindsByRoadName(String analyzedRoadname) {
-		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		resetFieldSelector();
 		Transaction tx = fullTextSession.beginTransaction();
 		TermQuery ftQuery = new TermQuery( new Term( "stops.roadName", analyzedRoadname ) );

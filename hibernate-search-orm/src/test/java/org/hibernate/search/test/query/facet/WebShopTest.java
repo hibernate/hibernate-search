@@ -55,7 +55,7 @@ public class WebShopTest extends AbstractFacetTest {
 
 	public void testSimulateClient() {
 		// get hold of the search service
-		SearchService searchService = new SearchService( sessions );
+		SearchService searchService = new SearchService( getSessions() );
 
 		// execute the search and display main query results
 		List<Car> cars = searchService.searchCar( "BMW" );

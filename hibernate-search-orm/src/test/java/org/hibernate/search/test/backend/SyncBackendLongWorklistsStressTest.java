@@ -61,9 +61,10 @@ public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 
-		//we need to close the session to wait for all async work to be flushed
-		sessions.close();
-		buildConfiguration();
+		//we need to close the SessionFactory to wait for all async work to be flushed
+		closeSessionFactory();
+		//and restart it again..
+		openSessionFactory();
 
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();

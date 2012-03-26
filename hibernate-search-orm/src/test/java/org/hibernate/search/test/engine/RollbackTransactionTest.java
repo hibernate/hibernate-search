@@ -58,7 +58,7 @@ public class RollbackTransactionTest extends SearchTestCase {
 	}
 	
 	private void createBusLines(int number, boolean rollback) {
-		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		for (int i=0; i<number; i++ ) {
 			BusLine line = new BusLine();
@@ -75,7 +75,7 @@ public class RollbackTransactionTest extends SearchTestCase {
 	}
 
 	public int countBusLinesByFullText() {
-		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		org.apache.lucene.search.Query ftQuery = new MatchAllDocsQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( ftQuery, BusLine.class );
@@ -86,7 +86,7 @@ public class RollbackTransactionTest extends SearchTestCase {
 	}
 	
 	public int countBusLineByDatabaseCount() {
-		FullTextSession fullTextSession = Search.getFullTextSession( sessions.openSession() );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 		int count = fullTextSession.createCriteria( BusLine.class ).list().size();
 		tx.commit();
