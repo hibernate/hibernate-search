@@ -60,6 +60,8 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	private MessageListener masterListener;
 	private boolean channelIsManaged = true;
 
+	private BuildContext context;
+
 	@Override
 	public void start(Properties props, BuildContext context) {
 		this.clusterName = props.getProperty( JGroupsChannelProvider.JG_CLUSTER_NAME, "HSearchCluster" );
@@ -73,6 +75,8 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 
 	@Override
 	public void stop() {
+		context.releaseService( MasterSelectorServiceProvider.class );
+		context = null;
 		try {
 			if ( channelIsManaged && channel != null && channel.isOpen() ) {
 				log.jGroupsDisconnectingAndClosingChannel();
@@ -87,6 +91,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	}
 
 	private void prepareJGroupsChannel(Properties props, BuildContext context) {
+		this.context = context;
 		log.jGroupsStartingChannel();
 		try {
 			buildChannel( props );

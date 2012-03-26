@@ -77,6 +77,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	public void close() {
+		context.releaseService( MasterSelectorServiceProvider.class );
 		context.releaseService( JGroupsChannelProvider.class );
 		luceneBackendQueueProcessor.close();
 	}
