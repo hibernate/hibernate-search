@@ -72,7 +72,7 @@
           <row>
             <entry>Hibernate Core</entry>
 
-            <entry>This instructions have been tested against Hibernate 4.0.
+            <entry>These instructions have been tested against Hibernate 4.1.
             You will need
             <literal>hibernate-core-&hibernateVersion;.jar</literal> and its
             transitive dependencies (either from the <ulink
