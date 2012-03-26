@@ -855,6 +855,12 @@ hibernate.search.default.directory_provider = filesystem-master
 #Backend is the default lucene one</programlisting>
         </example>
 
+        <tip>
+          <para>It is recommended that the refresh period be higher than the expected copy time; if a copy operation
+          is still being performed when the next refresh triggers, the second refresh is skipped:
+          it's safe to set this value low even when the copy time is not known.</para>
+        </tip>
+
         <para>In addition to the Hibernate Search framework configuration, a
         Message Driven Bean has to be written and set up to process the index
         works queue through JMS.</para>
