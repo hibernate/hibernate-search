@@ -59,6 +59,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	private Channel channel;
 	private JGroupsMasterMessageListener masterListener;
 	private boolean channelIsManaged = true;
+	private BuildContext context;
 
 	@Override
 	public void start(Properties props, BuildContext context) {
@@ -73,6 +74,8 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 
 	@Override
 	public void stop() {
+		context.releaseService( MasterSelectorServiceProvider.class );
+		context = null;
 		try {
 			if ( channelIsManaged && channel != null && channel.isOpen() ) {
 				log.jGroupsDisconnectingAndClosingChannel();
@@ -87,14 +90,17 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	}
 
 	private void prepareJGroupsChannel(Properties props, BuildContext context) {
+		this.context = context;
 		log.jGroupsStartingChannel();
 		try {
 			buildChannel( props );
-			masterListener = new JGroupsMasterMessageListener( context );
+			NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+			masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
 			channel.setReceiver( masterListener );
 			if ( channelIsManaged ) {
 				channel.connect( clusterName );
 			}
+			masterNodeSelector.setLocalAddress( channel.getAddress() );
 		}
 		catch ( Exception e ) {
 			throw log.unabletoConnectToJGroupsCluster( clusterName, e );
