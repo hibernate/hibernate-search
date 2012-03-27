@@ -34,6 +34,9 @@ import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
 import org.jgroups.Channel;
 
@@ -46,6 +49,8 @@ import org.jgroups.Channel;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final NodeSelectorStrategy selectionStrategy;
 
@@ -65,9 +70,10 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
+		this.indexName = indexManager.getIndexName();
+		assertLegacyOptionsNotUsed( props, indexName );
 		this.indexManager = indexManager;
 		this.context = context;
-		this.indexName = indexManager.getIndexName();
 		this.channel = context.requestService( JGroupsChannelProvider.class );
 		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
@@ -130,5 +136,15 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	@Override
 	public Lock getExclusiveWriteLock() {
 		return luceneBackendQueueProcessor.getExclusiveWriteLock();
+	}
+
+	private static void assertLegacyOptionsNotUsed(Properties props, String indexName) {
+		MaskedProperty jgroupsCfg = new MaskedProperty( props, "worker.backend.jgroups" );
+		if ( jgroupsCfg.containsKey( "configurationFile" )
+				|| jgroupsCfg.containsKey( "configurationXml" )
+				|| jgroupsCfg.containsKey( "configurationString" )
+				|| jgroupsCfg.containsKey( "clusterName" ) ) {
+			throw log.legacyJGroupsConfigurationDefined( indexName );
+		}
 	}
 }

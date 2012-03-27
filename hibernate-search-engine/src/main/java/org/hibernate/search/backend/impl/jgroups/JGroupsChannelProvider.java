@@ -92,19 +92,19 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	private void prepareJGroupsChannel(Properties props, BuildContext context) {
 		this.context = context;
 		log.jGroupsStartingChannel();
-		try {
-			buildChannel( props );
-			NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
-			masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
-			channel.setReceiver( masterListener );
-			if ( channelIsManaged ) {
+		buildChannel( props );
+		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+		masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
+		channel.setReceiver( masterListener );
+		if ( channelIsManaged ) {
+			try {
 				channel.connect( clusterName );
 			}
-			masterNodeSelector.setLocalAddress( channel.getAddress() );
+			catch ( Exception e ) {
+				throw log.unabletoConnectToJGroupsCluster( clusterName, e );
+			}
 		}
-		catch ( Exception e ) {
-			throw log.unabletoConnectToJGroupsCluster( clusterName, e );
-		}
+		masterNodeSelector.setLocalAddress( channel.getAddress() );
 		log.jGroupsConnectedToCluster( clusterName, channel.getAddress() );
 
 		if ( !channel.flushSupported() ) {
@@ -129,7 +129,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 					channelIsManaged = false;
 				}
 				catch ( ClassCastException e ) {
-					throw log.jGroupsChannelInjectionError( e );
+					throw log.jGroupsChannelInjectionError( e, channelObject.getClass() );
 				}
 			}
 
