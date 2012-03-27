@@ -253,7 +253,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             directory. The directory used will be &lt;indexBase&gt;/&lt;
             indexName &gt;</entry>
 
-            <entry><para><literal>indexBase</literal> : Base
+            <entry><para><literal>indexBase</literal> : base
             directory</para><para><literal>indexName</literal>: override
             @Indexed.index (useful for sharded
             indexes)</para><para><literal>locking_strategy</literal> :
@@ -291,19 +291,20 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             operating system and available RAM; most people reported good
             results using values between 16 and 64MB.</para></entry>
 
-            <entry><para><literal>indexBase</literal>: Base
+            <entry><para><literal>indexBase</literal>: base
             directory</para><para><literal>indexName</literal>: override
             @Indexed.index (useful for sharded
-            indexes)</para><para><literal>sourceBase</literal>: Source (copy)
-            base directory.</para><para><literal>source</literal>: Source
+            indexes)</para><para><literal>sourceBase</literal>: source (copy)
+            base directory.</para><para><literal>source</literal>: source
             directory suffix (default to <literal>@Indexed.index</literal>).
             The actual source directory name being
             <filename>&lt;sourceBase&gt;/&lt;source&gt;</filename>
-            </para><para><literal>refresh</literal>: refresh period in second
-            (the copy will take place every refresh
-            seconds). If a copy is still in progress when this triggers again,
-            the second copy operation will be skipped.</para>
-            <para><literal>buffer_size_on_copy</literal>: The
+            </para><para><literal>refresh</literal>: refresh period in seconds
+            (the copy will take place every <constant>refresh</constant>
+            seconds). If a copy is still in progress when the following
+            <constant>refresh</constant> period elapses, the second copy
+            operation will be
+            skipped.</para><para><literal>buffer_size_on_copy</literal>: The
             amount of MegaBytes to move in a single low level copy
             instruction; defaults to
             16MB.</para><para><literal>locking_strategy</literal> : optional,
@@ -336,13 +337,13 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             (at least) 50% higher that the time to copy the information
             (default 3600 seconds - 60 minutes).</para><para>Note that the
             copy is based on an incremental copy mechanism reducing the
-            average copy time. If a copy is still in progress when this triggers
-            again, the second copy operation will be skipped.</para>
-            <para>DirectoryProvider typically used on
-            slave nodes using a JMS back end.</para><para>The <literal>
-            buffer_size_on_copy</literal> optimum depends on your operating
-            system and available RAM; most people reported good results using
-            values between 16 and 64MB.</para></entry>
+            average copy time. If a copy is still in progress when
+            <constant>refresh</constant> period elapses, the second copy
+            operation will be skipped.</para><para>DirectoryProvider typically
+            used on slave nodes using a JMS back end.</para><para>The
+            <literal> buffer_size_on_copy</literal> optimum depends on your
+            operating system and available RAM; most people reported good
+            results using values between 16 and 64MB.</para></entry>
 
             <entry><para><literal>indexBase</literal>: Base
             directory</para><para><literal>indexName</literal>: override
@@ -363,7 +364,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             </para><para><literal>retry_marker_lookup</literal> : optional,
             default to 0. Defines how many times we look for the marker files
             in the source directory before failing. Waiting 5 seconds between
-            each try. </para> <para><literal>retry_initialize_period</literal>
+            each try. </para><para><literal>retry_initialize_period</literal>
             : optional, set an integer value in seconds to enable the retry
             initialize feature: if the slave can't find the master index it
             will try again until it's found in background, without preventing
@@ -373,10 +374,10 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             zero it will fail with an exception instead of scheduling a retry
             timer. To prevent the application from starting without an invalid
             index but still control an initialization timeout, see
-            <literal>retry_marker_lookup</literal> instead.</para>
-            <para><literal>filesystem_access_type</literal>: allows to
-            determine the exact type of <classname>FSDirectory</classname>
-            implementation used by this
+            <literal>retry_marker_lookup</literal>
+            instead.</para><para><literal>filesystem_access_type</literal>:
+            allows to determine the exact type of
+            <classname>FSDirectory</classname> implementation used by this
             <classname>DirectoryProvider</classname>. Allowed values are
             <literal>auto</literal> (the default value, selects
             <classname>NIOFSDirectory</classname> on non Windows systems,
@@ -460,8 +461,9 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
       configure it to have a <literal>CacheStore</literal> on each node or
       have a single centralized one shared by each node.</para>
 
-      <para>See the <ulink url="https://docs.jboss.org/author/display/ISPN51/Home">
-      Infinispan documentation</ulink> for all Infinispan configuration options.</para>
+      <para>See the <ulink
+      url="https://docs.jboss.org/author/display/ISPN51/Home"> Infinispan
+      documentation</ulink> for all Infinispan configuration options.</para>
 
       <section>
         <title>Requirements</title>
@@ -653,7 +655,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.execution</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.execution</property></entry>
 
             <entry><para><literal>sync</literal>: synchronous execution
             (default)</para><para><literal>async</literal>: asynchronous
@@ -661,7 +663,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.thread_pool.size</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.thread_pool.size</property></entry>
 
             <entry>The backend can apply updates from the same transaction
             context (or batch) in parallel, using a threadpool. The default
@@ -670,7 +672,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.buffer_queue.max</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.buffer_queue.max</property></entry>
 
             <entry>Defines the maximal number of work queue if the thread poll
             is starved. Useful only for asynchronous execution. Default to
@@ -701,7 +703,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.backend</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.backend</property></entry>
 
             <entry><para><literal>lucene</literal>: The default backend which
             runs index updates in the same VM. Also used when the property is
@@ -742,14 +744,14 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.jndi.*</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jndi.*</property></entry>
 
             <entry>Defines the JNDI properties to initiate the InitialContext
             (if needed). JNDI is only used by the JMS back end.</entry>
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.jms.connection_factory</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jms.connection_factory</property></entry>
 
             <entry>Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS connection factory from
@@ -758,7 +760,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.jms.queue</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jms.queue</property></entry>
 
             <entry>Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS queue from. The queue will be used to post work
@@ -780,14 +782,14 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.jgroups.clusterName</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jgroups.clusterName</property></entry>
 
             <entry>Optional for JGroups back end. Defines the name of JGroups
             channel.</entry>
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.jgroups.configurationFile</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jgroups.configurationFile</property></entry>
 
             <entry>Optional JGroups network stack configuration. Defines the
             name of a JGroups configuration file, which must exist on
@@ -795,14 +797,14 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.jgroups.configurationXml</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jgroups.configurationXml</property></entry>
 
             <entry>Optional JGroups network stack configuration. Defines a
             String representing JGroups configuration as XML.</entry>
           </row>
 
           <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.&#x200B;worker.jgroups.configurationString</property></entry>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jgroups.configurationString</property></entry>
 
             <entry>Optional JGroups network stack configuration. Provides
             JGroups configuration in plain text.</entry>
@@ -880,7 +882,6 @@ hibernate.search.default.worker.jms.queue = queue/hibernatesearch
           <para>A file system local copy is recommended for faster search
           results.</para>
         </tip>
-
       </section>
 
       <section>
@@ -1186,7 +1187,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
         <tbody>
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;exclusive_index_use</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​exclusive_index_use</property>
             </entry>
 
             <entry>
@@ -1202,7 +1203,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;max_queue_length</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​max_queue_length</property>
             </entry>
 
             <entry>
@@ -1221,7 +1222,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.max_buffered_delete_terms</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_buffered_delete_terms</property>
             </entry>
 
             <entry>
@@ -1236,7 +1237,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.max_buffered_docs</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_buffered_docs</property>
             </entry>
 
             <entry>
@@ -1249,7 +1250,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.max_merge_docs</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_merge_docs</property>
             </entry>
 
             <entry>
@@ -1264,7 +1265,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.merge_factor</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_factor</property>
             </entry>
 
             <entry>
@@ -1286,7 +1287,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.merge_min_size</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_min_size</property>
             </entry>
 
             <entry>
@@ -1308,7 +1309,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.merge_max_size</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_max_size</property>
             </entry>
 
             <entry>
@@ -1331,7 +1332,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.merge_max_optimize_size</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_max_optimize_size</property>
             </entry>
 
             <entry>
@@ -1351,7 +1352,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.merge_calibrate_by_deletes</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_calibrate_by_deletes</property>
             </entry>
 
             <entry>
@@ -1372,7 +1373,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.ram_buffer_size</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.ram_buffer_size</property>
             </entry>
 
             <entry>
@@ -1390,7 +1391,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.term_index_interval</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.term_index_interval</property>
             </entry>
 
             <entry>
@@ -1407,7 +1408,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;[default|&lt;indexname&gt;].&#x200B;indexwriter.use_compound_file</property>
+              <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.use_compound_file</property>
             </entry>
 
             <entry>The advantage of using the compound file format is that
@@ -1425,7 +1426,7 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
 
           <row>
             <entry>
-              <property>hibernate.search.&#x200B;enable_dirty_check</property>
+              <property>hibernate.search.​enable_dirty_check</property>
             </entry>
 
             <entry>
@@ -1523,17 +1524,17 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
     <title>LockFactory configuration</title>
 
     <para>Lucene <classname>Directory</classname>s have default locking
-    strategies which work generally good enough for most cases, but it's possible
-    to specify for each index managed by Hibernate Search a specific
-    <classname>LockingFactory</classname> you want to use. This is generally not
-    needed but could be useful.</para>
+    strategies which work generally good enough for most cases, but it's
+    possible to specify for each index managed by Hibernate Search a specific
+    <classname>LockingFactory</classname> you want to use. This is generally
+    not needed but could be useful.</para>
 
     <para>Some of these locking strategies require a filesystem level lock and
-    may be used even on RAM based indexes, this combination is valid but in this case
-    the <literal>indexBase</literal> configuration option usually needed only
-    for filesystem based <classname>Directory</classname> instances must be
-    specified to point to a filesystem location where to store the lock marker
-    files.</para>
+    may be used even on RAM based indexes, this combination is valid but in
+    this case the <literal>indexBase</literal> configuration option usually
+    needed only for filesystem based <classname>Directory</classname>
+    instances must be specified to point to a filesystem location where to
+    store the lock marker files.</para>
 
     <para>To select a locking factory, set the
     <literal>hibernate.search.&lt;index&gt;.locking_strategy</literal> option
@@ -1560,27 +1561,26 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
           <row>
             <entry><property>simple</property></entry>
 
-            <entry>org.apache.lucene.store.&#x200B;SimpleFSLockFactory</entry>
+            <entry>org.apache.lucene.store.​SimpleFSLockFactory</entry>
 
             <entry><para>Safe implementation based on Java's File API, it
             marks the usage of the index by creating a marker file.</para>
             <para>If for some reason you had to kill your application, you
-            will need to remove this file before restarting it.</para>
-            </entry>
+            will need to remove this file before restarting it.</para></entry>
           </row>
 
           <row>
             <entry><property>native</property></entry>
 
-            <entry>org.apache.lucene.store.&#x200B;NativeFSLockFactory</entry>
+            <entry>org.apache.lucene.store.​NativeFSLockFactory</entry>
 
             <entry><para>As does <literal>simple</literal> this also marks the
             usage of the index by creating a marker file, but this one is
             using native OS file locks so that even if the JVM is terminated
             the locks will be cleaned up.</para> <para>This implementation has
             known problems on NFS, avoid it on network shares.</para>
-            <para><literal>native</literal> is the default implementation for the
-            <literal>filesystem</literal>,
+            <para><literal>native</literal> is the default implementation for
+            the <literal>filesystem</literal>,
             <literal>filesystem-master</literal> and
             <literal>filesystem-slave</literal> directory
             providers.</para></entry>
@@ -1589,7 +1589,7 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
           <row>
             <entry><property>single</property></entry>
 
-            <entry>org.apache.lucene.store.&#x200B;SingleInstanceLockFactory</entry>
+            <entry>org.apache.lucene.store.​SingleInstanceLockFactory</entry>
 
             <entry><para>This LockFactory doesn't use a file marker but is a
             Java object lock held in memory; therefore it's possible to use it
@@ -1601,7 +1601,7 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
           <row>
             <entry><property>none</property></entry>
 
-            <entry>org.apache.lucene.store.&#x200B;NoLockFactory</entry>
+            <entry>org.apache.lucene.store.​NoLockFactory</entry>
 
             <entry><para>All changes to this index are not coordinated by any
             lock; test your application carefully and make sure you know what
@@ -1617,8 +1617,9 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
 hibernate.search.Animals.locking_strategy native
 hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</programlisting>
 
-	<para>The Infinispan Directory uses a custom implementation; it's still possible to override it
-	but make sure you understand how that will work, especially with clustered indexes.</para>
+    <para>The Infinispan Directory uses a custom implementation; it's still
+    possible to override it but make sure you understand how that will work,
+    especially with clustered indexes.</para>
   </section>
 
   <section>
