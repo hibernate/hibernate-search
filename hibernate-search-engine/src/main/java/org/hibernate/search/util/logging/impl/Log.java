@@ -35,6 +35,7 @@ import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
 
 import static org.jboss.logging.Logger.Level.ERROR;
@@ -81,7 +82,7 @@ public interface Log extends BasicLogger {
 			value = "FLUSH is not present in your JGroups stack!  FLUSH is needed to ensure messages are not dropped while new nodes join the cluster.  Will proceed, but inconsistencies may arise!")
 	void jGroupsFlushNotPresentInStack();
 
-	@Message(id = 8, value = "Error while trying to create a channel using config files: %1$s")
+	@Message(id = 8, value = "Error while trying to create a channel using config file: %1$s")
 	SearchException jGroupsChannelCreationUsingFileError(String configuration, @Cause Throwable e);
 
 	@Message(id = 9, value = "Error while trying to create a channel using config XML: %1$s")
@@ -543,6 +544,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
 	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
 
-	@Message(id = 129, value = "Injected object for JGroups Channel is not assignable to org.jgroups.JChannel")
-	SearchException jGroupsChannelInjectionError(@Cause Exception e);
+	@Message(id = 129, value = "Object injected for JGroups channel in " + JGroupsChannelProvider.CHANNEL_INJECT + " is of an unexpected type %1$s (expecting org.jgroups.JChannel)")
+	SearchException jGroupsChannelInjectionError(@Cause Exception e, Class<?> actualType);
+
+	@Message(id = 130, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
+			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
+	SearchException legacyJGroupsConfigurationDefined(String indexName);
 }
