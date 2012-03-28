@@ -50,8 +50,8 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	public static final String CONFIGURATION_STRING = JGROUPS_PREFIX + "configurationString";
 	public static final String CONFIGURATION_XML = JGROUPS_PREFIX + "configurationXml";
 	public static final String CONFIGURATION_FILE = JGROUPS_PREFIX + "configurationFile";
-	public static final String JG_CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
-	public static final String JG_CHANNEL_INJECT = JGROUPS_PREFIX + "providedChannel";
+	public static final String CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
+	public static final String CHANNEL_INJECT = JGROUPS_PREFIX + "providedChannel";
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 
 	protected String clusterName = "HSearchCluster";
@@ -63,7 +63,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 
 	@Override
 	public void start(Properties props, BuildContext context) {
-		this.clusterName = props.getProperty( JGroupsChannelProvider.JG_CLUSTER_NAME, "HSearchCluster" );
+		this.clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, "HSearchCluster" );
 		prepareJGroupsChannel( props, context );
 	}
 
@@ -122,8 +122,8 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	private void buildChannel(Properties props) {
 		String cfg;
 		if ( props != null ) {
-			if ( props.containsKey( JGroupsChannelProvider.JG_CHANNEL_INJECT ) ) {
-				Object channelObject = props.get( JGroupsChannelProvider.JG_CHANNEL_INJECT );
+			if ( props.containsKey( JGroupsChannelProvider.CHANNEL_INJECT ) ) {
+				Object channelObject = props.get( JGroupsChannelProvider.CHANNEL_INJECT );
 				try {
 					channel = (org.jgroups.JChannel) channelObject;
 					channelIsManaged = false;

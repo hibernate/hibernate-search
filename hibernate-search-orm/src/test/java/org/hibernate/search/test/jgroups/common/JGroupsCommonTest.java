@@ -172,7 +172,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	 * @param cfg the configuration to isolate
 	 */
 	protected void applyJGroupsChannelConfiguration(Configuration cfg) {
-		cfg.setProperty( "hibernate.search.default." + JGroupsChannelProvider.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( "hibernate.search.default." + JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
 		cfg.setProperty( "hibernate.search.default." + JGroupsChannelProvider.CONFIGURATION_FILE, TESTING_JGROUPS_CONFIGURATION_FILE );
 	}
 

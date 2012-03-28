@@ -76,7 +76,7 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 		//master jgroups configuration
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
-		cfg.getProperties().put( JGroupsChannelProvider.JG_CHANNEL_INJECT, masterChannel );
+		cfg.getProperties().put( JGroupsChannelProvider.CHANNEL_INJECT, masterChannel );
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 		//slave jgroups configuration
 		super.commonConfigure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.getProperties().put( JGroupsChannelProvider.JG_CHANNEL_INJECT, slaveChannel );
+		cfg.getProperties().put( JGroupsChannelProvider.CHANNEL_INJECT, slaveChannel );
 	}
 
 	private static JChannel createChannel() throws Exception {
