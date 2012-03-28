@@ -965,17 +965,10 @@ hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
 
         <para>Configuring the JGroups channel essentially entails specifying the
         transport in terms of a network protocol stack.
-        There are several ways to configure the JGroups transport details. You
-        can either set the
+        To configure the JGroups transport, point the configuration property
         <constant>hibernate.search.services.jgroups.configurationFile</constant>
-        property and specify a file containing the JGroups configuration or
-        you can use the property
-        <constant>hibernate.search.services.jgroups.configurationXml</constant>
-        or
-        <constant>hibernate.search.services.jgroups..configurationString</constant>
-        to directly embed either the xml or string JGroups configuration into
-        your Hibernate configuration file. All three options are shown in
-        <xref linkend="example-jgroup-xml-configuration" />.</para>
+        to a JGroups configuration file; this can be either a file path
+        or a Java resource name.</para>
 
         <tip>
           <para>If no property is explicitly specified it is assumed that the
@@ -985,51 +978,6 @@ hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
         url="http://www.jgroups.org/manual-3.x/html/">JGroups manual</ulink>
         for more examples and protocol configuration details.</para>
         </tip>
-
-        <example id="example-jgroup-xml-configuration">
-          <title>JGroups transport configuration options</title>
-
-          <programlisting>
-# OPTION 1 - udp.xml file needs to be located in the classpath
-hibernate.search.services.jgroups.configurationFile = udp.xml</programlisting>
-
-<programlisting language="XML" role="XML">
-# OPTION 2 - protocol stack configuration provided in XML format
-hibernate.search.services.jgroups.configurationXml =
-
-&lt;config xmlns="urn:org:jgroups"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.0.xsd"&gt;
-   &lt;UDP
-      mcast_addr="${jgroups.udp.mcast_addr:228.10.10.10}"
-      mcast_port="${jgroups.udp.mcast_port:45588}"
-      tos="8"
-      thread_naming_pattern="pl"
-      thread_pool.enabled="true"
-      thread_pool.min_threads="2"
-      thread_pool.max_threads="8"
-      thread_pool.keep_alive_time="5000"
-      thread_pool.queue_enabled="false"
-      thread_pool.queue_max_size="100"
-      thread_pool.rejection_policy="Run"/&gt;
-   &lt;PING timeout="1000" num_initial_members="3"/&gt;
-   &lt;MERGE2 max_interval="30000" min_interval="10000"/&gt;
-   &lt;FD_SOCK/&gt;
-   &lt;FD timeout="3000" max_tries="3"/&gt;
-   &lt;VERIFY_SUSPECT timeout="1500"/&gt;
-   &lt;pbcast.STREAMING_STATE_TRANSFER/&gt;
-   &lt;pbcast.FLUSH timeout="0"/&gt;
-&lt;/config&gt;
-</programlisting>
-<programlisting>
-# OPTION 3 - protocol stack configuration provided in "old style" jgroups format
-hibernate.search.services.jgroups.configurationString =
-
-UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):PING(timeout=3000;
-num_initial_members=6):FD(timeout=5000):VERIFY_SUSPECT(timeout=1500):
-pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):UNICAST(timeout=5000):
-FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlisting>
-        </example>
 
         <para>The default channel name is <literal>Hibernate Search Cluster</literal>
         which can be configured as seen in

@@ -29,7 +29,6 @@ import java.util.Properties;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.impl.XMLHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Channel;
@@ -47,8 +46,6 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	private static final Log log = LoggerFactory.make();
 
 	public static final String JGROUPS_PREFIX = "hibernate.search.services.jgroups.";
-	public static final String CONFIGURATION_STRING = JGROUPS_PREFIX + "configurationString";
-	public static final String CONFIGURATION_XML = JGROUPS_PREFIX + "configurationXml";
 	public static final String CONFIGURATION_FILE = JGROUPS_PREFIX + "configurationFile";
 	public static final String CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
 	public static final String CHANNEL_INJECT = JGROUPS_PREFIX + "providedChannel";
@@ -142,26 +139,6 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 				}
 				catch ( Exception e ) {
 					throw log.jGroupsChannelCreationUsingFileError( cfg, e );
-				}
-			}
-
-			if ( props.containsKey( JGroupsChannelProvider.CONFIGURATION_XML ) ) {
-				cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_XML );
-				try {
-					channel = new JChannel( XMLHelper.elementFromString( cfg ) );
-				}
-				catch ( Exception e ) {
-					throw log.jGroupsChannelCreationUsingXmlError( cfg, e );
-				}
-			}
-
-			if ( props.containsKey( JGroupsChannelProvider.CONFIGURATION_STRING ) ) {
-				cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_STRING );
-				try {
-					channel = new JChannel( cfg );
-				}
-				catch ( Exception e ) {
-					throw log.jGroupsChannelCreationFromStringError( cfg, e );
 				}
 			}
 		}
