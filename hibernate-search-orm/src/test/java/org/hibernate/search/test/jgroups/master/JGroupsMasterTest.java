@@ -53,6 +53,7 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.test.jms.master.TShirt;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
 /**
  * Tests that the Master node in a JGroups cluster can properly process messages received from channel.
@@ -116,7 +117,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 	}
 
 	private void prepareJGroupsChannel() throws Exception {
-		channel = new JChannel( prepareJGroupsConfigurationString() );
+		channel = new JChannel( ConfigurationParseHelper.locateConfig( "testing-flush-loopback.xml" ) );
 		channel.connect( CHANNEL_NAME );
 	}
 
@@ -198,19 +199,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 		// JGroups configuration for master node
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
 		cfg.setProperty( JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_STRING, prepareJGroupsConfigurationString() );
-	}
-
-	private String prepareJGroupsConfigurationString() {
-		return "SHARED_LOOPBACK:" +
-				"PING(timeout=500;num_initial_members=2):" +
-				"FD(timeout=2000):" +
-				"VERIFY_SUSPECT(timeout=2000):" +
-				"pbcast.NAKACK(retransmit_timeout=3000):" +
-				"UNICAST(timeout=5000):" +
-				"FRAG:" +
-				"pbcast.GMS(join_timeout=300;" +
-				"print_local_addr=true)";
+		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {

@@ -37,7 +37,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
-import org.hibernate.search.util.impl.XMLHelper;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
 /**
  * Tests that the Slave node in a JGroups cluster can properly send messages to the channel.
@@ -126,7 +126,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	}
 
 	private void prepareJGroupsChannel() throws Exception {
-		channel = new JChannel( XMLHelper.elementFromString( prepareXmlJGroupsConfiguration() ) );
+		channel = new JChannel( ConfigurationParseHelper.locateConfig( "testing-flush-loopback.xml" ) );
 		channel.connect( CHANNEL_NAME );
 		channel.setReceiver( new JGroupsReceiver(getSearchFactoryImpl()) );
 	}
@@ -155,26 +155,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
 		cfg.setProperty( JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_XML, prepareXmlJGroupsConfiguration() );
+		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}
 
-	private String prepareXmlJGroupsConfiguration() {
-		return "<config>" +
-				"<SHARED_LOOPBACK/>" +
-				"<PING timeout=\"100\" num_initial_members=\"2\"/>" +
-				"<MERGE2 max_interval=\"30000\" min_interval=\"10000\"/>" +
-				"<FD_SOCK/>" +
-				"<FD timeout=\"10000\" max_tries=\"5\"/>" +
-				"<VERIFY_SUSPECT timeout=\"1500\"/>" +
-				"<pbcast.NAKACK " +
-				"            use_mcast_xmit=\"false\"" +
-				"            retransmit_timeout=\"30,60,120,240,480\"" +
-				"            discard_delivered_msgs=\"false\"/>" +
-				"<UNICAST timeout=\"30,60,120,240,360\"/>" +
-				"<pbcast.STABLE stability_delay=\"1000\" desired_avg_gossip=\"50000\"" +
-				"            max_bytes=\"400000\"/>   " +
-				"<pbcast.GMS print_local_addr=\"true\" join_timeout=\"200\"" +
-				"            view_bundling=\"true\"/>" +
-				"</config>";
-	}
 }
