@@ -205,6 +205,12 @@
       the JGroups toolkit is used as a replication mechanism. This back end
       can be used as an alternative to JMS when response time is critical, but
       i.e. JNDI service is not available.</para>
+
+      <para>Note that while JMS can usually be configured to use persistent queues,
+      JGroups can only talk directly with the other nodes over network: it does
+      guarantee message delivery to other participants, but if no master node
+      is available, index update operations will be silently discarded.
+      A new mode for auto-election of a master node is being developed.</para>
     </section>
   </section>
 

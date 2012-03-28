@@ -770,49 +770,6 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
       </tgroup>
     </table>
 
-    <table id="table-jgroups-backend-configuration">
-      <title>JGroups backend configuration</title>
-
-      <tgroup cols="2">
-        <tbody>
-          <row>
-            <entry><emphasis role="bold">Property</emphasis></entry>
-
-            <entry><emphasis role="bold">Description</emphasis></entry>
-          </row>
-
-          <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jgroups.clusterName</property></entry>
-
-            <entry>Optional for JGroups back end. Defines the name of JGroups
-            channel.</entry>
-          </row>
-
-          <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jgroups.configurationFile</property></entry>
-
-            <entry>Optional JGroups network stack configuration. Defines the
-            name of a JGroups configuration file, which must exist on
-            classpath.</entry>
-          </row>
-
-          <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jgroups.configurationXml</property></entry>
-
-            <entry>Optional JGroups network stack configuration. Defines a
-            String representing JGroups configuration as XML.</entry>
-          </row>
-
-          <row>
-            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jgroups.configurationString</property></entry>
-
-            <entry>Optional JGroups network stack configuration. Provides
-            JGroups configuration in plain text.</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
-
     <warning>
       <para>As you probably noticed, some of the shown properties are
       correlated which means that not all combinations of property values make
@@ -961,12 +918,25 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
       (<constant>hibernate.search.worker.backend</constant>) needs to be
       set.</para>
 
+      <para>All backends configured to use JGroups share the same Channel.
+      The JGroups <classname>JChannel</classname> is the main communication
+      link across all nodes participating in the same cluster group; since it
+      is convenient and more efficient to have just one channel shared across all
+      backends, the Channel configuration properties are not defined on a
+      per-worker section but globally. See
+      <xref linkend="jgroups-channel-configuration" />.
+      </para>
+
       <section>
         <title>Slave nodes</title>
 
         <para>Every index update operation is sent through a JGroups channel
         to the master node. Index querying operations are executed on a local
-        index copy.</para>
+        index copy. Enabling the JGroups worker only makes sure the index
+        operations are sent to the master, you still have to synchronize
+        configuring an appropriate directory (See <literal>filesystem-master</literal>,
+        <literal>filesystem-slave</literal> or <literal>infinispan</literal>
+        options in <xref linkend="search-configuration-directory" />).</para>
 
         <example>
           <title>JGroups Slave configuration</title>
@@ -990,19 +960,19 @@ hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
         </example>
       </section>
 
-      <section>
+      <section id="jgroups-channel-configuration">
         <title>JGroups channel configuration</title>
 
-        <para>Optionally the configuration for the JGroups transport protocols
-        and channel name can be defined and applied to master and slave nodes.
+        <para>Configuring the JGroups channel essentially entails specifying the
+        transport in terms of a network protocol stack.
         There are several ways to configure the JGroups transport details. You
         can either set the
-        <constant>hibernate.search.default.worker.backend.jgroups.configurationFile</constant>
+        <constant>hibernate.search.services.jgroups.configurationFile</constant>
         property and specify a file containing the JGroups configuration or
         you can use the property
-        <constant>hibernate.search.default.worker.backend.jgroups.configurationXml</constant>
+        <constant>hibernate.search.services.jgroups.configurationXml</constant>
         or
-        <constant>hibernate.search.default.worker.backend.jgroups.configurationString</constant>
+        <constant>hibernate.search.services.jgroups..configurationString</constant>
         to directly embed either the xml or string JGroups configuration into
         your Hibernate configuration file. All three options are shown in
         <xref linkend="example-jgroup-xml-configuration" />.</para>
@@ -1010,45 +980,50 @@ hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
         <tip>
           <para>If no property is explicitly specified it is assumed that the
           JGroups default configuration file <literal>flush-udp.xml</literal>
-          is used.</para>
+          is used. This example configuration is known to work in most scenarios,
+          with the notable exception of Amazon AWS; refer to the <ulink
+        url="http://www.jgroups.org/manual-3.x/html/">JGroups manual</ulink>
+        for more examples and protocol configuration details.</para>
         </tip>
 
         <example id="example-jgroup-xml-configuration">
-          <title>JGroups transport protocol configuration</title>
+          <title>JGroups transport configuration options</title>
 
-          <programlisting language="XML" role="XML">## JGroups configuration options
+          <programlisting>
 # OPTION 1 - udp.xml file needs to be located in the classpath
-hibernate.search.default.worker.backend.jgroups.configurationFile = udp.xml
+hibernate.search.services.jgroups.configurationFile = udp.xml</programlisting>
 
+<programlisting language="XML" role="XML">
 # OPTION 2 - protocol stack configuration provided in XML format
-hibernate.search.default.worker.backend.jgroups.configurationXml =
+hibernate.search.services.jgroups.configurationXml =
 
 &lt;config xmlns="urn:org:jgroups"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="urn:org:jgroups file:schema/JGroups-2.8.xsd"&gt;
-&lt;UDP
-mcast_addr="${jgroups.udp.mcast_addr:228.10.10.10}"
-mcast_port="${jgroups.udp.mcast_port:45588}"
-tos="8"
-thread_naming_pattern="pl"
-thread_pool.enabled="true"
-thread_pool.min_threads="2"
-thread_pool.max_threads="8"
-thread_pool.keep_alive_time="5000"
-thread_pool.queue_enabled="false"
-thread_pool.queue_max_size="100"
-thread_pool.rejection_policy="Run"/&gt;
-&lt;PING timeout="1000" num_initial_members="3"/&gt;
-&lt;MERGE2 max_interval="30000" min_interval="10000"/&gt;
-&lt;FD_SOCK/&gt;
-&lt;FD timeout="3000" max_tries="3"/&gt;
-&lt;VERIFY_SUSPECT timeout="1500"/&gt;
-&lt;pbcast.STREAMING_STATE_TRANSFER/&gt;
-&lt;pbcast.FLUSH timeout="0"/&gt;
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.0.xsd"&gt;
+   &lt;UDP
+      mcast_addr="${jgroups.udp.mcast_addr:228.10.10.10}"
+      mcast_port="${jgroups.udp.mcast_port:45588}"
+      tos="8"
+      thread_naming_pattern="pl"
+      thread_pool.enabled="true"
+      thread_pool.min_threads="2"
+      thread_pool.max_threads="8"
+      thread_pool.keep_alive_time="5000"
+      thread_pool.queue_enabled="false"
+      thread_pool.queue_max_size="100"
+      thread_pool.rejection_policy="Run"/&gt;
+   &lt;PING timeout="1000" num_initial_members="3"/&gt;
+   &lt;MERGE2 max_interval="30000" min_interval="10000"/&gt;
+   &lt;FD_SOCK/&gt;
+   &lt;FD timeout="3000" max_tries="3"/&gt;
+   &lt;VERIFY_SUSPECT timeout="1500"/&gt;
+   &lt;pbcast.STREAMING_STATE_TRANSFER/&gt;
+   &lt;pbcast.FLUSH timeout="0"/&gt;
 &lt;/config&gt;
-
+</programlisting>
+<programlisting>
 # OPTION 3 - protocol stack configuration provided in "old style" jgroups format
-hibernate.search.default.worker.backend.jgroups.configurationString =
+hibernate.search.services.jgroups.configurationString =
 
 UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=32):PING(timeout=3000;
 num_initial_members=6):FD(timeout=5000):VERIFY_SUSPECT(timeout=1500):
@@ -1056,16 +1031,28 @@ pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):UNICAST(timeout=5000):
 FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlisting>
         </example>
 
-        <para>In this JGroups master/slave configuration nodes communicate
-        over a JGroups channel. The default channel name is
-        <literal>HSearchCluster</literal> which can be configured as seen in
+        <para>The default channel name is <literal>HSearchCluster</literal> which can be configured as seen in
         <xref linkend="example-jgroups-channel-name" />.</para>
 
         <example id="example-jgroups-channel-name">
           <title>JGroups channel name configuration</title>
 
-          <programlisting>hibernate.search.default.worker.backend.jgroups.clusterName = Hibernate-Search-Cluster       </programlisting>
+          <programlisting>hibernate.search.services.jgroups.clusterName = My-Custom-Cluster-Id</programlisting>
         </example>
+
+        <section>
+            <title>JGroups channel instance injection</title>
+            <para>For programmatic configurations, one additional option is available to configure the JGroups
+            channel: to pass an existing channel instance to Hibernate Search directly using the
+            property <literal>hibernate.search.services.jgroups.providedChannel</literal>, as shown in the
+            following example.</para>
+        </section><para></para>
+    <programlisting language="JAVA" role="JAVA">import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+
+org.jgroups.JChannel channel = ...
+Map&lt;String,String&gt; properties = new HashMap&lt;String,String)(1);
+properties.put( JGroupsChannelProvider.CHANNEL_INJECT, channel );
+EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", properties );</programlisting>
       </section>
     </section>
   </section>

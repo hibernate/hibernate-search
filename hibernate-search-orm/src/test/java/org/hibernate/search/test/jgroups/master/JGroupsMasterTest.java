@@ -197,7 +197,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 		super.configure( cfg );
 		// JGroups configuration for master node
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
-		cfg.setProperty( JGroupsChannelProvider.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
 		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_STRING, prepareJGroupsConfigurationString() );
 	}
 

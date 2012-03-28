@@ -154,7 +154,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.setProperty( JGroupsChannelProvider.JG_CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
 		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_XML, prepareXmlJGroupsConfiguration() );
 	}
 
