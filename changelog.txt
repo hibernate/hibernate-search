@@ -1,7 +1,38 @@
 Hibernate Search Changelog
 ==========================
 
-Version 4.1.0.CR1 (15-3-2012)
+
+Version 4.1.0.CR3 (29-3-2012)
+------------------------
+
+** Bug
+    * [HSEARCH-1049] - includePaths bombs on inclusion of id members
+    * [HSEARCH-1063] - maven-release-plugin 2.2.2 causes exception during release process
+    * [HSEARCH-1064] - Shrinkwrap tests need not be set in offline mode
+    * [HSEARCH-1067] - Path used in tests on Windows is illegal in certain test order executions
+    * [HSEARCH-1069] - Fix integration tests on Oracle 11gR1
+    * [HSEARCH-1070] - JGroups channels need to be shared across multiple backends
+    * [HSEARCH-1079] - Programmatic API, ClassBridgeMapping: missing analyze() norms() from @ClassBridge (Manthos)
+
+** Improvement
+    * [HSEARCH-1072] - ServiceManager should initialize classes lazily
+    * [HSEARCH-1074] - DSL phrase query should not throw an exception in case all specified terms are stop words
+    * [HSEARCH-1075] - Clarify documentation of JMS configuration parameter refresh
+
+** New Feature
+    * [HSEARCH-1071] - Allow usage of existing injected JGroups channel
+
+** Remove Feature
+    * [HSEARCH-1080] - Simplify JGroups configuration by removing options of inlining configuration in Hibernate configuration
+
+** Task
+    * [HSEARCH-1057] - Upgrade to Hibernate ORM 4.1.1.Final
+    * [HSEARCH-1066] - Exclude maven-jdocbook-plugin from Eclipse m2
+    * [HSEARCH-1068] - Have version numbers injected in docbook entities
+    * [HSEARCH-1073] - Minor version upgrade of Infinispan, JBoss Logging, JGroups
+
+
+Version 4.1.0.CR2 (15-3-2012)
 ------------------------
 
 ** Bug
