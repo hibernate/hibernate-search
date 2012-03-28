@@ -52,9 +52,11 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	public static final String CONFIGURATION_FILE = JGROUPS_PREFIX + "configurationFile";
 	public static final String CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
 	public static final String CHANNEL_INJECT = JGROUPS_PREFIX + "providedChannel";
-	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 
-	protected String clusterName = "HSearchCluster";
+	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
+	private static final String DEFAULT_CLUSTER_NAME = "Hibernate Search Cluster";
+
+	protected String clusterName;
 
 	private Channel channel;
 	private JGroupsMasterMessageListener masterListener;
@@ -63,7 +65,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 
 	@Override
 	public void start(Properties props, BuildContext context) {
-		this.clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, "HSearchCluster" );
+		this.clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
 		prepareJGroupsChannel( props, context );
 	}
 

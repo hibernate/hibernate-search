@@ -1031,7 +1031,8 @@ pbcast.NAKACK(gc_lag=10;retransmit_timeout=3000):UNICAST(timeout=5000):
 FRAG:pbcast.GMS(join_timeout=3000;shun=false;print_local_addr=true) </programlisting>
         </example>
 
-        <para>The default channel name is <literal>HSearchCluster</literal> which can be configured as seen in
+        <para>The default channel name is <literal>Hibernate Search Cluster</literal>
+        which can be configured as seen in
         <xref linkend="example-jgroups-channel-name" />.</para>
 
         <example id="example-jgroups-channel-name">
