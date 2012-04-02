@@ -44,8 +44,12 @@ public class EntityDescriptor {
 	private Set<Map<String,Object>> classBridges = new HashSet<Map<String,Object>>();
 	private Map<String, Object> dynamicBoost;
 	private Map<String, Object> cacheInMemory;
-	
-	public Map<String, Object> getIndexed() {
+
+    public Class<?> getEntityType() {
+        return entityType;
+    }
+
+    public Map<String, Object> getIndexed() {
 		return indexed;
 	}
 
