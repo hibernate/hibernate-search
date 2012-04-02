@@ -224,6 +224,10 @@
             <source>changelog.txt</source>
             <outputDirectory>/</outputDirectory>
         </file>
+        <file>
+            <source>copyright.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
     </files>
 
     <fileSets>

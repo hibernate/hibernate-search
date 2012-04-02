@@ -2369,21 +2369,27 @@ public class MyClass{
 
     <para>You can pass the <classname>SearchMapping</classname> object
     directly via the property key
-    <literal>hibernate.search.model_mapping</literal> or its type-safe
-    representation <classname>Environment.MODEL_MAPPING</classname>. Use the
+    <literal>hibernate.search.model_mapping</literal> or the constant
+    <classname>Environment.MODEL_MAPPING</classname>. Use the
     <classname>Configuration</classname> API or the Map passed to the JPA
     <classname>Persistence</classname> bootstrap methods.</para>
 
+    <example>
+    <title>Programmatic mapping</title>
+        <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
+[...] //configure mapping
+Configuration config = new Configuration();
+config.getProperties().put( Environment.MODEL_MAPPING, mapping );
+SessionFactory sf = config.buildSessionFactory();</programlisting>
+    </example>
+    <example>
+      <title>Programmatic mapping with JPA</title>
     <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
-[...]
-configuration.setProperty( Environment.MODEL_MAPPING, mapping );
-
-//or in JPA
-SearchMapping mapping = new SearchMapping();
-[...]
-Map&lt;String,String&gt; properties = new HashMap&lt;String,String)(1);
-properties.put( Environment.MODEL_MAPPING, mapping );
-EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", properties );</programlisting>
+[...] //configure mapping
+Map props = new HashMap();
+props.put( Environment.MODEL_MAPPING, mapping );
+EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", props );</programlisting>
+    </example>
 
     <para>Alternatively, you can create a factory class (ie. hosting a method
     annotated with <classname>@Factory</classname>) whose factory method

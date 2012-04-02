@@ -39,7 +39,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.test.bridge.PaddedIntegerBridge;
 
 /**
- * @author John Grffin
+ * @author John Griffin
  */
 @Entity
 @Indexed
