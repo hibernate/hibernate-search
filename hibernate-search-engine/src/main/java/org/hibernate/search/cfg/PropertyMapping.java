@@ -31,20 +31,28 @@ import org.apache.solr.analysis.TokenizerFactory;
 
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.BoostStrategy;
 
 /**
  * @author Emmanuel Bernard
  */
 public class PropertyMapping {
-	private SearchMapping mapping;
-	private EntityDescriptor entity;
-	private PropertyDescriptor property;
+
+	protected final SearchMapping mapping;
+	protected final EntityDescriptor entity;
+	protected final PropertyDescriptor property;
 
 	public PropertyMapping(String name, ElementType type, EntityDescriptor entity, SearchMapping mapping) {
 		this.mapping = mapping;
 		this.entity = entity;
-		property = entity.getProperty(name, type);
+		this.property = entity.getProperty(name, type);
+	}
+
+	protected PropertyMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
+		this.mapping = mapping;
+		this.entity = entity;
+		this.property = property;
 	}
 
 	public DocumentIdMapping documentId() {
@@ -95,5 +103,9 @@ public class PropertyMapping {
 
 	public ContainedInMapping containedIn() {
 		return new ContainedInMapping(mapping, property, entity);
+	}
+
+	public PropertyMapping bridge(Class<? extends FieldBridge> fieldBridge) {
+		return new FieldBridgeDirectMapping( property, entity, mapping, fieldBridge );
 	}
 }

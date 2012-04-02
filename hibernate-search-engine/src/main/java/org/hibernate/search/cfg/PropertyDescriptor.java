@@ -45,6 +45,7 @@ public class PropertyDescriptor {
 	private Map<String, Object> documentId;
 	private Map<String, Object> analyzerDiscriminator;
 	private Map<String, Object> dynamicBoost;
+	private Map<String,Object> fieldBridge;
 
 	public PropertyDescriptor(String name, ElementType type) {
 		this.name = name;
@@ -121,4 +122,13 @@ public class PropertyDescriptor {
 	public Map<String,Object> getDynamicBoost() {
 		return this.dynamicBoost;
 	}
+
+	public Map<String, Object> getFieldBridge() {
+		return fieldBridge;
+	}
+
+	public void setFieldBridge(Map<String, Object> fieldBridge) {
+		this.fieldBridge = fieldBridge;
+	}
+
 }

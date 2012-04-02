@@ -441,7 +441,18 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			createDateBridge( property );
 			createCalendarBridge( property );
 			createDynamicBoost( property );
+			createFieldBridge( property );
+		}
 
+		private void createFieldBridge(PropertyDescriptor property) {
+			if ( property.getFieldBridge() != null ) {
+				AnnotationDescriptor fieldBridgeAnn = new AnnotationDescriptor( FieldBridge.class );
+				Set<Entry<String, Object>> entrySet = property.getFieldBridge().entrySet();
+				for ( Entry<String, Object> entry : entrySet ) {
+					fieldBridgeAnn.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( FieldBridge.class, AnnotationFactory.create( fieldBridgeAnn ) );
+			}
 		}
 
 		private void createDynamicBoost(PropertyDescriptor property) {
