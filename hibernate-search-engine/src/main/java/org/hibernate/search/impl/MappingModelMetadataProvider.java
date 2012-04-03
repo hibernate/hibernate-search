@@ -38,7 +38,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
-import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
 import org.hibernate.annotations.common.reflection.AnnotationReader;
 import org.hibernate.annotations.common.reflection.Filter;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
@@ -155,7 +154,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			fullTextFilterDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 		}
 
-		return AnnotationFactory.create( fullTextFilterDefAnnotation );
+		return createAnnotation( fullTextFilterDefAnnotation );
 	}
 
 	private static FullTextFilterDef[] createFullTextFilterDefArray(Set<Map<String, Object>> fullTextFilterDefs) {
@@ -183,7 +182,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 						tokenizerAnnotation.setValue( tokenizerEntry.getKey(), tokenizerEntry.getValue() );
 					}
 				}
-				analyzerDefAnnotation.setValue( "tokenizer", AnnotationFactory.create( tokenizerAnnotation ) );
+				analyzerDefAnnotation.setValue( "tokenizer", createAnnotation( tokenizerAnnotation ) );
 			}
 			else if ( entry.getKey().equals( "filters" ) ) {
 				@SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters(
@@ -195,7 +194,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				analyzerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 			}
 		}
-		return AnnotationFactory.create( analyzerDefAnnotation );
+		return createAnnotation( analyzerDefAnnotation );
 	}
 
 	static private void addParamsToAnnotation(AnnotationDescriptor annotationDescriptor, Map.Entry<String, Object> entry) {
@@ -216,7 +215,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					filterAnn.setValue( filterEntry.getKey(), filterEntry.getValue() );
 				}
 			}
-			filtersArray[index] = AnnotationFactory.create( filterAnn );
+			filtersArray[index] = createAnnotation( filterAnn );
 			index++;
 		}
 		return filtersArray;
@@ -229,10 +228,33 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor paramAnnotation = new AnnotationDescriptor( Parameter.class );
 			paramAnnotation.setValue( "name", entry.get( "name" ) );
 			paramAnnotation.setValue( "value", entry.get( "value" ) );
-			paramArray[index] = AnnotationFactory.create( paramAnnotation );
+			paramArray[index] = createAnnotation( paramAnnotation );
 			index++;
 		}
 		return paramArray;
+	}
+
+	/**
+	 * Creates the proxy for an annotation using Hibernate Commons Annotations
+	 * @param annotation the AnnotationDescriptor
+	 * @return the proxy
+	 */
+	private static <T extends Annotation> T createAnnotation(AnnotationDescriptor annotation) {
+		//This is a filthy workaround for the Annotations proxy generation,
+		//which is using the ContextClassLoader to define the proxy classes
+		//(not working fine in modular environments when Search is used by
+		//other services such as CapeDwarf).
+		//See HSEARCH-1084
+
+		//use annotation's own classloader
+		try {
+			return AnnotationFactory.create( annotation, annotation.type().getClassLoader() );
+		}
+		catch ( Exception e ) {
+			//first try, but we have another trick
+		}
+		//Use TCCL
+		return org.hibernate.annotations.common.annotationfactory.AnnotationFactory.create( annotation );
 	}
 
 	private static class MappingModelAnnotationReader implements AnnotationReader {
@@ -335,7 +357,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			for ( Map.Entry<String, Object> entry : map.entrySet() ) {
 				AnnotationDescriptor dateBrigeAnnotation = new AnnotationDescriptor( DateBridge.class );
 				dateBrigeAnnotation.setValue( entry.getKey(), entry.getValue() );
-				annotations.put( DateBridge.class, AnnotationFactory.create( dateBrigeAnnotation ) );
+				annotations.put( DateBridge.class, createAnnotation( dateBrigeAnnotation ) );
 			}
 		}
 
@@ -344,7 +366,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			for ( Map.Entry<String, Object> entry : map.entrySet() ) {
 				AnnotationDescriptor calendarBrigeAnnotation = new AnnotationDescriptor( CalendarBridge.class );
 				calendarBrigeAnnotation.setValue( entry.getKey(), entry.getValue() );
-				annotations.put( CalendarBridge.class, AnnotationFactory.create( calendarBrigeAnnotation ) );
+				annotations.put( CalendarBridge.class, createAnnotation( calendarBrigeAnnotation ) );
 			}
 		}
 
@@ -355,7 +377,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Map.Entry<String, Object> entry : documentId.entrySet() ) {
 					documentIdAnnotation.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( DocumentId.class, AnnotationFactory.create( documentIdAnnotation ) );
+				annotations.put( DocumentId.class, createAnnotation( documentIdAnnotation ) );
 			}
 		}
 
@@ -366,7 +388,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Map.Entry<String, Object> entry : analyzerDiscriminator.entrySet() ) {
 					analyzerDiscriminatorAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( AnalyzerDiscriminator.class, AnnotationFactory.create( analyzerDiscriminatorAnn ) );
+				annotations.put( AnalyzerDiscriminator.class, createAnnotation( analyzerDiscriminatorAnn ) );
 			}
 		}
 
@@ -382,7 +404,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Map.Entry<String, Object> entry : numericField.entrySet() ) {
 					fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
 				}
-				numericFieldAnnotations.add( (NumericField) AnnotationFactory.create( fieldAnnotation ) );
+				numericFieldAnnotations.add( (NumericField) createAnnotation( fieldAnnotation ) );
 			}
 			for(Map<String, Object> field : fields) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
@@ -394,7 +416,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 						for ( Map.Entry<String, Object> analyzerEntry : analyzer.entrySet() ) {
 							analyzerAnnotation.setValue( analyzerEntry.getKey(), analyzerEntry.getValue() );
 						}
-						fieldAnnotation.setValue( "analyzer", AnnotationFactory.create( analyzerAnnotation ) );
+						fieldAnnotation.setValue( "analyzer", createAnnotation( analyzerAnnotation ) );
 					}
 					else if ( entry.getKey().equals( "boost" ) ) {
 						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
@@ -403,7 +425,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 						for ( Map.Entry<String, Object> boostEntry : boost.entrySet() ) {
 							boostAnnotation.setValue( boostEntry.getKey(), boostEntry.getValue() );
 						}
-						fieldAnnotation.setValue( "boost", AnnotationFactory.create( boostAnnotation ) );
+						fieldAnnotation.setValue( "boost", createAnnotation( boostAnnotation ) );
 					}
 					else if ( entry.getKey().equals( "bridge" ) ) {
 						AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
@@ -417,13 +439,13 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 								bridgeAnnotation.setValue( bridgeEntry.getKey(), bridgeEntry.getValue() );
 							}
 						}
-						fieldAnnotation.setValue( "bridge", AnnotationFactory.create( bridgeAnnotation ) );
+						fieldAnnotation.setValue( "bridge", createAnnotation( bridgeAnnotation ) );
 					}
 					else {
 						fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
 					}
 				}
-				fieldAnnotations.add( (org.hibernate.search.annotations.Field) AnnotationFactory.create( fieldAnnotation ) );
+				fieldAnnotations.add( (org.hibernate.search.annotations.Field) createAnnotation( fieldAnnotation ) );
 			}
 			AnnotationDescriptor fieldsAnnotation = new AnnotationDescriptor( Fields.class );
 			AnnotationDescriptor numericFieldsAnnotation = new AnnotationDescriptor( NumericFields.class );
@@ -435,9 +457,9 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final NumericField[] numericFieldArray = new NumericField[numericFieldAnnotations.size()];
 			final NumericField[] numericFieldAsArray = numericFieldAnnotations.toArray( numericFieldArray );
 			numericFieldsAnnotation.setValue( "value", numericFieldAsArray);
-			annotations.put( NumericFields.class, AnnotationFactory.create( numericFieldsAnnotation ));
+			annotations.put( NumericFields.class, createAnnotation( numericFieldsAnnotation ));
 			fieldsAnnotation.setValue( "value", fieldAsArray );
-			annotations.put( Fields.class, AnnotationFactory.create( fieldsAnnotation ) );
+			annotations.put( Fields.class, createAnnotation( fieldsAnnotation ) );
 			createDateBridge( property );
 			createCalendarBridge( property );
 			createDynamicBoost( property );
@@ -451,7 +473,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Entry<String, Object> entry : entrySet ) {
 					fieldBridgeAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( FieldBridge.class, AnnotationFactory.create( fieldBridgeAnn ) );
+				annotations.put( FieldBridge.class, createAnnotation( fieldBridgeAnn ) );
 			}
 		}
 
@@ -462,7 +484,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Entry<String, Object> entry : entrySet ) {
 					dynamicBoostAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ) );
+				annotations.put( DynamicBoost.class, createAnnotation( dynamicBoostAnn ) );
 			}
 		}
 
@@ -474,7 +496,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Entry<String, Object> entry : entrySet ) {
 					containedInAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( ContainedIn.class, AnnotationFactory.create( containedInAnn ) );
+				annotations.put( ContainedIn.class, createAnnotation( containedInAnn ) );
 			}
 		}
 
@@ -486,7 +508,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Entry<String, Object> entry : entrySet ) {
 					indexEmbeddedAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( IndexedEmbedded.class, AnnotationFactory.create( indexEmbeddedAnn ) );
+				annotations.put( IndexedEmbedded.class, createAnnotation( indexEmbeddedAnn ) );
 			}
 		}
 
@@ -498,7 +520,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					for ( Map.Entry<String, Object> entry : entity.getIndexed().entrySet() ) {
 						annotation.setValue( entry.getKey(), entry.getValue() );
 					}
-					annotations.put( annotationType, AnnotationFactory.create( annotation ) );
+					annotations.put( annotationType, createAnnotation( annotation ) );
 				}
 			}
 			{
@@ -507,7 +529,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					for ( Map.Entry<String, Object> entry : entity.getSimilarity().entrySet() ) {
 						annotation.setValue( entry.getKey(), entry.getValue() );
 					}
-					annotations.put( Similarity.class, AnnotationFactory.create( annotation ) );
+					annotations.put( Similarity.class, createAnnotation( annotation ) );
 				}
 			}
 			{
@@ -516,7 +538,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					for ( Map.Entry<String, Object> entry : entity.getCacheInMemory().entrySet() ) {
 						annotation.setValue( entry.getKey(), entry.getValue() );
 					}
-					annotations.put( CacheFromIndex.class, AnnotationFactory.create( annotation ) );
+					annotations.put( CacheFromIndex.class, createAnnotation( annotation ) );
 				}
 			}
 			{
@@ -525,7 +547,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					for ( Map.Entry<String, Object> entry : entity.getBoost().entrySet() ) {
 						annotation.setValue( entry.getKey(), entry.getValue() );
 					}
-					annotations.put( Boost.class, AnnotationFactory.create( annotation ) );
+					annotations.put( Boost.class, createAnnotation( annotation ) );
 				}
 			}
 			{
@@ -534,7 +556,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					for ( Map.Entry<String, Object> entry : entity.getAnalyzerDiscriminator().entrySet() ) {
 						annotation.setValue( entry.getKey(), entry.getValue() );
 					}
-					annotations.put( AnalyzerDiscriminator.class, AnnotationFactory.create( annotation ) );
+					annotations.put( AnalyzerDiscriminator.class, createAnnotation( annotation ) );
 				}
 			}
 			{
@@ -542,7 +564,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					AnnotationDescriptor fullTextFilterDefsAnnotation = new AnnotationDescriptor( FullTextFilterDefs.class );
 					FullTextFilterDef[] fullTextFilterDefArray = createFullTextFilterDefArray( entity.getFullTextFilterDefs() );
 					fullTextFilterDefsAnnotation.setValue( "value", fullTextFilterDefArray );
-					annotations.put( FullTextFilterDefs.class, AnnotationFactory.create( fullTextFilterDefsAnnotation ) );
+					annotations.put( FullTextFilterDefs.class, createAnnotation( fullTextFilterDefsAnnotation ) );
 				}
 			}
 			if ( entity.getProvidedId() != null ) {
@@ -553,7 +575,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				AnnotationDescriptor classBridgesAnn = new AnnotationDescriptor( ClassBridges.class );
 				ClassBridge[] classBridesDefArray = createClassBridgesDefArray( entity.getClassBridgeDefs() );
 				classBridgesAnn.setValue( "value", classBridesDefArray );
-				annotations.put( ClassBridges.class, AnnotationFactory.create( classBridgesAnn ) );
+				annotations.put( ClassBridges.class, createAnnotation( classBridgesAnn ) );
 			}
 
 			if ( entity.getDynamicBoost() != null ) {
@@ -562,7 +584,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				for ( Entry<String, Object> entry : entrySet ) {
 					dynamicBoostAnn.setValue( entry.getKey(), entry.getValue() );
 				}
-				annotations.put( DynamicBoost.class, AnnotationFactory.create( dynamicBoostAnn ) );
+				annotations.put( DynamicBoost.class, createAnnotation( dynamicBoostAnn ) );
 			}
 
 		}
@@ -590,7 +612,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
 			}
-			return AnnotationFactory.create( annotation );
+			return createAnnotation( annotation );
 		}
 
 		private void createProvidedId(EntityDescriptor entity) {
@@ -609,13 +631,13 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 							bridgeAnnotation.setValue( bridgeEntry.getKey(), bridgeEntry.getValue() );
 						}
 					}
-					annotation.setValue( "bridge", AnnotationFactory.create( bridgeAnnotation ) );
+					annotation.setValue( "bridge", createAnnotation( bridgeAnnotation ) );
 				}
 				else {
 					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
 			}
-			annotations.put( ProvidedId.class, AnnotationFactory.create( annotation ) );
+			annotations.put( ProvidedId.class, createAnnotation( annotation ) );
 		}
 
 		private void populateAnnotationArray() {
