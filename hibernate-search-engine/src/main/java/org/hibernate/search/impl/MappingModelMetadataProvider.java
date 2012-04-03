@@ -38,7 +38,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
-import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
 import org.hibernate.annotations.common.reflection.AnnotationReader;
 import org.hibernate.annotations.common.reflection.Filter;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
@@ -246,14 +245,16 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		//(not working fine in modular environments when Search is used by
 		//other services such as CapeDwarf).
 		//See HSEARCH-1084
-		final ClassLoader previous = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader( Indexed.class.getClassLoader() );
+
+		//use annotation's own classloader
 		try {
-			return AnnotationFactory.create( annotation );
+			return AnnotationFactory.create( annotation, annotation.type().getClassLoader() );
 		}
-		finally {
-			Thread.currentThread().setContextClassLoader( previous );
+		catch ( Exception e ) {
+			//first try, but we have another trick
 		}
+		//Use TCCL
+		return org.hibernate.annotations.common.annotationfactory.AnnotationFactory.create( annotation );
 	}
 
 	private static class MappingModelAnnotationReader implements AnnotationReader {
