@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
+import org.hibernate.search.bridge.FieldBridge;
 
 /**
  * @author Emmanuel Bernard
@@ -64,6 +65,10 @@ public class DocumentIdMapping {
 
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping(entityType, mapping);
+	}
+
+	public PropertyMapping bridge(Class<? extends FieldBridge> fieldBridge) {
+		return new FieldBridgeDirectMapping( property, entity, mapping, fieldBridge );
 	}
 
 }
