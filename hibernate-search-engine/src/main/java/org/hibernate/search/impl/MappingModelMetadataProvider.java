@@ -323,25 +323,31 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				if ( entityType != null ) {
 					final EntityDescriptor entity = mapping.getEntityDescriptor( entityType );
 					if ( entity != null ) {
-						if ( propertyName == null ) {
-							//entityType overriding
-							createIndexed( entity );
-						}
-						else {
-							final PropertyDescriptor property = entity.getPropertyDescriptor(
-									propertyName, elementType
-							);
-							if ( property != null ) {
-								// property name overriding
-								createDocumentId( property );
-								createAnalyzerDiscriminator( property );
-								createFields( property );
-								createIndexEmbedded( property );
-								createContainedIn( property );
+                        final ClassLoader previous = Thread.currentThread().getContextClassLoader();
+                        Thread.currentThread().setContextClassLoader(entity.getEntityType().getClassLoader());
+                        try {
+                            if ( propertyName == null ) {
+                                //entityType overriding
+                                createIndexed( entity );
+                            }
+                            else {
+                                final PropertyDescriptor property = entity.getPropertyDescriptor(
+                                        propertyName, elementType
+                                );
+                                if ( property != null ) {
+                                    // property name overriding
+                                    createDocumentId( property );
+                                    createAnalyzerDiscriminator( property );
+                                    createFields( property );
+                                    createIndexEmbedded( property );
+                                    createContainedIn( property );
 
-							}
-						}
-					}
+                                }
+                            }
+                        } finally {
+                            Thread.currentThread().setContextClassLoader(previous);
+                        }
+                    }
 				}
 				else {
 					delegatesAnnotationReading();
