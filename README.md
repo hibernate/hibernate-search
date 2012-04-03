@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 4.1.0.CR3 29-3-2012*
+*Version: 4.1.0.Final 4-4-2012*
 
 ## Description
 
@@ -30,7 +30,7 @@ Include the following to your dependency list:
     <dependency>
      <groupId>org.hibernate</groupId>
      <artifactId>hibernate-search</artifactId>
-     <version>4.1.0.CR3</version>
+     <version>4.1.0.Final</version>
     </dependency>
 
 ### Sourceforge Bundle
