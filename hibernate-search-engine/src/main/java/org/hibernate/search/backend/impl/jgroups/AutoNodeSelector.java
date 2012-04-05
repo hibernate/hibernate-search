@@ -37,6 +37,7 @@ import org.jgroups.View;
  * and use the same configuration, or the master might ignore incoming messages.</p>
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Ales Justin
  */
 public class AutoNodeSelector implements NodeSelectorStrategy {
 

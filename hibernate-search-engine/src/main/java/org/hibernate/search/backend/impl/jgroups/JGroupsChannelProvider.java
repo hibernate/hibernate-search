@@ -33,6 +33,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
+import org.jgroups.Receiver;
 
 /**
  * Service to initialize a JGroups Channel. This needs to be centralized to
@@ -40,6 +41,7 @@ import org.jgroups.JChannel;
  * 
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Ales Justin
  */
 public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 
@@ -73,14 +75,27 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 
 	@Override
 	public void stop() {
-		context.releaseService( MasterSelectorServiceProvider.class );
+        if (masterListener != null) {
+		    context.releaseService( MasterSelectorServiceProvider.class );
+        }
+        BuildContext temp = context;
 		context = null;
 		try {
-			if ( channelIsManaged && channel != null && channel.isOpen() ) {
-				log.jGroupsDisconnectingAndClosingChannel();
-				channel.disconnect();
-				channel.close();
-			}
+            if (channel != null) {
+                if ( channelIsManaged ) {
+                    if (channel.isOpen()) {
+                        log.jGroupsDisconnectingAndClosingChannel();
+                        channel.disconnect();
+                        channel.close();
+                    }
+                } else {
+                    Receiver receiver = channel.getReceiver();
+                    if (receiver instanceof MultiJGroupsMasterMessageListener) {
+                        MultiJGroupsMasterMessageListener multiReceiver = (MultiJGroupsMasterMessageListener) receiver;
+                        multiReceiver.removeContext(temp);
+                    }
+                }
+            }
 		}
 		catch ( Exception toLog ) {
 			log.jGroupsClosingChannelError( toLog );
@@ -92,9 +107,18 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 		this.context = context;
 		log.jGroupsStartingChannel();
 		buildChannel( props );
-		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
-		masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
-		channel.setReceiver( masterListener );
+        NodeSelectorStrategyHolder masterNodeSelector = null;
+        Receiver receiver = channel.getReceiver();
+        if (receiver != null) {
+            if (receiver instanceof MultiJGroupsMasterMessageListener) {
+                MultiJGroupsMasterMessageListener multiReceiver = (MultiJGroupsMasterMessageListener) receiver;
+                multiReceiver.addContext(context, props);
+            }
+        } else {
+            masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+            masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
+            channel.setReceiver(masterListener);
+        }
 		if ( channelIsManaged ) {
 			try {
 				channel.connect( clusterName );
@@ -103,7 +127,9 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 				throw log.unabletoConnectToJGroupsCluster( clusterName, e );
 			}
 		}
-		masterNodeSelector.setLocalAddress( channel.getAddress() );
+        if (masterNodeSelector != null) {
+		    masterNodeSelector.setLocalAddress( channel.getAddress() );
+        }
 		log.jGroupsConnectedToCluster( clusterName, channel.getAddress() );
 
 		if ( !channel.flushSupported() ) {
