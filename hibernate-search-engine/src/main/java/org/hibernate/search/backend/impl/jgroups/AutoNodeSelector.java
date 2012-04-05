@@ -53,7 +53,7 @@ public class AutoNodeSelector implements NodeSelectorStrategy {
 
 	@Override
 	public boolean isIndexOwnerLocal() {
-		return localAddress == null || localAddress.equals( masterAddress );
+		return masterAddress == null || localAddress == null || localAddress.equals( masterAddress );
 	}
 
 	@Override
