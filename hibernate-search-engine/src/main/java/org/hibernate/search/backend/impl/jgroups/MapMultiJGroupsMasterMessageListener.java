@@ -45,12 +45,16 @@ import org.jgroups.View;
  */
 public class MapMultiJGroupsMasterMessageListener implements MultiJGroupsMasterMessageListener {
     private ConcurrentMap<String, JGroupsMasterMessageListener> listeners = new ConcurrentHashMap<String, JGroupsMasterMessageListener>();
+    private volatile View view; // last view
 
     public void addContext(BuildContext context, Properties properties) {
         JGroupsMasterMessageListener listener = createListener(context, properties);
         IndexManagerHolder managerHolder = context.getAllIndexesManager();
         for (IndexManager manager : managerHolder.getIndexManagers()) {
             listeners.putIfAbsent(manager.getIndexName(), listener);
+        }
+        if (view != null) {
+            listener.viewAccepted(view); // set last view
         }
     }
 
@@ -77,6 +81,7 @@ public class MapMultiJGroupsMasterMessageListener implements MultiJGroupsMasterM
     }
 
     public void viewAccepted(View new_view) {
+        view = new_view;
         for (JGroupsMasterMessageListener listener : listeners.values()) {
             listener.viewAccepted(new_view);
         }
