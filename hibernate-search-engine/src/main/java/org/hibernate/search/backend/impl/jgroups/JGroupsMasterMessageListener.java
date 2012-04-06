@@ -75,27 +75,13 @@ public class JGroupsMasterMessageListener implements Receiver {
 	}
 
     protected void receive(Message message, byte[] rawBuffer, String indexName) {
-        if (classLoader != null) {
-            final ClassLoader previous = SecurityActions.setTCCL(classLoader);
-            try {
-                receiveInternal(message, rawBuffer, indexName);
-            } finally {
-                SecurityActions.setTCCL(previous);
-            }
-        } else {
-            receiveInternal(message, rawBuffer, indexName);
-        }
-    }
-
-    private void receiveInternal(Message message, byte[] rawBuffer, String indexName) {
         final NodeSelectorStrategy nodeSelector = selector.getMasterNodeSelector( indexName );
         try {
             if ( nodeSelector.isIndexOwnerLocal() ) {
                 byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue(rawBuffer);
                 final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
                 if ( indexManager != null ) {
-                    final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
-                    applyLuceneWorkLocally( queue, indexManager, message );
+                    applyToIndexManager(message, serializedQueue, indexManager);
                 }
                 else {
                     log.messageReceivedForUndefinedIndex( indexName );
@@ -111,6 +97,24 @@ public class JGroupsMasterMessageListener implements Receiver {
         catch ( SearchException e ) {
             log.illegalObjectRetrievedFromMessage( e );
         }
+    }
+
+    private void applyToIndexManager(Message message, byte[] serializedQueue, IndexManager indexManager) {
+        if (classLoader != null) {
+            final ClassLoader previous = SecurityActions.setTCCL(classLoader);
+            try {
+                applyToIndexManagerInternal(message, serializedQueue, indexManager);
+            } finally {
+                SecurityActions.setTCCL(previous);
+            }
+        } else {
+            applyToIndexManagerInternal(message, serializedQueue, indexManager);
+        }
+    }
+
+    private void applyToIndexManagerInternal(Message message, byte[] serializedQueue, IndexManager indexManager) {
+        final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
+        applyLuceneWorkLocally( queue, indexManager, message );
     }
 
     private void applyLuceneWorkLocally(List<LuceneWork> queue, IndexManager indexManager, Message message) {
