@@ -59,7 +59,6 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	protected String clusterName;
 
 	private Channel channel;
-	private JGroupsMasterMessageListener masterListener;
 	private boolean channelIsManaged = true;
 	private BuildContext context;
 
@@ -76,11 +75,9 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 
 	@Override
 	public void stop() {
-        if (masterListener != null) {
-		    context.releaseService( MasterSelectorServiceProvider.class );
-        }
         BuildContext temp = context;
-		context = null;
+        context = null;
+        temp.releaseService( MasterSelectorServiceProvider.class );
 		try {
             if (channel != null) {
                 if ( channelIsManaged ) {
@@ -108,7 +105,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 		this.context = context;
 		log.jGroupsStartingChannel();
 		buildChannel( props );
-        NodeSelectorStrategyHolder masterNodeSelector = null;
+        NodeSelectorStrategyHolder masterNodeSelector = context.requestService(MasterSelectorServiceProvider.class);
         Receiver receiver = channel.getReceiver();
         if (receiver != null) {
             if (receiver instanceof MultiJGroupsMasterMessageListener) {
@@ -116,8 +113,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
                 multiReceiver.addContext(context, props);
             }
         } else {
-            masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
-            masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
+            JGroupsMasterMessageListener masterListener = new JGroupsMasterMessageListener( context, masterNodeSelector );
             channel.setReceiver(masterListener);
         }
 		if ( channelIsManaged ) {
@@ -128,9 +124,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 				throw log.unabletoConnectToJGroupsCluster( clusterName, e );
 			}
 		}
-        if (masterNodeSelector != null) {
-		    masterNodeSelector.setLocalAddress( channel.getAddress() );
-        }
+		masterNodeSelector.setLocalAddress( channel.getAddress() );
 		log.jGroupsConnectedToCluster( clusterName, channel.getAddress() );
 
 		if ( !channel.flushSupported() ) {
