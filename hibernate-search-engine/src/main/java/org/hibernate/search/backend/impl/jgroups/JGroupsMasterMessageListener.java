@@ -45,6 +45,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Ales Justin
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
  * @see org.jgroups.Receiver
@@ -54,10 +55,16 @@ public class JGroupsMasterMessageListener implements Receiver {
 	private static final Log log = LoggerFactory.make();
 	private final BuildContext context;
 	private final NodeSelectorStrategyHolder selector;
+    private final ClassLoader classLoader;
 
 	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorStrategyHolder masterNodeSelector) {
+        this(context, masterNodeSelector, null);
+	}
+
+	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorStrategyHolder masterNodeSelector, ClassLoader classLoader) {
 		this.context = context;
 		this.selector = masterNodeSelector;
+        this.classLoader = classLoader;
 	}
 
 	@Override
@@ -68,6 +75,19 @@ public class JGroupsMasterMessageListener implements Receiver {
 	}
 
     protected void receive(Message message, byte[] rawBuffer, String indexName) {
+        if (classLoader != null) {
+            final ClassLoader previous = SecurityActions.setTCCL(classLoader);
+            try {
+                receiveInternal(message, rawBuffer, indexName);
+            } finally {
+                SecurityActions.setTCCL(previous);
+            }
+        } else {
+            receiveInternal(message, rawBuffer, indexName);
+        }
+    }
+
+    private void receiveInternal(Message message, byte[] rawBuffer, String indexName) {
         final NodeSelectorStrategy nodeSelector = selector.getMasterNodeSelector( indexName );
         try {
             if ( nodeSelector.isIndexOwnerLocal() ) {
@@ -79,7 +99,6 @@ public class JGroupsMasterMessageListener implements Receiver {
                 }
                 else {
                     log.messageReceivedForUndefinedIndex( indexName );
-                    return;
                 }
             }
             else {

@@ -51,6 +51,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 	public static final String CONFIGURATION_FILE = JGROUPS_PREFIX + "configurationFile";
 	public static final String CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
 	public static final String CHANNEL_INJECT = JGROUPS_PREFIX + "providedChannel";
+	public static final String CLASSLOADER = JGROUPS_PREFIX + "classloader";
 
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 	private static final String DEFAULT_CLUSTER_NAME = "Hibernate Search Cluster";

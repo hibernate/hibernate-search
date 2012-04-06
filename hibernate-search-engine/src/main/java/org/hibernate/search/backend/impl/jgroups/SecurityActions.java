@@ -21,33 +21,34 @@
   * 51 Franklin Street, Fifth Floor
   * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.search.backend.impl.jgroups;
 
-import java.util.Properties;
-
-import org.hibernate.search.spi.BuildContext;
-import org.jgroups.Receiver;
-
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
- * Listen for messages from slave nodes and apply them into <code>LuceneBackendQueueProcessor</code>
- * Handle messages in shared environment.
- *
- * @author Ales Justin
+ * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public interface MultiJGroupsMasterMessageListener extends Receiver {
-    /**
-     * Add context.
-     *
-     * @param context the context
-     * @param properties the properties
-     */
-    void addContext(BuildContext context, Properties properties);
+final class SecurityActions {
+    static ClassLoader setTCCL(final ClassLoader cl) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm == null) {
+            return setTCCLInternal(cl);
+        } else {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return setTCCLInternal(cl);
+                }
+            });
+        }
+    }
 
-    /**
-     * Remove context.
-     *
-     * @param context the context
-     */
-    void removeContext(BuildContext context);
+    private static ClassLoader setTCCLInternal(ClassLoader cl) {
+        final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        if (cl != null) {
+            Thread.currentThread().setContextClassLoader(cl);
+        }
+        return tccl;
+    }
 }

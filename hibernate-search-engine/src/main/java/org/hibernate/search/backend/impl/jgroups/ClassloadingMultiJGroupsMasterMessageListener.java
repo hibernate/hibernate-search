@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
   *
-  * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
   * indicated by the @author tags or express copyright attribution
   * statements applied by the authors.  All third-party contributions are
   * distributed under license by Red Hat, Inc.
@@ -21,33 +21,22 @@
   * 51 Franklin Street, Fifth Floor
   * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.search.backend.impl.jgroups;
 
 import java.util.Properties;
 
 import org.hibernate.search.spi.BuildContext;
-import org.jgroups.Receiver;
-
 
 /**
- * Listen for messages from slave nodes and apply them into <code>LuceneBackendQueueProcessor</code>
- * Handle messages in shared environment.
+ * Use custom classloader.
  *
  * @author Ales Justin
  */
-public interface MultiJGroupsMasterMessageListener extends Receiver {
-    /**
-     * Add context.
-     *
-     * @param context the context
-     * @param properties the properties
-     */
-    void addContext(BuildContext context, Properties properties);
-
-    /**
-     * Remove context.
-     *
-     * @param context the context
-     */
-    void removeContext(BuildContext context);
+public class ClassloadingMultiJGroupsMasterMessageListener extends MapMultiJGroupsMasterMessageListener {
+    protected JGroupsMasterMessageListener createListener(BuildContext context, Properties properties) {
+        final ClassLoader classLoader = (ClassLoader) properties.get(JGroupsChannelProvider.CLASSLOADER);
+        NodeSelectorStrategyHolder holder = context.requestService(MasterSelectorServiceProvider.class);
+        return new JGroupsMasterMessageListener(context, holder, classLoader);
+    }
 }
