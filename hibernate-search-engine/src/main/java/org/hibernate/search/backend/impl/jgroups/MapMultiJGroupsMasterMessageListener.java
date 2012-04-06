@@ -47,12 +47,16 @@ public class MapMultiJGroupsMasterMessageListener implements MultiJGroupsMasterM
     private ConcurrentMap<String, JGroupsMasterMessageListener> listeners = new ConcurrentHashMap<String, JGroupsMasterMessageListener>();
 
     public void addContext(BuildContext context, Properties properties) {
-        NodeSelectorStrategyHolder holder = context.requestService(MasterSelectorServiceProvider.class);
-        JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener(context, holder);
+        JGroupsMasterMessageListener listener = createListener(context, properties);
         IndexManagerHolder managerHolder = context.getAllIndexesManager();
         for (IndexManager manager : managerHolder.getIndexManagers()) {
             listeners.putIfAbsent(manager.getIndexName(), listener);
         }
+    }
+
+    protected JGroupsMasterMessageListener createListener(BuildContext context, Properties properties) {
+        NodeSelectorStrategyHolder holder = context.requestService(MasterSelectorServiceProvider.class);
+        return new JGroupsMasterMessageListener(context, holder);
     }
 
     public void removeContext(BuildContext context) {
