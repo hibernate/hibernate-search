@@ -161,9 +161,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( SimpleHotel.class ).get();
 
 		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
-				centerLatitude, centerLongitude, 50,
-				queryBuilder,
-				SimpleHotel.class
+				centerLatitude, centerLongitude, 50
 		);
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, SimpleHotel.class );
@@ -171,9 +169,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSimpleSpatialQuery(
-				centerLatitude, centerLongitude, 51,
-				queryBuilder,
-				SimpleHotel.class
+				centerLatitude, centerLongitude, 51
 		);
 
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, SimpleHotel.class );

@@ -49,13 +49,13 @@ public class SimpleSpatialFieldBridge implements FieldBridge {
 			Coordinates coordinates = (Coordinates) value;
 
 			luceneOptions.addNumericFieldToDocument(
-					"latitude",
+					"latitude_hibernate_search_spatial",
 					coordinates.getLatitude(),
 					document
 			);
 
 			luceneOptions.addNumericFieldToDocument(
-					"longitude",
+					"longitude_hibernate_search_spatial",
 					coordinates.getLongitude(),
 					document
 			);

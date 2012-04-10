@@ -20,13 +20,8 @@
  */
 package org.hibernate.search.spatial.impl;
 
-import org.apache.lucene.search.ConstantScoreQuery;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.search.*;
 import org.hibernate.search.spatial.SpatialFieldBridge;
-import org.hibernate.search.query.dsl.QueryBuilder;
 
 import java.util.List;
 
@@ -171,42 +166,34 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
-	 * @param queryBuilder a Hibernate Search query builder
-	 * @param entityType the class of the @Spatial annotated entity
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
 	 * @see	org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildSimpleSpatialQuery(Point center, double radius, QueryBuilder queryBuilder, Class<?> entityType) {
+	public static Query buildSimpleSpatialQuery(Point center, double radius) {
+
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
-		org.apache.lucene.search.Query query = queryBuilder.bool()
-				.must(
-						queryBuilder.range()
-								.onField( "latitude" )
-								.from( boundingBox.getLowerLeft().getLatitude() )
-								.to( boundingBox.getUpperRight().getLatitude() )
-								.createQuery()
-				)
-				.must(
-						queryBuilder.range()
-								.onField( "longitude" )
-								.from( boundingBox.getLowerLeft().getLongitude() )
-								.to( boundingBox.getUpperRight().getLongitude() )
-								.createQuery()
-				)
-				.createQuery();
-		return new ConstantScoreQuery(
+        Query latQuery= NumericRangeQuery.newDoubleRange( "latitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLatitude(),
+                boundingBox.getUpperRight().getLatitude(), true, true);
+
+        Query longQuery= NumericRangeQuery.newDoubleRange( "longitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLongitude(),
+                boundingBox.getUpperRight().getLongitude(), true, true);
+
+        BooleanQuery boxQuery = new BooleanQuery();
+        boxQuery.add(latQuery, BooleanClause.Occur.MUST);
+        boxQuery.add(longQuery, BooleanClause.Occur.MUST);
+
+        return new ConstantScoreQuery(
 				buildDistanceFilter(
-						new QueryWrapperFilter( query ),
+						new QueryWrapperFilter( boxQuery ),
 						center,
 						radius,
-						"latitude",
-						"longitude"
+						"latitude_hibernate_search_spatial",
+						"longitude_hibernate_search_spatial"
 				)
 		);
-
 	}
 }
