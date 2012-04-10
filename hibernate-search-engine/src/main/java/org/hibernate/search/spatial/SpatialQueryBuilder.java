@@ -21,8 +21,6 @@
 package org.hibernate.search.spatial;
 
 import org.apache.lucene.search.Query;
-
-import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
 
@@ -63,20 +61,16 @@ public abstract class SpatialQueryBuilder {
 	 * @param latitude WGS84 latitude of the center of the search
 	 * @param longitude WGS84 longitude of the center of the search
 	 * @param radius distance max to center in km
-	 * @param queryBuilder a Hibernate Search query builder
-	 * @param entityType the class of the @Spatial annotated entity
 	 *                      *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
 	 * @see	Coordinates
 	 */
-	public static Query buildSimpleSpatialQuery(double latitude, double longitude, double radius, QueryBuilder queryBuilder, Class<?> entityType) {
+	public static Query buildSimpleSpatialQuery(double latitude, double longitude, double radius) {
 		return SpatialQueryBuilderFromPoint.buildSimpleSpatialQuery(
 				Point.fromDegrees( latitude, longitude ),
-				radius,
-				queryBuilder,
-				entityType
+				radius
 		);
 	}
 }
