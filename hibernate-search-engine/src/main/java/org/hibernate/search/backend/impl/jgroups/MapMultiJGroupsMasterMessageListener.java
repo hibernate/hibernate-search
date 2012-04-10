@@ -33,6 +33,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.View;
@@ -44,6 +46,8 @@ import org.jgroups.View;
  * @author Ales Justin
  */
 public class MapMultiJGroupsMasterMessageListener implements MultiJGroupsMasterMessageListener {
+    protected static final Log log = LoggerFactory.make();
+
     private ConcurrentMap<String, JGroupsMasterMessageListener> listeners = new ConcurrentHashMap<String, JGroupsMasterMessageListener>();
     private volatile View view; // last view
 
@@ -77,6 +81,8 @@ public class MapMultiJGroupsMasterMessageListener implements MultiJGroupsMasterM
         JGroupsMasterMessageListener listener = listeners.get(indexName);
         if (listener != null) {
             listener.receive(message, rawBuffer, indexName);
+        } else {
+            log.warnf("No matching listener found for indexName: $1%s, missing an application?", indexName);
         }
     }
 
