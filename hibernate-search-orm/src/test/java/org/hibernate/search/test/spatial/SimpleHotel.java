@@ -28,9 +28,7 @@ public class SimpleHotel implements Coordinates {
 	@Field(store = Store.YES, index = Index.YES)
 	String type;
 
-	@Field
 	double latitude;
-	@Field
 	double longitude;
 
 	public SimpleHotel( Integer id, String name, double latitude, double longitude, String type ) {
