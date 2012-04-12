@@ -25,7 +25,6 @@ package org.hibernate.search.reader.impl;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 
 /**
@@ -50,16 +49,6 @@ public class CacheableMultiReader extends MultiReader {
 	}
 
 	@Override
-	public final void decRef() {
-		avoidUsingThis();
-	}
-
-	@Override
-	public final void incRef() {
-		avoidUsingThis();
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		// Equality only checks for subReaders as an equal sub-IndexReader is certainly coming from the same ReaderProvider.
 		if ( this == obj ) return true;
@@ -80,11 +69,6 @@ public class CacheableMultiReader extends MultiReader {
 			result = 31 * result + reader.hashCode();
 		}
 		return result;
-	}
-
-	private void avoidUsingThis() {
-		throw new SearchException( "IndexReader lifecycle should not be managed, please use "
-				+ "org.hibernate.search.SearchFactory.closeIndexReader(IndexReader) to close IndexReader instances or pool them." );
 	}
 
 }
