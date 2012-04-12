@@ -21,7 +21,6 @@ package org.hibernate.search.test.util;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
@@ -29,9 +28,9 @@ import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.document.MapFieldSelector;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.StaleReaderException;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.index.TermEnum;
@@ -39,7 +38,6 @@ import org.apache.lucene.index.TermFreqVector;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.index.TermVectorMapper;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.LockObtainFailedException;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.impl.NotSharedReaderProvider;
 import org.hibernate.search.indexes.spi.ReaderProvider;
@@ -177,15 +175,6 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			return delegate.maxDoc();
 		}
 
-		public int numDeletedDocs() {
-			return delegate.numDeletedDocs();
-		}
-
-		public Document document(int n) throws CorruptIndexException, IOException {
-			FieldSelectorLeakingReaderProvider.fieldSelector = null;
-			return delegate.document( n );
-		}
-
 		public Document document(int n, FieldSelector fieldSelector) throws CorruptIndexException, IOException {
 			FieldSelectorLeakingReaderProvider.fieldSelector = fieldSelector;
 			return delegate.document( n, fieldSelector );
@@ -211,10 +200,6 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			delegate.norms( field, bytes, offset );
 		}
 
-		public void setNorm(int doc, String field, byte value) throws StaleReaderException, CorruptIndexException, LockObtainFailedException, IOException {
-			delegate.setNorm( doc, field, value );
-		}
-
 		public TermEnum terms() throws IOException {
 			return delegate.terms();
 		}
@@ -235,28 +220,8 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			return delegate.termDocs();
 		}
 
-		public TermPositions termPositions(Term term) throws IOException {
-			return delegate.termPositions( term );
-		}
-
 		public TermPositions termPositions() throws IOException {
 			return delegate.termPositions();
-		}
-
-		public void deleteDocument(int docNum) throws StaleReaderException, CorruptIndexException, LockObtainFailedException, IOException {
-			delegate.deleteDocument( docNum );
-		}
-
-		public int deleteDocuments(Term term) throws StaleReaderException, CorruptIndexException, LockObtainFailedException, IOException {
-			return delegate.deleteDocuments( term );
-		}
-
-		public void undeleteAll() throws StaleReaderException, CorruptIndexException, LockObtainFailedException, IOException {
-			delegate.undeleteAll();
-		}
-
-		public Collection<String> getFieldNames(FieldOption fldOption) {
-			return delegate.getFieldNames( fldOption );
 		}
 
 		public IndexCommit getIndexCommit() throws IOException {
@@ -302,7 +267,12 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		protected void doClose() throws IOException {
 			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
 		}
-		
+
+		@Override
+		public FieldInfos getFieldInfos() {
+			return delegate.getFieldInfos();
+		}
+
 	}
 
 }
