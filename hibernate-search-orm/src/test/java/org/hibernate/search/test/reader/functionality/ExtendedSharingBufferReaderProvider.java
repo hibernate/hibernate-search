@@ -24,7 +24,6 @@
 package org.hibernate.search.test.reader.functionality;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -35,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
@@ -251,11 +251,6 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		}
 
 		@Override
-		public Collection getFieldNames(FieldOption fldOption) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public TermFreqVector getTermFreqVector(int docNumber, String field) {
 			throw new UnsupportedOperationException();
 		}
@@ -328,6 +323,11 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		@Override
 		protected void doCommit(Map<String, String> commitUserData) {
 			// no-op
+		}
+
+		@Override
+		public FieldInfos getFieldInfos() {
+			throw new UnsupportedOperationException();
 		}
 
 	}

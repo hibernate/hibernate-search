@@ -24,14 +24,13 @@
 package org.hibernate.search.test.embedded.depth;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 
 import junit.framework.Assert;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexReader.FieldOption;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.ReaderUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -178,8 +177,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		IndexReaderAccessor indexReaderAccessor = getSearchFactory().getIndexReaderAccessor();
 		IndexReader indexReader = indexReaderAccessor.open( WorkingPerson.class );
 		try {
-			Collection<String> fieldNames = indexReader.getFieldNames(FieldOption.ALL);
-			return fieldNames.contains( fieldName );
+			return ReaderUtil.getIndexedFields( indexReader ).contains( fieldName );
 		}
 		finally {
 			indexReaderAccessor.close( indexReader );
