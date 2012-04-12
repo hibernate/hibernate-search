@@ -125,18 +125,6 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			return delegate.equals( obj );
 		}
 
-		public int getRefCount() {
-			return delegate.getRefCount();
-		}
-
-		public void incRef() {
-			delegate.incRef();
-		}
-
-		public void decRef() throws IOException {
-			delegate.decRef();
-		}
-
 		public String toString() {
 			return delegate.toString();
 		}
