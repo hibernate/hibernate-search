@@ -16,6 +16,9 @@ public class PointTest {
 		Point point = Point.fromDegrees( 45, 517 );
 		Assert.assertEquals( 45, point.getLatitude(), 0 );
 		Assert.assertEquals( 157, point.getLongitude(), 0 );
+
+		Point point2 = Point.fromDegrees( 0, -185 );
+		Assert.assertEquals( 175, point2.getLongitude(), 0 );
 	}
 
 	@Test
