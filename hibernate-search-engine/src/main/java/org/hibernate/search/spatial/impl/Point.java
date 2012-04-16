@@ -44,8 +44,12 @@ public final class Point implements Coordinates {
 	 */
 	public static Point fromDegrees(double latitude, double longitude) {
 		// Normalize longitude in [-180;180]
-		longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE ) - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
-
+		longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE );
+		if( longitude < 0) {
+			longitude = longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
+		} else {
+			longitude = longitude - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
+		}
 		if ( latitude > GeometricConstants.LATITUDE_DEGREE_MAX || latitude < GeometricConstants.LATITUDE_DEGREE_MIN ) {
 			throw LOG.illegalLatitude();
 		}
