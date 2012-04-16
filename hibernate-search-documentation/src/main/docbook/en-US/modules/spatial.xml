@@ -30,24 +30,24 @@
 <chapter id="spatial">
   <title>Spatial</title>
 
-  <para>The spatial functionalities of Hibernate enable indexed entities with
+  <para>The spatial functionalities of Hibernate Search enable indexed entities with
   latitude and longitude fields to be spatialy indexed then searched and
   filtered by defining a search discus, providing a center and a radius.</para>
-  <para>Typical usage is to find nearby hotels (between 500m and 5 km) in a 5
-  millions worldwide data set.</para>
+  <para>Typical usage is to find nearby locations of interest (between 500m and 5 km) in a 5
+  millions worldwide data set (for instance hotels, pubs, airports).</para>
 
   <section id="spatial-goals">
     <title>Goals</title>
 
-    <para>The spatial support of Hibernate Search has a few goals :</para>
+    <para>The spatial support of Hibernate Search has a few goals:</para>
 
     <itemizedlist>
       <listitem>
-        <para>Enable spatial search on entities (find entities within x km
-        from location (latitude, longitude) on earth)</para>
+        <para>Enable spatial search on entities, find entities within x km
+        from location (latitude, longitude) on earth</para>
       </listitem>
       <listitem>
-        <para>Provide simple method for spatial index via annotations</para>
+        <para>Provide simple method to implement a spatial index via annotations</para>
       </listitem>
       <listitem>
         <para>Provide simple methods for querying (QueryBuilder + DSL)</para>
@@ -61,12 +61,12 @@
   <section id="spatial-strategy">
     <title>Choosing an indexing strategy</title>
 
-    <para>There are two strategy you can choose in HS spatial to index the
-    latitude,longitude) properties of your entities :</para>
+    <para>There are two strategies you can choose in HS spatial to index the
+    latitude and longitude properties of your entities :</para>
     
     <itemizedlist>
       <listitem>
-        <para>like numbers formatted for range queries</para>
+        <para>as numbers formatted for range queries</para>
       </listitem>
       <listitem>
         <para>in a grid (Quad-Tree) for two stage spatial queries</para>
@@ -76,27 +76,29 @@
     <section id="spatial-strategy-range">
       <title>Double range queries</title>
 
-      <para>Pros :</para>
+      <para>Pros:</para>
       <itemizedlist>
         <listitem>
           <para>Quick on small data sets (&lt; 100k entities)</para>
         </listitem>
         <listitem>
-          <para>Straigh forward to debug/analyze</para>
+          <para>Straight forward to debug/analyze</para>
         </listitem>
         <listitem>
           <para>Index size is moderate</para>
         </listitem>
       </itemizedlist>
       
-      <para>Cons :</para>
+      <para>Cons:</para>
       <itemizedlist>
         <listitem>
           <para>Poor performance on large data sets</para>
         </listitem>
         <listitem>
-          <para>Poor performance on worldwide data set (when data on US 
-          / Europe / Asia collide because of same latitude)</para>
+          <para>Poor performance on worldwide data set (For example when indexed points of 
+		  interest in the United States, in Europe and in Asia collide because they share the
+		  same latitude, the latitude range query returns large amounts of data that need to 
+		  be crossed check with those returned by the longitude range).</para>
         </listitem>
       </itemizedlist>
     </section>
@@ -117,10 +119,7 @@
       <para>Cons :</para>
       <itemizedlist>
         <listitem>
-          <para>Index size is big (de normalization)</para>
-        </listitem>
-        <listitem>
-          <para>Index size is big (de normalization)</para>
+          <para>Index size is big (denormalization)</para>
         </listitem>
       </itemizedlist>
       
@@ -130,13 +129,13 @@
   <section id="spatial-range-queries">
     <title>Range query indexing and querying</title>
     
-    <para>To index your entities for range querying you :</para>
+    <para>To index your entities for range querying you:</para>
     <itemizedlist>
       <listitem>
-        <para>have two double properties latitude and longitude marked with @Field</para>
+        <para>have two properties latitude and longitude of type double marked with @Field</para>
       </listitem>
       <listitem>
-        <para>implement the Coordinates interface </para>
+        <para>implement the <classname>Coordinates</classname> interface</para>
       </listitem>
       <listitem>
         <para>add the @Spatial annotation at class level</para>
@@ -156,7 +155,10 @@
     <example>
       <title>SimpleHotel class sample</title>
 
-      <programlisting language="JAVA" role="JAVA">@Entity
+      <programlisting language="JAVA" role="JAVA">import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.annotations.*;
+	  
+@Entity
 @Indexed
 @Spatial
 public class SimpleHotel implements Coordinates {
@@ -177,7 +179,7 @@ public class SimpleHotel implements Coordinates {
         with your search center and radius</para>
       </listitem>
       <listitem>
-        <para>eventually combine the resulting Qiuery with other filters</para>
+        <para>eventually combine the resulting Query with other filters</para>
       </listitem>
       <listitem>
         <para>call the createFullTextQuery() and use the results</para>
@@ -187,27 +189,29 @@ public class SimpleHotel implements Coordinates {
     <example>
       <title>SimpleHotel class sample</title>
 
-      <programlisting language="JAVA" role="JAVA">QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( SimpleHotel.class ).get();
+      <programlisting language="JAVA" role="JAVA">QueryBuilder queryBuilder = fullTextSession.getSearchFactory().
+	buildQueryBuilder().forEntity( SimpleHotel.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
-				centerLatitude, centerLongitude, radius,
-				queryBuilder,
-				SimpleHotel.class
-		);</programlisting>
+	org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
+		centerLatitude, centerLongitude, radius,
+		queryBuilder,
+		SimpleHotel.class
+	);</programlisting>
     </example>
     
-    <para>Sample code is at SpatialIndexingTest.testSimpleSpatialAnnotationOnClassLevel()
-    and in SimpleHotel class in tests.</para>
+    <para>A fully working example can be found in the source code, in the testsuite.
+	See SpatialIndexingTest.testSimpleSpatialAnnotationOnClassLevel()
+    and in SimpleHotel class.</para>
 
   </section>
   
   <section id="spatial-two-stages-grid">
     <title>Two stages spatial queries with grid</title>
     
-    <para>To index your entities you :</para>
+    <para>To index your entities you:</para>
     <itemizedlist>
       <listitem>
-        <para>implement the Coordinates interface </para>
+        <para>implement the <classname>Coordinates</classname> interface </para>
       </listitem>
       <listitem>
         <para>add the @Spatial annotation at class level with a name for referencing the grid
@@ -228,14 +232,14 @@ public class Hotel implements Coordinates {
 </programlisting>
     </example>
       
-    <para>To query your entities, you :</para>
+    <para>To query your entities, you:</para>
     <itemizedlist>
       <listitem>
         <para>call SpatialQueryBuilder.buildSpatialQuery with your center, radius and the name
         of the grid fields (location passed above)</para>
       </listitem>
       <listitem>
-        <para>eventually combine the resulting Qiuery with other filters</para>
+        <para>eventually combine the resulting Query with other filters</para>
       </listitem>
       <listitem>
         <para>call the createFullTextQuery() and use the results</para>
@@ -245,7 +249,8 @@ public class Hotel implements Coordinates {
     <example>
       <title>Querying grid indexed entities</title>
 
-      <programlisting language="JAVA" role="JAVA">		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQuery(
+      <programlisting language="JAVA" role="JAVA">org.apache.lucene.search.Query luceneQuery =
+	  SpatialQueryBuilder.buildSpatialQuery(
 				centerLatitude,
 				centerLongitude,
 				50,
@@ -262,20 +267,21 @@ public class Hotel implements Coordinates {
   <section id="spatial-behind -curtain">
     <title>Grid - Behind the curtain</title>
     
-    <para>Here comes the gory details of the grid based indexation.</para>
+    <para>Here are the gory details of the grid based indexation.</para>
     
     <section>
       <title>At indexation level</title>
       
-      <para>When Hibernate search index the entity annotated with @Spatial, it instantiate a SpatialFieldBridge
-      to transform the latitude and longitude fields accessed via the Coordiantes interface to the multiple index
+      <para>When Hibernate Search indexes the entity annotated with @Spatial, it instantiates a SpatialFieldBridge
+      to transform the latitude and longitude fields accessed via the Coordinates interface to the multiple index
       fields stored in the Lucene index.</para>
       
-      <para>Principle of the spatial index : the spatial index used in Hibernate Search is a QuadTree type
-      (http://en.wikipedia.org/wiki/Quadtree).</para>
+      <para>Principle of the spatial index : the spatial index used in Hibernate Search is a QuadTree
+      (<ulink url="http://en.wikipedia.org/wiki/Quadtree">http://en.wikipedia.org/wiki/Quadtree</ulink>).</para>
       
       <para>To make computation in a flat coordinates system the latitude and longitude field values will be projected
-      with a sinusoidal projection (http://en.wikipedia.org/wiki/Sinusoidal_projection).
+      with a sinusoidal projection (<ulink url="http://en.wikipedia.org/wiki/Sinusoidal_projection">
+	  http://en.wikipedia.org/wiki/Sinusoidal_projection</ulink>).
       Origin values space is :</para>
       <para>[-90 -> +90],]-180 -> 180]</para>
       <para>for latitude,longitude coordinates and projected space is :</para>
@@ -284,8 +290,8 @@ public class Hotel implements Coordinates {
       
       <para>The index is divided into n levels labeled from 0 to n-1.</para>
       
-      <para>At the 0 level the projected space is the whole earth.
-      At the 1 level the projected space is devided into 4 rectangles ( called boxes as in bouding box):</para>
+      <para>At the level 0 the projected space is the whole earth.
+      At the level 1 the projected space is devided into 4 rectangles (called boxes as in bounding box):</para>
       
       <para>[-pi,-pi/2]->[0,0], [-pi,0]->[0,+pi/2], [0,-pi/2]->[+pi,0] and [0,0]->[+pi,+pi/2]</para>
       
@@ -299,7 +305,7 @@ public class Hotel implements Coordinates {
       For instance, the 5th level has 4^5 = 1024 boxes with 32 indexes on each axis (32x32 is 1024) and the box of
       Id "0|8" is covering the [0,8/32*pi/2]->[1/32*pi,9/32*pi/2] rectangle is projected space.</para>
       
-      <para>Beware ! The boxes are rectangles in projected space but the related area on earth is not !</para>
+      <para>Beware! The boxes are rectangles in projected space but the related area on earth is not a rectangle!</para>
       
       <para>Now that we have all these boxes at all these levels will be indexing points "into" them.</para>
       
@@ -310,23 +316,24 @@ public class Hotel implements Coordinates {
       n the left side and inclusive on the right i-e ]start,end] (the points are normalized before projection to
       [-90,+90],]-180,+180]).</para>
       
-      <para>We store in the lucene document corresponding to the entity to index one field for each level of the grid.
-      The field is named : [spatial index fields name]_HSSI_[n] where [spatial index fields name] is the name given
-      either by the parameter at class level annotation or derived from the name of the spatial annoted method of
-      he entitiy, HSSI stands for Hibernate Search Spatial Index and n is the level of the grid.</para>
+      <para>We store in the Lucene document corresponding to the entity to index one field for each level of the grid.
+      The field is named : [spatial index fields name]_HSSI_[n].
+	  [spatial index fields name] is given either by the parameter at class level annotation
+	  or derived from the name of the spatial annoted method of he entitiy, HSSI stands for Hibernate Search Spatial
+	  Index and n is the level of the grid.</para>
       
-      <para>We also store the latitude and longitude in numeric field under [spatial index fields name]_HSSI_Latitude
+      <para>We also store the latitude and longitude as a Numeric field under [spatial index fields name]_HSSI_Latitude
       and [spatial index fields name]_HSSI_Longitude fields.
-      They will be used to filter precisly results by distance in the second stage of the search.</para>
+      They will be used to filter precisely results by distance in the second stage of the search.</para>
     </section>
     
     <section>
       <title>At search level</title>
       
-      <para>Now that we have all these fields, what are they here for ?</para>
+      <para>Now that we have all these fields, what are they used for?</para>
       
       <para>When you ask for a spatial search by providing a search discus (center+radius) we will calculate the boxes
-      ids that do cover the search discus in the projected space, fetch all the documents that belong to there boxes
+      ids that do cover the search discus in the projected space, fetch all the documents that belong to these boxes
       (thus narrowing the number of documents for which we will have to calculate distance to the center) and then
       filter this subset with a real distance calculation. This is called two level spatial filtering.</para>
       
@@ -337,34 +344,34 @@ public class Hotel implements Coordinates {
         hall be minimal without bringing back to many documents (level 0 has only 1 box but retrieve all documents).
         he optimal grid level is maximum level where the boxes width (on the X axis) is larger than the search area.
         Near the equator line where projection deformation is minimal, this will lead to the retrieval of at most
-        4 boxes. Towards the poles with deformation, it may bring more boxes but as the sinusoidal projection has a
-        Tissot's indicatrix quite simple (see http://en.wikipedia.org/wiki/Sinusoidal_projection) in populated area,
-        the overhead is minimal. (This should be tested, sampled and benchmarked).</para>
+        4 boxes. Towards the poles where the deformation is more significant,, it may bring more boxes but as the
+		sinusoidal projection has a Tissot's indicatrix quite simple (see http://en.wikipedia.org/wiki/Sinusoidal_projection)
+		in populated area, the overhead is minimal. (This should be tested, sampled and benchmarked).</para>
         
       </section>
       
       <section>
-        <title>Step 2 : compute the corresponding covering boCellIds at that level</title>
+        <title>Step 2 : compute ids of the corresponding covering boxes at that level</title>
         
-        <para>Now we have the optimal level chosen, we can compute the ids of the boxes covering the search
-        iscus (which is not a discus in projected space anymore).</para>
+        <para>Now that we have chosen the optimal level, we can compute the ids of the boxes covering the search
+        discus (which is not a discus in projected space anymore).</para>
         
         <para>This is done by org.hibernate.search.spatial.impl.GridHelper.getGridCellsIds(Point center, double
         radius, int gridLevel)</para>
         
-        <para>It will calculate the bouding box of the search discus and then call
+        <para>It will calculate the bounding box of the search discus and then call
         org.hibernate.search.spatial.impl.GridHelper.getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel)
-        that will do the actual computation. If the bouding box crosses the merdian line it will cut the search in two
-        and make two calls to getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel) with left and right
-        parts of the bouding box.</para>
+        that will do the actual computation. If the bounding box crosses the meridian line it will cut the search in two
+        and make two calls to <literal>getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel)</literal> with left and right
+        parts of the box.</para>
         
         <para>There are some geo related hacks (search radius too large, search radius crossing the poles) that are
         handled in bounding box computations done by Rectangle.fromBoundingCircle(Point center, double radius) (see
         http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates for reference on those subjects).</para>
         
         <para>The GridHelper.getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel) project the defining
-        points of the bouding box and compute the boxes they belong to. It returns all the box Ids between the lower
-        eft to the upper right corners, thus covering the area.</para>
+        points of the bounding box and compute the boxes they belong to. It returns all the box Ids between the lower
+        left to the upper right corners, thus covering the area.</para>
         
       </section>
       
@@ -374,9 +381,9 @@ public class Hotel implements Coordinates {
         <para>The Query is build with theses Ids to lookup for documents having a [spatial index fields name]_HSSI_[n]
         (n the level found at Step 1) field valued with one of the ids of Step 2. </para>
         
-        <para>See org.hibernate.search.spatial.impl.GridFilter implentation.</para>
+        <para>See org.hibernate.search.spatial.impl.GridFilter implementation.</para>
         
-        <para>This Query will return all documents in the boxes covering the projected bouding box of the search
+        <para>This Query will return all documents in the boxes covering the projected bounding box of the search
         discus. So it is too large and need refining. But we have narrowed the distance calculation problems to
         a subet of our datas.</para>
         
@@ -386,7 +393,7 @@ public class Hotel implements Coordinates {
         <title>Step 4 : refine </title>
         
         <para>A distance calulation filter is set after the Lucene index lookup query of Step 3 to exclude false
-        candidate from the result list.</para>
+        candidates from the result list.</para>
         
         <para>See SpatialQueryBuilderFromPoint.buildSpatialQuery(Point center, double radius, String fieldName)</para>
         
