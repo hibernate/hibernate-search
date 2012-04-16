@@ -110,12 +110,12 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		analyzer = fts.getSearchFactory().getAnalyzer( "html_standard_analyzer" );
 		text = "This is <b>foo</b><i>bar's</i>";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		assertTokensEqual( tokens, new String[] { "This", "is", "foo", "bar" } );
+		assertTokensEqual( tokens, new String[] { "This", "is", "foobar" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "html_whitespace_analyzer" );
 		text = "This is <b>foo</b><i>bar's</i>";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		assertTokensEqual( tokens, new String[] { "This", "is", "foo", "bar's" } );
+		assertTokensEqual( tokens, new String[] { "This", "is", "foobar's" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "trim_analyzer" );
 		text = " Kittens!   ";
