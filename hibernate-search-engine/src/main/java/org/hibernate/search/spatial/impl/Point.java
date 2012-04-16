@@ -43,21 +43,35 @@ public final class Point implements Coordinates {
 	 * @return a point with coordinates given in degrees
 	 */
 	public static Point fromDegrees(double latitude, double longitude) {
+		double _latitude, _longitude;
 		// Normalize longitude in [-180;180]
 		if( (longitude < -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) || (longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
-			longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE );
-			if( longitude < 0) {
-				longitude = longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
+			// shift 180 and normalize full circle turn
+			_longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE );
+			// as Java % is not a math modulus we may have negative numbers so the unshift is sign dependant
+			if( _longitude < 0) {
+				_longitude = _longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 			} else {
-				longitude = longitude - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
+				_longitude = _longitude - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 			}
+		} else {
+			_longitude= longitude;
 		}
 
 		if ( latitude > GeometricConstants.LATITUDE_DEGREE_MAX || latitude < GeometricConstants.LATITUDE_DEGREE_MIN ) {
-			throw LOG.illegalLatitude();
+			// shift 90, normalize full circle turn and 'symmetry' on the lat axis with abs
+			_latitude = Math.abs( ( latitude + ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % ( GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE ) );
+			// Push 2nd and 3rd quadran in 1st and 4th by 'symmetry'
+			if( _latitude > GeometricConstants.LATITUDE_DEGREE_RANGE ) {
+				_latitude= GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE- _latitude;
+			}
+			// unshift
+			_latitude= _latitude - ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 );
+		} else {
+			_latitude= latitude;
 		}
 
-		return new Point( latitude, longitude );
+		return new Point( _latitude, _longitude );
 	}
 
 	/**
