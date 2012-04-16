@@ -81,7 +81,7 @@
       <listitem>
         <para><literal>directory-based</literal>: the default implementation
         which uses the Lucene <classname>Directory</classname> abstraction to
-        mange index files.</para>
+        manage index files.</para>
       </listitem>
 
       <listitem>
