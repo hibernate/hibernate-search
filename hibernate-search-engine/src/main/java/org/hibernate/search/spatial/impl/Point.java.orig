@@ -43,21 +43,34 @@ public final class Point implements Coordinates {
 	 * @return a point with coordinates given in degrees
 	 */
 	public static Point fromDegrees(double latitude, double longitude) {
+		double _latitude, _longitude;
 		// Normalize longitude in [-180;180]
-		if( (longitude < -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) || (longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
+<<<<<<< Updated upstream
+		if( (longitude < -180) || (longitude > 180) ) {
 			longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE );
 			if( longitude < 0) {
 				longitude = longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
+=======
+		if( (longitude <= -180) || (longitude > 180) ) {
+			_longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE );
+			if( _longitude < 0) {
+				_longitude = _longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
+>>>>>>> Stashed changes
 			} else {
-				longitude = longitude - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
+				_longitude = _longitude - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 			}
+		} else {
+			_longitude= longitude;
 		}
 
 		if ( latitude > GeometricConstants.LATITUDE_DEGREE_MAX || latitude < GeometricConstants.LATITUDE_DEGREE_MIN ) {
-			throw LOG.illegalLatitude();
+			_latitude = ( ( latitude + ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LATITUDE_DEGREE_RANGE );
+			
+		} else {
+			_latitude= latitude;
 		}
 
-		return new Point( latitude, longitude );
+		return new Point( _latitude, _longitude );
 	}
 
 	/**
