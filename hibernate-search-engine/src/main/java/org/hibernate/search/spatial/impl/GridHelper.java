@@ -99,7 +99,7 @@ public abstract class GridHelper {
 	 * Generate a Grid Cell Ids List covered by a bounding box
 	 *
 	 * @param lowerLeft lower left corner of the bounding box
-	 * @param upperRight upper right corner of the bouding box
+	 * @param upperRight upper right corner of the bounding box
 	 * @param gridLevel grid level of the wanted cell ids
 	 *                  
 	 * @return List of ids of the cells containing the point
@@ -161,7 +161,7 @@ public abstract class GridHelper {
 	}
 
 	/**
-	 * Generate a Grid Cell Ids List for the bouding box of a circular search area
+	 * Generate a Grid Cell Ids List for the bounding box of a circular search area
 	 *
 	 * @param center center of the search area
 	 * @param radius radius of the search area
@@ -207,7 +207,7 @@ public abstract class GridHelper {
 	/**
 	 * If point are searched at d distance from a point, a certain grid cell level will problem grid cell that are
 	 * big enough to contain the search area but the smallest possible. By returning this level we ensure 4 Grid Cell
-	 * maximum will be needed to coverd the search area (2 max on each axis because of search area crossing fixed bonds
+	 * maximum will be needed to cover the search area (2 max on each axis because of search area crossing fixed bonds
 	 * of the grid cells)
 	 *
 	 * @param searchRange search range to be covered by the grid cells
@@ -222,7 +222,7 @@ public abstract class GridHelper {
 	}
 
 	/**
-	 * Project a degre latitude/longitude point into a sinusoidal projection planar space for grid cell ids computation
+	 * Project a degree latitude/longitude point into a sinusoidal projection planar space for grid cell ids computation
 	 *
 	 * @param point point to be projected
 	 *

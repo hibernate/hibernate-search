@@ -26,7 +26,7 @@ import org.hibernate.search.spatial.SpatialFieldBridge;
 import java.util.List;
 
 /**
- * The SpatialQueryBuilder hold builder methods for Grid, Distance and Spatial (Grid+Distance) filters and queries
+ * The SpatialQueryBuilder holds builder methods for Grid, Distance and Spatial (Grid+Distance) filters and queries
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
@@ -41,8 +41,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @return Lucene filter to be used in a Query
 	 *
-	 * @see	org.apache.lucene.search.Query
-	 * @see	org.hibernate.search.spatial.Coordinates
+	 * @see org.apache.lucene.search.Query
+	 * @see org.hibernate.search.spatial.Coordinates
 	 * @see org.apache.lucene.search.Filter
 	 */
 	public static Filter buildGridFilter(Point center, double radius, String fieldName) {
@@ -63,12 +63,12 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @return Lucene filter to be used in a Query
 	 *
-	 * @param	previousFilter	preceding filter in filter chain
+	 * @param previousFilter	preceding filter in filter chain
 	 * Warning if passed null DistanceFilter constructor use a
-	 * filter wrapped match all query (time/ressource consuming !)
-	 * @see	org.apache.lucene.search.Query
-	 * @see	org.hibernate.search.spatial.Coordinates
-	 * @see	DistanceFilter
+	 * filter wrapped match all query (time/resource consuming !)
+	 * @see org.apache.lucene.search.Query
+	 * @see org.hibernate.search.spatial.Coordinates
+	 * @see DistanceFilter
 	 * @see Filter
 	 */
 	public static Filter buildDistanceFilter(Filter previousFilter, Point center, double radius, String coordinatesField) {
@@ -85,12 +85,12 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @return Lucene filter to be used in a Query
 	 *
-	 * @param	previousFilter	preceding filter in filter chain
+	 * @param previousFilter	preceding filter in filter chain
 	 * Warning if passed null DistanceFilter constructor use a
 	 * filter wrapped match all query (time/ressource consuming !)
-	 * @see	org.apache.lucene.search.Query
-	 * @see	org.hibernate.search.spatial.Coordinates
-	 * @see	DistanceFilter
+	 * @see org.apache.lucene.search.Query
+	 * @see org.hibernate.search.spatial.Coordinates
+	 * @see DistanceFilter
 	 * @see Filter
 	 */
 	public static Filter buildDistanceFilter(Filter previousFilter, Point center, double radius, String latitudeField, String longitudeField) {
@@ -108,8 +108,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
-	 * @see	org.apache.lucene.search.Query
-	 * @see	org.hibernate.search.spatial.Coordinates
+	 * @see org.apache.lucene.search.Query
+	 * @see org.hibernate.search.spatial.Coordinates
 	 * @see org.apache.lucene.search.ConstantScoreQuery
 	 */
 	public static Query buildGridQuery(Point center, double radius, String fieldName) {
@@ -127,8 +127,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
-	 * @see	Query
-	 * @see	org.hibernate.search.spatial.Coordinates
+	 * @see Query
+	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildDistanceQuery(Point center, double radius, String fieldName) {
 		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
@@ -146,8 +146,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
-	 * @see	Query
-	 * @see	org.hibernate.search.spatial.Coordinates
+	 * @see Query
+	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildSpatialQuery(Point center, double radius, String fieldName) {
 		return new ConstantScoreQuery(
@@ -169,24 +169,24 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
-	 * @see	Query
-	 * @see	org.hibernate.search.spatial.Coordinates
+	 * @see Query
+	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildSimpleSpatialQuery(Point center, double radius) {
 
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
-        Query latQuery= NumericRangeQuery.newDoubleRange( "latitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLatitude(),
-                boundingBox.getUpperRight().getLatitude(), true, true);
+		Query latQuery= NumericRangeQuery.newDoubleRange( "latitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLatitude(),
+				boundingBox.getUpperRight().getLatitude(), true, true);
 
-        Query longQuery= NumericRangeQuery.newDoubleRange( "longitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLongitude(),
-                boundingBox.getUpperRight().getLongitude(), true, true);
+		Query longQuery= NumericRangeQuery.newDoubleRange( "longitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLongitude(),
+				boundingBox.getUpperRight().getLongitude(), true, true);
 
-        BooleanQuery boxQuery = new BooleanQuery();
-        boxQuery.add(latQuery, BooleanClause.Occur.MUST);
-        boxQuery.add(longQuery, BooleanClause.Occur.MUST);
+		BooleanQuery boxQuery = new BooleanQuery();
+		boxQuery.add(latQuery, BooleanClause.Occur.MUST);
+		boxQuery.add(longQuery, BooleanClause.Occur.MUST);
 
-        return new ConstantScoreQuery(
+		return new ConstantScoreQuery(
 				buildDistanceFilter(
 						new QueryWrapperFilter( boxQuery ),
 						center,

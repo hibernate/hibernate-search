@@ -21,7 +21,7 @@
 package org.hibernate.search.spatial.impl;
 
 /**
- * Bounding box older for search area on Earth
+ * Bounding box for search area on Earth
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  * @author Mathieu Perez <mathieu.perez@novacodex.net>
