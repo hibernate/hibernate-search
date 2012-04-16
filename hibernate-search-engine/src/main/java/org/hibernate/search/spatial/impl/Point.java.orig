@@ -46,13 +46,13 @@ public final class Point implements Coordinates {
 		double _latitude, _longitude;
 		// Normalize longitude in [-180;180]
 <<<<<<< Updated upstream
-		if( (longitude < -180) || (longitude > 180) ) {
+		if( (longitude < -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) || (longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
 			longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE );
 			if( longitude < 0) {
 				longitude = longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 =======
-		if( (longitude <= -180) || (longitude > 180) ) {
-			_longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE );
+		if( (longitude < -180) || (longitude > 180) ) {
+			_longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE );
 			if( _longitude < 0) {
 				_longitude = _longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 >>>>>>> Stashed changes
@@ -64,8 +64,11 @@ public final class Point implements Coordinates {
 		}
 
 		if ( latitude > GeometricConstants.LATITUDE_DEGREE_MAX || latitude < GeometricConstants.LATITUDE_DEGREE_MIN ) {
-			_latitude = ( ( latitude + ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LATITUDE_DEGREE_RANGE );
-			
+			_latitude = Math.abs( ( latitude - ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % ( GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE ) );
+			if( _latitude > 180 ) {
+				_latitude= GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE- _latitude;
+			}
+			_latitude= _latitude + ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 );
 		} else {
 			_latitude= latitude;
 		}
