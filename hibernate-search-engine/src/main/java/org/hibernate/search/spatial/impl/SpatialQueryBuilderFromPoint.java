@@ -34,7 +34,7 @@ import org.hibernate.search.spatial.SpatialFieldBridge;
 import java.util.List;
 
 /**
- * The SpatialQueryBuilder hold builder methods for Grid, Distance and Spatial (Grid+Distance) filters and queries
+ * The SpatialQueryBuilder holds builder methods for Grid, Distance and Spatial (Grid+Distance) filters and queries
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
