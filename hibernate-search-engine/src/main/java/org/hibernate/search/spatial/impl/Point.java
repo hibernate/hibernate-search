@@ -43,9 +43,18 @@ public final class Point implements Coordinates {
 	 * @return a point with coordinates given in degrees
 	 */
 	public static Point fromDegrees(double latitude, double longitude) {
-		double _latitude, _longitude;
-		// Normalize longitude in [-180;180]
+		return new Point( normalizeLatitude( latitude ), normalizeLongitude ( longitude ) );
+	}
+
+	/**
+	 * @param longitude in degrees
+	 *
+	 * @return longitude normalized in ]-180;+180]
+	 */
+	public static double normalizeLongitude(double longitude) {
+
 		if( (longitude < -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) || (longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
+			double _longitude;
 			// shift 180 and normalize full circle turn
 			_longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE );
 			// as Java % is not a math modulus we may have negative numbers so the unshift is sign dependant
@@ -54,24 +63,32 @@ public final class Point implements Coordinates {
 			} else {
 				_longitude = _longitude - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 			}
+			return _longitude;
 		} else {
-			_longitude= longitude;
+			return longitude;
 		}
+	}
 
+	/**
+	 * @param latitude in degrees
+	 *
+	 * @return latitude normalized in [-90;+90]
+	 */
+	public static double normalizeLatitude(double latitude) {
 		if ( latitude > GeometricConstants.LATITUDE_DEGREE_MAX || latitude < GeometricConstants.LATITUDE_DEGREE_MIN ) {
 			// shift 90, normalize full circle turn and 'symmetry' on the lat axis with abs
-			_latitude = Math.abs( ( latitude + ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % ( GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE ) );
+			double _latitude = Math.abs( ( latitude + ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % ( GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE ) );
 			// Push 2nd and 3rd quadran in 1st and 4th by 'symmetry'
 			if( _latitude > GeometricConstants.LATITUDE_DEGREE_RANGE ) {
 				_latitude= GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE- _latitude;
 			}
 			// unshift
 			_latitude= _latitude - ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 );
-		} else {
-			_latitude= latitude;
-		}
 
-		return new Point( _latitude, _longitude );
+			return _latitude;
+		} else {
+			return latitude;
+		}
 	}
 
 	/**
@@ -136,10 +153,26 @@ public final class Point implements Coordinates {
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
 	public double getDistanceTo(Point other) {
-		final double dLat= (other.getLatitudeRad()-getLatitudeRad())/2.0d;
-		final double dLon= (other.getLongitudeRad()-getLongitudeRad())/2.0d;
+		return getDistanceTo( other.getLatitude(), other.getLongitude() );
+	}
+
+	/**
+	 * Compute distance point and other location given by its latitude and longitude in decimal degrees
+	 *
+	 * @param latitude
+	 * @param longitude
+	 *
+	 * @return
+	 *
+	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
+	 */
+	public double getDistanceTo(double latitude, double longitude) {
+		double destinationLatitudeRadians= Math.toRadians(normalizeLatitude( latitude ));
+		double destinationLongitudeRadians= Math.toRadians(normalizeLongitude( longitude ));
+		final double dLat= (destinationLatitudeRadians - getLatitudeRad())/2.0d;
+		final double dLon= (destinationLongitudeRadians - getLongitudeRad())/2.0d;
 		final double a= Math.pow( Math.sin( dLat ), 2) +
-						Math.pow( Math.sin( dLon ), 2) * Math.cos( getLatitudeRad()) * Math.cos( other.getLatitudeRad() );
+				Math.pow( Math.sin( dLon ), 2) * Math.cos( getLatitudeRad()) * Math.cos( destinationLatitudeRadians );
 		final double c= 2.0d * Math.atan2(Math.sqrt( a ), Math.sqrt( 1.0d - a ));
 		return c * GeometricConstants.EARTH_MEAN_RADIUS_KM;
 	}
