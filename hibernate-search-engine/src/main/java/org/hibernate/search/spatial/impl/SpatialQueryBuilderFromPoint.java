@@ -20,7 +20,15 @@
  */
 package org.hibernate.search.spatial.impl;
 
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.ConstantScoreQuery;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
+
 import org.hibernate.search.spatial.SpatialFieldBridge;
 
 import java.util.List;
@@ -176,8 +184,10 @@ public abstract class SpatialQueryBuilderFromPoint {
 
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
-		Query latQuery= NumericRangeQuery.newDoubleRange( "latitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLatitude(),
-				boundingBox.getUpperRight().getLatitude(), true, true);
+		Query latQuery= NumericRangeQuery.newDoubleRange(
+				"latitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLatitude(),
+				boundingBox.getUpperRight().getLatitude(), true, true
+		);
 
 		Query longQuery= NumericRangeQuery.newDoubleRange( "longitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLongitude(),
 				boundingBox.getUpperRight().getLongitude(), true, true);
