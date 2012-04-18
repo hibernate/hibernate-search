@@ -176,17 +176,17 @@ public abstract class SpatialQueryBuilderFromPoint {
 
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
-        Query latQuery= NumericRangeQuery.newDoubleRange( "latitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLatitude(),
-                boundingBox.getUpperRight().getLatitude(), true, true);
+		Query latQuery= NumericRangeQuery.newDoubleRange( "latitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLatitude(),
+				boundingBox.getUpperRight().getLatitude(), true, true);
 
-        Query longQuery= NumericRangeQuery.newDoubleRange( "longitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLongitude(),
-                boundingBox.getUpperRight().getLongitude(), true, true);
+		Query longQuery= NumericRangeQuery.newDoubleRange( "longitude_hibernate_search_spatial", boundingBox.getLowerLeft().getLongitude(),
+				boundingBox.getUpperRight().getLongitude(), true, true);
 
-        BooleanQuery boxQuery = new BooleanQuery();
-        boxQuery.add(latQuery, BooleanClause.Occur.MUST);
-        boxQuery.add(longQuery, BooleanClause.Occur.MUST);
+		BooleanQuery boxQuery = new BooleanQuery();
+		boxQuery.add(latQuery, BooleanClause.Occur.MUST);
+		boxQuery.add(longQuery, BooleanClause.Occur.MUST);
 
-        return new ConstantScoreQuery(
+		return new ConstantScoreQuery(
 				buildDistanceFilter(
 						new QueryWrapperFilter( boxQuery ),
 						center,
