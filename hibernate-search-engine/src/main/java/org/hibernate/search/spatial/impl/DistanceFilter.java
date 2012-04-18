@@ -117,12 +117,9 @@ public final class DistanceFilter extends Filter {
 			@Override
 			protected boolean match(int documentIndex) {
 
-				Double documentDistance;
-				Point documentPosition = Point.fromDegrees(
-						latitudeValues[documentIndex],
-						longitudeValues[documentIndex]
-				);
-				documentDistance = documentPosition.getDistanceTo( center );
+				double documentDistance;
+
+				documentDistance = center.getDistanceTo( latitudeValues[documentIndex], longitudeValues[documentIndex] );
 				if ( documentDistance <= radius ) {
 					return true;
 				}
