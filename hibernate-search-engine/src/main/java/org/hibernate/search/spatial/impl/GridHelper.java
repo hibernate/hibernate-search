@@ -99,7 +99,7 @@ public abstract class GridHelper {
 	 * Generate a Grid Cell Ids List covered by a bounding box
 	 *
 	 * @param lowerLeft lower left corner of the bounding box
-	 * @param upperRight upper right corner of the bouding box
+	 * @param upperRight upper right corner of the bounding box
 	 * @param gridLevel grid level of the wanted cell ids
 	 *                  
 	 * @return List of ids of the cells containing the point
@@ -161,7 +161,7 @@ public abstract class GridHelper {
 	}
 
 	/**
-	 * Generate a Grid Cell Ids List for the bouding box of a circular search area
+	 * Generate a Grid Cell Ids List for the bounding box of a circular search area
 	 *
 	 * @param center center of the search area
 	 * @param radius radius of the search area
