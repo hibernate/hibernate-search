@@ -31,7 +31,7 @@ import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
  */
 public abstract class SpatialQueryBuilder {
 	/**
-	 * Returns a Lucene Query which rely on Hibernate Search Spatial
+	 * Returns a Lucene Query which relies on Hibernate Search Spatial
 	 * grid indexation to find candidate documents and filter its results
 	 * in radius range by a DistanceFilter
 	 *
@@ -54,7 +54,7 @@ public abstract class SpatialQueryBuilder {
 	}
 
 	/**
-	 * Returns a Lucene Query which rely on Hibernate Search Spatial
+	 * Returns a Lucene Query which relies on Hibernate Search Spatial
 	 * grid indexation to filter document at radius and filter its results
 	 * by a fine DistanceFilter
 	 *
