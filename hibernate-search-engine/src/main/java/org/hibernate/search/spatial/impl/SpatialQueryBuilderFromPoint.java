@@ -73,7 +73,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @param previousFilter	preceding filter in filter chain
 	 * Warning if passed null DistanceFilter constructor use a
-	 * filter wrapped match all query (time/ressource consuming !)
+	 * filter wrapped match all query (time/resource consuming !)
 	 * @see org.apache.lucene.search.Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 * @see DistanceFilter
