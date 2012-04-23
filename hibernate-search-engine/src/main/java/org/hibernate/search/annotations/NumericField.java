@@ -10,8 +10,6 @@ import java.lang.annotation.Target;
  * Extension annotation for {@code @Field} supporting Lucene's numeric field feature.
  *
  * @author Gustavo Fernandes
- * @experimental Lucene marks the numeric field API still as experimental and warns for incompatible changes in coming
- * releases. Using Hibernate Search will hopefully shield you from any underlying API changes, but that is not guaranteed.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD })

@@ -341,13 +341,6 @@ public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
 }
 </programlisting>
         </example>
-
-        <note>
-          <para>Lucene marks the numeric field API still as experimental and
-          warns for incompatible changes in coming releases. Using Hibernate
-          Search will hopefully shield you from any underlying API changes,
-          but that is not guaranteed.</para>
-        </note>
       </section>
 
       <section id="id-annotation">
