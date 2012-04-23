@@ -2273,10 +2273,6 @@ public class Blog {
   <section id="provided-id">
     <title>Providing your own id</title>
 
-    <warning>
-      <para>This part of the documentation is a work in progress.</para>
-    </warning>
-
     <para>You can provide your own id for Hibernate Search if you are
     extending the internals. You will have to generate a unique value so it
     can be given to Lucene to be indexed. This will have to be given to
