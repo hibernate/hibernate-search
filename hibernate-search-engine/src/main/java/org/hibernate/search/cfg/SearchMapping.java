@@ -43,11 +43,11 @@ public class SearchMapping {
 	public Set<Map<String, Object>> getAnalyzerDefs() {
 		return analyzerDefs;
 	}
-	
-	public Set<Map<String, Object>> getFullTextFilerDefs() {
+
+	public Set<Map<String, Object>> getFullTextFilterDefs() {
 		return fullTextFilterDefs;
 	}
-	
+
 	public EntityDescriptor getEntityDescriptor(Class<?> entityType) {
 		return entities.get( entityType );
 	}
