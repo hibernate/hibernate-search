@@ -1175,7 +1175,7 @@ if ( query.hasPartialResults() ) {
     <section>
       <title>Result size</title>
 
-      <para>It is sometime useful to know the total number of matching
+      <para>It is sometimes useful to know the total number of matching
       documents:</para>
 
       <itemizedlist>
@@ -1216,7 +1216,7 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; </program
       </example>
 
       <note>
-        <para>Like Google, the number of results is approximative if the index
+        <para>Like Google, the number of results is an approximation if the index
         is not fully up-to-date with the database (asynchronous cluster for
         example).</para>
       </note>
