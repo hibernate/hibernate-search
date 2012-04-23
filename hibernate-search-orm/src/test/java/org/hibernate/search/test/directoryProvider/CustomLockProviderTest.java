@@ -54,6 +54,7 @@ public class CustomLockProviderTest {
 			.build();
 		builder.close();
 		assertEquals( "somethingHere", CustomLockFactoryProvider.optionValue );
+		CustomLockFactoryProvider.optionValue = null;
 	}
 
 	@Test
@@ -112,7 +113,7 @@ public class CustomLockProviderTest {
 		finally {
 			builder.close();
 		}
-		assertEquals( "somethingHere", CustomLockFactoryProvider.optionValue );
+		assertEquals( null, CustomLockFactoryProvider.optionValue );
 	}
 
 }
