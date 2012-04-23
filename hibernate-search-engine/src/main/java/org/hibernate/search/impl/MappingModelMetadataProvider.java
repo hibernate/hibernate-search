@@ -105,7 +105,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					new HashMap<Object, Object>() :
 					new HashMap<Object, Object>( delegateDefaults );
 			defaults.put( AnalyzerDefs.class, createAnalyzerDefArray() );
-			if ( !mapping.getFullTextFilerDefs().isEmpty() ) {
+			if ( !mapping.getFullTextFilterDefs().isEmpty() ) {
 				defaults.put( FullTextFilterDefs.class, createFullTextFilterDefsForMapping() );
 			}
 		}
@@ -138,7 +138,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	private FullTextFilterDef[] createFullTextFilterDefsForMapping() {
-		Set<Map<String, Object>> fullTextFilterDefs = mapping.getFullTextFilerDefs();
+		Set<Map<String, Object>> fullTextFilterDefs = mapping.getFullTextFilterDefs();
 		FullTextFilterDef[] filters = new FullTextFilterDef[fullTextFilterDefs.size()];
 		int index = 0;
 		for ( Map<String, Object> filterDef : fullTextFilterDefs ) {
