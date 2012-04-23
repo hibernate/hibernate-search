@@ -2313,10 +2313,7 @@ public class MyClass{
   <section id="hsearch-mapping-programmaticapi">
     <title>Programmatic API</title>
 
-    <para><warning>
-        <para>This feature is considered experimental. While stable code-wise,
-        the API is subject to change in the future.</para>
-      </warning>Although the recommended approach for mapping indexed entities
+    <para>Although the recommended approach for mapping indexed entities
     is to use annotations, it is sometimes more convenient to use a different
     approach:</para>
 
