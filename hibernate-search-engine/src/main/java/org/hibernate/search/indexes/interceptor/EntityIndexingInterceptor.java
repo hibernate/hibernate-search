@@ -26,7 +26,7 @@ package org.hibernate.search.indexes.interceptor;
  *
  * Typical use case include so called soft deletes.
  *
- * Experimental: {@link IndexingOverride} might be updated
+ * @experimental: {@link IndexingOverride} might be updated
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
