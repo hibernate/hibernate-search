@@ -1072,8 +1072,7 @@ catch (javax.persistence.QueryTimeoutException e) {
         </section>
 
         <section>
-          <title>Limit the number of results when the time limit is reached
-          (EXPERIMENTAL)</title>
+          <title>Limit the number of results when the time limit is reached</title>
 
           <para>Alternatively, you can return the number of results which have
           already been fetched by the time the limit is reached. Note that
@@ -1130,9 +1129,6 @@ if ( query.hasPartialResults() ) {
           <methodname>hasPartialResults</methodname> are also available to
           you.</para>
 
-          <warning>
-            <para>This approach is considered experimental</para>
-          </warning>
         </section>
       </section>
     </section>
