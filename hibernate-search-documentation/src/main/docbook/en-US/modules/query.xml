@@ -865,8 +865,7 @@ String authorName = firstResult[2];</programlisting>
           <listitem>
             <para><classname>FullTextQuery.DOCUMENT_ID</classname>: the Lucene
             document id. Careful, Lucene document id can change overtime
-            between two different IndexReader opening (this feature is
-            experimental).</para>
+            between two different IndexReader opening.</para>
           </listitem>
 
           <listitem>
