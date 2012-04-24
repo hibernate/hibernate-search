@@ -132,9 +132,6 @@
     <para>To index your entities for range querying you:</para>
     <itemizedlist>
       <listitem>
-        <para>have two properties latitude and longitude of type double marked with @Field</para>
-      </listitem>
-      <listitem>
         <para>implement the <classname>Coordinates</classname> interface</para>
       </listitem>
       <listitem>
@@ -157,25 +154,18 @@
 
       <programlisting language="JAVA" role="JAVA">import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.annotations.*;
-	  
+
 @Entity
 @Indexed
 @Spatial
 public class SimpleHotel implements Coordinates {
-	@Field
-	double latitude;
-	@Field
-	double longitude;
   [..]</programlisting>
     </example>
       
     <para>To query your entities, you :</para>
     <itemizedlist>
       <listitem>
-        <para>get a queryBuilder for your entity</para>
-      </listitem>
-      <listitem>
-        <para>pass it to SpatialQueryBuilder.buildSimpleSpatialQuery()
+        <para>use SpatialQueryBuilder.buildSimpleSpatialQuery()
         with your search center and radius</para>
       </listitem>
       <listitem>
@@ -189,14 +179,12 @@ public class SimpleHotel implements Coordinates {
     <example>
       <title>SimpleHotel class sample</title>
 
-      <programlisting language="JAVA" role="JAVA">QueryBuilder queryBuilder = fullTextSession.getSearchFactory().
-	buildQueryBuilder().forEntity( SimpleHotel.class ).get();
+      <programlisting language="JAVA" role="JAVA">org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
+		centerLatitude, centerLongitude, radius);
 
-	org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
-		centerLatitude, centerLongitude, radius,
-		queryBuilder,
-		SimpleHotel.class
-	);</programlisting>
+org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
+	SimpleHotel.class );
+List results = hibQuery.list();</programlisting>
     </example>
     
     <para>A fully working example can be found in the source code, in the testsuite.
@@ -250,15 +238,16 @@ public class Hotel implements Coordinates {
       <title>Querying grid indexed entities</title>
 
       <programlisting language="JAVA" role="JAVA">org.apache.lucene.search.Query luceneQuery =
-	  SpatialQueryBuilder.buildSpatialQuery(
-				centerLatitude,
-				centerLongitude,
-				50,
-				"location"
-		);
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Hotel.class );
-		List results = hibQuery.list();</programlisting>
-    </example>
+	SpatialQueryBuilder.buildSpatialQuery(
+		centerLatitude,
+		centerLongitude,
+		50,
+		"location"
+	);
+org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
+	Hotel.class );
+List results = hibQuery.list();</programlisting>
+	</example>
     
     <para>Sample code is at SpatialIndexingTest.testSpatialAnnotationOnClassLevel() and in Hotel class.</para>
     
