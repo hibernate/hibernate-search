@@ -410,13 +410,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
 				for ( Map.Entry<String, Object> entry : field.entrySet() ) {
 					if ( entry.getKey().equals( "analyzer" ) ) {
-						AnnotationDescriptor analyzerAnnotation = new AnnotationDescriptor( Analyzer.class );
-						@SuppressWarnings("unchecked")
-						Map<String, Object> analyzer = (Map<String, Object>) entry.getValue();
-						for ( Map.Entry<String, Object> analyzerEntry : analyzer.entrySet() ) {
-							analyzerAnnotation.setValue( analyzerEntry.getKey(), analyzerEntry.getValue() );
-						}
-						fieldAnnotation.setValue( "analyzer", createAnnotation( analyzerAnnotation ) );
+						addAnalyzerAnnotationTo( fieldAnnotation, entry );
 					}
 					else if ( entry.getKey().equals( "boost" ) ) {
 						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
@@ -464,6 +458,16 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			createCalendarBridge( property );
 			createDynamicBoost( property );
 			createFieldBridge( property );
+		}
+
+		private void addAnalyzerAnnotationTo(AnnotationDescriptor fieldAnnotation, Entry<String, Object> entry) {
+			AnnotationDescriptor analyzerAnnotation = new AnnotationDescriptor( Analyzer.class );
+			@SuppressWarnings("unchecked")
+			Map<String, Object> analyzer = (Map<String, Object>) entry.getValue();
+			for ( Map.Entry<String, Object> analyzerEntry : analyzer.entrySet() ) {
+				analyzerAnnotation.setValue( analyzerEntry.getKey(), analyzerEntry.getValue() );
+			}
+			fieldAnnotation.setValue( "analyzer", createAnnotation( analyzerAnnotation ) );
 		}
 
 		private void createFieldBridge(PropertyDescriptor property) {
@@ -605,7 +609,10 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor annotation = new AnnotationDescriptor( ClassBridge.class );
 			Set<Entry<String, Object>> entrySet = classBridgeDef.entrySet();
 			for ( Entry<String, Object> entry : entrySet ) {
-				if ( entry.getKey().equals( "params" ) ) {
+				if ( entry.getKey().equals( "analyzer" ) ) {
+					addAnalyzerAnnotationTo( annotation, entry );
+				}
+				else if ( entry.getKey().equals( "params" ) ) {
 					addParamsToAnnotation( annotation, entry );
 				}
 				else {
@@ -669,7 +676,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 		public Annotation[] getAnnotations() {
 			initAnnotations();
-			return new Annotation[0];  //To change body of implemented methods use File | Settings | File Templates.
+			return new Annotation[0];
 		}
 	}
 }
