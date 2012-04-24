@@ -168,7 +168,9 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 		currentReferenceReader = newIndexReader;
 		writeLock.unlock();
 		try {
-			oldReader.close();
+			if ( oldReader != null ) {
+				oldReader.close();
+			}
 		}
 		catch ( IOException e ) {
 			log.unableToCLoseLuceneIndexReader( e );
