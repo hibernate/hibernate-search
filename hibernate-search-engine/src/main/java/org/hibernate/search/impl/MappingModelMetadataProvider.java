@@ -240,6 +240,9 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	 * @return the proxy
 	 */
 	private static Annotation createAnnotation(AnnotationDescriptor annotation) {
+		//The return type of this method could be "<T extends Annotation> T"
+		//but that would fail to compile on some JVMs: see HSEARCH-1106.
+
 		//This is a filthy workaround for the Annotations proxy generation,
 		//which is using the ContextClassLoader to define the proxy classes
 		//(not working fine in modular environments when Search is used by
