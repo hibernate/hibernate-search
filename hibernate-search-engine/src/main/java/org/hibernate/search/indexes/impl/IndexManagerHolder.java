@@ -110,19 +110,20 @@ public class IndexManagerHolder {
 					directoryProviderName + "." + index :
 					directoryProviderName;
 			IndexManager indexManager = indexManagersRegistry.get( providerName );
-            providerNames.add(new Tuple(providerName, indexManager != null));
+            final boolean initialized = (indexManager != null);
 			if ( indexManager == null ) {
 				indexManager = createDirectoryManager( providerName, indexProps[index], context );
 				indexManagersRegistry.put( providerName, indexManager );
 			}
-		}
+            providerNames.add(new Tuple(providerName, initialized, indexManager));
+        }
 
         // we need to configure in 2nd phase, so we get all index managers and its names
         IndexManager[] providers = new IndexManager[nbrOfProviders];
         for (int i = 0; i < nbrOfProviders; i++) {
             Tuple tuple = providerNames.get(i);
             String providerName = tuple.providerName;
-            IndexManager indexManager = indexManagersRegistry.get(providerName);
+            IndexManager indexManager = tuple.indexManager;
             providers[i] = indexManager;
             if (!tuple.initialized) {
                 try {
@@ -381,10 +382,12 @@ public class IndexManagerHolder {
     private static class Tuple {
         private String providerName;
         private boolean initialized;
+        private IndexManager indexManager;
 
-        private Tuple(String providerName, boolean initialized) {
+        private Tuple(String providerName, boolean initialized, IndexManager indexManager) {
             this.providerName = providerName;
             this.initialized = initialized;
+            this.indexManager = indexManager;
         }
     }
 }
