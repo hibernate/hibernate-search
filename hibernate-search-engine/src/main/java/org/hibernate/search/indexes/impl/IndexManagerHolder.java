@@ -23,11 +23,9 @@ package org.hibernate.search.indexes.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.Similarity;
@@ -40,9 +38,9 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -106,27 +104,27 @@ public class IndexManagerHolder {
 
 		//set up the IndexManagers
 		int nbrOfProviders = indexProps.length;
-        List<String> providerNames = new ArrayList<String>(nbrOfProviders);
+        List<Tuple> providerNames = new ArrayList<Tuple>(nbrOfProviders);
 		for ( int index = 0; index < nbrOfProviders; index++ ) {
 			String providerName = nbrOfProviders > 1 ?
 					directoryProviderName + "." + index :
 					directoryProviderName;
 			IndexManager indexManager = indexManagersRegistry.get( providerName );
+            providerNames.add(new Tuple(providerName, indexManager != null));
 			if ( indexManager == null ) {
 				indexManager = createDirectoryManager( providerName, indexProps[index], context );
 				indexManagersRegistry.put( providerName, indexManager );
 			}
-			providerNames.add(providerName);
 		}
 
         // we need to configure in 2nd phase, so we get all index managers and its names
-        Set<IndexManager> configured = new HashSet<IndexManager>();
         IndexManager[] providers = new IndexManager[nbrOfProviders];
         for (int i = 0; i < nbrOfProviders; i++) {
-            String providerName = providerNames.get(i);
+            Tuple tuple = providerNames.get(i);
+            String providerName = tuple.providerName;
             IndexManager indexManager = indexManagersRegistry.get(providerName);
             providers[i] = indexManager;
-            if (configured.add(indexManager)) {
+            if (!tuple.initialized) {
                 try {
                     indexManager.configure(providerName, indexProps[i], context);
                 } catch (Exception e) {
@@ -379,4 +377,14 @@ public class IndexManagerHolder {
 		}
 		return indexManagersRegistry.get( targetIndexName );
 	}
+
+    private static class Tuple {
+        private String providerName;
+        private boolean initialized;
+
+        private Tuple(String providerName, boolean initialized) {
+            this.providerName = providerName;
+            this.initialized = initialized;
+        }
+    }
 }

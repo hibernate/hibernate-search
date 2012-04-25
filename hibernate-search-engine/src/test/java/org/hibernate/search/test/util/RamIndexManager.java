@@ -45,6 +45,7 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		Properties properties = new Properties();
 		properties.setProperty( "directory_provider", "ram" );
 		ramIndexManager.initialize( "testIndex", properties, new EmptyWorkerBuildContext() );
+		ramIndexManager.configure( "testIndex", properties, new EmptyWorkerBuildContext() );
 		return ramIndexManager;
 	}
 	
