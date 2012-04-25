@@ -45,6 +45,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Ales Justin
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
  * @see org.jgroups.Receiver
@@ -54,45 +55,69 @@ public class JGroupsMasterMessageListener implements Receiver {
 	private static final Log log = LoggerFactory.make();
 	private final BuildContext context;
 	private final NodeSelectorStrategyHolder selector;
+    private final ClassLoader classLoader;
 
 	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorStrategyHolder masterNodeSelector) {
+        this(context, masterNodeSelector, null);
+	}
+
+	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorStrategyHolder masterNodeSelector, ClassLoader classLoader) {
 		this.context = context;
 		this.selector = masterNodeSelector;
+        this.classLoader = classLoader;
 	}
 
 	@Override
 	public void receive(Message message) {
 		final byte[] rawBuffer = message.getRawBuffer();
 		final String indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
-		final NodeSelectorStrategy nodeSelector = selector.getMasterNodeSelector( indexName );
-		try {
-			if ( nodeSelector.isIndexOwnerLocal() ) {
-				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
-				final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
-				if ( indexManager != null ) {
-					final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
-					applyLuceneWorkLocally( queue, indexManager, message );
-				}
-				else {
-					log.messageReceivedForUndefinedIndex( indexName );
-					return;
-				}
-			}
-			else {
-				//TODO forward to new owner or log error
-			}
-		}
-		catch ( ClassCastException e ) {
-			log.illegalObjectRetrievedFromMessage( e );
-			return;
-		}
-		catch ( SearchException e ) {
-			log.illegalObjectRetrievedFromMessage( e );
-			return;
-		}
+        receive(message, rawBuffer, indexName);
 	}
 
-	private void applyLuceneWorkLocally(List<LuceneWork> queue, IndexManager indexManager, Message message) {
+    protected void receive(Message message, byte[] rawBuffer, String indexName) {
+        final NodeSelectorStrategy nodeSelector = selector.getMasterNodeSelector( indexName );
+        try {
+            if ( nodeSelector.isIndexOwnerLocal() ) {
+                byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue(rawBuffer);
+                final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
+                if ( indexManager != null ) {
+                    applyToIndexManager(message, serializedQueue, indexManager);
+                }
+                else {
+                    log.messageReceivedForUndefinedIndex( indexName );
+                }
+            }
+            else {
+                //TODO forward to new owner or log error
+            }
+        }
+        catch ( ClassCastException e ) {
+            log.illegalObjectRetrievedFromMessage( e );
+        }
+        catch ( SearchException e ) {
+            log.illegalObjectRetrievedFromMessage( e );
+        }
+    }
+
+    private void applyToIndexManager(Message message, byte[] serializedQueue, IndexManager indexManager) {
+        if (classLoader != null) {
+            final ClassLoader previous = SecurityActions.setTCCL(classLoader);
+            try {
+                applyToIndexManagerInternal(message, serializedQueue, indexManager);
+            } finally {
+                SecurityActions.setTCCL(previous);
+            }
+        } else {
+            applyToIndexManagerInternal(message, serializedQueue, indexManager);
+        }
+    }
+
+    private void applyToIndexManagerInternal(Message message, byte[] serializedQueue, IndexManager indexManager) {
+        final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
+        applyLuceneWorkLocally( queue, indexManager, message );
+    }
+
+    private void applyLuceneWorkLocally(List<LuceneWork> queue, IndexManager indexManager, Message message) {
 		if ( queue != null && !queue.isEmpty() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debugf(

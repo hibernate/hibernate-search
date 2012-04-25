@@ -93,6 +93,16 @@ public interface IndexManager {
 	void initialize(String indexName, Properties properties, WorkerBuildContext context);
 
 	/**
+	 * Configure the IndexManager before its use.
+	 *
+	 * @param indexName The unique name of the index (manager). Can be used to retrieve a {@code IndexManager} instance
+	 * via the search factory and {@link org.hibernate.search.indexes.impl.IndexManagerHolder}.
+	 * @param properties The configuration properties
+	 * @param context context information needed to initialize this index manager
+	 */
+	void configure(String indexName, Properties properties, WorkerBuildContext context);
+
+	/**
 	 * Called when a <code>SearchFactory</code> is stopped. This method typically releases resources.
 	 */
 	void destroy();

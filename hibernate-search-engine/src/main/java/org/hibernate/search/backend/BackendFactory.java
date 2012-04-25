@@ -73,11 +73,10 @@ public class BackendFactory {
 		else if ( "jgroupsSlave".equals( backend ) ) {
 				backendQueueProcessor = new JGroupsBackendQueueProcessor( new SlaveNodeSelector() );
 		}
-		//TODO: enable it when considered less experimental:
-		//else if ( "jgroups".equals( backend ) ) {
-		//	backendQueueProcessor = new JGroupsBackendQueueProcessor(
-		//			new AutoNodeSelector( indexManager.getIndexName() ) );
-		//}
+		else if ( "jgroups".equals( backend ) ) {
+			backendQueueProcessor = new JGroupsBackendQueueProcessor(
+					new AutoNodeSelector( indexManager.getIndexName() ) );
+		}
 		else {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
 					BackendQueueProcessor.class,

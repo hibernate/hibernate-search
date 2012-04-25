@@ -47,6 +47,7 @@ import org.jgroups.Channel;
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Ales Justin
  */
 public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
@@ -74,9 +75,9 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		assertLegacyOptionsNotUsed( props, indexName );
 		this.indexManager = indexManager;
 		this.context = context;
-		this.channel = context.requestService( JGroupsChannelProvider.class );
-		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
-		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
+        NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+        masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
+        this.channel = context.requestService( JGroupsChannelProvider.class );
 		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector );
 		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 		luceneBackendQueueProcessor.initialize( props, context, indexManager );

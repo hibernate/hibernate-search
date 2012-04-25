@@ -86,6 +86,10 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
+	}
+
+	@Override
+	public void configure(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		directoryProvider = createDirectoryProvider( indexName, cfg, buildContext );
 		indexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );

@@ -20,8 +20,10 @@
  */
 package org.hibernate.search.indexes.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,9 +38,9 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -63,6 +65,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sylvain Vieujot
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
+ * @author Ales Justin
  */
 public class IndexManagerHolder {
 	
@@ -101,21 +104,38 @@ public class IndexManagerHolder {
 
 		//set up the IndexManagers
 		int nbrOfProviders = indexProps.length;
-		IndexManager[] providers = new IndexManager[nbrOfProviders];
+        List<Tuple> providerNames = new ArrayList<Tuple>(nbrOfProviders);
 		for ( int index = 0; index < nbrOfProviders; index++ ) {
 			String providerName = nbrOfProviders > 1 ?
 					directoryProviderName + "." + index :
 					directoryProviderName;
 			IndexManager indexManager = indexManagersRegistry.get( providerName );
+            final boolean initialized = (indexManager != null);
 			if ( indexManager == null ) {
 				indexManager = createDirectoryManager( providerName, indexProps[index], context );
 				indexManagersRegistry.put( providerName, indexManager );
 			}
-			indexManager.addContainedEntity( mappedClass );
-			providers[index] = indexManager;
-		}
+            providerNames.add(new Tuple(providerName, initialized, indexManager));
+        }
 
-		//define sharding strategy for this entity:
+        // we need to configure in 2nd phase, so we get all index managers and its names
+        IndexManager[] providers = new IndexManager[nbrOfProviders];
+        for (int i = 0; i < nbrOfProviders; i++) {
+            Tuple tuple = providerNames.get(i);
+            String providerName = tuple.providerName;
+            IndexManager indexManager = tuple.indexManager;
+            providers[i] = indexManager;
+            if (!tuple.initialized) {
+                try {
+                    indexManager.configure(providerName, indexProps[i], context);
+                } catch (Exception e) {
+                    throw log.unableToInitializeIndexManager( providerName, e );
+                }
+            }
+            indexManager.addContainedEntity( mappedClass );
+        }
+
+        //define sharding strategy for this entity:
 		IndexShardingStrategy shardingStrategy;
 		//any indexProperty will do, the indexProps[0] surely exists.
 		String shardingStrategyName = indexProps[0].getProperty( SHARDING_STRATEGY );
@@ -197,7 +217,7 @@ public class IndexManagerHolder {
 		return result;
 	}
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings({"unchecked", "UnusedParameters"})
 	private <T,U> MutableEntityIndexBinding<T> buildTypesafeMutableEntityBinder(Class<T> type, IndexManager[] providers,
 																			  IndexShardingStrategy shardingStrategy,
 																			  Similarity similarityInstance,
@@ -208,8 +228,8 @@ public class IndexManagerHolder {
 
 	/**
 	 * Specifies a custom similarity on an index
-	 * @param newSimilarity
-	 * @param manager
+	 * @param newSimilarity new similarity
+	 * @param manager index manager
 	 */
 	private void setSimilarity(Similarity newSimilarity, IndexManager manager) {
 		Similarity similarity = manager.getSimilarity();
@@ -317,6 +337,8 @@ public class IndexManagerHolder {
 	}
 
 	/**
+     * Note: index managers might not yet be configured.
+     *
 	 * @return all IndexManager instances
 	 */
 	public Collection<IndexManager> getIndexManagers() {
@@ -345,7 +367,9 @@ public class IndexManagerHolder {
 	}
 
 	/**
-	 * @param targetIndexName the name of the IndexManager to look up
+     * Note: index managers might not yet be configured.
+     *
+     * @param targetIndexName the name of the IndexManager to look up
 	 * @return the IndexManager, or null if it doesn't exist
 	 */
 	public IndexManager getIndexManager(String targetIndexName) {
@@ -354,4 +378,16 @@ public class IndexManagerHolder {
 		}
 		return indexManagersRegistry.get( targetIndexName );
 	}
+
+    private static class Tuple {
+        private String providerName;
+        private boolean initialized;
+        private IndexManager indexManager;
+
+        private Tuple(String providerName, boolean initialized, IndexManager indexManager) {
+            this.providerName = providerName;
+            this.initialized = initialized;
+            this.indexManager = indexManager;
+        }
+    }
 }
