@@ -154,7 +154,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			fullTextFilterDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 		}
 
-		return createAnnotation( fullTextFilterDefAnnotation );
+		return (FullTextFilterDef) createAnnotation( fullTextFilterDefAnnotation );
 	}
 
 	private static FullTextFilterDef[] createFullTextFilterDefArray(Set<Map<String, Object>> fullTextFilterDefs) {
@@ -194,7 +194,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				analyzerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 			}
 		}
-		return createAnnotation( analyzerDefAnnotation );
+		return (AnalyzerDef) createAnnotation( analyzerDefAnnotation );
 	}
 
 	static private void addParamsToAnnotation(AnnotationDescriptor annotationDescriptor, Map.Entry<String, Object> entry) {
@@ -215,7 +215,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					filterAnn.setValue( filterEntry.getKey(), filterEntry.getValue() );
 				}
 			}
-			filtersArray[index] = createAnnotation( filterAnn );
+			filtersArray[index] = (TokenFilterDef) createAnnotation( filterAnn );
 			index++;
 		}
 		return filtersArray;
@@ -228,7 +228,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor paramAnnotation = new AnnotationDescriptor( Parameter.class );
 			paramAnnotation.setValue( "name", entry.get( "name" ) );
 			paramAnnotation.setValue( "value", entry.get( "value" ) );
-			paramArray[index] = createAnnotation( paramAnnotation );
+			paramArray[index] = (Parameter) createAnnotation( paramAnnotation );
 			index++;
 		}
 		return paramArray;
@@ -239,7 +239,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	 * @param annotation the AnnotationDescriptor
 	 * @return the proxy
 	 */
-	private static <T extends Annotation> T createAnnotation(AnnotationDescriptor annotation) {
+	private static Annotation createAnnotation(AnnotationDescriptor annotation) {
 		//This is a filthy workaround for the Annotations proxy generation,
 		//which is using the ContextClassLoader to define the proxy classes
 		//(not working fine in modular environments when Search is used by
@@ -619,7 +619,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
 			}
-			return createAnnotation( annotation );
+			return (ClassBridge) createAnnotation( annotation );
 		}
 
 		private void createProvidedId(EntityDescriptor entity) {
