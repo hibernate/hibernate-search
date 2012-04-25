@@ -42,6 +42,7 @@ import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.hibernate.testing.SkipForDialect;
 
 /**
  * <pre>
@@ -73,6 +74,7 @@ import org.hibernate.search.test.util.LeakingLuceneBackend;
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
+@SkipForDialect(comment="looks like a database deadlock", value=org.hibernate.dialect.SybaseASE15Dialect.class, jiraKey="HSEARCH-1107")
 public class WorkDoneOnEntitiesTest extends SearchTestCase {
 	
 	private Session session = null;
