@@ -37,6 +37,11 @@ public abstract class GridHelper {
 	private static final double LOG2 = Math.log( 2 );
 
 	/**
+	 * Private construtor locking down utility class
+	 */
+	private GridHelper() {};
+
+	/**
 	 * Generate a Cell Index on one axis
 	 *
 	 * @param coordinate position to compute the Index for
