@@ -70,10 +70,8 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 			if( gridIndex ) {
 				Point point = Point.fromDegrees( coordinates.getLatitude(), coordinates.getLongitude() );
 
-				Map<Integer, String> cellIds = GridHelper.getGridCellsIds( point, topGridLevel, bottomGridLevel );
-
 				for ( int i = topGridLevel; i <= bottomGridLevel; i++ ) {
-					luceneOptions.addFieldToDocument( GridHelper.formatFieldName( i, name ), cellIds.get( i ), document );
+					luceneOptions.addFieldToDocument( GridHelper.formatFieldName( i, name ), GridHelper.getGridCellId( point, i), document );
 				}
 			}
 
