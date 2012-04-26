@@ -78,29 +78,6 @@ public abstract class GridHelper {
 	}
 
 	/**
-	 * Generate a Grid Cell Ids List for a position on all level between min and max
-	 *
-	 * @param point point position to compute the Grid Cell Ids for
-	 * @param topGridLevel top level of Grid to compute the Grid Cell Id for
-	 * @param bottomGridLevel bottom level of Grid to compute the Grid Cell Id for
-	 *                        
-	 * @return Map containing grid level => Cell Id
-	 */
-	public static Map<Integer, String> getGridCellsIds(Point point, int topGridLevel, int bottomGridLevel) {
-		if ( topGridLevel < 0 || bottomGridLevel < topGridLevel ) {
-			return null;
-		}
-
-		Map<Integer, String> gridCellIds = new HashMap<Integer, String>();
-
-		for ( int i = topGridLevel; i <= bottomGridLevel; i++ ) {
-			gridCellIds.put( i, getGridCellId( point, i ) );
-		}
-
-		return gridCellIds;
-	}
-
-	/**
 	 * Generate a Grid Cell Ids List covered by a bounding box
 	 *
 	 * @param lowerLeft lower left corner of the bounding box

@@ -53,17 +53,6 @@ public class GridHelperTest {
 	}
 
 	@Test
-	public void getGridCellIdsTest() {
-		Point point = Point.fromDegrees( 45, 4 );
-
-		Map<Integer, String> cellsIdsByGridLevel = GridHelper.getGridCellsIds( point, 0, 15 );
-
-		Assert.assertEquals( "0|8", cellsIdsByGridLevel.get( 5 ) );
-		Assert.assertEquals( "1|32", cellsIdsByGridLevel.get( 7 ) );
-		Assert.assertEquals( "128|4096", cellsIdsByGridLevel.get( 14 ) );
-	}
-
-	@Test
 	public void findBestGridLevelForSearchRangeTest() {
 		int bestGridLevel = GridHelper.findBestGridLevelForSearchRange( 50 );
 
