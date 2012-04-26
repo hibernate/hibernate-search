@@ -131,7 +131,7 @@ public abstract class GridHelper {
 			endY = upperRightYIndex;
 		}
 
-		List<String> gridCellsIds = new ArrayList<String>();
+		List<String> gridCellsIds = new ArrayList<String>((endX+1-startX)*(endY+1-startY));
 		int xIndex, yIndex;
 		for ( xIndex = startX; xIndex <= endX; xIndex++ ) {
 			for ( yIndex = startY; yIndex <= endY; yIndex++ ) {
