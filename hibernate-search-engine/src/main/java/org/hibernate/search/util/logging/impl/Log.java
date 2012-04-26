@@ -556,11 +556,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 131, value = "The field used for the spatial query is not using SpatialFieldBridge: %1$s.%2$s")
 	SearchException targetedFieldNotSpatial(String className, String fieldName);
 
-	@Message(id = 132, value = "Illegal latitude value for Point creation. Must be between "
-			+ GeometricConstants.LATITUDE_DEGREE_MIN + " and " + GeometricConstants.LATITUDE_DEGREE_MAX + ".")
-	IllegalArgumentException illegalLatitude();
-
-	@Message(id = 133, value = "@ClassBridge implementation implements none of the field bridge interfaces: %1$s")
+	@Message(id = 133, value = "@ClassBridge implementation '%1$s' should implement either org.hibernate.search.bridge.FieldBridge, org.hibernate.search.bridge.TwoWayStringBridge or org.hibernate.search.bridge.StringBridge")
 	SearchException noFieldBridgeInterfaceImplementedByClassBridge(String implName);
 
 	@Message(id = 134, value = "Unable to instantiate ClassBridge of type %1$s defined on %2$s")
