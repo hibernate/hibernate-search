@@ -36,15 +36,82 @@ import java.util.List;
  * - double range + distance
  * - grid + distance
  *
+ * To test you must download FR geonames file {@link http://download.geonames.org/export/dump/FR.zip} and extract it
+ * at the root directory of Hibernate Search
+ *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
 public class BenchWithGeonames {
+
+	private static String hibernateConfigurationFile = "/org/hibernate/search/test/spatial/hibernate.cfg.xml";
+	private static String geonamesDataFile = "FR.txt";
+
 	public static void main(String args[]) {
+		LoadGeonames();
+		Bench();
+		FacetTest();
+	}
+
+	public static void LoadGeonames() {
+		Session session = null;
+		FullTextSession fullTextSession = null;
+		try {
+			SessionFactory sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
+
+			session = sessionFactory.openSession();
+			session.createSQLQuery("delete from POI").executeUpdate();
+			session.beginTransaction();
+			fullTextSession = Search.getFullTextSession( session );
+
+			File geonamesFile = new File( geonamesDataFile );
+			BufferedReader buffRead = new BufferedReader( new FileReader( geonamesFile ) );
+			String line = null;
+
+			int line_number = 0;
+			while ( ( line = buffRead.readLine() ) != null ) {
+				String[] data = line.split( "\t" );
+				POI current = new POI(
+						Integer.parseInt( data[0] ),
+						data[1],
+						Double.parseDouble( data[4] ),
+						Double.parseDouble( data[5] ),
+						data[7]
+				);
+				session.save( current );
+				if ( ( line_number % 10000 ) == 0 ) {
+					fullTextSession.flushToIndexes();
+					session.getTransaction().commit();
+					session.close();
+					session = sessionFactory.openSession();
+					fullTextSession = Search.getFullTextSession( session );
+					session.beginTransaction();
+					System.out.println( Integer.toString( line_number ) );
+				}
+				line_number++;
+			}
+			session.getTransaction().commit();
+			session.close();
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+		}
+		finally {
+			if ( session != null && session.isOpen() ) {
+				Transaction transaction= session.getTransaction();
+				if(transaction!=null && transaction.isActive()){
+					transaction.rollback();
+				}
+				session.close();
+			}
+		}
+	}
+
+	public static void Bench() {
 		Session session = null;
 		FullTextSession fullTextSession = null;
 		try {
 
-			SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+			SessionFactory sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
 
 			session = sessionFactory.openSession();
 			session.beginTransaction();
@@ -219,64 +286,11 @@ public class BenchWithGeonames {
 		}
 	}
 
-	//@Test
-	public void LoadGeonames() {
-		Session session = null;
-		FullTextSession fullTextSession = null;
-		try {
-			SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-
-			session = sessionFactory.openSession();
-			session.beginTransaction();
-			fullTextSession = Search.getFullTextSession( session );
-
-			String geonamesFileName = "geonames\\FR.txt";
-			File geonamesFiles = new File( geonamesFileName );
-			BufferedReader buffRead = new BufferedReader( new FileReader( geonamesFiles ) );
-			String line = null;
-
-			int line_number = 0;
-			while ( ( line = buffRead.readLine() ) != null ) {
-				String[] data = line.split( "\t" );
-				POI current = new POI(
-						Integer.parseInt( data[0] ),
-						data[1],
-						Double.parseDouble( data[4] ),
-						Double.parseDouble( data[5] ),
-						data[7]
-				);
-				session.save( current );
-				if ( ( line_number % 10000 ) == 0 ) {
-					fullTextSession.flushToIndexes();
-					session.getTransaction().commit();
-					session.close();
-					session = sessionFactory.openSession();
-					session.beginTransaction();
-					fullTextSession = Search.getFullTextSession( session );
-					session.beginTransaction();
-					System.out.println( Integer.toString( line_number ) );
-				}
-				line_number++;
-			}
-			session.getTransaction().commit();
-			session.close();
-		}
-		catch ( Exception e ) {
-			e.printStackTrace();
-		}
-		finally {
-			if ( session != null && session.isOpen() ) {
-				session.close();
-			}
-		}
-	}
-
-	//@Test
-	public void FacetTest() {
+	public static void FacetTest() {
 		Session session = null;
 		FullTextSession fullTextSession = null;
 
-		SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+		SessionFactory sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
 
 		session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -320,7 +334,16 @@ public class BenchWithGeonames {
 
 		}
 		catch ( Exception e ) {
-
+			e.printStackTrace();
+		}
+		finally {
+			if ( session != null && session.isOpen() ) {
+				Transaction transaction= session.getTransaction();
+				if(transaction!=null && transaction.isActive()){
+					transaction.rollback();
+				}
+				session.close();
+			}
 		}
 	}
 }
