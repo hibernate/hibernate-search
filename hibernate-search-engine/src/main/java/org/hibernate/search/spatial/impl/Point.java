@@ -98,7 +98,7 @@ public final class Point implements Coordinates {
 	 * @return a point with coordinates given in radians
 	 */
 	public static Point fromRadians(double latitude, double longitude) {
-		return fromDegrees( Math.toDegrees( latitude ), Math.toDegrees( longitude ) );
+		return fromDegrees( latitude * GeometricConstants.TO_DEGREES_RATIO, longitude * GeometricConstants.TO_DEGREES_RATIO);
 	}
 
 	/**
@@ -114,14 +114,14 @@ public final class Point implements Coordinates {
 	 * Calculate end of travel point
 	 *
 	 * @param distance to travel
-	 * @param heading of travel
+	 * @param heading of travel in decimal degree
 	 *
 	 * @return arrival point
 	 *
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Compute destination</a>
 	 */
 	public Point computeDestination(double distance, double heading) {
-		double headingRadian = Math.toRadians( heading );
+		double headingRadian = heading * GeometricConstants.TO_RADIANS_RATIO;
 
 		double destinationLatitudeRadian = Math.asin(
 				Math.sin( getLatitudeRad() ) * Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) + Math.cos(
@@ -159,16 +159,16 @@ public final class Point implements Coordinates {
 	/**
 	 * Compute distance point and other location given by its latitude and longitude in decimal degrees
 	 *
-	 * @param latitude
-	 * @param longitude
+	 * @param latitude in decimal degrees
+	 * @param longitude in decimal degrees
 	 *
 	 * @return
 	 *
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
 	public double getDistanceTo(double latitude, double longitude) {
-		double destinationLatitudeRadians= Math.toRadians(normalizeLatitude( latitude ));
-		double destinationLongitudeRadians= Math.toRadians(normalizeLongitude( longitude ));
+		double destinationLatitudeRadians= normalizeLatitude( latitude ) * GeometricConstants.TO_RADIANS_RATIO;
+		double destinationLongitudeRadians= normalizeLongitude( longitude ) * GeometricConstants.TO_RADIANS_RATIO;
 		final double dLat= (destinationLatitudeRadians - getLatitudeRad())/2.0d;
 		final double dLon= (destinationLongitudeRadians - getLongitudeRad())/2.0d;
 		final double a= Math.pow( Math.sin( dLat ), 2) +
@@ -188,11 +188,11 @@ public final class Point implements Coordinates {
 	}
 
 	public double getLatitudeRad() {
-		return Math.toRadians( latitude );
+		return latitude * GeometricConstants.TO_RADIANS_RATIO;
 	}
 
 	public double getLongitudeRad() {
-		return Math.toRadians( longitude );
+		return longitude * GeometricConstants.TO_RADIANS_RATIO;
 	}
 
 	@Override
