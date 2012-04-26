@@ -37,7 +37,7 @@ public @interface Spatial {
 	Boost boost() default @Boost(value = 1.0F);
 
 	/**
-	 * @return top range grid level for spatial indexing
+	 * @return grid mode activation status
 	 */
 	boolean gridMode() default false;
 	
