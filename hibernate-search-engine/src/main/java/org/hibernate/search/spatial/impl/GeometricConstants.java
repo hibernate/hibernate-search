@@ -29,6 +29,8 @@ package org.hibernate.search.spatial.impl;
  */
 public interface GeometricConstants {
 
+	double TO_RADIANS_RATIO= Math.PI / 180.0;
+	double TO_DEGREES_RATIO= 180.0 / Math.PI;
 	int WHOLE_CIRCLE_DEGREE_RANGE= 360;
 	int LONGITUDE_DEGREE_RANGE = WHOLE_CIRCLE_DEGREE_RANGE;
 	int LONGITUDE_DEGREE_MIN = -LONGITUDE_DEGREE_RANGE / 2;
