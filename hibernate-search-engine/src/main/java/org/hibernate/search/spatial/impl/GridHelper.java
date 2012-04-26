@@ -242,27 +242,19 @@ public abstract class GridHelper {
 		return projectedCoordinates;
 	}
 
-	private static final String FIELDNAME_TEMPLATE = "%s_HSSI_%s";
-
-	private static final String LATITUDE_TEMPLATE = "%s_HSSI_Latitude";
-
-	private static final String LONGITUDE_TEMPLATE = "%s_HSSI_Longitude";
-
-	private static final String GRID_CELL_ID_TEMPLATE = "%s|%s";
-
 	public static String formatFieldName(int gridLevel, String fieldName) {
-		return String.format( FIELDNAME_TEMPLATE, fieldName, gridLevel);
+		return fieldName+"_HSSI_"+gridLevel;
 	}
 
 	public static String formatLatitude(String fieldName) {
-		return String.format( LATITUDE_TEMPLATE, fieldName );
+		return fieldName+"_HSSI_Latitude";
 	}
 
 	public static String formatLongitude(String fieldName) {
-		return String.format( LONGITUDE_TEMPLATE, fieldName );
+		return fieldName+"_HSSI_Longitude";
 	}
 
 	public static String formatGridCellId(int xIndex, int yIndex) {
-		return String.format( GRID_CELL_ID_TEMPLATE, xIndex, yIndex );
+		return xIndex+"|"+yIndex;
 	}
 }
