@@ -147,10 +147,14 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testSimpleSpatialAnnotationOnClassLevel() throws Exception {
 		SimpleHotel hotel = new SimpleHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
+		SimpleHotel hotel2 = new SimpleHotel( 2, "End of the world Hotel - Left", 0.0d, 179.0d, "Roots" );
+		SimpleHotel hotel3 = new SimpleHotel( 3, "End of the world Hotel - Right", 0.0d, -179.0d, "Cosy" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
 		Transaction tx = fullTextSession.beginTransaction();
 		fullTextSession.save( hotel );
+		fullTextSession.save( hotel2 );
+		fullTextSession.save( hotel3 );
 		tx.commit();
 
 		tx = fullTextSession.beginTransaction();
@@ -173,6 +177,17 @@ public class SpatialIndexingTest extends SearchTestCase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, SimpleHotel.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
+
+		double endOfTheWorldLatitude= 0.0d;
+		double endOfTheWorldLongitude= 180.0d;
+
+		org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildSimpleSpatialQuery(
+				endOfTheWorldLatitude, endOfTheWorldLongitude, 112
+		);
+
+		org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, SimpleHotel.class );
+		List results3 = hibQuery3.list();
+		Assert.assertEquals( 2, results3.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + SimpleHotel.class.getName() ).list();
 		for (Object entity : events) {
