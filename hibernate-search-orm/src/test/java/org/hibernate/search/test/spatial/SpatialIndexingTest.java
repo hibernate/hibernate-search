@@ -189,6 +189,14 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results3 = hibQuery3.list();
 		Assert.assertEquals( 2, results3.size() );
 
+		org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSimpleSpatialQuery(
+				endOfTheWorldLatitude, endOfTheWorldLongitude, 100000
+		);
+
+		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, SimpleHotel.class );
+		List results4 = hibQuery4.list();
+		Assert.assertEquals( 3, results4.size() );
+
 		List<?> events = fullTextSession.createQuery( "from " + SimpleHotel.class.getName() ).list();
 		for (Object entity : events) {
 			fullTextSession.delete( entity );

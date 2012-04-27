@@ -43,7 +43,17 @@ public final class Point implements Coordinates {
 	 * @return a point with coordinates given in degrees
 	 */
 	public static Point fromDegrees(double latitude, double longitude) {
-		return new Point( normalizeLatitude( latitude ), normalizeLongitude ( longitude ) );
+		return new Point( normalizeLatitude( latitude ), normalizeLongitude( longitude ) );
+	}
+
+	/**
+	 * @param latitude in degrees
+	 * @param longitude in degrees
+	 *
+	 * @return a point with coordinates given in degrees
+	 */
+	public static Point fromDegreesInclusive(double latitude, double longitude) {
+		return new Point( normalizeLatitude( latitude ), normalizeLongitudeInclusive( longitude ) );
 	}
 
 	/**
@@ -52,13 +62,26 @@ public final class Point implements Coordinates {
 	 * @return longitude normalized in ]-180;+180]
 	 */
 	public static double normalizeLongitude(double longitude) {
+		if(longitude ==  ( -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) {
+			return GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ;
+		} else {
+			return normalizeLongitudeInclusive( longitude );
+		}
+	}
 
-		if( (longitude <= -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) || (longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
+	/**
+			 * @param longitude in degrees
+			 *
+			 * @return longitude normalized in [-180;+180]
+			 */
+	public static double normalizeLongitudeInclusive(double longitude) {
+
+		if( (longitude < -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) || (longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
 			double _longitude;
 			// shift 180 and normalize full circle turn
 			_longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE );
 			// as Java % is not a math modulus we may have negative numbers so the unshift is sign dependant
-			if( _longitude <= 0) {
+			if( _longitude < 0) {
 				_longitude = _longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 			} else {
 				_longitude = _longitude - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );

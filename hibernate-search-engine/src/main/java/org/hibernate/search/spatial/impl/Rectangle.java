@@ -91,8 +91,8 @@ public final class Rectangle {
 		}
 
 		return new Rectangle(
-				Point.fromDegrees( minimumLatitude, minimumLongitude ),
-				Point.fromDegrees( maximumLatitude, maximumLongitude )
+				Point.fromDegreesInclusive( minimumLatitude, minimumLongitude ),
+				Point.fromDegreesInclusive( maximumLatitude, maximumLongitude )
 		);
 	}
 
