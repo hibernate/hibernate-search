@@ -66,6 +66,7 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Spatial;
+import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.LuceneWork;
@@ -907,7 +908,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		String fieldName = null;
 		if( !ann.name().isEmpty() ){
 			fieldName = prefix + ann.name();
-		} else if ( !ann.gridMode() ) {
+		} else if ( ann.spatialMode() == SpatialMode.SIMPLE ) {
 			fieldName = prefix + "lat/long";
 		} else {
 			throw log.spatialFieldNameNotDefined( clazz.getName() );

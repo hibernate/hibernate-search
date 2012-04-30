@@ -43,6 +43,7 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Spatial;
+import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
@@ -294,7 +295,7 @@ public final class BridgeFactory {
 		FieldBridge bridge = null;
 		if( spatial != null )  {
 			try {
-				if( spatial.gridMode() ) {
+				if( spatial.spatialMode() == SpatialMode.GRID ) {
 					bridge = new SpatialFieldBridge( spatial.topGridLevel(), spatial.bottomGridLevel() );
 				} else {
 					bridge = new SimpleSpatialFieldBridge();
