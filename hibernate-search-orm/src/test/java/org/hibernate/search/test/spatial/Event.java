@@ -6,6 +6,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Spatial;
+import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 
@@ -39,7 +40,7 @@ public class Event {
 	double longitude;
 
 	@Field(analyze = Analyze.NO)
-	@Spatial(gridMode = true)
+	@Spatial(spatialMode = SpatialMode.GRID)
 	public Coordinates getLocation() {
 		return new Coordinates() {
 			@Override

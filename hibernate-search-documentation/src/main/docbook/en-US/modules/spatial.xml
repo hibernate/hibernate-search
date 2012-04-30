@@ -203,7 +203,7 @@ List results = hibQuery.list();</programlisting>
       </listitem>
       <listitem>
         <para>add the @Spatial annotation at class level with a name for referencing the grid
-        field in the index and with gridmode set to true : @Spatial(name = "location", gridMode = true)</para>
+        field in the index and with gridmode set to true : @Spatial(name = "location", spatialMode = SpatialMode.GRID)</para>
       </listitem>
     </itemizedlist>
     
@@ -212,7 +212,7 @@ List results = hibQuery.list();</programlisting>
 
       <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
-@Spatial(name = "location", gridMode = true)
+@Spatial(name = "location", spatialMode = SpatialMode.GRID)
 public class Hotel implements Coordinates {
 	double latitude;
 	double longitude;
