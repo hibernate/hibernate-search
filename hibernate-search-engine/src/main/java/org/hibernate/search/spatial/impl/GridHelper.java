@@ -163,24 +163,24 @@ public abstract class GridHelper {
 		if ( upperRightLongitude < lowerLeftLongitude ) { // Box cross the 180 meridian
 			List<String> gridCellsIds;
 			gridCellsIds = getGridCellsIds(
-					Point.fromDegrees( lowerLeftLatitude, lowerLeftLongitude ),
-					Point.fromDegrees( upperRightLatitude, GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ),
+					Point.fromDegreesInclusive( lowerLeftLatitude, lowerLeftLongitude ),
+					Point.fromDegreesInclusive( upperRightLatitude, GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ),
 					gridLevel
 			);
 			gridCellsIds.addAll(
 					getGridCellsIds(
-							Point.fromDegrees(
+							Point.fromDegreesInclusive(
 									lowerLeftLatitude,
 									-GeometricConstants.LONGITUDE_DEGREE_RANGE / 2
-							), Point.fromDegrees( upperRightLatitude, upperRightLongitude ), gridLevel
+							), Point.fromDegreesInclusive( upperRightLatitude, upperRightLongitude ), gridLevel
 					)
 			);
 			return gridCellsIds;
 		}
 		else {
 			return getGridCellsIds(
-					Point.fromDegrees( lowerLeftLatitude, lowerLeftLongitude ),
-					Point.fromDegrees( upperRightLatitude, upperRightLongitude ),
+					Point.fromDegreesInclusive( lowerLeftLatitude, lowerLeftLongitude ),
+					Point.fromDegreesInclusive( upperRightLatitude, upperRightLongitude ),
 					gridLevel
 			);
 		}
@@ -200,7 +200,7 @@ public abstract class GridHelper {
 
 		double iterations = GeometricConstants.EARTH_EQUATOR_CIRCUMFERENCE_KM / ( 2.0d * searchRange );
 
-		return ( int ) Math.ceil( Math.log( iterations ) / LOG2 );
+		return ( int ) Math.max(  0, Math.ceil( Math.log( iterations ) / LOG2 ));
 	}
 
 	/**
