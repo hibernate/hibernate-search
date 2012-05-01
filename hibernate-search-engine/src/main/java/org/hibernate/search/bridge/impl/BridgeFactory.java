@@ -293,7 +293,7 @@ public final class BridgeFactory {
 	 */
 	public static FieldBridge buildSpatialBridge( Spatial spatial, XClass clazz ) {
 		FieldBridge bridge = null;
-		if( spatial != null )  {
+		if ( spatial != null )  {
 			try {
 				if( spatial.spatialMode() == SpatialMode.GRID ) {
 					bridge = new SpatialFieldBridge( spatial.topGridLevel(), spatial.bottomGridLevel() );
@@ -305,7 +305,7 @@ public final class BridgeFactory {
 				throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
 			}
 		}
-		if (bridge == null) {
+		if ( bridge == null ) {
 			throw LOG.unableToInstantiateSpatial( clazz.getName(), null);
 		}
 
