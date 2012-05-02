@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ * 
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+  -->
+<infinispan
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="urn:infinispan:config:5.1 http://www.infinispan.org/schemas/infinispan-config-5.1.xsd"
+      xmlns="urn:infinispan:config:5.1">
+
+  <global>
+    <globalJmxStatistics enabled="false" />
+    <!-- <transport clusterName="storage-test-cluster" /> -->
+    <shutdown hookBehavior="DONT_REGISTER" />
+  </global>
+
+  <default>
+    <storeAsBinary
+      enabled="false" />
+    <locking
+      isolationLevel="READ_COMMITTED"
+      lockAcquisitionTimeout="20000"
+      writeSkewCheck="false"
+      concurrencyLevel="5000"
+      useLockStriping="false" />
+    <invocationBatching
+      enabled="true" />
+  </default>
+
+  <namedCache name="LuceneIndexesMetadata">
+    <loaders
+      passivation="false" shared="false" preload="true">
+      <loader
+        class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" purgeOnStartup="false">
+        <properties>
+          <property name="location" value="${java.io.tmpdir}" />
+        </properties>
+      </loader>
+    </loaders>
+  </namedCache>
+
+  <namedCache name="LuceneIndexesData">
+    <loaders
+      passivation="false" shared="false" preload="true">
+      <loader
+        class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" purgeOnStartup="false">
+        <properties>
+          <property name="location" value="${java.io.tmpdir}" />
+        </properties>
+      </loader>
+    </loaders>
+  </namedCache>
+
+  <namedCache name="LuceneIndexesLocking">
+    <!-- No CacheLoader configured here -->
+  </namedCache>
+
+</infinispan>
