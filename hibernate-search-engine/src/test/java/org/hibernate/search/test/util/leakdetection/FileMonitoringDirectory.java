@@ -127,10 +127,6 @@ public class FileMonitoringDirectory extends RAMDirectory {
 			delegate.writeInt( i );
 		}
 
-		public void writeShort(short i) throws IOException {
-			delegate.writeShort( i );
-		}
-
 		public void writeLong(long i) throws IOException {
 			delegate.writeLong( i );
 		}
