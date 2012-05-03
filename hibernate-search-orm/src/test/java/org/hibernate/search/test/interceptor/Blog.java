@@ -31,21 +31,39 @@ import org.hibernate.search.annotations.Indexed;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 @Entity
-@Indexed(interceptor = IndexWhenPublishedInterceptor.class )
+@Indexed(interceptor = IndexWhenPublishedInterceptor.class)
 public class Blog {
 	@Id
 	@GeneratedValue
-	public Integer getId() { return id; }
-	public void setId(Integer id) {  this.id = id; }
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	private Integer id;
 
 	@Field
-	public String getTitle() { return title; }
-	public void setTitle(String title) {  this.title = title; }
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	private String title;
 
 	//state used by interceptor but not indexed on purpose to test optimization disablement
-	public BlogStatus getStatus() { return status; }
-	public void setStatus(BlogStatus status) {  this.status = status; }
+	public BlogStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(BlogStatus status) {
+		this.status = status;
+	}
+
 	private BlogStatus status;
 }
