@@ -20,89 +20,178 @@
  */
 package org.hibernate.search.test.interceptor;
 
-import org.apache.lucene.search.Query;
+import java.util.List;
+
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 
-import static org.fest.assertions.Assertions.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Hardy Ferentschik
  */
 public class IndexingActionInterceptorTest extends SearchTestCase {
 
-	public void testSoftDelete() throws Exception {
-		Blog blog = new Blog();
+	private FullTextSession fullTextSession;
+	private Blog blog;
+	private Article article;
+	TotalArticle totalArticle;
+
+	public void setUp() throws Exception {
+		super.setUp();
+		createPersistAndIndexTestData();
+	}
+
+	public void tearDown() throws Exception {
+		if ( !fullTextSession.getTransaction().isActive() ) {
+			Transaction tx = fullTextSession.beginTransaction();
+			blog = (Blog) fullTextSession.get( Blog.class, blog.getId() );
+			fullTextSession.delete( blog );
+			blog = (Blog) fullTextSession.get( Article.class, article.getId() );
+			fullTextSession.delete( blog );
+			blog = (Blog) fullTextSession.get( TotalArticle.class, totalArticle.getId() );
+			fullTextSession.delete( blog );
+			tx.commit();
+		}
+		fullTextSession.close();
+		super.tearDown();
+	}
+
+	public void testBlogAndArticleAreNotIndexedInDraftStatus() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		assertThat( getBlogEntriesFor( Blog.class ) ).as( "Blog is explicit intercepted" ).hasSize( 0 );
+		assertThat( getBlogEntriesFor( Article.class ) ).as( "Article is inherently intercepted" ).hasSize( 0 );
+
+		tx.commit();
+	}
+
+	public void testTotalArticleIsIndexedInDraftStatus() throws Exception {
+		Transaction tx = fullTextSession.beginTransaction();
+		assertThat( getBlogEntriesFor( TotalArticle.class ) ).as( "TotalArticle is explicit not intercepted" )
+				.hasSize( 1 );
+		tx.commit();
+	}
+
+
+	public void testBlogAndArticleAreIndexedInPublishedStatus() throws Exception {
+		setAllBlogEntriesToStatus( BlogStatus.PUBLISHED );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		assertThat( getBlogEntriesFor( Blog.class ) ).hasSize( 1 );
+		assertThat( getBlogEntriesFor( Article.class ) ).as( "Article is inherently intercepted" ).hasSize( 1 );
+		assertThat( getBlogEntriesFor( TotalArticle.class ) ).as( "TotalArticle is explicit not intercepted" )
+				.hasSize( 1 );
+
+		tx.commit();
+	}
+
+
+	public void testBlogAndArticleAreNotIndexedInRemovedStatus() throws Exception {
+		setAllBlogEntriesToStatus( BlogStatus.REMOVED );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		assertThat( getBlogEntriesFor( Blog.class ) ).hasSize( 0 );
+		assertThat( getBlogEntriesFor( Article.class ) ).as( "Article is inherently intercepted" ).hasSize( 0 );
+
+		tx.commit();
+	}
+
+	public void testTotalArticleIsIndexedInRemovedStatus() throws Exception {
+		setAllBlogEntriesToStatus( BlogStatus.REMOVED );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		assertThat( getBlogEntriesFor( TotalArticle.class ) ).as( "TotalArticle is explicit not intercepted" )
+				.hasSize( 1 );
+
+		tx.commit();
+	}
+
+	@SuppressWarnings("unchecked")
+	public void testInterceptorWithMassIndexer() throws Exception {
+		setAllBlogEntriesToStatus( BlogStatus.PUBLISHED );
+
+		List<Blog> allEntries = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
+		assertEquals( "Wrong total number of entries", 3, allEntries.size() );
+		for ( Blog blog : allEntries ) {
+			assertTrue( blog.getStatus().equals( BlogStatus.PUBLISHED ) );
+		}
+
+		Transaction tx = fullTextSession.beginTransaction();
+
+		fullTextSession.purgeAll( Blog.class );
+		fullTextSession.purgeAll( Article.class );
+		fullTextSession.purgeAll( TotalArticle.class );
+
+		tx.commit();
+
+		allEntries = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
+		assertEquals( "Wrong total number of entries. Index should be empty after purge.", 0, allEntries.size() );
+
+		tx = fullTextSession.beginTransaction();
+		fullTextSession.createIndexer()
+				.batchSizeToLoadObjects( 25 )
+				.threadsToLoadObjects( 1 )
+				.threadsForSubsequentFetching( 2 )
+				.optimizeOnFinish( true )
+				.startAndWait();
+		tx.commit();
+
+		allEntries = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() ).list();
+		assertEquals( "Wrong total number of entries.", 3, allEntries.size() );
+	}
+
+	private void createPersistAndIndexTestData() {
+		blog = new Blog();
 		blog.setTitle( "Hibernate Search now has soft deletes!" );
 		blog.setStatus( BlogStatus.DRAFT );
 
-		Article article = new Article();
+		article = new Article();
 		article.setTitle( "Hibernate Search: detailed description of soft deletes" );
 		article.setStatus( BlogStatus.DRAFT );
 
-		TotalArticle totalArticle = new TotalArticle();
+		totalArticle = new TotalArticle();
 		totalArticle.setTitle( "Hibernate Search: the total truth about soft deletes" );
 		totalArticle.setStatus( BlogStatus.DRAFT );
 
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		s.persist( blog );
-		s.persist( article );
-		s.persist( totalArticle );
+		fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.persist( blog );
+		fullTextSession.persist( article );
+		fullTextSession.persist( totalArticle );
 		tx.commit();
 
-		s.clear();
+		fullTextSession.clear();
+	}
 
-		tx = s.beginTransaction();
-		QueryBuilder b = s.getSearchFactory().buildQueryBuilder().forEntity( Blog.class ).get();
-		Query blogQuery = b.keyword().onField( "title" ).matching( "now" ).createQuery();
-		Query articleQuery = b.keyword().onField( "title" ).matching( "detailed" ).createQuery();
-		Query totalArticleQuery = b.keyword().onField( "title" ).matching( "truth" ).createQuery();
-		assertThat( s.createFullTextQuery( blogQuery, Blog.class ).list() ).as("Blog is explicit intercepted").hasSize( 0 );
-		assertThat( s.createFullTextQuery( articleQuery, Blog.class ).list() ).as("Article is inherently intercepted").hasSize( 0 );
-		assertThat( s.createFullTextQuery( totalArticleQuery, Blog.class ).list() ).as("TotalArticle is explicit not intercepted").hasSize( 1 );
-		blog = (Blog) s.get( Blog.class, blog.getId() );
-		blog.setStatus( BlogStatus.PUBLISHED );
-		article = (Article) s.get( Article.class, article.getId() );
-		article.setStatus( BlogStatus.PUBLISHED );
-		totalArticle = (TotalArticle) s.get( TotalArticle.class, totalArticle.getId() );
-		totalArticle.setStatus( BlogStatus.PUBLISHED );
+	private void setAllBlogEntriesToStatus(BlogStatus status) {
+		Transaction tx = fullTextSession.beginTransaction();
+
+		blog = (Blog) fullTextSession.get( Blog.class, blog.getId() );
+		blog.setStatus( status );
+
+		article = (Article) fullTextSession.get( Article.class, article.getId() );
+		article.setStatus( status );
+
+		totalArticle = (TotalArticle) fullTextSession.get( TotalArticle.class, totalArticle.getId() );
+		totalArticle.setStatus( status );
+
 		tx.commit();
+		fullTextSession.clear();
+	}
 
-		s.clear();
-
-		tx = s.beginTransaction();
-		assertThat( s.createFullTextQuery( blogQuery, Blog.class ).list() ).hasSize( 1 );
-		assertThat( s.createFullTextQuery( articleQuery, Blog.class ).list() ).as("Article is inherently intercepted").hasSize( 1 );
-		assertThat( s.createFullTextQuery( totalArticleQuery, Blog.class ).list() ).as("TotalArticle is explicit not intercepted").hasSize( 1 );
-		blog = (Blog) s.get( Blog.class, blog.getId() );
-		blog.setStatus( BlogStatus.REMOVED );
-		article = (Article) s.get( Article.class, article.getId() );
-		article.setStatus( BlogStatus.REMOVED );
-		totalArticle = (TotalArticle) s.get( TotalArticle.class, totalArticle.getId() );
-		totalArticle.setStatus( BlogStatus.REMOVED );
-		tx.commit();
-
-		s.clear();
-
-		tx = s.beginTransaction();
-		assertThat( s.createFullTextQuery( blogQuery, Blog.class ).list() ).hasSize( 0 );
-		assertThat( s.createFullTextQuery( articleQuery, Blog.class ).list() ).as("Article is inherently intercepted").hasSize( 0 );
-		assertThat( s.createFullTextQuery( totalArticleQuery, Blog.class ).list() ).as("TotalArticle is explicit not intercepted").hasSize( 1 );
-		blog = (Blog) s.get( Blog.class, blog.getId() );
-		s.delete( blog );
-		blog = (Blog) s.get( Article.class, article.getId() );
-		s.delete( blog );
-		blog = (Blog) s.get( TotalArticle.class, totalArticle.getId() );
-		s.delete( blog );
-		tx.commit();
-
-		s.close();
-
+	private List getBlogEntriesFor(Class<?> blogType) {
+		TermQuery query = new TermQuery( new Term( ProjectionConstants.OBJECT_CLASS, blogType.getName() ) );
+		return fullTextSession.createFullTextQuery( query ).list();
 	}
 
 	@Override
