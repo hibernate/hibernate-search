@@ -1,6 +1,6 @@
-/*
+/* 
  * Hibernate, Relational Persistence for Idiomatic Java
- *
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -18,23 +18,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.interceptor;
+package org.hibernate.search.test.util.leakdetection;
+
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
+
 
 /**
- * This interceptor is called upon indexing operations to optionally change the behavior.
- * Implementations must be thread safe and should have a no-arg constructor.
- *
- * Typical use case include so called soft deletes.
- *
- * @experimental: {@link IndexingOverride} might be updated
- *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * This DirectoryProvider enables us to check that all files have been properly closed,
+ * both after writes and reads.
+ * 
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public interface EntityIndexingInterceptor<T> {
-	IndexingOverride onAdd(T entity);
-	IndexingOverride onUpdate(T entity);
-	IndexingOverride onDelete(T entity);
-	IndexingOverride onCollectionUpdate(T entity);
+public class FileMonitoringDirectoryProvider extends RAMDirectoryProvider {
 
-	//FIXME should we add onPurge and onIndex?
+	@Override
+	protected FileMonitoringDirectory makeRAMDirectory() {
+		return new FileMonitoringDirectory();
+	}
+
 }

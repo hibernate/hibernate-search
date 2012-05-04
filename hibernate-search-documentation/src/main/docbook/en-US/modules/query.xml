@@ -865,8 +865,7 @@ String authorName = firstResult[2];</programlisting>
           <listitem>
             <para><classname>FullTextQuery.DOCUMENT_ID</classname>: the Lucene
             document id. Careful, Lucene document id can change overtime
-            between two different IndexReader opening (this feature is
-            experimental).</para>
+            between two different IndexReader opening.</para>
           </listitem>
 
           <listitem>
@@ -1073,8 +1072,7 @@ catch (javax.persistence.QueryTimeoutException e) {
         </section>
 
         <section>
-          <title>Limit the number of results when the time limit is reached
-          (EXPERIMENTAL)</title>
+          <title>Limit the number of results when the time limit is reached</title>
 
           <para>Alternatively, you can return the number of results which have
           already been fetched by the time the limit is reached. Note that
@@ -1131,9 +1129,6 @@ if ( query.hasPartialResults() ) {
           <methodname>hasPartialResults</methodname> are also available to
           you.</para>
 
-          <warning>
-            <para>This approach is considered experimental</para>
-          </warning>
         </section>
       </section>
     </section>
@@ -1180,7 +1175,7 @@ if ( query.hasPartialResults() ) {
     <section>
       <title>Result size</title>
 
-      <para>It is sometime useful to know the total number of matching
+      <para>It is sometimes useful to know the total number of matching
       documents:</para>
 
       <itemizedlist>
@@ -1221,7 +1216,7 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; </program
       </example>
 
       <note>
-        <para>Like Google, the number of results is approximative if the index
+        <para>Like Google, the number of results is an approximation if the index
         is not fully up-to-date with the database (asynchronous cluster for
         example).</para>
       </note>

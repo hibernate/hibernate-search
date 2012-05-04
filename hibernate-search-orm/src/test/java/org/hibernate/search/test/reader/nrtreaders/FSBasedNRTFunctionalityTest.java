@@ -1,6 +1,6 @@
-/*
+/* 
  * Hibernate, Relational Persistence for Idiomatic Java
- *
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -18,23 +18,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.interceptor;
+package org.hibernate.search.test.reader.nrtreaders;
+
+import org.hibernate.cfg.Configuration;
 
 /**
- * This interceptor is called upon indexing operations to optionally change the behavior.
- * Implementations must be thread safe and should have a no-arg constructor.
+ * Similar to parent class, but make sure the same functionality works fine
+ * when using a FSDirectory [HSEARCH-1095].
  *
- * Typical use case include so called soft deletes.
- *
- * @experimental: {@link IndexingOverride} might be updated
- *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public interface EntityIndexingInterceptor<T> {
-	IndexingOverride onAdd(T entity);
-	IndexingOverride onUpdate(T entity);
-	IndexingOverride onDelete(T entity);
-	IndexingOverride onCollectionUpdate(T entity);
+public class FSBasedNRTFunctionalityTest extends BasicNRTFunctionalityTest {
 
-	//FIXME should we add onPurge and onIndex?
+	protected void configure(Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+	}
+
 }

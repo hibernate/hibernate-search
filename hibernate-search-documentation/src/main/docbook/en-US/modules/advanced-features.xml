@@ -112,7 +112,9 @@ finally {
       <title>Accessing an <classname>IndexReader by index
       names</classname></title>
 
-      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory.getIndexReaderAccessor().open("Products.1", "Products.3");</programlisting>
+      <programlisting language="JAVA" role="JAVA">IndexReader reader = searchFactory
+      .getIndexReaderAccessor()
+      .open("Products.1", "Products.3");</programlisting>
     </example>
   </section>
 
@@ -144,11 +146,11 @@ finally {
     <para>In some cases it can be useful to split (shard) the indexed data of
     a given entity into several Lucene indexes.</para>
 
-    <warning>
+    <note>
       <para>This solution is not recommended unless there is a pressing need.
       Searches will be slower as all shards have to be opened for a single
       search. Don't do it until you have a real use case!</para>
-    </warning>
+    </note>
 
     <para>Possible use cases for sharding are:</para>
 
@@ -193,7 +195,7 @@ finally {
       <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy.Implementation</programlisting>
     </example>
 
-    <para>The <classname> IndexShardingStrategy</classname> also allows for
+    <para>The <classname>IndexShardingStrategy</classname> also allows for
     optimizing searches by selecting which shard to run the query against. By
     activating a filter (see <xref linkend="query-filter-shard" />), a
     sharding strategy can select a subset of the shards used to answer a query

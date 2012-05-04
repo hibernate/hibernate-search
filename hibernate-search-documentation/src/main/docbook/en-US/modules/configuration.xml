@@ -81,7 +81,7 @@
       <listitem>
         <para><literal>directory-based</literal>: the default implementation
         which uses the Lucene <classname>Directory</classname> abstraction to
-        mange index files.</para>
+        manage index files.</para>
       </listitem>
 
       <listitem>
@@ -1580,12 +1580,12 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
     subsequent <code>LuceneWork</code> instances that could not be processed
     due to the primary exception.</para>
 
-    <para><programlisting>public interface ErrorContext  {
+    <programlisting language="JAVA" role="JAVA">public interface ErrorContext {
    List&lt;LuceneWork&gt; getFailingOperations();
    LuceneWork getOperationAtFault();
    Throwable getThrowable();
    boolean hasErrors();
-}</programlisting></para>
+}</programlisting>
 
     <para>To register this error handler with Hibernate Search you must
     declare the fully qualified classname of your

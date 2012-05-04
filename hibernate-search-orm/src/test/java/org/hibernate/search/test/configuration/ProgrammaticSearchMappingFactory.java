@@ -65,6 +65,7 @@ public class ProgrammaticSearchMappingFactory {
 					.similarity( DefaultSimilarity.class )
 					.boost( 2 )
 					.classBridge( AddressClassBridge.class )
+					.analyzer( "english" )
 					.property( "addressId", ElementType.FIELD ).documentId().name( "id" )
 					.property("lastUpdated", ElementType.FIELD)
 						.field().name("last-updated")

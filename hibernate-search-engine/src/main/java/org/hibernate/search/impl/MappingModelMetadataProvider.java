@@ -105,7 +105,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					new HashMap<Object, Object>() :
 					new HashMap<Object, Object>( delegateDefaults );
 			defaults.put( AnalyzerDefs.class, createAnalyzerDefArray() );
-			if ( !mapping.getFullTextFilerDefs().isEmpty() ) {
+			if ( !mapping.getFullTextFilterDefs().isEmpty() ) {
 				defaults.put( FullTextFilterDefs.class, createFullTextFilterDefsForMapping() );
 			}
 		}
@@ -138,7 +138,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	private FullTextFilterDef[] createFullTextFilterDefsForMapping() {
-		Set<Map<String, Object>> fullTextFilterDefs = mapping.getFullTextFilerDefs();
+		Set<Map<String, Object>> fullTextFilterDefs = mapping.getFullTextFilterDefs();
 		FullTextFilterDef[] filters = new FullTextFilterDef[fullTextFilterDefs.size()];
 		int index = 0;
 		for ( Map<String, Object> filterDef : fullTextFilterDefs ) {
@@ -154,7 +154,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			fullTextFilterDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 		}
 
-		return createAnnotation( fullTextFilterDefAnnotation );
+		return (FullTextFilterDef) createAnnotation( fullTextFilterDefAnnotation );
 	}
 
 	private static FullTextFilterDef[] createFullTextFilterDefArray(Set<Map<String, Object>> fullTextFilterDefs) {
@@ -194,7 +194,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				analyzerDefAnnotation.setValue( entry.getKey(), entry.getValue() );
 			}
 		}
-		return createAnnotation( analyzerDefAnnotation );
+		return (AnalyzerDef) createAnnotation( analyzerDefAnnotation );
 	}
 
 	static private void addParamsToAnnotation(AnnotationDescriptor annotationDescriptor, Map.Entry<String, Object> entry) {
@@ -215,7 +215,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					filterAnn.setValue( filterEntry.getKey(), filterEntry.getValue() );
 				}
 			}
-			filtersArray[index] = createAnnotation( filterAnn );
+			filtersArray[index] = (TokenFilterDef) createAnnotation( filterAnn );
 			index++;
 		}
 		return filtersArray;
@@ -228,7 +228,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor paramAnnotation = new AnnotationDescriptor( Parameter.class );
 			paramAnnotation.setValue( "name", entry.get( "name" ) );
 			paramAnnotation.setValue( "value", entry.get( "value" ) );
-			paramArray[index] = createAnnotation( paramAnnotation );
+			paramArray[index] = (Parameter) createAnnotation( paramAnnotation );
 			index++;
 		}
 		return paramArray;
@@ -239,7 +239,10 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	 * @param annotation the AnnotationDescriptor
 	 * @return the proxy
 	 */
-	private static <T extends Annotation> T createAnnotation(AnnotationDescriptor annotation) {
+	private static Annotation createAnnotation(AnnotationDescriptor annotation) {
+		//The return type of this method could be "<T extends Annotation> T"
+		//but that would fail to compile on some JVMs: see HSEARCH-1106.
+
 		//This is a filthy workaround for the Annotations proxy generation,
 		//which is using the ContextClassLoader to define the proxy classes
 		//(not working fine in modular environments when Search is used by
@@ -410,13 +413,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
 				for ( Map.Entry<String, Object> entry : field.entrySet() ) {
 					if ( entry.getKey().equals( "analyzer" ) ) {
-						AnnotationDescriptor analyzerAnnotation = new AnnotationDescriptor( Analyzer.class );
-						@SuppressWarnings("unchecked")
-						Map<String, Object> analyzer = (Map<String, Object>) entry.getValue();
-						for ( Map.Entry<String, Object> analyzerEntry : analyzer.entrySet() ) {
-							analyzerAnnotation.setValue( analyzerEntry.getKey(), analyzerEntry.getValue() );
-						}
-						fieldAnnotation.setValue( "analyzer", createAnnotation( analyzerAnnotation ) );
+						addAnalyzerAnnotationTo( fieldAnnotation, entry );
 					}
 					else if ( entry.getKey().equals( "boost" ) ) {
 						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
@@ -464,6 +461,16 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			createCalendarBridge( property );
 			createDynamicBoost( property );
 			createFieldBridge( property );
+		}
+
+		private void addAnalyzerAnnotationTo(AnnotationDescriptor fieldAnnotation, Entry<String, Object> entry) {
+			AnnotationDescriptor analyzerAnnotation = new AnnotationDescriptor( Analyzer.class );
+			@SuppressWarnings("unchecked")
+			Map<String, Object> analyzer = (Map<String, Object>) entry.getValue();
+			for ( Map.Entry<String, Object> analyzerEntry : analyzer.entrySet() ) {
+				analyzerAnnotation.setValue( analyzerEntry.getKey(), analyzerEntry.getValue() );
+			}
+			fieldAnnotation.setValue( "analyzer", createAnnotation( analyzerAnnotation ) );
 		}
 
 		private void createFieldBridge(PropertyDescriptor property) {
@@ -605,14 +612,17 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor annotation = new AnnotationDescriptor( ClassBridge.class );
 			Set<Entry<String, Object>> entrySet = classBridgeDef.entrySet();
 			for ( Entry<String, Object> entry : entrySet ) {
-				if ( entry.getKey().equals( "params" ) ) {
+				if ( entry.getKey().equals( "analyzer" ) ) {
+					addAnalyzerAnnotationTo( annotation, entry );
+				}
+				else if ( entry.getKey().equals( "params" ) ) {
 					addParamsToAnnotation( annotation, entry );
 				}
 				else {
 					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
 			}
-			return createAnnotation( annotation );
+			return (ClassBridge) createAnnotation( annotation );
 		}
 
 		private void createProvidedId(EntityDescriptor entity) {
@@ -669,7 +679,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 		public Annotation[] getAnnotations() {
 			initAnnotations();
-			return new Annotation[0];  //To change body of implemented methods use File | Settings | File Templates.
+			return new Annotation[0];
 		}
 	}
 }

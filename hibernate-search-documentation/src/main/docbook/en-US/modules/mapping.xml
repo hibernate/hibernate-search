@@ -341,13 +341,6 @@ public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
 }
 </programlisting>
         </example>
-
-        <note>
-          <para>Lucene marks the numeric field API still as experimental and
-          warns for incompatible changes in coming releases. Using Hibernate
-          Search will hopefully shield you from any underlying API changes,
-          but that is not guaranteed.</para>
-        </note>
       </section>
 
       <section id="id-annotation">
@@ -2087,7 +2080,7 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
   </section>
 
   <section id="search-mapping-indexinginterceptor">
-    <title>Indexing interceptor: to index or not based on entity state</title>
+    <title>Conditional indexing: to index or not based on entity state</title>
 
     <important>
       <para>This feature is considered experimental. More operation types
@@ -2280,10 +2273,6 @@ public class Blog {
   <section id="provided-id">
     <title>Providing your own id</title>
 
-    <warning>
-      <para>This part of the documentation is a work in progress.</para>
-    </warning>
-
     <para>You can provide your own id for Hibernate Search if you are
     extending the internals. You will have to generate a unique value so it
     can be given to Lucene to be indexed. This will have to be given to
@@ -2320,11 +2309,8 @@ public class MyClass{
   <section id="hsearch-mapping-programmaticapi">
     <title>Programmatic API</title>
 
-    <para><warning>
-        <para>This feature is considered experimental. While stable code-wise,
-        the API is subject to change in the future.</para>
-      </warning>Although the recommended approach for mapping indexed entities
-    is to use annotations, it is sometimes more convenient to use a different
+    <para>Although the recommended approach for mapping indexed entities is to
+    use annotations, it is sometimes more convenient to use a different
     approach:</para>
 
     <itemizedlist>
@@ -2375,16 +2361,19 @@ public class MyClass{
     <classname>Persistence</classname> bootstrap methods.</para>
 
     <example>
-    <title>Programmatic mapping</title>
-        <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
+      <title>Programmatic mapping</title>
+
+      <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 [...] //configure mapping
 Configuration config = new Configuration();
 config.getProperties().put( Environment.MODEL_MAPPING, mapping );
 SessionFactory sf = config.buildSessionFactory();</programlisting>
     </example>
+
     <example>
       <title>Programmatic mapping with JPA</title>
-    <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
+
+      <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 [...] //configure mapping
 Map props = new HashMap();
 props.put( Environment.MODEL_MAPPING, mapping );

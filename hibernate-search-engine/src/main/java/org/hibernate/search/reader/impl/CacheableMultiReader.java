@@ -43,8 +43,8 @@ public class CacheableMultiReader extends MultiReader {
 	final ReaderProvider[] managers;
 
 	public CacheableMultiReader(IndexReader[] subReaders, ReaderProvider[] managers) {
-		// don't allow sub readers to be closed:
-		super( subReaders, false );
+		// If this flag isn't set to true, the MultiReader will increase the usage counter!
+		super( subReaders, true );
 		this.subReaders = subReaders;
 		this.managers = managers;
 	}

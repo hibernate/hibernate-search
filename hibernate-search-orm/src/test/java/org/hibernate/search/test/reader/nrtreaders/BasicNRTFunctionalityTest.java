@@ -26,13 +26,16 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.Environment;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.junit.Assert;
 
@@ -100,6 +103,11 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 
 		assertEquals( 0, getDocumentNbrFromFilesystem( indexManager ) );
 		assertEquals( 0, getDocumentNbrFromReaderProvider( indexManager ) );
+
+		ErrorHandler errorHandler = searchFactoryBySFI.getErrorHandler();
+		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
+		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
+		Assert.assertNull( "Errors detected in the backend!", mockErrorHandler.getLastException() );
 	}
 
 	private int getDocumentNbrFromReaderProvider(NRTIndexManager indexManager) {
@@ -132,7 +140,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.indexmanager", "near-real-time" );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
 
 }
