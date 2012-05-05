@@ -176,7 +176,8 @@ public final class ConfigContext {
 		String analyzerClassName = cfg.getProperty( Environment.ANALYZER_CLASS );
 		if ( analyzerClassName != null ) {
 			try {
-				analyzerClass = ReflectHelper.classForName( analyzerClassName );
+				// Use the same class loader used to load the SearchConfiguration implementation class ...
+				analyzerClass = ReflectHelper.classForName( analyzerClassName, cfg.getClass() );
 			}
 			catch ( Exception e ) {
 				return buildLazyAnalyzer( analyzerClassName );
