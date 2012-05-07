@@ -176,7 +176,7 @@
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>1.5.1</version>
+                <version>1.6.3</version>
             </dependency>
             <dependency>
                 <!-- To force testing of Apache Avro integration with the version of Jackson used in AS 7.1 -->
