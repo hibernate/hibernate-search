@@ -50,6 +50,8 @@ public class BenchWithGeonames {
 		LoadGeonames();
 		Bench();
 		FacetTest();
+
+		return;
 	}
 
 	public static void LoadGeonames() {
@@ -122,6 +124,11 @@ public class BenchWithGeonames {
 			long doubleRangeTotalDuration = 0;
 			long distanceDoubleRangeTotalDuration = 0;
 
+			long gridDocsFetched = 0;
+			long spatialDocsFetched = 0;
+			long doubleRangeDocsFetched = 0;
+			long distanceDoubleRangeDocsFetched = 0;
+
 			org.apache.lucene.search.Query luceneQuery;
 			long startTime, endTime, duration;
 			FullTextQuery hibQuery;
@@ -156,7 +163,7 @@ public class BenchWithGeonames {
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
 				try {
-					hibQuery.getResultSize();
+					doubleRangeDocsFetched += hibQuery.getResultSize();
 				}
 				finally {
 					endTime = System.nanoTime();
@@ -195,7 +202,7 @@ public class BenchWithGeonames {
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
 				try {
-					hibQuery.getResultSize();
+					distanceDoubleRangeDocsFetched += hibQuery.getResultSize();
 				}
 				finally {
 					endTime = System.nanoTime();
@@ -212,7 +219,7 @@ public class BenchWithGeonames {
 				startTime = System.nanoTime();
 
 				try {
-					hibQuery.getResultSize();
+					gridDocsFetched += hibQuery.getResultSize();
 				}
 				finally {
 					endTime = System.nanoTime();
@@ -229,7 +236,7 @@ public class BenchWithGeonames {
 				startTime = System.nanoTime();
 
 				try {
-					hibQuery.getResultSize();
+					spatialDocsFetched += hibQuery.getResultSize();
 				}
 				finally {
 					endTime = System.nanoTime();
@@ -247,25 +254,25 @@ public class BenchWithGeonames {
 					.println(
 							"Mean time with Grid : " + Double.toString(
 									( double ) gridTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
-							) + " ms"
+							) + " ms. Average number of docs  fetched : " + Double.toString( gridDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with Grid + Distance filter : " + Double.toString(
 									( double ) spatialTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
-							) + " ms"
+							) + " ms. Average number of docs  fetched : " + Double.toString( spatialDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with DoubleRange : " + Double.toString(
 									( double ) doubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
-							) + " ms"
+							) + " ms. Average number of docs  fetched : " + Double.toString( doubleRangeDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with DoubleRange + Distance filter : " + Double.toString(
 									( double ) distanceDoubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
-							) + " ms"
+							) + " ms. Average number of docs  fetched : " + Double.toString( distanceDoubleRangeDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 
 		}
