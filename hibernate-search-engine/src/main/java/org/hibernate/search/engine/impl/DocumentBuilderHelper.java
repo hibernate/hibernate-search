@@ -57,7 +57,8 @@ public final class DocumentBuilderHelper {
 
 	public static Class getDocumentClass(String className) {
 		try {
-			return ReflectHelper.classForName( className );
+			// Use the same class loader used to load this class ...
+			return ReflectHelper.classForName( className, DocumentBuilderHelper.class );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new SearchException( "Unable to load indexed class: " + className, e );
