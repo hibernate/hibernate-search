@@ -109,15 +109,17 @@ public class ObjectLoaderBuilder {
 		Class entityType = targetedEntities.size() == 0 ? null : targetedEntities.iterator().next();
 		if ( criteria instanceof CriteriaImpl) {
 			String targetEntity = ( ( CriteriaImpl ) criteria ).getEntityOrClassName();
-			if ( entityType != null && !entityType.getName().equals( targetEntity ) ) {
-				throw new SearchException( "Criteria query entity should match query entity" );
-			}
-			else {
+			if ( entityType == null ) {
 				try {
-					entityType = ReflectHelper.classForName( targetEntity );
+					entityType = ReflectHelper.classForName( targetEntity, ObjectLoaderBuilder.class );
 				}
 				catch ( ClassNotFoundException e ) {
 					throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
+				}
+			}
+			else {
+				if ( !entityType.getName().equals( targetEntity ) ) {
+					throw new SearchException( "Criteria query entity should match query entity" );
 				}
 			}
 		}
