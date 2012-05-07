@@ -43,7 +43,7 @@ public abstract class WorkerFactory {
 		Properties workerProperties = new Properties();
 		for ( Map.Entry entry : props.entrySet() ) {
 			String key = (String) entry.getKey();
-			if ( key.startsWith( Environment.WORKER_PREFIX ) ) {
+			if ( key.startsWith( "hibernate.search.worker" ) ) {
 				workerProperties.setProperty( key, (String) entry.getValue() );
 			}
 		}
@@ -54,17 +54,11 @@ public abstract class WorkerFactory {
 		Properties props = getProperties( cfg );
 		String impl = props.getProperty( Environment.WORKER_SCOPE );
 		Worker worker;
-		if ( StringHelper.isEmpty( impl ) ) {
-			worker = new TransactionalWorker();
-		}
-		else if ( "transaction".equalsIgnoreCase( impl ) ) {
+		if ( StringHelper.isEmpty( impl ) || "transaction".equalsIgnoreCase( impl ) ) {
 			worker = new TransactionalWorker();
 		}
 		else {
-			worker = ClassLoaderHelper.instanceFromName(
-					Worker.class,
-					impl, WorkerFactory.class, "worker"
-			);
+			worker = ClassLoaderHelper.instanceFromName( Worker.class, impl, WorkerFactory.class, "worker" );
 		}
 		worker.initialize( props, context, queueingProcessor );
 		return worker;
