@@ -142,13 +142,16 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 		}
 	}
 
-    private static synchronized short generateMuxId(Muxer<UpHandler> muxer, UpHandler handler) {
+    private static short generateMuxId(Muxer<UpHandler> muxer, UpHandler handler) {
         Random random = new Random();
-        while(true) {
-            short id = (short) random.nextInt();
-            if (muxer.get(id) == null) {
-                muxer.add(id, handler);
-                return id;
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (muxer) {
+            while(true) {
+                short id = (short) random.nextInt();
+                if (muxer.get(id) == null) {
+                    muxer.add(id, handler);
+                    return id;
+                }
             }
         }
     }
