@@ -83,16 +83,16 @@ public class SortTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void testResultOrderedByIdPerDefault() throws Exception {
+	public void testResultOrderedById() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
+		Sort sort = new Sort( new SortField( "id", SortField.STRING, false ) );
+		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Wrong number of test results.", 3, result.size() );
-		// make sure that the order is according to in which order the books got inserted
-		// into the index.
 		int id = 1;
 		for ( Book b : result ) {
 			assertEquals( "Expected another id", Integer.valueOf( id ), b.getId() );
