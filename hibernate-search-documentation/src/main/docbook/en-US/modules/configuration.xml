@@ -55,7 +55,7 @@
       through Hibernate, Hibernate Search updates the according Lucene index.
       It is sometimes desirable to disable that features if either your index
       is read-only or if index updates are done in a batch way (see <xref
-      linkend="search-batchindex" />).</para>
+      linkend="search-batchindex"/>).</para>
 
       <para>To disable event based indexing, set</para>
 
@@ -74,7 +74,7 @@
     <title>Configuring the <classname>IndexManager</classname></title>
 
     <para>The role of the index manager component is described in <xref
-    linkend="search-architecture" />. Hibernate Search provides two possible
+    linkend="search-architecture"/>. Hibernate Search provides two possible
     implementations for this interface to choose from.</para>
 
     <itemizedlist>
@@ -103,9 +103,9 @@
       This is the one mostly referred to in this documentation. It is highly
       configurable and allows you to select different settings for the reader
       strategy, back ends and directory providers. Refer to <xref
-      linkend="search-configuration-directory" />, <xref
-      linkend="configuration-worker" /> and <xref
-      linkend="configuration-reader-strategy" /> for more details.</para>
+      linkend="search-configuration-directory"/>, <xref
+      linkend="configuration-worker"/> and <xref
+      linkend="configuration-reader-strategy"/> for more details.</para>
     </section>
 
     <section>
@@ -152,7 +152,7 @@
   <section id="search-configuration-directory" revision="1">
     <title>Directory configuration</title>
 
-    <para>As we have seen in <xref linkend="configuration-indexmanager" /> the
+    <para>As we have seen in <xref linkend="configuration-indexmanager"/> the
     default index manager uses Lucene's notion of a
     <classname>Directory</classname> to store the index files. The
     <classname>Directory</classname> implementation can be customized and
@@ -160,14 +160,14 @@
     <classname>DirectoryProvider</classname> is the Hibernate Search
     abstraction around a Lucene <classname>Directory</classname> and handles
     the configuration and the initialization of the underlying Lucene
-    resources. <xref linkend="directory-provider-table" /> shows the list of
+    resources. <xref linkend="directory-provider-table"/> shows the list of
     the directory providers available in Hibernate Search together with their
     corresponding options.</para>
 
     <para>To configure your <classname>DirectoryProvider</classname> you have
     to understand that each indexed entity is associated to a Lucene index
     (except of the case where multiple entities share the same index - <xref
-    linkend="section-sharing-indexes" />). The name of the index is given by
+    linkend="section-sharing-indexes"/>). The name of the index is given by
     the <constant>index</constant> property of the
     <classname>@Indexed</classname> annotation. If the
     <constant>index</constant> property is not specified the fully qualified
@@ -179,7 +179,7 @@
     The name <constant>default</constant>
     (<constant>hibernate.search.default</constant>) is reserved and can be
     used to define properties which apply to all indexes. <xref
-    linkend="example-configuring-directory-providers" /> shows how
+    linkend="example-configuring-directory-providers"/> shows how
     <constant>hibernate.search.default.directory_provider</constant> is used
     to set the default directory provider to be the filesystem one.
     <constant>hibernate.search.default.indexBase</constant> sets then the
@@ -258,7 +258,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             @Indexed.index (useful for sharded
             indexes)</para><para><literal>locking_strategy</literal> :
             optional, see <xref
-            linkend="search-configuration-directory-lockfactories" />
+            linkend="search-configuration-directory-lockfactories"/>
             </para><para><literal>filesystem_access_type</literal>: allows to
             determine the exact type of <classname>FSDirectory</classname>
             implementation used by this
@@ -308,8 +308,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             amount of MegaBytes to move in a single low level copy
             instruction; defaults to
             16MB.</para><para><literal>locking_strategy</literal> : optional,
-            see <xref
-            linkend="search-configuration-directory-lockfactories" />
+            see <xref linkend="search-configuration-directory-lockfactories"/>
             </para><para><literal>filesystem_access_type</literal>: allows to
             determine the exact type of <classname>FSDirectory</classname>
             implementation used by this
@@ -359,8 +358,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             amount of MegaBytes to move in a single low level copy
             instruction; defaults to
             16MB.</para><para><literal>locking_strategy</literal> : optional,
-            see <xref
-            linkend="search-configuration-directory-lockfactories" />
+            see <xref linkend="search-configuration-directory-lockfactories"/>
             </para><para><literal>retry_marker_lookup</literal> : optional,
             default to 0. Defines how many times we look for the marker files
             in the source directory before failing. Waiting 5 seconds between
@@ -397,7 +395,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             <entry><para><property>infinispan</property>: Infinispan based
             directory. Use it to store the index in a distributed grid, making
             index changes visible to all elements of the cluster very quickly.
-            Also see <xref linkend="infinispan-directories" /> for additional
+            Also see <xref linkend="infinispan-directories"/> for additional
             requirements and configuration settings. Infinispan needs a global
             configuration and additional dependencies; the settings defined
             here apply to each different index.</para></entry>
@@ -555,9 +553,9 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
         should work fine in most cases but does not store the index in a
         persistent cache store.</para>
 
-        <para>As mentioned in <xref linkend="directory-provider-table" />,
-        each index makes use of three caches, so three different caches should
-        be configured as shown in the
+        <para>As mentioned in <xref linkend="directory-provider-table"/>, each
+        index makes use of three caches, so three different caches should be
+        configured as shown in the
         <literal>default-hibernatesearch-infinispan.xml</literal> provided in
         the <literal>hibernate-search-infinispan.jar</literal>. Several
         indexes can share the same caches.</para>
@@ -582,7 +580,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
     depends for example on the number of entity changes or some other
     application (lifecycle) events. For this reason the
     <classname>Worker</classname> implementation is configurable as shown in
-    <xref linkend="table-worker-configuration" />.</para>
+    <xref linkend="table-worker-configuration"/>.</para>
 
     <table id="table-worker-configuration">
       <title>Scope configuration</title>
@@ -624,7 +622,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
     hand, can help to minimize the user response time. The drawback is
     potential discrepancies between database and index states. Lets look at
     the configuration options shown in <xref
-    linkend="table-work-execution-configuration" />.</para>
+    linkend="table-work-execution-configuration"/>.</para>
 
     <note>
       <para>The following options can be different on each index; in fact they
@@ -677,7 +675,7 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
     the single VM. Luckily there is a better approach, namely delegation. It
     is possible to send the indexing work to a different server by configuring
     hibernate.search.worker.backend - see <xref
-    linkend="table-backend-configuration" />. Again this option can be
+    linkend="table-backend-configuration"/>. Again this option can be
     configured differently for each index.</para>
 
     <table id="table-backend-configuration">
@@ -699,16 +697,15 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             undefined or empty.</para><para><literal>jms</literal>: JMS
             backend. Index updates are send to a JMS queue to be processed by
             an indexing master. See <xref
-            linkend="table-jms-backend-configuration" /> for additional
-            configuration options and <xref linkend="jms-backend" /> for a
-            more detailed descripton of this
+            linkend="table-jms-backend-configuration"/> for additional
+            configuration options and <xref linkend="jms-backend"/> for a more
+            detailed descripton of this
             setup.</para><para><literal>jgroupsMaster</literal> or
             <literal>jgroupsSlave</literal>: Backend using <ulink
             url="http://www.jgroups.org/">JGroups</ulink> as communication
-            layer. See <xref linkend="table-jgroups-backend-configuration" />
-            for additional configuration options and <xref
-            linkend="jgroups-backend" /> for a more detailed description of
-            this setup.</para><para><literal>blackhole</literal>: Mainly a
+            layer. See <xref linkend="jgroups-backend"/> for a more detailed
+            description of this
+            setup.</para><para><literal>blackhole</literal>: Mainly a
             test/developer setting which ignores all indexing
             work</para><para>You can also specify the fully qualified name of
             a class implementing <classname>BackendQueueProcessor</classname>.
@@ -777,12 +774,12 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
 
       <mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="jms-backend.png" format="PNG" />
+          <imagedata align="center" fileref="jms-backend.png" format="PNG"/>
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center" depth="" fileref="jms-backend.png"
-                     format="PNG" scalefit="1" width="12cm" />
+                     format="PNG" scalefit="1" width="12cm"/>
         </imageobject>
 
         <caption><para>JMS back end configuration.</para></caption>
@@ -903,18 +900,17 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
 
       <para>This section describes how to configure the JGroups Master/Slave
       back end. The configuration examples illustrated in <xref
-      linkend="jms-backend" /> also apply here, only a different backend
+      linkend="jms-backend"/> also apply here, only a different backend
       (<constant>hibernate.search.worker.backend</constant>) needs to be
       set.</para>
 
-      <para>All backends configured to use JGroups share the same Channel.
-      The JGroups <classname>JChannel</classname> is the main communication
-      link across all nodes participating in the same cluster group; since it
-      is convenient and more efficient to have just one channel shared across all
+      <para>All backends configured to use JGroups share the same Channel. The
+      JGroups <classname>JChannel</classname> is the main communication link
+      across all nodes participating in the same cluster group; since it is
+      convenient and more efficient to have just one channel shared across all
       backends, the Channel configuration properties are not defined on a
-      per-worker section but globally. See
-      <xref linkend="jgroups-channel-configuration" />.
-      </para>
+      per-worker section but globally. See <xref
+      linkend="jgroups-channel-configuration"/>.</para>
 
       <section>
         <title>Slave nodes</title>
@@ -923,9 +919,10 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
         to the master node. Index querying operations are executed on a local
         index copy. Enabling the JGroups worker only makes sure the index
         operations are sent to the master, you still have to synchronize
-        configuring an appropriate directory (See <literal>filesystem-master</literal>,
+        configuring an appropriate directory (See
+        <literal>filesystem-master</literal>,
         <literal>filesystem-slave</literal> or <literal>infinispan</literal>
-        options in <xref linkend="search-configuration-directory" />).</para>
+        options in <xref linkend="search-configuration-directory"/>).</para>
 
         <example>
           <title>JGroups Slave configuration</title>
@@ -952,25 +949,26 @@ hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
       <section id="jgroups-channel-configuration">
         <title>JGroups channel configuration</title>
 
-        <para>Configuring the JGroups channel essentially entails specifying the
-        transport in terms of a network protocol stack.
-        To configure the JGroups transport, point the configuration property
+        <para>Configuring the JGroups channel essentially entails specifying
+        the transport in terms of a network protocol stack. To configure the
+        JGroups transport, point the configuration property
         <constant>hibernate.search.services.jgroups.configurationFile</constant>
-        to a JGroups configuration file; this can be either a file path
-        or a Java resource name.</para>
+        to a JGroups configuration file; this can be either a file path or a
+        Java resource name.</para>
 
         <tip>
           <para>If no property is explicitly specified it is assumed that the
           JGroups default configuration file <literal>flush-udp.xml</literal>
-          is used. This example configuration is known to work in most scenarios,
-          with the notable exception of Amazon AWS; refer to the <ulink
-        url="http://www.jgroups.org/manual-3.x/html/">JGroups manual</ulink>
-        for more examples and protocol configuration details.</para>
+          is used. This example configuration is known to work in most
+          scenarios, with the notable exception of Amazon AWS; refer to the
+          <ulink url="http://www.jgroups.org/manual-3.x/html/">JGroups
+          manual</ulink> for more examples and protocol configuration
+          details.</para>
         </tip>
 
-        <para>The default channel name is <literal>Hibernate Search Cluster</literal>
-        which can be configured as seen in
-        <xref linkend="example-jgroups-channel-name" />.</para>
+        <para>The default channel name is <literal>Hibernate Search
+        Cluster</literal> which can be configured as seen in <xref
+        linkend="example-jgroups-channel-name"/>.</para>
 
         <example id="example-jgroups-channel-name">
           <title>JGroups channel name configuration</title>
@@ -979,13 +977,18 @@ hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
         </example>
 
         <section>
-            <title>JGroups channel instance injection</title>
-            <para>For programmatic configurations, one additional option is available to configure the JGroups
-            channel: to pass an existing channel instance to Hibernate Search directly using the
-            property <literal>hibernate.search.services.jgroups.providedChannel</literal>, as shown in the
-            following example.</para>
-        </section><para></para>
-    <programlisting language="JAVA" role="JAVA">import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+          <title>JGroups channel instance injection</title>
+
+          <para>For programmatic configurations, one additional option is
+          available to configure the JGroups channel: to pass an existing
+          channel instance to Hibernate Search directly using the property
+          <literal>hibernate.search.services.jgroups.providedChannel</literal>,
+          as shown in the following example.</para>
+        </section>
+
+        <para/>
+
+        <programlisting language="JAVA" role="JAVA">import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 
 org.jgroups.JChannel channel = ...
 Map&lt;String,String&gt; properties = new HashMap&lt;String,String)(1);
@@ -999,7 +1002,7 @@ EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", pro
     <title>Reader strategy configuration</title>
 
     <para>The different reader strategies are described in <xref
-    linkend="search-architecture-readerstrategy" />. Out of the box strategies
+    linkend="search-architecture-readerstrategy"/>. Out of the box strategies
     are:</para>
 
     <itemizedlist>
@@ -1057,7 +1060,7 @@ hibernate.search.Animals.2.indexwriter.term_index_interval default
 hibernate.search.default.indexwriter.max_merge_docs 100
 hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
       </example> The configuration in <xref
-    linkend="example-performamce-option-configuration" /> will result in these
+    linkend="example-performamce-option-configuration"/> will result in these
     settings applied on the second shard of the <classname>Animal</classname>
     index:</para>
 
@@ -1082,10 +1085,10 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
     <para>All other values will use the defaults defined in Lucene.</para>
 
     <para>The default for all values is to leave them at Lucene's own default.
-    The values listed in <xref linkend="table-performance-parameters" />
-    depend for this reason on the version of Lucene you are using. The values
-    shown are relative to version <literal>2.4</literal>. For more information
-    about Lucene indexing performance, please refer to the Lucene
+    The values listed in <xref linkend="table-performance-parameters"/> depend
+    for this reason on the version of Lucene you are using. The values shown
+    are relative to version <literal>2.4</literal>. For more information about
+    Lucene indexing performance, please refer to the Lucene
     documentation.</para>
 
     <info>
