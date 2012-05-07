@@ -21,13 +21,12 @@
 package org.hibernate.search.test.jgroups.common;
 
 import junit.framework.Assert;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+import org.hibernate.search.backend.impl.jgroups.MessageSender;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.jgroups.Channel;
 import org.jgroups.JChannel;
 import org.junit.Test;
 
@@ -45,8 +44,8 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 	@Test
 	public void testInjectionHappened() throws Exception {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		Channel enabledChannel = searchFactory.getServiceManager().requestService( JGroupsChannelProvider.class, null );
-		Assert.assertTrue( enabledChannel == masterChannel );
+		MessageSender sender = searchFactory.getServiceManager().requestService( JGroupsChannelProvider.class, null );
+		Assert.assertTrue( masterChannel.getAddress().equals(sender.getAddress()) );
 	}
 
 	@Override

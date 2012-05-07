@@ -39,6 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Ales Justin
  */
 public class JGroupsBackendQueueTask {
 
@@ -87,7 +88,7 @@ public class JGroupsBackendQueueTask {
 
 		try {
 			Message message =  masterNodeSelector.createMessage( data );
-			factory.getChannel().send( message );
+			factory.getMessageSender().send(message);
 			if ( trace ) {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );
 			}
