@@ -51,12 +51,13 @@ public class BenchWithGeonames {
 		Bench();
 		FacetTest();
 
-		return;
+		System.exit(0);
 	}
 
 	public static void LoadGeonames() {
 		Session session = null;
 		FullTextSession fullTextSession = null;
+		BufferedReader buffRead = null;
 		try {
 			SessionFactory sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
 
@@ -66,7 +67,7 @@ public class BenchWithGeonames {
 			fullTextSession = Search.getFullTextSession( session );
 
 			File geonamesFile = new File( geonamesDataFile );
-			BufferedReader buffRead = new BufferedReader( new FileReader( geonamesFile ) );
+			buffRead = new BufferedReader( new FileReader( geonamesFile ) );
 			String line = null;
 
 			int line_number = 0;
@@ -93,6 +94,7 @@ public class BenchWithGeonames {
 			}
 			session.getTransaction().commit();
 			session.close();
+			buffRead.close();
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
@@ -104,6 +106,14 @@ public class BenchWithGeonames {
 					transaction.rollback();
 				}
 				session.close();
+			}
+			try {
+				if( buffRead != null) {
+					buffRead.close();
+				}
+			}
+			catch ( Exception e ) {
+				e.printStackTrace();
 			}
 		}
 	}
