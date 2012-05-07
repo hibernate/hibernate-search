@@ -27,6 +27,8 @@ import org.jboss.byteman.rule.helper.Helper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @author Hardy Ferentschik
@@ -54,6 +56,12 @@ public class BytemanHelper extends Helper {
 	public void throwNPE(String message) {
 		//Needed because of Bug BYTEMAN-173: can't simply inject a NPE from the rule
 		throw new NullPointerException( message );
+	}
+
+	public void assertBooleanValue(boolean actual, boolean expected) {
+		if ( actual != expected ) {
+			fail("Unexpected boolean value");
+		}
 	}
 
 	public void countInvocation() {
