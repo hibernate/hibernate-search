@@ -613,17 +613,6 @@ hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryPr
             Worker during initialization. This allows adding custom, worker
             specific parameters.</entry>
           </row>
-
-          <row>
-            <entry><property>hibernate.search.worker.batch_size</property></entry>
-
-            <entry>Defines the maximum number of indexing operation batched
-            per context. Once the limit is reached indexing will be triggered
-            even though the context has not ended yet. This property only
-            works if the <classname>Worker</classname> implementation
-            delegates the queued work to BatchedQueueingProcessor (which is
-            what the <classname>TransactionalWorker</classname> does)</entry>
-          </row>
         </tbody>
       </tgroup>
     </table>
