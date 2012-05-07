@@ -128,8 +128,8 @@ public class BenchWithGeonames {
 			List results;
 			final QueryBuilder queryBuilder= fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 			org.apache.lucene.search.Query query;
-			final Integer iterations = 200;
-			final Integer warmUp = 25;
+			final Integer iterations = 2000;
+			final Integer warmUp = 50;
 
 			for ( int i = 0; i < iterations; i++ ) {
 				Point center = Point.fromDegrees( Math.random() * 2 + 44 , Math.random() * 2 + 3 );
@@ -162,7 +162,7 @@ public class BenchWithGeonames {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
-				if ( i > ( iterations - warmUp ) ) {
+				if ( i > warmUp ) {
 					doubleRangeTotalDuration += duration;
 				}
 				session.clear();
@@ -201,7 +201,7 @@ public class BenchWithGeonames {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
-				if ( i > ( iterations - warmUp ) ) {
+				if ( i > warmUp ) {
 					distanceDoubleRangeTotalDuration += duration;
 				}
 				session.clear();
@@ -218,7 +218,7 @@ public class BenchWithGeonames {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
-				if ( i > ( iterations - warmUp ) ) {
+				if ( i > warmUp ) {
 					gridTotalDuration += duration;
 				}
 				session.clear();
@@ -235,7 +235,7 @@ public class BenchWithGeonames {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
-				if ( i > ( iterations - warmUp ) ) {
+				if ( i > warmUp ) {
 					spatialTotalDuration += duration;
 				}
 				session.clear();
@@ -245,30 +245,27 @@ public class BenchWithGeonames {
 
 			System.out
 					.println(
-							" Mean time with Grid : " + Double.toString(
-									( double ) gridTotalDuration / 100.0d * Math.pow(
-											10,
-											-9
-									)
-							)
+							"Mean time with Grid : " + Double.toString(
+									( double ) gridTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+							) + " ms"
 					);
 			System.out
 					.println(
-							" Mean time with Grid + Distance filter : " + Double.toString(
-									( double ) spatialTotalDuration / 100.0d * Math.pow( 10, -9 )
-							)
+							"Mean time with Grid + Distance filter : " + Double.toString(
+									( double ) spatialTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+							) + " ms"
 					);
 			System.out
 					.println(
-							" Mean time with DoubleRange : " + Double.toString(
-									( double ) doubleRangeTotalDuration / 100.0d * Math.pow( 10, -9 )
-							)
+							"Mean time with DoubleRange : " + Double.toString(
+									( double ) doubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+							) + " ms"
 					);
 			System.out
 					.println(
-							" Mean time with DoubleRange + Distance filter : " + Double.toString(
-									( double ) distanceDoubleRangeTotalDuration / 100.0d * Math.pow( 10, -9 )
-							)
+							"Mean time with DoubleRange + Distance filter : " + Double.toString(
+									( double ) distanceDoubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+							) + " ms"
 					);
 
 		}
