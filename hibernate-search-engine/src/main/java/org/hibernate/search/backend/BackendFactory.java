@@ -27,7 +27,6 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
-import org.hibernate.search.backend.impl.jgroups.AutoNodeSelector;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.MasterNodeSelector;
 import org.hibernate.search.backend.impl.jgroups.SlaveNodeSelector;
@@ -35,10 +34,10 @@ import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.PluggableSerializationLuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -51,13 +50,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class BackendFactory {
 
 	private static final Log log = LoggerFactory.make();
-	
+
 	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties properties) {
 
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
-		
+
 		final BackendQueueProcessor backendQueueProcessor;
-		
+
 		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = new LuceneBackendQueueProcessor();
 		}
@@ -68,10 +67,10 @@ public class BackendFactory {
 			backendQueueProcessor = new BlackHoleBackendQueueProcessor();
 		}
 		else if ( "jgroupsMaster".equals( backend ) ) {
-				backendQueueProcessor = new JGroupsBackendQueueProcessor( new MasterNodeSelector() );
+			backendQueueProcessor = new JGroupsBackendQueueProcessor( new MasterNodeSelector() );
 		}
 		else if ( "jgroupsSlave".equals( backend ) ) {
-				backendQueueProcessor = new JGroupsBackendQueueProcessor( new SlaveNodeSelector() );
+			backendQueueProcessor = new JGroupsBackendQueueProcessor( new SlaveNodeSelector() );
 		}
 		//TODO: enable it when considered less experimental:
 		//else if ( "jgroups".equals( backend ) ) {
@@ -87,52 +86,53 @@ public class BackendFactory {
 		backendQueueProcessor.initialize( properties, context, indexManager );
 		return backendQueueProcessor;
 	}
-	
+
 	/**
 	 * @param properties the configuration to parse
+	 *
 	 * @return true if the configuration uses sync indexing
 	 */
 	public static boolean isConfiguredAsSync(Properties properties) {
 		// default to sync if none defined
 		return !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
 	}
-	
+
 	/**
-	 * Builds an ExecutorService to run backend work. 
+	 * Builds an ExecutorService to run backend work.
+	 *
 	 * @param properties Might optionally contain configuration options for the ExecutorService
 	 * @param indexManagerName The indexManager going to be linked to this ExecutorService
+	 *
 	 * @return null if the work needs execution in sync
 	 */
 	public static ExecutorService buildWorkersExecutor(Properties properties, String indexManagerName) {
 		int threadPoolSize = getWorkerThreadPoolSize( properties );
 		int queueSize = getWorkerQueueSize( properties );
-		return Executors.newFixedThreadPool( threadPoolSize,
+		return Executors.newFixedThreadPool(
+				threadPoolSize,
 				"IndexWriter worker executor for " + indexManagerName,
-				queueSize );
+				queueSize
+		);
 	}
-	
+
 	public static int getWorkerThreadPoolSize(Properties properties) {
 		//default to a simple asynchronous operation
 		return ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
 	}
-	
+
 	public static int getWorkerQueueSize(Properties properties) {
 		//no queue limit
 		return ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE );
 	}
-	
-	public static int getWorkerBatchSize(Properties properties) {
-		return ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
-	}
 
-	public static LuceneWorkSerializer createSerializer(String indexName, Properties cfg,
-			WorkerBuildContext buildContext) {
+	public static LuceneWorkSerializer createSerializer(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		try {
 			return new PluggableSerializationLuceneWorkSerializer(
 					new AvroSerializationProvider(),
-					buildContext.getUninitializedSearchFactory() );
+					buildContext.getUninitializedSearchFactory()
+			);
 		}
-		catch (RuntimeException e) {
+		catch ( RuntimeException e ) {
 			if ( e instanceof SearchException ) {
 				throw e;
 			}
@@ -141,5 +141,4 @@ public class BackendFactory {
 			}
 		}
 	}
-
 }
