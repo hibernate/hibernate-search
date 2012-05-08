@@ -1,6 +1,6 @@
-/*
+/* 
  * Hibernate, Relational Persistence for Idiomatic Java
- *
+ * 
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -18,52 +18,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.interceptor;
+package org.hibernate.search.test.util.leakdetection;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * This DirectoryProvider enables us to check that all files have been properly closed,
+ * both after writes and reads.
+ * 
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-@Entity
-@Indexed(interceptor = IndexWhenPublishedInterceptor.class)
-public class Blog {
-	@Id
-	@GeneratedValue
-	public Integer getId() {
-		return id;
+public class FileMonitoringDirectoryProvider extends RAMDirectoryProvider {
+
+	@Override
+	protected FileMonitoringDirectory makeRAMDirectory() {
+		return new FileMonitoringDirectory();
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	private Integer id;
-
-	@Field
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	private String title;
-
-	//state used by interceptor but not indexed on purpose to test optimization disablement
-	public BlogStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(BlogStatus status) {
-		this.status = status;
-	}
-
-	private BlogStatus status;
 }

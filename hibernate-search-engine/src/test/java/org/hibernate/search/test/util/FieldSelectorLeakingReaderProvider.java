@@ -261,11 +261,15 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		}
 
 		protected void doCommit(Map<String, String> commitUserData) throws IOException {
-			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
+			//can't implement as method is not visibile
+			//not important either as method is deprecated and all Readers are read-only: nothing to commit
+			//also, method is going to be removed.
 		}
 
 		protected void doClose() throws IOException {
-			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
+			//can't implement as method is not visibile
+			//not important either as method is deprecated and all Readers are read-only: nothing to flush on close
+			//also, method is going to be removed.
 		}
 
 		@Override

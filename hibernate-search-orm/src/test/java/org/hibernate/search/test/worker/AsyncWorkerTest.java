@@ -23,29 +23,44 @@
  */
 package org.hibernate.search.test.worker;
 
-import org.hibernate.search.Environment;
-import org.hibernate.cfg.Configuration;
 import org.apache.lucene.analysis.StopAnalyzer;
+import org.jboss.byteman.contrib.bmunit.BMRule;
+import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.hibernate.cfg.Configuration;
+import org.hibernate.search.Environment;
 
 /**
  * @author Emmanuel Bernard
  */
+@RunWith(BMUnitRunner.class)
 public class AsyncWorkerTest extends WorkerTestCase {
+
+	@Test
+	@BMRule(targetClass = "org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor",
+			targetMethod = "applyWork",
+			helper = "org.hibernate.search.test.util.BytemanHelper",
+			action = "assertBooleanValue($0.sync, false)", // asserting that we are in async mode
+			name = "testConcurrency")
+	public void testConcurrency() throws Exception {
+		super.testConcurrency();
+	}
 
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		cfg.setProperty( Environment.WORKER_SCOPE, "transaction" );
-		cfg.setProperty( Environment.WORKER_EXECUTION, "async" );
-		cfg.setProperty( Environment.WORKER_PREFIX + "thread_pool.size", "1" );
-		cfg.setProperty( Environment.WORKER_PREFIX + "buffer_queue.max", "10" );
+		cfg.setProperty( "hibernate.search.worker.scope", "transaction" );
+		cfg.setProperty( "hibernate.search.default.worker.execution", "async" );
+		cfg.setProperty( "hibernate.search.default.worker.thread_pool.size", "1" );
+		cfg.setProperty( "hibernate.search.default.worker.buffer_queue.max", "10" );
 	}
-	
+
 	@Override
 	protected boolean isWorkerSync() {
 		return false;
 	}
-
 }

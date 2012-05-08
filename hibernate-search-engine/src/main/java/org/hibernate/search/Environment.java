@@ -53,8 +53,9 @@ public final class Environment {
 	 */
 	public static final String SIMILARITY_CLASS = "hibernate.search.similarity";
 
+
+	public static final String WORKER_SCOPE = "hibernate.search.worker.scope";
 	public static final String WORKER_PREFIX = "worker.";
-	public static final String WORKER_SCOPE = WORKER_PREFIX + "scope";
 	public static final String WORKER_BACKEND = WORKER_PREFIX + "backend";
 	public static final String WORKER_EXECUTION = WORKER_PREFIX + "execution";
 

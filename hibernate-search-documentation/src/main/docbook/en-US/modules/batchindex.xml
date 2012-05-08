@@ -65,7 +65,7 @@ tx.commit(); //index only updated at commit time</programlisting>
     <para>In case you want to add all instances for a type, or for all indexed
     types, the recommended approach is to use a
     <classname>MassIndexer</classname>: see <xref
-    linkend="search-batchindex-massindexer" /> for more details.</para>
+    linkend="search-batchindex-massindexer"/> for more details.</para>
   </section>
 
   <section>
@@ -79,7 +79,7 @@ tx.commit(); //index only updated at commit time</programlisting>
     <example>
       <title>Purging a specific instance of an entity from the index</title>
 
-      <programlisting  language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 for (Customer customer : customers) {
     <emphasis role="bold">fullTextSession.purge( Customer.class, customer.getId() );</emphasis>
@@ -98,7 +98,7 @@ tx.commit(); //index is updated at commit time</programlisting>
     <example>
       <title>Purging all instances of an entity from the index</title>
 
-      <programlisting  language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
+      <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 <emphasis role="bold">fullTextSession.purgeAll( Customer.class );</emphasis>
 //optionally optimize the index
@@ -194,12 +194,6 @@ while( results.next() ) {
 transaction.commit();</programlisting>
       </example>
 
-      <note>
-        <para><literal>hibernate.search.default.worker.batch_size</literal> has been
-        deprecated in favor of this explicit API which provides better
-        control</para>
-      </note>
-
       <para>Try to use a batch size that guarantees that your application will
       not run out of memory: with a bigger batch size objects are fetched
       faster from database but more memory is needed.</para>
@@ -218,7 +212,7 @@ transaction.commit();</programlisting>
       <example>
         <title>Index rebuilding using a MassIndexer</title>
 
-        <programlisting  language="JAVA" role="JAVA">fullTextSession.createIndexer().startAndWait();</programlisting>
+        <programlisting language="JAVA" role="JAVA">fullTextSession.createIndexer().startAndWait();</programlisting>
       </example>
 
       <para>This will rebuild the index, deleting it and then reloading all
@@ -228,8 +222,8 @@ transaction.commit();</programlisting>
 
       <warning>
         <para>During the progress of a MassIndexer the content of the index is
-        undefined! If a query is performed while the MassIndexer is working most
-        likely some results will be missing.</para>
+        undefined! If a query is performed while the MassIndexer is working
+        most likely some results will be missing.</para>
       </warning>
 
       <example>
@@ -250,11 +244,11 @@ transaction.commit();</programlisting>
       and will create 5 parallel threads to load the User instances using
       batches of 25 objects per query; these loaded User instances are then
       pipelined to 20 parallel threads to load the attached lazy collections
-      of User containing some information needed for the index.
-      The number of threads working on actual index writing is defined by the backend
-      configuration of each index.
-      See the option <literal>worker.thread_pool.size</literal> in <xref
-      linkend="table-work-execution-configuration" />.</para>
+      of User containing some information needed for the index. The number of
+      threads working on actual index writing is defined by the backend
+      configuration of each index. See the option
+      <literal>worker.thread_pool.size</literal> in <xref
+      linkend="table-work-execution-configuration"/>.</para>
 
       <para>It is recommended to leave cacheMode to
       <literal>CacheMode.IGNORE</literal> (the default), as in most reindexing
@@ -282,8 +276,8 @@ transaction.commit();</programlisting>
       </note>
     </section>
 
-    <para>Other parameters which affect indexing time and memory
-    consumption are:</para>
+    <para>Other parameters which affect indexing time and memory consumption
+    are:</para>
 
     <itemizedlist>
       <listitem>
@@ -301,19 +295,19 @@ transaction.commit();</programlisting>
       <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_factor</literal>
       </listitem>
-      
+
       <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_min_size</literal>
       </listitem>
-      
+
       <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_max_size</literal>
       </listitem>
-      
+
       <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_max_optimize_size</literal>
       </listitem>
-      
+
       <listitem>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_calibrate_by_deletes</literal>
       </listitem>
@@ -326,18 +320,19 @@ transaction.commit();</programlisting>
         <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.term_index_interval</literal>
       </listitem>
     </itemizedlist>
-    
-    <para>Previous versions also had a <literal>max_field_length</literal> but this was removed from Lucene,
-    it's possible to obtain a similar effect by using a <classname>LimitTokenCountAnalyzer</classname>.</para>
+
+    <para>Previous versions also had a <literal>max_field_length</literal> but
+    this was removed from Lucene, it's possible to obtain a similar effect by
+    using a <classname>LimitTokenCountAnalyzer</classname>.</para>
 
     <para>All <literal>.indexwriter</literal> parameters are Lucene specific
     and Hibernate Search is just passing these parameters through - see <xref
-    linkend="lucene-indexing-performance" /> for more details.</para>
+    linkend="lucene-indexing-performance"/> for more details.</para>
 
-    <para>The <classname>MassIndexer</classname> uses a forward only scrollable result to iterate
-    on the primary keys to be loaded, but MySQL's JDBC driver will load all values in memory;
-    to avoid this "optimisation" set <literal>idFetchSize</literal> to
+    <para>The <classname>MassIndexer</classname> uses a forward only
+    scrollable result to iterate on the primary keys to be loaded, but MySQL's
+    JDBC driver will load all values in memory; to avoid this "optimisation"
+    set <literal>idFetchSize</literal> to
     <literal>Integer.MIN_VALUE</literal>.</para>
-
   </section>
 </chapter>

@@ -40,7 +40,8 @@ import org.hibernate.search.store.DirectoryProvider;
  */
 public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 
-	private final RAMDirectory directory = new RAMDirectory();
+	private final RAMDirectory directory = makeRAMDirectory();
+
 	private String indexName;
 	private Properties properties;
 
@@ -69,6 +70,14 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 
 	public void stop() {
 		directory.close();
+	}
+
+	/**
+	 * To allow extensions to create different RAMDirectory flavours:
+	 * @return the RAMDirectory this provider is going to manage
+	 */
+	protected RAMDirectory makeRAMDirectory() {
+		return new RAMDirectory();
 	}
 
 	@Override
