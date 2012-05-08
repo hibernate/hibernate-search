@@ -23,14 +23,14 @@
  */
 package org.hibernate.search.bridge.builtin;
 
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.util.StringHelper;
-import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * Convert a Class back and forth
- * 
+ *
  * @author Emmanuel Bernard
  */
 public class ClassBridge implements TwoWayStringBridge {
@@ -40,18 +40,15 @@ public class ClassBridge implements TwoWayStringBridge {
 		}
 		else {
 			try {
-				return ReflectHelper.classForName( stringValue, ClassBridge.class );
+				return ClassLoaderHelper.classForName( stringValue, ClassBridge.class.getClassLoader() );
 			}
-			catch (ClassNotFoundException e) {
-				throw new SearchException("Unable to deserialize Class: " + stringValue, e);
+			catch ( ClassNotFoundException e ) {
+				throw new SearchException( "Unable to deserialize Class: " + stringValue, e );
 			}
 		}
 	}
 
 	public String objectToString(Object object) {
-		return object == null ?
-				null :
-				( (Class) object).getName();
-
+		return object == null ? null : ( (Class) object ).getName();
 	}
 }

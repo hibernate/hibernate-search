@@ -132,7 +132,7 @@ public final class LuceneBackendResources {
 			Thread.currentThread().interrupt();
 		}
 		if ( ! executor.isTerminated() ) {
-			log.unableToShutdownAsyncronousIndexingByTimeout( indexName );
+			log.unableToShutdownAsynchronousIndexingByTimeout( indexName );
 		}
 	}
 

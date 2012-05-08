@@ -47,8 +47,8 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
-import org.hibernate.search.engine.spi.AbstractDocumentBuilder.PathsContext;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
@@ -326,8 +326,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			try {
 				@SuppressWarnings("unchecked")
 				Class<? extends Annotation> jpaIdClass =
-						org.hibernate.annotations.common.util.ReflectHelper
-								.classForName( "javax.persistence.Id", ConfigContext.class );
+						ClassLoaderHelper.classForName( "javax.persistence.Id", ConfigContext.class.getClassLoader() );
 				jpaId = member.getAnnotation( jpaIdClass );
 			}
 			catch ( ClassNotFoundException e ) {

@@ -30,10 +30,10 @@ import javax.naming.InitialContext;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.JNDIHelper;
 
 
@@ -128,7 +128,7 @@ public class IndexControl implements IndexControlMBean {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ReflectHelper.classForName( entity, IndexControl.class );
+			clazz = ClassLoaderHelper.classForName( entity, IndexControl.class.getClassLoader() );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );

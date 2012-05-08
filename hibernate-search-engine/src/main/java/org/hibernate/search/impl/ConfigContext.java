@@ -36,20 +36,18 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
 
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.impl.DelegateNamedAnalyzer;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XPackage;
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.DelegateNamedAnalyzer;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -169,14 +167,15 @@ public final class ConfigContext {
 	 *
 	 * @param cfg The current configuration.
 	 *
-	 * @return The Lucene analyzer to use for tokenisation.
+	 * @return The Lucene analyzer to use for tokenization.
 	 */
 	private Analyzer initAnalyzer(SearchConfiguration cfg) {
 		Class analyzerClass;
 		String analyzerClassName = cfg.getProperty( Environment.ANALYZER_CLASS );
 		if ( analyzerClassName != null ) {
 			try {
-				analyzerClass = ReflectHelper.classForName( analyzerClassName );
+				// Use the same class loader used to load the SearchConfiguration implementation class ...
+				analyzerClass = ClassLoaderHelper.classForName( analyzerClassName, cfg.getClass().getClassLoader() );
 			}
 			catch ( Exception e ) {
 				return buildLazyAnalyzer( analyzerClassName );
@@ -285,7 +284,7 @@ public final class ConfigContext {
 
 	private boolean isPresent(String className) {
 		try {
-			ReflectHelper.classForName( className, ConfigContext.class );
+			ClassLoaderHelper.classForName( className, ConfigContext.class.getClassLoader() );
 			return true;
 		}
 		catch ( Exception e ) {

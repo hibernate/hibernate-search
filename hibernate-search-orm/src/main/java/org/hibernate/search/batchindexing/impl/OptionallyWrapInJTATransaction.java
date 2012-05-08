@@ -103,7 +103,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 					}
 					catch ( SystemException e1 ) {
 						// we already have an exception, don't propagate this one
-						log.errorRollbackingTransaction( e.getMessage(), e1 );
+						log.errorRollingBackTransaction( e.getMessage(), e1 );
 					}
 				}
 			}
