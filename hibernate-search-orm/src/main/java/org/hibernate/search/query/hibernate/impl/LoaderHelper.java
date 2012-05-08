@@ -27,8 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.annotations.common.util.ReflectHelper;
-
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -43,7 +42,7 @@ public class LoaderHelper {
 			objectNotFoundExceptions = new ArrayList<Class>( 2 );
 			try {
 				objectNotFoundExceptions.add(
-						ReflectHelper.classForName( "org.hibernate.ObjectNotFoundException", caller )
+						ClassLoaderHelper.classForName( "org.hibernate.ObjectNotFoundException", caller )
 				);
 			}
 			catch ( ClassNotFoundException e ) {
@@ -51,7 +50,7 @@ public class LoaderHelper {
 			}
 			try {
 				objectNotFoundExceptions.add(
-						ReflectHelper.classForName( "javax.persistence.EntityNotFoundException", caller )
+						ClassLoaderHelper.classForName( "javax.persistence.EntityNotFoundException", caller )
 				);
 			}
 			catch ( ClassNotFoundException e ) {

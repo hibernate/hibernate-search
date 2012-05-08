@@ -41,7 +41,6 @@ import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -53,6 +52,7 @@ import org.hibernate.search.test.configuration.mutablefactory.generated.Generate
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -168,7 +168,7 @@ public class MutableFactoryTest {
 		sf.getIndexReaderAccessor().close( indexReader );
 
 		luceneQuery = parser.parse( "Vincent" );
-		
+
 		indexReader = sf.getIndexReaderAccessor().open( C.class );
 		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
@@ -232,7 +232,7 @@ public class MutableFactoryTest {
 	}
 
 	private static Class<?> getClassAByNumber(int i) throws ClassNotFoundException {
-		final Class<?> aClass = ReflectHelper.classForName(
+		final Class<?> aClass = ClassLoaderHelper.classForName(
 				Generated.A0.class.getName().replace(
 						"A0", "A" + i
 				)
@@ -278,7 +278,7 @@ public class MutableFactoryTest {
 					ManualTransactionContext context = new ManualTransactionContext();
 					MutableFactoryTest.doIndexWork(entity, i, factory, context );
 					context.end();
-					
+
 					EntityIndexBinder indexBindingForEntity = factory.getIndexBindingForEntity( aClass );
 					assertNotNull( indexBindingForEntity );
 					IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
