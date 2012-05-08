@@ -80,7 +80,7 @@ public class LogErrorHandler implements ErrorHandler {
 
 	@Override
 	public void handleException(String errorMsg, Throwable exception) {
-		log.exceptionOccured( errorMsg, exception );
+		log.exceptionOccurred( errorMsg, exception );
 	}
 
 }

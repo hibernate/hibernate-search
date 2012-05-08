@@ -122,7 +122,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 		}
 
 		if ( allReaders.size() != 0 ) {
-			log.readersNotProperlyClosedinReaderProvider();
+			log.readersNotProperlyClosedInReaderProvider();
 		}
 	}
 

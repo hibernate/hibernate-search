@@ -100,7 +100,7 @@ public class JGroupsChannelProvider implements ServiceProvider<Channel> {
 				channel.connect( clusterName );
 			}
 			catch ( Exception e ) {
-				throw log.unabletoConnectToJGroupsCluster( clusterName, e );
+				throw log.unableConnectingToJGroupsCluster( clusterName, e );
 			}
 		}
 		masterNodeSelector.setLocalAddress( channel.getAddress() );
