@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
-import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * @author Emmanuel Bernard
@@ -38,7 +38,10 @@ class Helper {
 	private static void doMarkforJoined(Transaction transaction)
 			throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		if ( transaction.getClass().getName().equals( "org.hibernate.ejb.transaction.JoinableCMTTransaction" ) ) {
-			Class<?> joinableCMTTransaction = ReflectHelper.classForName( "org.hibernate.ejb.transaction.JoinableCMTTransaction", Helper.class );
+			Class<?> joinableCMTTransaction = ClassLoaderHelper.classForName(
+					"org.hibernate.ejb.transaction.JoinableCMTTransaction",
+					Helper.class
+			);
 			final Method markForJoined = joinableCMTTransaction.getMethod( "markForJoined" );
 			markForJoined.invoke( transaction );
 		}

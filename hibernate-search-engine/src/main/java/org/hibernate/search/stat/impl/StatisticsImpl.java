@@ -42,13 +42,13 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * A concurrent implementation of the {@code Statistics} interface.
@@ -238,7 +238,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ReflectHelper.classForName( entity, StatisticsImpl.class );
+			clazz = ClassLoaderHelper.classForName( entity, StatisticsImpl.class );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );

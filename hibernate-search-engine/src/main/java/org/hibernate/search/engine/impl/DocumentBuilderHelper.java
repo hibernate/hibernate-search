@@ -31,7 +31,7 @@ import java.util.zip.DataFormatException;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
-import org.hibernate.annotations.common.util.ReflectHelper;
+
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
@@ -41,6 +41,7 @@ import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -58,7 +59,8 @@ public final class DocumentBuilderHelper {
 	public static Class getDocumentClass(String className) {
 		try {
 			// Use the same class loader used to load this class ...
-			return ReflectHelper.classForName( className, DocumentBuilderHelper.class );
+			return ClassLoaderHelper.classForName( className );
+
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new SearchException( "Unable to load indexed class: " + className, e );
@@ -132,8 +134,8 @@ public final class DocumentBuilderHelper {
 		//TODO make use of an isTwoWay() method
 		if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 			result[matchingPosition] = conversionContext
-				.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge )
-				.get( fieldName, document );
+					.twoWayConversionContext( (TwoWayFieldBridge) fieldBridge )
+					.get( fieldName, document );
 			if ( log.isTraceEnabled() ) {
 				log.tracef( "Field %s projected as %s", fieldName, result[matchingPosition] );
 			}
@@ -177,7 +179,8 @@ public final class DocumentBuilderHelper {
 		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
 		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
 			//there is nothing we can do for collections
-			if ( metadata.embeddedContainers.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
+			if ( metadata.embeddedContainers
+					.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
 				contextualBridge.pushProperty( metadata.embeddedFieldNames.get( index ) );
 				try {
 					processFieldsForProjection(
