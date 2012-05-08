@@ -110,7 +110,10 @@ public class ObjectLoaderBuilder {
 			String targetEntity = ( (CriteriaImpl) criteria ).getEntityOrClassName();
 			if ( entityType == null ) {
 				try {
-					entityType = ClassLoaderHelper.classForName( targetEntity, ObjectLoaderBuilder.class );
+					entityType = ClassLoaderHelper.classForName(
+							targetEntity,
+							ObjectLoaderBuilder.class.getClassLoader()
+					);
 				}
 				catch ( ClassNotFoundException e ) {
 					throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );

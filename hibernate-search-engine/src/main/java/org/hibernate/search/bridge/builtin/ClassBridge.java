@@ -40,7 +40,7 @@ public class ClassBridge implements TwoWayStringBridge {
 		}
 		else {
 			try {
-				return ClassLoaderHelper.classForName( stringValue, ClassBridge.class );
+				return ClassLoaderHelper.classForName( stringValue, ClassBridge.class.getClassLoader() );
 			}
 			catch ( ClassNotFoundException e ) {
 				throw new SearchException( "Unable to deserialize Class: " + stringValue, e );

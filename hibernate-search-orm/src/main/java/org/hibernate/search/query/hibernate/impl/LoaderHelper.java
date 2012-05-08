@@ -42,7 +42,10 @@ public class LoaderHelper {
 			objectNotFoundExceptions = new ArrayList<Class>( 2 );
 			try {
 				objectNotFoundExceptions.add(
-						ClassLoaderHelper.classForName( "org.hibernate.ObjectNotFoundException", caller )
+						ClassLoaderHelper.classForName(
+								"org.hibernate.ObjectNotFoundException",
+								caller.getClassLoader()
+						)
 				);
 			}
 			catch ( ClassNotFoundException e ) {
@@ -50,7 +53,10 @@ public class LoaderHelper {
 			}
 			try {
 				objectNotFoundExceptions.add(
-						ClassLoaderHelper.classForName( "javax.persistence.EntityNotFoundException", caller )
+						ClassLoaderHelper.classForName(
+								"javax.persistence.EntityNotFoundException",
+								caller.getClassLoader()
+						)
 				);
 			}
 			catch ( ClassNotFoundException e ) {

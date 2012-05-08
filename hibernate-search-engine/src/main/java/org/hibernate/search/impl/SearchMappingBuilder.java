@@ -115,7 +115,7 @@ public class SearchMappingBuilder {
 		if (programmaticConfig instanceof String) {
 			final String className = ( String ) programmaticConfig;
 			try {
-				clazz = ClassLoaderHelper.classForName( className, SearchMappingBuilder.class );
+				clazz = ClassLoaderHelper.classForName( className, SearchMappingBuilder.class.getClassLoader() );
 			} catch (ClassNotFoundException e) {
 				throw new SearchException("Unable to find " + Environment.MODEL_MAPPING + "=" + className, e);
 			}

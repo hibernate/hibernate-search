@@ -128,7 +128,7 @@ public class IndexControl implements IndexControlMBean {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ClassLoaderHelper.classForName( entity, IndexControl.class );
+			clazz = ClassLoaderHelper.classForName( entity, IndexControl.class.getClassLoader() );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );

@@ -238,7 +238,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ClassLoaderHelper.classForName( entity, StatisticsImpl.class );
+			clazz = ClassLoaderHelper.classForName( entity, StatisticsImpl.class.getClassLoader() );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );
