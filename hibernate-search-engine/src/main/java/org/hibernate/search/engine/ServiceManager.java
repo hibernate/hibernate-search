@@ -78,7 +78,8 @@ public class ServiceManager {
 					while ( name != null ) {
 						name = name.trim();
 						if ( !name.startsWith( "#" ) ) {
-							final Class<?> serviceProviderClass = ClassLoaderHelper.classForName( name, ServiceManager.class, "service provider" );
+							final Class<?> serviceProviderClass =
+									ClassLoaderHelper.classForName( name, ServiceManager.class.getClassLoader(), "service provider" );
 							availableProviders.add( serviceProviderClass );
 						}
 						name = reader.readLine();

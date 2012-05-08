@@ -40,7 +40,7 @@ class Helper {
 		if ( transaction.getClass().getName().equals( "org.hibernate.ejb.transaction.JoinableCMTTransaction" ) ) {
 			Class<?> joinableCMTTransaction = ClassLoaderHelper.classForName(
 					"org.hibernate.ejb.transaction.JoinableCMTTransaction",
-					Helper.class
+					Helper.class.getClassLoader()
 			);
 			final Method markForJoined = joinableCMTTransaction.getMethod( "markForJoined" );
 			markForJoined.invoke( transaction );

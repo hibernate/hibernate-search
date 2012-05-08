@@ -175,7 +175,7 @@ public final class ConfigContext {
 		if ( analyzerClassName != null ) {
 			try {
 				// Use the same class loader used to load the SearchConfiguration implementation class ...
-				analyzerClass = ClassLoaderHelper.classForName( analyzerClassName );
+				analyzerClass = ClassLoaderHelper.classForName( analyzerClassName, cfg.getClass().getClassLoader() );
 			}
 			catch ( Exception e ) {
 				return buildLazyAnalyzer( analyzerClassName );
@@ -284,7 +284,7 @@ public final class ConfigContext {
 
 	private boolean isPresent(String className) {
 		try {
-			ClassLoaderHelper.classForName( className, ConfigContext.class );
+			ClassLoaderHelper.classForName( className, ConfigContext.class.getClassLoader() );
 			return true;
 		}
 		catch ( Exception e ) {

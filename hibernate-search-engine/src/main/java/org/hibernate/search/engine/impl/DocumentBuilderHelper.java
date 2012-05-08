@@ -59,8 +59,7 @@ public final class DocumentBuilderHelper {
 	public static Class getDocumentClass(String className) {
 		try {
 			// Use the same class loader used to load this class ...
-			return ClassLoaderHelper.classForName( className );
-
+			return ClassLoaderHelper.classForName( className, DocumentBuilderHelper.class.getClassLoader() );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new SearchException( "Unable to load indexed class: " + className, e );
@@ -179,8 +178,7 @@ public final class DocumentBuilderHelper {
 		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
 		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
 			//there is nothing we can do for collections
-			if ( metadata.embeddedContainers
-					.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
+			if ( metadata.embeddedContainers.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
 				contextualBridge.pushProperty( metadata.embeddedFieldNames.get( index ) );
 				try {
 					processFieldsForProjection(

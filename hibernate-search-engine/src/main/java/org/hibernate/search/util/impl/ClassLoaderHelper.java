@@ -107,7 +107,7 @@ public class ClassLoaderHelper {
 	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad,
 										 Class<?> caller, String componentDescription) {
 		final Class<?> clazzDef;
-		clazzDef = classForName( classNameToLoad, caller, componentDescription );
+		clazzDef = classForName( classNameToLoad, caller.getClassLoader(), componentDescription );
 		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
 	}
 
@@ -253,10 +253,10 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	public static Class<?> classForName(String classNameToLoad, Class<?> caller, String componentDescription) {
+	public static Class<?> classForName(String classNameToLoad, ClassLoader classLoader, String componentDescription) {
 		Class<?> clazzDef;
 		try {
-			clazzDef = classForName( classNameToLoad, caller );
+			clazzDef = classForName( classNameToLoad, classLoader );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new SearchException(
@@ -274,13 +274,13 @@ public class ClassLoaderHelper {
 	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
 	 *
 	 * @param name The class name
-	 * @param caller The class from which this call originated (in order to access that class's loader).
+	 * @param classLoader The classloader from which this call originated.
 	 *
 	 * @return The class reference.
 	 *
 	 * @throws ClassNotFoundException From {@link Class#forName(String, boolean, ClassLoader)}.
 	 */
-	public static Class classForName(String name, Class caller) throws ClassNotFoundException {
+	public static Class classForName(String name, ClassLoader classLoader) throws ClassNotFoundException {
 		try {
 			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 			if ( contextClassLoader != null ) {
@@ -289,24 +289,26 @@ public class ClassLoaderHelper {
 		}
 		catch ( Throwable ignore ) {
 		}
-		return Class.forName( name, true, caller.getClassLoader() );
+		return Class.forName( name, true, classLoader );
 	}
 
 	/**
 	 * Perform resolution of a class name.
 	 * <p/>
-	 * Same as {@link #classForName(String, Class)} except that here we delegate to
+	 * Same as {@link #classForName(String, ClassLoader)} except that here we delegate to
 	 * {@link Class#forName(String)} if the context classloader lookup is unsuccessful.
 	 *
 	 * @param name The class name
+	 *
 	 * @return The class reference.
+	 *
 	 * @throws ClassNotFoundException From {@link Class#forName(String)}.
 	 */
 	public static Class classForName(String name) throws ClassNotFoundException {
 		try {
 			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 			if ( contextClassLoader != null ) {
-				return contextClassLoader.loadClass(name);
+				return contextClassLoader.loadClass( name );
 			}
 		}
 		catch ( Throwable ignore ) {

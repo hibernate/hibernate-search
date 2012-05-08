@@ -325,7 +325,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			Annotation jpaId;
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends Annotation> jpaIdClass = ClassLoaderHelper.classForName( "javax.persistence.Id", ConfigContext.class );
+				Class<? extends Annotation> jpaIdClass =
+						ClassLoaderHelper.classForName( "javax.persistence.Id", ConfigContext.class.getClassLoader() );
 				jpaId = member.getAnnotation( jpaIdClass );
 			}
 			catch ( ClassNotFoundException e ) {
