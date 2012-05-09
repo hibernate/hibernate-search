@@ -26,43 +26,38 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * @author Emmanuel Bernard
  */
 public class LoaderHelper {
-	private static volatile List<Class> objectNotFoundExceptions;
-	private static volatile boolean init = false;
 
-	//init with a caller containing the Hibernate ORM aware classloader
-	public static void init(Class<?> caller) {
-		if ( !init ) {
-			objectNotFoundExceptions = new ArrayList<Class>( 2 );
-			try {
-				objectNotFoundExceptions.add(
-						ClassLoaderHelper.classForName(
-								"org.hibernate.ObjectNotFoundException",
-								caller.getClassLoader()
-						)
-				);
-			}
-			catch ( ClassNotFoundException e ) {
-				//leave it alone
-			}
-			try {
-				objectNotFoundExceptions.add(
-						ClassLoaderHelper.classForName(
-								"javax.persistence.EntityNotFoundException",
-								caller.getClassLoader()
-						)
-				);
-			}
-			catch ( ClassNotFoundException e ) {
-				//leave it alone
-			}
-			init = true;
+	private static final List<Class> objectNotFoundExceptions;
+
+	static {
+		objectNotFoundExceptions = new ArrayList<Class>( 2 );
+		try {
+			objectNotFoundExceptions.add(
+					ClassLoaderHelper.classForName(
+							"org.hibernate.ObjectNotFoundException",
+							LoaderHelper.class.getClassLoader()
+					)
+			);
+		}
+		catch ( ClassNotFoundException e ) {
+			//leave it alone
+		}
+		try {
+			objectNotFoundExceptions.add(
+					ClassLoaderHelper.classForName(
+							"javax.persistence.EntityNotFoundException",
+							LoaderHelper.class.getClassLoader()
+					)
+			);
+		}
+		catch ( ClassNotFoundException e ) {
+			//leave it alone
 		}
 	}
 
@@ -70,9 +65,6 @@ public class LoaderHelper {
 	}
 
 	public static boolean isObjectNotFoundException(RuntimeException e) {
-		if ( !init ) {
-			throw new AssertionFailure( "LoaderHelper not initialized before use" );
-		}
 		boolean objectNotFound = false;
 		Class exceptionClass = e.getClass();
 		for ( Class clazz : objectNotFoundExceptions ) {

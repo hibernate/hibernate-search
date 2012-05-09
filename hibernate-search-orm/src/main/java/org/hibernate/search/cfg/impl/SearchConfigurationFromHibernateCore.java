@@ -36,7 +36,6 @@ import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
-import org.hibernate.search.query.hibernate.impl.LoaderHelper;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 
@@ -53,7 +52,6 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	public SearchConfigurationFromHibernateCore(org.hibernate.cfg.Configuration cfg) {
 		if ( cfg == null ) throw new NullPointerException( "Configuration is null" );
 		this.cfg = cfg;
-		LoaderHelper.init( cfg.getClass() );
 	}
 
 	public Iterator<Class<?>> getClassMappings() {
