@@ -118,8 +118,13 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
             Muxer<UpHandler> muxer = (Muxer<UpHandler>) handler;
             ClassLoader cl = (ClassLoader) props.get(CLASSLOADER);
             MessageListener wrapper = (cl != null) ? new ClassloaderMessageListener(listener, cl) : listener;
-            MessageDispatcher dispatcher = new MuxMessageDispatcher(muxId, channel, wrapper, listener, null);
-            muxId = generateMuxId(muxer, dispatcher.getProtocolAdapter());
+            MessageDispatcher dispatcher;
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
+            synchronized (muxer) {
+                muxId = generateMuxId(muxer);
+                dispatcher = new MuxMessageDispatcher(muxId, channel, wrapper, listener, null);
+                muxer.add(muxId, dispatcher.getProtocolAdapter());
+            }
             sender = new DispatcherMessageSender(dispatcher);
         } else {
             // TODO -- perhaps port previous multi-handling?
@@ -142,16 +147,12 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 		}
 	}
 
-    private static short generateMuxId(Muxer<UpHandler> muxer, UpHandler handler) {
+    private static short generateMuxId(Muxer<UpHandler> muxer) {
         Random random = new Random();
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-        synchronized (muxer) {
-            while(true) {
-                short id = (short) random.nextInt();
-                if (muxer.get(id) == null) {
-                    muxer.add(id, handler);
-                    return id;
-                }
+        while (true) {
+            short id = (short) random.nextInt();
+            if (muxer.get(id) == null) {
+                return id;
             }
         }
     }

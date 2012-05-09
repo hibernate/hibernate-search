@@ -24,7 +24,6 @@
 
 package org.hibernate.search.backend.impl.jgroups;
 
-import org.jgroups.Address;
 import org.jgroups.Channel;
 import org.jgroups.Message;
 
@@ -33,18 +32,12 @@ import org.jgroups.Message;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-class ChannelMessageSender implements MessageSender {
-    private Channel channel;
-
+class ChannelMessageSender extends AbstractMessageSender {
     ChannelMessageSender(Channel channel) {
-        this.channel = channel;
+        super(channel);
     }
 
     public void send(Message message) throws Exception {
         channel.send(message);
-    }
-
-    public Address getAddress() {
-        return channel.getAddress();
     }
 }

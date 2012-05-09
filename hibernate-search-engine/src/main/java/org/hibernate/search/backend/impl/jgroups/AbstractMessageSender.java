@@ -25,35 +25,27 @@
 package org.hibernate.search.backend.impl.jgroups;
 
 import org.jgroups.Address;
+import org.jgroups.Channel;
 import org.jgroups.Message;
 import org.jgroups.View;
 
 /**
- * Abstract away message submission.
- * e.g. either via channel directly or using message dispatcher
+ * Abstract Channel based message sender.
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public interface MessageSender {
-    /**
-     * Send message.
-     *
-     * @param message the JGroups message
-     * @throws Exception for any error
-     */
-    void send(Message message) throws Exception;
+abstract class AbstractMessageSender implements MessageSender {
+    protected final Channel channel;
 
-    /**
-     * Get sender's address.
-     *
-     * @return the sender's address
-     */
-    Address getAddress();
+    AbstractMessageSender(Channel channel) {
+        this.channel = channel;
+    }
 
-    /**
-     * Get current view.
-     *
-     * @return the current cluster view
-     */
-    View getView();
+    public Address getAddress() {
+        return channel.getAddress();
+    }
+
+    public View getView() {
+        return channel.getView();
+    }
 }

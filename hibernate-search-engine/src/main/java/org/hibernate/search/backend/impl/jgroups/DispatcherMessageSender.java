@@ -24,8 +24,6 @@
 
 package org.hibernate.search.backend.impl.jgroups;
 
-import org.jgroups.Address;
-import org.jgroups.Channel;
 import org.jgroups.Message;
 import org.jgroups.blocks.MessageDispatcher;
 import org.jgroups.blocks.RequestOptions;
@@ -35,18 +33,15 @@ import org.jgroups.blocks.RequestOptions;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-class DispatcherMessageSender implements MessageSender {
+class DispatcherMessageSender extends AbstractMessageSender {
     private MessageDispatcher dispatcher;
 
     DispatcherMessageSender(MessageDispatcher dispatcher) {
+        super(dispatcher.getChannel());
         this.dispatcher = dispatcher;
     }
 
     public void send(Message message) throws Exception {
         dispatcher.sendMessage(message, RequestOptions.ASYNC());
-    }
-
-    public Address getAddress() {
-        return dispatcher.getChannel().getAddress();
     }
 }
