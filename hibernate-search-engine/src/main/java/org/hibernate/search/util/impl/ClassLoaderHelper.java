@@ -35,7 +35,6 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.util.Version;
 
-import org.hibernate.annotations.common.util.ReflectHelper;
 import org.hibernate.search.SearchException;
 
 /**
@@ -55,16 +54,19 @@ public class ClassLoaderHelper {
 
 	/**
 	 * Load all resources matching a specific name
-	 * 
+	 *
 	 * @param resourceName the resource name
 	 * @param caller the caller
+	 *
 	 * @return found resource URLs
 	 */
 	public static Enumeration<URL> getResources(String resourceName, Class<?> caller) {
-		if ( resourceName == null )
+		if ( resourceName == null ) {
 			throw new SearchException( "Null resource name!" );
-		if ( caller == null )
+		}
+		if ( caller == null ) {
 			throw new SearchException( "Null caller!" );
+		}
 
 		final Set<URL> urls = new HashSet<URL>();
 		getResources( resourceName, Thread.currentThread().getContextClassLoader(), urls );
@@ -73,8 +75,9 @@ public class ClassLoaderHelper {
 	}
 
 	private static void getResources(String resourceName, ClassLoader cl, Set<URL> urls) {
-		if ( cl == null )
+		if ( cl == null ) {
 			return;
+		}
 
 		try {
 			Enumeration<URL> e = cl.getResources( resourceName );
@@ -99,12 +102,12 @@ public class ClassLoaderHelper {
 	 * @return a new instance of classNameToLoad
 	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
-	 *                         classNotFound, missing proper constructor, wrong type, security errors.
+	 * classNotFound, missing proper constructor, wrong type, security errors.
 	 */
 	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad,
 										 Class<?> caller, String componentDescription) {
 		final Class<?> clazzDef;
-		clazzDef = classForName( classNameToLoad, caller, componentDescription );
+		clazzDef = classForName( classNameToLoad, caller.getClassLoader(), componentDescription );
 		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
 	}
 
@@ -119,7 +122,7 @@ public class ClassLoaderHelper {
 	 * @return a new instance of classToLoad
 	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
-	 *                         missing proper constructor, wrong type, security errors.
+	 * missing proper constructor, wrong type, security errors.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription) {
@@ -157,7 +160,7 @@ public class ClassLoaderHelper {
 			}
 		}
 		else {
-			return ( T ) instance;
+			return (T) instance;
 		}
 	}
 
@@ -186,10 +189,10 @@ public class ClassLoaderHelper {
 
 		try {
 			if ( useVersionParameter ) {
-				analyzerInstance = ( Analyzer ) constructor.newInstance( luceneMatchVersion );
+				analyzerInstance = (Analyzer) constructor.newInstance( luceneMatchVersion );
 			}
 			else {
-				analyzerInstance = ( Analyzer ) constructor.newInstance();
+				analyzerInstance = (Analyzer) constructor.newInstance();
 			}
 		}
 		catch ( IllegalAccessException e ) {
@@ -208,7 +211,8 @@ public class ClassLoaderHelper {
 			throw new SearchException(
 					"Unable to instantiate analyzer class: " + classToInstantiate.getName() +
 							". Verify it has a no-args public constructor and is not abstract."
-					+ " Also Analyzer implementation classes or their tokenStream() and reusableTokenStream() implementations must be final.", e
+							+ " Also Analyzer implementation classes or their tokenStream() and reusableTokenStream() implementations must be final.",
+					e
 			);
 		}
 		return analyzerInstance;
@@ -249,10 +253,10 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	public static Class<?> classForName(String classNameToLoad, Class<?> caller, String componentDescription) {
+	public static Class<?> classForName(String classNameToLoad, ClassLoader classLoader, String componentDescription) {
 		Class<?> clazzDef;
 		try {
-			clazzDef = ReflectHelper.classForName( classNameToLoad, caller );
+			clazzDef = classForName( classNameToLoad, classLoader );
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new SearchException(
@@ -261,5 +265,54 @@ public class ClassLoaderHelper {
 			);
 		}
 		return clazzDef;
+	}
+
+	/**
+	 * Perform resolution of a class name.
+	 * <p/>
+	 * Here we first check the context classloader, if one, before delegating to
+	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
+	 *
+	 * @param name The class name
+	 * @param classLoader The classloader from which this call originated.
+	 *
+	 * @return The class reference.
+	 *
+	 * @throws ClassNotFoundException From {@link Class#forName(String, boolean, ClassLoader)}.
+	 */
+	public static Class classForName(String name, ClassLoader classLoader) throws ClassNotFoundException {
+		try {
+			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+			if ( contextClassLoader != null ) {
+				return contextClassLoader.loadClass( name );
+			}
+		}
+		catch ( Throwable ignore ) {
+		}
+		return Class.forName( name, true, classLoader );
+	}
+
+	/**
+	 * Perform resolution of a class name.
+	 * <p/>
+	 * Same as {@link #classForName(String, ClassLoader)} except that here we delegate to
+	 * {@link Class#forName(String)} if the context classloader lookup is unsuccessful.
+	 *
+	 * @param name The class name
+	 *
+	 * @return The class reference.
+	 *
+	 * @throws ClassNotFoundException From {@link Class#forName(String)}.
+	 */
+	public static Class classForName(String name) throws ClassNotFoundException {
+		try {
+			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+			if ( contextClassLoader != null ) {
+				return contextClassLoader.loadClass( name );
+			}
+		}
+		catch ( Throwable ignore ) {
+		}
+		return Class.forName( name );
 	}
 }

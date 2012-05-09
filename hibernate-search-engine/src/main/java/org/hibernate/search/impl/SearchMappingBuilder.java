@@ -30,7 +30,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
-import org.hibernate.annotations.common.util.ReflectHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -115,7 +115,7 @@ public class SearchMappingBuilder {
 		if (programmaticConfig instanceof String) {
 			final String className = ( String ) programmaticConfig;
 			try {
-				clazz = ReflectHelper.classForName( className, SearchMappingBuilder.class);
+				clazz = ClassLoaderHelper.classForName( className, SearchMappingBuilder.class.getClassLoader() );
 			} catch (ClassNotFoundException e) {
 				throw new SearchException("Unable to find " + Environment.MODEL_MAPPING + "=" + className, e);
 			}

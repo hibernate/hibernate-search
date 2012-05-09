@@ -26,20 +26,23 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.common.util.ReflectHelper;
-
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * @author Emmanuel Bernard
  */
 public class LoaderHelper {
+
 	private static final List<Class> objectNotFoundExceptions;
 
 	static {
 		objectNotFoundExceptions = new ArrayList<Class>( 2 );
 		try {
 			objectNotFoundExceptions.add(
-					ReflectHelper.classForName( "org.hibernate.ObjectNotFoundException" )
+					ClassLoaderHelper.classForName(
+							"org.hibernate.ObjectNotFoundException",
+							LoaderHelper.class.getClassLoader()
+					)
 			);
 		}
 		catch ( ClassNotFoundException e ) {
@@ -47,7 +50,10 @@ public class LoaderHelper {
 		}
 		try {
 			objectNotFoundExceptions.add(
-					ReflectHelper.classForName( "javax.persistence.EntityNotFoundException" )
+					ClassLoaderHelper.classForName(
+							"javax.persistence.EntityNotFoundException",
+							LoaderHelper.class.getClassLoader()
+					)
 			);
 		}
 		catch ( ClassNotFoundException e ) {

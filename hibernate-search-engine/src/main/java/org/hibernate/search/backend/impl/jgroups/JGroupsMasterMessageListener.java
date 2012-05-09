@@ -104,7 +104,7 @@ public class JGroupsMasterMessageListener implements Receiver {
 			indexManager.performOperations( queue, null );
 		}
 		else {
-			log.receivedEmptyLuceneWOrksInMessage();
+			log.receivedEmptyLuceneWorksInMessage();
 		}
 	}
 

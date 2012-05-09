@@ -264,7 +264,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 51, value = "Received null or empty Lucene works list in message.")
-	void receivedEmptyLuceneWOrksInMessage();
+	void receivedEmptyLuceneWorksInMessage();
 
 	@LogMessage(level = WARN)
 	@Message(id = 52, value = "Going to force release of the IndexWriter lock")
@@ -276,7 +276,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 54, value = "ReaderProvider contains readers not properly closed at destroy time")
-	void readersNotProperlyClosedinReaderProvider();
+	void readersNotProperlyClosedInReaderProvider();
 
 	@LogMessage(level = WARN)
 	@Message(id = 55, value = "Unable to close Lucene IndexReader")
@@ -293,7 +293,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = ERROR)
 	@Message(id = 58, value = "%1$s")
-	void exceptionOccured(String errorMsg, @Cause Throwable exceptionThatOccurred);
+	void exceptionOccurred(String errorMsg, @Cause Throwable exceptionThatOccurred);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 59, value = "Worker raises an exception on close()")
@@ -320,8 +320,8 @@ public interface Log extends BasicLogger {
 	void errorExecutingRunnableInTransaction(@Cause Throwable e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 65, value = "Error while rollbacking transaction after %1$s")
-	void errorRollbackingTransaction(String message, @Cause Exception e1);
+	@Message(id = 65, value = "Error while rolling back transaction after %1$s")
+	void errorRollingBackTransaction(String message, @Cause Exception e1);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 66, value = "Failed to initialize SlaveDirectoryProvider %1$s")
@@ -345,7 +345,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = ERROR)
 	@Message(id = 71, value = "Unable to properly shut down asynchronous indexing work")
-	void unableToShutdownAsyncronousIndexing(@Cause Exception e);
+	void unableToShutdownAsynchronousIndexing(@Cause Exception e);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 72,
@@ -373,7 +373,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = ERROR)
 	@Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %1$s")
-	void unableToShutdownAsyncronousIndexingByTimeout(String indexName);
+	void unableToShutdownAsynchronousIndexingByTimeout(String indexName);
 
 	@LogMessage(level = INFO)
 	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d")
@@ -400,7 +400,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 85, value = "Attribute type is not recognized and not serializable: %1$s")
 	SearchException attributeNotRecognizedNorSerializable(Class<?> attributeType);
 
-	@Message(id = 86, value = "Unknown attribute serialzied representation: %1$s")
+	@Message(id = 86, value = "Unknown attribute serialized representation: %1$s")
 	SearchException unknownAttributeSerializedRepresentation(String name);
 
 	@Message(id = 87, value = "Unable to read TokenStream")
@@ -520,7 +520,7 @@ public interface Log extends BasicLogger {
 	void inconsistentFieldConfiguration(String fieldName);
 
 	@Message(id = 121, value = "Unable to connect to: [%1$s] JGroups channel")
-	SearchException unabletoConnectToJGroupsCluster(String clusterName, @Cause Throwable e);
+	SearchException unableConnectingToJGroupsCluster(String clusterName, @Cause Throwable e);
 
 	@Message(id = 122, value = "Unable to start JGroups channel")
 	SearchException unableToStartJGroupsChannel(@Cause Throwable e);
