@@ -217,7 +217,7 @@ public interface Log extends BasicLogger {
 					"Hibernate Search might have to workaround this by slightly inaccurate faceting values or reduced performance.")
 	void unexpectedValueMissingFromFieldCache();
 
-	@LogMessage(level = WARN)
+	@LogMessage(level = INFO)
 	@Message(id = 41, value = "Index directory not found, creating: '%1$s'")
 	void indexDirectoryNotFoundCreatingNewOne(String absolutePath);
 
