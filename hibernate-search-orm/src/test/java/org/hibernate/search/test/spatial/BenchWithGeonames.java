@@ -15,18 +15,20 @@ import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.spatial.impl.GridHelper;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.Rectangle;
-import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Hibernate Search spatial : Benchmarks with {@link http://www.geonames.org} as data source (nearly 8M points)
+ * Hibernate Search spatial : Benchmarks with <a href="http://www.geonames.org">GeoNames</a>
+ * as data source (nearly 8M points)
  *
  * Test many queries types :
  *
@@ -36,8 +38,8 @@ import java.util.List;
  * - double range + distance
  * - grid + distance
  *
- * To test you must download FR geonames file {@link http://download.geonames.org/export/dump/FR.zip} and extract it
- * at the root directory of Hibernate Search
+ * To test you must download <a href="http://download.geonames.org/export/dump/FR.zip">FR GeoBames file</a>
+ * and extract it at the root directory of Hibernate Search
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
@@ -142,7 +144,7 @@ public class BenchWithGeonames {
 			org.apache.lucene.search.Query luceneQuery;
 			long startTime, endTime, duration;
 			FullTextQuery hibQuery;
-			List results;
+			List gridResults, rangeResults;
 			final QueryBuilder queryBuilder= fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 			org.apache.lucene.search.Query query;
 			final Integer iterations = 2000;
@@ -221,6 +223,7 @@ public class BenchWithGeonames {
 				if ( i > warmUp ) {
 					distanceDoubleRangeTotalDuration += duration;
 				}
+				rangeResults= hibQuery.list();
 				session.clear();
 
 				luceneQuery = SpatialQueryBuilderFromPoint.buildGridQuery( center, radius, "location" );
@@ -255,7 +258,40 @@ public class BenchWithGeonames {
 				if ( i > warmUp ) {
 					spatialTotalDuration += duration;
 				}
+				gridResults= hibQuery.list();
 				session.clear();
+
+				if ( rangeResults.size() != gridResults.size() ) {
+					luceneQuery = SpatialQueryBuilderFromPoint.buildDistanceQuery( center, radius, "location" );
+					hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+					hibQuery.setProjection( "id", "name" );
+
+					System.out.println(
+							">>>>> Different numbers of documents fetched for point (" +
+									Double.toString( center.getLatitude()) +
+									"," +
+									Double.toString( center.getLongitude()) +
+									") and radius " +
+									Double.toString( radius )
+					);
+					System.out.println( "Range results : " + rangeResults );
+					System.out.println( "Grid results : " + gridResults );
+					System.out.println( "Pure distance results : " + hibQuery.getResultSize());
+
+					List<Integer> rangeIds = new ArrayList<Integer>();
+					for( int index= 0; index< rangeResults.size(); index++) {
+						rangeIds.add((Integer)((Object [])rangeResults.get( index ))[0]);
+					}
+					List<Integer> gridIds = new ArrayList<Integer>();
+					for( int index= 0; index< gridResults.size(); index++) {
+						gridIds.add((Integer)((Object [])gridResults.get( index ))[0]);
+					}
+
+					rangeIds.removeAll( gridIds );
+
+					System.out.println( "Missing Ids : " + rangeIds);
+				}
+
 			}
 			session.getTransaction().commit();
 			session.close();

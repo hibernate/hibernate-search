@@ -111,25 +111,38 @@ public abstract class GridHelper {
 				gridLevel
 		);
 
+		double[] projectedLowerRight= projectToIndexSpace( Point.fromDegrees( lowerLeft.getLatitude(), upperRight.getLongitude() ) );
+		int lowerRightXIndex = getCellIndex(
+				projectedLowerRight[0],
+				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
+				gridLevel
+		);
+		int lowerRightYIndex = getCellIndex(
+				projectedLowerRight[1],
+				GeometricConstants.PROJECTED_LATITUDE_RANGE,
+				gridLevel
+		);
+
+		double[] projectedUpperLeft = projectToIndexSpace( Point.fromDegrees( upperRight.getLatitude(), lowerLeft.getLongitude() ) );
+		int upperLeftXIndex = getCellIndex(
+				projectedUpperLeft[0],
+				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
+				gridLevel
+		);
+		int upperLeftYIndex = getCellIndex(
+				projectedUpperLeft[1],
+				GeometricConstants.PROJECTED_LATITUDE_RANGE,
+				gridLevel
+		);
+
+
 		int startX, endX;
-		if ( lowerLeftXIndex > upperRightXIndex ) {
-			startX = upperRightXIndex;
-			endX = lowerLeftXIndex;
-		}
-		else {
-			startX = lowerLeftXIndex;
-			endX = upperRightXIndex;
-		}
+		startX= Math.min(Math.min(Math.min(lowerLeftXIndex,upperLeftXIndex),upperRightXIndex),lowerRightXIndex);
+		endX= Math.max(Math.max(Math.max(lowerLeftXIndex,upperLeftXIndex),upperRightXIndex),lowerRightXIndex);
 
 		int startY, endY;
-		if ( lowerLeftYIndex > upperRightYIndex ) {
-			startY = upperRightYIndex;
-			endY = lowerLeftYIndex;
-		}
-		else {
-			startY = lowerLeftYIndex;
-			endY = upperRightYIndex;
-		}
+		startY= Math.min(Math.min(Math.min(lowerLeftYIndex,upperLeftYIndex),upperRightYIndex),lowerRightYIndex);
+		endY= Math.max(Math.max(Math.max(lowerLeftYIndex,upperLeftYIndex),upperRightYIndex),lowerRightYIndex);
 
 		List<String> gridCellsIds = new ArrayList<String>((endX+1-startX)*(endY+1-startY));
 		int xIndex, yIndex;
