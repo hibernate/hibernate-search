@@ -3,6 +3,7 @@ package org.hibernate.search.test.spatial;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.spatial.impl.GridHelper;
@@ -61,5 +62,52 @@ public class GridHelperTest {
 		int bestGridLevel2 = GridHelper.findBestGridLevelForSearchRange( 1 );
 
 		Assert.assertEquals( 15, bestGridLevel2 );
+	}
+
+	@Test
+	public void projectedBoundingBoxCellsIdsInclusionTest() {
+		Point center = Point.fromDegrees( 45.0d, 32.0d );
+		Double radius = 50.0d;
+		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ));
+
+		center = Point.fromDegrees( 0.0d, 0.0d );
+		radius = 100.0d;
+		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ));
+
+		center = Point.fromDegrees( 180.0d, 0.0d );
+		radius = 250.0d;
+		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ));
+
+		center = Point.fromDegrees( 0.0d, 90.0d );
+		radius = 25.0d;
+		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ));
+
+		center = Point.fromDegrees( 45.0d, 360.0d );
+		radius = 100.0d;
+		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ));
+
+		center = Point.fromDegrees( -147.0d, -24.0d );
+		radius = 73.0d;
+		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ));
+	}
+
+	public boolean projectedBoundingBoxCellsIdsInclusionTest( Point center, Double radius) {
+		Integer gridLevel = GridHelper.findBestGridLevelForSearchRange( radius );
+
+		List<String> cellsIds = GridHelper.getGridCellsIds( center, radius, gridLevel );
+
+		Point edge = null;
+
+		boolean validated= true;
+
+		for( int heading = 0 ; heading < 360 ; heading++ ) {
+			edge = center.computeDestination( radius, heading );
+
+			String cellId = GridHelper.getGridCellId( edge, gridLevel );
+
+			validated &= cellsIds.contains( cellId );
+		}
+
+		return validated;
 	}
 }
