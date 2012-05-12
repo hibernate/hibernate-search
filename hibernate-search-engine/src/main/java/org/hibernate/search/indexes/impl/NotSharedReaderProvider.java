@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -33,12 +33,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Open a reader each time
- * 
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
 public class NotSharedReaderProvider implements DirectoryBasedReaderProvider {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	private DirectoryProvider directoryProvider;
@@ -63,7 +63,7 @@ public class NotSharedReaderProvider implements DirectoryBasedReaderProvider {
 			reader.close();
 		}
 		catch ( IOException e ) {
-			log.unableToCLoseLuceneIndexReader( e );
+			log.unableToCloseLuceneIndexReader(e);
 		}
 	}
 
