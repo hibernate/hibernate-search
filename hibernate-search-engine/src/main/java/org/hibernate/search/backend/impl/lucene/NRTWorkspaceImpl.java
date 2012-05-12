@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -38,17 +38,17 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * The Workspace implementation to be used to take advantage of NRT Lucene features.
  * IndexReader instances are obtained directly from the IndexWriter, which is not forced
  * to flush all pending changes to the Directory structure.
- * 
+ *
  * We keep a reference Reader, obtained from the IndexWriter each time a transactional queue
  * is applied, so that the IndexReader instance "sees" only fully committed transactions;
  * the reference is never returned to clients, but each time a client needs an IndexReader
  * a clone is created from the last refreshed IndexReader.
- * 
+ *
  * Since the backend is forced to create a reference IndexReader after each (skipped) commit,
  * some IndexReaders might be opened without being ever used.
- * 
+ *
  * This class implements both Workspace and ReaderProvider.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements DirectoryBasedReaderProvider {
@@ -141,7 +141,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 			reader.close();
 		}
 		catch ( IOException e ) {
-			log.unableToCLoseLuceneIndexReader( e );
+			log.unableToCloseLuceneIndexReader(e);
 		}
 	}
 
@@ -173,7 +173,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 			}
 		}
 		catch ( IOException e ) {
-			log.unableToCLoseLuceneIndexReader( e );
+			log.unableToCloseLuceneIndexReader(e);
 		}
 	}
 

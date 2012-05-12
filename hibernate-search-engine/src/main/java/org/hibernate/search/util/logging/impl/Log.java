@@ -280,7 +280,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 55, value = "Unable to close Lucene IndexReader")
-	void unableToCLoseLuceneIndexReader(@Cause Exception e);
+	void unableToCloseLuceneIndexReader(@Cause Exception e);
 
 	@LogMessage(level = WARN)
 	@Message(id = 56, value = "Unable to un-register existing MBean: %1$s")
