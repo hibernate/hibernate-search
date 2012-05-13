@@ -164,7 +164,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 					reader.close();
 				}
 				catch ( IOException e ) {
-					log.unableToCLoseLuceneIndexReader( e );
+					log.unableToCloseLuceneIndexReader( e );
 				}
 				assert removed != null;
 			}

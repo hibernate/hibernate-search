@@ -141,7 +141,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 			reader.close();
 		}
 		catch ( IOException e ) {
-			log.unableToCLoseLuceneIndexReader( e );
+			log.unableToCloseLuceneIndexReader( e );
 		}
 	}
 
@@ -173,7 +173,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 			}
 		}
 		catch ( IOException e ) {
-			log.unableToCLoseLuceneIndexReader( e );
+			log.unableToCloseLuceneIndexReader( e );
 		}
 	}
 

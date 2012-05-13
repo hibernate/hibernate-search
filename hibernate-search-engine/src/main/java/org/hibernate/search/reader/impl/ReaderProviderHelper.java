@@ -82,7 +82,7 @@ public abstract class ReaderProviderHelper {
 					reader.close();
 				}
 				catch (IOException ee) {
-					log.unableToCLoseLuceneIndexReader( e );
+					log.unableToCloseLuceneIndexReader( e );
 				}
 			}
 		}
