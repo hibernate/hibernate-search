@@ -118,9 +118,13 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
             if (n == null) {
                 throw new IllegalArgumentException("Missing mux id!");
             }
-            muxId = n;
             @SuppressWarnings("unchecked")
             Muxer<UpHandler> muxer = (Muxer<UpHandler>) handler;
+            if (muxer.get(n) != null) {
+                throw new IllegalArgumentException("Muxer with id " + n + " already used!");
+            }
+
+            muxId = n;
             ClassLoader cl = (ClassLoader) props.get(CLASSLOADER);
             MessageListener wrapper = (cl != null) ? new ClassloaderMessageListener(listener, cl) : listener;
             MessageDispatcher dispatcher = new MuxMessageDispatcher(muxId, channel, wrapper, listener, null);
