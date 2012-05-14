@@ -25,7 +25,6 @@ package org.hibernate.search.backend.impl.jgroups;
 
 import java.net.URL;
 import java.util.Properties;
-import java.util.Random;
 
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
@@ -57,6 +56,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	public static final String CLUSTER_NAME = JGROUPS_PREFIX + "clusterName";
 	public static final String CHANNEL_INJECT = JGROUPS_PREFIX + "providedChannel";
 	public static final String CLASSLOADER = JGROUPS_PREFIX + "classloader";
+	public static final String MUX_ID = JGROUPS_PREFIX + "mux_id";
 
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 	private static final String DEFAULT_CLUSTER_NAME = "Hibernate Search Cluster";
@@ -114,17 +114,17 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 
         UpHandler handler = channel.getUpHandler();
         if ( handler instanceof Muxer ) {
+            Short n = (Short) props.get(MUX_ID);
+            if (n == null) {
+                throw new IllegalArgumentException("Missing mux id!");
+            }
+            muxId = n;
             @SuppressWarnings("unchecked")
             Muxer<UpHandler> muxer = (Muxer<UpHandler>) handler;
             ClassLoader cl = (ClassLoader) props.get(CLASSLOADER);
             MessageListener wrapper = (cl != null) ? new ClassloaderMessageListener(listener, cl) : listener;
-            MessageDispatcher dispatcher;
-            //noinspection SynchronizationOnLocalVariableOrMethodParameter
-            synchronized (muxer) {
-                muxId = generateMuxId(muxer);
-                dispatcher = new MuxMessageDispatcher(muxId, channel, wrapper, listener, null);
-                muxer.add(muxId, dispatcher.getProtocolAdapter());
-            }
+            MessageDispatcher dispatcher = new MuxMessageDispatcher(muxId, channel, wrapper, listener, null);
+            muxer.add(muxId, dispatcher.getProtocolAdapter());
             sender = new DispatcherMessageSender(dispatcher);
         } else {
             // TODO -- perhaps port previous multi-handling?
@@ -146,16 +146,6 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 			log.jGroupsFlushNotPresentInStack();
 		}
 	}
-
-    private static short generateMuxId(Muxer<UpHandler> muxer) {
-        Random random = new Random();
-        while (true) {
-            short id = (short) random.nextInt();
-            if (muxer.get(id) == null) {
-                return id;
-            }
-        }
-    }
 
     /**
 	 * Reads configuration and builds channel with its base.
