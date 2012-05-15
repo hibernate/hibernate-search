@@ -19,8 +19,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.hibernate.Session;
-import org.hibernate.search.FullTextSession;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 
@@ -90,9 +88,9 @@ public class IndexAndSearchTest {
 	}
 
 	private void index() {
-		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( em.unwrap( Session.class ) );
+		FullTextEntityManager ftEm = org.hibernate.search.jpa.Search.getFullTextEntityManager( em );
 		try {
-			ftSession.createIndexer().startAndWait();
+			ftEm.createIndexer().startAndWait();
 		}
 		catch ( InterruptedException e ) {
 			log.error( "Was interrupted during indexing", e );
@@ -100,10 +98,10 @@ public class IndexAndSearchTest {
 	}
 
 	private void purge() {
-		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( em.unwrap( Session.class ) );
-		ftSession.purgeAll( Book.class );
-		ftSession.flushToIndexes();
-		ftSession.close();
+		FullTextEntityManager ftEm = org.hibernate.search.jpa.Search.getFullTextEntityManager( em );
+		ftEm.purgeAll( Book.class );
+		ftEm.flushToIndexes();
+		ftEm.close();
 		emf.close();
 	}
 
