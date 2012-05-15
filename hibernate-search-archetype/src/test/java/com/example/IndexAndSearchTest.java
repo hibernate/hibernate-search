@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -19,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.hibernate.Session;
-import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -85,14 +85,12 @@ public class IndexAndSearchTest {
 
 
 	private void initHibernate() {
-		Ejb3Configuration config = new Ejb3Configuration();
-		config.configure( "hibernate-search-example", new HashMap() );
-		emf = config.buildEntityManagerFactory();
+		emf = Persistence.createEntityManagerFactory( "hibernate-search-example" );
 		em = emf.createEntityManager();
 	}
 
 	private void index() {
-		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( (Session) em.getDelegate() );
+		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( em.unwrap( Session.class ) );
 		try {
 			ftSession.createIndexer().startAndWait();
 		}
@@ -102,7 +100,7 @@ public class IndexAndSearchTest {
 	}
 
 	private void purge() {
-		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( (Session) em.getDelegate() );
+		FullTextSession ftSession = org.hibernate.search.Search.getFullTextSession( em.unwrap( Session.class ) );
 		ftSession.purgeAll( Book.class );
 		ftSession.flushToIndexes();
 		ftSession.close();
