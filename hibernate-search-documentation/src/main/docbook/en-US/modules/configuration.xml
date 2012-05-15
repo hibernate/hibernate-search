@@ -215,10 +215,10 @@ public class Action { ... }</programlisting>
     <example id="example-configuring-directory-providers">
       <title>Configuring directory providers</title>
 
-      <programlisting>hibernate.search.default.directory_provider filesystem
+      <programlisting>hibernate.search.default.directory_provider=filesystem
 hibernate.search.default.indexBase=/usr/lucene/indexes
-hibernate.search.Rules.directory_provider ram
-hibernate.search.Actions.directory_provider com.acme.hibernate.CustomDirectoryProvider</programlisting>
+hibernate.search.Rules.directory_provider=ram
+hibernate.search.Actions.directory_provider=com.acme.hibernate.CustomDirectoryProvider</programlisting>
     </example>
 
     <tip>
