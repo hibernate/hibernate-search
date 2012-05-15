@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Hibernate Search spatial : Benchmarks with <a href="http://www.geonames.org">GeoNames</a>
@@ -149,9 +150,10 @@ public class BenchWithGeonames {
 			org.apache.lucene.search.Query query;
 			final Integer iterations = 2000;
 			final Integer warmUp = 50;
+			Random random = new Random( 42 );
 
 			for ( int i = 0; i < iterations; i++ ) {
-				Point center = Point.fromDegrees( Math.random() * 2 + 44 , Math.random() * 2 + 3 );
+				Point center = Point.fromDegrees( random.nextDouble() * 2 + 44 , random.nextDouble() * 2 + 3 );
 				double radius = 25.0d;
 				Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
