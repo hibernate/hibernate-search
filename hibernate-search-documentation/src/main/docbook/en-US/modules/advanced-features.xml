@@ -75,9 +75,9 @@ finally {
     <para>In this example the <classname>SearchFactory</classname> figures out
     which indexes are needed to query this entity (considering a Sharding
     strategy). Using the configured <classname>ReaderProvider</classname>
-    (described in<xref linkend="search-architecture-readerstrategy" />) on
-    each index, it returns a compound <literal>IndexReader</literal> on top of
-    all involved indexes. Because this <classname>IndexReader</classname> is
+    (described in<xref linkend="search-architecture-readerstrategy"/>) on each
+    index, it returns a compound <literal>IndexReader</literal> on top of all
+    involved indexes. Because this <classname>IndexReader</classname> is
     shared amongst several clients, you must adhere to the following
     rules:</para>
 
@@ -170,13 +170,13 @@ finally {
     <para>By default sharding is not enabled unless the number of shards is
     configured. To do this use the
     <constant>hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards</constant>
-    property as seen in <xref linkend="example-index-sharding" />. In this
+    property as seen in <xref linkend="example-index-sharding"/>. In this
     example 5 shards are enabled.</para>
 
     <example id="example-index-sharding">
       <title>Enabling index sharding</title>
 
-      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards 5</programlisting>
+      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards = 5</programlisting>
     </example>
 
     <para>Responsible for splitting the data into sub-indexes is the
@@ -192,39 +192,39 @@ finally {
     <example>
       <title>Specifying a custom sharding strategy</title>
 
-      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy.Implementation</programlisting>
+      <programlisting>hibernate.search.&lt;indexName&gt;.sharding_strategy = my.shardingstrategy.Implementation</programlisting>
     </example>
 
     <para>The <classname>IndexShardingStrategy</classname> also allows for
     optimizing searches by selecting which shard to run the query against. By
-    activating a filter (see <xref linkend="query-filter-shard" />), a
-    sharding strategy can select a subset of the shards used to answer a query
+    activating a filter (see <xref linkend="query-filter-shard"/>), a sharding
+    strategy can select a subset of the shards used to answer a query
     (<classname>IndexShardingStrategy.getIndexManagersForQuery</classname>)
     and thus speed up the query execution.</para>
 
     <para>Each shard has an independent <classname>IndexManager</classname>
     and so can be configured to use a different directory provider and backend
     configurations. The <classname>IndexManager</classname> index names for
-    the Animal entity in <xref linkend="example-sharding-configuration" /> are
+    the Animal entity in <xref linkend="example-sharding-configuration"/> are
     <literal>Animal.0</literal> to <literal>Animal.4</literal>. In other
     words, each shard has the name of it's owning index followed by
     <constant>.</constant> (dot) and its index number (see also <xref
-    linkend="search-configuration-directory" />).</para>
+    linkend="search-configuration-directory"/>).</para>
 
     <example id="example-sharding-configuration">
       <title>Sharding configuration for entity
       <classname>Animal</classname></title>
 
-      <programlisting>hibernate.search.default.indexBase /usr/lucene/indexes
+      <programlisting>hibernate.search.default.indexBase = /usr/lucene/indexes
 
-hibernate.search.Animal.sharding_strategy.nbr_of_shards 5
-hibernate.search.Animal.directory_provider filesystem
-hibernate.search.Animal.0.indexName Animal00
-hibernate.search.Animal.3.indexBase /usr/lucene/sharded
-hibernate.search.Animal.3.indexName Animal03</programlisting>
+hibernate.search.Animal.sharding_strategy.nbr_of_shards = 5
+hibernate.search.Animal.directory_provider = filesystem
+hibernate.search.Animal.0.indexName = Animal00
+hibernate.search.Animal.3.indexBase = /usr/lucene/sharded
+hibernate.search.Animal.3.indexName = Animal03</programlisting>
     </example>
 
-    <para>In <xref linkend="example-sharding-configuration" />, the
+    <para>In <xref linkend="example-sharding-configuration"/>, the
     configuration uses the default id string hashing strategy and shards the
     <classname>Animal</classname> index into 5 sub-indexes. All sub-indexes
     are filesystem instances and the directory where each sub-index is stored
@@ -262,14 +262,14 @@ hibernate.search.Animal.3.indexName Animal03</programlisting>
       </listitem>
     </itemizedlist>
 
-   <para>When implementing a <classname>IndexShardingStrategy</classname> any field
-    can be used to determine the sharding selection. Consider that to handle deletions,
-    <literal>purge</literal> and <literal>purgeAll</literal> operations, the implementation
-    might need to return one or more indexes without being able to read all the field
-    values or the primary identifier; in case the information is not enough to pick a single
-    index, all indexes should be returned, so that the delete operation will be propagated
-    to all indexes potentially containing the documents to be deleted.</para>
-
+    <para>When implementing a <classname>IndexShardingStrategy</classname> any
+    field can be used to determine the sharding selection. Consider that to
+    handle deletions, <literal>purge</literal> and <literal>purgeAll</literal>
+    operations, the implementation might need to return one or more indexes
+    without being able to read all the field values or the primary identifier;
+    in case the information is not enough to pick a single index, all indexes
+    should be returned, so that the delete operation will be propagated to all
+    indexes potentially containing the documents to be deleted.</para>
   </section>
 
   <section id="section-sharing-indexes">
@@ -581,7 +581,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     <para>You can also override the similarity used for a specific index by
     setting the <literal>similarity</literal> property</para>
 
-    <programlisting>hibernate.search.default.similarity my.custom.Similarity</programlisting>
+    <programlisting>hibernate.search.default.similarity = my.custom.Similarity</programlisting>
 
     <para>Finally you can override the default similarity on class level using
     the <literal>@Similarity</literal> annotation. <programlisting>@Entity

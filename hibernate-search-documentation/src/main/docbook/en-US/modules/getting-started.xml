@@ -91,7 +91,7 @@
             has also its own set of annotations (<emphasis>@Indexed,
             @DocumentId, @Field,...</emphasis>) for which there exists so far
             no XML based alternative; a better option is the <xref
-            linkend="hsearch-mapping-programmaticapi" />.</para></entry>
+            linkend="hsearch-mapping-programmaticapi"/>.</para></entry>
           </row>
         </tbody>
       </tgroup>
@@ -172,7 +172,7 @@
 mvn archetype:generate                                 \
    -DarchetypeGroupId=org.hibernate                    \
    -DarchetypeArtifactId=hibernate-search-quickstart   \
-   -DarchetypeVersion=&version;                      \
+   -DarchetypeVersion=&version;                          \
    -DarchetypeRepository=http://repository.jboss.org/nexus/content/groups/public-jboss/
 </programlisting>
       </example>
@@ -219,7 +219,7 @@ mvn archetype:generate                                 \
     Search (eg via <ulink url="http://code.google.com/p/luke/">Luke</ulink>).
     Once you have a working configuration you can start experimenting with
     other directory providers (see <xref
-    linkend="search-configuration-directory" />). Next to the directory
+    linkend="search-configuration-directory"/>). Next to the directory
     provider you also have to specify the default base directory for all
     indexes via <literal>hibernate.search.default.indexBase</literal>.</para>
 
@@ -300,7 +300,7 @@ public class Author {
     stored in the index or not has nothing to do with the ability to search
     for it. From Lucene's perspective it is not necessary to keep the data
     once the index is created. The benefit of storing it is the ability to
-    retrieve it via projections ( see <xref linkend="projections" />).</para>
+    retrieve it via projections ( see <xref linkend="projections"/>).</para>
 
     <para>Without projections, Hibernate Search will per default execute a
     Lucene query in order to find the database identifiers of the entities
@@ -324,7 +324,7 @@ public class Author {
     bridges are provided, including the <classname>DateBridge</classname>
     which will convert a <classname>java.util.Date</classname> into a
     <classname>String</classname> with the specified resolution. For more
-    details see <xref linkend="search-mapping-bridge" />.</para>
+    details see <xref linkend="search-mapping-bridge"/>.</para>
 
     <para>This leaves us with <literal>@IndexedEmbedded. </literal>This
     annotation is used to index associated entities
@@ -337,10 +337,10 @@ public class Author {
     <literal>@IndexedEmbedded</literal> you will also have to mark all fields
     of the associated entity you want to have included in the index with
     <literal>@Indexed</literal>. For more details see <xref
-    linkend="search-mapping-associated" />.</para>
+    linkend="search-mapping-associated"/>.</para>
 
     <para>These settings should be sufficient for now. For more details on
-    entity mapping refer to <xref linkend="search-mapping-entity" />.</para>
+    entity mapping refer to <xref linkend="search-mapping-entity"/>.</para>
 
     <example>
       <title>Example entities after adding Hibernate Search
@@ -369,7 +369,7 @@ public class Book {
   <emphasis role="bold">@IndexedEmbedded</emphasis>
   @ManyToMany 
   private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
-<emphasis role="bold"></emphasis>
+<emphasis role="bold"/>
   public Book() {
   } 
   
@@ -407,7 +407,7 @@ public class Author {
     you have added the above properties and annotations it is time to trigger
     an initial batch index of your books. You can achieve this by using one of
     the following code snippets (see also <xref
-    linkend="search-batchindex" />):</para>
+    linkend="search-batchindex"/>):</para>
 
     <example>
       <title>Using Hibernate Session to index data</title>
@@ -436,9 +436,9 @@ fullTextEntityManager.createIndexer().startAndWait();</programlisting>
 
     <para>Now it is time to execute a first search. The general approach is to
     create a Lucene query (either via the Lucene API (<xref
-    linkend="search-query-lucene-api" />) or via the Hibernate Search query
-    DSL (<xref linkend="search-query-querydsl" />)) and then wrap this query
-    into a <classname>org.hibernate.Query</classname> in order to get all the
+    linkend="search-query-lucene-api"/>) or via the Hibernate Search query DSL
+    (<xref linkend="search-query-querydsl"/>)) and then wrap this query into a
+    <classname>org.hibernate.Query</classname> in order to get all the
     functionality one is used to from the Hibernate API. The following code
     will prepare a query against the indexed fields, execute it and return a
     list of <classname>Book</classname>s.</para>
@@ -512,8 +512,7 @@ em.close();</programlisting>
     Lucene this can be achieved by choosing an analyzer class which applies
     word stemming during the indexing <emphasis role="bold">as well
     as</emphasis> the search process. Hibernate Search offers several ways to
-    configure the analyzer to be used (see <xref
-    linkend="analyzer" />):</para>
+    configure the analyzer to be used (see <xref linkend="analyzer"/>):</para>
 
     <itemizedlist>
       <listitem>
@@ -617,13 +616,13 @@ public class Book {
     <para>The above paragraphs helped you getting an overview of Hibernate
     Search. The next step after this tutorial is to get more familiar with the
     overall architecture of Hibernate Search (<xref
-    linkend="search-architecture" />) and explore the basic features in more
+    linkend="search-architecture"/>) and explore the basic features in more
     detail. Two topics which were only briefly touched in this tutorial were
-    analyzer configuration (<xref linkend="analyzer" />) and field bridges
-    (<xref linkend="search-mapping-bridge" />). Both are important features
+    analyzer configuration (<xref linkend="analyzer"/>) and field bridges
+    (<xref linkend="search-mapping-bridge"/>). Both are important features
     required for more fine-grained indexing. More advanced topics cover
-    clustering (<xref linkend="jms-backend" />, <xref
-    linkend="infinispan-directories" />) and large index handling (<xref
-    linkend="search-configuration-directory-sharding" />).</para>
+    clustering (<xref linkend="jms-backend"/>, <xref
+    linkend="infinispan-directories"/>) and large index handling (<xref
+    linkend="search-configuration-directory-sharding"/>).</para>
   </section>
 </chapter>

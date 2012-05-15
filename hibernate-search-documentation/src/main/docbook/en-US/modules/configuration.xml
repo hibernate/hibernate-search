@@ -522,7 +522,7 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
         <para>The most simple configuration only requires to enable the
         backend:</para>
 
-        <programlisting>hibernate.search.[default|&lt;indexname&gt;].directory_provider infinispan</programlisting>
+        <programlisting>hibernate.search.[default|&lt;indexname&gt;].directory_provider = infinispan</programlisting>
 
         <para>That's all what is needed to get a cluster-replicated index, but
         the default configuration does not enable any form of permanent
@@ -1054,11 +1054,11 @@ EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", pro
         id="example-performamce-option-configuration">
         <title>Example performance option configuration</title>
 
-        <programlisting>hibernate.search.Animals.2.indexwriter.max_merge_docs 10
-hibernate.search.Animals.2.indexwriter.merge_factor 20
-hibernate.search.Animals.2.indexwriter.term_index_interval default
-hibernate.search.default.indexwriter.max_merge_docs 100
-hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
+        <programlisting>hibernate.search.Animals.2.indexwriter.max_merge_docs = 10
+hibernate.search.Animals.2.indexwriter.merge_factor = 20
+hibernate.search.Animals.2.indexwriter.term_index_interval = default
+hibernate.search.default.indexwriter.max_merge_docs = 100
+hibernate.search.default.indexwriter.ram_buffer_size = 64</programlisting>
       </example> The configuration in <xref
     linkend="example-performamce-option-configuration"/> will result in these
     settings applied on the second shard of the <classname>Animal</classname>
@@ -1434,9 +1434,9 @@ hibernate.search.default.indexwriter.ram_buffer_size 64</programlisting>
       <para>Example:</para>
 
       <programlisting>//to be fairly confident no files grow above 15MB, use:
-hibernate.search.default.indexwriter.ram_buffer_size 10
-hibernate.search.default.indexwriter.merge_max_optimize_size 7
-hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
+hibernate.search.default.indexwriter.ram_buffer_size = 10
+hibernate.search.default.indexwriter.merge_max_optimize_size = 7
+hibernate.search.default.indexwriter.merge_max_size = 7</programlisting>
     </section>
 
     <tip>
@@ -1541,9 +1541,9 @@ hibernate.search.default.indexwriter.merge_max_size 7</programlisting>
 
     <para>Configuration example:</para>
 
-    <programlisting>hibernate.search.default.locking_strategy simple
-hibernate.search.Animals.locking_strategy native
-hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</programlisting>
+    <programlisting>hibernate.search.default.locking_strategy = simple
+hibernate.search.Animals.locking_strategy = native
+hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory</programlisting>
 
     <para>The Infinispan Directory uses a custom implementation; it's still
     possible to override it but make sure you understand how that will work,
@@ -1558,7 +1558,7 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
     exceptions are logged to the log output by default. It is possible to
     explicitly declare the exception logging mechanism as seen below:</para>
 
-    <programlisting>hibernate.search.error_handler log</programlisting>
+    <programlisting>hibernate.search.error_handler = log</programlisting>
 
     <para>The default exception handling occurs for both synchronous and
     asynchronous indexing. Hibernate Search provides an easy mechanism to
@@ -1584,7 +1584,7 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
     <classname>ErrorHandler</classname> implementation in the configuration
     properties:</para>
 
-    <para><programlisting>hibernate.search.error_handler CustomerErrorHandler</programlisting></para>
+    <para><programlisting>hibernate.search.error_handler = CustomerErrorHandler</programlisting></para>
   </section>
 
   <section>
@@ -1623,7 +1623,7 @@ hibernate.search.Books.locking_strategy org.custom.components.MyLockingFactory</
       <title>Force Analyzers to be compatible with a Lucene 3.0 created
       index</title>
 
-      <programlisting>hibernate.search.lucene_version LUCENE_30</programlisting>
+      <programlisting>hibernate.search.lucene_version = LUCENE_30</programlisting>
     </example>
 
     <para>This option is global for the configured
