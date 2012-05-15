@@ -53,16 +53,15 @@ public class BenchWithGeonames {
 		LoadGeonames();
 		Bench();
 		FacetTest();
-
-		System.exit(0);
 	}
 
 	public static void LoadGeonames() {
 		Session session = null;
 		FullTextSession fullTextSession = null;
 		BufferedReader buffRead = null;
+		SessionFactory sessionFactory = null;
 		try {
-			SessionFactory sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
+			sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
 
 			session = sessionFactory.openSession();
 			session.createSQLQuery("delete from POI").executeUpdate();
@@ -96,19 +95,23 @@ public class BenchWithGeonames {
 				line_number++;
 			}
 			session.getTransaction().commit();
-			session.close();
+			fullTextSession.close();
+			sessionFactory.close();
 			buffRead.close();
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
 		}
 		finally {
-			if ( session != null && session.isOpen() ) {
-				Transaction transaction= session.getTransaction();
+			if ( fullTextSession != null && fullTextSession.isOpen() ) {
+				Transaction transaction= fullTextSession.getTransaction();
 				if(transaction!=null && transaction.isActive()){
 					transaction.rollback();
 				}
-				session.close();
+				fullTextSession.close();
+			}
+			if ( sessionFactory != null && !sessionFactory.isClosed() ) {
+				sessionFactory.close();
 			}
 			try {
 				if( buffRead != null) {
@@ -124,9 +127,10 @@ public class BenchWithGeonames {
 	public static void Bench() {
 		Session session = null;
 		FullTextSession fullTextSession = null;
+		SessionFactory sessionFactory = null;
 		try {
 
-			SessionFactory sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
+			sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
 
 			session = sessionFactory.openSession();
 			session.beginTransaction();
@@ -297,6 +301,7 @@ public class BenchWithGeonames {
 			}
 			session.getTransaction().commit();
 			session.close();
+			sessionFactory.close();
 
 			System.out
 					.println(
@@ -328,12 +333,15 @@ public class BenchWithGeonames {
 			e.printStackTrace();
 		}
 		finally {
-			if ( session != null && session.isOpen() ) {
-				Transaction transaction= session.getTransaction();
+			if ( fullTextSession != null && fullTextSession.isOpen() ) {
+				Transaction transaction= fullTextSession.getTransaction();
 				if(transaction!=null && transaction.isActive()){
 					transaction.rollback();
 				}
-				session.close();
+				fullTextSession.close();
+			}
+			if ( sessionFactory != null && !sessionFactory.isClosed() ) {
+				sessionFactory.close();
 			}
 		}
 	}
@@ -342,39 +350,39 @@ public class BenchWithGeonames {
 		Session session = null;
 		FullTextSession fullTextSession = null;
 
-		SessionFactory sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
-
-		session = sessionFactory.openSession();
-		session.beginTransaction();
-		fullTextSession = Search.getFullTextSession( session );
-
-		org.apache.lucene.search.Query luceneQuery;
-
-		FullTextQuery hibQuery;
-
-		Point center = Point.fromDegrees( 46, 4 );
-		double radius = 50.0d;
-
-		luceneQuery = SpatialQueryBuilderFromPoint.buildSpatialQuery( center, radius, "location" );
-		hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
-		hibQuery.setProjection( "id", "name", "type" );
-
-		FacetManager facetManager = hibQuery.getFacetManager();
-
-		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
-
-		FacetingRequest facetingRequest = queryBuilder.facet()
-				.name( "typeFacet" )
-				.onField( "type" )
-				.discrete()
-				.orderedBy( FacetSortOrder.COUNT_DESC )
-				.includeZeroCounts( false )
-				.createFacetingRequest();
-
-		facetManager.enableFaceting( facetingRequest );
-
+		SessionFactory sessionFactory = null;
 
 		try {
+			sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
+
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+			fullTextSession = Search.getFullTextSession( session );
+
+			org.apache.lucene.search.Query luceneQuery;
+
+			FullTextQuery hibQuery;
+
+			Point center = Point.fromDegrees( 46, 4 );
+			double radius = 50.0d;
+
+			luceneQuery = SpatialQueryBuilderFromPoint.buildSpatialQuery( center, radius, "location" );
+			hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+			hibQuery.setProjection( "id", "name", "type" );
+
+			FacetManager facetManager = hibQuery.getFacetManager();
+
+			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+
+			FacetingRequest facetingRequest = queryBuilder.facet()
+					.name( "typeFacet" )
+					.onField( "type" )
+					.discrete()
+					.orderedBy( FacetSortOrder.COUNT_DESC )
+					.includeZeroCounts( false )
+					.createFacetingRequest();
+
+			facetManager.enableFaceting( facetingRequest );
 
 			Integer size = hibQuery.getResultSize();
 
@@ -384,17 +392,23 @@ public class BenchWithGeonames {
 
 			System.out.println( facets );
 
+			session.getTransaction().commit();
+			session.close();
+			sessionFactory.close();
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
 		}
 		finally {
-			if ( session != null && session.isOpen() ) {
-				Transaction transaction= session.getTransaction();
+			if ( fullTextSession != null && fullTextSession.isOpen() ) {
+				Transaction transaction= fullTextSession.getTransaction();
 				if(transaction!=null && transaction.isActive()){
 					transaction.rollback();
 				}
-				session.close();
+				fullTextSession.close();
+			}
+			if ( sessionFactory != null && !sessionFactory.isClosed() ) {
+				sessionFactory.close();
 			}
 		}
 	}
