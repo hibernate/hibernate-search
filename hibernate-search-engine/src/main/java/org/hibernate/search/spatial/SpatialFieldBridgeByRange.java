@@ -49,13 +49,13 @@ public class SpatialFieldBridgeByRange implements FieldBridge {
 			Coordinates coordinates = (Coordinates) value;
 
 			luceneOptions.addNumericFieldToDocument(
-					"latitude_hibernate_search_spatial",
+					name + "_HSSI_Latitude",
 					coordinates.getLatitude(),
 					document
 			);
 
 			luceneOptions.addNumericFieldToDocument(
-					"longitude_hibernate_search_spatial",
+					name + "_HSSI_Longitude",
 					coordinates.getLongitude(),
 					document
 			);
