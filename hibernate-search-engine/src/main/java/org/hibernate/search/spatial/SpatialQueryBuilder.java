@@ -61,7 +61,7 @@ public abstract class SpatialQueryBuilder {
 	 * @param latitude WGS84 latitude of the center of the search
 	 * @param longitude WGS84 longitude of the center of the search
 	 * @param radius distance max to center in km
-	 *                      *
+	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
