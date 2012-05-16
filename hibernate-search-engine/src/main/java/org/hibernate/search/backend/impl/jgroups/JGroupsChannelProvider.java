@@ -127,8 +127,8 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
             muxId = n;
             ClassLoader cl = (ClassLoader) props.get(CLASSLOADER);
             MessageListener wrapper = (cl != null) ? new ClassloaderMessageListener(listener, cl) : listener;
-            MessageDispatcher dispatcher = new MuxMessageDispatcher(muxId, channel, wrapper, listener, null);
-            muxer.add(muxId, dispatcher.getProtocolAdapter());
+            MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter(wrapper);
+            MessageDispatcher dispatcher = new MuxMessageDispatcher(muxId, channel, wrapper, listener, adapter);
             sender = new DispatcherMessageSender(dispatcher);
         } else {
             // TODO -- perhaps port previous multi-handling?
