@@ -22,7 +22,6 @@ package org.hibernate.search.query.dsl.impl;
 
 import org.apache.lucene.search.Filter;
 
-import org.hibernate.search.query.dsl.LatitudeFieldContext;
 import org.hibernate.search.query.dsl.SpatialContext;
 import org.hibernate.search.query.dsl.SpatialMatchingContext;
 
@@ -51,12 +50,6 @@ public class ConnectedSpatialContext implements SpatialContext {
 	}
 
 	@Override
-	public LatitudeFieldContext onLatitudeField(String latitudeField) {
-		spatialContext.setLatitudeField( latitudeField );
-		return new ConnectedLatitudeFieldContext(this);
-	}
-
-	@Override
 	public SpatialContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
@@ -72,19 +65,5 @@ public class ConnectedSpatialContext implements SpatialContext {
 	public SpatialContext filteredBy(Filter filter) {
 		queryCustomizer.filteredBy(filter);
 		return this;
-	}
-
-	private static final class ConnectedLatitudeFieldContext implements LatitudeFieldContext {
-		private final ConnectedSpatialContext mother;
-
-		public ConnectedLatitudeFieldContext(ConnectedSpatialContext mother) {
-			this.mother = mother;
-		}
-
-		@Override
-		public SpatialMatchingContext onLongitudeField(String longitudeField) {
-			mother.spatialContext.setLongitudeField( longitudeField );
-			return new ConnectedSpatialMatchingContext(mother.queryContext, mother.queryCustomizer, mother.spatialContext, mother.queryBuilder);
-		}
 	}
 }

@@ -27,6 +27,4 @@ public interface SpatialContext extends QueryCustomization<SpatialContext> {
 	//TODO score by proximity
 
 	SpatialMatchingContext onCoordinates(String field);
-
-	LatitudeFieldContext onLatitudeField(String latitudeField);
 }

@@ -30,6 +30,7 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.SpatialFieldBridge;
@@ -59,7 +60,7 @@ public class POI {
 	double longitude;
 
 	@Field(store = Store.YES, index = Index.YES, analyze = Analyze.NO)
-	@FieldBridge(impl = SpatialFieldBridge.class)
+	@Spatial
 	@Embedded
 	public Coordinates getLocation() {
 		return new Coordinates() {

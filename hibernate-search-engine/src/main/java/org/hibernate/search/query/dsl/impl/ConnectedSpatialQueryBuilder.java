@@ -65,64 +65,28 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 		//      and on coordinates field, use grid query
 		// FIXME in the future we will likely react to some state stored in SpatialFieldBridge (for the indexing strategy)
 		String coordinatesField = spatialContext.getCoordinatesField();
-		if ( coordinatesField == null ) {
-			Point center = Point.fromDegrees(
-					spatialContext.getCoordinates().getLatitude(),
-					spatialContext.getCoordinates().getLongitude()
+		FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
+		if ( fieldBridge instanceof SpatialFieldBridge ) {
+			return SpatialQueryBuilderFromPoint.buildSpatialQuery(
+					Point.fromDegrees(
+							spatialContext.getCoordinates().getLatitude(),
+							spatialContext.getCoordinates().getLongitude()
+					),
+					spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
+					coordinatesField
 			);
-			Rectangle boundingBox = Rectangle.fromBoundingCircle(center, spatialContext.getRadiusDistance() /* no conversion needed as we have one unit */ );
-
-			org.apache.lucene.search.Query query = queryBuilder.bool()
-				.must(
-					queryBuilder.range()
-							.onField( spatialContext.getLatitudeField() )
-							.from( boundingBox.getLowerLeft().getLatitude() )
-							.to( boundingBox.getUpperRight().getLatitude() )
-							.createQuery()
-				)
-				.must(
-					queryBuilder.range()
-							.onField( spatialContext.getLongitudeField() )
-							.from( boundingBox.getLowerLeft().getLongitude() )
-							.to( boundingBox.getUpperRight().getLongitude() )
-							.createQuery()
-				)
-				.createQuery();
-			org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery(
-					SpatialQueryBuilderFromPoint.buildDistanceFilter(
-							new QueryWrapperFilter( query ),
-							center,
-							spatialContext.getRadiusDistance(),
-							spatialContext.getLatitudeField(),
-							spatialContext.getLongitudeField()
-					)
+		}
+		else if ( fieldBridge instanceof SimpleSpatialFieldBridge ) {
+			return SpatialQueryBuilderFromPoint.buildSimpleSpatialQuery(
+					Point.fromDegrees(
+							spatialContext.getCoordinates().getLatitude(),
+							spatialContext.getCoordinates().getLongitude()
+					),
+					spatialContext.getRadiusDistance() //always in KM so far, no need to convert
 			);
-			return filteredQuery;
 		}
 		else {
-			FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
-			if ( fieldBridge instanceof SpatialFieldBridge ) {
-				return SpatialQueryBuilderFromPoint.buildSpatialQuery(
-						Point.fromDegrees(
-								spatialContext.getCoordinates().getLatitude(),
-								spatialContext.getCoordinates().getLongitude()
-						),
-						spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
-						coordinatesField
-				);
-			}
-			else if ( fieldBridge instanceof SimpleSpatialFieldBridge ) {
-				return SpatialQueryBuilderFromPoint.buildSimpleSpatialQuery(
-						Point.fromDegrees(
-								spatialContext.getCoordinates().getLatitude(),
-								spatialContext.getCoordinates().getLongitude()
-						),
-						spatialContext.getRadiusDistance() //always in KM so far, no need to convert
-				);
-			}
-			else {
-				throw LOG.targetedFieldNotSpatial( queryContext.getEntityType().getName(), coordinatesField );
-			}
+			throw LOG.targetedFieldNotSpatial( queryContext.getEntityType().getName(), coordinatesField );
 		}
 	}
 }
