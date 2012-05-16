@@ -57,7 +57,6 @@ public class POI {
 	@NumericField
 	double longitude;
 
-	@Field(store = Store.YES, index = Index.YES, analyze = Analyze.NO)
 	@Spatial
 	@Embedded
 	public Coordinates getLocation() {
