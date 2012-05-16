@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.search.query.dsl.QueryBuilder;
 import org.junit.Assert;
 
 import org.hibernate.Transaction;
@@ -43,7 +42,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				centerLatitude,
 				centerLongitude,
 				50,
@@ -53,7 +52,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				centerLatitude,
 				centerLongitude,
 				51,
@@ -63,7 +62,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
 
-		org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				0.0d,
 				180.0d,
 				112,
@@ -73,7 +72,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results3 = hibQuery3.list();
 		Assert.assertEquals( 2, results3.size() );
 
-		org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				0.0d,
 				0.0d,
 				100000,
@@ -106,7 +105,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				centerLatitude,
 				centerLongitude,
 				50,
@@ -116,7 +115,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				centerLatitude,
 				centerLongitude,
 				51,
@@ -147,7 +146,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				centerLatitude,
 				centerLongitude,
 				50,
@@ -157,7 +156,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				centerLatitude,
 				centerLongitude,
 				51,
@@ -192,7 +191,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
 				centerLatitude, centerLongitude, 50
 		);
 
@@ -200,7 +199,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSimpleSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByRange(
 				centerLatitude, centerLongitude, 51
 		);
 
@@ -211,7 +210,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double endOfTheWorldLatitude= 0.0d;
 		double endOfTheWorldLongitude= 180.0d;
 
-		org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildSimpleSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildSpatialQueryByRange(
 				endOfTheWorldLatitude, endOfTheWorldLongitude, 112
 		);
 
@@ -219,7 +218,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results3 = hibQuery3.list();
 		Assert.assertEquals( 2, results3.size() );
 
-		org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSimpleSpatialQuery(
+		org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSpatialQueryByRange(
 				endOfTheWorldLatitude, endOfTheWorldLongitude, 100000
 		);
 

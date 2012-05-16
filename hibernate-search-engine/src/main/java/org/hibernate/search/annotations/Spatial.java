@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.annotations;
 
-import org.hibernate.search.spatial.SpatialFieldBridge;
+import org.hibernate.search.spatial.SpatialFieldBridgeByGrid;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -64,11 +64,11 @@ public @interface Spatial {
 	/**
 	 * @return top range grid level for spatial indexing
 	 */
-	int topGridLevel() default SpatialFieldBridge.DEFAULT_TOP_GRID_LEVEL;
+	int topGridLevel() default SpatialFieldBridgeByGrid.DEFAULT_TOP_GRID_LEVEL;
 
 	/**
 	 * @return bottom grid level for spatial indexing
 	 */
-	int bottomGridLevel() default SpatialFieldBridge.DEFAULT_BOTTOM_GRID_LEVEL;
+	int bottomGridLevel() default SpatialFieldBridgeByGrid.DEFAULT_BOTTOM_GRID_LEVEL;
 }
 

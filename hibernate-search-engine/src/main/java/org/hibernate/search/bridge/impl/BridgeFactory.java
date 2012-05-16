@@ -78,8 +78,8 @@ import org.hibernate.search.bridge.builtin.StringBridge;
 import org.hibernate.search.bridge.builtin.UUIDBridge;
 import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
-import org.hibernate.search.spatial.SimpleSpatialFieldBridge;
-import org.hibernate.search.spatial.SpatialFieldBridge;
+import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
+import org.hibernate.search.spatial.SpatialFieldBridgeByGrid;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -296,9 +296,9 @@ public final class BridgeFactory {
 		if ( spatial != null )  {
 			try {
 				if( spatial.spatialMode() == SpatialMode.GRID ) {
-					bridge = new SpatialFieldBridge( spatial.topGridLevel(), spatial.bottomGridLevel() );
+					bridge = new SpatialFieldBridgeByGrid( spatial.topGridLevel(), spatial.bottomGridLevel() );
 				} else {
-					bridge = new SimpleSpatialFieldBridge();
+					bridge = new SpatialFieldBridgeByRange();
 				}
 			}
 			catch ( Exception e ) {
@@ -340,7 +340,7 @@ public final class BridgeFactory {
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
 			Spatial spatialAnn = member.getAnnotation( org.hibernate.search.annotations.Spatial.class );
-			bridge= new SpatialFieldBridge( spatialAnn.topGridLevel(),
+			bridge = new SpatialFieldBridgeByGrid( spatialAnn.topGridLevel(),
 					spatialAnn.bottomGridLevel() );
 		}
 		else {

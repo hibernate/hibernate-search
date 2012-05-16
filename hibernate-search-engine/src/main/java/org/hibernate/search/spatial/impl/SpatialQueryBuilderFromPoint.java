@@ -29,7 +29,7 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 
-import org.hibernate.search.spatial.SpatialFieldBridge;
+import org.hibernate.search.spatial.SpatialFieldBridgeByGrid;
 
 import java.util.List;
 
@@ -55,8 +55,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 */
 	public static Filter buildGridFilter(Point center, double radius, String fieldName) {
 		int bestGridLevel = GridHelper.findBestGridLevelForSearchRange( 2.0d * radius );
-		if ( bestGridLevel > SpatialFieldBridge.DEFAULT_BOTTOM_GRID_LEVEL ) {
-			bestGridLevel = SpatialFieldBridge.DEFAULT_BOTTOM_GRID_LEVEL;
+		if ( bestGridLevel > SpatialFieldBridgeByGrid.DEFAULT_BOTTOM_GRID_LEVEL ) {
+			bestGridLevel = SpatialFieldBridgeByGrid.DEFAULT_BOTTOM_GRID_LEVEL;
 		}
 		List<String> gridCellsIds = GridHelper.getGridCellsIds( center, radius, bestGridLevel );
 		return new GridFilter( gridCellsIds, GridHelper.formatFieldName( bestGridLevel, fieldName ) );
@@ -157,7 +157,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildSpatialQuery(Point center, double radius, String fieldName) {
+	public static Query buildSpatialQueryByGrid(Point center, double radius, String fieldName) {
 		return new ConstantScoreQuery(
 				buildDistanceFilter(
 						buildGridFilter( center, radius, fieldName ),
@@ -174,13 +174,14 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildSimpleSpatialQuery(Point center, double radius) {
+	public static Query buildSpatialQueryByRange(Point center, double radius, String fieldName) {
 
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 

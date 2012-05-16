@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
+public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridge {
 
 	public static final int DEFAULT_TOP_GRID_LEVEL = 0;
 	public static final int DEFAULT_BOTTOM_GRID_LEVEL = 16;
@@ -46,9 +46,9 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 	private boolean gridIndex = true;
 	private boolean numericFieldsIndex = true;
 
-	public SpatialFieldBridge() {}
+	public SpatialFieldBridgeByGrid() {}
 
-	public SpatialFieldBridge( int topGridLevel, int bottomGridLevel ) {
+	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel) {
 		this.topGridLevel = topGridLevel;
 		this.bottomGridLevel = bottomGridLevel;
 	}

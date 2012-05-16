@@ -31,11 +31,12 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
 
 /**
- * Lucene Filter for filtering documents which have been indexed with Hibernate Search Spatial SpatialFieldBridge
- * Use double lat,long field ine the index from a Coordinates field declaration
+ * Lucene Filter for filtering documents which have been indexed with Hibernate Search spatial Field bridge
+ * Use double lat,long field in the index from a Coordinates field declaration
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridge
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByGrid
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
  * @see org.hibernate.search.spatial.Coordinates
  */
 public final class DistanceFilter extends Filter {
