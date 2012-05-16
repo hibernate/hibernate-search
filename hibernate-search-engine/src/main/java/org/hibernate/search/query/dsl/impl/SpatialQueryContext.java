@@ -28,8 +28,6 @@ import org.hibernate.search.spatial.Coordinates;
  */
 public class SpatialQueryContext {
 	private String coordinatesField;
-	private String latitudeField;
-	private String longitudeField;
 	private double radiusDistance;
 	private Unit distanceUnit;
 	private Coordinates coordinates;
@@ -40,22 +38,6 @@ public class SpatialQueryContext {
 
 	public void setCoordinatesField(String coordinatesField) {
 		this.coordinatesField = coordinatesField;
-	}
-
-	public String getLatitudeField() {
-		return latitudeField;
-	}
-
-	public void setLatitudeField(String latitudeField) {
-		this.latitudeField = latitudeField;
-	}
-
-	public String getLongitudeField() {
-		return longitudeField;
-	}
-
-	public void setLongitudeField(String longitudeField) {
-		this.longitudeField = longitudeField;
 	}
 
 	public double getRadiusDistance() {

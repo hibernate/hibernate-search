@@ -608,18 +608,6 @@ public class DSLTest extends SearchTestCase {
 
 		query = builder
 				.spatial()
-					.onLatitudeField( "latitude" ).onLongitudeField( "longitude" )
-					.within( 51, Unit.KM )
-						.ofLatitude( 24d ).andLongitude( 31.5d )
-					.createQuery();
-
-		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
-
-		assertEquals( "test boolean based spatial query", 1, results.size() );
-		assertEquals( "test boolean based spatial query", "Bozo", ( (POI) results.get( 0 ) ).getName() );
-
-		query = builder
-				.spatial()
 					.onCoordinates( "location" )
 					.within( 500, Unit.KM )
 						.ofLatitude(48.858333d).andLongitude(2.294444d)
