@@ -62,12 +62,12 @@ public class POI {
 	public Coordinates getLocation() {
 		return new Coordinates() {
 			@Override
-			public double getLatitude() {
+			public Double getLatitude() {
 				return latitude;
 			}
 
 			@Override
-			public double getLongitude() {
+			public Double getLongitude() {
 				return longitude;
 			}
 		};

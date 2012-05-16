@@ -29,10 +29,10 @@ public interface Coordinates {
 	/**
 	 * @return the latitude in degrees
 	 */
-	double getLatitude();
+	Double getLatitude();
 
 	/**
 	 * @return the longitude in degrees
 	 */
-	double getLongitude();
+	Double getLongitude();
 }
