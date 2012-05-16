@@ -66,27 +66,32 @@ public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridg
 		if ( value != null ) {
 
 			Coordinates coordinates = (Coordinates) value;
+			Double latitude = coordinates.getLatitude();
+			Double longitude = coordinates.getLongitude();
 
-			if( gridIndex ) {
-				Point point = Point.fromDegrees( coordinates.getLatitude(), coordinates.getLongitude() );
+			if( ( latitude != null ) && ( longitude != null ) ) {
 
-				for ( int i = topGridLevel; i <= bottomGridLevel; i++ ) {
-					luceneOptions.addFieldToDocument( GridHelper.formatFieldName( i, name ), GridHelper.getGridCellId( point, i), document );
+				if( gridIndex ) {
+					Point point = Point.fromDegrees( latitude, longitude );
+
+					for ( int i = topGridLevel; i <= bottomGridLevel; i++ ) {
+						luceneOptions.addFieldToDocument( GridHelper.formatFieldName( i, name ), GridHelper.getGridCellId( point, i), document );
+					}
 				}
-			}
 
-			if( numericFieldsIndex ) {
-				luceneOptions.addNumericFieldToDocument(
-						GridHelper.formatLatitude( name ),
-						coordinates.getLatitude(),
-						document
-				);
+				if( numericFieldsIndex ) {
+					luceneOptions.addNumericFieldToDocument(
+							GridHelper.formatLatitude( name ),
+							latitude,
+							document
+					);
 
-				luceneOptions.addNumericFieldToDocument(
-						GridHelper.formatLongitude( name ),
-						coordinates.getLongitude(),
-						document
-				);
+					luceneOptions.addNumericFieldToDocument(
+							GridHelper.formatLongitude( name ),
+							longitude,
+							document
+					);
+				}
 			}
 		}
 	}

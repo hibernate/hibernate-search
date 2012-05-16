@@ -47,19 +47,23 @@ public class SpatialFieldBridgeByRange implements FieldBridge {
 		if ( value != null ) {
 
 			Coordinates coordinates = (Coordinates) value;
+			Double latitude = coordinates.getLatitude();
+			Double longitude = coordinates.getLongitude();
 
-			luceneOptions.addNumericFieldToDocument(
-					name + "_HSSI_Latitude",
-					coordinates.getLatitude(),
-					document
-			);
+			if( ( latitude != null ) && ( longitude != null ) ) {
 
-			luceneOptions.addNumericFieldToDocument(
-					name + "_HSSI_Longitude",
-					coordinates.getLongitude(),
-					document
-			);
+				luceneOptions.addNumericFieldToDocument(
+						name + "_HSSI_Latitude",
+						latitude,
+						document
+				);
 
+				luceneOptions.addNumericFieldToDocument(
+						name + "_HSSI_Longitude",
+						longitude,
+						document
+				);
+			}
 		}
 	}
 }

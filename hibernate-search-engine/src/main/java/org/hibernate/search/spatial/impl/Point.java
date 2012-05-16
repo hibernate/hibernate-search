@@ -201,12 +201,12 @@ public final class Point implements Coordinates {
 	}
 
 	@Override
-	public double getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
 
 	@Override
-	public double getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
 
