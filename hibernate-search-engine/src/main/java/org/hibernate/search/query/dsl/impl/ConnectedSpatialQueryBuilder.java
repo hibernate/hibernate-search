@@ -27,6 +27,7 @@ import org.apache.lucene.search.QueryWrapperFilter;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.SpatialTermination;
+import org.hibernate.search.spatial.SimpleSpatialFieldBridge;
 import org.hibernate.search.spatial.SpatialFieldBridge;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.Rectangle;
@@ -108,6 +109,15 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 						),
 						spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
 						coordinatesField
+				);
+			}
+			else if ( fieldBridge instanceof SimpleSpatialFieldBridge ) {
+				return SpatialQueryBuilderFromPoint.buildSimpleSpatialQuery(
+						Point.fromDegrees(
+								spatialContext.getCoordinates().getLatitude(),
+								spatialContext.getCoordinates().getLongitude()
+						),
+						spatialContext.getRadiusDistance() //always in KM so far, no need to convert
 				);
 			}
 			else {
