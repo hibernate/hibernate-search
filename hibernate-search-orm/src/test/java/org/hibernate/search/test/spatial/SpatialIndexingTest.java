@@ -150,7 +150,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				centerLatitude,
 				centerLongitude,
 				50,
-				"location"
+				"hotel_location"
 		);
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Hotel.class );
 		List results = hibQuery.list();
@@ -160,7 +160,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				centerLatitude,
 				centerLongitude,
 				51,
-				"location"
+				"hotel_location"
 		);
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Hotel.class );
 		List results2 = hibQuery2.list();
@@ -192,7 +192,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLongitude= 31.5;
 
 		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
-				centerLatitude, centerLongitude, 50
+				centerLatitude, centerLongitude, 50, "location"
 		);
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, SimpleHotel.class );
@@ -200,7 +200,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByRange(
-				centerLatitude, centerLongitude, 51
+				centerLatitude, centerLongitude, 51, "location"
 		);
 
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, SimpleHotel.class );
@@ -211,7 +211,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double endOfTheWorldLongitude= 180.0d;
 
 		org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildSpatialQueryByRange(
-				endOfTheWorldLatitude, endOfTheWorldLongitude, 112
+				endOfTheWorldLatitude, endOfTheWorldLongitude, 112, "location"
 		);
 
 		org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, SimpleHotel.class );
@@ -219,7 +219,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 2, results3.size() );
 
 		org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSpatialQueryByRange(
-				endOfTheWorldLatitude, endOfTheWorldLongitude, 100000
+				endOfTheWorldLatitude, endOfTheWorldLongitude, 100000, "location"
 		);
 
 		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, SimpleHotel.class );
