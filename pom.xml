@@ -142,7 +142,7 @@
         <hibernateCommonsAnnotationVersion>4.0.1.Final</hibernateCommonsAnnotationVersion>
         <bytemanVersion>1.5.2</bytemanVersion>
         <jbossLoggingVersion>3.1.0.GA</jbossLoggingVersion>
-        <jbossLoggingProcessorVersion>1.0.1.Final</jbossLoggingProcessorVersion>
+        <jbossLoggingProcessorVersion>1.0.3.Final</jbossLoggingProcessorVersion>
         <jbossJTAVersion>4.16.4.Final</jbossJTAVersion>
     </properties>
 
@@ -764,20 +764,6 @@
                                         <versionRange>[1.0.2,)</versionRange>
                                         <goals>
                                             <goal>bytecode</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.bsc.maven</groupId>
-                                        <artifactId>maven-processor-plugin</artifactId>
-                                        <versionRange>[2.0.2,)</versionRange>
-                                        <goals>
-                                            <goal>process-test</goal>
-                                            <goal>process</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
