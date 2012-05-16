@@ -293,20 +293,57 @@ public final class BridgeFactory {
 	 */
 	public static FieldBridge buildSpatialBridge( Spatial spatial, XClass clazz ) {
 		FieldBridge bridge = null;
-		if ( spatial != null )  {
-			try {
-				if( spatial.spatialMode() == SpatialMode.GRID ) {
-					bridge = new SpatialFieldBridgeByGrid( spatial.topGridLevel(), spatial.bottomGridLevel() );
-				} else {
-					bridge = new SpatialFieldBridgeByRange();
-				}
-			}
-			catch ( Exception e ) {
-				throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
-			}
+		try {
+			bridge = buildSpatialBridge( spatial );
+		}
+		catch ( Exception e ) {
+			throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
 		}
 		if ( bridge == null ) {
 			throw LOG.unableToInstantiateSpatial( clazz.getName(), null);
+		}
+
+		return bridge;
+	}
+
+	/**
+	 * This instantiates the SpatialFieldBridge from a {@code Spatial} annotation.
+	 *
+	 * @param spatial the {@code Spatial} annotation
+	 * @param member the {@code XMember} on which the annotation is defined on
+	 *
+	 * @return Returns the {@code SpatialFieldBridge} instance
+	 */
+	public static FieldBridge buildSpatialBridge( Spatial spatial, XMember member ) {
+		FieldBridge bridge = null;
+		try {
+			bridge = buildSpatialBridge( spatial );
+		}
+		catch ( Exception e ) {
+			throw LOG.unableToInstantiateSpatial( member.getName(), e );
+		}
+		if ( bridge == null ) {
+			throw LOG.unableToInstantiateSpatial( member.getName(), null);
+		}
+
+		return bridge;
+	}
+
+	/**
+	 * This instantiates the SpatialFieldBridge from a {@code Spatial} annotation.
+	 *
+	 * @param spatial the {@code Spatial} annotation
+	 *
+	 * @return Returns the {@code SpatialFieldBridge} instance
+	 */
+	public static FieldBridge buildSpatialBridge( Spatial spatial) {
+		FieldBridge bridge = null;
+		if ( spatial != null )  {
+			if( spatial.spatialMode() == SpatialMode.GRID ) {
+				bridge = new SpatialFieldBridgeByGrid( spatial.topGridLevel(), spatial.bottomGridLevel() );
+			} else {
+				bridge = new SpatialFieldBridgeByRange();
+			}
 		}
 
 		return bridge;
@@ -340,8 +377,7 @@ public final class BridgeFactory {
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
 			Spatial spatialAnn = member.getAnnotation( org.hibernate.search.annotations.Spatial.class );
-			bridge = new SpatialFieldBridgeByGrid( spatialAnn.topGridLevel(),
-					spatialAnn.bottomGridLevel() );
+			bridge = buildSpatialBridge( spatialAnn, member );
 		}
 		else {
 			//find in built-ins

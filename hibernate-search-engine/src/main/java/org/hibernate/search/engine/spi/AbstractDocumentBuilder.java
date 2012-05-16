@@ -908,9 +908,8 @@ public abstract class AbstractDocumentBuilder<T> {
 		String fieldName = null;
 		if( !ann.name().isEmpty() ){
 			fieldName = prefix + ann.name();
-		} else if ( ann.spatialMode() == SpatialMode.SIMPLE ) {
-			fieldName = prefix + "lat/long";
-		} else {
+		}
+		else {
 			throw log.spatialFieldNameNotDefined( clazz.getName() );
 		}
 		propertiesMetadata.classNames.add( fieldName );
