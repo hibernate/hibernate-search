@@ -28,7 +28,11 @@ import org.apache.lucene.document.Field;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -40,6 +44,8 @@ import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
 
 /**
  * Encapsulating the metadata for a single {@code @Field} annotation.
@@ -65,28 +71,43 @@ public class FieldMetadata {
 						 XProperty member,
 						 org.hibernate.search.annotations.Field fieldAnn,
 						 NumericField numericFieldAnn,
+						 Spatial spatialAnn,
 						 ConfigContext context,
 						 ReflectionManager reflectionManager) {
 		ReflectionHelper.setAccessible( member );
 		fieldGetter = member;
-		fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
-		store = fieldAnn.store();
-		index = AnnotationProcessingHelper.getIndex( fieldAnn.index(), fieldAnn.analyze(), fieldAnn.norms() );
-		boost = AnnotationProcessingHelper.getBoost( member, fieldAnn );
-		dynamicBoostStrategy = AnnotationProcessingHelper.getDynamicBoost( member );
-		termVector = AnnotationProcessingHelper.getTermVector( fieldAnn.termVector() );
-		precisionStep = AnnotationProcessingHelper.getPrecisionStep( numericFieldAnn );
-
-		// null token
-		String indexNullAs = fieldAnn.indexNullAs();
-		if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL ) ) {
+		String indexNullAs;
+		Analyzer tmpAnalyzer;
+		if ( fieldAnn != null ) {
+			index = AnnotationProcessingHelper.getIndex( fieldAnn.index(), fieldAnn.analyze(), fieldAnn.norms() );
+			store = fieldAnn.store();
+			fieldName = prefix + ReflectionHelper.getAttributeName( member, fieldAnn.name() );
+			boost = AnnotationProcessingHelper.getBoost( member, fieldAnn );
+			termVector = AnnotationProcessingHelper.getTermVector( fieldAnn.termVector() );
+			// null token
+			indexNullAs = fieldAnn.indexNullAs();
+			if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL ) ) {
+				indexNullAs = null;
+			}
+			else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
+				indexNullAs = context.getDefaultNullToken();
+			}
+			nullToken = indexNullAs;
+			tmpAnalyzer = AnnotationProcessingHelper.getAnalyzer( fieldAnn.analyzer(), context );
+		}
+		else {
+			index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
+			store = spatialAnn.store();
+			fieldName = prefix + ReflectionHelper.getAttributeName( member, spatialAnn.name() );
+			boost = AnnotationProcessingHelper.getBoost( member, spatialAnn );
+			termVector = Field.TermVector.NO;
+			//FIXME what should we do about null tokens in Spatial?
 			indexNullAs = null;
+			nullToken = indexNullAs;
+			tmpAnalyzer = null;
 		}
-		else if ( indexNullAs.equals( org.hibernate.search.annotations.Field.DEFAULT_NULL_TOKEN ) ) {
-			indexNullAs = context.getDefaultNullToken();
-		}
-		nullToken = indexNullAs;
-
+		dynamicBoostStrategy = AnnotationProcessingHelper.getDynamicBoost( member );
+		precisionStep = AnnotationProcessingHelper.getPrecisionStep( numericFieldAnn );
 		FieldBridge bridge = BridgeFactory.guessType( fieldAnn, numericFieldAnn, member, reflectionManager );
 		if ( indexNullAs != null && bridge instanceof TwoWayFieldBridge ) {
 			bridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) bridge, indexNullAs );
@@ -94,7 +115,6 @@ public class FieldMetadata {
 		fieldBridge = bridge;
 
 		// Field > property > entity analyzer
-		Analyzer tmpAnalyzer = AnnotationProcessingHelper.getAnalyzer( fieldAnn.analyzer(), context );
 		if ( tmpAnalyzer == null ) {
 			tmpAnalyzer = AnnotationProcessingHelper.getAnalyzer(
 					member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),

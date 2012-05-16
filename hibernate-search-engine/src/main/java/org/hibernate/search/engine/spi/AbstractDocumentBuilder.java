@@ -93,6 +93,8 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
+
 /**
  * Abstract base class for the document builders.
  *
@@ -461,6 +463,7 @@ public abstract class AbstractDocumentBuilder<T> {
 												  boolean disableOptimizations, PathsContext pathsContext) {
 		checkForField( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForFields( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
+		checkForSpatial( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata, context );
 		checkForIndexedEmbedded(
@@ -604,7 +607,16 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 	}
 
-	private boolean isFieldInPath(org.hibernate.search.annotations.Field fieldAnn, XProperty member,
+	private void checkForSpatial(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context, PathsContext pathsContext) {
+		Spatial spatialAnn = member.getAnnotation( Spatial.class );
+		if ( spatialAnn != null ) {
+			if ( isFieldInPath( spatialAnn, member, pathsContext, prefix ) || level <= maxLevel ) {
+				bindSpatialAnnotation( classHostingMember, member, propertiesMetadata, prefix, spatialAnn, context );
+			}
+		}
+	}
+
+	private boolean isFieldInPath(Annotation fieldAnn, XProperty member,
 			PathsContext pathsContext, String prefix) {
 		if ( pathsContext != null ) {
 			String path = prefix + fieldName( fieldAnn, member );
@@ -616,14 +628,15 @@ public abstract class AbstractDocumentBuilder<T> {
 		return false;
 	}
 
-	private String fieldName(org.hibernate.search.annotations.Field fieldAnn, XProperty member) {
-		if (fieldAnn == null)
+	private String fieldName(Annotation fieldAnn, XProperty member) {
+		if ( fieldAnn == null ) {
 			return member.getName();
-
-		if (fieldAnn.name().isEmpty())
+		}
+		final String fieldName = getFieldName( fieldAnn );
+		if ( fieldName == null || fieldName.isEmpty() ) {
 			return member.getName();
-
-		return fieldAnn.name();
+		}
+		return fieldName;
 	}
 
 	private void checkForContainedIn(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata) {
@@ -933,7 +946,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private void bindSpatialAnnotation(String prefix, PropertiesMetadata propertiesMetadata, Spatial ann, XClass clazz, ConfigContext context) {
-		String fieldName = null;
+		String fieldName;
 		if( !ann.name().isEmpty() ){
 			fieldName = prefix + ann.name();
 		}
@@ -948,12 +961,10 @@ public abstract class AbstractDocumentBuilder<T> {
 		propertiesMetadata.classBridges.add( BridgeFactory.buildSpatialBridge( ann, clazz ) );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
 
-
 		Analyzer analyzer = propertiesMetadata.analyzer;
 		if ( analyzer == null ) {
 			throw new AssertionFailure( "Analyzer should not be undefined" );
 		}
-		addToScopedAnalyzer( fieldName, analyzer, index );
 	}
 
 	private void bindFieldAnnotation(XClass classHostingMember,
@@ -970,10 +981,23 @@ public abstract class AbstractDocumentBuilder<T> {
 			forceStateInspectionOptimizationsDisabled();
 		}
 
-		FieldMetadata fieldMetadata = new FieldMetadata(  prefix, member, fieldAnnotation, numericFieldAnnotation, context, reflectionManager );
+		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, fieldAnnotation, numericFieldAnnotation, null, context, reflectionManager );
 		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		addToScopedAnalyzer( fieldMetadata.getFieldName(), fieldMetadata.getAnalyzer(), fieldMetadata.getIndex() );
 		
+		if ( member.isCollection() ) {
+			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
+		}
+	}
+
+	private void bindSpatialAnnotation(XClass classHostingMember,
+									 XProperty member,
+									 PropertiesMetadata propertiesMetadata,
+									 String prefix,
+									 Spatial fieldAnnotation,
+									 ConfigContext context) {
+		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, null, null, fieldAnnotation, context, reflectionManager );
+		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		if ( member.isCollection() ) {
 			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 		}

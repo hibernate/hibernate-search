@@ -599,4 +599,14 @@ public interface Log extends BasicLogger {
 	@Message(id = 145, value = "Spatial field name not defined for class level annotation on class %1$s")
 	SearchException spatialFieldNameNotDefined( String className );
 
+        @Message(id = 131, value = "The query string '%2$s' applied on field '%1$s' has no meaningfull tokens to be matched. Validate the query input " +
+			"against the Analyzer applied on this field.")
+	EmptyQueryException queryWithNoTermsAfterAnalysis(String field, String searchTerm);
+
+	@Message(id = 132, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '" + JGroupsChannelProvider.MUX_ID + "'.")
+	SearchException missingJGroupsMuxId();
+
+	@Message(id = 133, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
+	SearchException jGroupsMuxIdAlreadyTaken(short n);
+
 }

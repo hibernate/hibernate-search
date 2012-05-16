@@ -37,10 +37,13 @@ import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+
+import java.lang.annotation.Annotation;
 
 /**
  * A helper classes dealing with the processing of annotation. It is there to share some annotation processing
@@ -84,14 +87,25 @@ public final class AnnotationProcessingHelper {
 		}
 	}
 
-	public static Float getBoost(XProperty member, org.hibernate.search.annotations.Field fieldAnn) {
+	public static Float getBoost(XProperty member, Annotation fieldAnn) {
 		float computedBoost = 1.0f;
 		Boost boostAnn = member.getAnnotation( Boost.class );
 		if ( boostAnn != null ) {
 			computedBoost = boostAnn.value();
 		}
 		if ( fieldAnn != null ) {
-			computedBoost *= fieldAnn.boost().value();
+			float boost;
+			if ( fieldAnn instanceof org.hibernate.search.annotations.Field ) {
+				boost = ( ( org.hibernate.search.annotations.Field ) fieldAnn ).boost().value();
+			}
+			else if ( fieldAnn instanceof Spatial ) {
+				boost = ( (Spatial) fieldAnn ).boost().value();
+			}
+			else {
+				raiseAssertionOnIncorrectAnnotation( fieldAnn );
+				boost = 0; //never reached
+			}
+			computedBoost *= boost;
 		}
 		return computedBoost;
 	}
@@ -163,6 +177,24 @@ public final class AnnotationProcessingHelper {
 
 	public static Integer getPrecisionStep(NumericField numericFieldAnn) {
 		return numericFieldAnn == null ? NumericField.PRECISION_STEP_DEFAULT : numericFieldAnn.precisionStep();
+	}
+
+	public static String getFieldName(Annotation fieldAnn) {
+		final String fieldName;
+		if ( fieldAnn instanceof org.hibernate.search.annotations.Field ) {
+			fieldName = ( (org.hibernate.search.annotations.Field) fieldAnn ).name();
+		}
+		else if ( fieldAnn instanceof Spatial ) {
+			fieldName = ( (Spatial) fieldAnn ).name();
+		}
+		else {
+			return raiseAssertionOnIncorrectAnnotation( fieldAnn );
+		}
+		return fieldName;
+	}
+
+	private static String raiseAssertionOnIncorrectAnnotation(Annotation fieldAnn) {
+		throw new AssertionFailure( "Cannot instances other than @Field and @Spatial. Found: " + fieldAnn.getClass() );
 	}
 }
 

@@ -39,7 +39,6 @@ public class Event {
 	@NumericField
 	double longitude;
 
-	@Field(analyze = Analyze.NO)
 	@Spatial(spatialMode = SpatialMode.GRID)
 	public Coordinates getLocation() {
 		return new Coordinates() {
