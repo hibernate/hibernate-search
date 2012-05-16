@@ -35,7 +35,7 @@ import java.util.List;
  * Use denormalized Grid Cell Ids to return a sub set of documents near the center
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridge
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByGrid
  * @see org.hibernate.search.spatial.Coordinates
  */
 public final class GridFilter extends Filter {

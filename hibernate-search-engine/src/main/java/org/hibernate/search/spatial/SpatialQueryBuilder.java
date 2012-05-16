@@ -45,8 +45,8 @@ public abstract class SpatialQueryBuilder {
 	 * @see	Query
 	 * @see	Coordinates
 	 */
-	public static Query buildSpatialQuery(double latitude, double longitude, double radius, String fieldName) {
-		return SpatialQueryBuilderFromPoint.buildSpatialQuery(
+	public static Query buildSpatialQueryByGrid(double latitude, double longitude, double radius, String fieldName) {
+		return SpatialQueryBuilderFromPoint.buildSpatialQueryByGrid(
 				Point.fromDegrees( latitude, longitude ),
 				radius,
 				fieldName
@@ -61,16 +61,18 @@ public abstract class SpatialQueryBuilder {
 	 * @param latitude WGS84 latitude of the center of the search
 	 * @param longitude WGS84 longitude of the center of the search
 	 * @param radius distance max to center in km
+	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *
 	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
 	 * @see	Coordinates
 	 */
-	public static Query buildSimpleSpatialQuery(double latitude, double longitude, double radius) {
-		return SpatialQueryBuilderFromPoint.buildSimpleSpatialQuery(
+	public static Query buildSpatialQueryByRange(double latitude, double longitude, double radius, String fieldName) {
+		return SpatialQueryBuilderFromPoint.buildSpatialQueryByRange(
 				Point.fromDegrees( latitude, longitude ),
-				radius
+				radius,
+				fieldName
 		);
 	}
 }

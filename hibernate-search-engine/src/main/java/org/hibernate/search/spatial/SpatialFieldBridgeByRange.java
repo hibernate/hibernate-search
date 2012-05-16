@@ -30,9 +30,9 @@ import org.hibernate.search.bridge.LuceneOptions;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class SimpleSpatialFieldBridge implements FieldBridge {
+public class SpatialFieldBridgeByRange implements FieldBridge {
 
-	public SimpleSpatialFieldBridge() {}
+	public SpatialFieldBridgeByRange() {}
 
 	/**
 	 * Actual overridden method that does the indexing

@@ -20,17 +20,14 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.SpatialTermination;
-import org.hibernate.search.spatial.SimpleSpatialFieldBridge;
-import org.hibernate.search.spatial.SpatialFieldBridge;
+import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
+import org.hibernate.search.spatial.SpatialFieldBridgeByGrid;
 import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.spatial.impl.Rectangle;
 import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -66,8 +63,8 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 		// FIXME in the future we will likely react to some state stored in SpatialFieldBridge (for the indexing strategy)
 		String coordinatesField = spatialContext.getCoordinatesField();
 		FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
-		if ( fieldBridge instanceof SpatialFieldBridge ) {
-			return SpatialQueryBuilderFromPoint.buildSpatialQuery(
+		if ( fieldBridge instanceof SpatialFieldBridgeByGrid ) {
+			return SpatialQueryBuilderFromPoint.buildSpatialQueryByGrid(
 					Point.fromDegrees(
 							spatialContext.getCoordinates().getLatitude(),
 							spatialContext.getCoordinates().getLongitude()
@@ -76,13 +73,14 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 					coordinatesField
 			);
 		}
-		else if ( fieldBridge instanceof SimpleSpatialFieldBridge ) {
-			return SpatialQueryBuilderFromPoint.buildSimpleSpatialQuery(
+		else if ( fieldBridge instanceof SpatialFieldBridgeByRange ) {
+			return SpatialQueryBuilderFromPoint.buildSpatialQueryByRange(
 					Point.fromDegrees(
 							spatialContext.getCoordinates().getLatitude(),
 							spatialContext.getCoordinates().getLongitude()
 					),
-					spatialContext.getRadiusDistance() //always in KM so far, no need to convert
+					spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
+					coordinatesField
 			);
 		}
 		else {
