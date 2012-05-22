@@ -137,7 +137,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
                 try {
                     channel.connect(clusterName);
                 } catch (Exception e) {
-                    throw log.unabletoConnectToJGroupsCluster(clusterName, e);
+                    throw log.unableConnectingToJGroupsCluster(clusterName, e);
                 }
             }
             sender = new ChannelMessageSender(channel);
