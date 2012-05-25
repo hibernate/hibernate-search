@@ -69,9 +69,11 @@ public class JmsMasterSlaveRegistrationIT {
 
 	private static final File TEMP_DIR_PATH = Files.createTempDir();
 
-	private static final int REFRESH_PERIOD_IN_SEC = 5;
+	private static final int REFRESH_PERIOD_IN_SEC = 2;
 
 	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION = ( REFRESH_PERIOD_IN_SEC + 1 ) * 1000;
+
+	private static final int MAX_SEARCH_ATTEMPTS = 3;
 
 	@Deployment(name = "master", order = 1, testable = false)
 	public static Archive<?> createTestArchiveMaster() throws Exception {
@@ -173,8 +175,12 @@ public class JmsMasterSlaveRegistrationIT {
 		List<RegisteredMember> results = memberRegistration.search( "Davide" );
 		assertEquals( "Result found before synchronization", 0, results.size() );
 
-		waitForIndexSynchronization();
-		results = memberRegistration.search( "Davide" );
+		int attempts = 0;
+		do {
+			attempts ++;
+			waitForIndexSynchronization();
+			results = memberRegistration.search( "Davide" );
+		} while ( results.size() == 0 && attempts < MAX_SEARCH_ATTEMPTS );
 
 		assertEquals( "Unexpected number of results from search", 1, results.size() );
 		assertEquals( "Unexpected result from search", "Davide D'Alto", results.get( 0 ).getName() );
