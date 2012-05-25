@@ -37,7 +37,7 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 
 @Stateful
-public class SlaveRegistrationController {
+public class RegistrationController {
 
 	@PersistenceContext
 	private EntityManager em;

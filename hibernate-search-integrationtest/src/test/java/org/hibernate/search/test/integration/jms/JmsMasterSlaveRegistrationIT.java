@@ -33,8 +33,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.hibernate.search.Version;
-import org.hibernate.search.test.integration.jms.controller.MasterRegistrationController;
-import org.hibernate.search.test.integration.jms.controller.SlaveRegistrationController;
+import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
+import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -69,62 +69,59 @@ public class JmsMasterSlaveRegistrationIT {
 
 	private static final File TEMP_DIR_PATH = Files.createTempDir();
 
-	private static final int REFRESH_PERIOD_IN_SEC = 2;
+	private static final int REFRESH_PERIOD_IN_SEC = 4;
 
 	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION = ( REFRESH_PERIOD_IN_SEC + 1 ) * 1000;
 
 	private static final int MAX_SEARCH_ATTEMPTS = 3;
 
-	@Deployment(name = "master", order = 1, testable = false)
-	public static Archive<?> createTestArchiveMaster() throws Exception {
-		return ShrinkWrap
-				.create( WebArchive.class, "jms-master.war" )
-				.addClasses( MasterRegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class )
-				.addAsResource( masterPersistenceXml(), "META-INF/persistence.xml" )
-				.addAsLibraries( libraries() )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
-				.addAsWebInfResource( hornetqJmsXml(), "hornetq-jms.xml" );
+	@Deployment(name = "master", order = 1 )
+	public static Archive<?> createDeploymentMaster() throws Exception {
+		return baseArchive( "master", masterPersistenceXml() )
+				.addClass( RegistrationMdb.class )
+				.addAsWebInfResource( hornetqJmsXml(), "hornetq-jms.xml" )
+				;
 	}
 
 	@Deployment(name = "slave-1", order = 2)
-	public static Archive<?> createTestArchiveSlave1() throws Exception {
-		return slaveArchive(1);
+	public static Archive<?> createDeploymentSlave1() throws Exception {
+		String name = "slave-1";
+		return baseArchive( name, slavePersitenceXml( name ) );
 	}
 
 	@Deployment(name = "slave-2", order = 3)
-	public static Archive<?> createTestArchiveSlave2() throws Exception {
-		return slaveArchive(2);
+	public static Archive<?> createDeploymentSlave2() throws Exception {
+		String name = "slave-2";
+		return baseArchive( name, slavePersitenceXml( name ) );
 	}
 
-	private static Archive<?> slaveArchive(int index) throws Exception {
+	private static WebArchive baseArchive(String name, PersistenceUnitDef unitDef) throws Exception {
 		return ShrinkWrap
-				.create( WebArchive.class, "jms-slave-" + index + ".war" )
-				.addClasses( SlaveRegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class )
-				.addAsResource( slavePersitenceXml(index), "META-INF/persistence.xml" )
+				.create( WebArchive.class, name + ".war" )
+				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class )
+				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsLibraries( libraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				;
 	}
 
-	private static Asset masterPersistenceXml() throws Exception {
-		PersistenceUnitDef persistenceXml = commonUnitDef( "pu-master", "filesystem-master" )
+	private static PersistenceUnitDef masterPersistenceXml() throws Exception {
+		return commonUnitDef( "pu-master", "filesystem-master" )
 				.property( "hibernate.search.default.indexBase", location( "index-master" ) )
 				;
-		return new StringAsset( persistenceXml.exportAsString() );
 	}
 
-	private static Asset slavePersitenceXml(int index) throws Exception {
-		PersistenceUnitDef persistenceXml = commonUnitDef( "pu-slave-" + index, "filesystem-slave" )
+	private static PersistenceUnitDef slavePersitenceXml(String name) throws Exception {
+		return commonUnitDef( "pu-" + name, "filesystem-slave" )
 				.property( "hibernate.search.default.worker.backend", "jms" )
 				.property( "hibernate.search.default.worker.jms.connection_factory", "ConnectionFactory" )
 				.property( "hibernate.search.default.worker.jms.queue", RegistrationConfiguration.DESTINATION_QUEUE )
-				.property( "hibernate.search.default.indexBase", location( "index-slave-" + index ) )
+				.property( "hibernate.search.default.indexBase", location( "index-" + name ) )
 				;
-		return new StringAsset( persistenceXml.exportAsString() );
 	}
 
 	private static PersistenceUnitDef commonUnitDef(String unitName, String directoryProvider) throws Exception {
-		PersistenceUnitDef persistenceXml = Descriptors.create( PersistenceDescriptor.class ).version( "2.0" )
+		return Descriptors.create( PersistenceDescriptor.class ).version( "2.0" )
 				.persistenceUnit( unitName ).jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.property( "hibernate.hbm2ddl.auto", "update" )
 				.property( "hibernate.search.default.lucene_version", "LUCENE_CURRENT" )
@@ -133,7 +130,6 @@ public class JmsMasterSlaveRegistrationIT {
 				.property( "hibernate.search.default.refresh", REFRESH_PERIOD_IN_SEC )
 				.property( "hibernate.search.default.worker.execution", "sync" )
 				;
-		return persistenceXml;
 	}
 
 	private static Collection<JavaArchive> libraries() {
@@ -164,7 +160,7 @@ public class JmsMasterSlaveRegistrationIT {
 	}
 
 	@Inject
-	SlaveRegistrationController memberRegistration;
+	RegistrationController memberRegistration;
 
 	@Test
 	@InSequence(1)
@@ -190,6 +186,16 @@ public class JmsMasterSlaveRegistrationIT {
 	@InSequence(2)
 	@OperateOnDeployment("slave-2")
 	public void searchMemberOnDifferentSlave() throws Exception {
+		List<RegisteredMember> results = memberRegistration.search( "Davide" );
+
+		assertEquals( "Unexpected number of results from search", 1, results.size() );
+		assertEquals( "Unexpected result from search", "Davide D'Alto", results.get( 0 ).getName() );
+	}
+
+	@Test
+	@InSequence(3)
+	@OperateOnDeployment("master")
+	public void searchMemberOnMaster() throws Exception {
 		List<RegisteredMember> results = memberRegistration.search( "Davide" );
 
 		assertEquals( "Unexpected number of results from search", 1, results.size() );
