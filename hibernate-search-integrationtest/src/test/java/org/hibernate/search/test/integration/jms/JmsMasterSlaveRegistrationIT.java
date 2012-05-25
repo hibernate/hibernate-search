@@ -23,18 +23,17 @@
  */
 package org.hibernate.search.test.integration.jms;
 
+import static org.hibernate.search.test.integration.jms.util.RegistrationConfiguration.indexLocation;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.hibernate.search.Version;
-import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
+import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -56,8 +55,6 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.common.io.Files;
-
 /**
  * Integration test for hibernate search JMS Master/Slave configuration.
  *
@@ -66,8 +63,6 @@ import com.google.common.io.Files;
  */
 @RunWith(Arquillian.class)
 public class JmsMasterSlaveRegistrationIT {
-
-	private static final File TEMP_DIR_PATH = Files.createTempDir();
 
 	private static final int REFRESH_PERIOD_IN_SEC = 4;
 
@@ -107,7 +102,7 @@ public class JmsMasterSlaveRegistrationIT {
 
 	private static PersistenceUnitDef masterPersistenceXml() throws Exception {
 		return commonUnitDef( "pu-master", "filesystem-master" )
-				.property( "hibernate.search.default.indexBase", location( "index-master" ) )
+				.property( "hibernate.search.default.indexBase", indexLocation( "index-master" ) )
 				;
 	}
 
@@ -116,7 +111,7 @@ public class JmsMasterSlaveRegistrationIT {
 				.property( "hibernate.search.default.worker.backend", "jms" )
 				.property( "hibernate.search.default.worker.jms.connection_factory", "ConnectionFactory" )
 				.property( "hibernate.search.default.worker.jms.queue", RegistrationConfiguration.DESTINATION_QUEUE )
-				.property( "hibernate.search.default.indexBase", location( "index-" + name ) )
+				.property( "hibernate.search.default.indexBase", indexLocation( "index-" + name ) )
 				;
 	}
 
@@ -126,7 +121,7 @@ public class JmsMasterSlaveRegistrationIT {
 				.property( "hibernate.hbm2ddl.auto", "update" )
 				.property( "hibernate.search.default.lucene_version", "LUCENE_CURRENT" )
 				.property( "hibernate.search.default.directory_provider", directoryProvider )
-				.property( "hibernate.search.default.sourceBase", location( "sourceBase" ) )
+				.property( "hibernate.search.default.sourceBase", indexLocation( "sourceBase" ) )
 				.property( "hibernate.search.default.refresh", REFRESH_PERIOD_IN_SEC )
 				.property( "hibernate.search.default.worker.execution", "sync" )
 				;
@@ -135,7 +130,7 @@ public class JmsMasterSlaveRegistrationIT {
 	private static Collection<JavaArchive> libraries() {
 		String currentVersion = Version.getVersionString();
 		return DependencyResolvers.use( MavenDependencyResolver.class )
-				.artifacts( "org.hibernate:hibernate-search-orm:" + currentVersion, "com.google.guava:guava:r05" )
+				.artifacts( "org.hibernate:hibernate-search-orm:" + currentVersion )
 				.exclusion( "org.hibernate:hibernate-entitymanager" )
 				.exclusion( "org.hibernate:hibernate-core" )
 				.exclusion( "org.hibernate:hibernate-search-analyzers" )
@@ -211,15 +206,6 @@ public class JmsMasterSlaveRegistrationIT {
 
 	private void waitForIndexSynchronization() throws InterruptedException {
 		Thread.sleep( SLEEP_TIME_FOR_SYNCHRONIZATION );
-	}
-
-	private static String location(String type) {
-		try {
-			return TEMP_DIR_PATH.getCanonicalPath() + File.separator + type;
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException( e.getMessage() );
-		}
 	}
 
 }

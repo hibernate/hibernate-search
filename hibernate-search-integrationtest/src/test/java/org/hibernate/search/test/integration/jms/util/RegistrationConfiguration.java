@@ -23,8 +23,39 @@
  */
 package org.hibernate.search.test.integration.jms.util;
 
+import java.io.File;
+import java.io.IOException;
+
 public class RegistrationConfiguration {
 
 	public static final String DESTINATION_QUEUE = "queue/hsearch";
+
+	private static final File TEMP_DIR_PATH = createTempDir();
+
+	private static final int MAX_ATTEMPTS = 3;
+
+	private static File createTempDir() {
+		int attempts = 0;
+		File baseDir = new File( System.getProperty( "java.io.tmpdir" ) );
+		do {
+			attempts++;
+			String baseName = System.currentTimeMillis() + "_" + attempts;
+			File tempDir = new File( baseDir, baseName );
+			if ( tempDir.mkdir() ) {
+				return tempDir;
+			}
+		} while ( attempts < MAX_ATTEMPTS );
+
+		throw new RuntimeException( "Impossible to create folder directory for indexes" );
+	}
+
+	public static String indexLocation(String name) {
+		try {
+			return TEMP_DIR_PATH.getCanonicalPath() + File.separator + name;
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException( e.getMessage() );
+		}
+	}
 
 }
