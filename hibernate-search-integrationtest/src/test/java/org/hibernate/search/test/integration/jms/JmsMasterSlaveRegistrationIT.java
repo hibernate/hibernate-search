@@ -25,6 +25,8 @@ package org.hibernate.search.test.integration.jms;
 
 import static org.hibernate.search.test.integration.jms.util.RegistrationConfiguration.indexLocation;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.InputStream;
@@ -66,7 +68,7 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class JmsMasterSlaveRegistrationIT {
 
-	private static final int REFRESH_PERIOD_IN_SEC = 4;
+	private static final int REFRESH_PERIOD_IN_SEC = 5;
 
 	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION = ( REFRESH_PERIOD_IN_SEC + 1 ) * 1000;
 
@@ -163,12 +165,46 @@ public class JmsMasterSlaveRegistrationIT {
 	@Test
 	@InSequence(1)
 	@OperateOnDeployment("slave-1")
-	public void registerNewMemberAndSearchIt() throws Exception {
-		registerMember("Davide D'Alto", "dd@slave1.fake.email");
+	public void registerNewMember() throws Exception {
+		RegisteredMember newMember = memberRegistration.getNewMember();
+		assertNull( "A non registered member should have null ID", newMember.getId() );
 
+		newMember.setName( "Davide D'Alto" );
+		newMember.setEmail( "dd@slave1.fake.email" );
+		memberRegistration.register();
+
+		assertNotNull( "A registered member should have an ID", newMember.getId() );
+	}
+
+	@Test
+	@InSequence(2)
+	@OperateOnDeployment("master")
+	public void searchNewMemberBeforeSynchronizationOnMaster() throws Exception {
 		List<RegisteredMember> results = memberRegistration.search( "Davide" );
-		assertEquals( "Result found before synchronization", 0, results.size() );
+		assertEquals( "Result found before synchronization on Master", 0, results.size() );
+	}
 
+	@Test
+	@InSequence(3)
+	@OperateOnDeployment("slave-1")
+	public void searchNewMemberBeforeSynchronizationOnSlave1() throws Exception {
+		List<RegisteredMember> results = memberRegistration.search( "Davide" );
+		assertEquals( "Result found before synchronization on Slave 1", 0, results.size() );
+	}
+
+	@Test
+	@InSequence(4)
+	@OperateOnDeployment("slave-2")
+	public void searchNewMemberBeforeSynchronizationOnSlave2() throws Exception {
+		List<RegisteredMember> results = memberRegistration.search( "Davide" );
+		assertEquals( "Result found before synchronization on Slave 2", 0, results.size() );
+	}
+
+	@Test
+	@InSequence(5)
+	@OperateOnDeployment("slave-1")
+	public void searchNewMemberAfterSynchronizationOnSlave1() throws Exception {
+		List<RegisteredMember> results;
 		int attempts = 0;
 		do {
 			attempts ++;
@@ -181,9 +217,9 @@ public class JmsMasterSlaveRegistrationIT {
 	}
 
 	@Test
-	@InSequence(2)
+	@InSequence(6)
 	@OperateOnDeployment("slave-2")
-	public void searchMemberOnDifferentSlave() throws Exception {
+	public void searchNewMemberAfterSynchronizationOnSlave2() throws Exception {
 		List<RegisteredMember> results = memberRegistration.search( "Davide" );
 
 		assertEquals( "Unexpected number of results from search", 1, results.size() );
@@ -191,20 +227,13 @@ public class JmsMasterSlaveRegistrationIT {
 	}
 
 	@Test
-	@InSequence(3)
+	@InSequence(7)
 	@OperateOnDeployment("master")
-	public void searchMemberOnMaster() throws Exception {
+	public void searchNewMemberAfterSynchronizationOnMaster() throws Exception {
 		List<RegisteredMember> results = memberRegistration.search( "Davide" );
 
 		assertEquals( "Unexpected number of results from search", 1, results.size() );
 		assertEquals( "Unexpected result from search", "Davide D'Alto", results.get( 0 ).getName() );
-	}
-
-	private void registerMember(String name, String email) throws Exception {
-		RegisteredMember newMember = memberRegistration.getNewMember();
-		newMember.setName( name );
-		newMember.setEmail( email );
-		memberRegistration.register();
 	}
 
 	private void waitForIndexSynchronization() throws InterruptedException {
