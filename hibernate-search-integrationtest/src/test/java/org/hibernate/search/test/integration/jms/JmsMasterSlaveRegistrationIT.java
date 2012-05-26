@@ -68,7 +68,7 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class JmsMasterSlaveRegistrationIT {
 
-	private static final int REFRESH_PERIOD_IN_SEC = 5;
+	private static final int REFRESH_PERIOD_IN_SEC = 10;
 
 	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION = ( REFRESH_PERIOD_IN_SEC + 1 ) * 1000;
 
