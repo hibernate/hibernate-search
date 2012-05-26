@@ -26,12 +26,15 @@ package org.hibernate.search.test.integration.jms;
 import static org.hibernate.search.test.integration.jms.util.RegistrationConfiguration.indexLocation;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.Version;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
@@ -45,13 +48,12 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.importer.ZipImporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceUnitDef;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -127,17 +129,18 @@ public class JmsMasterSlaveRegistrationIT {
 				;
 	}
 
-	private static Collection<JavaArchive> libraries() {
-		String currentVersion = Version.getVersionString();
-		return DependencyResolvers.use( MavenDependencyResolver.class )
-				.artifacts( "org.hibernate:hibernate-search-orm:" + currentVersion )
-				.exclusion( "org.hibernate:hibernate-entitymanager" )
-				.exclusion( "org.hibernate:hibernate-core" )
-				.exclusion( "org.hibernate:hibernate-search-analyzers" )
-				.exclusion( "org.hibernate.common:hibernate-commons-annotations" )
-				.exclusion( "org.jboss.logging:jboss-logging" )
-				.resolveAs( JavaArchive.class )
-				;
+	private static Collection<JavaArchive> libraries() throws Exception {
+		Collection<JavaArchive> libs = new ArrayList<JavaArchive>();
+		File libDir = new File(getLibrariesDirectory());
+		for ( String lib : libDir.list() ) {
+			JavaArchive javaArchive = ShrinkWrap
+					.create( ZipImporter.class, lib )
+					.importFrom( new File( libDir, lib ) )
+					.as( JavaArchive.class )
+					;
+			libs.add( javaArchive );
+		}
+		return libs;
 	}
 
 	private static Asset hornetqJmsXml() {
@@ -206,6 +209,14 @@ public class JmsMasterSlaveRegistrationIT {
 
 	private void waitForIndexSynchronization() throws InterruptedException {
 		Thread.sleep( SLEEP_TIME_FOR_SYNCHRONIZATION );
+	}
+
+	private static String getLibrariesDirectory() throws Exception {
+		InputStream resourceAsStream = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream( "integration-test.properties" );
+		Properties properties = new Properties();
+		properties.load( resourceAsStream );
+		return properties.getProperty( "lib.dir" );
 	}
 
 }
