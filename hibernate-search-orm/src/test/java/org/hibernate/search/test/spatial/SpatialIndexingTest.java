@@ -133,6 +133,49 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	public void testSpatialAnnotationOnFieldLevelRangeMode() throws Exception {
+		SimpleDateFormat dateFormat= new SimpleDateFormat("d M yyyy");
+		Date date= dateFormat.parse( "10 9 1976" );
+		RangeEvent event = new RangeEvent( 1, "Test", 24.0d, 32.0d, date );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( event );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
+				centerLatitude,
+				centerLongitude,
+				50,
+				"location"
+		);
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, RangeEvent.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByRange(
+				centerLatitude,
+				centerLongitude,
+				51,
+				"location"
+		);
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, RangeEvent.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + RangeEvent.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
 	public void testSpatialAnnotationOnClassLevel() throws Exception {
 		Hotel hotel = new Hotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -240,7 +283,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 				POI.class,
 				Event.class,
 				Hotel.class,
-				SimpleHotel.class
+				SimpleHotel.class,
+				RangeEvent.class
 		};
 	}
 }
