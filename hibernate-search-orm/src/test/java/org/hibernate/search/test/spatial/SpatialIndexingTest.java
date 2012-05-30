@@ -277,6 +277,46 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	public void testSpatialAnnotationOnEmbeddableFieldLevel() throws Exception {
+		Restaurant restaurant = new Restaurant( 1, "Al's kitchen", "42, space avenue CA8596 BYOB Street",  24.0d, 32.0d);
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( restaurant );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
+				centerLatitude,
+				centerLongitude,
+				50,
+				"position.location"
+		);
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Restaurant.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByRange(
+				centerLatitude,
+				centerLongitude,
+				51,
+				"position.location"
+		);
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Restaurant.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + Restaurant.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
@@ -284,7 +324,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 				Event.class,
 				Hotel.class,
 				RangeHotel.class,
-				RangeEvent.class
+				RangeEvent.class,
+				Restaurant.class
 		};
 	}
 }
