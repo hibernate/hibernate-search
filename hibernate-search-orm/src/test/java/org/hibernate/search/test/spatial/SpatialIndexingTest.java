@@ -217,10 +217,10 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
-	public void testSimpleSpatialAnnotationOnClassLevel() throws Exception {
-		SimpleHotel hotel = new SimpleHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
-		SimpleHotel hotel2 = new SimpleHotel( 2, "End of the world Hotel - Left", 0.0d, 179.0d, "Roots" );
-		SimpleHotel hotel3 = new SimpleHotel( 3, "End of the world Hotel - Right", 0.0d, -179.0d, "Cosy" );
+	public void testSpatialAnnotationOnClassLevelRangeMode() throws Exception {
+		RangeHotel hotel = new RangeHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
+		RangeHotel hotel2 = new RangeHotel( 2, "End of the world Hotel - Left", 0.0d, 179.0d, "Roots" );
+		RangeHotel hotel3 = new RangeHotel( 3, "End of the world Hotel - Right", 0.0d, -179.0d, "Cosy" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
 		Transaction tx = fullTextSession.beginTransaction();
@@ -238,7 +238,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				centerLatitude, centerLongitude, 50, "location"
 		);
 
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, SimpleHotel.class );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, RangeHotel.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
@@ -246,7 +246,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				centerLatitude, centerLongitude, 51, "location"
 		);
 
-		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, SimpleHotel.class );
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, RangeHotel.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
 
@@ -257,7 +257,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				endOfTheWorldLatitude, endOfTheWorldLongitude, 112, "location"
 		);
 
-		org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, SimpleHotel.class );
+		org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, RangeHotel.class );
 		List results3 = hibQuery3.list();
 		Assert.assertEquals( 2, results3.size() );
 
@@ -265,11 +265,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 				endOfTheWorldLatitude, endOfTheWorldLongitude, 100000, "location"
 		);
 
-		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, SimpleHotel.class );
+		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, RangeHotel.class );
 		List results4 = hibQuery4.list();
 		Assert.assertEquals( 3, results4.size() );
 
-		List<?> events = fullTextSession.createQuery( "from " + SimpleHotel.class.getName() ).list();
+		List<?> events = fullTextSession.createQuery( "from " + RangeHotel.class.getName() ).list();
 		for (Object entity : events) {
 			fullTextSession.delete( entity );
 		}
@@ -283,7 +283,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 				POI.class,
 				Event.class,
 				Hotel.class,
-				SimpleHotel.class,
+				RangeHotel.class,
 				RangeEvent.class
 		};
 	}
