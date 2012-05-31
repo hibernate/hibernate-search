@@ -37,6 +37,7 @@ import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.builtin.LongBridge;
 import org.hibernate.search.cfg.ConcatStringBridge;
@@ -155,7 +156,18 @@ public class ProgrammaticSearchMappingFactory {
 							.name("blog-entry-created")
 								.analyzer("en")
 								.store(Store.YES)
-								.dateBridge(Resolution.DAY);
+								.dateBridge(Resolution.DAY)
+				.entity( POI.class ).indexed()
+					.property( "name", ElementType.METHOD )
+						.field()
+					.property( "location", ElementType.METHOD )
+						.spatial().spatialMode( SpatialMode.GRID )
+				.entity( POI2.class).indexed()
+					.spatial().name( "location" ).spatialMode( SpatialMode.GRID )
+					.property( "name", ElementType.METHOD )
+						.field()
+		;
+
 		return mapping;
 	}
 }

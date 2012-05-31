@@ -41,6 +41,7 @@ public class EntityDescriptor {
 	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
 	private Map<String, Object> providedId;
 	private Set<Map<String, Object>> classBridges = new HashSet<Map<String, Object>>();
+	private Set<Map<String, Object>> spatials = new HashSet<Map<String, Object>>();
 	private Map<String, Object> dynamicBoost;
 	private Map<String, Object> cacheInMemory;
 
@@ -117,6 +118,14 @@ public class EntityDescriptor {
 		return classBridges;
 	}
 
+	public void addSpatial(Map<String,Object> spatial) {
+		spatials.add(spatial);
+	}
+
+	public Set<Map<String, Object>> getSpatials() {
+		return spatials;
+	}
+
 	public void setProvidedId(Map<String, Object> providedId) {
 		this.providedId = providedId;
 	}
@@ -134,8 +143,8 @@ public class EntityDescriptor {
 	}
 
 	private static class PropertyKey {
-		private String name;
-		private ElementType type;
+		private final String name;
+		private final ElementType type;
 
 		PropertyKey(String name, ElementType type) {
 			this.name = name;

@@ -71,4 +71,8 @@ public class DocumentIdMapping {
 		return new FieldBridgeDirectMapping( property, entity, mapping, fieldBridge );
 	}
 
+	public PropertySpatialMapping spatial() {
+		return new PropertySpatialMapping(property, entity, mapping);
+	}
+
 }
