@@ -9,11 +9,13 @@ import javax.inject.Inject;
 
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
+import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Archive;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +29,7 @@ import org.junit.runner.RunWith;
  * synchronization of the indexes occurs.
  *
  * @author "Davide D'Alto"
+ * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
 public class SearchBeforeIndexSynchronizationJmsMasterSlaveIT {
@@ -156,5 +159,10 @@ public class SearchBeforeIndexSynchronizationJmsMasterSlaveIT {
 
 	private List<RegisteredMember> search(String name) throws InterruptedException {
 		return memberRegistration.search( name );
+	}
+
+	@AfterClass
+	public static void cleanup() {
+		RegistrationConfiguration.removeRootTempDirectory();
 	}
 }

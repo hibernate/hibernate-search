@@ -26,6 +26,8 @@ package org.hibernate.search.test.integration.jms.util;
 import java.io.File;
 import java.io.IOException;
 
+import org.hibernate.search.util.impl.FileHelper;
+
 public class RegistrationConfiguration {
 
 	public static final String DESTINATION_QUEUE = "queue/hsearch";
@@ -56,6 +58,10 @@ public class RegistrationConfiguration {
 		catch ( IOException e ) {
 			throw new RuntimeException( e.getMessage() );
 		}
+	}
+
+	public static void removeRootTempDirectory() {
+		FileHelper.delete( TEMP_DIR_PATH );
 	}
 
 }
