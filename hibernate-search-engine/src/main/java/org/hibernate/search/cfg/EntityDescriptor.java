@@ -42,6 +42,7 @@ public class EntityDescriptor {
 	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
 	private Map<String,Object> providedId;
 	private Set<Map<String,Object>> classBridges = new HashSet<Map<String,Object>>();
+	private Set<Map<String,Object>> spatials = new HashSet<Map<String,Object>>();
 	private Map<String, Object> dynamicBoost;
 	private Map<String, Object> cacheInMemory;
 	
@@ -115,11 +116,19 @@ public class EntityDescriptor {
 	public void addClassBridgeDef(Map<String,Object> classBridge) {
 		classBridges.add(classBridge);
 	}
-	
+
 	public Set<Map<String, Object>> getClassBridgeDefs() {
 		return classBridges;
 	}
-	
+
+	public void addSpatial(Map<String,Object> spatial) {
+		spatials.add(spatial);
+	}
+
+	public Set<Map<String, Object>> getSpatials() {
+		return spatials;
+	}
+
 	public void setProvidedId(Map<String, Object> providedId) {
 		this.providedId = providedId;
 	}

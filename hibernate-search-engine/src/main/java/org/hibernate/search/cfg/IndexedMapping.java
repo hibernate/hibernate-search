@@ -116,5 +116,9 @@ public class IndexedMapping {
 	public ProvidedIdMapping providedId() {
 		return new ProvidedIdMapping(mapping,entity);
 	}
+
+	public EntitySpatialMapping spatial() {
+		return new EntitySpatialMapping( mapping, entity);
+	}
 	
 }

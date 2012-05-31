@@ -28,62 +28,60 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
-import org.hibernate.search.analyzer.Discriminator;
-import org.hibernate.search.engine.BoostStrategy;
+
+import org.hibernate.search.annotations.SpatialMode;
+import org.hibernate.search.annotations.Store;
 
 /**
- * @author Emmanuel Bernard
+ * @author Nicolas Helleringer
  */
-public class EntityMapping {
-	private SearchMapping mapping;
-	private EntityDescriptor entity;
-	
-	public EntityMapping(Class<?> entityType, SearchMapping mapping) {
+public class EntitySpatialMapping {
+	private final SearchMapping mapping;
+	private final EntityDescriptor entity;
+	private final Map<String, Object> spatial = new HashMap<String, Object>();
+
+	public EntitySpatialMapping(SearchMapping mapping, EntityDescriptor entity) {
 		this.mapping = mapping;
-		entity = mapping.getEntity(entityType);
-	}
-	
-	public IndexedMapping indexed() {
-		return new IndexedMapping(mapping,entity, this);
+		this.entity = entity;
+		this.entity.addSpatial(spatial);
 	}
 
-	public EntitySpatialMapping spatial() {
-		return new EntitySpatialMapping( mapping, entity );
-	}
-	
-	public EntityMapping similarity(Class<?> impl) {
-		Map<String, Object> similarity = new HashMap<String, Object>(1);
-		similarity.put( "impl", impl );
-		entity.setSimilariy(similarity);
+	public EntitySpatialMapping name(String fieldName) {
+		spatial.put( "name", fieldName );
 		return this;
 	}
 
-	public EntityMapping boost(float boost) {
+	public EntitySpatialMapping store(Store store) {
+		spatial.put( "store", store );
+		return this;
+	}
+
+	public EntitySpatialMapping boost(float boost) {
 		final Map<String, Object> boostAnn = new HashMap<String, Object>();
 		boostAnn.put( "value", boost );
-		entity.setBoost(boostAnn);
+		spatial.put( "boost", boostAnn );
 		return this;
 	}
 
-	public EntityMapping dynamicBoost(Class<? extends BoostStrategy>  impl) {
-		final Map<String, Object> dynamicBoost = new HashMap<String, Object>();
-		dynamicBoost.put("impl", impl);
-		entity.setDynamicBoost(dynamicBoost);
+	public EntitySpatialMapping spatialMode(SpatialMode spatialMode) {
+		spatial.put( "spatialMode", spatialMode );
 		return this;
 	}
-	
-	public EntityMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
-		final Map<String, Object> discriminatorAnn = new HashMap<String, Object>();
-		discriminatorAnn.put( "impl", discriminator );
-		entity.setAnalyzerDiscriminator(discriminatorAnn);
+
+	public EntitySpatialMapping topGridLevel(int topGridLevel) {
+		spatial.put( "topGridLevel", topGridLevel );
 		return this;
 	}
-	
-	
+
+	public EntitySpatialMapping bottomGridLevel(int bottomGridLevel) {
+		spatial.put( "bottomGridLevel", bottomGridLevel );
+		return this;
+	}
+
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
 		return new FullTextFilterDefMapping(mapping,name, impl);
 	}
-	
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping(name, type, entity, mapping);
 	}
@@ -96,8 +94,4 @@ public class EntityMapping {
 		return new EntityMapping(entityType, mapping);
 	}
 
-	public ClassBridgeMapping classBridge(Class<?> impl) {
-		return new ClassBridgeMapping(mapping, entity, impl, this);
-	}
-	
 }

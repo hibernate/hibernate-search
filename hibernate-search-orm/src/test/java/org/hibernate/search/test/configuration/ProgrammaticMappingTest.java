@@ -51,6 +51,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.ManualTransactionContext;
@@ -634,6 +635,88 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		lib2Score = getScore( new TermQuery( new Term( "name", "two" ) ) );
 		assertTrue( "lib1score should be greater than lib2score", lib1Score > lib2Score );
 	}
+
+	public void testSpatial() {
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		POI poi = new POI( "test", 24.0, 32.0d );
+		s.persist( poi );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.getFullTextSession( s );
+
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				50,
+				"location"
+		);
+		org.hibernate.Query hibQuery = session.createFullTextQuery( luceneQuery, POI.class );
+		List results = hibQuery.list();
+		assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				51,
+				"location"
+		);
+		org.hibernate.Query hibQuery2 = session.createFullTextQuery( luceneQuery2, POI.class );
+		List results2 = hibQuery2.list();
+		assertEquals( 1, results2.size() );
+
+		List<?> events = session.createQuery( "from " + POI.class.getName() ).list();
+		for (Object entity : events) {
+			session.delete( entity );
+		}
+		tx.commit();
+		session.close();
+
+		 s = openSession();
+		 tx = s.beginTransaction();
+		POI2 poi2 = new POI2( "test", 24.0, 32.0d );
+		s.persist( poi2 );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		session = Search.getFullTextSession( s );
+
+		centerLatitude= 24;
+		centerLongitude= 31.5;
+
+		luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				50,
+				"location"
+		);
+		hibQuery = session.createFullTextQuery( luceneQuery, POI2.class );
+		results = hibQuery.list();
+		assertEquals( 0, results.size() );
+
+		luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				51,
+				"location"
+		);
+		hibQuery2 = session.createFullTextQuery( luceneQuery2, POI2.class );
+		results2 = hibQuery2.list();
+		assertEquals( 1, results2.size() );
+
+		events = session.createQuery( "from " + POI2.class.getName() ).list();
+		for (Object entity : events) {
+			session.delete( entity );
+		}
+		tx.commit();
+		session.close();
+	}
 	
 	private float getScore(Query query) {
 		Session session = openSession();
@@ -733,8 +816,9 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				ProductCatalog.class,
 				Item.class,
 				Departments.class,
-				DynamicBoostedDescLibrary.class
-				
+				DynamicBoostedDescLibrary.class,
+				POI.class,
+				POI2.class
 		};
 	}	
 }

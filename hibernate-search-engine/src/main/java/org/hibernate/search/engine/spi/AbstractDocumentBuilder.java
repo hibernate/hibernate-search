@@ -66,7 +66,7 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
+import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.LuceneWork;
@@ -441,9 +441,16 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 		
 		//Check for Spatial annotation on class level
-		Spatial spatiaAnn = clazz.getAnnotation( Spatial.class );
-		if ( spatiaAnn != null ) {
-			bindSpatialAnnotation( prefix, propertiesMetadata, spatiaAnn, clazz, context );
+		Spatial spatialAnn = clazz.getAnnotation( Spatial.class );
+		if ( spatialAnn != null ) {
+			bindSpatialAnnotation( prefix, propertiesMetadata, spatialAnn, clazz, context );
+		}
+		Spatials spatialsAnn = clazz.getAnnotation( Spatials.class );
+		if ( spatialsAnn != null ) {
+			Spatial[] spatials = spatialsAnn.value();
+			for ( Spatial spatial : spatials ) {
+				bindSpatialAnnotation( prefix, propertiesMetadata, spatial, clazz, context );
+			}
 		}
 
 		checkForAnalyzerDiscriminator( clazz, propertiesMetadata );
@@ -460,6 +467,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		checkForField( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForFields( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForSpatial( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
+		checkForSpatials( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
 		checkForIndexedEmbedded(
@@ -576,6 +584,24 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 		if ( ( fieldAnn == null && idAnn == null ) && numericFieldAnn != null ) {
 			throw new SearchException( "@NumericField without a @Field on property '" + member.getName() + "'" );
+		}
+	}
+
+	private void checkForSpatials(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context, PathsContext pathsContext) {
+		org.hibernate.search.annotations.Spatials spatialsAnn = member.getAnnotation( org.hibernate.search.annotations.Spatials.class );
+		if ( spatialsAnn != null ) {
+			for ( org.hibernate.search.annotations.Spatial spatial : spatialsAnn.value() ) {
+				if ( isFieldInPath( spatial, member, pathsContext, prefix ) || level <= maxLevel ) {
+					bindSpatialAnnotation(
+							classHostingMember,
+							member,
+							propertiesMetadata,
+							prefix,
+							spatial,
+							context
+					);
+				}
+			}
 		}
 	}
 
