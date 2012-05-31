@@ -19,12 +19,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-release-version>3.0.6.RELEASE</spring-release-version>
         <version.jboss.as>7.1.1.Final</version.jboss.as>
-        <version.arquillian>1.0.0.CR7</version.arquillian>
+        <version.arquillian>1.0.0.Final</version.arquillian>
+        <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
         <integration.test.lib.dir>${project.build.directory}/lib</integration.test.lib.dir>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- We override the version of ShrinkWrap Maven Resolver from Arquillian BOM -->
+            <dependency>
+                <groupId>org.jboss.shrinkwrap.resolver</groupId>
+                <artifactId>shrinkwrap-resolver-bom</artifactId>
+                <version>${version.shrinkwrapResolver}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Imports compatible versions for each Arquillian module -->
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
@@ -302,13 +312,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-            <artifactId>shrinkwrap-descriptors-impl</artifactId>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-depchain</artifactId>
+            <version>${version.shrinkwrapResolver}</version>
+            <type>pom</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

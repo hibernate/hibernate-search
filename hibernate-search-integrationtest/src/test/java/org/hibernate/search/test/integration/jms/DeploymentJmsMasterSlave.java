@@ -3,11 +3,8 @@ package org.hibernate.search.test.integration.jms;
 import static org.hibernate.search.test.integration.jms.util.RegistrationConfiguration.indexLocation;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Properties;
 
+import org.hibernate.search.Version;
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
@@ -17,20 +14,23 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.importer.ZipImporter;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
-import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceUnitDef;
+import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
+import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
+import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
+import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 
 /**
  * Create deployments for JMS Master/Slave configuration integration tests.
  *
- * @author "Davide D'Alto"
- *
+ * @author Davide D'Alto
+ * @author Sanne Grinovero
  */
 public class DeploymentJmsMasterSlave {
+
+	private static File[] libraryFiles;
 
 	public static Archive<?> createMaster(String deploymentName, int refreshPeriod) throws Exception {
 		return baseArchive( deploymentName, masterPersistenceXml(deploymentName, refreshPeriod) )
@@ -43,29 +43,30 @@ public class DeploymentJmsMasterSlave {
 		return baseArchive( deploymentName, slavePersitenceXml( deploymentName, refreshPeriod ) );
 	}
 
-	private static WebArchive baseArchive(String name, PersistenceUnitDef unitDef) throws Exception {
-		return ShrinkWrap
+	private static WebArchive baseArchive(String name, PersistenceDescriptor unitDef) throws Exception {
+		WebArchive webArchive = ShrinkWrap
 				.create( WebArchive.class, name + ".war" )
 				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
-				.addAsLibraries( libraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				;
+		addLibraries( webArchive );
+		return webArchive;
 	}
 
-	private static PersistenceUnitDef masterPersistenceXml(String name, int refreshPeriod) throws Exception {
+	private static PersistenceDescriptor masterPersistenceXml(String name, int refreshPeriod) throws Exception {
 		return commonUnitDef( "pu-" + name, "filesystem-master", refreshPeriod )
-				.property( "hibernate.search.default.indexBase", indexLocation( "index-master" ) )
-				;
+				.createProperty().name( "hibernate.search.default.indexBase" ).value( indexLocation( "index-master" ) ).up()
+				.up().up();
 	}
 
-	private static PersistenceUnitDef slavePersitenceXml(String name, int refreshPeriod) throws Exception {
+	private static PersistenceDescriptor slavePersitenceXml(String name, int refreshPeriod) throws Exception {
 		return commonUnitDef( "pu-" + name, "filesystem-slave", refreshPeriod )
-				.property( "hibernate.search.default.worker.backend", "jms" )
-				.property( "hibernate.search.default.worker.jms.connection_factory", "ConnectionFactory" )
-				.property( "hibernate.search.default.worker.jms.queue", RegistrationConfiguration.DESTINATION_QUEUE )
-				.property( "hibernate.search.default.indexBase", indexLocation( callerName() + "-" + name ) )
-				;
+				.createProperty().name( "hibernate.search.default.worker.backend" ).value( "jms" ).up()
+				.createProperty().name( "hibernate.search.default.worker.jms.connection_factory" ).value( "ConnectionFactory" ).up()
+				.createProperty().name( "hibernate.search.default.worker.jms.queue" ).value( RegistrationConfiguration.DESTINATION_QUEUE ).up()
+				.createProperty().name( "hibernate.search.default.indexBase" ).value( indexLocation( callerName() + "-" + name ) ).up()
+				.up().up();
 	}
 
 	private static String callerName() {
@@ -76,32 +77,37 @@ public class DeploymentJmsMasterSlave {
 		}
 	}
 
-	private static PersistenceUnitDef commonUnitDef(String unitName, String directoryProvider, int refreshPeriod) throws Exception {
+	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(String unitName, String directoryProvider, int refreshPeriod) throws Exception {
 		return Descriptors.create( PersistenceDescriptor.class )
-				.version( "2.0" )
-				.persistenceUnit( unitName )
+				.createPersistenceUnit()
+					.name( unitName )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
-				.property( "hibernate.hbm2ddl.auto", "create-drop" )
-				.property( "hibernate.search.default.lucene_version", "LUCENE_CURRENT" )
-				.property( "hibernate.search.default.directory_provider", directoryProvider )
-				.property( "hibernate.search.default.sourceBase", indexLocation( "sourceBase" ) )
-				.property( "hibernate.search.default.refresh", refreshPeriod )
-				.property( "hibernate.search.default.worker.execution", "sync" )
-				;
+				.getOrCreateProperties()
+					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
+					.createProperty().name( "hibernate.search.default.directory_provider" ).value( directoryProvider ).up()
+					.createProperty().name( "hibernate.search.default.sourceBase" ).value( indexLocation( "sourceBase" ) ).up()
+					.createProperty().name( "hibernate.search.default.refresh" ).value( String.valueOf( refreshPeriod ) ).up()
+					.createProperty().name( "hibernate.search.default.worker.execution" ).value( "sync" ).up();
 	}
 
-	private static Collection<JavaArchive> libraries() throws Exception {
-		Collection<JavaArchive> libs = new ArrayList<JavaArchive>();
-		File libDir = new File(getLibrariesDirectory());
-		for ( String lib : libDir.list() ) {
-			JavaArchive javaArchive = ShrinkWrap
-					.create( ZipImporter.class, lib )
-					.importFrom( new File( libDir, lib ) )
-					.as( JavaArchive.class )
-					;
-			libs.add( javaArchive );
+	private static void addLibraries(WebArchive archive) {
+		if ( libraryFiles == null ) { //cache this as Maven resolution is painfully slow
+			MavenDependencyResolver resolver = DependencyResolvers
+				.use( MavenDependencyResolver.class )
+				.goOffline();
+			String currentVersion = Version.getVersionString();
+			libraryFiles = resolver
+						.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
+							.exclusion( "org.hibernate:hibernate-entitymanager" )
+							.exclusion( "org.hibernate:hibernate-core" )
+							.exclusion( "org.hibernate:hibernate-search-analyzers" )
+							.exclusion( "org.hibernate.common:hibernate-commons-annotations" )
+							.exclusion( "org.jboss.logging:jboss-logging" )
+							.exclusion( "org.slf4j:slf4j-api" )
+						.resolveAsFiles();
 		}
-		return libs;
+		archive.addAsLibraries( libraryFiles );
 	}
 
 	private static Asset hornetqJmsXml() {
@@ -118,11 +124,4 @@ public class DeploymentJmsMasterSlave {
 		return new StringAsset( hornetqXml );
 	}
 
-	private static String getLibrariesDirectory() throws Exception {
-		InputStream resourceAsStream = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream( "integration-test.properties" );
-		Properties properties = new Properties();
-		properties.load( resourceAsStream );
-		return properties.getProperty( "lib.dir" );
-	}
 }

@@ -28,7 +28,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -44,11 +43,10 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
-import org.jboss.shrinkwrap.descriptor.api.spec.jpa.persistence.PersistenceDescriptor;
+import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
@@ -88,11 +86,14 @@ public class MemberRegistrationIT {
 	private static Asset persistenceXml() {
 		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
 			.version( "2.0" )
-			.persistenceUnit( "primary" )
-			.jtaDataSource( "java:jboss/datasources/ExampleDS" )
-			.property( "hibernate.hbm2ddl.auto", "create-drop" )
-			.property( "hibernate.search.default.directory_provider", "ram" )
-			.property( "hibernate.search.lucene_version", "LUCENE_CURRENT")
+			.createPersistenceUnit()
+				.name( "primary" )
+				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.getOrCreateProperties()
+					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
+					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
+				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );
 	}
