@@ -46,15 +46,27 @@ import org.junit.runner.RunWith;
  * entities created by some other nodes after the synchronization succeed.
  * 
  * @author Davide D'Alto
+ * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
 public class SearchNewEntityJmsMasterSlaveIT {
 
-	private static final int REFRESH_PERIOD_IN_SEC = 5;
+	/**
+	 * Affects how often the Master and Slave directories should start the refresh copy work
+	 */
+	private static final int REFRESH_PERIOD_IN_SEC = 2;
 
-	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION = ( REFRESH_PERIOD_IN_SEC + 1 ) * 1000;
+	/**
+	 * Idle loop to wait for results to be transmitted
+	 */
+	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION = 50;
 
-	private static final int MAX_SEARCH_ATTEMPTS = 3;
+	/**
+	 * Multiplier on top of REFRESH_PERIOD_IN_SEC we can wait before considering the test failed.
+	 */
+	private static final int MAX_PERIOD_RETRIES = 5;
+
+	private static final int MAX_SEARCH_ATTEMPTS = ( MAX_PERIOD_RETRIES * REFRESH_PERIOD_IN_SEC * 1000 / SLEEP_TIME_FOR_SYNCHRONIZATION );
 
 	@Deployment(name = "master", order = 1 )
 	public static Archive<?> createDeploymentMaster() throws Exception {
