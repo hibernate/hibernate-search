@@ -21,7 +21,6 @@
         <version.jboss.as>7.1.1.Final</version.jboss.as>
         <version.arquillian>1.0.0.Final</version.arquillian>
         <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
-        <integration.test.lib.dir>${project.build.directory}/lib</integration.test.lib.dir>
     </properties>
 
     <dependencyManagement>
@@ -104,65 +103,6 @@
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-jms-artifact</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${integration.test.lib.dir}</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-orm</artifactId>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-search-engine</artifactId>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.lucene</groupId>
-                                    <artifactId>lucene-core</artifactId>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.avro</groupId>
-                                    <artifactId>avro</artifactId>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.codehaus.jackson</groupId>
-                                    <artifactId>jackson-core-asl</artifactId>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.codehaus.jackson</groupId>
-                                    <artifactId>jackson-mapper-asl</artifactId>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.thoughtworks.paranamer</groupId>
-                                    <artifactId>paranamer</artifactId>
-                                    <version>2.3</version>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.slf4j</groupId>
-                                    <artifactId>slf4j-api</artifactId>
-                                    <overWrite>true</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.xerial.snappy</groupId>
-                                    <artifactId>snappy-java</artifactId>
-                                    <version>1.0.4.1</version>
-                                    <overWrite>true</overWrite>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
