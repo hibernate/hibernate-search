@@ -55,9 +55,6 @@ public class RegisteredMember implements Serializable {
 	@Field(index = Index.YES, store = Store.NO)
 	private String email;
 
-	@Column(name = "phone_number")
-	private String phoneNumber;
-
 	public Long getId() {
 		return id;
 	}
@@ -82,16 +79,8 @@ public class RegisteredMember implements Serializable {
 		this.email = email;
 	}
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
 	@Override
 	public String toString() {
-		return "JmsMember [id=" + id + ", name=" + name + ", email=" + email + ", phoneNumber=" + phoneNumber + "]";
+		return "[" + id + ", " + name + ", " + email + "]";
 	}
 }

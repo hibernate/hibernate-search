@@ -54,6 +54,10 @@ public class RegistrationController {
 		resetNewMember();
 	}
 
+	public int deleteAllMembers() throws Exception {
+		return em.createQuery("DELETE FROM RegisteredMember").executeUpdate();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<RegisteredMember> search(String name) {
 		FullTextEntityManager fullTextEm = Search.getFullTextEntityManager( em );
