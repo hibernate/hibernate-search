@@ -286,25 +286,23 @@ public class SpatialIndexingTest extends SearchTestCase {
 		tx.commit();
 
 		tx = fullTextSession.beginTransaction();
+
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Restaurant.class ).get();
+
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
-				centerLatitude,
-				centerLongitude,
-				50,
-				"position.location"
-		);
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "position.location" )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Restaurant.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByRange(
-				centerLatitude,
-				centerLongitude,
-				51,
-				"position.location"
-		);
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "position.location" )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Restaurant.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
