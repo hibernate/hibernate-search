@@ -116,7 +116,7 @@ public class IndexedMapping {
 	}
 
 	public EntitySpatialMapping spatial() {
-		return new EntitySpatialMapping( mapping, entity);
+		return new EntitySpatialMapping( mapping, entity, entityMapping);
 	}
 	
 }

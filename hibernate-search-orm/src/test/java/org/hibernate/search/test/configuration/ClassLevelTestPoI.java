@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import org.hibernate.search.spatial.Coordinates;
 
 @Entity
-public class POI2 implements Coordinates{
+public class ClassLevelTestPoI implements Coordinates {
 	@Id
 	@GeneratedValue
 	private int poiId;
@@ -41,13 +41,13 @@ public class POI2 implements Coordinates{
 		this.name = name;
 	}
 
-	public POI2(String name, double latitude, double longitude) {
+	public ClassLevelTestPoI(String name, double latitude, double longitude) {
 		this.name = name;
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 
-	public POI2() {
+	public ClassLevelTestPoI() {
 	}
 
 }

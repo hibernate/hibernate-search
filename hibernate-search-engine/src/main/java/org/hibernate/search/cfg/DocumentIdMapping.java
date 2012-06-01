@@ -55,6 +55,10 @@ public class DocumentIdMapping {
 		return new FieldMapping(property, entity, mapping);
 	}
 
+	public PropertySpatialMapping spatial() {
+		return new PropertySpatialMapping(property, entity, mapping);
+	}
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping(name, type, entity, mapping);
 	}
@@ -69,10 +73,6 @@ public class DocumentIdMapping {
 
 	public PropertyMapping bridge(Class<? extends FieldBridge> fieldBridge) {
 		return new FieldBridgeDirectMapping( property, entity, mapping, fieldBridge );
-	}
-
-	public PropertySpatialMapping spatial() {
-		return new PropertySpatialMapping(property, entity, mapping);
 	}
 
 }
