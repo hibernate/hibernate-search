@@ -63,7 +63,7 @@ public class BenchWithGeonames {
 			sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
 
 			session = sessionFactory.openSession();
-			session.createSQLQuery("delete from POI").executeUpdate();
+			session.createSQLQuery("delete from MemberLevelTestPoI").executeUpdate();
 			session.beginTransaction();
 			fullTextSession = Search.getFullTextSession( session );
 

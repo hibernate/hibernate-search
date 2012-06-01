@@ -48,7 +48,7 @@ public class EntityMapping {
 	}
 
 	public EntitySpatialMapping spatial() {
-		return new EntitySpatialMapping( mapping, entity );
+		return new EntitySpatialMapping( mapping, entity, this );
 	}
 	
 	public EntityMapping similarity(Class<?> impl) {

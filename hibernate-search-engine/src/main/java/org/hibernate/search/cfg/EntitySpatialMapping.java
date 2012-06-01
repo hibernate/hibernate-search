@@ -38,12 +38,18 @@ import org.hibernate.search.annotations.Store;
 public class EntitySpatialMapping {
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
+	private final EntityMapping entityMapping;
 	private final Map<String, Object> spatial = new HashMap<String, Object>();
 
-	public EntitySpatialMapping(SearchMapping mapping, EntityDescriptor entity) {
+	public EntitySpatialMapping(SearchMapping mapping, EntityDescriptor entity, EntityMapping entityMapping) {
 		this.mapping = mapping;
 		this.entity = entity;
+		this.entityMapping = entityMapping;
 		this.entity.addSpatial(spatial);
+	}
+
+	public EntitySpatialMapping spatial() {
+		return new EntitySpatialMapping( mapping, entity, entityMapping );
 	}
 
 	public EntitySpatialMapping name(String fieldName) {
@@ -92,6 +98,10 @@ public class EntitySpatialMapping {
 
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping(entityType, mapping);
+	}
+
+	public ClassBridgeMapping classBridge(Class<?> impl) {
+		return new ClassBridgeMapping(mapping, entity, impl, entityMapping);
 	}
 
 }

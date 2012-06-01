@@ -49,6 +49,10 @@ public class PropertySpatialMapping {
 		this.property.setSpatial( spatial );
 	}
 
+	public PropertySpatialMapping spatial() {
+		return new PropertySpatialMapping(property, entity, mapping);
+	}
+
 	public PropertySpatialMapping name(String fieldName) {
 		spatial.put( "name", fieldName );
 		return this;
