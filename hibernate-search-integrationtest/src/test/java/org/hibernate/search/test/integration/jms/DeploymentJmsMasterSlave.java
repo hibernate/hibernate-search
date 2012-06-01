@@ -55,17 +55,15 @@ public class DeploymentJmsMasterSlave {
 	}
 
 	private static PersistenceDescriptor masterPersistenceXml(String name, int refreshPeriod) throws Exception {
-		return commonUnitDef( "pu-" + name, "filesystem-master", refreshPeriod )
-				.createProperty().name( "hibernate.search.default.indexBase" ).value( indexLocation( "index-master" ) ).up()
+		return commonUnitDef( name, "filesystem-master", refreshPeriod )
 				.up().up();
 	}
 
 	private static PersistenceDescriptor slavePersitenceXml(String name, int refreshPeriod) throws Exception {
-		return commonUnitDef( "pu-" + name, "filesystem-slave", refreshPeriod )
+		return commonUnitDef( name, "filesystem-slave", refreshPeriod )
 				.createProperty().name( "hibernate.search.default.worker.backend" ).value( "jms" ).up()
 				.createProperty().name( "hibernate.search.default.worker.jms.connection_factory" ).value( "ConnectionFactory" ).up()
 				.createProperty().name( "hibernate.search.default.worker.jms.queue" ).value( RegistrationConfiguration.DESTINATION_QUEUE ).up()
-				.createProperty().name( "hibernate.search.default.indexBase" ).value( indexLocation( callerName() + "-" + name ) ).up()
 				.up().up();
 	}
 
@@ -73,20 +71,21 @@ public class DeploymentJmsMasterSlave {
 		try {
 			throw new RuntimeException();
 		} catch (Exception ex ) {
-			return ex.getStackTrace()[3].getClassName();
+			return ex.getStackTrace()[4].getClassName();
 		}
 	}
 
-	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(String unitName, String directoryProvider, int refreshPeriod) throws Exception {
+	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(String name, String directoryProvider, int refreshPeriod) throws Exception {
 		return Descriptors.create( PersistenceDescriptor.class )
 				.createPersistenceUnit()
-					.name( unitName )
+					.name( "pu-" + name )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( directoryProvider ).up()
-					.createProperty().name( "hibernate.search.default.sourceBase" ).value( indexLocation( "sourceBase" ) ).up()
+					.createProperty().name( "hibernate.search.default.sourceBase" ).value( indexLocation( callerName() + "-sourceBase" ) ).up()
+					.createProperty().name( "hibernate.search.default.indexBase" ).value( indexLocation( callerName() + "-" + name ) ).up()
 					.createProperty().name( "hibernate.search.default.refresh" ).value( String.valueOf( refreshPeriod ) ).up()
 					.createProperty().name( "hibernate.search.default.worker.execution" ).value( "sync" ).up();
 	}
