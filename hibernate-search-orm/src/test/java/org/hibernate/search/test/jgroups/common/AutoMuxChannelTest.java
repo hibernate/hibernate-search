@@ -22,26 +22,29 @@
   * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.backend.impl.jgroups;
+package org.hibernate.search.test.jgroups.common;
 
-import org.jgroups.Message;
-import org.jgroups.blocks.MessageDispatcher;
-import org.jgroups.blocks.RequestOptions;
+import org.jgroups.JChannel;
 
 /**
- * Channel message sender.
+ * Test auto injected mux supported channel.
  *
- * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author Ales Justin
  */
-class DispatcherMessageSender extends AbstractMessageSender {
-    private MessageDispatcher dispatcher;
+public class AutoMuxChannelTest extends MuxChannelTest {
 
-    DispatcherMessageSender(MessageDispatcher dispatcher) {
-        super(dispatcher.getChannel());
-        this.dispatcher = dispatcher;
+    protected JChannel[] createChannels() throws Exception {
+        JChannel[] channels = new JChannel[2];
+        channels[1] = createChannel(); // order matters in AutoNodeSelector -- 1 ~ "slave"
+        channels[0] = createChannel();
+        return channels;
     }
 
-    public void send(Message message) throws Exception {
-        dispatcher.castMessage(null, message, RequestOptions.ASYNC());
+    protected String getMasterBackend() {
+        return "jgroups";
+    }
+
+    protected String getSlaveBackend() {
+        return "jgroups";
     }
 }
