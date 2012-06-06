@@ -41,6 +41,7 @@ import java.util.TreeSet;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.search.Similarity;
+import org.apache.lucene.util.Version;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -107,7 +108,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	private final ScopedAnalyzer analyzer = new ScopedAnalyzer();
 	private Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	private boolean isRoot;
-	private Analyzer passThroughAnalyzer = new PassThroughAnalyzer();
+	private final Analyzer passThroughAnalyzer;
 	protected final Set<String> fieldCollectionRoles = new TreeSet<String>();
 	protected final Set<String> indexedEmbeddedCollectionRoles = new TreeSet<String>();
 	protected final Set<String> containedInCollectionRoles = new TreeSet<String>();
@@ -133,7 +134,9 @@ public abstract class AbstractDocumentBuilder<T> {
 		if ( xClass == null ) {
 			throw new AssertionFailure( "Unable to build a DocumentBuilderContainedEntity with a null class" );
 		}
+		final Version luceneVersion = context.getLuceneMatchVersion();
 
+		this.passThroughAnalyzer = new PassThroughAnalyzer( luceneVersion );
 		this.instanceInitalizer = instanceInitializer;
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanXClass = xClass;

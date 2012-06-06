@@ -28,6 +28,7 @@ import java.io.Reader;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharTokenizer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.util.Version;
 
 /**
  * Analyzer that applies no operation whatsoever to the flux
@@ -40,17 +41,50 @@ import org.apache.lucene.analysis.TokenStream;
  */
 public final class PassThroughAnalyzer extends Analyzer {
 
-	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		return new PassThroughTokenizer( reader );
+	private final Version luceneVersion;
+
+	/**
+	 * Create a new PassThroughAnalyzer.
+	 * 
+	 * @param luceneVersion
+	 */
+	public PassThroughAnalyzer(Version luceneVersion) {
+		this.luceneVersion = luceneVersion;
 	}
 
+	@Override
+	public TokenStream tokenStream(String fieldName, Reader reader) {
+		if ( luceneVersion.onOrAfter( Version.LUCENE_31 ) ) {
+			return new PassThroughTokenizer( luceneVersion, reader );
+		}
+		else {
+			return new Pre31PassThroughTokenizer( luceneVersion, reader );
+		}
+	}
+
+	/**
+	 * To be used when Lucene's Version >= 3.1
+	 * @since 4.2
+	 */
 	private static class PassThroughTokenizer extends CharTokenizer {
-		public PassThroughTokenizer(Reader input) {
-			super( input );
+		public PassThroughTokenizer(Version luceneVersion, Reader input) {
+			super( luceneVersion, input );
+		}
+		protected boolean isTokenChar(int c) {
+			return true;
+		}
+	}
+
+	/**
+	 * To be used when Lucene's Version < 3.1
+	 * @since 4.2
+	 */
+	private static class Pre31PassThroughTokenizer extends CharTokenizer {
+		public Pre31PassThroughTokenizer(Version luceneVersion, Reader input) {
+			super( luceneVersion, input );
 		}
 
-		@Override
+		//@Override not really: will be removed in Lucene 4.0
 		protected boolean isTokenChar(char c) {
 			return true;
 		}
