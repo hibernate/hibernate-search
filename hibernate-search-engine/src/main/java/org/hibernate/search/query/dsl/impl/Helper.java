@@ -32,7 +32,7 @@ import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
@@ -83,12 +83,12 @@ class Helper {
 		}
 		Reader reader = new StringReader(localText);
 		TokenStream stream = analyzer.reusableTokenStream( fieldName, reader);
-		TermAttribute attribute = stream.addAttribute( TermAttribute.class );
+		CharTermAttribute attribute = stream.addAttribute( CharTermAttribute.class );
 		stream.reset();
 
 		while ( stream.incrementToken() ) {
-			if ( attribute.termLength() > 0 ) {
-				String term = attribute.term();
+			if ( attribute.length() > 0 ) {
+				String term = new String( attribute.buffer(), 0, attribute.length() );
 				terms.add( term );
 			}
 		}

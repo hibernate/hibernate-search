@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.io.Serializable;
 
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
@@ -93,7 +94,7 @@ public class LuceneFieldContext {
 	}
 
 	public boolean isOmitTermFreqAndPositions() {
-		return field.getOmitTermFreqAndPositions();
+		return field.getIndexOptions() == IndexOptions.DOCS_ONLY;
 	}
 
 	public String getStringValue() {

@@ -128,7 +128,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 
 	//overridable method for testability:
 	protected IndexReader readerFactory(final Directory directory) throws IOException {
-		return IndexReader.open( directory, true );
+		return IndexReader.open( directory );
 	}
 
 	/**

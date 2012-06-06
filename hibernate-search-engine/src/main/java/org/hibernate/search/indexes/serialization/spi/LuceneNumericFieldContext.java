@@ -21,6 +21,7 @@
 package org.hibernate.search.indexes.serialization.spi;
 
 import org.apache.lucene.document.NumericField;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -57,6 +58,6 @@ public class LuceneNumericFieldContext {
 	}
 
 	public boolean getOmitTermFreqAndPositions() {
-		return field.getOmitTermFreqAndPositions();
+		return field.getIndexOptions() == IndexOptions.DOCS_ONLY;
 	}
 }
