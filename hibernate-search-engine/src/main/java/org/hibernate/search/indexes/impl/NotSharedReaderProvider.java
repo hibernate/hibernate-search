@@ -50,7 +50,7 @@ public class NotSharedReaderProvider implements DirectoryBasedReaderProvider {
 		// org.hibernate.search.store.impl.FSSlaveDirectoryProvider
 		Directory directory = directoryProvider.getDirectory();
 		try {
-			return IndexReader.open( directory, true );
+			return IndexReader.open( directory );
 		}
 		catch ( IOException e ) {
 			throw new SearchException( "Could not open index \"" + indexName + "\"", e );

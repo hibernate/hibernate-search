@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -92,7 +92,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			Reader reader = new StringReader( sentence );
 			stream = queryContext.getQueryAnalyzer().reusableTokenStream( fieldName, reader);
 
-			TermAttribute termAttribute = stream.addAttribute( TermAttribute.class );
+			CharTermAttribute termAttribute = stream.addAttribute( CharTermAttribute.class );
 			PositionIncrementAttribute positionAttribute = stream.addAttribute( PositionIncrementAttribute.class );
 
 			stream.reset();
@@ -114,7 +114,8 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 					termsPerPosition.put( position, termsAtSamePosition  );
 				}
 
-				termsAtSamePosition.add( new Term( fieldName, termAttribute.term() ) );
+				String termString = new String( termAttribute.buffer(), 0, termAttribute.length() );
+				termsAtSamePosition.add( new Term( fieldName, termString ) );
 				if ( termsAtSamePosition.size() > 1 ) {
 					isMultiPhrase = true;
 				}
