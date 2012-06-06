@@ -61,7 +61,7 @@ public class AllFilesClosedTest {
 			doSomeOperations();
 			assertDirectoryOpen( directoryOne );
 			assertDirectoryOpen( directoryTwo );
-			assertAllFilesClosed( directoryTwo );
+			if (nrtNotEnabled()) assertAllFilesClosed( directoryTwo );
 			// directoryOne is using resource pooling
 		}
 		finally {
@@ -74,10 +74,17 @@ public class AllFilesClosedTest {
 	}
 
 	/**
+	 * Override point for extending test
+	 */
+	protected boolean nrtNotEnabled() {
+		return true;
+	}
+
+	/**
 	 * Verifies all files in the Directory were closed
 	 */
 	private void assertAllFilesClosed(FileMonitoringDirectory directory) {
-		Assert.assertTrue( directory.allFilesWereClosed() );
+		Assert.assertTrue( "not all files were closed", directory.allFilesWereClosed() );
 	}
 
 	/**
@@ -151,7 +158,7 @@ public class AllFilesClosedTest {
 		tc.end();
 	}
 
-	private SearchFactoryImplementor initializeSearchFactory() {
+	protected SearchFactoryImplementor initializeSearchFactory() {
 		ManualConfiguration cfg = new ManualConfiguration()
 			.addProperty( "hibernate.search.default.directory_provider", FileMonitoringDirectoryProvider.class.getName() )
 			.addProperty( "hibernate.search.default.reader.strategy", "shared" )
@@ -160,9 +167,14 @@ public class AllFilesClosedTest {
 			.addClass( Book.class )
 			.addClass( Dvd.class )
 			;
+		overrideProperties( cfg ); //allow extending tests with different configuration
 		return new SearchFactoryBuilder()
 			.configuration( cfg )
 			.buildSearchFactory();
+	}
+
+	protected void overrideProperties(ManualConfiguration cfg) {
+		//nothing to do
 	}
 
 	/** Two mapped entities on two differently configured indexes **/
