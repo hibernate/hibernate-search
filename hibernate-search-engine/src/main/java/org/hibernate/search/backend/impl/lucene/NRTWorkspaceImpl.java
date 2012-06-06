@@ -25,7 +25,6 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -55,8 +54,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	private static final Log log = LoggerFactory.make();
 
-	private final ReentrantLock writeLock;
-	private final String indexName;
+	private final ReentrantLock writeLock = new ReentrantLock();
 	private final AtomicReference<IndexReader> currentReader = new AtomicReference<IndexReader>();
 
 	/**
@@ -66,8 +64,6 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	public NRTWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext buildContext, Properties cfg) {
 		super( indexManager, buildContext, cfg );
-		this.indexName = indexManager.getIndexName();
-		this.writeLock = new ReentrantLock();
 	}
 
 	@Override
@@ -101,23 +97,8 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 				writeLock.unlock();
 			}
 		}
-		return cloneReader( indexReader );
-	}
-
-	/**
-	 * We need to return clones so that each reader can be closed independently;
-	 * clones should share most heavy-weight buffers anyway.
-	 */
-	private IndexReader cloneReader(IndexReader indexReader) {
-		try {
-			return indexReader.clone( true );
-		}
-		catch ( CorruptIndexException cie ) {
-			throw log.cantOpenCorruptedIndex( cie, indexName );
-		}
-		catch ( IOException ioe ) {
-			throw log.ioExceptionOnIndex( ioe, indexName );
-		}
+		indexReader.incRef();
+		return indexReader;
 	}
 
 	@Override
