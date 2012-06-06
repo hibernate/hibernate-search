@@ -107,7 +107,8 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 			return;
 		}
 		try {
-			reader.close();
+			//don't use IndexReader#close as it prevents further counter decrements!
+			reader.decRef();
 		}
 		catch ( IOException e ) {
 			log.unableToCloseLuceneIndexReader( e );
