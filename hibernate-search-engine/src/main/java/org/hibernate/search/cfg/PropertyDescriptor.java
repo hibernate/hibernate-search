@@ -33,8 +33,7 @@ import java.util.Map;
  * @author Emmanuel Bernard
  */
 public class PropertyDescriptor {
-	private ElementType type;
-	private String name;
+
 	private Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
 	private Collection<Map<String, Object>> numericFields = new ArrayList<Map<String, Object>>();
 	private Map<String, Object> dateBridge= new HashMap<String, Object>();
@@ -48,8 +47,6 @@ public class PropertyDescriptor {
 	private Map<String,Object> fieldBridge;
 
 	public PropertyDescriptor(String name, ElementType type) {
-		this.name = name;
-		this.type = type;
 	}
 	
 	public void setDocumentId(Map<String, Object> documentId) {

@@ -33,7 +33,6 @@ import java.util.Set;
  * @author Emmanuel Bernard
  */
 public class EntityDescriptor {
-	private Class<?> entityType;
 	private Map<String, Object> indexed;
 	private Map<PropertyKey, PropertyDescriptor> properties = new HashMap<PropertyKey, PropertyDescriptor>();
 	private Map<String, Object> similarity;
@@ -50,7 +49,6 @@ public class EntityDescriptor {
 	}
 
 	public EntityDescriptor(Class<?> entityType) {
-		this.entityType = entityType;
 	}
 
 	public void setIndexed(Map<String, Object> indexed) {
