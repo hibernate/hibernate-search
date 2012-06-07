@@ -38,10 +38,8 @@ public class IndexedMapping {
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
 	private final Map<String, Object> indexed;
-	private final EntityMapping entityMapping;
 	
 	public IndexedMapping(SearchMapping mapping, EntityDescriptor entity, EntityMapping entityMapping) {
-		this.entityMapping = entityMapping;
 		this.mapping = mapping;
 		this.entity = entity;
 		indexed = new HashMap<String, Object>();
