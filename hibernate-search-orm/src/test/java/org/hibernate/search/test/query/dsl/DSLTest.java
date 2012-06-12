@@ -48,6 +48,9 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.query.dsl.Unit;
+import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.testing.TestForIssue;
 
@@ -55,6 +58,8 @@ import org.hibernate.testing.TestForIssue;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
+//DO NOT AUTO INDENT THIS FILE.
+//MY DSL IS BEAUTIFUL, DUMP INDENTATION IS SCREWING IT UP
 public class DSLTest extends SearchTestCase {
 	private final Calendar calendar = Calendar.getInstance();
 
@@ -86,7 +91,7 @@ public class DSLTest extends SearchTestCase {
 
 		query = monthQb.keyword()
 				.onField( "monthValue" )
-				.ignoreFieldBridge()
+					.ignoreFieldBridge()
 				.matching( "2" )
 				.createQuery();
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
@@ -135,12 +140,12 @@ public class DSLTest extends SearchTestCase {
 		//fuzzy search with custom threshold and prefix
 		Query query = monthQb
 				.keyword()
-				.fuzzy()
-				.withThreshold( .8f )
-				.withPrefixLength( 1 )
-				.onField( "mythology" )
-				.matching( "calder" )
-				.createQuery();
+					.fuzzy()
+						.withThreshold( .8f )
+						.withPrefixLength( 1 )
+					.onField( "mythology" )
+					.matching( "calder" )
+					.createQuery();
 
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
@@ -159,10 +164,10 @@ public class DSLTest extends SearchTestCase {
 		//wildcard query
 		query = monthQb
 				.keyword()
-				.wildcard()
-				.onField( "mythology" )
-				.matching( "mon*" )
-				.createQuery();
+					.wildcard()
+					.onField( "mythology" )
+					.matching( "mon*" )
+					.createQuery();
 
 		assertEquals( 3, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
@@ -214,7 +219,8 @@ public class DSLTest extends SearchTestCase {
 		Query query = monthQb.keyword()
 				.onField( "mythology" )
 				.andField( "history" )
-				.matching( "whitening" ).createQuery();
+				.matching( "whitening" )
+				.createQuery();
 
 		List<Month> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
 		assertEquals( 2, results.size() );
@@ -223,7 +229,7 @@ public class DSLTest extends SearchTestCase {
 		//combined query, January and february both contain whitening but February in a longer text
 		query = monthQb.keyword()
 				.onFields( "mythology", "history" )
-				.boostedTo( 30 )
+					.boostedTo( 30 )
 				.matching( "whitening" ).createQuery();
 
 		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
@@ -235,7 +241,7 @@ public class DSLTest extends SearchTestCase {
 		query = monthQb.keyword()
 				.onField( "mythology" )
 				.andField( "history" )
-				.boostedTo( 30 )
+					.boostedTo( 30 )
 				.matching( "whitening" )
 				.createQuery();
 
@@ -266,10 +272,10 @@ public class DSLTest extends SearchTestCase {
 		//must not + all
 		query = monthQb
 				.bool()
-				.should( monthQb.all().createQuery() )
-				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
-				.not()
-				.createQuery();
+					.should( monthQb.all().createQuery() )
+					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+						.not()
+					.createQuery();
 
 		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
 		assertEquals( 2, results.size() );
@@ -279,9 +285,9 @@ public class DSLTest extends SearchTestCase {
 		//implicit must not + all (not recommended)
 		query = monthQb
 				.bool()
-				.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
-				.not()
-				.createQuery();
+					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+						.not()
+					.createQuery();
 		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
 		assertEquals( 2, results.size() );
 		assertEquals( "February", results.get( 0 ).getName() );
@@ -290,7 +296,7 @@ public class DSLTest extends SearchTestCase {
 		//all except (recommended)
 		query = monthQb
 				.all()
-				.except( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
+					.except( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 				.createQuery();
 
 		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
@@ -313,26 +319,27 @@ public class DSLTest extends SearchTestCase {
 		calendar.set( 1910, 2, 12, 0, 0, 0 );
 		Date to = calendar.getTime();
 
-		Query query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.from( from )
-				.to( to ).excludeLimit()
-				.createQuery();
+		Query query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.from( from )
+					.to( to ).excludeLimit()
+					.createQuery();
 
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.ignoreFieldBridge()
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.from( DateTools.dateToString( from, DateTools.Resolution.MINUTE ) )
-				.to( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) ).excludeLimit()
-				.createQuery();
+		query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+						.ignoreFieldBridge()
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.from( DateTools.dateToString( from, DateTools.Resolution.MINUTE ) )
+					.to( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+						.excludeLimit()
+					.createQuery();
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 		transaction.commit();
 	}
@@ -346,26 +353,26 @@ public class DSLTest extends SearchTestCase {
 		calendar.set( 10 + 1800, 2, 12, 0, 0, 0 );
 		Date to = calendar.getTime();
 
-		Query query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.below( to )
-				.createQuery();
+		Query query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.below( to )
+					.createQuery();
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "March", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
-		query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.ignoreFieldBridge()
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.below( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
-				.createQuery();
+		query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+						.ignoreFieldBridge()
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.below( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+					.createQuery();
 
 		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
@@ -395,49 +402,49 @@ public class DSLTest extends SearchTestCase {
 		calendar.set( 10 + 1900, 2, 12, 0, 0, 0 );
 		Date to = calendar.getTime();
 
-		Query query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.above( to )
-				.createQuery();
+		Query query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.above( to )
+					.createQuery();
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
-		query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.ignoreFieldBridge()
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.above( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
-				.createQuery();
+		query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+						.ignoreFieldBridge()
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.above( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+					.createQuery();
 		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
 		// test the limits, inclusive
-		query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.above( february )
-				.createQuery();
+		query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.above( february )
+					.createQuery();
 		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
 		// test the limits, exclusive
-		query = monthQb.
-				range()
-				.onField( "estimatedCreation" )
-				.andField( "justfortest" )
-				.ignoreFieldBridge().ignoreAnalyzer()
-				.above( february ).excludeLimit()
-				.createQuery();
+		query = monthQb
+				.range()
+					.onField( "estimatedCreation" )
+					.andField( "justfortest" )
+						.ignoreFieldBridge().ignoreAnalyzer()
+					.above( february ).excludeLimit()
+					.createQuery();
 		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 0, hibQuery.getResultSize() );
 
@@ -449,38 +456,38 @@ public class DSLTest extends SearchTestCase {
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
-		Query query = monthQb.
-				phrase()
-				.onField( "mythology" )
-				.sentence( "colder and whitening" )
-				.createQuery();
+		Query query = monthQb
+				.phrase()
+					.onField( "mythology" )
+					.sentence( "colder and whitening" )
+					.createQuery();
 
 		assertEquals(
 				"test exact phrase", 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize()
 		);
 
-		query = monthQb.
-				phrase()
-				.onField( "mythology" )
-				.sentence( "Month whitening" )
-				.createQuery();
+		query = monthQb
+				.phrase()
+					.onField( "mythology" )
+					.sentence( "Month whitening" )
+					.createQuery();
 
 		assertEquals( "test slop", 0, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		query = monthQb.
-				phrase()
-				.withSlop( 3 )
-				.onField( "mythology" )
-				.sentence( "Month whitening" )
-				.createQuery();
+		query = monthQb
+				.phrase()
+					.withSlop( 3 )
+					.onField( "mythology" )
+					.sentence( "Month whitening" )
+					.createQuery();
 
 		assertEquals( "test slop", 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		query = monthQb.
-				phrase()
-				.onField( "mythology" )
-				.sentence( "whitening" )
-				.createQuery();
+		query = monthQb
+				.phrase()
+					.onField( "mythology" )
+					.sentence( "whitening" )
+					.createQuery();
 
 		assertEquals(
 				"test one term optimization",
@@ -526,11 +533,12 @@ public class DSLTest extends SearchTestCase {
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
-		Query query = monthQb.range()
-				.onField( "raindropInMm" )
-				.from( 0.23d )
-				.to( 0.24d )
-				.createQuery();
+		Query query = monthQb
+				.range()
+					.onField( "raindropInMm" )
+					.from( 0.23d )
+					.to( 0.24d )
+					.createQuery();
 
 		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
@@ -579,6 +587,39 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+
+	public void testSpatialQueries() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( POI.class ).get();
+
+		Coordinates coordinates = Point.fromDegrees(24d, 31.5d);
+		Query query = builder
+				.spatial()
+					.onCoordinates( "location" )
+					.within( 51, Unit.KM )
+						.ofCoordinates( coordinates )
+					.createQuery();
+
+		List results = fullTextSession.createFullTextQuery( query, POI.class ).list();
+
+		assertEquals( "test grid based spatial query", 1, results.size() );
+		assertEquals( "test grid based spatial query", "Bozo", ( (POI) results.get( 0 ) ).getName() );
+
+		query = builder
+				.spatial()
+					.onCoordinates( "location" )
+					.within( 500, Unit.KM )
+						.ofLatitude(48.858333d).andLongitude(2.294444d)
+					.createQuery();
+		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
+
+		assertEquals( "test grid based spatial query", 1, results.size() );
+		assertEquals( "test grid based spatial  query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
+
+		transaction.commit();
+	}
+
 	private void indexTestData() {
 		Transaction tx = fullTextSession.beginTransaction();
 		final Calendar calendar = Calendar.getInstance();
@@ -619,6 +660,12 @@ public class DSLTest extends SearchTestCase {
 						0.435d
 				)
 		);
+
+		POI poi = new POI( 1, "Tour Eiffel", 48.858333d, 2.294444d, "Monument" );
+		fullTextSession.persist( poi );
+		poi = new POI( 2, "Bozo", 24d, 32d, "Monument" );
+		fullTextSession.persist( poi );
+
 		tx.commit();
 		fullTextSession.clear();
 	}
@@ -634,10 +681,10 @@ public class DSLTest extends SearchTestCase {
 		}
 		tx = fullTextSession.beginTransaction();
 		@SuppressWarnings("unchecked")
-		final List<Month> results = fullTextSession.createQuery( "from " + Month.class.getName() ).list();
-		assertEquals( 3, results.size() );
+		final List<Object> results = fullTextSession.createQuery( "from " + Object.class.getName() ).list();
+		assertEquals( 5, results.size() );
 
-		for ( Month entity : results ) {
+		for ( Object entity : results ) {
 			fullTextSession.delete( entity );
 		}
 
@@ -648,7 +695,8 @@ public class DSLTest extends SearchTestCase {
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
-				Month.class
+				Month.class,
+				POI.class
 		};
 	}
 

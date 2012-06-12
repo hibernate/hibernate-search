@@ -46,6 +46,7 @@ public class PropertyDescriptor {
 	private Map<String, Object> analyzerDiscriminator;
 	private Map<String, Object> dynamicBoost;
 	private Map<String,Object> fieldBridge;
+	private Map<String, Object> spatial;
 
 	public PropertyDescriptor(String name, ElementType type) {
 		this.name = name;
@@ -129,6 +130,14 @@ public class PropertyDescriptor {
 
 	public void setFieldBridge(Map<String, Object> fieldBridge) {
 		this.fieldBridge = fieldBridge;
+	}
+
+	public Map<String, Object> getSpatial() {
+		return spatial;
+	}
+
+	public void setSpatial(Map<String, Object> spatial) {
+		this.spatial = spatial;
 	}
 
 }

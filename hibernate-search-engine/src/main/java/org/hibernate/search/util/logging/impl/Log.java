@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.CorruptIndexException;
+import org.hibernate.annotations.common.AssertionFailure;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -37,6 +38,7 @@ import org.jboss.logging.MessageLogger;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.spatial.impl.GeometricConstants;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
@@ -550,4 +552,47 @@ public interface Log extends BasicLogger {
 	@Message(id = 130, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
 			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
+	
+	@Message(id = 131, value = "The field used for the spatial query is not using SpatialFieldBridge: %1$s.%2$s")
+	SearchException targetedFieldNotSpatial(String className, String fieldName);
+
+	@Message(id = 133, value = "@ClassBridge implementation '%1$s' should implement either org.hibernate.search.bridge.FieldBridge, org.hibernate.search.bridge.TwoWayStringBridge or org.hibernate.search.bridge.StringBridge")
+	SearchException noFieldBridgeInterfaceImplementedByClassBridge(String implName);
+
+	@Message(id = 134, value = "Unable to instantiate ClassBridge of type %1$s defined on %2$s")
+	SearchException cannotInstantiateClassBridgeOfType(String implName, String className, @Cause Throwable e);
+
+	@Message(id = 135, value = "Unable to guess FieldBridge for  %1$s")
+	SearchException unableToGuessFieldBridge(String classBridgeName);
+
+	@Message(id = 136, value = "Unable to instantiate Spatial defined on %1$s")
+	SearchException unableToInstantiateSpatial(String className, @Cause Throwable e);
+
+	@Message(id = 137, value = "@FieldBridge with no implementation class defined in: %1$s")
+	SearchException noImplementationClassInFieldBridge(String className);
+
+	@Message(id = 138, value = "@FieldBridge implementation implements none of the field bridge interfaces: %1$s in %2$s")
+	SearchException noFieldBridgeInterfaceImplementedByFieldBridge(String implName, String appliedOnName);
+
+	@Message(id = 139, value = "Unable to instantiate FieldBridge for %1$s of class %2$s")
+	SearchException unableToInstantiateFieldBridge(String appliedOnName, String appliedOnTypeName, @Cause Throwable e);
+
+	@Message(id = 140, value = "Unknown Resolution: %1$s")
+	AssertionFailure unknownResolution(String resolution);
+
+	@Message(id = 141, value = "Unknown ArrayBridge for resolution: %1$s")
+	AssertionFailure unknownArrayBridgeForResolution(String resolution);
+
+	@Message(id = 142, value = "Unknown MapBridge for resolution: %1$s")
+	AssertionFailure unknownMapBridgeForResolution(String resolution);
+
+	@Message(id = 143, value = "Unknown IterableBridge for resolution: %1$s")
+	AssertionFailure unknownIterableBridgeForResolution(String resolution);
+
+	@Message(id = 144, value = "FieldBridge passed in is not an instance of %1$s")
+	SearchException fieldBridgeNotAnInstanceof(String className);
+
+	@Message(id = 145, value = "Spatial field name not defined for class level annotation on class %1$s")
+	SearchException spatialFieldNameNotDefined( String className );
+
 }

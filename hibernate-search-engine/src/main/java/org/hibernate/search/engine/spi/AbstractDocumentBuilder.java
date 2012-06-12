@@ -50,6 +50,7 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.AnalyzerDiscriminator;
@@ -59,10 +60,15 @@ import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.DynamicBoost;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
+import org.hibernate.search.annotations.Spatial;
+import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -84,6 +90,8 @@ import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
 
 /**
  * Abstract base class for the document builders.
@@ -431,6 +439,19 @@ public abstract class AbstractDocumentBuilder<T> {
 		if ( classBridgeAnn != null ) {
 			bindClassBridgeAnnotation( prefix, propertiesMetadata, classBridgeAnn, clazz, context );
 		}
+		
+		//Check for Spatial annotation on class level
+		Spatial spatialAnn = clazz.getAnnotation( Spatial.class );
+		if ( spatialAnn != null ) {
+			bindSpatialAnnotation( prefix, propertiesMetadata, spatialAnn, clazz, context );
+		}
+		Spatials spatialsAnn = clazz.getAnnotation( Spatials.class );
+		if ( spatialsAnn != null ) {
+			Spatial[] spatials = spatialsAnn.value();
+			for ( Spatial spatial : spatials ) {
+				bindSpatialAnnotation( prefix, propertiesMetadata, spatial, clazz, context );
+			}
+		}
 
 		checkForAnalyzerDiscriminator( clazz, propertiesMetadata );
 
@@ -445,6 +466,8 @@ public abstract class AbstractDocumentBuilder<T> {
 												  boolean disableOptimizations, PathsContext pathsContext) {
 		checkForField( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForFields( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
+		checkForSpatial( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
+		checkForSpatials( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForAnalyzerDefs( member, context );
 		checkForAnalyzerDiscriminator( member, propertiesMetadata );
 		checkForIndexedEmbedded(
@@ -564,7 +587,34 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 	}
 
-	private boolean isFieldInPath(org.hibernate.search.annotations.Field fieldAnn, XProperty member,
+	private void checkForSpatials(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context, PathsContext pathsContext) {
+		org.hibernate.search.annotations.Spatials spatialsAnn = member.getAnnotation( org.hibernate.search.annotations.Spatials.class );
+		if ( spatialsAnn != null ) {
+			for ( org.hibernate.search.annotations.Spatial spatial : spatialsAnn.value() ) {
+				if ( isFieldInPath( spatial, member, pathsContext, prefix ) || level <= maxLevel ) {
+					bindSpatialAnnotation(
+							classHostingMember,
+							member,
+							propertiesMetadata,
+							prefix,
+							spatial,
+							context
+					);
+				}
+			}
+		}
+	}
+
+	private void checkForSpatial(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix, ConfigContext context, PathsContext pathsContext) {
+		Spatial spatialAnn = member.getAnnotation( Spatial.class );
+		if ( spatialAnn != null ) {
+			if ( isFieldInPath( spatialAnn, member, pathsContext, prefix ) || level <= maxLevel ) {
+				bindSpatialAnnotation( classHostingMember, member, propertiesMetadata, prefix, spatialAnn, context );
+			}
+		}
+	}
+
+	private boolean isFieldInPath(Annotation fieldAnn, XProperty member,
 			PathsContext pathsContext, String prefix) {
 		if ( pathsContext != null ) {
 			String path = prefix + fieldName( fieldAnn, member );
@@ -576,14 +626,15 @@ public abstract class AbstractDocumentBuilder<T> {
 		return false;
 	}
 
-	private String fieldName(org.hibernate.search.annotations.Field fieldAnn, XProperty member) {
-		if (fieldAnn == null)
+	private String fieldName(Annotation fieldAnn, XProperty member) {
+		if ( fieldAnn == null ) {
 			return member.getName();
-
-		if (fieldAnn.name().isEmpty())
+		}
+		final String fieldName = getFieldName( fieldAnn );
+		if ( fieldName == null || fieldName.isEmpty() ) {
 			return member.getName();
-
-		return fieldAnn.name();
+		}
+		return fieldName;
 	}
 
 	private void checkForContainedIn(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata) {
@@ -892,6 +943,28 @@ public abstract class AbstractDocumentBuilder<T> {
 		addToScopedAnalyzer( fieldName, analyzer, index );
 	}
 
+	private void bindSpatialAnnotation(String prefix, PropertiesMetadata propertiesMetadata, Spatial ann, XClass clazz, ConfigContext context) {
+		String fieldName;
+		if( !ann.name().isEmpty() ){
+			fieldName = prefix + ann.name();
+		}
+		else {
+			throw log.spatialFieldNameNotDefined( clazz.getName() );
+		}
+		propertiesMetadata.classNames.add( fieldName );
+		propertiesMetadata.classStores.add( ann.store() );
+		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
+		propertiesMetadata.classIndexes.add( index );
+		propertiesMetadata.classTermVectors.add( AnnotationProcessingHelper.getTermVector( TermVector.NO ) );
+		propertiesMetadata.classBridges.add( BridgeFactory.buildSpatialBridge( ann, clazz ) );
+		propertiesMetadata.classBoosts.add( ann.boost().value() );
+
+		Analyzer analyzer = propertiesMetadata.analyzer;
+		if ( analyzer == null ) {
+			throw new AssertionFailure( "Analyzer should not be undefined" );
+		}
+	}
+
 	private void bindFieldAnnotation(XClass classHostingMember,
 									 XProperty member,
 									 PropertiesMetadata propertiesMetadata,
@@ -899,10 +972,23 @@ public abstract class AbstractDocumentBuilder<T> {
 									 org.hibernate.search.annotations.Field fieldAnnotation,
 									 NumericField numericFieldAnnotation,
 									 ConfigContext context) {
-		FieldMetadata fieldMetadata = new FieldMetadata(  prefix, member, fieldAnnotation, numericFieldAnnotation, context, reflectionManager );
+		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, fieldAnnotation, numericFieldAnnotation, null, context, reflectionManager );
 		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		addToScopedAnalyzer( fieldMetadata.getFieldName(), fieldMetadata.getAnalyzer(), fieldMetadata.getIndex() );
 		
+		if ( member.isCollection() ) {
+			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
+		}
+	}
+
+	private void bindSpatialAnnotation(XClass classHostingMember,
+									 XProperty member,
+									 PropertiesMetadata propertiesMetadata,
+									 String prefix,
+									 Spatial fieldAnnotation,
+									 ConfigContext context) {
+		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, null, null, fieldAnnotation, context, reflectionManager );
+		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		if ( member.isCollection() ) {
 			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 		}

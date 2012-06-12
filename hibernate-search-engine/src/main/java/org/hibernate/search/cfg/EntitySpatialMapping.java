@@ -28,35 +28,64 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
-import org.hibernate.search.bridge.FieldBridge;
+
+import org.hibernate.search.annotations.SpatialMode;
+import org.hibernate.search.annotations.Store;
 
 /**
- * @author Emmanuel Bernard
+ * @author Nicolas Helleringer
  */
-public class DocumentIdMapping {
+public class EntitySpatialMapping {
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
-	private final PropertyDescriptor property;
-	private final Map<String, Object> documentId = new HashMap<String, Object>();
+	private final EntityMapping entityMapping;
+	private final Map<String, Object> spatial = new HashMap<String, Object>();
 
-	public DocumentIdMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
+	public EntitySpatialMapping(SearchMapping mapping, EntityDescriptor entity, EntityMapping entityMapping) {
 		this.mapping = mapping;
 		this.entity = entity;
-		this.property = property;
-		property.setDocumentId( documentId );
+		this.entityMapping = entityMapping;
+		this.entity.addSpatial(spatial);
 	}
 
-	public DocumentIdMapping name(String fieldName) {
-		documentId.put( "name", fieldName );
+	public EntitySpatialMapping spatial() {
+		return new EntitySpatialMapping( mapping, entity, entityMapping );
+	}
+
+	public EntitySpatialMapping name(String fieldName) {
+		spatial.put( "name", fieldName );
 		return this;
 	}
 
-	public FieldMapping field() {
-		return new FieldMapping(property, entity, mapping);
+	public EntitySpatialMapping store(Store store) {
+		spatial.put( "store", store );
+		return this;
 	}
 
-	public PropertySpatialMapping spatial() {
-		return new PropertySpatialMapping(property, entity, mapping);
+	public EntitySpatialMapping boost(float boost) {
+		final Map<String, Object> boostAnn = new HashMap<String, Object>();
+		boostAnn.put( "value", boost );
+		spatial.put( "boost", boostAnn );
+		return this;
+	}
+
+	public EntitySpatialMapping spatialMode(SpatialMode spatialMode) {
+		spatial.put( "spatialMode", spatialMode );
+		return this;
+	}
+
+	public EntitySpatialMapping topGridLevel(int topGridLevel) {
+		spatial.put( "topGridLevel", topGridLevel );
+		return this;
+	}
+
+	public EntitySpatialMapping bottomGridLevel(int bottomGridLevel) {
+		spatial.put( "bottomGridLevel", bottomGridLevel );
+		return this;
+	}
+
+	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
+		return new FullTextFilterDefMapping(mapping,name, impl);
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
@@ -71,8 +100,8 @@ public class DocumentIdMapping {
 		return new EntityMapping(entityType, mapping);
 	}
 
-	public PropertyMapping bridge(Class<? extends FieldBridge> fieldBridge) {
-		return new FieldBridgeDirectMapping( property, entity, mapping, fieldBridge );
+	public ClassBridgeMapping classBridge(Class<?> impl) {
+		return new ClassBridgeMapping(mapping, entity, impl, entityMapping);
 	}
 
 }

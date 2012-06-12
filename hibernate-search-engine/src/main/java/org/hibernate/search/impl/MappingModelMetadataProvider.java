@@ -67,6 +67,8 @@ import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.annotations.Similarity;
+import org.hibernate.search.annotations.Spatial;
+import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.cfg.EntityDescriptor;
@@ -398,6 +400,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 		private void createFields(PropertyDescriptor property) {
 			final Collection<Map<String,Object>> fields = property.getFields();
+			final Map<String,Object> spatial = property.getSpatial();
 			final Collection<Map<String,Object>> numericFields = property.getNumericFields();
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
@@ -444,6 +447,26 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 				fieldAnnotations.add( (org.hibernate.search.annotations.Field) createAnnotation( fieldAnnotation ) );
 			}
+
+			if( spatial != null && spatial.size() > 0 ) {
+				AnnotationDescriptor spatialAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Spatial.class );
+				for ( Map.Entry<String, Object> entry : spatial.entrySet() ) {
+					 if ( entry.getKey().equals( "boost" ) ) {
+						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
+						@SuppressWarnings("unchecked")
+						Map<String, Object> boost = (Map<String, Object>) entry.getValue();
+						for ( Map.Entry<String, Object> boostEntry : boost.entrySet() ) {
+							boostAnnotation.setValue( boostEntry.getKey(), boostEntry.getValue() );
+						}
+						spatialAnnotation.setValue( "boost", createAnnotation( boostAnnotation ) );
+					}
+					else {
+						spatialAnnotation.setValue( entry.getKey(), entry.getValue() );
+					}
+				}
+				annotations.put( Spatial.class, createAnnotation( spatialAnnotation ) );
+			}
+
 			AnnotationDescriptor fieldsAnnotation = new AnnotationDescriptor( Fields.class );
 			AnnotationDescriptor numericFieldsAnnotation = new AnnotationDescriptor( NumericFields.class );
 
@@ -454,7 +477,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			final NumericField[] numericFieldArray = new NumericField[numericFieldAnnotations.size()];
 			final NumericField[] numericFieldAsArray = numericFieldAnnotations.toArray( numericFieldArray );
 			numericFieldsAnnotation.setValue( "value", numericFieldAsArray);
-			annotations.put( NumericFields.class, createAnnotation( numericFieldsAnnotation ));
+			annotations.put( NumericFields.class, createAnnotation( numericFieldsAnnotation ) );
 			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, createAnnotation( fieldsAnnotation ) );
 			createDateBridge( property );
@@ -585,6 +608,13 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				annotations.put( ClassBridges.class, createAnnotation( classBridgesAnn ) );
 			}
 
+			if ( entity.getSpatials().size() > 0 ) {
+				AnnotationDescriptor spatialsAnn = new AnnotationDescriptor( Spatials.class );
+				Spatial[] spatialsArray = createSpatialsArray( entity.getSpatials() );
+				spatialsAnn.setValue( "value", spatialsArray );
+				annotations.put( Spatials.class, createAnnotation( spatialsAnn ) );
+			}
+
 			if ( entity.getDynamicBoost() != null ) {
 				AnnotationDescriptor dynamicBoostAnn = new AnnotationDescriptor( DynamicBoost.class );
 				Set<Entry<String, Object>> entrySet = entity.getDynamicBoost().entrySet();
@@ -607,6 +637,16 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			return classBridgeDefArray;
 		}
 
+		private Spatial[] createSpatialsArray(Set<Map<String, Object>> spatials) {
+			Spatial[] spatialsArray = new Spatial[spatials.size()];
+			int index = 0;
+			for ( Map<String, Object> spatial : spatials ) {
+				spatialsArray[index] = createSpatial( spatial );
+				index++;
+			}
+
+			return spatialsArray;
+		}
 
 		private ClassBridge createClassBridge(Map<String, Object> classBridgeDef) {
 			AnnotationDescriptor annotation = new AnnotationDescriptor( ClassBridge.class );
@@ -623,6 +663,15 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 			}
 			return (ClassBridge) createAnnotation( annotation );
+		}
+
+		private Spatial createSpatial(Map<String, Object> spatial) {
+			AnnotationDescriptor annotation = new AnnotationDescriptor( Spatial.class );
+			Set<Entry<String, Object>> entrySet = spatial.entrySet();
+			for ( Entry<String, Object> entry : entrySet ) {
+				annotation.setValue( entry.getKey(), entry.getValue() );
+			}
+			return (Spatial) createAnnotation( annotation );
 		}
 
 		private void createProvidedId(EntityDescriptor entity) {

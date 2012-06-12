@@ -69,4 +69,9 @@ public interface QueryBuilder {
 	 * @return the facet context as entry point for building the facet request
 	 */
 	FacetContext facet();
+
+	/**
+	 * Build a spatial query
+	 */
+	SpatialContext spatial();
 }

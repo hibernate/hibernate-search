@@ -63,6 +63,10 @@ public class PropertyMapping {
 		return new FieldMapping(property, entity, mapping);
 	}
 
+	public PropertySpatialMapping spatial() {
+		return new PropertySpatialMapping(property, entity, mapping);
+	}
+
 	public DateBridgeMapping dateBridge(Resolution resolution) {
 		return new DateBridgeMapping(mapping, entity, property, resolution);
 	}

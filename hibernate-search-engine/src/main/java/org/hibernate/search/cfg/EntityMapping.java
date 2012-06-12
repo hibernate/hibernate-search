@@ -46,6 +46,10 @@ public class EntityMapping {
 	public IndexedMapping indexed() {
 		return new IndexedMapping(mapping,entity, this);
 	}
+
+	public EntitySpatialMapping spatial() {
+		return new EntitySpatialMapping( mapping, entity, this );
+	}
 	
 	public EntityMapping similarity(Class<?> impl) {
 		Map<String, Object> similarity = new HashMap<String, Object>(1);
