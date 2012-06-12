@@ -253,7 +253,43 @@ List results = hibQuery.list();</programlisting>
     
   </section>
   
-  <section id="spatial-behind -curtain">
+  <section id="spatial-dsl">
+	<title>Spatial query DSL</title>
+	
+	<para>Beyond the spatial query builder, the Hibernate Search DSL has been extended to support the
+	spatial feature. You can build a query for searching around a (latitude,longitude) or around an
+	bean implementing the Coordinates interface :</para>
+
+	<example>
+		<title>DSL example with latitude and longitude</title>
+		<programlisting language="JAVA" role="JAVA">final QueryBuilder builder = fullTextSession.getSearchFactory()
+	.buildQueryBuilder().forEntity( RangeEvent.class ).get();
+
+double centerLatitude= 24;
+double centerLongitude= 31.5;
+
+org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+	.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude )
+	.createQuery();
+	
+org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
+	RangeEvent.class );</programlisting>
+	</example>
+	<example>
+		<title>DSL example with Coordinates</title>
+		<programlisting language="JAVA" role="JAVA">Coordinates coordinates = Point.fromDegrees(24d, 31.5d);
+Query query = builder
+		.spatial()
+			.onCoordinates( "location" )
+			.within( 51, Unit.KM )
+				.ofCoordinates( coordinates )
+			.createQuery();
+
+List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</programlisting>
+	</example>	
+  </section>
+  
+  <section id="spatial-behind-curtain">
     <title>Grid - Behind the curtain</title>
     
     <para>Here are the gory details of the grid based indexation.</para>
