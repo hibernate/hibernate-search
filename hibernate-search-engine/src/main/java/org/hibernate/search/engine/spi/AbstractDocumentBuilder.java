@@ -79,6 +79,7 @@ import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -432,7 +433,7 @@ public abstract class AbstractDocumentBuilder<T> {
 			bindClassBridgeAnnotation( prefix, propertiesMetadata, classBridgeAnn, clazz, context );
 		}
 
-		checkForAnalyzerDiscriminator( clazz, propertiesMetadata );
+		checkForAnalyzerDiscriminator( clazz, propertiesMetadata, context );
 
 		// Get similarity
 		if ( isRoot ) {
@@ -446,7 +447,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		checkForField( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForFields( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForAnalyzerDefs( member, context );
-		checkForAnalyzerDiscriminator( member, propertiesMetadata );
+		checkForAnalyzerDiscriminator( member, propertiesMetadata, context );
 		checkForIndexedEmbedded(
 				classHostingMember,
 				member,
@@ -473,13 +474,18 @@ public abstract class AbstractDocumentBuilder<T> {
 		context.addAnalyzerDef( def, annotatedElement );
 	}
 
-	private void checkForAnalyzerDiscriminator(XAnnotatedElement annotatedElement, PropertiesMetadata propertiesMetadata) {
+	private void checkForAnalyzerDiscriminator(XAnnotatedElement annotatedElement, PropertiesMetadata propertiesMetadata, ConfigContext context) {
 		AnalyzerDiscriminator discriminatorAnn = annotatedElement.getAnnotation( AnalyzerDiscriminator.class );
 		if ( discriminatorAnn != null ) {
 			if ( propertiesMetadata.discriminator != null ) {
 				throw new SearchException(
 						"Multiple AnalyzerDiscriminator defined in the same class hierarchy: " + beanXClass.getName()
 				);
+			}
+
+			if ( annotatedElement instanceof XProperty && isPropertyTransient( (XProperty)annotatedElement, context ) ) {
+				//if the discriminator is calculated on a @Transient field, we can't trust field level dirtyness
+				forceStateInspectionOptimizationsDisabled();
 			}
 
 			Class<? extends Discriminator> discriminatorClass = discriminatorAnn.impl();
@@ -561,6 +567,25 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 		if ( ( fieldAnn == null && idAnn == null ) && numericFieldAnn != null ) {
 			throw new SearchException( "@NumericField without a @Field on property '" + member.getName() + "'" );
+		}
+	}
+
+	private boolean isPropertyTransient(XProperty member, ConfigContext context) {
+		if ( context.isJpaPresent() == false ) {
+			return false;
+		}
+		else {
+			Annotation transientAnnotation;
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends Annotation> jpaIdClass =
+						ClassLoaderHelper.classForName( "javax.persistence.Transient", ConfigContext.class.getClassLoader() );
+				transientAnnotation = member.getAnnotation( jpaIdClass );
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new SearchException( "Unable to load @Transient.class even though it should be present ?!" );
+			}
+			return transientAnnotation != null;
 		}
 	}
 
@@ -899,6 +924,13 @@ public abstract class AbstractDocumentBuilder<T> {
 									 org.hibernate.search.annotations.Field fieldAnnotation,
 									 NumericField numericFieldAnnotation,
 									 ConfigContext context) {
+
+		if ( isPropertyTransient( member, context ) ) {
+			//If the indexed values are derived from a Transient field, we can't rely on dirtyness of properties.
+			//Only applies on JPA mapped entities.
+			forceStateInspectionOptimizationsDisabled();
+		}
+
 		FieldMetadata fieldMetadata = new FieldMetadata(  prefix, member, fieldAnnotation, numericFieldAnnotation, context, reflectionManager );
 		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		addToScopedAnalyzer( fieldMetadata.getFieldName(), fieldMetadata.getAnalyzer(), fieldMetadata.getIndex() );
