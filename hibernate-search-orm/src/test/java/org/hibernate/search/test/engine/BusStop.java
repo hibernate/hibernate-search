@@ -36,7 +36,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Fields;
 
 /**
  * Test entity: BusStop is @ContainedIn BusLine
@@ -129,18 +128,6 @@ public class BusStop {
 			return false;
 		}
 		return true;
-	}
-
-	@Fields({
-		@Field(name = "strMultiple"),
-		@Field })
-	@Transient
-	public String getTextTestField() {
-		StringBuilder sb = new StringBuilder();
-		sb.append( getRoadName() ).append( " " ).append( getServiceComments() )
-				.append( " - " ).append( getStartingDate() );
-		setNumMethodCalls( getNumMethodCalls() + 1 );
-		return sb.toString();
 	}
 
 	@Transient
