@@ -30,9 +30,9 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
-import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.search.Similarity;
 
 import org.hibernate.search.Environment;
@@ -51,22 +51,23 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 class IndexWriterHolder {
-	
 	private static final Log log = LoggerFactory.make();
-	
+
 	/**
 	 * This Analyzer is never used in practice: during Add operation it's overridden.
 	 * So we don't care for the Version, using whatever Lucene thinks is safer.
 	 */
 	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer( Environment.DEFAULT_LUCENE_MATCH_VERSION );
-	
-	private final IndexWriterConfig writerConfig = new IndexWriterConfig( Environment.DEFAULT_LUCENE_MATCH_VERSION , SIMPLE_ANALYZER );
-	private final LuceneIndexingParameters luceneParameters;
+
+	private final IndexWriterConfig writerConfig = new IndexWriterConfig(
+			Environment.DEFAULT_LUCENE_MATCH_VERSION,
+			SIMPLE_ANALYZER
+	);
 	private final ErrorHandler errorHandler;
 	private final ParameterSet indexParameters;
 	private final DirectoryProvider directoryProvider;
 	private final String indexName;
-	
+
 	// variable state:
 
 	/**
@@ -83,10 +84,10 @@ class IndexWriterHolder {
 	IndexWriterHolder(ErrorHandler errorHandler, DirectoryBasedIndexManager indexManager) {
 		this.errorHandler = errorHandler;
 		this.indexName = indexManager.getIndexName();
-		this.luceneParameters = indexManager.getIndexingParameters();
+		LuceneIndexingParameters luceneParameters = indexManager.getIndexingParameters();
 		this.indexParameters = luceneParameters.getIndexParameters();
 		this.directoryProvider = indexManager.getDirectoryProvider();
-		this.luceneParameters.applyToWriter( writerConfig );
+		luceneParameters.applyToWriter( writerConfig );
 		Similarity similarity = indexManager.getSimilarity();
 		if ( similarity != null ) {
 			writerConfig.setSimilarity( similarity );
@@ -98,8 +99,10 @@ class IndexWriterHolder {
 
 	/**
 	 * Gets the IndexWriter, opening one if needed.
+	 *
 	 * @param errorContextBuilder might contain some context useful to provide when handling IOExceptions.
-	 *  Is an optional parameter.
+	 * Is an optional parameter.
+	 *
 	 * @return a new IndexWriter or one already open.
 	 */
 	public IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
@@ -143,12 +146,12 @@ class IndexWriterHolder {
 		writerConfig.setMergePolicy( newMergePolicy );
 		MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler, this.indexName );
 		writerConfig.setMergeScheduler( mergeScheduler );
-		IndexWriter writer = new IndexWriter( directoryProvider.getDirectory(), writerConfig );
-		return writer;
+		return new IndexWriter( directoryProvider.getDirectory(), writerConfig );
 	}
 
 	/**
 	 * Commits changes to a previously opened IndexWriter.
+	 *
 	 * @param errorContextBuilder use it to handle exceptions, as it might contain a reference to the work performed before the commit
 	 */
 	public void commitIndexWriter(ErrorContextBuilder errorContextBuilder) {
@@ -156,7 +159,7 @@ class IndexWriterHolder {
 		if ( indexWriter != null ) {
 			try {
 				indexWriter.commit();
-				log.trace( "Index changes commited." );
+				log.trace( "Index changes committed." );
 			}
 			catch ( IOException ioe ) {
 				handleIOException( ioe, errorContextBuilder );
@@ -206,7 +209,7 @@ class IndexWriterHolder {
 				IndexWriter.unlock( directoryProvider.getDirectory() );
 			}
 		}
-		catch (IOException ioe) {
+		catch ( IOException ioe ) {
 			handleIOException( ioe, null );
 		}
 		finally {
@@ -269,8 +272,7 @@ class IndexWriterHolder {
 			this.errorHandler.handle( errorContext );
 		}
 		else {
-			errorHandler.handleException( log.ioExceptionOnIndexWriter() , ioe );
+			errorHandler.handleException( log.ioExceptionOnIndexWriter(), ioe );
 		}
 	}
-
 }

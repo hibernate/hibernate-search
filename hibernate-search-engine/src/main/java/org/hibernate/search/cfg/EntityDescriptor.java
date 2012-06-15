@@ -39,11 +39,11 @@ public class EntityDescriptor {
 	private Map<String, Object> boost;
 	private Map<String, Object> analyzerDiscriminator;
 	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
-	private Map<String,Object> providedId;
-	private Set<Map<String,Object>> classBridges = new HashSet<Map<String,Object>>();
+	private Map<String, Object> providedId;
+	private Set<Map<String, Object>> classBridges = new HashSet<Map<String, Object>>();
 	private Map<String, Object> dynamicBoost;
 	private Map<String, Object> cacheInMemory;
-	
+
 	public Map<String, Object> getIndexed() {
 		return indexed;
 	}
@@ -58,9 +58,9 @@ public class EntityDescriptor {
 	PropertyDescriptor getProperty(String name, ElementType type) {
 		PropertyKey propertyKey = new PropertyKey( name, type );
 		PropertyDescriptor descriptor = properties.get( propertyKey );
-		if (descriptor == null) {
-			descriptor = new PropertyDescriptor(name, type);
-			properties.put(propertyKey, descriptor);
+		if ( descriptor == null ) {
+			descriptor = new PropertyDescriptor( name, type );
+			properties.put( propertyKey, descriptor );
 		}
 		return descriptor;
 	}
@@ -72,11 +72,11 @@ public class EntityDescriptor {
 	public void setSimilariy(Map<String, Object> similarity) {
 		this.similarity = similarity;
 	}
-	
+
 	public Map<String, Object> getSimilarity() {
 		return similarity;
 	}
-	
+
 	public Map<String, Object> getCacheInMemory() {
 		return cacheInMemory;
 	}
@@ -100,40 +100,39 @@ public class EntityDescriptor {
 	public Map<String, Object> getAnalyzerDiscriminator() {
 		return analyzerDiscriminator;
 	}
-	
+
 	public Set<Map<String, Object>> getFullTextFilterDefs() {
 		return fullTextFilterDefs;
 	}
-	
+
 	public void addFulltextFilterDef(Map<String, Object> fullTextFilterDef) {
-		fullTextFilterDefs.add(fullTextFilterDef);
+		fullTextFilterDefs.add( fullTextFilterDef );
 	}
 
-	
-	public void addClassBridgeDef(Map<String,Object> classBridge) {
-		classBridges.add(classBridge);
+	public void addClassBridgeDef(Map<String, Object> classBridge) {
+		classBridges.add( classBridge );
 	}
-	
+
 	public Set<Map<String, Object>> getClassBridgeDefs() {
 		return classBridges;
 	}
-	
+
 	public void setProvidedId(Map<String, Object> providedId) {
 		this.providedId = providedId;
 	}
-	
+
 	public Map<String, Object> getProvidedId() {
 		return this.providedId;
 	}
-	
+
 	public void setDynamicBoost(Map<String, Object> dynamicEntityBoost) {
 		this.dynamicBoost = dynamicEntityBoost;
 	}
-	
+
 	public Map<String, Object> getDynamicBoost() {
 		return this.dynamicBoost;
 	}
-	
+
 	private static class PropertyKey {
 		private String name;
 		private ElementType type;
@@ -152,7 +151,7 @@ public class EntityDescriptor {
 				return false;
 			}
 
-			PropertyKey property = ( PropertyKey ) o;
+			PropertyKey property = (PropertyKey) o;
 
 			if ( name != null ? !name.equals( property.name ) : property.name != null ) {
 				return false;
@@ -171,5 +170,4 @@ public class EntityDescriptor {
 			return result;
 		}
 	}
-
 }

@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.index.IndexReader;
+
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
@@ -35,19 +36,17 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * The Workspace implementation to be used to take advantage of NRT Lucene features.
- * IndexReader instances are obtained directly from the IndexWriter, which is not forced
+ * {@code IndexReader} instances are obtained directly from the {@code IndexWriter}, which is not forced
  * to flush all pending changes to the Directory structure.
- * 
- * We keep a reference Reader, obtained from the IndexWriter each time a transactional queue
- * is applied, so that the IndexReader instance "sees" only fully committed transactions;
- * the reference is never returned to clients, but each time a client needs an IndexReader
- * a clone is created from the last refreshed IndexReader.
- * 
- * Since the backend is forced to create a reference IndexReader after each (skipped) commit,
- * some IndexReaders might be opened without being ever used.
- * 
+ *
+ * We keep a reference reader, obtained from the {@code IndexWriter} each time a transactional queue
+ * is applied, so that the {@code IndexReader} instance "sees" only fully committed transactions.
+ *
+ * Since the backend is forced to create a reference {@code IndexReader} after each (skipped) commit,
+ * some {@code IndexReader}s might be opened without being ever used.
+ *
  * This class implements both Workspace and ReaderProvider.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements DirectoryBasedReaderProvider {
@@ -72,7 +71,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 			writerHolder.forceLockRelease();
 		}
 		else {
-			if ( ! streaming ) {
+			if ( !streaming ) {
 				flush();
 			}
 		}
@@ -121,15 +120,15 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	@Override
 	public void stop() {
-			writeLock.lock();
-			try {
-				final IndexReader oldReader = currentReader.getAndSet( null );
-				closeIndexReader( oldReader );
-				shutdown = true;
-			}
-			finally {
-				writeLock.unlock();
-			}
+		writeLock.lock();
+		try {
+			final IndexReader oldReader = currentReader.getAndSet( null );
+			closeIndexReader( oldReader );
+			shutdown = true;
+		}
+		finally {
+			writeLock.unlock();
+		}
 	}
 
 	@Override
@@ -145,5 +144,4 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 			log.unableToCloseLuceneIndexReader( e );
 		}
 	}
-
 }
