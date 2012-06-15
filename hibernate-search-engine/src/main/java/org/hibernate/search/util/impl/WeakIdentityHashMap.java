@@ -930,7 +930,7 @@ public class WeakIdentityHashMap<K,V> /*extends AbstractMap*/ implements Map<K,V
 				return false;
 			Map.Entry e = (Map.Entry) o;
 			Object k = e.getKey();
-			Entry candidate = getEntry( e.getKey() );
+			Entry candidate = getEntry( k );
 			return candidate != null && candidate.equals( e );
 		}
 
@@ -997,7 +997,6 @@ public class WeakIdentityHashMap<K,V> /*extends AbstractMap*/ implements Map<K,V
 		}
 
 		public int hashCode() {
-			Object v;
 			return ( ( key == null ) ?
 					0 :
 					key.hashCode() ) ^

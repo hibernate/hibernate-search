@@ -200,6 +200,7 @@ public final class Environment {
 	 * and not wanting to rebuild the index from scratch. It's highly recommended to specify a version, so that you
 	 * can upgrade Hibernate Search and control when to eventually upgrade the Lucene format.
 	 */
+	@SuppressWarnings("deprecation")//We know it's discouraged
 	public static final org.apache.lucene.util.Version DEFAULT_LUCENE_MATCH_VERSION = org.apache.lucene.util.Version.LUCENE_CURRENT;
 
 	/**

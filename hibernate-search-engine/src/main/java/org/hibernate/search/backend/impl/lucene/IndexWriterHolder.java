@@ -21,6 +21,8 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
@@ -66,11 +68,16 @@ class IndexWriterHolder {
 	private final String indexName;
 	
 	// variable state:
-	
+
 	/**
-	 * Current open IndexWriter, or null when closed. Guarded by synchronization.
+	 * Current open IndexWriter, or null when closed.
 	 */
-	private IndexWriter writer;
+	private final AtomicReference<IndexWriter> writer = new AtomicReference<IndexWriter>();
+
+	/**
+	 * Protects from multiple initialization attempts of IndexWriter
+	 */
+	private final ReentrantLock writerInitializationLock = new ReentrantLock();
 
 
 	IndexWriterHolder(ErrorHandler errorHandler, DirectoryBasedIndexManager indexManager) {
@@ -95,18 +102,30 @@ class IndexWriterHolder {
 	 *  Is an optional parameter.
 	 * @return a new IndexWriter or one already open.
 	 */
-	public synchronized IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
-		if ( writer != null )
-			return writer;
-		try {
-			writer = createNewIndexWriter();
-			log.trace( "IndexWriter opened" );
+	public IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
+		IndexWriter indexWriter = writer.get();
+		if ( indexWriter == null ) {
+			writerInitializationLock.lock();
+			try {
+				indexWriter = writer.get();
+				if ( indexWriter == null ) {
+					try {
+						indexWriter = createNewIndexWriter();
+						log.trace( "IndexWriter opened" );
+						writer.set( indexWriter );
+					}
+					catch ( IOException ioe ) {
+						indexWriter = null;
+						writer.set( null );
+						handleIOException( ioe, errorContextBuilder );
+					}
+				}
+			}
+			finally {
+				writerInitializationLock.unlock();
+			}
 		}
-		catch ( IOException ioe ) {
-			writer = null;
-			handleIOException( ioe, errorContextBuilder );
-		}
-		return writer;
+		return indexWriter;
 	}
 
 	public IndexWriter getIndexWriter() {
@@ -132,11 +151,11 @@ class IndexWriterHolder {
 	 * Commits changes to a previously opened IndexWriter.
 	 * @param errorContextBuilder use it to handle exceptions, as it might contain a reference to the work performed before the commit
 	 */
-	//TODO HSEARCH-852 : a commit should not block a getIndexWriter: split the locking
-	public synchronized void commitIndexWriter(ErrorContextBuilder errorContextBuilder) {
-		if ( writer != null ) {
+	public void commitIndexWriter(ErrorContextBuilder errorContextBuilder) {
+		IndexWriter indexWriter = writer.get();
+		if ( indexWriter != null ) {
 			try {
-				writer.commit();
+				indexWriter.commit();
 				log.trace( "Index changes commited." );
 			}
 			catch ( IOException ioe ) {
@@ -155,9 +174,8 @@ class IndexWriterHolder {
 	/**
 	 * Closes a previously opened IndexWriter.
 	 */
-	public synchronized void closeIndexWriter() {
-		IndexWriter toClose = writer;
-		writer = null;
+	public void closeIndexWriter() {
+		final IndexWriter toClose = writer.getAndSet( null );
 		if ( toClose != null ) {
 			try {
 				toClose.close();
@@ -173,22 +191,26 @@ class IndexWriterHolder {
 	/**
 	 * Forces release of Directory lock. Should be used only to cleanup as error recovery.
 	 */
-	public synchronized void forceLockRelease() {
+	public void forceLockRelease() {
 		log.forcingReleaseIndexWriterLock();
+		writerInitializationLock.lock();
 		try {
 			try {
-				if ( writer != null ) {
-					writer.close();
+				IndexWriter indexWriter = writer.getAndSet( null );
+				if ( indexWriter != null ) {
+					indexWriter.close();
 					log.trace( "IndexWriter closed" );
 				}
 			}
 			finally {
-				writer = null; //make sure to send a faulty writer into garbage
 				IndexWriter.unlock( directoryProvider.getDirectory() );
 			}
 		}
 		catch (IOException ioe) {
 			handleIOException( ioe, null );
+		}
+		finally {
+			writerInitializationLock.unlock();
 		}
 	}
 
@@ -196,11 +218,11 @@ class IndexWriterHolder {
 	 * Opens an IndexReader having visibility on uncommitted writes from
 	 * the IndexWriter, if any writer is open, or null if no IndexWriter is open.
 	 */
-	//TODO HSEARCH-852 : fine grained synchronization
-	public synchronized IndexReader openNRTIndexReader(boolean applyDeletes) {
+	public IndexReader openNRTIndexReader(boolean applyDeletes) {
+		final IndexWriter indexWriter = writer.get();
 		try {
-			if ( writer != null ) {
-				return IndexReader.open( writer, applyDeletes );
+			if ( indexWriter != null ) {
+				return IndexReader.open( indexWriter, applyDeletes );
 			}
 			else {
 				return null;
@@ -221,7 +243,7 @@ class IndexWriterHolder {
 	 */
 	public IndexReader openDirectoryIndexReader() {
 		try {
-			return IndexReader.open( directoryProvider.getDirectory(), true );
+			return IndexReader.open( directoryProvider.getDirectory() );
 		}
 		// following exceptions should be propagated as the IndexReader is needed by
 		// the main thread

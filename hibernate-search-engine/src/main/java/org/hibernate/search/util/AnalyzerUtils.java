@@ -124,6 +124,6 @@ public class AnalyzerUtils {
 	}
 
 	public static String getTermText(Token token) {
-		return token.term();
+		return new String( token.buffer(), 0, token.length() );
 	}
 }

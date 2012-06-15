@@ -22,12 +22,11 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -55,18 +54,16 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	private static final Log log = LoggerFactory.make();
 
-	private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+	private final ReentrantLock writeLock = new ReentrantLock();
+	private final AtomicReference<IndexReader> currentReader = new AtomicReference<IndexReader>();
 
-	private final ReadLock readLock = readWriteLock.readLock();
-	private final WriteLock writeLock = readWriteLock.writeLock();
-	private final String indexName;
-
-	//guardedBy readLock/writeLok
-	private IndexReader currentReferenceReader = null;
+	/**
+	 * Set to true when this service is shutdown (not revertible)
+	 */
+	private boolean shutdown = false;
 
 	public NRTWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext buildContext, Properties cfg) {
 		super( indexManager, buildContext, cfg );
-		indexName = indexManager.getIndexName();
 	}
 
 	@Override
@@ -83,53 +80,25 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	@Override
 	public IndexReader openIndexReader() {
-		// we need to readLock to read the state of the currentReferenceReader
-		readLock.lock(); // balanced by the finally block
-		boolean readlockAcquired = true;
-		try {
-			if ( currentReferenceReader == null ) {
-				readLock.unlock();
-				// in this case we need to create a new Reader, so we need to upgrade
-				// the read lock to the write lock (upgrade is not supported by a
-				// ReentrantReadWriteLock so we need to release the readlock first)
-				readlockAcquired = false;
-				writeLock.lock(); // balanced by the inner final block
-				try {
-					// check again as we had to release the lock after the first check:
-					if ( currentReferenceReader == null) {
-						currentReferenceReader = writerHolder.openDirectoryIndexReader();
-					}
+		IndexReader indexReader = currentReader.get();
+		if ( indexReader == null ) {
+			writeLock.lock();
+			try {
+				if ( shutdown ) {
+					throw new AssertionFailure( "IndexReader requested after ReaderProvider is shutdown" );
 				}
-				finally {
-					writeLock.unlock();
+				indexReader = currentReader.get();
+				if ( indexReader == null ) {
+					indexReader = writerHolder.openDirectoryIndexReader();
+					currentReader.set( indexReader );
 				}
-				readLock.lock();
-				// if we succeed in acquiring this, make sure we will release it again:
-				readlockAcquired = true;
 			}
-			return cloneReader( currentReferenceReader );
-		}
-		finally {
-			if ( readlockAcquired ) {
-				readLock.unlock();
+			finally {
+				writeLock.unlock();
 			}
 		}
-	}
-
-	/**
-	 * We need to return clones so that each reader can be closed independently;
-	 * clones should share most heavy-weight buffers anyway.
-	 */
-	private IndexReader cloneReader(IndexReader indexReader) {
-		try {
-			return indexReader.clone( true );
-		}
-		catch ( CorruptIndexException cie ) {
-			throw log.cantOpenCorruptedIndex( cie, indexName );
-		}
-		catch ( IOException ioe ) {
-			throw log.ioExceptionOnIndex( ioe, indexName );
-		}
+		indexReader.incRef();
+		return indexReader;
 	}
 
 	@Override
@@ -138,7 +107,8 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 			return;
 		}
 		try {
-			reader.close();
+			//don't use IndexReader#close as it prevents further counter decrements!
+			reader.decRef();
 		}
 		catch ( IOException e ) {
 			log.unableToCloseLuceneIndexReader( e );
@@ -151,22 +121,21 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	@Override
 	public void stop() {
-		writeLock.lock();
-		try {
-			closeIndexReader( currentReferenceReader );
-		}
-		finally {
-			writeLock.unlock();
-		}
+			writeLock.lock();
+			try {
+				final IndexReader oldReader = currentReader.getAndSet( null );
+				closeIndexReader( oldReader );
+				shutdown = true;
+			}
+			finally {
+				writeLock.unlock();
+			}
 	}
 
 	@Override
 	public void flush() {
-		IndexReader newIndexReader = writerHolder.openNRTIndexReader( true );
-		writeLock.lock();
-		IndexReader oldReader = currentReferenceReader;
-		currentReferenceReader = newIndexReader;
-		writeLock.unlock();
+		final IndexReader newIndexReader = writerHolder.openNRTIndexReader( true );
+		final IndexReader oldReader = currentReader.getAndSet( newIndexReader );
 		try {
 			if ( oldReader != null ) {
 				oldReader.close();

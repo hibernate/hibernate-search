@@ -38,6 +38,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.Payload;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.AttributeSource;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
@@ -234,7 +235,12 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		numField.setBoost( boost );
 		numField.setOmitNorms( omitNorms );
-		numField.setOmitTermFreqAndPositions( omitTermFreqAndPositions );
+		if ( omitTermFreqAndPositions ) {
+			numField.setIndexOptions( IndexOptions.DOCS_ONLY );
+		}
+		else {
+			numField.setIndexOptions( IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
+		}
 		return numField;
 	}
 
@@ -262,7 +268,12 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private void setCommonFieldAttributesAddAddToDocument(float boost, boolean omitNorms, boolean omitTermFreqAndPositions, Field luceneField) {
 		luceneField.setBoost( boost );
 		luceneField.setOmitNorms( omitNorms );
-		luceneField.setOmitTermFreqAndPositions( omitTermFreqAndPositions );
+		if ( omitTermFreqAndPositions ) {
+			luceneField.setIndexOptions( IndexOptions.DOCS_ONLY );
+		}
+		else {
+			luceneField.setIndexOptions( IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
+		}
 		getLuceneDocument().add( luceneField );
 	}
 
