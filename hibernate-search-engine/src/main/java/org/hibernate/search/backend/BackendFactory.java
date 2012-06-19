@@ -27,6 +27,7 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.AutoNodeSelector;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.MasterNodeSelector;
 import org.hibernate.search.backend.impl.jgroups.SlaveNodeSelector;
@@ -72,12 +73,10 @@ public class BackendFactory {
 		else if ( "jgroupsSlave".equals( backend ) ) {
 			backendQueueProcessor = new JGroupsBackendQueueProcessor( new SlaveNodeSelector() );
 		}
-		//TODO: enable it when considered less experimental:
-		//else if ( "jgroups".equals( backend ) ) {
-		//	backendQueueProcessor = new JGroupsBackendQueueProcessor(
-		//			new AutoNodeSelector( indexManager.getIndexName() ) );
-		//}
-		else {
+        else if ( "jgroups".equals( backend ) ) {
+			backendQueueProcessor = new JGroupsBackendQueueProcessor( new AutoNodeSelector( indexManager.getIndexName() ) );
+		}
+        else {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
 					BackendQueueProcessor.class,
 					backend, BackendFactory.class, "processor"

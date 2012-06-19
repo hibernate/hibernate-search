@@ -45,6 +45,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Ales Justin
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor
  * @see org.hibernate.search.backend.impl.lucene.LuceneBackendQueueTask
  * @see org.jgroups.Receiver
@@ -75,7 +76,6 @@ public class JGroupsMasterMessageListener implements Receiver {
 				}
 				else {
 					log.messageReceivedForUndefinedIndex( indexName );
-					return;
 				}
 			}
 			else {
@@ -84,11 +84,9 @@ public class JGroupsMasterMessageListener implements Receiver {
 		}
 		catch ( ClassCastException e ) {
 			log.illegalObjectRetrievedFromMessage( e );
-			return;
 		}
 		catch ( SearchException e ) {
 			log.illegalObjectRetrievedFromMessage( e );
-			return;
 		}
 	}
 
