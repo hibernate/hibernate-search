@@ -550,4 +550,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 130, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
 			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
+
+	@Message(id = 132, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '" + JGroupsChannelProvider.MUX_ID + "'.")
+	SearchException missingJGroupsMuxId();
+
+	@Message(id = 133, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
+	SearchException jGroupsMuxIdAlreadyTaken(short n);
 }

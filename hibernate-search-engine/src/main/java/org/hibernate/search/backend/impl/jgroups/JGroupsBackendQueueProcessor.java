@@ -38,7 +38,6 @@ import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
-import org.jgroups.Channel;
 
 /**
  * This index backend is able to switch dynamically between a standard
@@ -47,6 +46,7 @@ import org.jgroups.Channel;
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Ales Justin
  */
 public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
@@ -54,7 +54,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	private final NodeSelectorStrategy selectionStrategy;
 
-	protected Channel channel;
+	protected MessageSender messageSender;
 	protected String indexName;
 	protected DirectoryBasedIndexManager indexManager;
 
@@ -74,9 +74,10 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		assertLegacyOptionsNotUsed( props, indexName );
 		this.indexManager = indexManager;
 		this.context = context;
-		this.channel = context.requestService( JGroupsChannelProvider.class );
+		this.messageSender = context.requestService( JGroupsChannelProvider.class );
 		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
+		selectionStrategy.viewAccepted( messageSender.getView() ); // set current view?
 		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector );
 		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 		luceneBackendQueueProcessor.initialize( props, context, indexManager );
@@ -88,8 +89,8 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		luceneBackendQueueProcessor.close();
 	}
 
-	Channel getChannel() {
-		return channel;
+	MessageSender getMessageSender() {
+		return messageSender;
 	}
 
 	/**
@@ -98,8 +99,8 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	 * @return Address
 	 */
 	public Address getAddress() {
-		if ( address == null && channel != null ) {
-			address = channel.getAddress();
+		if ( address == null && messageSender != null ) {
+			address = messageSender.getAddress();
 		}
 		return address;
 	}
