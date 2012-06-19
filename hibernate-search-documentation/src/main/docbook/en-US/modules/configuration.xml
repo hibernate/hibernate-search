@@ -539,12 +539,12 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
         <para>To use and existing <classname>CacheManager</classname> via JNDI
         (optional parameter):</para>
 
-        <programlisting>hibernate.search.[default|&lt;indexname&gt;].infinispan.cachemanager_jndiname = [jndiname]</programlisting>
+        <programlisting>hibernate.search.infinispan.cachemanager_jndiname = [jndiname]</programlisting>
 
         <para>To start a new <classname>CacheManager</classname> from a
         configuration file (optional parameter):</para>
 
-        <programlisting>hibernate.search.[default|&lt;indexname&gt;].infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
+        <programlisting>hibernate.search.infinispan.configuration_resourcename = [infinispan configuration filename]</programlisting>
 
         <para>If both parameters are defined, JNDI will have priority. If none
         of these is defined, Hibernate Search will use the default Infinispan
