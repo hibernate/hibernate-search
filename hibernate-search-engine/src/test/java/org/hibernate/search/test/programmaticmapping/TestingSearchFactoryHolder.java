@@ -36,9 +36,15 @@ public class TestingSearchFactoryHolder extends ExternalResource {
 
 	private final SearchMapping buildMappingDefinition;
 	private SearchFactoryImplementor sf;
+	private final Class<?>[] entities;
 
-	public TestingSearchFactoryHolder(SearchMapping buildMappingDefinition) {
+	public TestingSearchFactoryHolder(Class<?>... entities) {
+		this( null, entities );
+	}
+
+	public TestingSearchFactoryHolder(SearchMapping buildMappingDefinition, Class<?>... entities) {
 		this.buildMappingDefinition = buildMappingDefinition;
+		this.entities = entities;
 	}
 
 	public SearchFactoryImplementor getSearchFactory() {
@@ -50,6 +56,9 @@ public class TestingSearchFactoryHolder extends ExternalResource {
 		ManualConfiguration cfg = new ManualConfiguration();
 		cfg.setProgrammaticMapping( buildMappingDefinition );
 		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		for ( Class<?> c : entities ) {
+			cfg.addClass( c );
+		}
 		sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 	}
 

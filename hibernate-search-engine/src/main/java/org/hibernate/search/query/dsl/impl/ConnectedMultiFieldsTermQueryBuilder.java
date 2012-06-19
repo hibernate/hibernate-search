@@ -46,11 +46,16 @@ import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.TermTermination;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
+
+	private static final Log log = LoggerFactory.make();
+
 	private final Object value;
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext termContext;
@@ -103,7 +108,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			);
 
 			if ( terms.size() == 0 ) {
-				throw new SearchException( "Try to search with an empty string: " + fieldContext.getField() );
+				throw log.queryWithNoTermsAfterAnalysis( fieldContext.getField(), searchTerm );
 			}
 			else if ( terms.size() == 1 ) {
 				perFieldQuery = createTermQuery( fieldContext, terms.get( 0 ) );
