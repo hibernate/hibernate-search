@@ -34,8 +34,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.BuildContext;
@@ -103,11 +103,11 @@ public class ServiceManager {
 			return (T) providedProviders.get( serviceProviderClass );
 		}
 
-		ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
+		ServiceProviderWrapper<T> wrapper = managedProviders.get( serviceProviderClass );
 		if ( wrapper == null ) {
 			if ( availableProviders.contains( serviceProviderClass ) ) {
-				ServiceProvider<?> serviceProvider = ClassLoaderHelper.instanceFromClass( ServiceProvider.class, serviceProviderClass, "service provider" );
-				wrapper = new ServiceProviderWrapper( serviceProvider, context );
+				ServiceProvider<T> serviceProvider = ClassLoaderHelper.instanceFromClass( ServiceProvider.class, serviceProviderClass, "service provider" );
+				wrapper = new ServiceProviderWrapper( serviceProvider, context, serviceProviderClass );
 				managedProviders.putIfAbsent( serviceProviderClass, wrapper );
 			}
 			else {
@@ -115,8 +115,8 @@ public class ServiceManager {
 			}
 		}
 		wrapper = managedProviders.get( serviceProviderClass );
-		wrapper.increaseCounter();
-		return (T) wrapper.getServiceProvider().getService();
+		wrapper.startVirtual();
+		return wrapper.getService();
 	}
 
 	public void releaseService(Class<? extends ServiceProvider<?>> serviceProviderClass) {
@@ -124,55 +124,100 @@ public class ServiceManager {
 		if ( providedProviders.containsKey( serviceProviderClass ) ) {
 			return;
 		}
-		
+
 		final ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
 		if ( wrapper == null ) {
-			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
+			throw new AssertionFailure( "Unable to find service related to " + serviceProviderClass);
 		}
-		wrapper.decreaseCounter();
+
+		wrapper.stopVirtual();
 	}
 
 	public void stopServices() {
 		for ( ServiceProviderWrapper wrapper :  managedProviders.values() ) {
-			if ( wrapper.getCounter() != 0 ) {
-				log.serviceProviderNotReleased( wrapper.getServiceProvider().getClass() );
-			}
-			try {
-				wrapper.getServiceProvider().stop();
-			}
-			catch ( Exception e ) {
-				log.stopServiceFailed( wrapper.getServiceProvider().getClass(), e );
-			}
+			wrapper.ensureStopped();
 		}
 	}
 
-	private class ServiceProviderWrapper {
-		private final ServiceProvider<?> serviceProvider;
-		private final AtomicInteger counter = new AtomicInteger( 0 );
-		private final BuildContext context;
+	private class ServiceProviderWrapper<S> {
 
-		public ServiceProviderWrapper(ServiceProvider<?> serviceProvider, BuildContext context) {
+		private final ServiceProvider<S> serviceProvider;
+		private final BuildContext context;
+		private final Class<? extends ServiceProvider<S>> serviceProviderClass;
+
+		private int userCounter = 0;
+		private ServiceStatus status = ServiceStatus.STOPPED;
+
+		ServiceProviderWrapper(ServiceProvider<S> serviceProvider, BuildContext context, Class<? extends ServiceProvider<S>> serviceProviderClass) {
 			this.serviceProvider = serviceProvider;
 			this.context = context;
+			this.serviceProviderClass = serviceProviderClass;
 		}
 
-		public ServiceProvider<?> getServiceProvider() {
-			return serviceProvider;
+		synchronized S getService() {
+			if ( status != ServiceStatus.RUNNING ) {
+				stateExpectedFailure();
+			}
+			return serviceProvider.getService();
 		}
 
-		synchronized void increaseCounter() {
-			final int oldValue = counter.getAndIncrement();
-			if ( oldValue == 0 ) {
+		synchronized void startVirtual() {
+			int previousValue = userCounter;
+			userCounter++;
+			if ( previousValue == 0 ) {
+				if ( status != ServiceStatus.STOPPED ) {
+					stateExpectedFailure();
+				}
+				status = ServiceStatus.STARTING;
 				serviceProvider.start( properties, context );
+				status = ServiceStatus.RUNNING;
+			}
+			if ( status != ServiceStatus.RUNNING ) {
+				//Could happen on circular dependencies
+				stateExpectedFailure();
 			}
 		}
 
-		int getCounter() {
-			return counter.get();
+		synchronized void stopVirtual() {
+			userCounter--;
+			if ( userCounter == 0 ) {
+				if ( status != ServiceStatus.RUNNING ) {
+					stateExpectedFailure();
+				}
+				status = ServiceStatus.STOPPING;
+				forceStop();
+				status = ServiceStatus.STOPPED;
+				managedProviders.remove( serviceProviderClass );
+			}
+			else if ( status != ServiceStatus.RUNNING ) {
+				//Could happen on circular dependencies
+				stateExpectedFailure();
+			}
 		}
 
-		void decreaseCounter() {
-			counter.getAndDecrement();
+		synchronized void ensureStopped() {
+			if ( status != ServiceStatus.STOPPED ) {
+				log.serviceProviderNotReleased( serviceProviderClass );
+				forceStop();
+			}
 		}
+
+		private void forceStop() {
+			try {
+				serviceProvider.stop();
+			}
+			catch ( Exception e ) {
+				log.stopServiceFailed( serviceProviderClass, e );
+			}
+		}
+
+		private void stateExpectedFailure() {
+			throw new AssertionFailure( "Unexpected status '" + status + "' for serviceProvider '" + serviceProvider + "'." +
+					" Check for circular dependencies or unreleased resources in your services." );
+		}
+	}
+
+	private enum ServiceStatus {
+		RUNNING, STOPPED, STARTING, STOPPING;
 	}
 }
