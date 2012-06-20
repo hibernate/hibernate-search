@@ -112,6 +112,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final TimingSource timingSource;
 	private final SearchMapping mapping;
 	private final boolean indexMetadataIsComplete;
+	private final boolean isIdProvidedImplicit;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -134,6 +135,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.mapping = state.getProgrammaticMapping();
 		this.statistics = new StatisticsImpl( this );
 		this.indexMetadataIsComplete = state.isIndexMetadataComplete();
+		this.isIdProvidedImplicit = state.isIdProvidedImplicit();
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false
 		);
@@ -381,6 +383,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public boolean isIndexMetadataComplete() {
 		return this.indexMetadataIsComplete;
+	}
+
+	@Override
+	public boolean isIdProvidedImplicit() {
+		return isIdProvidedImplicit;
 	}
 
 }

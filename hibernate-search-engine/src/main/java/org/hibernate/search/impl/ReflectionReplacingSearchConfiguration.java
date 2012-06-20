@@ -107,4 +107,9 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 		return cfg.isIndexMetadataComplete();
 	}
 
+	@Override
+	public boolean isIdProvidedImplicit() {
+		return cfg.isIdProvidedImplicit();
+	}
+
 }

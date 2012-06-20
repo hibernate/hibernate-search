@@ -51,6 +51,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	private SearchMapping programmaticMapping;
 	private boolean transactionsExpected = true;
 	private boolean indexMetadataComplete = true;
+	private boolean idProvidedImplicit = false;
 
 	public ManualConfiguration() {
 		this(SimpleInitializer.INSTANCE);
@@ -97,8 +98,9 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 		return programmaticMapping;
 	}
 
-	public void setProgrammaticMapping(SearchMapping programmaticMapping) {
+	public ManualConfiguration setProgrammaticMapping(SearchMapping programmaticMapping) {
 		this.programmaticMapping = programmaticMapping;
+		return this;
 	}
 
 	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
@@ -126,6 +128,16 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 
 	public void setIndexMetadataComplete(boolean indexMetadataComplete) {
 		this.indexMetadataComplete = indexMetadataComplete;
+	}
+
+	@Override
+	public boolean isIdProvidedImplicit() {
+		return idProvidedImplicit;
+	}
+
+	public ManualConfiguration setIdProvidedImplicit(boolean idProvidedImplicit) {
+		this.idProvidedImplicit = idProvidedImplicit;
+		return this;
 	}
 
 }

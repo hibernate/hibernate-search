@@ -98,6 +98,7 @@ public final class ConfigContext {
 	private final boolean jpaPresent;
 	private final Version luceneMatchVersion;
 	private final String nullToken;
+	private final boolean idProvidedImplicit;
 
 	public ConfigContext(SearchConfiguration cfg) {
 		luceneMatchVersion = getLuceneMatchVersion( cfg );
@@ -106,6 +107,7 @@ public final class ConfigContext {
 		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
 		jpaPresent = isPresent( "javax.persistence.Id" );
 		nullToken = initNullToken( cfg );
+		idProvidedImplicit = cfg.isIdProvidedImplicit();
 	}
 
 	/**
@@ -340,5 +342,12 @@ public final class ConfigContext {
 		else {
 			throw new SearchException( "Unknown XAnnoatedElement: " + annotatedElement );
 		}
+	}
+
+	/**
+	 * @return true if we have to assume entities are annotated with @ProvidedId implicitly
+	 */
+	public boolean isProvidedIdImplicit() {
+		return idProvidedImplicit;
 	}
 }

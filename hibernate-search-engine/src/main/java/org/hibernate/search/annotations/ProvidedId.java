@@ -42,8 +42,10 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ProvidedId {
 
-   String name() default "providedId";
+	public static final String defaultFieldName = "providedId";
 
-   FieldBridge bridge() default @FieldBridge(impl = org.hibernate.search.bridge.builtin.StringBridge.class);
-   
+	String name() default defaultFieldName;
+
+	FieldBridge bridge() default @FieldBridge(impl = org.hibernate.search.bridge.builtin.StringBridge.class);
+
 }
