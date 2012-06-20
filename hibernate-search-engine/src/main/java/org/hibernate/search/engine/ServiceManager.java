@@ -47,6 +47,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
+ * @author Ales Justin
  */
 public class ServiceManager {
 	private static final String SERVICES_FILE = "META-INF/services/" + ServiceProvider.class.getName();
@@ -129,7 +130,11 @@ public class ServiceManager {
 		if ( wrapper == null ) {
 			throw new SearchException( "Unable to find service related to " + serviceProviderClass);
 		}
-		wrapper.decreaseCounter();
+
+        if ( wrapper.decreaseCounter() == 0 ) {
+            managedProviders.remove( serviceProviderClass );
+            wrapper.getServiceProvider().stop();
+        }
 	}
 
 	public void stopServices() {
@@ -160,7 +165,7 @@ public class ServiceManager {
 			return serviceProvider;
 		}
 
-		synchronized void increaseCounter() {
+		void increaseCounter() {
 			final int oldValue = counter.getAndIncrement();
 			if ( oldValue == 0 ) {
 				serviceProvider.start( properties, context );
@@ -171,8 +176,8 @@ public class ServiceManager {
 			return counter.get();
 		}
 
-		void decreaseCounter() {
-			counter.getAndDecrement();
+		int decreaseCounter() {
+			return counter.decrementAndGet();
 		}
 	}
 }
