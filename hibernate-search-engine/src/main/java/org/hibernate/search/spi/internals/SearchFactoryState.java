@@ -84,4 +84,6 @@ public interface SearchFactoryState {
 	SearchMapping getProgrammaticMapping();
 
 	boolean isIndexMetadataComplete();
+
+	boolean isIdProvidedImplicit();
 }

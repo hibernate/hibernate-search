@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
@@ -117,4 +118,10 @@ public interface SearchConfiguration {
 	boolean isIndexMetadataComplete();
 
 	InstanceInitializer getInstanceInitializer();
+
+	/**
+	 * @return {@code true} if we should treat indexed entities as implicitly annotated
+	 * with a {@link ProvidedId}, if no other Id is specified.
+	 */
+	boolean isIdProvidedImplicit();
 }

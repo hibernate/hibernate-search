@@ -184,6 +184,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			idKeywordName = provided.name();
 			idProvided = true;
 		}
+		else if ( context.isProvidedIdImplicit() ) {
+			idBridge =  new TwoWayString2FieldBridgeAdaptor( org.hibernate.search.bridge.builtin.StringBridge.INSTANCE );
+			idKeywordName = ProvidedId.defaultFieldName;
+			idProvided = true;
+		}
 		if ( idKeywordName == null ) {
 			throw new SearchException( "No document id in: " + clazz );
 		}

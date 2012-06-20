@@ -250,4 +250,9 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.isIndexMetadataComplete();
 	}
 
+	@Override
+	public boolean isIdProvidedImplicit() {
+		return delegate.isIdProvidedImplicit();
+	}
+
 }

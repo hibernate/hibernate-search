@@ -31,6 +31,9 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
  * @author Emmanuel Bernard
  */
 public class StringBridge implements TwoWayStringBridge {
+
+	public static final StringBridge INSTANCE = new StringBridge();
+
 	public Object stringToObject(String stringValue) {
 		return stringValue;
 	}

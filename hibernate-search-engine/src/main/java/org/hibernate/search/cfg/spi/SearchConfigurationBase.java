@@ -55,4 +55,9 @@ public abstract class SearchConfigurationBase implements SearchConfiguration {
 		return SimpleInitializer.INSTANCE;
 	}
 
+	@Override
+	public boolean isIdProvidedImplicit() {
+		return false;
+	}
+
 }
