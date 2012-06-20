@@ -100,4 +100,9 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	public boolean isIndexMetadataComplete() {
 		return state.isIndexMetadataComplete();
 	}
+
+	@Override
+	public boolean isIdProvidedImplicit() {
+		return state.isIdProvidedImplicit();
+	}
 }

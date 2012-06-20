@@ -351,6 +351,7 @@ public class SearchFactoryBuilder {
 			factoryState.setTimingSource( new DefaultTimingSource() );
 			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );
 			factoryState.setTransactionManagerExpected( cfg.isTransactionManagerExpected() );
+			factoryState.setIdProvidedImplicit( cfg.isIdProvidedImplicit() );
 		}
 	}
 
