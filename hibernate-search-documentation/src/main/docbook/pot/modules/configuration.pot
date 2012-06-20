@@ -1288,7 +1288,7 @@ msgstr ""
 #. Tag: programlisting
 #: configuration.xml:1027
 #, no-c-format
-msgid "hibernate.search.[default|&lt;indexname&gt;].infinispan.cachemanager_jndiname = [jndiname]"
+msgid "hibernate.search.infinispan.cachemanager_jndiname = [jndiname]"
 msgstr ""
 
 #. Tag: para
@@ -1300,7 +1300,7 @@ msgstr ""
 #. Tag: programlisting
 #: configuration.xml:1032
 #, no-c-format
-msgid "hibernate.search.[default|&lt;indexname&gt;].infinispan.configuration_resourcename = [infinispan configuration filename]"
+msgid "hibernate.search.infinispan.configuration_resourcename = [infinispan configuration filename]"
 msgstr ""
 
 #. Tag: para

@@ -456,7 +456,7 @@ QueryBuilder qb = fullTextSession.getSearchFactory()
     .buildQueryBuilder().forEntity( Book.class ).get();
 org.apache.lucene.search.Query query = qb
   .keyword()
-  .onFields("title", "subtitle", "authors.name", "publicationDate")
+  .onFields("title", "subtitle", "authors.name")
   .matching("Java rocks!");
   .createQuery();
 
@@ -486,7 +486,7 @@ QueryBuilder qb = fullTextEntityManager.getSearchFactory()
     .buildQueryBuilder().forEntity( Book.class ).get();
 org.apache.lucene.search.Query query = qb
   .keyword()
-  .onFields("title", "subtitle", "authors.name", "publicationDate")
+  .onFields("title", "subtitle", "authors.name")
   .matching("Java rocks!")
   .createQuery();
 
