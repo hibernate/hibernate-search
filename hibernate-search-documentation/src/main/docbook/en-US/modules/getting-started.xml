@@ -289,7 +289,7 @@ public class Author {
     start with <literal>title</literal> and <literal>subtitle</literal> and
     annotate both with <literal>@Field</literal>. The parameter
     <literal>index=Index.YES</literal> will ensure that the text will be
-    indexed, while <literal> analyze=analyze.YES</literal> ensures that the
+    indexed, while <literal>analyze=Analyze.YES</literal> ensures that the
     text will be analyzed using the default Lucene analyzer. Usually,
     analyzing means chunking a sentence into individual words and potentially
     excluding common words like <literal>'a'</literal> or
@@ -311,7 +311,7 @@ public class Author {
     arrays.</para>
 
     <para>Note that <literal>index=Index.YES</literal>,
-    <literal>analyze=analyze.YES</literal> and
+    <literal>analyze=Analyze.YES</literal> and
     <literal>store=Store.NO</literal> are the default values for these
     paramters and could be ommited.</para>
 
