@@ -1,6 +1,66 @@
 Hibernate Search Changelog
 ==========================
 
+
+Version 4.2.0.Beta1 (21-6-2012)
+------------------------
+
+** Sub-task
+    * [HSEARCH-1008] - Point (an impl class) is used in a public API SpatialQueryBuilder.buildGridFilter
+    * [HSEARCH-1009] - buildSpatialQuery vs buildGridQuery is still a bit confusing
+    * [HSEARCH-1010] - Move from HSSI_xx_fieldname to fieldname_HSSI_xx for readability
+    * [HSEARCH-1012] - Add @Spatial as a marker annotation for the spatial bridge
+    * [HSEARCH-1013] - Support entities implementing Coordinates (instead of a property returning Coordinates)
+    * [HSEARCH-1014] - Write documentation for spatial indexing and queries
+    * [HSEARCH-1016] - Move spatial code to JBoss Logging
+    * [HSEARCH-1018] - Implement bridge that supports indexing for boolean queries based on lat and long instead of the whole grid
+    * [HSEARCH-1155] - Test @Embeddable nesting
+    * [HSEARCH-1156] - Add more tests to cover Range/Grid and Class/Member level combinations
+
+** Bug
+    * [HSEARCH-1088] - Specifying an analyzer on an entity class bridge using the programmatic API is broken
+    * [HSEARCH-1090] - IndexReader leaks file handles on close
+    * [HSEARCH-1095] - Near Real Time produces NPEs in worker thread on first flush
+    * [HSEARCH-1096] - @Transient Fields are never marked dirty
+    * [HSEARCH-1106] - Compile error on MappingModelMetadataProvider on some JVMs only
+    * [HSEARCH-1115] - Failure to load Analyzer class when deployed into AS7
+    * [HSEARCH-1118] - Wrong property name to configure worker scope
+    * [HSEARCH-1164] - QueryBuilder example in chapter 1.5 "Searching" uses an unsupported keyword query
+    * [HSEARCH-1165] - Wrong name in documentation for Infinispan configuration properties
+
+** Deprecation
+    * [HSEARCH-1102] - Avoid forceful generation of loggers compatible with older JBoss Logger
+
+** Improvement
+    * [HSEARCH-852] - Locks to manage IndexWriter instances should not prevent a concurrent get and a commit operation
+    * [HSEARCH-1098] - Update to Apache Lucene 3.6
+    * [HSEARCH-1122] - Update Avro dependency to 1.6.3
+    * [HSEARCH-1124] - Log level for Log#indexDirectoryNotFoundCreatingNewOne should be INFO and not WARN
+    * [HSEARCH-1125] - archetype improvement
+    * [HSEARCH-1158] - Make NRT ReaderProvider lockless on the hot path
+    * [HSEARCH-1159] - Avoid cloning of IndexReader instances for concurrent searchers
+    * [HSEARCH-1161] - Throw a more specific exception type on searching on meaningless input
+    * [HSEARCH-1162] - Shutdown services in dependency order
+    * [HSEARCH-1163] - Have JGroups optionally use a MUX channel
+
+** New Feature
+    * [HSEARCH-923] - Add support for geospatial queries
+    * [HSEARCH-1157] - Create an option to assume @ProvidedId by default
+
+** Patch
+    * [HSEARCH-1114] - javadoc typo: changed StoreNorm -> Norms (Andrej Golovnin)
+
+** Task
+    * [HSEARCH-1001] - Create a testcase using HornetQ on JBoss7 for the backend
+    * [HSEARCH-1094] - Typo method name SearchMapping#getFullTextFilerDefs
+    * [HSEARCH-1103] - Fix CustomLockProviderTest to pass on Java7 as well
+    * [HSEARCH-1104] - Remove warnings about experimental features which are no longer experimental
+    * [HSEARCH-1110] - Add a test to verify stored indexes in Infinispan's cacheloader
+    * [HSEARCH-1117] - Minor version upgrade of core dependencies
+    * [HSEARCH-1129] - Enable automatic setup of annotation processors on Eclipse project import
+    * [HSEARCH-1160] - PassThroughAnalyzer requires the Lucene Version option
+
+
 Version 4.1.0.Final (4-4-2012)
 ------------------------
 

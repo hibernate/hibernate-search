@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 4.1.0.Final 4-4-2012*
+*Version: 4.2.0.Beta1 21-6-2012*
 
 ## Description
 
@@ -19,7 +19,7 @@ Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the c
 This version of Hibernate Search requires:
 
 * Hibernate Core 4.1 and above
-* Apache Lucene 3.5
+* Apache Lucene 3.6
 
 ## Instructions
 
@@ -30,7 +30,7 @@ Include the following to your dependency list:
     <dependency>
      <groupId>org.hibernate</groupId>
      <artifactId>hibernate-search</artifactId>
-     <version>4.1.0.Final</version>
+     <version>4.2.0.Beta1</version>
     </dependency>
 
 ### Sourceforge Bundle
@@ -57,7 +57,7 @@ If you want to contribute, read [Contributing to Hibernate Search](http://commun
 
 ### Bug Reports:
 
-* Hibernate Jira [HSEARCH](https://hibernate.onjira.com/browse/HSEARCH) (preferred)
+* Hibernate JIRA [HSEARCH](https://hibernate.onjira.com/browse/HSEARCH) (preferred)
 * hibernate-dev@lists.jboss.org
 
 ### Free Technical Support:
