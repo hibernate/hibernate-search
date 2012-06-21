@@ -96,9 +96,9 @@
         </listitem>
         <listitem>
           <para>Poor performance on worldwide data set (For example when indexed points of 
-		  interest in the United States, in Europe and in Asia collide because they share the
-		  same latitude, the latitude range query returns large amounts of data that need to 
-		  be crossed check with those returned by the longitude range).</para>
+          interest in the United States, in Europe and in Asia collide because they share the
+          same latitude, the latitude range query returns large amounts of data that need to 
+          be crossed check with those returned by the longitude range).</para>
         </listitem>
       </itemizedlist>
     </section>
@@ -180,15 +180,15 @@ public class SimpleHotel implements Coordinates {
       <title>SimpleHotel class sample</title>
 
       <programlisting language="JAVA" role="JAVA">org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
-		centerLatitude, centerLongitude, radius);
+   centerLatitude, centerLongitude, radius);
 
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
-	SimpleHotel.class );
+   SimpleHotel.class );
 List results = hibQuery.list();</programlisting>
     </example>
     
     <para>A fully working example can be found in the source code, in the testsuite.
-	See SpatialIndexingTest.testSimpleSpatialAnnotationOnClassLevel()
+    See SpatialIndexingTest.testSimpleSpatialAnnotationOnClassLevel()
     and in SimpleHotel class.</para>
 
   </section>
@@ -203,7 +203,7 @@ List results = hibQuery.list();</programlisting>
       </listitem>
       <listitem>
         <para>add the @Spatial annotation at class level with a name for referencing the grid
-        field in the index and with gridmode set to true : @Spatial(name = "location", spatialMode = SpatialMode.GRID)</para>
+        field in the index and with gridmode set to true: @Spatial(name = "location", spatialMode = SpatialMode.GRID)</para>
       </listitem>
     </itemizedlist>
     
@@ -214,9 +214,9 @@ List results = hibQuery.list();</programlisting>
 @Indexed
 @Spatial(name = "location", spatialMode = SpatialMode.GRID)
 public class Hotel implements Coordinates {
-	double latitude;
-	double longitude;
-  [...]
+   double latitude;
+   double longitude;
+   [...]
 </programlisting>
     </example>
       
@@ -238,55 +238,56 @@ public class Hotel implements Coordinates {
       <title>Querying grid indexed entities</title>
 
       <programlisting language="JAVA" role="JAVA">org.apache.lucene.search.Query luceneQuery =
-	SpatialQueryBuilder.buildSpatialQuery(
-		centerLatitude,
-		centerLongitude,
-		50,
-		"location"
-	);
+   SpatialQueryBuilder.buildSpatialQuery(
+      centerLatitude,
+      centerLongitude,
+      50,
+      "location"
+   );
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
-	Hotel.class );
+   Hotel.class );
 List results = hibQuery.list();</programlisting>
-	</example>
+    </example>
     
     <para>Sample code is at SpatialIndexingTest.testSpatialAnnotationOnClassLevel() and in Hotel class.</para>
     
   </section>
   
   <section id="spatial-dsl">
-	<title>Spatial query DSL</title>
-	
-	<para>Beyond the spatial query builder, the Hibernate Search DSL has been extended to support the
-	spatial feature. You can build a query for searching around a (latitude,longitude) or around an
-	bean implementing the Coordinates interface :</para>
+    <title>Spatial query DSL</title>
+    
+    <para>Beyond the spatial query builder, the Hibernate Search DSL has been extended to support the
+    spatial feature. You can build a query for searching around a (latitude,longitude) or around an
+    bean implementing the Coordinates interface :</para>
 
-	<example>
-		<title>DSL example with latitude and longitude</title>
-		<programlisting language="JAVA" role="JAVA">final QueryBuilder builder = fullTextSession.getSearchFactory()
-	.buildQueryBuilder().forEntity( RangeEvent.class ).get();
+    <example>
+        <title>DSL example with latitude and longitude</title>
+        <programlisting language="JAVA" role="JAVA">final QueryBuilder builder = fullTextSession.getSearchFactory()
+   .buildQueryBuilder().forEntity( RangeEvent.class ).get();
 
 double centerLatitude= 24;
 double centerLongitude= 31.5;
 
 org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
-	.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude )
-	.createQuery();
-	
-org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
-	RangeEvent.class );</programlisting>
-	</example>
-	<example>
-		<title>DSL example with Coordinates</title>
-		<programlisting language="JAVA" role="JAVA">Coordinates coordinates = Point.fromDegrees(24d, 31.5d);
-Query query = builder
-		.spatial()
-			.onCoordinates( "location" )
-			.within( 51, Unit.KM )
-				.ofCoordinates( coordinates )
-			.createQuery();
+   .within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude )
+   .createQuery();
 
-List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</programlisting>
-	</example>	
+org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
+   RangeEvent.class );</programlisting>
+    </example>
+
+    <example>
+        <title>DSL example with Coordinates</title>
+        <programlisting language="JAVA" role="JAVA">Coordinates coordinates = Point.fromDegrees(24d, 31.5d);
+   Query query = builder
+      .spatial()
+         .onCoordinates( "location" )
+         .within( 51, Unit.KM )
+            .ofCoordinates( coordinates )
+      .createQuery();
+
+   List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</programlisting>
+    </example>	
   </section>
   
   <section id="spatial-behind-curtain">
@@ -301,7 +302,7 @@ List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</
       to transform the latitude and longitude fields accessed via the Coordinates interface to the multiple index
       fields stored in the Lucene index.</para>
       
-      <para>Principle of the spatial index : the spatial index used in Hibernate Search is a QuadTree
+      <para>Principle of the spatial index: the spatial index used in Hibernate Search is a QuadTree
       (<ulink url="http://en.wikipedia.org/wiki/Quadtree">http://en.wikipedia.org/wiki/Quadtree</ulink>).</para>
       
       <para>To make computation in a flat coordinates system the latitude and longitude field values will be projected
@@ -309,9 +310,9 @@ List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</
 	  http://en.wikipedia.org/wiki/Sinusoidal_projection</ulink>).
       Origin values space is :</para>
       <para>[-90 -> +90],]-180 -> 180]</para>
-      <para>for latitude,longitude coordinates and projected space is :</para>
+      <para>for latitude,longitude coordinates and projected space is:</para>
       <para>]-pi -> +pi],[-pi/2 -> +pi/2]</para>
-      <para>for cartesian x,y coordinates (beware of fields order inversion : x is longitude and y is latitude).</para>
+      <para>for cartesian x,y coordinates (beware of fields order inversion: x is longitude and y is latitude).</para>
       
       <para>The index is divided into n levels labeled from 0 to n-1.</para>
       
@@ -323,7 +324,7 @@ List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</
       <para>At level n+1 each box of level n is divided into 4 new boxes and so on. The numbers of boxes at a
       given level is 4^n.</para>
       
-      <para>Each box is given an id, in this format : [Box index on the X axis]|[Box index on the Y axis]
+      <para>Each box is given an id, in this format: [Box index on the X axis]|[Box index on the Y axis]
       To calculate the index of a box on an axis we divide the axis range in 2^n slots and find the slot the box
       belongs to.
       At the n level the indexes on an axis are from -(2^n)/2 to (2^n)/2.
@@ -342,10 +343,10 @@ List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</
       [-90,+90],]-180,+180]).</para>
       
       <para>We store in the Lucene document corresponding to the entity to index one field for each level of the grid.
-      The field is named : [spatial index fields name]_HSSI_[n].
-	  [spatial index fields name] is given either by the parameter at class level annotation
-	  or derived from the name of the spatial annoted method of he entitiy, HSSI stands for Hibernate Search Spatial
-	  Index and n is the level of the grid.</para>
+      The field is named: [spatial index fields name]_HSSI_[n].
+      [spatial index fields name] is given either by the parameter at class level annotation
+      or derived from the name of the spatial annoted method of he entitiy, HSSI stands for Hibernate Search Spatial
+      Index and n is the level of the grid.</para>
       
       <para>We also store the latitude and longitude as a Numeric field under [spatial index fields name]_HSSI_Latitude
       and [spatial index fields name]_HSSI_Longitude fields.
@@ -363,20 +364,20 @@ List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</
       filter this subset with a real distance calculation. This is called two level spatial filtering.</para>
       
       <section>
-        <title>Step 1 : compute the best grid level for the search discus</title>
+        <title>Step 1: compute the best grid level for the search discus</title>
         
         <para>For a given search radius there is an optimal grid level where the number of boxes to retrieve
         hall be minimal without bringing back to many documents (level 0 has only 1 box but retrieve all documents).
         he optimal grid level is maximum level where the boxes width (on the X axis) is larger than the search area.
         Near the equator line where projection deformation is minimal, this will lead to the retrieval of at most
         4 boxes. Towards the poles where the deformation is more significant,, it may bring more boxes but as the
-		sinusoidal projection has a Tissot's indicatrix quite simple (see http://en.wikipedia.org/wiki/Sinusoidal_projection)
-		in populated area, the overhead is minimal. (This should be tested, sampled and benchmarked).</para>
+        sinusoidal projection has a Tissot's indicatrix quite simple (see http://en.wikipedia.org/wiki/Sinusoidal_projection)
+        in populated area, the overhead is minimal. (This should be tested, sampled and benchmarked).</para>
         
       </section>
       
       <section>
-        <title>Step 2 : compute ids of the corresponding covering boxes at that level</title>
+        <title>Step 2: compute ids of the corresponding covering boxes at that level</title>
         
         <para>Now that we have chosen the optimal level, we can compute the ids of the boxes covering the search
         discus (which is not a discus in projected space anymore).</para>
@@ -401,7 +402,7 @@ List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</
       </section>
       
       <section>
-        <title>Step 3 : Lucene index lookup</title>
+        <title>Step 3: Lucene index lookup</title>
         
         <para>The Query is build with theses Ids to lookup for documents having a [spatial index fields name]_HSSI_[n]
         (n the level found at Step 1) field valued with one of the ids of Step 2. </para>
@@ -415,7 +416,7 @@ List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</
       </section>
 
       <section>
-        <title>Step 4 : refine </title>
+        <title>Step 4: refine </title>
         
         <para>A distance calulation filter is set after the Lucene index lookup query of Step 3 to exclude false
         candidates from the result list.</para>
