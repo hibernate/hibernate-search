@@ -9,7 +9,7 @@ import org.hibernate.search.spi.ServiceProvider;
  * @author Emmanuel Bernard
  */
 public class ProvidedServiceProvider implements ServiceProvider<ProvidedService> {
-	private static volatile Boolean active = null;
+	private static volatile boolean active = false;
 
 	public void start(Properties properties, BuildContext context) {
 		throw new RuntimeException( "should not be started" );
@@ -24,6 +24,6 @@ public class ProvidedServiceProvider implements ServiceProvider<ProvidedService>
 		throw new RuntimeException( "should not be stopped" );
 	}
 
-	public static Boolean isActive() { return active; }
-	public static void resetActive() { active = null; }
+	public static boolean isActive() { return active; }
+	public static void resetActive() { active = false; }
 }

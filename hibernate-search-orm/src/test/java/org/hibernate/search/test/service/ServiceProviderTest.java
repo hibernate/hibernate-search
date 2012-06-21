@@ -6,18 +6,25 @@ import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.test.util.ManualConfiguration;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import static org.junit.Assert.*;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class ServiceProviderTest {
-	
+
+	@Rule
+	public ExpectedException exceptions = ExpectedException.none();
+
 	@Test
 	public void testManagedService() throws Exception {
 		MyServiceProvider.resetActive();
-		assertNull( MyServiceProvider.isActive() );
+		assertFalse( MyServiceProvider.isActive() );
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration.addProperty( "hibernate.search.default.directory_provider", ServiceDirectoryProvider.class.getName() )
 				.addClass( Telephone.class );
@@ -28,18 +35,40 @@ public class ServiceProviderTest {
 	}
 
 	@Test
+	public void testCircularDependenciesNotAllowed() throws Exception {
+		MyServiceProvider.resetActive();
+		assertFalse( MyServiceProvider.isActive() );
+		final ManualConfiguration configuration = new HibernateManualConfiguration();
+		configuration.addProperty( "hibernate.search.default.directory_provider", ServiceDirectoryProvider.class.getName() )
+				.addClass( Telephone.class );
+
+		exceptions.expect( SearchException.class );
+		MyServiceProvider.setSimulateCircularDependency( true );
+		SearchFactoryImplementor sf = null;
+		try {
+			sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		}
+		finally {
+			MyServiceProvider.setSimulateCircularDependency( false );
+			if ( sf != null ) {
+				sf.close();
+			}
+		}
+	}
+
+	@Test
 	public void testProvidedService() throws Exception {
 		ProvidedServiceProvider.resetActive();
-		assertNull( ProvidedServiceProvider.isActive() );
+		assertFalse( ProvidedServiceProvider.isActive() );
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration
 				.addProperty( "hibernate.search.default.directory_provider", ProvidedServiceDirectoryProvider.class.getName() )
 				.addClass( Telephone.class )
 				.getProvidedServices().put( ProvidedServiceProvider.class, new ProvidedService(true) );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
-		assertNull( ProvidedServiceProvider.isActive() );
+		assertFalse( ProvidedServiceProvider.isActive() );
 		sf.close();
-		assertNull( ProvidedServiceProvider.isActive() );
+		assertFalse( ProvidedServiceProvider.isActive() );
 	}
 
 	@Test
