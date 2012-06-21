@@ -9,13 +9,14 @@ import org.hibernate.search.spi.ServiceProvider;
  * @author Emmanuel Bernard
  */
 public class MyServiceProvider implements ServiceProvider<MyService> {
-	private static volatile Boolean active = null;
+
+	private static volatile boolean active = false;
 	private static volatile boolean simulateCircularDependency = false;
 	private MyService foo;
 
 	public void start(Properties properties, BuildContext context) {
 		foo = new MyService();
-		active = Boolean.TRUE;
+		active = true;
 		if ( simulateCircularDependency ) {
 			context.requestService( MyServiceProvider.class );
 		}
@@ -27,11 +28,11 @@ public class MyServiceProvider implements ServiceProvider<MyService> {
 
 	public void stop() {
 		foo = null;
-		active = Boolean.FALSE;
+		active = false;
 	}
 
-	public static Boolean isActive() { return active; }
-	public static void resetActive() { active = null; }
+	public static boolean isActive() { return active; }
+	public static void resetActive() { active = false; }
 
 	public static void setSimulateCircularDependency(boolean simulateCircularDependency) {
 		MyServiceProvider.simulateCircularDependency = simulateCircularDependency;

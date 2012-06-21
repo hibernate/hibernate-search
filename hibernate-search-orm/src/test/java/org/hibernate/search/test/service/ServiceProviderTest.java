@@ -24,7 +24,7 @@ public class ServiceProviderTest {
 	@Test
 	public void testManagedService() throws Exception {
 		MyServiceProvider.resetActive();
-		assertNull( MyServiceProvider.isActive() );
+		assertFalse( MyServiceProvider.isActive() );
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration.addProperty( "hibernate.search.default.directory_provider", ServiceDirectoryProvider.class.getName() )
 				.addClass( Telephone.class );
@@ -37,7 +37,7 @@ public class ServiceProviderTest {
 	@Test
 	public void testCircularDependenciesNotAllowed() throws Exception {
 		MyServiceProvider.resetActive();
-		assertNull( MyServiceProvider.isActive() );
+		assertFalse( MyServiceProvider.isActive() );
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration.addProperty( "hibernate.search.default.directory_provider", ServiceDirectoryProvider.class.getName() )
 				.addClass( Telephone.class );
@@ -59,16 +59,16 @@ public class ServiceProviderTest {
 	@Test
 	public void testProvidedService() throws Exception {
 		ProvidedServiceProvider.resetActive();
-		assertNull( ProvidedServiceProvider.isActive() );
+		assertFalse( ProvidedServiceProvider.isActive() );
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration
 				.addProperty( "hibernate.search.default.directory_provider", ProvidedServiceDirectoryProvider.class.getName() )
 				.addClass( Telephone.class )
 				.getProvidedServices().put( ProvidedServiceProvider.class, new ProvidedService(true) );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
-		assertNull( ProvidedServiceProvider.isActive() );
+		assertFalse( ProvidedServiceProvider.isActive() );
 		sf.close();
-		assertNull( ProvidedServiceProvider.isActive() );
+		assertFalse( ProvidedServiceProvider.isActive() );
 	}
 
 	@Test
