@@ -54,8 +54,8 @@ public class ServiceManager {
 
 	//barrier protected by the Hibernate Search instantiation
 	private final HashSet<Class<?>> availableProviders = new HashSet<Class<?>>();
-	private final ConcurrentHashMap<Class<?>,ServiceProviderWrapper> managedProviders = new ConcurrentHashMap<Class<?>,ServiceProviderWrapper>();
-	private final Map<Class<? extends ServiceProvider<?>>,Object> providedProviders = new HashMap<Class<? extends ServiceProvider<?>>,Object>();
+	private final ConcurrentHashMap<Class<?>, ServiceProviderWrapper> managedProviders = new ConcurrentHashMap<Class<?>, ServiceProviderWrapper>();
+	private final Map<Class<? extends ServiceProvider<?>>, Object> providedProviders = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
 	private final Properties properties;
 
 	public ServiceManager(SearchConfiguration cfg) {
