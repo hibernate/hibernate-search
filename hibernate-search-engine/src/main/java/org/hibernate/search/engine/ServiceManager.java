@@ -54,7 +54,7 @@ public class ServiceManager {
 
 	//barrier protected by the Hibernate Search instantiation
 	private final HashSet<Class<?>> availableProviders = new HashSet<Class<?>>();
-	private final ConcurrentHashMap<Class<?>, ServiceProviderWrapper> managedProviders = new ConcurrentHashMap<Class<?>, ServiceProviderWrapper>();
+	private final ConcurrentHashMap<Class<?>, ServiceProviderWrapper<?>> managedProviders = new ConcurrentHashMap<Class<?>, ServiceProviderWrapper<?>>();
 	private final Map<Class<? extends ServiceProvider<?>>, Object> providedProviders = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
 	private final Properties properties;
 
@@ -95,6 +95,7 @@ public class ServiceManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass, BuildContext context) {
 		//provided services have priority over managed services
 		if ( providedProviders.containsKey( serviceProviderClass ) ) {
@@ -103,18 +104,22 @@ public class ServiceManager {
 			return (T) providedProviders.get( serviceProviderClass );
 		}
 
-		ServiceProviderWrapper<T> wrapper = managedProviders.get( serviceProviderClass );
+		ServiceProviderWrapper<T> wrapper = (ServiceProviderWrapper<T>) managedProviders.get( serviceProviderClass );
 		if ( wrapper == null ) {
 			if ( availableProviders.contains( serviceProviderClass ) ) {
-				ServiceProvider<T> serviceProvider = ClassLoaderHelper.instanceFromClass( ServiceProvider.class, serviceProviderClass, "service provider" );
-				wrapper = new ServiceProviderWrapper( serviceProvider, context, serviceProviderClass );
+				ServiceProvider<T> serviceProvider = ClassLoaderHelper.instanceFromClass(
+						ServiceProvider.class,
+						serviceProviderClass,
+						"service provider"
+				);
+				wrapper = new ServiceProviderWrapper<T>( serviceProvider, context, serviceProviderClass );
 				managedProviders.putIfAbsent( serviceProviderClass, wrapper );
 			}
 			else {
 				throw new SearchException( "Unable to find service related to " + serviceProviderClass );
 			}
 		}
-		wrapper = managedProviders.get( serviceProviderClass );
+		wrapper = (ServiceProviderWrapper<T>) managedProviders.get( serviceProviderClass );
 		wrapper.startVirtual();
 		return wrapper.getService();
 	}
@@ -218,6 +223,6 @@ public class ServiceManager {
 	}
 
 	private enum ServiceStatus {
-		RUNNING, STOPPED, STARTING, STOPPING;
+		RUNNING, STOPPED, STARTING, STOPPING
 	}
 }
