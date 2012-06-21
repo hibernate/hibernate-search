@@ -593,7 +593,7 @@ public class DSLTest extends SearchTestCase {
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( POI.class ).get();
 
-		Coordinates coordinates = Point.fromDegrees(24d, 31.5d);
+		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );
 		Query query = builder
 				.spatial()
 					.onCoordinates( "location" )
@@ -610,7 +610,7 @@ public class DSLTest extends SearchTestCase {
 				.spatial()
 					.onCoordinates( "location" )
 					.within( 500, Unit.KM )
-						.ofLatitude(48.858333d).andLongitude(2.294444d)
+						.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
 					.createQuery();
 		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 

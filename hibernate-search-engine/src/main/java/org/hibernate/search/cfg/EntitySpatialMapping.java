@@ -36,20 +36,19 @@ import org.hibernate.search.annotations.Store;
  * @author Nicolas Helleringer
  */
 public class EntitySpatialMapping {
+
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
-	private final EntityMapping entityMapping;
 	private final Map<String, Object> spatial = new HashMap<String, Object>();
 
-	public EntitySpatialMapping(SearchMapping mapping, EntityDescriptor entity, EntityMapping entityMapping) {
+	public EntitySpatialMapping(SearchMapping mapping, EntityDescriptor entity) {
 		this.mapping = mapping;
 		this.entity = entity;
-		this.entityMapping = entityMapping;
-		this.entity.addSpatial(spatial);
+		this.entity.addSpatial( spatial );
 	}
 
 	public EntitySpatialMapping spatial() {
-		return new EntitySpatialMapping( mapping, entity, entityMapping );
+		return new EntitySpatialMapping( mapping, entity );
 	}
 
 	public EntitySpatialMapping name(String fieldName) {
@@ -85,23 +84,23 @@ public class EntitySpatialMapping {
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
-		return new FullTextFilterDefMapping(mapping,name, impl);
+		return new FullTextFilterDefMapping( mapping, name, impl );
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, mapping);
+		return new PropertyMapping( name, type, entity, mapping );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 
 	public ClassBridgeMapping classBridge(Class<?> impl) {
-		return new ClassBridgeMapping(mapping, entity, impl, entityMapping);
+		return new ClassBridgeMapping( mapping, entity, impl );
 	}
 
 }

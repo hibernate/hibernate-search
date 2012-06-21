@@ -38,11 +38,7 @@ import org.jboss.logging.MessageLogger;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
-<<<<<<< HEAD
 import org.hibernate.search.errors.EmptyQueryException;
-=======
-import org.hibernate.search.spatial.impl.GeometricConstants;
->>>>>>> HSEARCH-1016 Move spatial code to use i18n logs and exceptions
 
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
@@ -599,14 +595,14 @@ public interface Log extends BasicLogger {
 	@Message(id = 145, value = "Spatial field name not defined for class level annotation on class %1$s")
 	SearchException spatialFieldNameNotDefined( String className );
 
-        @Message(id = 131, value = "The query string '%2$s' applied on field '%1$s' has no meaningfull tokens to be matched. Validate the query input " +
+	@Message(id = 146, value = "The query string '%2$s' applied on field '%1$s' has no meaningfull tokens to be matched. Validate the query input " +
 			"against the Analyzer applied on this field.")
 	EmptyQueryException queryWithNoTermsAfterAnalysis(String field, String searchTerm);
 
-	@Message(id = 132, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '" + JGroupsChannelProvider.MUX_ID + "'.")
+	@Message(id = 147, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '" + JGroupsChannelProvider.MUX_ID + "'.")
 	SearchException missingJGroupsMuxId();
 
-	@Message(id = 133, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
+	@Message(id = 148, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
 	SearchException jGroupsMuxIdAlreadyTaken(short n);
 
 }

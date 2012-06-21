@@ -35,17 +35,14 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 
 public class ClassBridgeMapping {
-	
+
 	private final SearchMapping mapping;
 	private final EntityDescriptor entity;
 	private final Map<String, Object> classBridge;
-	private final EntityMapping entityMapping;
-	
-	
-	public ClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity, Class<?> impl, EntityMapping entityMapping) {
+
+	public ClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity, Class<?> impl) {
 		this.mapping = mapping;
 		this.entity = entity;
-		this.entityMapping = entityMapping;
 		this.classBridge = new HashMap<String,Object>();
 		entity.addClassBridgeDef(classBridge);
 		if (impl != null) {
@@ -112,34 +109,33 @@ public class ClassBridgeMapping {
 		param.put("value", value);
 		return this;
 	}
-	
-	
+
 	public ClassBridgeMapping classBridge(Class<?> impl) {
-		return new ClassBridgeMapping(mapping, entity,impl,entityMapping );
+		return new ClassBridgeMapping( mapping, entity, impl );
 	}
-	
+
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
-		return new FullTextFilterDefMapping(mapping,name, impl);
+		return new FullTextFilterDefMapping( mapping, name, impl );
 	}
 	
 	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, mapping);
+		return new PropertyMapping( name, type, entity, mapping );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 
 	public ProvidedIdMapping providedId() {
-		return new ProvidedIdMapping(mapping,entity);
+		return new ProvidedIdMapping( mapping, entity );
 	}
 
 	public IndexedMapping indexed() {
-		return new IndexedMapping(mapping, entity, entityMapping);
+		return new IndexedMapping( mapping, entity );
 	}
 	
 }
