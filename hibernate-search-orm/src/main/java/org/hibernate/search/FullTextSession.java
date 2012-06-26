@@ -98,5 +98,11 @@ public interface FullTextSession extends Session {
 	 * @return
 	 */
 	public MassIndexer createIndexer(Class<?>... types);
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FullTextSharedSessionBuilder sessionWithOptions();
+
 }

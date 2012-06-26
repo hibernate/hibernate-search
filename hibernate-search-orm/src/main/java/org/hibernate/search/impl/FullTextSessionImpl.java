@@ -47,7 +47,6 @@ import org.hibernate.SQLQuery;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
-import org.hibernate.SharedSessionBuilder;
 import org.hibernate.SimpleNaturalIdLoadAccess;
 import org.hibernate.Transaction;
 import org.hibernate.TypeHelper;
@@ -73,6 +72,7 @@ import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.FullTextSharedSessionBuilder;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.TransactionContext;
@@ -303,7 +303,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public SharedSessionBuilder sessionWithOptions() {
+	public FullTextSharedSessionBuilder sessionWithOptions() {
 		return new FullTextSharedSessionBuilderDelegator( session.sessionWithOptions() );
 	}
 
