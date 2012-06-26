@@ -42,7 +42,7 @@ public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override
 	FullTextSharedSessionBuilder autoJoinTransactions();
 
-	@Override
+	@Override @Deprecated
 	FullTextSharedSessionBuilder autoClose();
 
 	@Override
@@ -66,7 +66,7 @@ public interface FullTextSharedSessionBuilder extends SharedSessionBuilder {
 	@Override
 	FullTextSharedSessionBuilder autoJoinTransactions(boolean autoJoinTransactions);
 
-	@Override
+	@Override @Deprecated
 	FullTextSharedSessionBuilder autoClose(boolean autoClose);
 
 	@Override
