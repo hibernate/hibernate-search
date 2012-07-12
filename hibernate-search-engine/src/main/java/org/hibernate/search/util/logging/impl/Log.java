@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.CorruptIndexException;
-import org.hibernate.annotations.common.AssertionFailure;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -35,6 +34,7 @@ import org.jboss.logging.Logger.Level;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
@@ -42,8 +42,8 @@ import org.hibernate.search.errors.EmptyQueryException;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.WARN;
 import static org.jboss.logging.Logger.Level.TRACE;
+import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -552,7 +552,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 130, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
 			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
-	
+
 	@Message(id = 131, value = "The field used for the spatial query is not using SpatialFieldBridge: %1$s.%2$s")
 	SearchException targetedFieldNotSpatial(String className, String fieldName);
 
@@ -562,8 +562,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 134, value = "Unable to instantiate ClassBridge of type %1$s defined on %2$s")
 	SearchException cannotInstantiateClassBridgeOfType(String implName, String className, @Cause Throwable e);
 
-	@Message(id = 135, value = "Unable to guess FieldBridge for  %1$s")
-	SearchException unableToGuessFieldBridge(String classBridgeName);
+	@Message(id = 135, value = "Unable to guess FieldBridge for %2$s in %1$s")
+	SearchException unableToGuessFieldBridge(String className, String fieldName);
 
 	@Message(id = 136, value = "Unable to instantiate Spatial defined on %1$s")
 	SearchException unableToInstantiateSpatial(String className, @Cause Throwable e);
@@ -605,4 +605,24 @@ public interface Log extends BasicLogger {
 	@Message(id = 148, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
 	SearchException jGroupsMuxIdAlreadyTaken(short n);
 
+	@Message(id = 149, value = "Unable to determine ClassBridge for %1$s")
+	SearchException unableToDetermineClassBridge(String className);
+
+	@Message(id = 150, value = "Unable to get input stream from blob data")
+	SearchException unableToGetInputStreamFromBlob(@Cause Throwable e);
+
+	@Message(id = 151, value = "Unable to get input stream from blob data")
+	SearchException unsupportedTikaBridgeType();
+
+	@Message(id = 152, value = "File %1$s does not exist")
+	SearchException fileDoesNotExist( String fileName );
+
+	@Message(id = 153, value = "%1$s is a directory and not a file")
+	SearchException fileIsADirectory( String fileName );
+
+	@Message(id = 154, value = "File %1$s is not readable")
+	SearchException fileIsNotReadable( String fileName );
+
+	@Message(id = 155, value = "Unable to configure %1$s")
+	SearchException unableToConfigureTikaBridge(String bridgeName, @Cause Throwable e);
 }

@@ -22,7 +22,9 @@
   ~  51 Franklin Street, Fifth Floor
   ~  Boston, MA  02110-1301  USA
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -52,8 +54,9 @@
             <artifactId>hibernate-search-analyzers</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
@@ -135,6 +138,16 @@
             <testResource>
                 <filtering>true</filtering>
                 <directory>src/test/resources</directory>
+                <excludes>
+                    <exclude>*.pdf</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <filtering>false</filtering>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>*.pdf</include>
+                </includes>
             </testResource>
         </testResources>
         <plugins>

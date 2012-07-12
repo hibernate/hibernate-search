@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -30,16 +30,30 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specifies a custom field bridge implementation
+ * Defines a bridge for integrating with <a href="http://tika.apache.org">Apache Tika</a>.
+ * <p>
+ * The bridge supports the following data types:
+ * <ul>
+ * <li>{@code String} - where the string value is interpreted as a file path</li>
+ * <li>{@code URI} - where the URI is interpreted as a file: URI</li>
+ * <li>{@code byte[]}</li>
+ * <li>{@code java.sql.Blob}</li>
+ * </ul>
+ * </p>
  *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
-public @interface FieldBridge {
-	//default to embed @FieldBridge in @Field
-	public Class<?> impl() default void.class;
+public @interface TikaBridge {
+	/**
+	 * @return Class used for optional Tika metadata pre- and post-processing
+	 */
+	public Class<?> metadataProcessor() default void.class;
 
-	public Parameter[] params() default { };
+	/**
+	 * @return Class used for optionally providing a Tika parsing context
+	 */
+	public Class<?> parseContextProvider() default void.class;
 }
