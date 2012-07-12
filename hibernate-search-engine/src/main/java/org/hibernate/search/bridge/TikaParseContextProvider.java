@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,24 +23,24 @@
  */
 package org.hibernate.search.bridge;
 
-import java.util.Map;
+import org.apache.tika.parser.ParseContext;
 
 /**
- * Allow parameter injection to a given bridge.
- * 
- * Implementors need to be threadsafe, but the
- * setParameterValues method doesn't need any
- * guard as initialization is always safe.
- *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public interface ParameterizedBridge {
+public interface TikaParseContextProvider {
 
 	/**
-	 * Called on the bridge implementation to pass the parameters.
+	 * This method is called by the Tika bridge prior to parsing the data.
+	 * <p/>
+	 * It allows to create a custom {@code ParseContext}
 	 *
-	 * @param parameters map containing string based parameters to be passed to the parameterized bridge. The map is never
-	 * {@code null}.
+	 * @param name the field name of the property which is processed by the Tika bridge
+	 * @param value the value to be indexed
+	 *
+	 * @return A {@code ParseContext} instance used by the Tika bridge to parse the data
+	 *
+	 * @see <a href="http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html">Tika API</a>
 	 */
-	void setParameterValues(Map<String, String> parameters);
+	public ParseContext getParseContext(String name, Object value);
 }

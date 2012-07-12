@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.bridge.impl;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -81,6 +83,7 @@ import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 import org.hibernate.search.spatial.SpatialFieldBridgeByGrid;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -198,6 +201,10 @@ public final class BridgeFactory {
 	public static final FieldBridge ITERABLE_CALENDAR_MILLISECOND = new BuiltinIterableBridge( CALENDAR_MILLISECOND );
 	public static final FieldBridge MAP_CALENDAR_MILLISECOND = new BuiltinMapBridge( CALENDAR_MILLISECOND );
 
+	public static final String TIKA_BRIDGE_NAME = "org.hibernate.search.bridge.builtin.TikaBridge";
+	public static final String TIKA_BRIDGE_METADATA_PROCESSOR_SETTER = "setMetadataProcessorClass";
+	public static final String TIKA_BRIDGE_PARSE_CONTEXT_SETTER = "setParseContextProviderClass";
+
 	static {
 		builtInBridges.put( Character.class.getName(), CHARACTER );
 		builtInBridges.put( char.class.getName(), CHARACTER );
@@ -278,7 +285,7 @@ public final class BridgeFactory {
 			}
 		}
 		if ( bridge == null ) {
-			throw LOG.unableToGuessFieldBridge( ClassBridge.class.getName() );
+			throw LOG.unableToDetermineClassBridge( ClassBridge.class.getName() );
 		}
 
 		return bridge;
@@ -373,6 +380,10 @@ public final class BridgeFactory {
 					.resolution();
 			bridge = guessCalendarFieldBridge( member, reflectionManager, resolution );
 		}
+		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.TikaBridge.class ) ) {
+			org.hibernate.search.annotations.TikaBridge annotation = member.getAnnotation( org.hibernate.search.annotations.TikaBridge.class );
+			bridge = createTikaBridge( annotation );
+		}
 		else if ( numericField != null ) {
 			bridge = guessNumericFieldBridge( member, reflectionManager );
 		}
@@ -395,11 +406,54 @@ public final class BridgeFactory {
 				bridge = guessEmbeddedFieldBridge( member, reflectionManager );
 			}
 		}
-		//TODO add classname
 		if ( bridge == null ) {
-			throw LOG.unableToGuessFieldBridge( member.getName() );
+			throw LOG.unableToGuessFieldBridge( member.getType().getName(), member.getName() );
 		}
 		return bridge;
+	}
+
+	private static FieldBridge createTikaBridge(org.hibernate.search.annotations.TikaBridge annotation) {
+		Class<?> tikaBridgeClass;
+		FieldBridge tikaBridge;
+		try {
+			tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME, BridgeFactory.class.getClassLoader() );
+			tikaBridge = ClassLoaderHelper.instanceFromClass( FieldBridge.class, tikaBridgeClass, "Tika bridge" );
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new AssertionFailure( "Unable to find Tika bridge class: " + TIKA_BRIDGE_NAME );
+		}
+
+		Class<?> tikaMetadataProcessorClass = annotation.metadataProcessor();
+		if ( tikaMetadataProcessorClass != void.class ) {
+			configureTikaBridgeParameters(
+					tikaBridgeClass,
+					TIKA_BRIDGE_METADATA_PROCESSOR_SETTER,
+					tikaBridge,
+					tikaMetadataProcessorClass
+			);
+		}
+
+		Class<?> tikaParseContextProviderClass = annotation.parseContextProvider();
+		if ( tikaParseContextProviderClass != void.class ) {
+			configureTikaBridgeParameters(
+					tikaBridgeClass,
+					TIKA_BRIDGE_PARSE_CONTEXT_SETTER,
+					tikaBridge,
+					tikaParseContextProviderClass
+			);
+		}
+
+		return tikaBridge;
+	}
+
+	private static void configureTikaBridgeParameters(Class<?> tikaBridgeClass, String setter, Object tikaBridge, Class<?> clazz) {
+		try {
+			Method m = tikaBridgeClass.getMethod( setter, Class.class );
+			m.invoke( tikaBridge, clazz );
+		}
+		catch ( Exception e ) {
+			throw LOG.unableToConfigureTikaBridge( TIKA_BRIDGE_NAME, e );
+		}
 	}
 
 	private static FieldBridge guessEmbeddedFieldBridge(XMember member, ReflectionManager reflectionManager) {
@@ -750,7 +804,7 @@ public final class BridgeFactory {
 		}
 
 		if ( bridge == null ) {
-			throw LOG.unableToGuessFieldBridge( appliedOnType.getName() );
+			throw LOG.unableToDetermineClassBridge( appliedOnType.getName() );
 		}
 
 		return bridge;

@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,26 +21,52 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.bridge;
+package org.hibernate.search.test.bridge.tika;
 
-import java.util.Map;
+import java.sql.Blob;
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.TikaBridge;
+
 
 /**
- * Allow parameter injection to a given bridge.
- * 
- * Implementors need to be threadsafe, but the
- * setParameterValues method doesn't need any
- * guard as initialization is always safe.
- *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public interface ParameterizedBridge {
+@Entity
+@Indexed
+public class Book {
 
-	/**
-	 * Called on the bridge implementation to pass the parameters.
-	 *
-	 * @param parameters map containing string based parameters to be passed to the parameterized bridge. The map is never
-	 * {@code null}.
-	 */
-	void setParameterValues(Map<String, String> parameters);
+	private Integer id;
+	private Blob content;
+
+	@Id
+	@GeneratedValue
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+	@Field
+	@TikaBridge
+	public Blob getContent() {
+		return content;
+	}
+
+	public void setContent(Blob content) {
+		this.content = content;
+	}
 }
+
+
