@@ -24,25 +24,60 @@
 
 package org.hibernate.search.test.bridge.tika;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.Query;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.XMPDM;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TikaBridge;
 import org.hibernate.search.bridge.BridgeException;
+import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Hardy Ferentschik
  */
 public class TikaBridgeTest extends SearchTestCase {
+	private static final String TEST_MP3_DOCUMENT = "/mysong.mp3";
+	private static final String PATH_TO_TEST_MP3;
+
+	static {
+		try {
+			File mp3File = new File( TikaBridgeTest.class.getResource( TEST_MP3_DOCUMENT ).toURI() );
+			PATH_TO_TEST_MP3 = mp3File.getAbsolutePath();
+		}
+		catch ( URISyntaxException e ) {
+			throw new RuntimeException( "Unable to determine file path for test document" );
+		}
+	}
+
+	public void testIndexMp3MetaTags() throws Exception {
+		Session session = openSession();
+
+		persistSong( session );
+		searchSong( session );
+
+		session.close();
+	}
 
 	public void testUnsupportedTypeForTikaBridge() throws Exception {
 		Session session = openSession();
@@ -52,12 +87,13 @@ public class TikaBridgeTest extends SearchTestCase {
 			session.save( new Foo() );
 			tx.commit();
 			fail();
-		} catch ( HibernateException e ) {
+		}
+		catch ( HibernateException e ) {
 			// hmm, a lot of exception wrapping going on
-			assertTrue( e.getCause() instanceof BridgeException);
-			BridgeException bridgeException = (BridgeException) e.getCause();
+			assertTrue( e.getCause() instanceof BridgeException );
+			BridgeException bridgeException = ( BridgeException ) e.getCause();
 			assertTrue( e.getCause() instanceof SearchException );
-			SearchException searchException = (SearchException) bridgeException.getCause();
+			SearchException searchException = ( SearchException ) bridgeException.getCause();
 			assertTrue( "Wrong root cause", searchException.getMessage().startsWith( "HSEARCH000151" ) );
 		}
 		finally {
@@ -68,8 +104,38 @@ public class TikaBridgeTest extends SearchTestCase {
 
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Foo.class
+				Foo.class, Song.class
 		};
+	}
+
+	private void persistSong(Session session) {
+		Transaction tx = session.beginTransaction();
+		Song mySong = new Song( PATH_TO_TEST_MP3 );
+		session.save( mySong );
+		tx.commit();
+	}
+
+	@SuppressWarnings("unchecked")
+	private void searchSong(Session session) throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		Transaction tx = session.beginTransaction();
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				XMPDM.ARTIST.getName(),
+				TestConstants.standardAnalyzer
+		);
+		Query query = parser.parse( "Emmanuel" );
+
+
+		List<Song> result = fullTextSession.createFullTextQuery( query ).list();
+		assertEquals( "Emmanuel is not an artist", 0, result.size() );
+
+		query = parser.parse( "Hardy" );
+
+		result = fullTextSession.createFullTextQuery( query ).list();
+		assertEquals( "Hardy is the artist", 1, result.size() );
+
+		tx.commit();
 	}
 
 	@Entity
@@ -89,6 +155,38 @@ public class TikaBridgeTest extends SearchTestCase {
 
 		public Date getNow() {
 			return now;
+		}
+	}
+
+	@Entity
+	@Indexed
+	public static class Song {
+		@Id
+		@GeneratedValue
+		long id;
+
+		@Field
+		@TikaBridge(metadataProcessor = Mp3TikaMetadataProcessor.class)
+		String mp3FileName;
+
+		public Song(String mp3FileName) {
+			this.mp3FileName = mp3FileName;
+		}
+
+		public String getMp3FileName() {
+			return mp3FileName;
+		}
+	}
+
+	public static class Mp3TikaMetadataProcessor implements TikaMetadataProcessor {
+		@Override
+		public Metadata prepareMetadata() {
+			return new Metadata();
+		}
+
+		@Override
+		public void set(String name, Object value, Document document, LuceneOptions luceneOptions, Metadata metadata) {
+			luceneOptions.addFieldToDocument( XMPDM.ARTIST.getName() , metadata.get( XMPDM.ARTIST ), document );
 		}
 	}
 }
