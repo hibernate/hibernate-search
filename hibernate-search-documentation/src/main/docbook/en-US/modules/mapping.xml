@@ -1625,9 +1625,9 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
     <para>When discussing the basic mapping for an entity one important fact
     was so far disregarded. In Lucene all index fields have to be represented
     as strings. All entity properties annotated with <literal>@Field</literal>
-    have to be converted to strings to be indexed. The reason we have not
-    mentioned it so far is, that for most of your properties Hibernate Search
-    does the translation job for you thanks to set of built-in bridges.
+    have to be converted to strings in order to be indexed. The reason we have
+    not mentioned it so far is, that for most of your properties Hibernate
+    Search does the translation job for you thanks to set of built-in bridges.
     However, in some cases you need a more fine grained control over the
     translation process.</para>
 
@@ -1736,6 +1736,44 @@ public class Meeting {
           </listitem>
         </varlistentry>
       </variablelist>
+    </section>
+
+    <section>
+      <title>Tika bridge</title>
+
+      <para>Hibernate Search allows you to extract text from various document
+      types using the built-in <classname>TikaBridge</classname> which
+      utilizes <ulink url="http://tika.apache.org">Apache Tika</ulink> to
+      extract text and metadata from the provided documents. The
+      <classname>TikaBridge</classname> annotation can be used with
+      <classname>String</classname>, <classname>URI</classname>,
+      <classname>byte[]</classname> or <classname>java.sql.Blob</classname>
+      properties. In the case of <classname>String</classname> and
+      <classname>URI</classname> the bridge interprets the values are file
+      paths and tries to open a file to parse the document. In the case of
+      <classname>byte[]</classname> and <classname>Blob</classname> the values
+      are directly passed to Tika for parsing.</para>
+
+      <para>Tika uses metadata as in- and output of the parsing process and it
+      also allows to provide additional context information. This process is
+      described in <ulink
+      url="http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html">Parser
+      interface</ulink>. The Hibernate Search Tika bridge allows you to make
+      use of these additional configuration options by providing two
+      interfaces in conjunction with <classname>TikaBridge</classname>. The
+      first interface is the <classname>TikaParseContextProvider</classname>.
+      It allows you to create a custom <classname>ParseContext</classname> for
+      the document parsing. The second interface is
+      <classname>TikaMetadataProcessor</classname> which has two methods -
+      <methodname>prepareMetadata()</methodname> and <methodname>set(String,
+      Object, Document, LuceneOptions, Metadata metadata)</methodname>. The
+      former allows to add additional metadata to the pasing process (for
+      example the file name) and the latter allows you to index metadata
+      discovered during the parsing process.</para>
+
+      <para><classname>TikaParseContextProvider</classname> as well as
+      <classname>TikaMetadataProcessor</classname> implementation classes can
+      both be specified as parameters on the TikaBridge annotation.</para>
     </section>
 
     <section>
