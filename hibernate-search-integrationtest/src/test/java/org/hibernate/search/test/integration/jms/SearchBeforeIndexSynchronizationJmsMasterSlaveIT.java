@@ -1,29 +1,53 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ *  Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
+ */
 package org.hibernate.search.test.integration.jms;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
+import java.io.File;
 import java.util.List;
-
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.jms.controller.RegistrationController;
-import org.hibernate.search.test.integration.jms.model.RegisteredMember;
-import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Archive;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.hibernate.search.test.integration.jms.controller.RegistrationController;
+import org.hibernate.search.test.integration.jms.model.RegisteredMember;
+import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  * In a JMS Master/Slave configuration, it's not possible for a node to find any
  * entity before the synchronization of the indexes.
- *
+ * <p/>
  * The refresh period is set to a very high value ({@link Integer#MAX_VALUE}) so
  * that we can be confident it's executed before the
  * synchronization of the indexes occurs.
@@ -35,20 +59,21 @@ import org.junit.runner.RunWith;
 public class SearchBeforeIndexSynchronizationJmsMasterSlaveIT {
 
 	private static final int INFINITE_REFRESH_PERIOD = Integer.MAX_VALUE;
+	private static final File tmpDir = RegistrationConfiguration.createTempDir();
 
-	@Deployment(name = "master", order = 1 )
+	@Deployment(name = "master", order = 1)
 	public static Archive<?> createDeploymentMaster() throws Exception {
-		return DeploymentJmsMasterSlave.createMaster("master", INFINITE_REFRESH_PERIOD);
+		return DeploymentJmsMasterSlave.createMaster( "master", INFINITE_REFRESH_PERIOD, tmpDir );
 	}
 
 	@Deployment(name = "slave-1", order = 2)
 	public static Archive<?> createDeploymentSlave1() throws Exception {
-		return DeploymentJmsMasterSlave.createSlave("slave-1", INFINITE_REFRESH_PERIOD);
+		return DeploymentJmsMasterSlave.createSlave( "slave-1", INFINITE_REFRESH_PERIOD, tmpDir );
 	}
 
 	@Deployment(name = "slave-2", order = 3)
 	public static Archive<?> createDeploymentSlave2() throws Exception {
-		return DeploymentJmsMasterSlave.createSlave("slave-2", INFINITE_REFRESH_PERIOD);
+		return DeploymentJmsMasterSlave.createSlave( "slave-2", INFINITE_REFRESH_PERIOD, tmpDir );
 	}
 
 	@Inject
@@ -58,7 +83,8 @@ public class SearchBeforeIndexSynchronizationJmsMasterSlaveIT {
 	@InSequence(0)
 	@OperateOnDeployment("master")
 	public void deleteExistingMembers() throws Exception {
-		memberRegistration.deleteAllMembers();
+		int deletedMembers = memberRegistration.deleteAllMembers();
+		assertEquals( "At the start of the test there should be no members", 0, deletedMembers );
 	}
 
 	@Test
@@ -105,64 +131,41 @@ public class SearchBeforeIndexSynchronizationJmsMasterSlaveIT {
 
 	@Test
 	@InSequence(4)
-	@OperateOnDeployment("master")
-	public void searchNewMembersBeforeSynchronizationOnMaster() throws Exception {
+	@OperateOnDeployment("slave-1")
+	public void searchNewMemberBeforeSynchronizationOnSlave1() throws Exception {
 		{
-			List<RegisteredMember> result = search("Davide");
-			Assert.assertEquals("Found user created by Slave 1: " + result, 0, result.size());
+			List<RegisteredMember> result = search( "Davide" );
+			Assert.assertEquals( "Found user created by Slave 1: " + result, 0, result.size() );
 		}
 		{
-			List<RegisteredMember> result = search("Peter");
-			Assert.assertEquals("Found user created by Slave 2: " + result, 0, result.size());
+			List<RegisteredMember> result = search( "Peter" );
+			Assert.assertEquals( "Found user created by Slave 2: " + result, 0, result.size() );
 		}
 		{
-			List<RegisteredMember> result = search("Richard");
-			Assert.assertEquals("Found user created by Master: " + result, 0, result.size());
+			List<RegisteredMember> result = search( "Richard" );
+			Assert.assertEquals( "Found user created by Master: " + result, 0, result.size() );
 		}
 	}
 
 	@Test
 	@InSequence(5)
-	@OperateOnDeployment("slave-1")
-	public void searchNewMemberBeforeSynchronizationOnSlave1() throws Exception {
-		{
-			List<RegisteredMember> result = search("Davide");
-			Assert.assertEquals("Found user created by Slave 1: " + result, 0, result.size());
-		}
-		{
-			List<RegisteredMember> result = search("Peter");
-			Assert.assertEquals("Found user created by Slave 2: " + result, 0, result.size());
-		}
-		{
-			List<RegisteredMember> result = search("Richard");
-			Assert.assertEquals("Found user created by Master: " + result, 0, result.size());
-		}
-	}
-
-	@Test
-	@InSequence(6)
 	@OperateOnDeployment("slave-2")
 	public void searchNewMemberBeforeSynchronizationOnSlave2() throws Exception {
 		{
-			List<RegisteredMember> result = search("Davide");
-			Assert.assertEquals("Found user created by Slave 1: " + result, 0, result.size());
+			List<RegisteredMember> result = search( "Davide" );
+			Assert.assertEquals( "Found user created by Slave 1: " + result, 0, result.size() );
 		}
 		{
-			List<RegisteredMember> result = search("Peter");
-			Assert.assertEquals("Found user created by Slave 2: " + result, 0, result.size());
+			List<RegisteredMember> result = search( "Peter" );
+			Assert.assertEquals( "Found user created by Slave 2: " + result, 0, result.size() );
 		}
 		{
-			List<RegisteredMember> result = search("Richard");
-			Assert.assertEquals("Found user created by Master: " + result, 0, result.size());
+			List<RegisteredMember> result = search( "Richard" );
+			Assert.assertEquals( "Found user created by Master: " + result, 0, result.size() );
 		}
 	}
 
 	private List<RegisteredMember> search(String name) throws InterruptedException {
 		return memberRegistration.search( name );
-	}
-
-	@AfterClass
-	public static void cleanup() {
-		RegistrationConfiguration.removeRootTempDirectory();
 	}
 }
