@@ -24,7 +24,6 @@
 package org.hibernate.search.test.integration.jms.controller;
 
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateful;
 import javax.inject.Named;
@@ -32,6 +31,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.apache.lucene.search.Query;
+
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
@@ -55,7 +55,7 @@ public class RegistrationController {
 	}
 
 	public int deleteAllMembers() throws Exception {
-		return em.createQuery("DELETE FROM RegisteredMember").executeUpdate();
+		return em.createQuery( "DELETE FROM RegisteredMember" ).executeUpdate();
 	}
 
 	@SuppressWarnings("unchecked")
