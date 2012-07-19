@@ -23,36 +23,35 @@
  */
 package org.hibernate.search.test.integration.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
+import java.io.File;
 import java.util.List;
-
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.jms.controller.RegistrationController;
-import org.hibernate.search.test.integration.jms.model.RegisteredMember;
-import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Archive;
-import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.hibernate.search.test.integration.jms.controller.RegistrationController;
+import org.hibernate.search.test.integration.jms.model.RegisteredMember;
+import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * In a JMS Master/Slave configuration, every node should be able to find
  * entities created by some other nodes after the synchronization succeed.
- * 
+ *
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
 public class SearchNewEntityJmsMasterSlaveIT {
-
 	/**
 	 * Affects how often the Master and Slave directories should start the refresh copy work
 	 */
@@ -70,19 +69,21 @@ public class SearchNewEntityJmsMasterSlaveIT {
 
 	private static final int MAX_SEARCH_ATTEMPTS = ( MAX_PERIOD_RETRIES * REFRESH_PERIOD_IN_SEC * 1000 / SLEEP_TIME_FOR_SYNCHRONIZATION );
 
-	@Deployment(name = "master", order = 1 )
+	private static final File tmpDir = RegistrationConfiguration.createTempDir();
+
+	@Deployment(name = "master", order = 1)
 	public static Archive<?> createDeploymentMaster() throws Exception {
-		return DeploymentJmsMasterSlave.createMaster("master", REFRESH_PERIOD_IN_SEC);
+		return DeploymentJmsMasterSlave.createMaster( "master", REFRESH_PERIOD_IN_SEC, tmpDir );
 	}
 
 	@Deployment(name = "slave-1", order = 2)
 	public static Archive<?> createDeploymentSlave1() throws Exception {
-		return DeploymentJmsMasterSlave.createSlave("slave-1", REFRESH_PERIOD_IN_SEC);
+		return DeploymentJmsMasterSlave.createSlave( "slave-1", REFRESH_PERIOD_IN_SEC, tmpDir );
 	}
 
 	@Deployment(name = "slave-2", order = 3)
 	public static Archive<?> createDeploymentSlave2() throws Exception {
-		return DeploymentJmsMasterSlave.createSlave("slave-2", REFRESH_PERIOD_IN_SEC);
+		return DeploymentJmsMasterSlave.createSlave( "slave-2", REFRESH_PERIOD_IN_SEC, tmpDir );
 	}
 
 	@Inject
@@ -92,7 +93,8 @@ public class SearchNewEntityJmsMasterSlaveIT {
 	@InSequence(0)
 	@OperateOnDeployment("master")
 	public void deleteExistingMembers() throws Exception {
-		memberRegistration.deleteAllMembers();
+		int deletedMembers = memberRegistration.deleteAllMembers();
+		assertEquals( "At the start of the test there should be no members", 0, deletedMembers );
 	}
 
 	@Test
@@ -141,27 +143,27 @@ public class SearchNewEntityJmsMasterSlaveIT {
 	@InSequence(4)
 	@OperateOnDeployment("slave-1")
 	public void searchNewMembersAfterSynchronizationOnSlave1() throws Exception {
-		assertSearchResult("Davide D'Alto", search("Davide"));
-		assertSearchResult("Peter O'Tall", search("Peter"));
-		assertSearchResult("Richard Mayhew", search("Richard"));
+		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
+		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
+		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
 	}
 
 	@Test
 	@InSequence(5)
 	@OperateOnDeployment("slave-2")
 	public void searchNewMembersAfterSynchronizationOnSlave2() throws Exception {
-		assertSearchResult("Davide D'Alto", search("Davide"));
-		assertSearchResult("Peter O'Tall", search("Peter"));
-		assertSearchResult("Richard Mayhew", search("Richard"));
+		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
+		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
+		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
 	}
 
 	@Test
 	@InSequence(6)
 	@OperateOnDeployment("master")
 	public void searchNewMembersAfterSynchronizationOnMaster() throws Exception {
-		assertSearchResult("Davide D'Alto", search("Davide"));
-		assertSearchResult("Peter O'Tall", search("Peter"));
-		assertSearchResult("Richard Mayhew", search("Richard"));
+		assertSearchResult( "Davide D'Alto", search( "Davide" ) );
+		assertSearchResult( "Peter O'Tall", search( "Peter" ) );
+		assertSearchResult( "Richard Mayhew", search( "Richard" ) );
 	}
 
 	private void assertSearchResult(String expectedResult, List<RegisteredMember> results) {
@@ -178,16 +180,10 @@ public class SearchNewEntityJmsMasterSlaveIT {
 
 		int attempts = 0;
 		while ( results.size() == 0 && attempts < MAX_SEARCH_ATTEMPTS ) {
-			attempts ++;
+			attempts++;
 			waitForIndexSynchronization();
 			results = memberRegistration.search( name );
 		}
 		return results;
 	}
-
-	@AfterClass
-	public static void cleanup() {
-		RegistrationConfiguration.removeRootTempDirectory();
-	}
-
 }

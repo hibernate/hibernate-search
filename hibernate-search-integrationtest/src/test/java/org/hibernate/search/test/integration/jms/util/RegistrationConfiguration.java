@@ -24,19 +24,22 @@
 package org.hibernate.search.test.integration.jms.util;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.hibernate.search.util.impl.FileHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * @author Davide D'Alto
+ * @author Sanne Grinovero
+ * @author Hardy Ferentschik
+ */
 public class RegistrationConfiguration {
 
+	private static final Logger log = LoggerFactory.getLogger( RegistrationConfiguration.class );
 	public static final String DESTINATION_QUEUE = "queue/hsearch";
-
-	private static final File TEMP_DIR_PATH = createTempDir();
-
 	private static final int MAX_ATTEMPTS = 3;
 
-	private static File createTempDir() {
+	public static File createTempDir() {
 		int attempts = 0;
 		File baseDir = new File( System.getProperty( "java.io.tmpdir" ) );
 		do {
@@ -44,24 +47,12 @@ public class RegistrationConfiguration {
 			String baseName = System.currentTimeMillis() + "_" + attempts;
 			File tempDir = new File( baseDir, baseName );
 			if ( tempDir.mkdir() ) {
+				log.info( "Created tmp directory: " + tempDir.getAbsolutePath() );
+				tempDir.deleteOnExit(); // delete the JVM exit, this way we don't have to bother about it
 				return tempDir;
 			}
 		} while ( attempts < MAX_ATTEMPTS );
 
 		throw new RuntimeException( "Impossible to create folder directory for indexes" );
 	}
-
-	public static String indexLocation(String name) {
-		try {
-			return TEMP_DIR_PATH.getCanonicalPath() + File.separator + name;
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException( e.getMessage() );
-		}
-	}
-
-	public static void removeRootTempDirectory() {
-		FileHelper.delete( TEMP_DIR_PATH );
-	}
-
 }
