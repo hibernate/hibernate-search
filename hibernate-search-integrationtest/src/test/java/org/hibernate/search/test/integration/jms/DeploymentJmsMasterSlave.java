@@ -1,14 +1,30 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ *  Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ *  indicated by the @author tags or express copyright attribution
+ *  statements applied by the authors.  All third-party contributions are
+ *  distributed under license by Red Hat, Inc.
+ *
+ *  This copyrighted material is made available to anyone wishing to use, modify,
+ *  copy, or redistribute it subject to the terms and conditions of the GNU
+ *  Lesser General Public License, as published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this distribution; if not, write to:
+ *  Free Software Foundation, Inc.
+ *  51 Franklin Street, Fifth Floor
+ *  Boston, MA  02110-1301  USA
+ */
 package org.hibernate.search.test.integration.jms;
-
-import static org.hibernate.search.test.integration.jms.util.RegistrationConfiguration.indexLocation;
 
 import java.io.File;
 
-import org.hibernate.search.Version;
-import org.hibernate.search.test.integration.jms.controller.RegistrationController;
-import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
-import org.hibernate.search.test.integration.jms.model.RegisteredMember;
-import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
@@ -22,6 +38,12 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 
+import org.hibernate.search.Version;
+import org.hibernate.search.test.integration.jms.controller.RegistrationController;
+import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
+import org.hibernate.search.test.integration.jms.model.RegisteredMember;
+import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
+
 /**
  * Create deployments for JMS Master/Slave configuration integration tests.
  *
@@ -32,15 +54,15 @@ public class DeploymentJmsMasterSlave {
 
 	private static File[] libraryFiles;
 
-	public static Archive<?> createMaster(String deploymentName, int refreshPeriod) throws Exception {
-		return baseArchive( deploymentName, masterPersistenceXml(deploymentName, refreshPeriod) )
+	public static Archive<?> createMaster(String deploymentName, int refreshPeriod, File tmpDir) throws Exception {
+		return baseArchive( deploymentName, masterPersistenceXml( deploymentName, refreshPeriod, tmpDir ) )
 				.addClass( RegistrationMdb.class )
 				.addAsWebInfResource( hornetqJmsXml(), "hornetq-jms.xml" )
 				;
 	}
 
-	public static Archive<?> createSlave(String deploymentName, int refreshPeriod) throws Exception {
-		return baseArchive( deploymentName, slavePersitenceXml( deploymentName, refreshPeriod ) );
+	public static Archive<?> createSlave(String deploymentName, int refreshPeriod, File tmpDir) throws Exception {
+		return baseArchive( deploymentName, slavePersistenceXml( deploymentName, refreshPeriod, tmpDir ) );
 	}
 
 	private static WebArchive baseArchive(String name, PersistenceDescriptor unitDef) throws Exception {
@@ -48,79 +70,93 @@ public class DeploymentJmsMasterSlave {
 				.create( WebArchive.class, name + ".war" )
 				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
-				;
+				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		addLibraries( webArchive );
 		return webArchive;
 	}
 
-	private static PersistenceDescriptor masterPersistenceXml(String name, int refreshPeriod) throws Exception {
-		return commonUnitDef( name, "filesystem-master", refreshPeriod )
-				.up().up();
+	private static PersistenceDescriptor masterPersistenceXml(String name, int refreshPeriod, File tmpDir)
+			throws Exception {
+		return commonUnitDef( name, "filesystem-master", refreshPeriod, tmpDir ).up().up();
 	}
 
-	private static PersistenceDescriptor slavePersitenceXml(String name, int refreshPeriod) throws Exception {
-		return commonUnitDef( name, "filesystem-slave", refreshPeriod )
+	private static PersistenceDescriptor slavePersistenceXml(String name, int refreshPeriod, File tmpDir)
+			throws Exception {
+		return commonUnitDef( name, "filesystem-slave", refreshPeriod, tmpDir )
 				.createProperty().name( "hibernate.search.default.worker.backend" ).value( "jms" ).up()
-				.createProperty().name( "hibernate.search.default.worker.jms.connection_factory" ).value( "ConnectionFactory" ).up()
-				.createProperty().name( "hibernate.search.default.worker.jms.queue" ).value( RegistrationConfiguration.DESTINATION_QUEUE ).up()
-				.up().up();
+				.createProperty()
+				.name( "hibernate.search.default.worker.jms.connection_factory" )
+				.value( "ConnectionFactory" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.worker.jms.queue" )
+				.value( RegistrationConfiguration.DESTINATION_QUEUE )
+				.up()
+				.up()
+				.up();
 	}
 
-	private static String callerName() {
-		try {
-			throw new RuntimeException();
-		} catch (Exception ex ) {
-			return ex.getStackTrace()[4].getClassName();
-		}
-	}
-
-	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(String name, String directoryProvider, int refreshPeriod) throws Exception {
+	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(String name,
+																					String directoryProvider,
+																					int refreshPeriod,
+																					File tmpDir)
+			throws Exception {
 		return Descriptors.create( PersistenceDescriptor.class )
 				.createPersistenceUnit()
-					.name( "pu-" + name )
+				.name( "pu-" + name )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
-					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
-					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
-					.createProperty().name( "hibernate.search.default.directory_provider" ).value( directoryProvider ).up()
-					.createProperty().name( "hibernate.search.default.sourceBase" ).value( indexLocation( callerName() + "-sourceBase" ) ).up()
-					.createProperty().name( "hibernate.search.default.indexBase" ).value( indexLocation( callerName() + "-" + name ) ).up()
-					.createProperty().name( "hibernate.search.default.refresh" ).value( String.valueOf( refreshPeriod ) ).up()
-					.createProperty().name( "hibernate.search.default.worker.execution" ).value( "sync" ).up();
+				.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+				.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
+				.createProperty().name( "hibernate.search.default.directory_provider" ).value( directoryProvider ).up()
+				.createProperty()
+				.name( "hibernate.search.default.sourceBase" )
+				.value( tmpDir.getAbsolutePath() + "-sourceBase" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.indexBase" )
+				.value( tmpDir.getAbsolutePath() + "-" + name )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.refresh" )
+				.value( String.valueOf( refreshPeriod ) )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.worker.execution" )
+				.value( "sync" )
+				.up();
 	}
 
 	private static void addLibraries(WebArchive archive) {
 		if ( libraryFiles == null ) { //cache this as Maven resolution is painfully slow
 			MavenDependencyResolver resolver = DependencyResolvers
-				.use( MavenDependencyResolver.class )
-				.goOffline();
+					.use( MavenDependencyResolver.class )
+					.goOffline();
 			String currentVersion = Version.getVersionString();
 			libraryFiles = resolver
-						.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
-							.exclusion( "org.hibernate:hibernate-entitymanager" )
-							.exclusion( "org.hibernate:hibernate-core" )
-							.exclusion( "org.hibernate:hibernate-search-analyzers" )
-							.exclusion( "org.hibernate.common:hibernate-commons-annotations" )
-							.exclusion( "org.jboss.logging:jboss-logging" )
-							.exclusion( "org.slf4j:slf4j-api" )
-						.resolveAsFiles();
+					.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
+					.exclusion( "org.hibernate:hibernate-entitymanager" )
+					.exclusion( "org.hibernate:hibernate-core" )
+					.exclusion( "org.hibernate:hibernate-search-analyzers" )
+					.exclusion( "org.hibernate.common:hibernate-commons-annotations" )
+					.exclusion( "org.jboss.logging:jboss-logging" )
+					.exclusion( "org.slf4j:slf4j-api" )
+					.resolveAsFiles();
 		}
 		archive.addAsLibraries( libraryFiles );
 	}
 
 	private static Asset hornetqJmsXml() {
 		String hornetqXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-								+ "<messaging-deployment xmlns=\"urn:jboss:messaging-deployment:1.0\">"
-									+ "<hornetq-server>"
-										+ "<jms-destinations>"
-											+ "<jms-queue name=\"hsearchQueue\">"
-												+ "<entry name=\"" + RegistrationConfiguration.DESTINATION_QUEUE + "\"/>"
-											+ "</jms-queue>"
-										+ "</jms-destinations>"
-									+ "</hornetq-server>"
-								+ "</messaging-deployment>";
+				+ "<messaging-deployment xmlns=\"urn:jboss:messaging-deployment:1.0\">"
+				+ "<hornetq-server>"
+				+ "<jms-destinations>"
+				+ "<jms-queue name=\"hsearchQueue\">"
+				+ "<entry name=\"" + RegistrationConfiguration.DESTINATION_QUEUE + "\"/>"
+				+ "</jms-queue>"
+				+ "</jms-destinations>"
+				+ "</hornetq-server>"
+				+ "</messaging-deployment>";
 		return new StringAsset( hornetqXml );
 	}
-
 }
