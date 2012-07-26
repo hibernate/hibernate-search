@@ -156,6 +156,9 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				else if ( ProjectionConstants.OBJECT_CLASS.equals( projectionName ) ) {
 					continue;
 				}
+				else if ( ProjectionConstants.SPATIAL_DISTANCE.equals( projectionName ) ) {
+					continue;
+				}
 				else {
 					fields.put( projectionName, FieldSelectorResult.LOAD );
 				}
@@ -258,6 +261,9 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				}
 				else if ( ProjectionConstants.OBJECT_CLASS.equals( projection[x] ) ) {
 					eip[x] = entityInfo.getClazz();
+				}
+				else if ( ProjectionConstants.SPATIAL_DISTANCE.equals( projection[x] ) ) {
+					eip[x] = queryHits.spatialDistance( scoreDocIndex );
 				}
 				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 					//THIS could be projected more than once

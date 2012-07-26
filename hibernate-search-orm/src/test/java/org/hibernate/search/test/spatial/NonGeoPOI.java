@@ -20,41 +20,48 @@
  */
 package org.hibernate.search.test.spatial;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.Store;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Store;
-
 /**
- * Hibernate Search spatial : Point Of Interest test entity
+ * Hibernate Search spatial : Non Geo enabled Point Of Interest test entity
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
 @Entity
 @Indexed
-public class Restaurant {
+public class NonGeoPOI {
 	@Id
 	Integer id;
 
 	@Field(store = Store.YES)
 	String name;
 
-	@IndexedEmbedded
-	Position position;
+	@Field(store = Store.YES, index = Index.YES)
+	String type;
 
-	public Restaurant(Integer id, String name, String address,double latitude, double longitude) {
+	@Field(store = Store.YES, index = Index.YES)
+	@NumericField
+	Double latitude;
+	@Field(store = Store.YES, index = Index.YES)
+	@NumericField
+	Double longitude;
+
+	public NonGeoPOI(Integer id, String name, Double latitude, Double longitude, String type) {
 		this.id = id;
 		this.name = name;
-		this.position= new Position();
-		this.position.address= address;
-		this.position.latitude = latitude;
-		this.position.longitude = longitude;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.type= type;
 	}
 
-	public Restaurant() {
+	public NonGeoPOI() {
 	}
 
 	public Integer getId() {
@@ -65,16 +72,16 @@ public class Restaurant {
 		return name;
 	}
 
-	public String getAddress() {
-		return position.address;
+	public double getLatitude() {
+		return latitude;
 	}
 
-	public Double getLatitude() {
-		return position.latitude;
+	public double getLongitude() {
+		return longitude;
 	}
 
-	public Double getLongitude() {
-		return position.longitude;
+	public String getType() {
+		return type;
 	}
 
 }

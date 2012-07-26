@@ -18,40 +18,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.spatial;
+package org.hibernate.search.spatial.impl;
 
-import javax.persistence.Embeddable;
-
-import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.spatial.Coordinates;
+import org.apache.lucene.search.SortField;
 
 /**
- * Created with IntelliJ IDEA.
- * User: nicolashelleringer
- * Date: 30/05/12
- * Time: 16:50
- * To change this template use File | Settings | File Templates.
+ * Lucene SortField for sorting documents which have been indexed with Hibernate Search spatial
+ *
+ * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByGrid
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
+ * @see org.hibernate.search.spatial.Coordinates
  */
-@Embeddable
-public class Position {
-	String address;
-	double latitude;
-	double longitude;
+public class DistanceSortField extends SortField {
 
-	@Spatial
-	public Coordinates getLocation() {
-		return new Coordinates() {
-			@Override
-			public Double getLatitude() {
-				return latitude;
-			}
+    public DistanceSortField(Point center, String fieldName) {
+        super( fieldName, new DistanceComparatorSource( center ) );
+    }
 
-			@Override
-			public Double getLongitude() {
-				return longitude;
-			}
-		};
-	}
-
-	public Position() {}
+    public DistanceSortField(double latitude, double longitude, String fieldName) {
+        this( Point.fromDegrees( latitude, longitude ), fieldName );
+    }
 }

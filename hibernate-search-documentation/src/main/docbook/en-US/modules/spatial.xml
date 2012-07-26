@@ -31,7 +31,7 @@
   <title>Spatial</title>
 
   <para>The spatial functionalities of Hibernate Search enable indexed entities with
-  latitude and longitude fields to be spatialy indexed then searched and
+  latitude and longitude fields to be spatially indexed then searched and
   filtered by defining a search discus, providing a center and a radius.</para>
   <para>Typical usage is to find nearby locations of interest (between 500m and 5 km) in a 5
   millions worldwide data set (for instance hotels, pubs, airports).</para>
@@ -290,6 +290,78 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
     </example>	
   </section>
   
+  <section id="spatial-distance">
+    <title>Returning distance to query point in the search results</title>
+    <section id="spatial-distance-projection">
+      <title>Returning distance to the center in the results</title>
+      <para>To get the distance to the center of the search returned with the results you just need to project it:</para>
+      <example>
+          <title>Distance projection example</title>
+          <programlisting language="JAVA" role="JAVA">double centerLatitude = 24.0d;
+double centerLongitude= 32.0d;
+
+QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity(POI.class).get();
+org.apache.lucene.search.Query luceneQuery = builder.spatial()
+      .onCoordinates("location")
+      .within(100, Unit.KM)
+      .ofLatitude(centerLatitude)
+      .andLongitude(centerLongitude)
+   .createQuery();
+
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
+hibQuery.setProjection(FullTextQuery.SPATIAL_DISTANCE, FullTextQuery.THIS);
+hibQuery.setSpatialSearchCenter(centerLatitude, centerLongitude);
+List results = hibQuery.list();</programlisting>
+      </example>
+      <itemizedlist>
+        <listitem>
+          <para>Use <classname>FullTextQuery</classname>.<literal>setProjection</literal> with FullTextQuery.SPATIAL_DISTANCE as one of the projected fields.</para>
+        </listitem>
+        <listitem>
+          <para>Call <classname>FullTextQuery</classname>.<literal>setSpatialSearchCenter</literal> with the latitude and longitude used to build the spatial query.
+          Note that using coordinates different than the center used for the query will have unexpected results.</para>
+        </listitem>
+      </itemizedlist>
+      <para>Using distance projection on non @Spatial enabled entities and/or with a non spatial Query will have
+      unexpected results as entities not spatially indexed and/or having null values for latitude or longitude will be
+      considered to be at (0,0)/(lat,0)/(0,long)</para>
+      <para>Using distance projection with a spatial query on spatially indexed entities having, eventually, <literal>null</literal> values for
+      latitude and/or longitude is safe as they will not be found by the spatial query and won't have distance calculated</para>
+    </section>
+    <section id="spatial-distance-sort">
+      <title>Sorting by distance</title>
+      <para>To sort the results by distance to the center of the search you will have to build a Sort object using a
+      DistanceSortField:</para>
+      <example>
+          <title>Distance sort example</title>
+          <programlisting language="JAVA" role="JAVA">double centerLatitude= 24.0d;
+double centerLongitude= 32.0d;
+
+final QueryBuilder builder = fullTextSession.getSearchFactory()
+   .buildQueryBuilder().forEntity( POI.class ).get();            
+org.apache.lucene.search.Query luceneQuery = builder.spatial()
+      .onCoordinates("location")
+      .within(100, Unit.KM)
+      .ofLatitude(centerLatitude)
+      .andLongitude(centerLongitude)
+   .createQuery();
+
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
+Sort distanceSort = new Sort(new DistanceSortField(centerLatitude,centerLongitude));
+hibQuery.setSort(distanceSort);</programlisting>
+      </example>
+      <para>The <classname>DistanceSortField</classname> must be constructed using the same coordinates used to
+      build the spatial query otherwise the sorting will occur with another center than the query.
+      This repetition is needed to allow you to define Queries with any tool.</para>
+      <para>Using distance sort on non @Spatial enabled entities and/or with a non spatial Query will have also
+      unexpected results as entities non spatially indexed and/or with null values for latitude or longitude will be
+      considered to be at (0,0)/(lat,0)/(0,long)</para>
+      <para>Using distance sort with a spatial query on spatially indexed entities having, eventually, <literal>null</literal>
+      values for latitude and/or longitude is safe as they will not be found by the spatial query and so won't be sorted</para>
+    </section>
+  </section>
+  
   <section id="spatial-behind-curtain">
     <title>Grid - Behind the curtain</title>
     
@@ -410,9 +482,8 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
         <para>See org.hibernate.search.spatial.impl.GridFilter implementation.</para>
         
         <para>This Query will return all documents in the boxes covering the projected bounding box of the search
-        discus. So it is too large and need refining. But we have narrowed the distance calculation problems to
+        discus. So it is too large and needs refining. But we have narrowed the distance calculation problems to
         a subet of our datas.</para>
-        
       </section>
 
       <section>

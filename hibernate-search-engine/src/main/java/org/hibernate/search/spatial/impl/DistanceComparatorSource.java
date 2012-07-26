@@ -18,40 +18,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.spatial;
+package org.hibernate.search.spatial.impl;
 
-import javax.persistence.Embeddable;
+import java.io.IOException;
 
-import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.spatial.Coordinates;
+import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.FieldComparatorSource;
 
-/**
- * Created with IntelliJ IDEA.
- * User: nicolashelleringer
- * Date: 30/05/12
- * Time: 16:50
- * To change this template use File | Settings | File Templates.
- */
-@Embeddable
-public class Position {
-	String address;
-	double latitude;
-	double longitude;
+public class DistanceComparatorSource extends FieldComparatorSource {
 
-	@Spatial
-	public Coordinates getLocation() {
-		return new Coordinates() {
-			@Override
-			public Double getLatitude() {
-				return latitude;
-			}
+	private final Point center;
 
-			@Override
-			public Double getLongitude() {
-				return longitude;
-			}
-		};
+	public DistanceComparatorSource(Point center) {
+		this.center = center;
 	}
 
-	public Position() {}
+	@Override
+	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed)
+			throws IOException {
+		return new DistanceComparator( center, numHits, fieldname );
+	}
 }
+

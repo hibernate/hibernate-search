@@ -65,6 +65,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
+import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -114,6 +115,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private boolean useFieldCacheOnClassTypes = false;
 	private transient FacetManagerImpl facetManager;
 	private transient TimeoutExceptionFactory timeoutExceptionFactory;
+	private Point spatialSearchCenter = null;
+	private String spatialFieldName = null;
 
 	/**
 	 * The number of results for this query. This field gets populated once {@link #queryResultSize}, {@link #queryEntityInfos}
@@ -129,6 +132,13 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	
 	public void afterDeserialise(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
+	}
+
+	@Override
+	public HSQuery setSpatialParameters(Point center, String fieldName) {
+		spatialSearchCenter = center;
+		spatialFieldName = fieldName;
+		return this;
 	}
 
 	public HSQuery luceneQuery(Query query) {
@@ -422,7 +432,9 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					facetManager.getFacetRequests(),
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory(),
-					this.timeoutExceptionFactory
+					this.timeoutExceptionFactory,
+					spatialSearchCenter,
+					spatialFieldName
 			);
 		}
 		else if ( 0 == n) {
@@ -436,7 +448,9 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					null,
 					false,
 					null,
-					this.timeoutExceptionFactory
+					this.timeoutExceptionFactory,
+					spatialSearchCenter,
+					spatialFieldName
 			);
 		}
 		else {
@@ -450,7 +464,9 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					facetManager.getFacetRequests(),
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory(),
-					this.timeoutExceptionFactory
+					this.timeoutExceptionFactory,
+					spatialSearchCenter,
+					spatialFieldName
 			);
 		}
 		resultSize = queryHits.getTotalHits();

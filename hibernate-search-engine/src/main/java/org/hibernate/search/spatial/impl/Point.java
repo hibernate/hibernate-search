@@ -186,7 +186,7 @@ public final class Point implements Coordinates {
 	 *
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
-	public double getDistanceTo(double latitude, double longitude) {
+	public final double getDistanceTo(final double latitude,final double longitude) {
 		double destinationLatitudeRadians= normalizeLatitude( latitude ) * GeometricConstants.TO_RADIANS_RATIO;
 		double destinationLongitudeRadians= normalizeLongitude( longitude ) * GeometricConstants.TO_RADIANS_RATIO;
 		final double dLat= (destinationLatitudeRadians - getLatitudeRad())/2.0d;
