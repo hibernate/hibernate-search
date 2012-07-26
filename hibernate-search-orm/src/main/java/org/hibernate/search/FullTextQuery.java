@@ -34,6 +34,7 @@ import org.hibernate.Query;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
+import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -108,14 +109,33 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	FullTextQuery setProjection(String... fields);
 
 	/**
-	 * Enable a given filter by its name.
+	 * Defines the center of the spatial search for this query to project distance in results
 	 *
-	 * @param name the name of the filter to enable
+	 * @param latitude latitude of the search center
+	 * @param longitude longitude of the search center
 	 *
-	 * @return Returns a {@code FullTextFilter} object that allows filter parameter injection
-	 *
-	 * @throws SearchException in case the filter with the specified name is not defined
+	 * @return {@code this} for method chaining
 	 */
+	FullTextQuery setSpatialSearchCenter(double latitude, double longitude);
+
+	/**
+	 * Defines the center of the spatial search for this query to project distance in results
+	 *
+	 * @param center the search center
+	 *
+	 * @return {@code this} for method chaining
+	 */
+	FullTextQuery setSpatialSearchCenter(Point center);
+
+	/**
+			 * Enable a given filter by its name.
+			 *
+			 * @param name the name of the filter to enable
+			 *
+			 * @return Returns a {@code FullTextFilter} object that allows filter parameter injection
+			 *
+			 * @throws SearchException in case the filter with the specified name is not defined
+			 */
 	FullTextFilter enableFullTextFilter(String name);
 
 	/**
