@@ -116,6 +116,7 @@ public class ProvidedIdTest {
 				null,
 				false,
 				null,
+				null,
 				null
 		);
 		Set<String> identifiers = new HashSet<String>();

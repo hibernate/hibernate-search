@@ -73,4 +73,9 @@ public interface ProjectionConstants {
 	 * represents an actual field value of the underlying Lucene document and hence can directly be used in queries.
 	 */
 	public String OBJECT_CLASS = "_hibernate_class";
+
+	/**
+	 * Represents the distance between an entity and the center of the search radius in case of a spatial query
+	 */
+	public String SPATIAL_DISTANCE = "_HSearch_SpatialDistance";
 }
