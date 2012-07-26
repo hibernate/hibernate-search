@@ -31,6 +31,7 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spatial.impl.Point;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).
@@ -249,4 +250,10 @@ public interface HSQuery extends ProjectionConstants {
 	 */
 	void afterDeserialise(SearchFactoryImplementor searchFactory);
 
+	/**
+	 * @param center center of the spatial search
+	 *
+	 * @return {@code this}  to allow for method chaining
+	 */
+	HSQuery setSpatialSearchCenter(Point center);
 }

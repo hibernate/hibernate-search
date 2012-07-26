@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Assert;
 
 import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -91,6 +92,61 @@ public class SpatialIndexingTest extends SearchTestCase {
 		tx.commit();
 		fullTextSession.close();
 	}
+
+	public void testDistanceProjection() throws Exception {
+		POI poi = new POI( 1, "Test", 24.0d, 32.0d, "" );
+		POI poi2= new POI(  2, "Test2", 24.0d, 31.9d, "" );
+		POI poi3= new POI(  3, "Test3", 23.9d, 32.0d, "" );
+		POI poi4= new POI(  4, "Test4", 23.9d, 32.1d, "" );
+		POI poi5= new POI(  5, "Test5", 24.1d, 32.0d, "" );
+		POI poi6= new POI(  6, "Test6", 24.1d, 31.9d, "" );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( poi );
+		fullTextSession.save( poi2 );
+		fullTextSession.save( poi3 );
+		fullTextSession.save( poi4 );
+		fullTextSession.save( poi5 );
+		fullTextSession.save( poi6 );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		double centerLatitude= 24.0d;
+		double centerLongitude= 32.0d;
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				100,
+				"location"
+		);
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialSearchCenter( centerLatitude, centerLongitude );
+		List results = hibQuery.list();
+		Object[] firstResult = (Object[]) results.get(0);
+		Object[] secondResult = (Object[]) results.get(1);
+		Object[] thirdResult = (Object[]) results.get(2);
+		Object[] fourthResult = (Object[]) results.get(3);
+		Object[] fifthResult = (Object[]) results.get(4);
+		Object[] sixthResult = (Object[]) results.get(5);
+		Assert.assertTrue( ((Double)firstResult[1]) == 0 );
+		Assert.assertTrue( ( ((Double)secondResult[1]) <= 10.1582 ) && ( ((Double)secondResult[1]) >= 10.1581 ) );
+		Assert.assertTrue( ( ((Double)thirdResult[1]) <= 11.1195 ) && ( ((Double)thirdResult[1]) >= 11.1194 ) );
+		Assert.assertTrue( ( ((Double)fourthResult[1]) <= 15.0636 ) && ( ((Double)fourthResult[1]) >= 15.0635 ) );
+		Assert.assertTrue( ( ((Double)fifthResult[1]) <= 11.1195 ) && ( ((Double)fifthResult[1]) >= 11.1194 ) );
+		Assert.assertTrue( ( ((Double)sixthResult[1]) <= 15.0583 ) && ( ((Double)sixthResult[1]) >= 15.0582 ) );
+
+		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
+		for (Object entity : pois) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
 
 	public void testSpatialAnnotationOnFieldLevel() throws Exception {
 		SimpleDateFormat dateFormat= new SimpleDateFormat("d M yyyy");
