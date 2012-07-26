@@ -178,7 +178,7 @@ public class QueryHits {
 		if ( spatialSearchCenter == null ) {
 			return null;
 		}
-		return DistanceCache.DISTANCE_CACHE.get( spatialSearchCenter, index );
+		return DistanceCache.DISTANCE_CACHE.get( spatialSearchCenter, docId( index ) );
 	}
 
 	public Explanation explain(int index) throws IOException {
