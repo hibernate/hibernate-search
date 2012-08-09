@@ -137,7 +137,8 @@
 
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.6.1</luceneVersion>
-        <infinispanVersion>5.1.4.FINAL</infinispanVersion>
+        <infinispanVersion>5.1.6.FINAL</infinispanVersion>
+        <jgroupsVersion>3.0.13.Final</jgroupsVersion>
         <hibernateVersion>4.1.6.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.1.Final</hibernateCommonsAnnotationVersion>
         <bytemanVersion>2.1.0</bytemanVersion>
@@ -259,7 +260,7 @@
             <dependency>
                 <groupId>org.jgroups</groupId>
                 <artifactId>jgroups</artifactId>
-                <version>3.0.9.Final</version>
+                <version>${jgroupsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.annotation</groupId>
