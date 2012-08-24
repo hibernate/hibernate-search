@@ -148,6 +148,7 @@
                         <!--     could also locate the docbook dependency and inspect its version... -->
                         <docbookVersion>1.72.0</docbookVersion>
                         <localeSeparator>-</localeSeparator>
+                        <injectionDateFormat>yyyy-MM-dd</injectionDateFormat>
                     </options>
                     <injections>
                         <injection>
