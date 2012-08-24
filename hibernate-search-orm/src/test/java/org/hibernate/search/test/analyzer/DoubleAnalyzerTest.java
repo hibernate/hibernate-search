@@ -35,12 +35,12 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.testing.TestForIssue;
 
 /**
- * Test for http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-263
- *
  * @author Sanne Grinovero
  */
+@TestForIssue(jiraKey = "HSEARCH-263")
 public class DoubleAnalyzerTest extends SearchTestCase {
 
 	public static final Log log = LoggerFactory.make();
@@ -62,14 +62,18 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				"id",
+				TestConstants.standardAnalyzer
+		);
 		{
-			Query luceneQuery =  new MatchAllDocsQuery();
+			Query luceneQuery = new MatchAllDocsQuery();
 			FullTextQuery query = s.createFullTextQuery( luceneQuery );
 			assertEquals( 2, query.getResultSize() );
 		}
 		{
-			Query luceneQuery =  parser.parse( "entity:alarm" );
+			Query luceneQuery = parser.parse( "entity:alarm" );
 			FullTextQuery query = s.createFullTextQuery( luceneQuery, MyEntity.class );
 			assertEquals( 1, query.getResultSize() );
 		}
@@ -88,7 +92,7 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 			FullTextQuery query = s.createFullTextQuery( luceneQuery, AlarmEntity.class );
 			assertEquals( 1, query.getResultSize() );
 		}
-		
+
 		tx.commit();
 		s.close();
 	}
