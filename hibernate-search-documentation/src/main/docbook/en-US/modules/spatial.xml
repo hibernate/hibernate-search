@@ -291,21 +291,20 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
   </section>
   
   <section id="spatial-distance">
-    <title>Distance to center in results</title>
+    <title>Using distance to center in the results</title>
     <section id="spatial-distance-projection">
-      <title>Distance projection</title>
-      <para>To get the distance to the center of the search returned with the results you will have to project it:</para>
+      <title>Returning distance to the center in the results</title>
+      <para>To get the distance to the center of the search returned with the results you just need to project it:</para>
       <example>
           <title>Distance projection example</title>
           <programlisting language="JAVA" role="JAVA">double centerLatitude= 24.0d;
           double centerLongitude= 32.0d;
 
-          org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
-                  centerLatitude,
-                  centerLongitude,
-                  100,
-                  "location"
-          );
+      		final QueryBuilder builder = fullTextSession.getSearchFactory()
+			    	.buildQueryBuilder().forEntity( POI.class ).get();            
+          org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+	    			.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
           FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
           hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
           hibQuery.setSpatialSearchCenter( centerLatitude, centerLongitude );
@@ -317,7 +316,8 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
           <para>Call FullTextQuery.setProjection with FullTextQuery.SPATIAL_DISTANCE as one of the projected fields.</para>
         </listitem>
         <listitem>
-          <para>Call FullTextQuery.setSpatialSearchCenter with the latitude and longitude used to build the spatial query. If these are other coordinates the distance shall not be found and will be returned null.</para>
+          <para>Call FullTextQuery.setSpatialSearchCenter with the latitude and longitude used to build the spatial query.
+          Note that using coordinates different than the center used for the query will have unexpected results. The distance will be set to null.</para>
         </listitem>
       </itemizedlist>
     </section>
@@ -329,17 +329,17 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
           <programlisting language="JAVA" role="JAVA">        double centerLatitude= 24.0d;
         double centerLongitude= 32.0d;
 
-        org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
-                centerLatitude,
-                centerLongitude,
-                100,
-                "location"
-        );
+    		final QueryBuilder builder = fullTextSession.getSearchFactory()
+			    	.buildQueryBuilder().forEntity( POI.class ).get();            
+        org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+	    			.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
         FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
         Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude ));
         hibQuery.setSort( distanceSort );</programlisting>
       </example>
-      <para>The DistanceSortField must be built with the coordinates used to build the spatial query. Otherwise the distance to the center shall not be found and the sorting will not occur as all distances shall be null.</para>
+      <para>The DistanceSortField must be built with the coordinates used to build the spatial query.
+      Otherwise the distance to the center shall not be found and the sorting will not occur as all distances shall be null.</para>
     </section>
   </section>
   
