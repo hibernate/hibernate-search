@@ -119,12 +119,12 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24.0d;
 		double centerLongitude= 32.0d;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
-				centerLatitude,
-				centerLongitude,
-				100,
-				"location"
-		);
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( POI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialSearchCenter( centerLatitude, centerLongitude );
@@ -174,12 +174,12 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24.0d;
 		double centerLongitude= 32.0d;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
-				centerLatitude,
-				centerLongitude,
-				100,
-				"location"
-		);
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( POI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude ));
 		hibQuery.setSort(  distanceSort );
