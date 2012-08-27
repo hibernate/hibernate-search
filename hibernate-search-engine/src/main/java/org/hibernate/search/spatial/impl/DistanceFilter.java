@@ -47,7 +47,6 @@ public final class DistanceFilter extends Filter {
 	private String coordinatesField;
 	private String latitudeField;
 	private String longitudeField;
-	private int nextReaderBase = 0;
 
 	/**
 	 * Construct a Distance Filter to match document distant at most of radius from center Point
@@ -109,9 +108,6 @@ public final class DistanceFilter extends Filter {
 		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, getLatitudeField() );
 		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( reader, getLongitudeField() );
 
-		final int readerBase = nextReaderBase;
-		nextReaderBase += reader.maxDoc();
-
 		DocIdSet docs = previousFilter.getDocIdSet( reader );
 
 		if ( ( docs == null ) || ( docs.iterator() == null ) ) {
@@ -148,10 +144,6 @@ public final class DistanceFilter extends Filter {
 		else {
 			return GridHelper.formatLongitude( coordinatesField );
 		}
-	}
-
-	public void reset() {
-		nextReaderBase = 0;
 	}
 
 	@Override
