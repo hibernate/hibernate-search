@@ -127,7 +127,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
-		hibQuery.setSpatialSearchCenter( centerLatitude, centerLongitude );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.list();
 		Object[] firstResult = (Object[]) results.get(0);
 		Object[] secondResult = (Object[]) results.get(1);
@@ -181,10 +181,10 @@ public class SpatialIndexingTest extends SearchTestCase {
 				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
-		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude ));
+		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ));
 		hibQuery.setSort(  distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
-		hibQuery.setSpatialSearchCenter( centerLatitude, centerLongitude );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.list();
 
 		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();

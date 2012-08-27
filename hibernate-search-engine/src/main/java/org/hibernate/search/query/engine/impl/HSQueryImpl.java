@@ -115,7 +115,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private boolean useFieldCacheOnClassTypes = false;
 	private transient FacetManagerImpl facetManager;
 	private transient TimeoutExceptionFactory timeoutExceptionFactory;
-	private Point spatialSearchCenter= null;
+	private Point spatialSearchCenter = null;
+	private String spatialFieldName = null;
 
 	/**
 	 * The number of results for this query. This field gets populated once {@link #queryResultSize}, {@link #queryEntityInfos}
@@ -134,8 +135,9 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	}
 
 	@Override
-	public HSQuery setSpatialSearchCenter(Point center) {
+	public HSQuery setSpatialParameters(Point center, String fieldName) {
 		spatialSearchCenter = center;
+		spatialFieldName = fieldName;
 		return this;
 	}
 
@@ -431,7 +433,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory(),
 					this.timeoutExceptionFactory,
-					spatialSearchCenter
+					spatialSearchCenter,
+					spatialFieldName
 			);
 		}
 		else if ( 0 == n) {
@@ -446,7 +449,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					false,
 					null,
 					this.timeoutExceptionFactory,
-					spatialSearchCenter
+					spatialSearchCenter,
+					spatialFieldName
 			);
 		}
 		else {
@@ -461,7 +465,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory(),
 					this.timeoutExceptionFactory,
-					spatialSearchCenter
+					spatialSearchCenter,
+					spatialFieldName
 			);
 		}
 		resultSize = queryHits.getTotalHits();

@@ -246,14 +246,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public FullTextQuery setSpatialSearchCenter( Point center ) {
-		hSearchQuery.setSpatialSearchCenter( center );
+	public FullTextQuery setSpatialParameters( Point center, String fieldName ) {
+		hSearchQuery.setSpatialParameters( center, fieldName );
 		return this;
 	}
 
 	@Override
-	public FullTextQuery setSpatialSearchCenter(double latitude, double longitude) {
-		setSpatialSearchCenter(  Point.fromDegrees( latitude, longitude ) );
+	public FullTextQuery setSpatialParameters(double latitude, double longitude, String fieldName) {
+		setSpatialParameters(  Point.fromDegrees( latitude, longitude ), fieldName );
 		return this;
 	}
 

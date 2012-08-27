@@ -3,21 +3,26 @@ package org.hibernate.search.spatial.impl;
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldCache;
-import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Scorer;
 
-public class DistanceComparator extends FieldComparator<Double> {
+public class DistanceCollector extends Collector {
+
+	private Collector delegate;
+	private boolean acceptsDocsOutOfOrder;
 
 	private Point center;
 	private String latitudeField;
 	private String longitudeField;
-	private Double bottomDistance;
 	private int docBase = 0;
 	private double[] distances;
 	private double[] latitudeValues;
 	private double[] longitudeValues;
 
-	public DistanceComparator(Point center, int hitsCount, String fieldname) {
+	public DistanceCollector(Collector delegate, Point center, int hitsCount, String fieldname) {
+		this.delegate= delegate;
+		this.acceptsDocsOutOfOrder = delegate.acceptsDocsOutOfOrder();
 		this.center = center;
 		this.distances = new double[ hitsCount ];
 		this.latitudeValues = new double[ hitsCount ];
@@ -27,28 +32,20 @@ public class DistanceComparator extends FieldComparator<Double> {
 	}
 
 	@Override
-	public int compare(int slot1, int slot2) {
-		return Double.compare( distances[ slot1 ], distances [ slot2 ]);
-	}
-
-	@Override
-	public void setBottom(int slot) {
-		bottomDistance = center.getDistanceTo( latitudeValues[slot], longitudeValues[slot] );
-	}
-
-	@Override
-	public int compareBottom(int doc) throws IOException {
-		return Double.compare( bottomDistance, distances[ doc ]);
-	}
-
-	@Override
-	public void copy(int slot, int doc) throws IOException {
-		distances[ slot ] = center.getDistanceTo( latitudeValues[doc], longitudeValues[doc] );
+	public void setScorer(Scorer scorer) throws IOException {
+		delegate.setScorer( scorer );
 		return;
 	}
 
 	@Override
+	public void collect(int doc) throws IOException {
+		delegate.collect( doc );
+		distances[ docBase + doc] = center.getDistanceTo( latitudeValues[ docBase + doc ], longitudeValues[ docBase + doc ] );
+	}
+
+	@Override
 	public void setNextReader(IndexReader reader, int docBase) throws IOException {
+		delegate.setNextReader( reader, docBase );
 		double[] unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( reader, latitudeField );
 		double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( reader, longitudeField );
 		this.docBase = docBase;
@@ -60,7 +57,11 @@ public class DistanceComparator extends FieldComparator<Double> {
 	}
 
 	@Override
-	public Double value(int slot) {
-		return center.getDistanceTo( latitudeValues[slot], longitudeValues[slot] );
+	public boolean acceptsDocsOutOfOrder() {
+		return acceptsDocsOutOfOrder;
+	}
+
+	public double getDistance(int index) {
+		return distances[ index ];
 	}
 }

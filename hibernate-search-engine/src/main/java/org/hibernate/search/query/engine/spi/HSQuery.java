@@ -252,8 +252,9 @@ public interface HSQuery extends ProjectionConstants {
 
 	/**
 	 * @param center center of the spatial search
+	 * @param fieldName name ot the spatial field
 	 *
 	 * @return {@code this}  to allow for method chaining
 	 */
-	HSQuery setSpatialSearchCenter(Point center);
+	HSQuery setSpatialParameters(Point center, String fieldName);
 }

@@ -122,15 +122,7 @@ public final class DistanceFilter extends Filter {
 			@Override
 			protected boolean match(int documentIndex) {
 
-				Double documentDistance;
-				documentDistance = DistanceCache.DISTANCE_CACHE.get( center, readerBase + documentIndex );
-				if ( documentDistance == null ) {
-					documentDistance = center.getDistanceTo( latitudeValues[documentIndex], longitudeValues[documentIndex] );
-
-					DistanceCache.DISTANCE_CACHE.put( center, readerBase + documentIndex, documentDistance );
-				}
-
-				if ( documentDistance <= radius ) {
+				if ( center.getDistanceTo( latitudeValues[documentIndex], longitudeValues[documentIndex] ) <= radius ) {
 					return true;
 				}
 				else {

@@ -12,11 +12,11 @@ import org.apache.lucene.search.SortField;
  */
 public class DistanceSortField extends SortField {
 
-	public DistanceSortField(Point center) {
-		super("Distance", new DistanceComparatorSource( center ));
+	public DistanceSortField(Point center, String fieldname) {
+		super(fieldname, new DistanceComparatorSource( center ));
 	}
 
-	public DistanceSortField(double latitude, double longitude) {
-		this( Point.fromDegrees( latitude, longitude ) );
+	public DistanceSortField(double latitude, double longitude, String fieldname) {
+		this( Point.fromDegrees( latitude, longitude ), fieldname );
 	}
 }

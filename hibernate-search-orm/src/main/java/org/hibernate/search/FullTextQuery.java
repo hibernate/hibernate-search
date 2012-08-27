@@ -113,19 +113,21 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param latitude latitude of the search center
 	 * @param longitude longitude of the search center
+	 * @param fieldName name of the spatial field
 	 *
 	 * @return {@code this} for method chaining
 	 */
-	FullTextQuery setSpatialSearchCenter(double latitude, double longitude);
+	FullTextQuery setSpatialParameters(double latitude, double longitude, String fieldName);
 
 	/**
 	 * Defines the center of the spatial search for this query to project distance in results
 	 *
 	 * @param center the search center
+	 * @param fieldName name of the spatial field
 	 *
 	 * @return {@code this} for method chaining
 	 */
-	FullTextQuery setSpatialSearchCenter(Point center);
+	FullTextQuery setSpatialParameters(Point center, String fieldName);
 
 	/**
 			 * Enable a given filter by its name.
