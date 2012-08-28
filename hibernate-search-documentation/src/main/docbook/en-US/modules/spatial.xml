@@ -317,13 +317,19 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
         </listitem>
         <listitem>
           <para>Call FullTextQuery.setSpatialSearchCenter with the latitude and longitude used to build the spatial query.
-          Note that using coordinates different than the center used for the query will have unexpected results. The distance will be set to null.</para>
+          Note that using coordinates different than the center used for the query will have unexpected results.</para>
         </listitem>
       </itemizedlist>
+      <para>Using distance projection on non @Spatial enabled entities and/or with a non spatial Query will have also
+      unexpected results as entities non spatialy indexed and/or with null values for latitude or longitude will be 
+      considered to be at (0,0)/(lat,0)/(0,long)</para>
+      <para>Using distance projection with a spatial query on spatialy indexed entities having, eventually, null values for
+      latitude and/or longitude is safe as they will not be found by the spatial query and so won't have distance calculated</para>
     </section>
     <section id="spatial-distance-sort">
       <title>Sorting by distance</title>
-      <para>To sort the results by distance to the center of the search you will have to build a Sort object using a DistanceSortField:</para>
+      <para>To sort the results by distance to the center of the search you will have to build a Sort object using a 
+      DistanceSortField:</para>
       <example>
           <title>Distance sort example</title>
           <programlisting language="JAVA" role="JAVA">        double centerLatitude= 24.0d;
@@ -338,8 +344,13 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
         Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude ));
         hibQuery.setSort( distanceSort );</programlisting>
       </example>
-      <para>The DistanceSortField must be built with the coordinates used to build the spatial query.
-      Otherwise the distance to the center shall not be found and the sorting will not occur as all distances shall be null.</para>
+      <para>You shall build the DistanceSortField with the coordinates used to build the spatial query otherwise the sorting
+      will occur with another centere than the search. This could lead to unexpected results.</para>
+      <para>Using distance sort on non @Spatial enabled entities and/or with a non spatial Query will have also
+      unexpected results as entities non spatialy indexed and/or with null values for latitude or longitude will be 
+      considered to be at (0,0)/(lat,0)/(0,long)</para>
+      <para>Using distance sort with a spatial query on spatialy indexed entities having, eventually, null values for
+      latitude and/or longitude is safe as they will not be found by the spatial query and so won't be sorted</para>
     </section>
   </section>
   

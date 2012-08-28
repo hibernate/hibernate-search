@@ -195,6 +195,50 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	public void testNonGeoDistanceSort() throws Exception {
+		NonGeoPOI poi = new NonGeoPOI( 1, "Distance to 24,32 : 0", 24.0d, null, "" );
+		NonGeoPOI poi6= new NonGeoPOI(  2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
+		NonGeoPOI poi2= new NonGeoPOI(  3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
+		NonGeoPOI poi4= new NonGeoPOI(  4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
+		NonGeoPOI poi3= new NonGeoPOI(  5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
+		NonGeoPOI poi5= new NonGeoPOI(  6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( poi );
+		fullTextSession.save( poi2 );
+		fullTextSession.save( poi3 );
+		tx.commit(); tx= fullTextSession.beginTransaction();
+		fullTextSession.save( poi4 );
+		fullTextSession.save( poi5 );
+		fullTextSession.save( poi6 );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		double centerLatitude= 24.0d;
+		double centerLongitude= 32.0d;
+
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( NonGeoPOI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.all().createQuery();
+
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, NonGeoPOI.class );
+		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ));
+		hibQuery.setSort(  distanceSort );
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		List results = hibQuery.list();
+
+		List<?> pois = fullTextSession.createQuery( "from " + NonGeoPOI.class.getName() ).list();
+		for (Object entity : pois) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
 
 	public void testSpatialAnnotationOnFieldLevel() throws Exception {
 		SimpleDateFormat dateFormat= new SimpleDateFormat("d M yyyy");
@@ -427,7 +471,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 				Hotel.class,
 				RangeHotel.class,
 				RangeEvent.class,
-				Restaurant.class
+				Restaurant.class,
+				NonGeoPOI.class
 		};
 	}
 }
