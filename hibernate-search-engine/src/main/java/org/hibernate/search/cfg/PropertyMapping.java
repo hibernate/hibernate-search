@@ -60,19 +60,27 @@ public class PropertyMapping {
 	}
 
 	public FieldMapping field() {
-		return new FieldMapping(property, entity, mapping);
+		return new FieldMapping( property, entity, mapping );
 	}
 
 	public PropertySpatialMapping spatial() {
-		return new PropertySpatialMapping(property, entity, mapping);
+		return new PropertySpatialMapping( property, entity, mapping );
+	}
+
+	public PropertyLatitudeMapping latitude() {
+		return new PropertyLatitudeMapping( property, entity, mapping );
+	}
+
+	public PropertyLongitudeMapping longitude() {
+		return new PropertyLongitudeMapping( property, entity, mapping );
 	}
 
 	public DateBridgeMapping dateBridge(Resolution resolution) {
-		return new DateBridgeMapping(mapping, entity, property, resolution);
+		return new DateBridgeMapping( mapping, entity, property, resolution );
 	}
 	
 	public CalendarBridgeMapping calendarBridge(Resolution resolution) {
-		return new CalendarBridgeMapping(mapping, entity, property, resolution);
+		return new CalendarBridgeMapping( mapping, entity, property, resolution );
 	}
 	
 	public PropertyMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {

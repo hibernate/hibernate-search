@@ -63,6 +63,8 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Latitude;
+import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
@@ -85,6 +87,7 @@ import org.hibernate.search.engine.impl.FieldMetadata;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
@@ -121,6 +124,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	protected final Set<String> fieldCollectionRoles = new TreeSet<String>();
 	protected final Set<String> indexedEmbeddedCollectionRoles = new TreeSet<String>();
 	protected final Set<String> containedInCollectionRoles = new TreeSet<String>();
+	protected final Set<String> spatialNames = new TreeSet<String>( );
 
 	protected final PropertiesMetadata metadata = new PropertiesMetadata();
 	protected EntityState entityState;
@@ -977,14 +981,52 @@ public abstract class AbstractDocumentBuilder<T> {
 			fieldName = prefix + ann.name();
 		}
 		else {
-			throw log.spatialFieldNameNotDefined( clazz.getName() );
+			fieldName = clazz.getName();
 		}
+
+		if ( spatialNames.contains( ann.name() ) ) {
+			throw log.cannotHaveTwoSpatialsWithDefaultOrSameName( clazz.getName() );
+		}
+		spatialNames.add( ann.name() );
+
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( ann.store() );
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		propertiesMetadata.classIndexes.add( index );
 		propertiesMetadata.classTermVectors.add( AnnotationProcessingHelper.getTermVector( TermVector.NO ) );
-		propertiesMetadata.classBridges.add( BridgeFactory.buildSpatialBridge( ann, clazz ) );
+		FieldBridge spatialBridge = null;
+		if ( reflectionManager.toXClass( Coordinates.class ).isAssignableFrom( clazz ) ) {
+			spatialBridge = BridgeFactory.buildSpatialBridge( ann, clazz, null, null );
+		}
+		else {
+
+			List<XProperty> propertyList = clazz.getDeclaredProperties( XClass.ACCESS_FIELD );
+
+			String latitudeField = null;
+			String longitudeField = null;
+			for ( XProperty property : propertyList ) {
+				if ( property.isAnnotationPresent( Latitude.class ) && ( property.getAnnotation( Latitude.class ) ).spatialName().equals( ann.name() ) ) {
+					if ( latitudeField != null ) {
+						throw log.ambiguousLatitudeDefinition( this.beanXClassName, latitudeField, property.getName() );
+					}
+					latitudeField = property.getName();
+				}
+				if ( property.isAnnotationPresent( Longitude.class ) && ( property.getAnnotation( Longitude.class )).spatialName().equals( ann.name() ) ) {
+					if ( longitudeField != null ) {
+						throw log.ambiguousLongitudeDefinition( this.beanXClassName, longitudeField, property.getName() );
+					}
+					longitudeField = property.getName();
+				}
+			}
+
+			if ( latitudeField != null && longitudeField != null) {
+				spatialBridge = BridgeFactory.buildSpatialBridge( ann, clazz, latitudeField, longitudeField );
+			}
+		}
+		if ( spatialBridge == null ) {
+			throw log.cannotFindCoordinatesNorLatLongForSpatial( ann.name().isEmpty() ? "default" : ann.name(), clazz.getName() );
+		}
+		propertiesMetadata.classBridges.add( spatialBridge );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
 
 		Analyzer analyzer = propertiesMetadata.analyzer;
@@ -1020,9 +1062,15 @@ public abstract class AbstractDocumentBuilder<T> {
 									 XProperty member,
 									 PropertiesMetadata propertiesMetadata,
 									 String prefix,
-									 Spatial fieldAnnotation,
+									 Spatial spatialAnnotation,
 									 ConfigContext context) {
-		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, null, null, fieldAnnotation, context, reflectionManager );
+		if ( spatialNames.contains( spatialAnnotation.name() )) {
+			throw log.cannotHaveTwoSpatialsWithDefaultOrSameName( classHostingMember.getName() );
+		}
+		spatialNames.add( spatialAnnotation.name() );
+
+		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, null, null,
+				spatialAnnotation, context, reflectionManager );
 		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		if ( member.isCollection() ) {
 			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );

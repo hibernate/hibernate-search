@@ -1,3 +1,23 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ * JBoss, Home of Professional Open Source
+ * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
+ * as indicated by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ */
 package org.hibernate.search.test.spatial;
 
 import java.text.SimpleDateFormat;
@@ -128,6 +148,123 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + Event.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	public void testSpatialAnnotationWithSubAnnotationsLevel() throws Exception {
+		User user = new User( 1, 24.0d, 32.0d );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( user );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				50,
+				"home"
+		);
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, User.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				51,
+				"home"
+		);
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, User.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + User.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	public void testSpatialAnnotationWithSubAnnotationsLevelRangeMode() throws Exception {
+		UserRange user = new UserRange( 1, 24.0d, 32.0d );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( user );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
+
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( UserRange.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( UserRange.class.getName() )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserRange.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( UserRange.class.getName() )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserRange.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + UserRange.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	public void testSpatiaslAnnotation() throws Exception {
+		UserEx user = new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( user );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
+				24.0d,
+				31.5d,
+				100.0d,
+				UserEx.class.getName()
+		);
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserEx.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 1, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				12.0d,
+				27.5d,
+				100.0d,
+				"work"
+		);
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserEx.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + UserEx.class.getName() ).list();
 		for (Object entity : events) {
 			fullTextSession.delete( entity );
 		}
@@ -323,7 +460,10 @@ public class SpatialIndexingTest extends SearchTestCase {
 				Hotel.class,
 				RangeHotel.class,
 				RangeEvent.class,
-				Restaurant.class
+				Restaurant.class,
+				User.class,
+				UserEx.class,
+				UserRange.class
 		};
 	}
 }

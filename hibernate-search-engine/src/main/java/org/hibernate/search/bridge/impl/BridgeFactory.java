@@ -298,10 +298,10 @@ public final class BridgeFactory {
 	 *
 	 * @return Returns the {@code SpatialFieldBridge} instance
 	 */
-	public static FieldBridge buildSpatialBridge(Spatial spatial, XClass clazz) {
+	public static FieldBridge buildSpatialBridge(Spatial spatial, XClass clazz, String latitudeField, String longitudeField) {
 		FieldBridge bridge;
 		try {
-			bridge = buildSpatialBridge( spatial );
+			bridge = buildSpatialBridge( spatial, latitudeField, longitudeField );
 		}
 		catch ( Exception e ) {
 			throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
@@ -324,7 +324,7 @@ public final class BridgeFactory {
 	public static FieldBridge buildSpatialBridge(Spatial spatial, XMember member) {
 		FieldBridge bridge;
 		try {
-			bridge = buildSpatialBridge( spatial );
+			bridge = buildSpatialBridge( spatial, null, null );
 		}
 		catch ( Exception e ) {
 			throw LOG.unableToInstantiateSpatial( member.getName(), e );
@@ -343,14 +343,23 @@ public final class BridgeFactory {
 	 *
 	 * @return Returns the {@code SpatialFieldBridge} instance
 	 */
-	public static FieldBridge buildSpatialBridge(Spatial spatial) {
+	public static FieldBridge buildSpatialBridge(Spatial spatial, String latitudeField, String longitudeField) {
 		FieldBridge bridge = null;
 		if ( spatial != null ) {
 			if ( spatial.spatialMode() == SpatialMode.GRID ) {
-				bridge = new SpatialFieldBridgeByGrid( spatial.topGridLevel(), spatial.bottomGridLevel() );
+				if ( latitudeField != null && longitudeField != null ) {
+					bridge = new SpatialFieldBridgeByGrid( spatial.topGridLevel(), spatial.bottomGridLevel(), latitudeField, longitudeField );
+				}
+				else {
+					bridge = new SpatialFieldBridgeByGrid( spatial.topGridLevel(), spatial.bottomGridLevel() );
+                                }
 			}
 			else {
-				bridge = new SpatialFieldBridgeByRange();
+				if ( latitudeField != null && longitudeField != null ) {
+					bridge = new SpatialFieldBridgeByRange( latitudeField, longitudeField );
+				} else {
+					bridge = new SpatialFieldBridgeByRange();
+				}
 			}
 		}
 

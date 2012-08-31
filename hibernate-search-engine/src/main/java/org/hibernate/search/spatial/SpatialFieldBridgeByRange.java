@@ -21,8 +21,6 @@
 package org.hibernate.search.spatial;
 
 import org.apache.lucene.document.Document;
-
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
 /**
@@ -30,9 +28,17 @@ import org.hibernate.search.bridge.LuceneOptions;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class SpatialFieldBridgeByRange implements FieldBridge {
+public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 
-	public SpatialFieldBridgeByRange() {}
+	public SpatialFieldBridgeByRange() {
+		this.fieldMode = false;
+	}
+
+	public SpatialFieldBridgeByRange(String latitudeField, String longitudeField) {
+		this.latitudeField = latitudeField;
+		this.longitudeField = longitudeField;
+		this.fieldMode = true;
+	}
 
 	/**
 	 * Actual overridden method that does the indexing
@@ -46,11 +52,10 @@ public class SpatialFieldBridgeByRange implements FieldBridge {
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
 
-			Coordinates coordinates = (Coordinates) value;
-			Double latitude = coordinates.getLatitude();
-			Double longitude = coordinates.getLongitude();
+			Double latitude = getLatitude( value );
+			Double longitude = getLongitude( value );
 
-			if( ( latitude != null ) && ( longitude != null ) ) {
+			if ( ( latitude != null ) && ( longitude != null ) ) {
 
 				luceneOptions.addNumericFieldToDocument(
 						name + "_HSSI_Latitude",

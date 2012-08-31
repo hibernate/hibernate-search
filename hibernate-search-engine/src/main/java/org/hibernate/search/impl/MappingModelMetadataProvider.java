@@ -62,6 +62,8 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Latitude;
+import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Parameter;
@@ -401,6 +403,8 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		private void createFields(PropertyDescriptor property) {
 			final Collection<Map<String,Object>> fields = property.getFields();
 			final Map<String,Object> spatial = property.getSpatial();
+			final Map<String,Object> latitude = property.getLatitude();
+			final Map<String,Object> longitude = property.getLongitude();
 			final Collection<Map<String,Object>> numericFields = property.getNumericFields();
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
@@ -449,7 +453,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 
 			if( spatial != null && spatial.size() > 0 ) {
-				AnnotationDescriptor spatialAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Spatial.class );
+				AnnotationDescriptor spatialAnnotation = new AnnotationDescriptor( Spatial.class );
 				for ( Map.Entry<String, Object> entry : spatial.entrySet() ) {
 					 if ( entry.getKey().equals( "boost" ) ) {
 						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
@@ -465,6 +469,22 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					}
 				}
 				annotations.put( Spatial.class, createAnnotation( spatialAnnotation ) );
+			}
+
+			if ( latitude != null && latitude.size() > 0 ) {
+				AnnotationDescriptor latitudeAnnotation = new AnnotationDescriptor( Latitude.class );
+				for ( Map.Entry<String, Object> entry : latitude.entrySet() ) {
+					latitudeAnnotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( Latitude.class, createAnnotation( latitudeAnnotation ) );
+			}
+
+			if ( longitude != null && longitude.size() > 0 ) {
+				AnnotationDescriptor longitudeAnnotation = new AnnotationDescriptor( Longitude.class );
+				for ( Map.Entry<String, Object> entry : longitude.entrySet() ) {
+					longitudeAnnotation.setValue( entry.getKey(), entry.getValue() );
+				}
+				annotations.put( Longitude.class, createAnnotation( longitudeAnnotation ) );
 			}
 
 			AnnotationDescriptor fieldsAnnotation = new AnnotationDescriptor( Fields.class );

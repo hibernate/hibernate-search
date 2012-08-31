@@ -22,7 +22,6 @@ package org.hibernate.search.spatial;
 
 import org.apache.lucene.document.Document;
 
-import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.spatial.impl.GridHelper;
@@ -35,7 +34,7 @@ import java.util.Map;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridge {
+public class SpatialFieldBridgeByGrid extends SpatialFieldBridge implements ParameterizedBridge {
 
 	public static final int DEFAULT_TOP_GRID_LEVEL = 0;
 	public static final int DEFAULT_BOTTOM_GRID_LEVEL = 16;
@@ -46,11 +45,22 @@ public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridg
 	private boolean gridIndex = true;
 	private boolean numericFieldsIndex = true;
 
-	public SpatialFieldBridgeByGrid() {}
+	public SpatialFieldBridgeByGrid() {
+		this.fieldMode = false;
+	}
 
 	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel) {
 		this.topGridLevel = topGridLevel;
 		this.bottomGridLevel = bottomGridLevel;
+		this.fieldMode = false;
+	}
+
+	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel, String latitudeField, String longitudeField) {
+		this.topGridLevel = topGridLevel;
+		this.bottomGridLevel = bottomGridLevel;
+		this.latitudeField = latitudeField;
+		this.longitudeField = longitudeField;
+		this.fieldMode = true;
 	}
 
 	/**
@@ -65,13 +75,12 @@ public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridg
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
 
-			Coordinates coordinates = (Coordinates) value;
-			Double latitude = coordinates.getLatitude();
-			Double longitude = coordinates.getLongitude();
+			Double latitude = getLatitude( value );
+			Double longitude = getLongitude( value );
 
-			if( ( latitude != null ) && ( longitude != null ) ) {
+			if ( ( latitude != null ) && ( longitude != null ) ) {
 
-				if( gridIndex ) {
+				if ( gridIndex ) {
 					Point point = Point.fromDegrees( latitude, longitude );
 
 					for ( int i = topGridLevel; i <= bottomGridLevel; i++ ) {
@@ -79,7 +88,7 @@ public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridg
 					}
 				}
 
-				if( numericFieldsIndex ) {
+				if ( numericFieldsIndex ) {
 					luceneOptions.addNumericFieldToDocument(
 							GridHelper.formatLatitude( name ),
 							latitude,
@@ -102,7 +111,7 @@ public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridg
 	 * @param parameters Map containing the topGridLevel and bottomGridLevel values
 	 */
 	@Override
-	public void setParameterValues(Map parameters) {
+	public void setParameterValues(final Map parameters) {
 		Object topGridLevel = parameters.get( "topGridLevel" );
 		if ( topGridLevel instanceof Integer ) {
 			this.topGridLevel = ( Integer ) topGridLevel;

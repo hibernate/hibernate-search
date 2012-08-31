@@ -649,11 +649,11 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
 
-		final QueryBuilder builder = session.getSearchFactory()
+		QueryBuilder builder = session.getSearchFactory()
 				.buildQueryBuilder().forEntity( MemberLevelTestPoI.class ).get();
 
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
 				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
@@ -669,8 +669,8 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		List results2 = hibQuery2.list();
 		assertEquals( 1, results2.size() );
 
-		List<?> events = session.createQuery( "from " + MemberLevelTestPoI.class.getName() ).list();
-		for (Object entity : events) {
+		List<?> testPoIs = session.createQuery( "from " + MemberLevelTestPoI.class.getName() ).list();
+		for ( Object entity : testPoIs ) {
 			session.delete( entity );
 		}
 		tx.commit();
@@ -686,8 +686,11 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx = s.beginTransaction();
 		session = Search.getFullTextSession( s );
 
-		centerLatitude= 24;
-		centerLongitude= 31.5;
+		builder = session.getSearchFactory()
+				.buildQueryBuilder().forEntity( ClassLevelTestPoI.class ).get();
+
+		centerLatitude = 24;
+		centerLongitude = 31.5;
 
 		luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
 				centerLatitude,
@@ -709,11 +712,49 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		results2 = hibQuery2.list();
 		assertEquals( 1, results2.size() );
 
-		events = session.createQuery( "from " + ClassLevelTestPoI.class.getName() ).list();
-		for (Object entity : events) {
+		testPoIs = session.createQuery( "from " + ClassLevelTestPoI.class.getName() ).list();
+		for ( Object entity : testPoIs ) {
 			session.delete( entity );
 		}
 		tx.commit();
+		session.close();
+
+		s = openSession();
+		tx = s.beginTransaction();
+		LatLongAnnTestPoi latLongAnnTestPoi = new LatLongAnnTestPoi( "test", 24.0, 32.0d );
+		s.persist( latLongAnnTestPoi );
+		s.flush();
+		tx.commit();
+		tx = s.beginTransaction();
+		session = Search.getFullTextSession( s );
+
+		builder = session.getSearchFactory()
+				.buildQueryBuilder().forEntity( LatLongAnnTestPoi.class ).get();
+
+		centerLatitude = 24;
+		centerLongitude = 31.5;
+
+		luceneQuery = builder.spatial().onCoordinates( "location" )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		hibQuery = session.createFullTextQuery( luceneQuery, LatLongAnnTestPoi.class );
+		results = hibQuery.list();
+		assertEquals( 0, results.size() );
+
+		luceneQuery2 = builder.spatial().onCoordinates( "location" )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		hibQuery2 = session.createFullTextQuery( luceneQuery2, LatLongAnnTestPoi.class );
+		results2 = hibQuery2.list();
+		assertEquals( 1, results2.size() );
+
+
+		testPoIs = session.createQuery( "from " + LatLongAnnTestPoi.class.getName() ).list();
+		for ( Object entity : testPoIs ) {
+			session.delete( entity );
+		}
+		tx.commit();
+
 		session.close();
 	}
 	
@@ -817,7 +858,8 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				Departments.class,
 				DynamicBoostedDescLibrary.class,
 				MemberLevelTestPoI.class,
-				ClassLevelTestPoI.class
+				ClassLevelTestPoI.class,
+				LatLongAnnTestPoi.class
 		};
 	}	
 }
