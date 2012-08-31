@@ -135,6 +135,126 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	public void testSpatialAnnotationWithSubAnnotationsLevel() throws Exception {
+		User user = new User( 1, 24.0d, 32.0d );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( user );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				50,
+				"home"
+		);
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, User.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				centerLatitude,
+				centerLongitude,
+				51,
+				"home"
+		);
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, User.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + User.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	public void testSpatialAnnotationWithSubAnnotationsLevelRangeMode() throws Exception {
+		UserRange user = new UserRange( 1, 24.0d, 32.0d );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( user );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		double centerLatitude= 24;
+		double centerLongitude= 31.5;
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
+				centerLatitude,
+				centerLongitude,
+				50,
+				"home"
+		);
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserRange.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByRange(
+				centerLatitude,
+				centerLongitude,
+				51,
+				"home"
+		);
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserRange.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + UserRange.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	public void testSpatiaslAnnotation() throws Exception {
+		UserEx user = new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( user );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				24.0d,
+				31.5d,
+				100.0d,
+				"home"
+		);
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserEx.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 1, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
+				12.0d,
+				27.5d,
+				100.0d,
+				"work"
+		);
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserEx.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + UserEx.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
 	public void testSpatialAnnotationOnFieldLevelRangeMode() throws Exception {
 		SimpleDateFormat dateFormat= new SimpleDateFormat("d M yyyy");
 		Date date= dateFormat.parse( "10 9 1976" );
@@ -323,7 +443,10 @@ public class SpatialIndexingTest extends SearchTestCase {
 				Hotel.class,
 				RangeHotel.class,
 				RangeEvent.class,
-				Restaurant.class
+				Restaurant.class,
+				User.class,
+				UserEx.class,
+				UserRange.class
 		};
 	}
 }

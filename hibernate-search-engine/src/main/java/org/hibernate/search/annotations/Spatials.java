@@ -30,7 +30,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Documented;
 
 @Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.METHOD, ElementType.FIELD} )
+@Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE } )
 @Documented
 public @interface Spatials {
 	Spatial[] value();

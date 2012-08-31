@@ -625,4 +625,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 155, value = "Unable to configure %1$s")
 	SearchException unableToConfigureTikaBridge(String bridgeName, @Cause Throwable e);
+	
+	@Message(id = 156, value = "Cannot read %1$s field from a %2$s object : does getter exists and is it public ?")
+	SearchException cannotReadFieldForClass(String fieldName, String className);
+
+	@Message(id = 157, value = "Class %1$s does not implement the Coordinates interface")
+	SearchException cannotExtractCoordinateFromObject(String className);
+
 }

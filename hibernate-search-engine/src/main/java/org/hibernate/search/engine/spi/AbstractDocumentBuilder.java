@@ -63,6 +63,8 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Latitude;
+import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
@@ -85,6 +87,7 @@ import org.hibernate.search.engine.impl.FieldMetadata;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
@@ -984,7 +987,32 @@ public abstract class AbstractDocumentBuilder<T> {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		propertiesMetadata.classIndexes.add( index );
 		propertiesMetadata.classTermVectors.add( AnnotationProcessingHelper.getTermVector( TermVector.NO ) );
-		propertiesMetadata.classBridges.add( BridgeFactory.buildSpatialBridge( ann, clazz ) );
+		FieldBridge spatialBridge = null;
+		if ( reflectionManager.toXClass( Coordinates.class ).isAssignableFrom( clazz ) ) {
+			spatialBridge = BridgeFactory.buildSpatialBridge( ann, clazz, null, null );
+		} else {
+
+			List<XProperty> propertyList = clazz.getDeclaredProperties( XClass.ACCESS_FIELD );
+
+			String latitudeField = null;
+			String longitudeField = null;
+			for ( XProperty property : propertyList ) {
+				if ( property.isAnnotationPresent( Latitude.class ) && ( property.getAnnotation( Latitude.class )).spatialName().equals( ann.name() )) {
+					latitudeField = property.getName();
+				}
+				if ( property.isAnnotationPresent( Longitude.class ) && ( property.getAnnotation( Longitude.class )).spatialName().equals(  ann.name() )) {
+					longitudeField = property.getName();
+				}
+			}
+
+			if ( latitudeField != null && longitudeField != null) {
+				spatialBridge = BridgeFactory.buildSpatialBridge( ann, clazz, latitudeField, longitudeField );
+			}
+	    }
+		if ( spatialBridge == null ) {
+			throw new AssertionFailure( "Spatial annotation incorrect configuration" );
+		}
+		propertiesMetadata.classBridges.add( spatialBridge );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
 
 		Analyzer analyzer = propertiesMetadata.analyzer;

@@ -28,6 +28,9 @@ import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.spatial.impl.GridHelper;
 import org.hibernate.search.spatial.impl.Point;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -35,7 +38,7 @@ import java.util.Map;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridge {
+public class SpatialFieldBridgeByGrid extends SpatialFieldBridge implements ParameterizedBridge {
 
 	public static final int DEFAULT_TOP_GRID_LEVEL = 0;
 	public static final int DEFAULT_BOTTOM_GRID_LEVEL = 16;
@@ -46,11 +49,22 @@ public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridg
 	private boolean gridIndex = true;
 	private boolean numericFieldsIndex = true;
 
-	public SpatialFieldBridgeByGrid() {}
+	public SpatialFieldBridgeByGrid() {
+		this.fieldMode = false;
+	}
 
 	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel) {
 		this.topGridLevel = topGridLevel;
 		this.bottomGridLevel = bottomGridLevel;
+		this.fieldMode = false;
+	}
+
+	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel, String latitudeField, String longitudeField) {
+		this.topGridLevel = topGridLevel;
+		this.bottomGridLevel = bottomGridLevel;
+		this.latitudeField = latitudeField;
+		this.longitudeField = longitudeField;
+		this.fieldMode = true;
 	}
 
 	/**
@@ -65,9 +79,8 @@ public class SpatialFieldBridgeByGrid implements FieldBridge, ParameterizedBridg
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
 
-			Coordinates coordinates = (Coordinates) value;
-			Double latitude = coordinates.getLatitude();
-			Double longitude = coordinates.getLongitude();
+			Double latitude = getLatitude( value );
+			Double longitude = getLongitude( value );
 
 			if( ( latitude != null ) && ( longitude != null ) ) {
 
