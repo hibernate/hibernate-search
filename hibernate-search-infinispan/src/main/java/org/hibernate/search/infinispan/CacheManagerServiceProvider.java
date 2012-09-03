@@ -114,7 +114,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 			return (EmbeddedCacheManager) ctx.lookup( jndiNamespace );
 		}
 		catch ( NamingException ne ) {
-		    String msg = "Unable to retrieve CacheManager from JNDI [" + jndiNamespace + "]";
+			String msg = "Unable to retrieve CacheManager from JNDI [" + jndiNamespace + "]";
 			log.unableToRetrieveCacheManagerFromJndi(jndiNamespace, ne);
 			throw new SearchException( msg );
 		}

@@ -102,8 +102,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 				return Collections.EMPTY_LIST;
 			}
 			else {
-				final List<Object> list = new ArrayList<Object>( 1 );
-				list.add( entity );
+				final List<Object> list = Collections.singletonList( entity );
 				return list;
 			}
 		}
