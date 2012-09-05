@@ -291,26 +291,26 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
   </section>
   
   <section id="spatial-distance">
-    <title>Using distance to center in the results</title>
+    <title>Returning distance to query point in the search results</title>
     <section id="spatial-distance-projection">
       <title>Returning distance to the center in the results</title>
       <para>To get the distance to the center of the search returned with the results you just need to project it:</para>
       <example>
           <title>Distance projection example</title>
-          <programlisting language="JAVA" role="JAVA">double centerLatitude= 24.0d;
-          double centerLongitude= 32.0d;
+          <programlisting language="JAVA" role="JAVA">double centerLatitude = 24.0d;
+double centerLongitude= 32.0d;
 
-      		final QueryBuilder builder = fullTextSession.getSearchFactory()
-			    	.buildQueryBuilder().forEntity( POI.class ).get();            
-          org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
-	    			.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+final QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity( POI.class ).get();            
+org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+  .within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
-          FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
-          hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
-          hibQuery.setSpatialSearchCenter( centerLatitude, centerLongitude );
-          List results = hibQuery.list();</programlisting>
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+hibQuery.setSpatialSearchCenter( centerLatitude, centerLongitude );
+List results = hibQuery.list();</programlisting>
       </example>
-      <para>There is two call to make:</para>
+      <para>There is two calls to make:</para>
       <itemizedlist>
         <listitem>
           <para>Call FullTextQuery.setProjection with FullTextQuery.SPATIAL_DISTANCE as one of the projected fields.</para>
@@ -333,16 +333,16 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
       <example>
           <title>Distance sort example</title>
           <programlisting language="JAVA" role="JAVA">        double centerLatitude= 24.0d;
-        double centerLongitude= 32.0d;
+double centerLongitude= 32.0d;
 
-    		final QueryBuilder builder = fullTextSession.getSearchFactory()
-			    	.buildQueryBuilder().forEntity( POI.class ).get();            
-        org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
-	    			.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+final QueryBuilder builder = fullTextSession.getSearchFactory()
+    .buildQueryBuilder().forEntity( POI.class ).get();            
+org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+    .within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
-        FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
-        Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude ));
-        hibQuery.setSort( distanceSort );</programlisting>
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude ));
+hibQuery.setSort( distanceSort );</programlisting>
       </example>
       <para>You shall build the DistanceSortField with the coordinates used to build the spatial query otherwise the sorting
       will occur with another centere than the search. This could lead to unexpected results.</para>
