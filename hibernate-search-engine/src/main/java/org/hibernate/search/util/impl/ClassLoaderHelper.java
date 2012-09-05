@@ -292,27 +292,4 @@ public class ClassLoaderHelper {
 		return Class.forName( name, true, classLoader );
 	}
 
-	/**
-	 * Perform resolution of a class name.
-	 * <p/>
-	 * Same as {@link #classForName(String, ClassLoader)} except that here we delegate to
-	 * {@link Class#forName(String)} if the context classloader lookup is unsuccessful.
-	 *
-	 * @param name The class name
-	 *
-	 * @return The class reference.
-	 *
-	 * @throws ClassNotFoundException From {@link Class#forName(String)}.
-	 */
-	public static Class classForName(String name) throws ClassNotFoundException {
-		try {
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-			if ( contextClassLoader != null ) {
-				return contextClassLoader.loadClass( name );
-			}
-		}
-		catch ( Throwable ignore ) {
-		}
-		return Class.forName( name );
-	}
 }

@@ -235,7 +235,8 @@ public class MutableFactoryTest {
 		final Class<?> aClass = ClassLoaderHelper.classForName(
 				Generated.A0.class.getName().replace(
 						"A0", "A" + i
-				)
+				),
+				Generated.A0.class.getClassLoader()
 		);
 		return aClass;
 	}
