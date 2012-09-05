@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,25 +21,26 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.annotations;
+package org.hibernate.search.bridge;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.tika.parser.ParseContext;
 
 /**
- * Specifies a custom field bridge implementation
- *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( {ElementType.FIELD, ElementType.METHOD} )
-@Documented
-public @interface FieldBridge {
-	//default to embed @FieldBridge in @Field
-	public Class<?> impl() default void.class;
+public interface TikaParseContextProvider {
 
-	public Parameter[] params() default {};
+	/**
+	 * This method is called by the Tika bridge prior to parsing the data.
+	 * <p/>
+	 * It allows to create a custom {@code ParseContext}
+	 *
+	 * @param name the field name of the property which is processed by the Tika bridge
+	 * @param value the value to be indexed
+	 *
+	 * @return A {@code ParseContext} instance used by the Tika bridge to parse the data
+	 *
+	 * @see <a href="http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html">Tika API</a>
+	 */
+	public ParseContext getParseContext(String name, Object value);
 }

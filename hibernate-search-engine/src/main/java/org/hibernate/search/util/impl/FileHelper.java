@@ -195,7 +195,8 @@ public abstract class FileHelper {
 	}
 
 	/**
-	 * Attempts to delete a file, and if it is a directory recurse to all content.
+	 * Attempts to delete a file. If the file is a directory delete recursive all content.
+	 *
 	 * @param file the file or Directory to be deleted
 	 * @return false if it wasn't possible to delete it or all of the contents. A common problem on Windows systems.
 	 */
