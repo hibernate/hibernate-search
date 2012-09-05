@@ -135,12 +135,12 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Object[] fourthResult = (Object[]) results.get(3);
 		Object[] fifthResult = (Object[]) results.get(4);
 		Object[] sixthResult = (Object[]) results.get(5);
-		Assert.assertTrue( ((Double)firstResult[1]) == 0 );
-		Assert.assertTrue( ( ((Double)secondResult[1]) <= 10.1582 ) && ( ((Double)secondResult[1]) >= 10.1581 ) );
-		Assert.assertTrue( ( ((Double)thirdResult[1]) <= 11.1195 ) && ( ((Double)thirdResult[1]) >= 11.1194 ) );
-		Assert.assertTrue( ( ((Double)fourthResult[1]) <= 15.0636 ) && ( ((Double)fourthResult[1]) >= 15.0635 ) );
-		Assert.assertTrue( ( ((Double)fifthResult[1]) <= 22.239 ) && ( ((Double)fifthResult[1]) >= 22.238 ) );
-		Assert.assertTrue( ( ((Double)sixthResult[1]) <= 24.446 ) && ( ((Double)sixthResult[1]) >= 24.445 ) );
+		Assert.assertEquals( ((Double)firstResult[1]), 0.0, 0.0001 );
+		Assert.assertEquals( ((Double)secondResult[1]), 10.1582, 0.0001 );
+		Assert.assertEquals( ((Double)thirdResult[1]), 11.1195, 0.0001 );
+		Assert.assertEquals( ((Double)fourthResult[1]), 15.0636, 0.0001 );
+		Assert.assertEquals( ((Double)fifthResult[1]), 22.239, 0.001 );
+		Assert.assertEquals( ((Double)sixthResult[1]), 24.446, 0.001 );
 
 		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
 		for (Object entity : pois) {
