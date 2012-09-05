@@ -21,6 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.search.annotations;
 
 import java.lang.annotation.Documented;
@@ -35,7 +36,7 @@ import java.lang.annotation.Target;
  * The bridge supports the following data types:
  * <ul>
  * <li>{@code String} - where the string value is interpreted as a file path</li>
- * <li>{@code URI} - where the URI is interpreted as a file: URI</li>
+ * <li>{@code URI} - where the URI is interpreted as a resource URI</li>
  * <li>{@code byte[]}</li>
  * <li>{@code java.sql.Blob}</li>
  * </ul>

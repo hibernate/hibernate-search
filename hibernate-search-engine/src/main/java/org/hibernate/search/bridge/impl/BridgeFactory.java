@@ -418,7 +418,7 @@ public final class BridgeFactory {
 		Class<?> tikaBridgeClass;
 		FieldBridge tikaBridge;
 		try {
-			tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME );
+			tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME, BridgeFactory.class.getClassLoader() );
 			tikaBridge = ClassLoaderHelper.instanceFromClass( FieldBridge.class, tikaBridgeClass, "Tika bridge" );
 		}
 		catch ( ClassNotFoundException e ) {

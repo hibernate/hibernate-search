@@ -57,7 +57,7 @@ import org.hibernate.search.test.TestConstants;
  * @author Hardy Ferentschik
  */
 public class TikaBridgeTest extends SearchTestCase {
-	private static final String TEST_MP3_DOCUMENT = "/mysong.mp3";
+	private static final String TEST_MP3_DOCUMENT = "/org/hibernate/search/test/bridge/tika/mysong.mp3";
 	private static final String PATH_TO_TEST_MP3;
 
 	static {
@@ -97,7 +97,6 @@ public class TikaBridgeTest extends SearchTestCase {
 			assertTrue( "Wrong root cause", searchException.getMessage().startsWith( "HSEARCH000151" ) );
 		}
 		finally {
-
 			session.close();
 		}
 	}
@@ -186,7 +185,7 @@ public class TikaBridgeTest extends SearchTestCase {
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions, Metadata metadata) {
-			luceneOptions.addFieldToDocument( XMPDM.ARTIST.getName() , metadata.get( XMPDM.ARTIST ), document );
+			luceneOptions.addFieldToDocument( XMPDM.ARTIST.getName(), metadata.get( XMPDM.ARTIST ), document );
 		}
 	}
 }

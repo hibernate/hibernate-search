@@ -50,7 +50,7 @@ import static junit.framework.Assert.fail;
  * @author Hardy Ferentschik
  */
 public class TikaBridgeTest {
-	private static final String TEST_DOCUMENT_PDF = "/test-document-1.pdf";
+	private static final String TEST_DOCUMENT_PDF = "/org/hibernate/search/test/bridge/builtin/test-document-1.pdf";
 	private static final String PATH_TO_TEST_DOCUMENT_PDF;
 
 	static {

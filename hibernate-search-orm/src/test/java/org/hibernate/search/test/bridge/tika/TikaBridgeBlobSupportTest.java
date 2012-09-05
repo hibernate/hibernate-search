@@ -51,13 +51,13 @@ import org.hibernate.search.test.TestConstants;
 /**
  * @author Hardy Ferentschik
  */
-public class TikaBridgeBlogSupportTest extends SearchTestCase {
-	private static final String TEST_DOCUMENT_PDF = "/test-document-1.pdf";
+public class TikaBridgeBlobSupportTest extends SearchTestCase {
+	private static final String TEST_DOCUMENT_PDF = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
 	private static final String PATH_TO_TEST_DOCUMENT_PDF;
 
 	static {
 		try {
-			File pdfFile = new File( TikaBridgeBlogSupportTest.class.getResource( TEST_DOCUMENT_PDF ).toURI() );
+			File pdfFile = new File( TikaBridgeBlobSupportTest.class.getResource( TEST_DOCUMENT_PDF ).toURI() );
 			PATH_TO_TEST_DOCUMENT_PDF = pdfFile.getAbsolutePath();
 		}
 		catch ( URISyntaxException e ) {
