@@ -30,7 +30,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * specifies a given field bridge implementation
+ * Specifies a custom field bridge implementation
  *
  * @author Emmanuel Bernard
  */

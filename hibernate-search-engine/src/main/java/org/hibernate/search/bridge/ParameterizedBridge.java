@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  * Allow parameter injection to a given bridge.
- * 
+ * <p/>
  * Implementors need to be threadsafe, but the
  * setParameterValues method doesn't need any
  * guard as initialization is always safe.
