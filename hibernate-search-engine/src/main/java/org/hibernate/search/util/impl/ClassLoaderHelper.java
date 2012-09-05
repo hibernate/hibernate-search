@@ -102,7 +102,7 @@ public class ClassLoaderHelper {
 	 * @return a new instance of classNameToLoad
 	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
-	 * classNotFound, missing proper constructor, wrong type, security errors.
+	 *                         classNotFound, missing proper constructor, wrong type, security errors.
 	 */
 	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad,
 										 Class<?> caller, String componentDescription) {
@@ -122,7 +122,7 @@ public class ClassLoaderHelper {
 	 * @return a new instance of classToLoad
 	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
-	 * missing proper constructor, wrong type, security errors.
+	 *                         missing proper constructor, wrong type, security errors.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription) {
@@ -160,7 +160,7 @@ public class ClassLoaderHelper {
 			}
 		}
 		else {
-			return (T) instance;
+			return ( T ) instance;
 		}
 	}
 
@@ -189,10 +189,10 @@ public class ClassLoaderHelper {
 
 		try {
 			if ( useVersionParameter ) {
-				analyzerInstance = (Analyzer) constructor.newInstance( luceneMatchVersion );
+				analyzerInstance = ( Analyzer ) constructor.newInstance( luceneMatchVersion );
 			}
 			else {
-				analyzerInstance = (Analyzer) constructor.newInstance();
+				analyzerInstance = ( Analyzer ) constructor.newInstance();
 			}
 		}
 		catch ( IllegalAccessException e ) {
