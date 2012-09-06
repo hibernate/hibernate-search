@@ -46,11 +46,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testIndexing() throws Exception {
 		POI poi = new POI( 1, "Test", 24.0d, 32.0d, "" );
-		POI poi2= new POI(  2, "Test2", 0.0d, -179.0d, "" );
-		POI poi3= new POI(  3, "Test3", 0.0d, 179.0d, "" );
-		POI poi4= new POI(  4, "Test4", 89.0d, 1.0d, "" );
-		POI poi5= new POI(  5, "Test5", -90.0d, 17.0d, "" );
-		POI poi6= new POI(  6, "Test6", 47.0d, 154.0d, "" );
+		POI poi2 = new POI(  2, "Test2", 0.0d, -179.0d, "" );
+		POI poi3 = new POI(  3, "Test3", 0.0d, 179.0d, "" );
+		POI poi4 = new POI(  4, "Test4", 89.0d, 1.0d, "" );
+		POI poi5 = new POI(  5, "Test5", -90.0d, 17.0d, "" );
+		POI poi6 = new POI(  6, "Test6", 47.0d, 154.0d, "" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
 		Transaction tx = fullTextSession.beginTransaction();
@@ -129,7 +129,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.save( poi );
 		fullTextSession.save( poi2 );
 		fullTextSession.save( poi3 );
-		tx.commit(); tx= fullTextSession.beginTransaction();
+		tx.commit();
+		tx = fullTextSession.beginTransaction();
 		fullTextSession.save( poi4 );
 		fullTextSession.save( poi5 );
 		fullTextSession.save( poi6 );
@@ -172,11 +173,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testDistanceSort() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
-		POI poi6= new POI(  2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
-		POI poi2= new POI(  3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
-		POI poi4= new POI(  4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
-		POI poi3= new POI(  5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
-		POI poi5= new POI(  6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
+		POI poi2 = new POI(  2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
+		POI poi3 = new POI(  3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
+		POI poi4 = new POI(  4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
+		POI poi5 = new POI(  5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
+		POI poi6 = new POI(  6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
@@ -184,7 +185,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.save( poi );
 		fullTextSession.save( poi2 );
 		fullTextSession.save( poi3 );
-		tx.commit(); tx= fullTextSession.beginTransaction();
+		tx.commit();
+		tx = fullTextSession.beginTransaction();
 		fullTextSession.save( poi4 );
 		fullTextSession.save( poi5 );
 		fullTextSession.save( poi6 );
@@ -217,11 +219,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testNonGeoDistanceSort() throws Exception {
 		NonGeoPOI poi = new NonGeoPOI( 1, "Distance to 24,32 : 0", 24.0d, null, "" );
-		NonGeoPOI poi6= new NonGeoPOI(  2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
-		NonGeoPOI poi2= new NonGeoPOI(  3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
-		NonGeoPOI poi4= new NonGeoPOI(  4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
-		NonGeoPOI poi3= new NonGeoPOI(  5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
-		NonGeoPOI poi5= new NonGeoPOI(  6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
+		NonGeoPOI poi2 = new NonGeoPOI(  2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
+		NonGeoPOI poi3 = new NonGeoPOI(  3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
+		NonGeoPOI poi4 = new NonGeoPOI(  4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
+		NonGeoPOI poi5 = new NonGeoPOI(  5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
+		NonGeoPOI poi6 = new NonGeoPOI(  6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
@@ -229,7 +231,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.save( poi );
 		fullTextSession.save( poi2 );
 		fullTextSession.save( poi3 );
-		tx.commit(); tx= fullTextSession.beginTransaction();
+		tx.commit();
+		tx = fullTextSession.beginTransaction();
 		fullTextSession.save( poi4 );
 		fullTextSession.save( poi5 );
 		fullTextSession.save( poi6 );
@@ -261,8 +264,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 
 	public void testSpatialAnnotationOnFieldLevel() throws Exception {
-		SimpleDateFormat dateFormat= new SimpleDateFormat("d M yyyy");
-		Date date= dateFormat.parse( "10 9 1976" );
+		SimpleDateFormat dateFormat = new SimpleDateFormat("d M yyyy");
+		Date date = dateFormat.parse( "10 9 1976" );
 		Event event = new Event( 1, "Test", 24.0d, 32.0d, date );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
@@ -305,7 +308,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testSpatialAnnotationOnFieldLevelRangeMode() throws Exception {
 		SimpleDateFormat dateFormat= new SimpleDateFormat("d M yyyy");
-		Date date= dateFormat.parse( "10 9 1976" );
+		Date date = dateFormat.parse( "10 9 1976" );
 		RangeEvent event = new RangeEvent( 1, "Test", 24.0d, 32.0d, date );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
