@@ -42,6 +42,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
+
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -124,6 +125,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	protected final Set<String> fieldCollectionRoles = new TreeSet<String>();
 	protected final Set<String> indexedEmbeddedCollectionRoles = new TreeSet<String>();
 	protected final Set<String> containedInCollectionRoles = new TreeSet<String>();
+	Set<String> spatialNames = new TreeSet<String>( );
 
 	protected final PropertiesMetadata metadata = new PropertiesMetadata();
 	protected EntityState entityState;
@@ -980,8 +982,14 @@ public abstract class AbstractDocumentBuilder<T> {
 			fieldName = prefix + ann.name();
 		}
 		else {
-			throw log.spatialFieldNameNotDefined( clazz.getName() );
+			fieldName = clazz.getName();
 		}
+
+		if ( spatialNames.contains( ann.name() )) {
+			throw log.cannotHaveTwoSpatialsWithDefaultOrSameName( clazz.getName() );
+		}
+		spatialNames.add( ann.name() );
+
 		propertiesMetadata.classNames.add( fieldName );
 		propertiesMetadata.classStores.add( ann.store() );
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
@@ -1010,7 +1018,7 @@ public abstract class AbstractDocumentBuilder<T> {
 			}
 	    }
 		if ( spatialBridge == null ) {
-			throw new AssertionFailure( "Spatial annotation incorrect configuration" );
+			throw log.cannotFindCoordinatesNorLatLongForSpatial( ann.name().isEmpty() ? "default" : ann.name(), clazz.getName() );
 		}
 		propertiesMetadata.classBridges.add( spatialBridge );
 		propertiesMetadata.classBoosts.add( ann.boost().value() );
@@ -1048,9 +1056,15 @@ public abstract class AbstractDocumentBuilder<T> {
 									 XProperty member,
 									 PropertiesMetadata propertiesMetadata,
 									 String prefix,
-									 Spatial fieldAnnotation,
+									 Spatial spatialAnnotation,
 									 ConfigContext context) {
-		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, null, null, fieldAnnotation, context, reflectionManager );
+		if ( spatialNames.contains( spatialAnnotation.name() )) {
+			throw log.cannotHaveTwoSpatialsWithDefaultOrSameName( classHostingMember.getName() );
+		}
+		spatialNames.add( spatialAnnotation.name() );
+
+		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, null, null,
+				spatialAnnotation, context, reflectionManager );
 		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		if ( member.isCollection() ) {
 			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );

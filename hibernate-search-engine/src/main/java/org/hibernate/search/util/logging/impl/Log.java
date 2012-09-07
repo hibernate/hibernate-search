@@ -632,4 +632,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 157, value = "Class %1$s does not implement the Coordinates interface")
 	SearchException cannotExtractCoordinateFromObject(String className);
 
+	@Message(id = 158, value = "Class %1$s cannot have two @Spatial using default/same name")
+	SearchException cannotHaveTwoSpatialsWithDefaultOrSameName(String className);
+
+	@Message(id = 159, value = "Cannot find a Coordinates Interface nor Lat/Long annotations bound to %1$s @Spatial for class %2$s")
+	SearchException cannotFindCoordinatesNorLatLongForSpatial(String spatialName, String className);
 }

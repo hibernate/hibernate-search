@@ -5,13 +5,14 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import org.apache.lucene.document.Document;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static java.util.Locale.ENGLISH;
 
 public abstract class SpatialFieldBridge implements FieldBridge {
 
@@ -32,7 +33,11 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 				return (Double)latitude.get( value );
 			} catch ( NoSuchFieldException e )  {
 				try {
-					PropertyDescriptor propertyDescriptor =  new PropertyDescriptor( latitudeField, clazz );
+					PropertyDescriptor propertyDescriptor =  new PropertyDescriptor(
+							latitudeField,
+							clazz,
+							"get" + capitalize( latitudeField ),
+							null);
 					Method latitudeGetter = propertyDescriptor.getReadMethod();
 					if ( latitudeGetter != null ) {
 						return (Double)latitudeGetter.invoke( value, null );
@@ -67,7 +72,11 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 				return (Double)longitude.get( value );
 			} catch ( NoSuchFieldException e )  {
 				try {
-					PropertyDescriptor propertyDescriptor =  new PropertyDescriptor( longitudeField, clazz );
+					PropertyDescriptor propertyDescriptor =  new PropertyDescriptor(
+							longitudeField,
+							clazz,
+							"get" + capitalize( longitudeField ),
+							null);
 					Method longitudeGetter = propertyDescriptor.getReadMethod();
 					if ( longitudeGetter != null ) {
 						return (Double)longitudeGetter.invoke( value, null );
@@ -92,5 +101,12 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 				throw LOG.cannotExtractCoordinateFromObject( value.getClass().getName() );
 			}
 		}
+	}
+
+	public static String capitalize(String name) {
+		if (name == null || name.length() == 0) {
+			return name;
+		}
+		return name.substring(0, 1).toUpperCase(ENGLISH) + name.substring(1);
 	}
 }

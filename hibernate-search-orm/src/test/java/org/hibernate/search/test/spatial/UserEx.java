@@ -11,7 +11,7 @@ import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Spatials;
 
 @Spatials({
-	@Spatial(name="home",  spatialMode = SpatialMode.GRID),
+	@Spatial,
 	@Spatial(name="work",  spatialMode = SpatialMode.GRID)
 		})
 @Entity
@@ -21,10 +21,10 @@ public class UserEx {
 	@Id
 	Integer id;
 
-	@Latitude(spatialName="home")
+	@Latitude
 	Double homeLatitude;
 
-	@Longitude(spatialName="home")
+	@Longitude
 	Double homeLongitude;
 
 	@Latitude(spatialName="work")

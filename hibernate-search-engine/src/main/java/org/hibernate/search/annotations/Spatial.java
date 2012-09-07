@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Spatial {
 	/**
-	 * @return the field name (defaults to the JavaBean property name)
+	 * @return the field name
 	 */
 	String name() default "";
 

@@ -9,7 +9,7 @@ import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 
-@Spatial(name="home")
+@Spatial
 @Entity
 @Indexed
 public class UserRange {
@@ -17,10 +17,10 @@ public class UserRange {
 	@Id
 	Integer id;
 
-	@Latitude(spatialName="home")
+	@Latitude
 	Double homeLatitude;
 
-	@Longitude(spatialName="home")
+	@Longitude
 	Double homeLongitude;
 
 	public UserRange( Integer id, Double homeLatitude, Double homeLongitude) {

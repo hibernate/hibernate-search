@@ -189,22 +189,19 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
-				centerLatitude,
-				centerLongitude,
-				50,
-				"home"
-		);
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( UserRange.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( UserRange.class.getName() )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserRange.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByRange(
-				centerLatitude,
-				centerLongitude,
-				51,
-				"home"
-		);
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( UserRange.class.getName() )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserRange.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
@@ -227,11 +224,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		tx = fullTextSession.beginTransaction();
 
-		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
+		org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQueryByRange(
 				24.0d,
 				31.5d,
 				100.0d,
-				"home"
+				UserEx.class.getName()
 		);
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserEx.class );
 		List results = hibQuery.list();
