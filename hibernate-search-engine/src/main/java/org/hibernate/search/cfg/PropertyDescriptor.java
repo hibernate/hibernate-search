@@ -46,6 +46,8 @@ public class PropertyDescriptor {
 	private Map<String, Object> dynamicBoost;
 	private Map<String,Object> fieldBridge;
 	private Map<String, Object> spatial;
+	private Map<String, Object> latitude;
+	private Map<String, Object> longitude;
 
 	public PropertyDescriptor(String name, ElementType type) {
 	}
@@ -137,4 +139,19 @@ public class PropertyDescriptor {
 		this.spatial = spatial;
 	}
 
+	public Map<String, Object> getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Map<String, Object> latitude) {
+		this.latitude = latitude;
+	}
+
+	public Map<String, Object> getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Map<String, Object> longitude) {
+		this.longitude = longitude;
+	}
 }

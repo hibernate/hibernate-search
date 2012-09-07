@@ -162,10 +162,16 @@ public class ProgrammaticSearchMappingFactory {
 						.field()
 					.property( "location", ElementType.METHOD )
 						.spatial().spatialMode( SpatialMode.GRID )
-				.entity( ClassLevelTestPoI.class).indexed()
+				.entity( ClassLevelTestPoI.class ).indexed()
 					.spatial().name( "location" ).spatialMode( SpatialMode.GRID )
 					.property( "name", ElementType.METHOD )
 						.field()
+				.entity( LatLongAnnTestPoi.class ).indexed()
+					.spatial().name(  "location" )
+					.property(  "latitude", ElementType.FIELD )
+						.latitude().name( "location" )
+					.property(  "longitude", ElementType.FIELD )
+						.longitude().name( "location" )
 		;
 
 		return mapping;

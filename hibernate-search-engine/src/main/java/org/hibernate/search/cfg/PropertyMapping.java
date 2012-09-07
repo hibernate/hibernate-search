@@ -67,6 +67,14 @@ public class PropertyMapping {
 		return new PropertySpatialMapping(property, entity, mapping);
 	}
 
+	public PropertyLatitudeMapping latitude() {
+		return new PropertyLatitudeMapping(property, entity, mapping);
+	}
+
+	public PropertyLongitudeMapping longitude() {
+		return new PropertyLongitudeMapping(property, entity, mapping);
+	}
+
 	public DateBridgeMapping dateBridge(Resolution resolution) {
 		return new DateBridgeMapping(mapping, entity, property, resolution);
 	}
