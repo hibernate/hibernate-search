@@ -32,6 +32,7 @@ import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
 
+import org.apache.lucene.document.NumericField;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
@@ -48,6 +49,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
+ * @author Ales Justin
  */
 public final class DocumentBuilderHelper {
 	private static final Log log = LoggerFactory.make();
@@ -209,19 +211,27 @@ public final class DocumentBuilderHelper {
 			}
 		}
 
-		//If we still didn't know the value using any bridge, return the raw string:
+		//If we still didn't know the value using any bridge, return the raw value or string:
 		for ( int index = 0; index < result.length; index++ ) {
 			if ( result[index] == NOT_SET ) {
 				result[index] = null; // make sure we never return NOT_SET
 				if ( document != null ) {
 					Fieldable field = document.getFieldable( fields[index] );
 					if ( field != null ) {
-						result[index] = extractStringFromFieldable( field );
+						result[index] = extractObjectFromFieldable( field );
 					}
 				}
 			}
 		}
 	}
+
+    public static Object extractObjectFromFieldable(Fieldable field) {
+        if (field instanceof NumericField) {
+            return NumericField.class.cast( field ).getNumericValue();
+        } else {
+            return extractStringFromFieldable(field);
+        }
+    }
 
 	public static String extractStringFromFieldable(Fieldable field) {
 		if ( field.isBinary() ) {
