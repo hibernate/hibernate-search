@@ -225,13 +225,14 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-    public static Object extractObjectFromFieldable(Fieldable field) {
-        if (field instanceof NumericField) {
-            return NumericField.class.cast( field ).getNumericValue();
-        } else {
-            return extractStringFromFieldable(field);
-        }
-    }
+	public static Object extractObjectFromFieldable(Fieldable field) {
+		if ( field instanceof NumericField ) {
+			return NumericField.class.cast( field ).getNumericValue();
+		}
+		else {
+			return extractStringFromFieldable( field );
+		}
+	}
 
 	public static String extractStringFromFieldable(Fieldable field) {
 		if ( field.isBinary() ) {
