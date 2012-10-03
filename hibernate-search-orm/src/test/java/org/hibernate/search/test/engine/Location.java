@@ -60,6 +60,10 @@ public class Location {
 	@FieldBridge(impl = BigDecimalNumericFieldBridge.class)
 	private BigDecimal visibleStars;
 
+	@Field(store = Store.YES) @NumericField
+	@FieldBridge(impl = CoordinatesPairFieldBridge.class)
+	private String coordinatePair = "1;2";
+
 	@Field
 	private String description;
 

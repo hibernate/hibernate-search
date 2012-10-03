@@ -15,6 +15,8 @@ import org.hibernate.search.test.SearchTestCase;
 import java.math.BigDecimal;
 import java.util.List;
 
+import junit.framework.Assert;
+
 public class NumericFieldTest extends SearchTestCase {
 
 	FullTextSession fullTextSession;
@@ -83,6 +85,31 @@ public class NumericFieldTest extends SearchTestCase {
 		assertEquals("Check for deletion on index projection", 0, fullTextQuery.list().size() );
 		
 		tx.commit();
+	}
+
+	public void testNumericFieldProjections() {
+		Transaction tx = fullTextSession.beginTransaction();
+		try {
+			Query latidueQuery = NumericFieldUtils.createNumericRangeQuery( "latitude", -20d, -20d, true, true );
+			List list = fullTextSession.createFullTextQuery(latidueQuery, Location.class)
+				.setProjection( "latitude" )
+				.list();
+			Assert.assertEquals( 1, list.size() );
+			Object[] firstProjection = (Object[]) list.get( 0 );
+			Assert.assertEquals( 1, firstProjection.length );
+			Assert.assertEquals( Double.valueOf( -20d ), firstProjection[0] );
+			List listAgain = fullTextSession.createFullTextQuery(latidueQuery, Location.class)
+				.setProjection( "coordinatePair_x", "coordinatePair_y" )
+				.list();
+			Assert.assertEquals( 1, listAgain.size() );
+			Object[] secondProjection = (Object[]) listAgain.get( 0 );
+			Assert.assertEquals( 2, secondProjection.length );
+			Assert.assertEquals( Double.valueOf( 1d ), secondProjection[0] );
+			Assert.assertEquals( Double.valueOf( 2d ), secondProjection[1] );
+		}
+		finally {
+			tx.commit();
+		}
 	}
 
 	private boolean indexIsEmpty() {
