@@ -29,6 +29,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
@@ -91,6 +92,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestCase {
 
 	@Entity
 	@Indexed
+	@Table(name="ITEM")
 	public static class Item {
 		@Id
 		@GeneratedValue

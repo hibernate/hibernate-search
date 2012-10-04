@@ -26,6 +26,7 @@ package org.hibernate.search.test.analyzer;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -110,6 +111,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 	}
 
 	@Entity
+	@Table(name="JUSTFOO")
 	@Indexed
 	@ClassBridge(impl = FooBridge.class)
 	@AnalyzerDiscriminator(impl = FooBridge.class)
@@ -155,6 +157,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 	}
 
 	@Entity
+	@Table(name="JUSTBAR")
 	@Indexed
 	@ClassBridge(name = "classField", impl = BarBridge.class, analyzer = @Analyzer(impl = AnalyzerForTests1.class))
 	public static class Bar {

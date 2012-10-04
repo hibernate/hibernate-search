@@ -26,6 +26,7 @@ package org.hibernate.search.test.engine;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import junit.framework.Assert;
@@ -103,6 +104,7 @@ public class TransientFieldsDirtyTest extends SearchTestCase {
 
 	@Indexed
 	@Entity
+	@Table(name="FORMULAADD")
 	public static class FormulaAdd {
 
 		long id;
