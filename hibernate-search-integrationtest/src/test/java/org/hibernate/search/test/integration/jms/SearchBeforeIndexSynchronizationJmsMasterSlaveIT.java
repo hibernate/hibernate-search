@@ -52,7 +52,7 @@ import static org.junit.Assert.assertNull;
  * that we can be confident it's executed before the
  * synchronization of the indexes occurs.
  *
- * @author "Davide D'Alto"
+ * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
