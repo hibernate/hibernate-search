@@ -25,6 +25,7 @@ package org.hibernate.search.test.engine;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
+
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
@@ -55,7 +56,7 @@ public class CoordinatesPairFieldBridge implements TwoWayFieldBridge {
 	}
 
 	private void appendValue(final Fieldable field, final StringBuilder sb) {
-		if ( field != null) {
+		if ( field != null ) {
 			sb.append( field.stringValue() );
 		}
 		else {

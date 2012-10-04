@@ -1,7 +1,35 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ *
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+ */
 package org.hibernate.search.test.engine;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import junit.framework.Assert;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -11,11 +39,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.test.SearchTestCase;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import junit.framework.Assert;
+import org.hibernate.testing.TestForIssue;
 
 public class NumericFieldTest extends SearchTestCase {
 
@@ -38,16 +62,16 @@ public class NumericFieldTest extends SearchTestCase {
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// Range Queries including lower and upper bounds
-		assertEquals("Query id ", 3, numericQueryFor("overridenFieldName", 1, 3).size());
+		assertEquals("Query id ", 3, numericQueryFor("overriddenFieldName", 1, 3).size());
 		assertEquals("Query by double range", 3, numericQueryFor( "latitude", -10d, 10d ).size() );
 		assertEquals("Query by integer range", 4, numericQueryFor( "ranking", 1 ,2 ).size() );
 		assertEquals("Query by long range", 3, numericQueryFor( "myCounter", 1L, 3L ).size() );
-		assertEquals("Query by multifields", 2, numericQueryFor( "strMultiple", 0.7d, 0.9d).size() );
+		assertEquals("Query by multi-fields", 2, numericQueryFor( "strMultiple", 0.7d, 0.9d).size() );
 		assertEquals("Query on custom bridge by range", 4, numericQueryFor("visibleStars", -100L, 500L).size() );
 
 		// Range Queries different bounds
-		assertEquals("Query by id excluding upper", 2, numericQueryFor("overridenFieldName", 1, 3, true, false).size() );
-		assertEquals("Query by id excluding upper and lower", 1, numericQueryFor("overridenFieldName", 1, 3, false, false).size() );
+		assertEquals("Query by id excluding upper", 2, numericQueryFor("overriddenFieldName", 1, 3, true, false).size() );
+		assertEquals("Query by id excluding upper and lower", 1, numericQueryFor("overriddenFieldName", 1, 3, false, false).size() );
 
 		// Range Query for embedded entities
 		assertEquals("Range Query for indexed embedded", 2, numericQueryFor("country.idh", 0.9, 1d).size() );
@@ -56,7 +80,7 @@ public class NumericFieldTest extends SearchTestCase {
 		assertEquals("Range Query across entities", 1, numericQueryFor("pinPoints.stars", 4, 5).size() );
 
 		// Exact Matching Queries
-		assertEquals("Query id exact", 1, doExactQuery("overridenFieldName", 1).getId());
+		assertEquals("Query id exact", 1, doExactQuery("overriddenFieldName", 1).getId());
 		assertEquals("Query double exact", 2, doExactQuery( "latitude", -10d).getId() );
 		assertEquals("Query integer exact", 3, doExactQuery("longitude", -20d).getId() );
 		assertEquals("Query long exact", 4, doExactQuery("myCounter",4L).getId() );
@@ -76,9 +100,9 @@ public class NumericFieldTest extends SearchTestCase {
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
 		
-		assertEquals("Check for deletion on Query", 0, numericQueryFor("overridenFieldName", 1, 6).size());
+		assertEquals("Check for deletion on Query", 0, numericQueryFor("overriddenFieldName", 1, 6).size());
 		// and now check also for the real index contents:
-		Query query = NumericFieldUtils.createNumericRangeQuery("overridenFieldName", 1, 6, true, true);
+		Query query = NumericFieldUtils.createNumericRangeQuery("overriddenFieldName", 1, 6, true, true);
 		FullTextQuery fullTextQuery = fullTextSession
 			.createFullTextQuery( query, Location.class )
 			.setProjection( ProjectionConstants.DOCUMENT );
@@ -87,18 +111,19 @@ public class NumericFieldTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@TestForIssue( jiraKey = "HSEARCH-1193")
 	public void testNumericFieldProjections() {
 		Transaction tx = fullTextSession.beginTransaction();
 		try {
-			Query latidueQuery = NumericFieldUtils.createNumericRangeQuery( "latitude", -20d, -20d, true, true );
-			List list = fullTextSession.createFullTextQuery(latidueQuery, Location.class)
+			Query latitudeQuery = NumericFieldUtils.createNumericRangeQuery( "latitude", -20d, -20d, true, true );
+			List list = fullTextSession.createFullTextQuery(latitudeQuery, Location.class)
 				.setProjection( "latitude" )
 				.list();
 			Assert.assertEquals( 1, list.size() );
 			Object[] firstProjection = (Object[]) list.get( 0 );
 			Assert.assertEquals( 1, firstProjection.length );
 			Assert.assertEquals( Double.valueOf( -20d ), firstProjection[0] );
-			List listAgain = fullTextSession.createFullTextQuery(latidueQuery, Location.class)
+			List listAgain = fullTextSession.createFullTextQuery(latitudeQuery, Location.class)
 				.setProjection( "coordinatePair_x", "coordinatePair_y" )
 				.list();
 			Assert.assertEquals( 1, listAgain.size() );
