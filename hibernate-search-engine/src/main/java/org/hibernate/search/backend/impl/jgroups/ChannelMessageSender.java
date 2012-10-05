@@ -29,16 +29,39 @@ import org.jgroups.Message;
 
 /**
  * Channel message sender.
- * 
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 class ChannelMessageSender extends AbstractMessageSender {
+    private final boolean channelIsManaged;
+    private final String clusterName;
 
-	ChannelMessageSender(Channel channel) {
+	ChannelMessageSender(Channel channel, boolean channelIsManaged, String clusterName) {
 		super( channel );
+        this.channelIsManaged = channelIsManaged;
+        this.clusterName = clusterName;
 	}
 
-	public void send(Message message) throws Exception {
+    public void start() {
+        if ( channel != null && channelIsManaged ) {
+            try {
+                channel.connect( clusterName );
+            }
+            catch ( Exception e ) {
+                throw log.unableConnectingToJGroupsCluster( clusterName, e );
+            }
+        }
+    }
+
+    public void stop() {
+        if ( channel != null && channel.isOpen() && channelIsManaged ) {
+            log.jGroupsDisconnectingAndClosingChannel();
+            channel.disconnect();
+            channel.close();
+        }
+    }
+
+    public void send(Message message) throws Exception {
 		channel.send( message );
 	}
 }
