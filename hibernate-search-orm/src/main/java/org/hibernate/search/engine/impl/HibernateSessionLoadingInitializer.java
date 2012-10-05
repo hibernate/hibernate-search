@@ -25,6 +25,7 @@ import java.util.Map;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
+import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
@@ -39,6 +40,14 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 
 	public HibernateSessionLoadingInitializer(SessionImplementor hibernateSession) {
 		this.hibernateSession = hibernateSession;
+	}
+	
+	@Override
+	public Object unproxy(Object instance) {
+		if ( instance instanceof HibernateProxy ) {
+			instance = ( (HibernateProxy) instance ).getHibernateLazyInitializer().getImplementation( hibernateSession );
+		}
+		return instance;
 	}
 	
 	@Override
