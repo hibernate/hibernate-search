@@ -378,7 +378,7 @@ public interface Log extends BasicLogger {
 	void unableToShutdownAsynchronousIndexingByTimeout(String indexName);
 
 	@LogMessage(level = INFO)
-	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d")
+	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d initialized")
 	void serializationProtocol(int major, int minor);
 
 	@LogMessage(level = ERROR)
