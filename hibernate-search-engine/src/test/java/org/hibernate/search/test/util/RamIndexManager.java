@@ -29,6 +29,7 @@ import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -99,7 +100,19 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 
 		@Override
 		public ServiceManager getServiceManager() {
-			return null;
+			return new ServiceManager() {
+				@Override
+				public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass,
+						BuildContext context) {
+					return null;
+				}
+				@Override
+				public void releaseService(Class<? extends ServiceProvider<?>> serviceProviderClass) {
+				}
+				@Override
+				public void stopServices() {
+				}
+			};
 		}
 	}
 
