@@ -26,6 +26,7 @@ import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.proxy.LazyInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
@@ -45,7 +46,15 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 	@Override
 	public Object unproxy(Object instance) {
 		if ( instance instanceof HibernateProxy ) {
-			instance = ( (HibernateProxy) instance ).getHibernateLazyInitializer().getImplementation( hibernateSession );
+			final HibernateProxy proxy = (HibernateProxy) instance;
+			final LazyInitializer lazyInitializer = proxy.getHibernateLazyInitializer();
+			Object initialized = lazyInitializer.getImplementation( hibernateSession );
+			if ( initialized == null ) {
+				// This is the case in which the proxy was created by a different session.
+				// unproxyAndReassociate is the ultimate bomb,
+				// able to deal with a Session change:
+				return hibernateSession.getPersistenceContext().unproxyAndReassociate( proxy );
+			}
 		}
 		return instance;
 	}
