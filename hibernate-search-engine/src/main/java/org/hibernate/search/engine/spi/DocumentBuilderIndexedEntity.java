@@ -518,7 +518,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		for ( int i = 0; i < propertiesMetadata.fieldNames.size(); i++ ) {
 			XMember member = propertiesMetadata.fieldGetters.get( i );
 			if ( previousMember != member ) {
-				currentFieldValue = ReflectionHelper.getMemberValue( unproxiedInstance, member );
+				currentFieldValue = unproxy( ReflectionHelper.getMemberValue( unproxiedInstance, member ),
+						objectInitializer );
 				previousMember = member;
 				if ( member.isCollection() ) {
 					if ( currentFieldValue instanceof Collection ) {
