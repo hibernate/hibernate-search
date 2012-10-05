@@ -24,6 +24,8 @@
 
 package org.hibernate.search.backend.impl.jgroups;
 
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
 import org.jgroups.Channel;
 import org.jgroups.View;
@@ -35,9 +37,16 @@ import org.jgroups.View;
  */
 abstract class AbstractMessageSender implements MessageSender {
 
-	protected final Channel channel;
+    protected static final Log log = LoggerFactory.make();
+    protected final Channel channel;
 
-	AbstractMessageSender(Channel channel) {
+    public void start() {
+    }
+
+    public void stop() {
+    }
+
+    AbstractMessageSender(Channel channel) {
 		this.channel = channel;
 	}
 

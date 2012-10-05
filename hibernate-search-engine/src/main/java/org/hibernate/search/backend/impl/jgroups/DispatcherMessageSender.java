@@ -42,7 +42,11 @@ class DispatcherMessageSender extends AbstractMessageSender {
 		this.dispatcher = dispatcher;
 	}
 
-	public void send(final Message message) throws Exception {
+    public void stop() {
+        dispatcher.stop();
+    }
+
+    public void send(final Message message) throws Exception {
 		dispatcher.castMessage( null, message, RequestOptions.ASYNC() );
 	}
 }
