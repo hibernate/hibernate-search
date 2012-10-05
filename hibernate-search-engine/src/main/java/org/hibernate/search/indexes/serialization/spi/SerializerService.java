@@ -23,6 +23,7 @@ package org.hibernate.search.indexes.serialization.spi;
 import java.util.Properties;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.serialization.impl.PluggableSerializationLuceneWorkSerializer;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
@@ -40,14 +41,15 @@ public class SerializerService implements ServiceProvider<LuceneWorkSerializer> 
 	private static final Log log = LoggerFactory.make();
 
 	private PluggableSerializationLuceneWorkSerializer workSerializer;
-	private BuildContext buildContext;
+	private ServiceManager serviceManager;
 
 	@Override
 	public void start(Properties properties, BuildContext buildContext) {
-		this.buildContext = buildContext;
+		serviceManager = buildContext.getServiceManager();
+		SerializationProvider serializationProvider = serviceManager.requestService( SerializationProviderService.class, buildContext );
 		try {
 			workSerializer = new PluggableSerializationLuceneWorkSerializer(
-					buildContext.requestService( SerializationProviderService.class ),
+					serializationProvider,
 					buildContext.getUninitializedSearchFactory()
 			);
 		}
@@ -69,7 +71,7 @@ public class SerializerService implements ServiceProvider<LuceneWorkSerializer> 
 	@Override
 	public void stop() {
 		if ( workSerializer != null ) {
-			buildContext.releaseService( SerializationProviderService.class );
+			serviceManager.releaseService( SerializationProviderService.class );
 		}
 	}
 

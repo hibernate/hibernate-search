@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.spi;
 
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -62,20 +63,33 @@ public interface BuildContext {
 	 * All callers of this method must call
 	 * (@link #releaseService}
 	 * or the service will not be released
+	 * 
+	 * @deprecated use {@link #getServiceManager()} instead
 	 *
 	 * @param provider of the service
 	 * @param <T> class of the service
 	 * @return the service instance
 	 */
+	@Deprecated
 	<T> T requestService(Class<? extends ServiceProvider<T>> provider);
 
 	/**
 	 * Release a service from duty. Each call to (@link #requestService} should be coupled with
 	 * a call to (@link #releaseService} when the service is no longer needed.
 	 * 
+	 * @deprecated use {@link #getServiceManager()} instead
+	 * 
 	 * @param provider of the service
 	 */
+	@Deprecated
 	void releaseService(Class<? extends ServiceProvider<?>> provider);
+
+	/**
+	 * Access the ServiceManager. Service users should keep a reference to the
+	 * ServiceManager to allow for cleanup, but should never keep a reference to the
+	 * BuildContext.
+	 */
+	ServiceManager getServiceManager();
 
 	/**
 	 * @return a reference to the IndexManagerHolder, storing all IndexManager instances.

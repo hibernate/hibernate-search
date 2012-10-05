@@ -35,6 +35,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
@@ -66,7 +67,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private SearchFactoryImplementor boundSearchFactory = null;
 	private DirectoryBasedReaderProvider readers = null;
 	private IndexWriterConfig writerConfig;
-	private WorkerBuildContext buildContext;
+	private ServiceManager serviceManager;
 
 	@Override
 	public String getIndexName() {
@@ -83,20 +84,20 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		readers.stop();
 		backend.close();
 		directoryProvider.stop();
-		buildContext.releaseService( SerializerService.class );
+		serviceManager.releaseService( SerializerService.class );
 	}
 
 	@Override
 	public void initialize(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		this.indexName = indexName;
-		this.buildContext = buildContext;
 		directoryProvider = createDirectoryProvider( indexName, cfg, buildContext );
 		indexingParameters = CommonPropertiesParse.extractIndexingPerformanceOptions( cfg );
 		optimizer = CommonPropertiesParse.getOptimizerStrategy( this, cfg );
 		backend = createBackend( indexName, cfg, buildContext );
 		directoryProvider.start( this );
 		readers = createIndexReader( indexName, cfg, buildContext );
-		serializer = buildContext.requestService( SerializerService.class );
+		serviceManager = buildContext.getServiceManager();
+		serializer = serviceManager.requestService( SerializerService.class, buildContext );
 	}
 
 	@Override

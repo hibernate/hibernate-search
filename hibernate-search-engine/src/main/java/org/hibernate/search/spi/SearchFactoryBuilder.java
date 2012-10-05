@@ -632,10 +632,12 @@ public class SearchFactoryBuilder {
 			return factoryState.getIndexingStrategy();
 		}
 
+		@Deprecated
 		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
 			return factoryState.getServiceManager().requestService( provider, this );
 		}
 
+		@Deprecated
 		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
 			factoryState.getServiceManager().releaseService( provider );
 		}
@@ -663,6 +665,11 @@ public class SearchFactoryBuilder {
 		@Override
 		public boolean isIndexMetadataComplete() {
 			return factoryState.isIndexMetadataComplete();
+		}
+
+		@Override
+		public ServiceManager getServiceManager() {
+			return factoryState.getServiceManager();
 		}
 
 	}

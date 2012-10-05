@@ -22,6 +22,7 @@ package org.hibernate.search.test.util;
 
 import java.util.Properties;
 
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
@@ -61,11 +62,13 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		}
 
 		@Override
+		@Deprecated
 		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
 			return null;
 		}
 
 		@Override
+		@Deprecated
 		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
 		}
 
@@ -92,6 +95,11 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		@Override
 		public boolean isIndexMetadataComplete() {
 			return true;
+		}
+
+		@Override
+		public ServiceManager getServiceManager() {
+			return null;
 		}
 	}
 

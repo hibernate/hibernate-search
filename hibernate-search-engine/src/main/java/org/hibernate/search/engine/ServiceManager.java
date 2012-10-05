@@ -45,6 +45,12 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * The ServiceManager is a singleton used to manage uniqueness of services
+ * and runtime discovery of new implementation.
+ * <p/>
+ * Any service requested should be released using (@link #releaseService} when it's not needed anymore
+ * to allow for a cleanup phase.
+ * 
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
