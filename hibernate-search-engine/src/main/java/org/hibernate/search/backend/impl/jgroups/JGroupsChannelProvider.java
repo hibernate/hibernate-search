@@ -61,18 +61,52 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 	private static final String DEFAULT_CLUSTER_NAME = "Hibernate Search Cluster";
 
-	protected String clusterName;
-
 	private Channel channel;
-	private boolean channelIsManaged = true;
-	private short muxId;
 	private MessageSender sender;
 	private BuildContext context;
 
 	@Override
 	public void start(Properties props, BuildContext context) {
-		this.clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
-		prepareJGroupsChannel( props, context );
+		this.context = context;
+		log.jGroupsStartingChannel();
+
+		boolean channelIsManaged = buildChannel( props );
+		String clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
+
+		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+		JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener( context, masterNodeSelector );
+
+		UpHandler handler = channel.getUpHandler();
+		if ( handler instanceof Muxer ) {
+			Short muxId = (Short) props.get( MUX_ID );
+			if ( muxId == null ) {
+				throw log.missingJGroupsMuxId();
+			}
+			@SuppressWarnings("unchecked")
+			Muxer<UpHandler> muxer = (Muxer<UpHandler>) handler;
+			if ( muxer.get( muxId ) != null ) {
+				throw log.jGroupsMuxIdAlreadyTaken( muxId );
+			}
+
+			ClassLoader cl = (ClassLoader) props.get( CLASSLOADER );
+			MessageListener wrapper = ( cl != null ) ? new ClassloaderMessageListener( listener, cl ) : listener;
+			MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( wrapper );
+			MessageDispatcher dispatcher = new MuxMessageDispatcher( muxId, channel, wrapper, listener, adapter );
+			sender = new DispatcherMessageSender( dispatcher );
+		}
+		else {
+			// TODO -- perhaps port previous multi-handling?
+			channel.setReceiver( listener );
+			sender = new ChannelMessageSender( channel, channelIsManaged, clusterName);
+		}
+		sender.start();
+
+		masterNodeSelector.setLocalAddress( channel.getAddress() );
+		log.jGroupsConnectedToCluster( clusterName, channel.getAddress() );
+
+		if ( !channel.flushSupported() ) {
+			log.jGroupsFlushNotPresentInStack();
+		}
 	}
 
 	@Override
@@ -85,72 +119,15 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 		context.releaseService( MasterSelectorServiceProvider.class );
 		context = null;
 		try {
-			if ( channel != null && channel.isOpen() ) {
-				UpHandler handler = channel.getUpHandler();
-				if ( handler instanceof Muxer ) {
-					Muxer muxer = (Muxer) handler;
-					muxer.remove( muxId );
-				}
-				else {
-					if ( channelIsManaged ) {
-						log.jGroupsDisconnectingAndClosingChannel();
-						channel.disconnect();
-						channel.close();
-					}
-				}
+			channel = null;
+
+			if ( sender != null ) {
+				sender.stop();
+				sender = null;
 			}
 		}
 		catch ( Exception toLog ) {
 			log.jGroupsClosingChannelError( toLog );
-			channel = null;
-		}
-	}
-
-	private void prepareJGroupsChannel(Properties props, BuildContext context) {
-		this.context = context;
-		log.jGroupsStartingChannel();
-		buildChannel( props );
-		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
-		JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener( context, masterNodeSelector );
-
-		UpHandler handler = channel.getUpHandler();
-		if ( handler instanceof Muxer ) {
-			Short n = (Short) props.get( MUX_ID );
-			if ( n == null ) {
-				throw log.missingJGroupsMuxId();
-			}
-			@SuppressWarnings("unchecked")
-			Muxer<UpHandler> muxer = (Muxer<UpHandler>) handler;
-			if ( muxer.get( n ) != null ) {
-				throw log.jGroupsMuxIdAlreadyTaken( n );
-			}
-
-			muxId = n;
-			ClassLoader cl = (ClassLoader) props.get( CLASSLOADER );
-			MessageListener wrapper = ( cl != null ) ? new ClassloaderMessageListener( listener, cl ) : listener;
-			MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( wrapper );
-			MessageDispatcher dispatcher = new MuxMessageDispatcher( muxId, channel, wrapper, listener, adapter );
-			sender = new DispatcherMessageSender( dispatcher );
-		}
-		else {
-			// TODO -- perhaps port previous multi-handling?
-			channel.setReceiver( listener );
-			if ( channelIsManaged ) {
-				try {
-					channel.connect( clusterName );
-				}
-				catch ( Exception e ) {
-					throw log.unableConnectingToJGroupsCluster( clusterName, e );
-				}
-			}
-			sender = new ChannelMessageSender( channel );
-		}
-
-		masterNodeSelector.setLocalAddress( channel.getAddress() );
-		log.jGroupsConnectedToCluster( clusterName, channel.getAddress() );
-
-		if ( !channel.flushSupported() ) {
-			log.jGroupsFlushNotPresentInStack();
 		}
 	}
 
@@ -160,9 +137,11 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	 * finally the legacy JGroups String properties.
 	 * 
 	 * @param props configuration file
+	 * @return true if channel is managed, false otherwise
 	 */
-	private void buildChannel(Properties props) {
-		String cfg;
+	private boolean buildChannel(Properties props) {
+		boolean channelIsManaged = true;
+
 		if ( props != null ) {
 			if ( props.containsKey( JGroupsChannelProvider.CHANNEL_INJECT ) ) {
 				Object channelObject = props.get( JGroupsChannelProvider.CHANNEL_INJECT );
@@ -176,7 +155,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 			}
 
 			if ( props.containsKey( JGroupsChannelProvider.CONFIGURATION_FILE ) ) {
-				cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_FILE );
+				String cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_FILE );
 				try {
 					channel = new JChannel( ConfigurationParseHelper.locateConfig( cfg ) );
 				}
@@ -202,6 +181,8 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 				throw log.unableToStartJGroupsChannel( e );
 			}
 		}
+
+		return channelIsManaged;
 	}
 
 }

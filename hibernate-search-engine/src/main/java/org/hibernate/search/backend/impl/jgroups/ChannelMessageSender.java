@@ -24,21 +24,50 @@
 
 package org.hibernate.search.backend.impl.jgroups;
 
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Channel;
 import org.jgroups.Message;
 
 /**
  * Channel message sender.
- * 
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-class ChannelMessageSender extends AbstractMessageSender {
+final class ChannelMessageSender extends AbstractMessageSender {
 
-	ChannelMessageSender(Channel channel) {
+	private static final Log log = LoggerFactory.make();
+
+	private final boolean channelIsManaged;
+	private final String clusterName;
+
+	ChannelMessageSender(Channel channel, boolean channelIsManaged, String clusterName) {
 		super( channel );
+		this.channelIsManaged = channelIsManaged;
+		this.clusterName = clusterName;
 	}
 
-	public void send(Message message) throws Exception {
+	public void start() {
+		if ( channel != null && channelIsManaged ) {
+			try {
+				channel.connect( clusterName );
+			}
+			catch ( Exception e ) {
+				throw log.unableConnectingToJGroupsCluster( clusterName, e );
+			}
+		}
+	}
+
+	public void stop() {
+		if ( channel != null && channel.isOpen() && channelIsManaged ) {
+			log.jGroupsDisconnectingAndClosingChannel( clusterName );
+			channel.disconnect();
+			channel.close();
+		}
+	}
+
+	public void send(final Message message) throws Exception {
 		channel.send( message );
 	}
 }

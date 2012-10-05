@@ -37,6 +37,16 @@ import org.jgroups.View;
 public interface MessageSender {
 
 	/**
+	 * Start sender.
+	 */
+	void start();
+
+	/**
+	 * Stop sender.
+	 */
+	void stop();
+
+	/**
 	 * Send message.
 	 * 
 	 * @param message the JGroups message

@@ -104,8 +104,8 @@ public interface Log extends BasicLogger {
 	void jGroupsDefaultConfigurationFileNotFound();
 
 	@LogMessage(level = INFO)
-	@Message(id = 13, value = "Disconnecting and closing JGroups Channel")
-	void jGroupsDisconnectingAndClosingChannel();
+	@Message(id = 13, value = "Disconnecting and closing JGroups Channel to cluster '%1$s'")
+	void jGroupsDisconnectingAndClosingChannel(String clusterName);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 14, value = "Problem closing channel; setting it to null")
