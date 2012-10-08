@@ -42,7 +42,7 @@ import org.hibernate.search.spi.WorkerBuildContext;
  * manager (and hence index) differently. A concrete implementation can also decide to only support a specific mode
  * of operation. It can ignore some configuration properties or expect additional properties.
  *
- * @author Sanne Grinovero &lt;sanne@hibernate.org&gt; (C) 2011 Red Hat Inc.
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public interface IndexManager {
 

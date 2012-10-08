@@ -83,48 +83,57 @@ public class DeploymentJmsMasterSlave {
 	private static PersistenceDescriptor slavePersistenceXml(String name, int refreshPeriod, File tmpDir)
 			throws Exception {
 		return commonUnitDef( name, "filesystem-slave", refreshPeriod, tmpDir )
-				.createProperty().name( "hibernate.search.default.worker.backend" ).value( "jms" ).up()
-				.createProperty()
-				.name( "hibernate.search.default.worker.jms.connection_factory" )
-				.value( "ConnectionFactory" )
-				.up()
-				.createProperty()
-				.name( "hibernate.search.default.worker.jms.queue" )
-				.value( RegistrationConfiguration.DESTINATION_QUEUE )
-				.up()
-				.up()
+					.createProperty()
+						.name( "hibernate.search.default.worker.backend" )
+						.value( "jms" )
+						.up()
+					.createProperty()
+					.	name( "hibernate.search.default.worker.jms.connection_factory" )
+						.value( "ConnectionFactory" )
+						.up()
+					.createProperty()
+						.name( "hibernate.search.default.worker.jms.queue" )
+						.value( RegistrationConfiguration.DESTINATION_QUEUE )
+						.up()
+					.up()
 				.up();
 	}
 
-	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(String name,
-																					String directoryProvider,
-																					int refreshPeriod,
-																					File tmpDir)
-			throws Exception {
+	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(
+			String name, String directoryProvider, int refreshPeriod, File tmpDir) throws Exception {
 		return Descriptors.create( PersistenceDescriptor.class )
 				.createPersistenceUnit()
-				.name( "pu-" + name )
-				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
-				.getOrCreateProperties()
-				.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
-				.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
-				.createProperty().name( "hibernate.search.default.directory_provider" ).value( directoryProvider ).up()
-				.createProperty()
-				.name( "hibernate.search.default.sourceBase" )
-				.value( tmpDir.getAbsolutePath() + "-sourceBase" )
-				.up()
-				.createProperty()
-				.name( "hibernate.search.default.indexBase" )
-				.value( tmpDir.getAbsolutePath() + "-" + name )
-				.up()
-				.createProperty()
-				.name( "hibernate.search.default.refresh" )
-				.value( String.valueOf( refreshPeriod ) )
-				.up()
-				.createProperty()
-				.name( "hibernate.search.default.worker.execution" )
-				.value( "sync" )
-				.up();
+					.name( "pu-" + name )
+					.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+					.getOrCreateProperties()
+						.createProperty()
+							.name( "hibernate.hbm2ddl.auto" )
+							.value( "create-drop" )
+							.up()
+						.createProperty()
+							.name( "hibernate.search.default.lucene_version" )
+							.value( "LUCENE_CURRENT" )
+							.up()
+						.createProperty()
+							.name( "hibernate.search.default.directory_provider" )
+							.value( directoryProvider )
+							.up()
+						.createProperty()
+							.name( "hibernate.search.default.sourceBase" )
+							.value( tmpDir.getAbsolutePath() + "-sourceBase" )
+							.up()
+						.createProperty()
+							.name( "hibernate.search.default.indexBase" )
+							.value( tmpDir.getAbsolutePath() + "-" + name )
+							.up()
+						.createProperty()
+							.name( "hibernate.search.default.refresh" )
+							.value( String.valueOf( refreshPeriod ) )
+							.up()
+						.createProperty()
+							.name( "hibernate.search.default.worker.execution" )
+							.value( "sync" )
+							.up();
 	}
 
 	private static void addLibraries(WebArchive archive) {
@@ -147,16 +156,17 @@ public class DeploymentJmsMasterSlave {
 	}
 
 	private static Asset hornetqJmsXml() {
-		String hornetqXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-				+ "<messaging-deployment xmlns=\"urn:jboss:messaging-deployment:1.0\">"
+		String hornetqXml =
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<messaging-deployment xmlns=\"urn:jboss:messaging-deployment:1.0\">"
 				+ "<hornetq-server>"
-				+ "<jms-destinations>"
-				+ "<jms-queue name=\"hsearchQueue\">"
-				+ "<entry name=\"" + RegistrationConfiguration.DESTINATION_QUEUE + "\"/>"
-				+ "</jms-queue>"
-				+ "</jms-destinations>"
+					+ "<jms-destinations>"
+						+ "<jms-queue name=\"hsearchQueue\">"
+							+ "<entry name=\"" + RegistrationConfiguration.DESTINATION_QUEUE + "\"/>"
+						+ "</jms-queue>"
+					+ "</jms-destinations>"
 				+ "</hornetq-server>"
-				+ "</messaging-deployment>";
+			+ "</messaging-deployment>";
 		return new StringAsset( hornetqXml );
 	}
 }

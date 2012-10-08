@@ -29,7 +29,7 @@ import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
 
 /**
- * @author "Davide D'Alto"
+ * @author Davide D'Alto
  */
 @Entity
 class DocumentEntity {
