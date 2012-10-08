@@ -18,7 +18,7 @@ public class MyServiceProvider implements ServiceProvider<MyService> {
 		foo = new MyService();
 		active = true;
 		if ( simulateCircularDependency ) {
-			context.requestService( MyServiceProvider.class );
+			context.getServiceManager().requestService( MyServiceProvider.class, context );
 		}
 	}
 

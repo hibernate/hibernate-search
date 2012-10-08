@@ -26,6 +26,7 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.net.URL;
 import java.util.Properties;
 
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -63,17 +64,17 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 
 	private Channel channel;
 	private MessageSender sender;
-	private BuildContext context;
+	private ServiceManager serviceManager;
 
 	@Override
 	public void start(Properties props, BuildContext context) {
-		this.context = context;
+		serviceManager = context.getServiceManager();
 		log.jGroupsStartingChannel();
 
 		boolean channelIsManaged = buildChannel( props );
 		String clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
 
-		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
 		JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener( context, masterNodeSelector );
 
 		UpHandler handler = channel.getUpHandler();
@@ -116,8 +117,8 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 
 	@Override
 	public void stop() {
-		context.releaseService( MasterSelectorServiceProvider.class );
-		context = null;
+		serviceManager.releaseService( MasterSelectorServiceProvider.class );
+		serviceManager = null;
 		try {
 			channel = null;
 

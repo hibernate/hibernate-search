@@ -32,6 +32,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
@@ -59,10 +60,11 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	protected DirectoryBasedIndexManager indexManager;
 
 	private Address address;
-	private WorkerBuildContext context;
+	private ServiceManager serviceManager;
 
 	private JGroupsBackendQueueTask jgroupsProcessor;
 	private LuceneBackendQueueProcessor luceneBackendQueueProcessor;
+
 
 	public JGroupsBackendQueueProcessor(NodeSelectorStrategy selectionStrategy) {
 		this.selectionStrategy = selectionStrategy;
@@ -73,9 +75,9 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		this.indexName = indexManager.getIndexName();
 		assertLegacyOptionsNotUsed( props, indexName );
 		this.indexManager = indexManager;
-		this.context = context;
-		this.messageSender = context.requestService( JGroupsChannelProvider.class );
-		NodeSelectorStrategyHolder masterNodeSelector = context.requestService( MasterSelectorServiceProvider.class );
+		serviceManager = context.getServiceManager();
+		this.messageSender = serviceManager.requestService( JGroupsChannelProvider.class, context );
+		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
 		selectionStrategy.viewAccepted( messageSender.getView() ); // set current view?
 		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector );
@@ -84,8 +86,8 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	}
 
 	public void close() {
-		context.releaseService( MasterSelectorServiceProvider.class );
-		context.releaseService( JGroupsChannelProvider.class );
+		serviceManager.releaseService( MasterSelectorServiceProvider.class );
+		serviceManager.releaseService( JGroupsChannelProvider.class );
 		luceneBackendQueueProcessor.close();
 	}
 

@@ -23,206 +23,22 @@
  */
 package org.hibernate.search.engine;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * @author Emmanuel Bernard
- * @author Sanne Grinovero
+ * The ServiceManager is a singleton used to manage uniqueness of services
+ * and runtime discovery of new implementation.
+ * <p/>
+ * Any service requested should be released using (@link #releaseService} when it's not needed anymore
+ * to allow for a cleanup phase.
  */
-public class ServiceManager {
-	private static final String SERVICES_FILE = "META-INF/services/" + ServiceProvider.class.getName();
-	private static final Log log = LoggerFactory.make();
+public interface ServiceManager {
 
-	//barrier protected by the Hibernate Search instantiation
-	private final HashSet<Class<?>> availableProviders = new HashSet<Class<?>>();
-	private final ConcurrentHashMap<Class<?>, ServiceProviderWrapper<?>> managedProviders = new ConcurrentHashMap<Class<?>, ServiceProviderWrapper<?>>();
-	private final Map<Class<? extends ServiceProvider<?>>, Object> providedProviders = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
-	private final Properties properties;
+	public abstract <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass, BuildContext context);
 
-	public ServiceManager(SearchConfiguration cfg) {
-		this.properties = cfg.getProperties();
-		this.providedProviders.putAll( cfg.getProvidedServices() );
-		listAndInstantiateServiceProviders();
-	}
+	public abstract void releaseService(Class<? extends ServiceProvider<?>> serviceProviderClass);
 
-	private void listAndInstantiateServiceProviders() {
-		//get list of services available
-		final Enumeration<URL> resources = ClassLoaderHelper.getResources( SERVICES_FILE, ServiceManager.class );
-		String name;
-		try {
-			while ( resources.hasMoreElements() ) {
-				URL url = resources.nextElement();
-				InputStream stream = url.openStream();
-				try {
-					BufferedReader reader = new BufferedReader( new InputStreamReader( stream ), 100 );
-					name = reader.readLine();
-					while ( name != null ) {
-						name = name.trim();
-						if ( !name.startsWith( "#" ) ) {
-							final Class<?> serviceProviderClass =
-									ClassLoaderHelper.classForName( name, ServiceManager.class.getClassLoader(), "service provider" );
-							availableProviders.add( serviceProviderClass );
-						}
-						name = reader.readLine();
-					}
-				}
-				finally {
-					stream.close();
-				}
-			}
-		}
-		catch ( IOException e ) {
-			throw new SearchException( "Unable to read " + SERVICES_FILE, e );
-		}
-	}
+	public abstract void stopServices();
 
-	@SuppressWarnings("unchecked")
-	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass, BuildContext context) {
-		//provided services have priority over managed services
-		if ( providedProviders.containsKey( serviceProviderClass ) ) {
-			//we use containsKey as the service itself might be null
-			//TODO be safer and throw a cleaner exception
-			return (T) providedProviders.get( serviceProviderClass );
-		}
-
-		ServiceProviderWrapper<T> wrapper = (ServiceProviderWrapper<T>) managedProviders.get( serviceProviderClass );
-		if ( wrapper == null ) {
-			if ( availableProviders.contains( serviceProviderClass ) ) {
-				ServiceProvider<T> serviceProvider = ClassLoaderHelper.instanceFromClass(
-						ServiceProvider.class,
-						serviceProviderClass,
-						"service provider"
-				);
-				wrapper = new ServiceProviderWrapper<T>( serviceProvider, context, serviceProviderClass );
-				managedProviders.putIfAbsent( serviceProviderClass, wrapper );
-			}
-			else {
-				throw new SearchException( "Unable to find service related to " + serviceProviderClass );
-			}
-		}
-		wrapper = (ServiceProviderWrapper<T>) managedProviders.get( serviceProviderClass );
-		wrapper.startVirtual();
-		return wrapper.getService();
-	}
-
-	public void releaseService(Class<? extends ServiceProvider<?>> serviceProviderClass) {
-		//provided services have priority over managed services
-		if ( providedProviders.containsKey( serviceProviderClass ) ) {
-			return;
-		}
-
-		final ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
-		if ( wrapper == null ) {
-			throw new AssertionFailure( "Unable to find service related to " + serviceProviderClass);
-		}
-
-		wrapper.stopVirtual();
-	}
-
-	public void stopServices() {
-		for ( ServiceProviderWrapper wrapper :  managedProviders.values() ) {
-			wrapper.ensureStopped();
-		}
-	}
-
-	private class ServiceProviderWrapper<S> {
-
-		private final ServiceProvider<S> serviceProvider;
-		private final BuildContext context;
-		private final Class<? extends ServiceProvider<S>> serviceProviderClass;
-
-		private int userCounter = 0;
-		private ServiceStatus status = ServiceStatus.STOPPED;
-
-		ServiceProviderWrapper(ServiceProvider<S> serviceProvider, BuildContext context, Class<? extends ServiceProvider<S>> serviceProviderClass) {
-			this.serviceProvider = serviceProvider;
-			this.context = context;
-			this.serviceProviderClass = serviceProviderClass;
-		}
-
-		synchronized S getService() {
-			if ( status != ServiceStatus.RUNNING ) {
-				stateExpectedFailure();
-			}
-			return serviceProvider.getService();
-		}
-
-		synchronized void startVirtual() {
-			int previousValue = userCounter;
-			userCounter++;
-			if ( previousValue == 0 ) {
-				if ( status != ServiceStatus.STOPPED ) {
-					stateExpectedFailure();
-				}
-				status = ServiceStatus.STARTING;
-				serviceProvider.start( properties, context );
-				status = ServiceStatus.RUNNING;
-			}
-			if ( status != ServiceStatus.RUNNING ) {
-				//Could happen on circular dependencies
-				stateExpectedFailure();
-			}
-		}
-
-		synchronized void stopVirtual() {
-			userCounter--;
-			if ( userCounter == 0 ) {
-				if ( status != ServiceStatus.RUNNING ) {
-					stateExpectedFailure();
-				}
-				status = ServiceStatus.STOPPING;
-				forceStop();
-				status = ServiceStatus.STOPPED;
-				managedProviders.remove( serviceProviderClass );
-			}
-			else if ( status != ServiceStatus.RUNNING ) {
-				//Could happen on circular dependencies
-				stateExpectedFailure();
-			}
-		}
-
-		synchronized void ensureStopped() {
-			if ( status != ServiceStatus.STOPPED ) {
-				log.serviceProviderNotReleased( serviceProviderClass );
-				forceStop();
-			}
-		}
-
-		private void forceStop() {
-			try {
-				serviceProvider.stop();
-			}
-			catch ( Exception e ) {
-				log.stopServiceFailed( serviceProviderClass, e );
-			}
-		}
-
-		private void stateExpectedFailure() {
-			throw new AssertionFailure( "Unexpected status '" + status + "' for serviceProvider '" + serviceProvider + "'." +
-					" Check for circular dependencies or unreleased resources in your services." );
-		}
-	}
-
-	private enum ServiceStatus {
-		RUNNING, STOPPED, STARTING, STOPPING
-	}
 }
