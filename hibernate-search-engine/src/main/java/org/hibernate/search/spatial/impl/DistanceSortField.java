@@ -18,27 +18,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.spatial;
+package org.hibernate.search.spatial.impl;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.spatial.impl.Rectangle;
+import org.apache.lucene.search.SortField;
 
 /**
- * Unit tests for Hibernate Search spatial rectangle implementation
+ * Lucene SortField for sorting documents which have been indexed with Hibernate Search spatial
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByGrid
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
+ * @see org.hibernate.search.spatial.Coordinates
  */
-public class RectangleTest {
-	@Test
-	public void boundingBoxTest() {
-		Point center = Point.fromDegrees( 45, 4 );
-		Rectangle rectangle = Rectangle.fromBoundingCircle( center, 50 );
+public class DistanceSortField extends SortField {
 
-		Assert.assertEquals( 44.550339, rectangle.getLowerLeft().getLatitude(), 0.000001d );
-		Assert.assertEquals( 3.359047, rectangle.getLowerLeft().getLongitude(), 0.000001d );
-		Assert.assertEquals( 45.449660, rectangle.getUpperRight().getLatitude(), 0.000001d );
-		Assert.assertEquals( 4.640952, rectangle.getUpperRight().getLongitude(), 0.000001d );
-	}
+    public DistanceSortField(Point center, String fieldName) {
+        super( fieldName, new DistanceComparatorSource( center ));
+    }
+
+    public DistanceSortField(double latitude, double longitude, String fieldName) {
+        this( Point.fromDegrees( latitude, longitude ), fieldName );
+    }
 }

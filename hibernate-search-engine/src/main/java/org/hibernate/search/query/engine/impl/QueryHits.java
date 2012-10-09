@@ -54,6 +54,8 @@ import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.spatial.impl.DistanceCollector;
+import org.hibernate.search.spatial.impl.Point;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
@@ -77,8 +79,12 @@ public class QueryHits {
 	private TopDocs topDocs;
 	private Map<String, List<Facet>> facetMap;
 	private List<FacetCollector> facetCollectors;
+	private DistanceCollector distanceCollector = null;
 
 	private final boolean enableFieldCacheOnClassName;
+
+	private Point spatialSearchCenter = null;
+	private String spatialFieldName = null;
 
 	/**
 	 * If enabled, after hits collection it will contain the class name for each hit
@@ -101,11 +107,13 @@ public class QueryHits {
 					 Map<String, FacetingRequestImpl> facetRequests,
 					 boolean enableFieldCacheOnTypes,
 					 FieldCacheCollectorFactory idFieldCollector,
-					 TimeoutExceptionFactory timeoutExceptionFactory)
+					 TimeoutExceptionFactory timeoutExceptionFactory,
+					 Point spatialSearchCenter,
+					 String spatialFieldName)
 			throws IOException {
 		this(
 				searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager, facetRequests,
-				enableFieldCacheOnTypes, idFieldCollector, timeoutExceptionFactory
+				enableFieldCacheOnTypes, idFieldCollector, timeoutExceptionFactory, spatialSearchCenter, spatialFieldName
 		);
 	}
 
@@ -118,7 +126,9 @@ public class QueryHits {
 					 Map<String, FacetingRequestImpl> facetRequests,
 					 boolean enableFieldCacheOnTypes,
 					 FieldCacheCollectorFactory idFieldCollector,
-					 TimeoutExceptionFactory timeoutExceptionFactory)
+					 TimeoutExceptionFactory timeoutExceptionFactory,
+					 Point spatialSearchCenter,
+					 String spatialFieldName)
 			throws IOException {
 		this.timeoutManager = timeoutManager;
 		this.preparedQuery = preparedQuery;
@@ -129,6 +139,8 @@ public class QueryHits {
 		this.enableFieldCacheOnClassName = enableFieldCacheOnTypes;
 		this.idFieldCollectorFactory = idFieldCollector;
 		this.timeoutExceptionFactory = timeoutExceptionFactory;
+		this.spatialSearchCenter = spatialSearchCenter;
+		this.spatialFieldName = spatialFieldName;
 		updateTopDocs( n );
 	}
 
@@ -165,6 +177,13 @@ public class QueryHits {
 
 	public float score(int index) throws IOException {
 		return scoreDoc( index ).score;
+	}
+
+	public Double spatialDistance(int index) throws IOException {
+		if ( spatialSearchCenter == null ) {
+			return null;
+		}
+		return distanceCollector.getDistance( index );
 	}
 
 	public Explanation explain(int index) throws IOException {
@@ -209,6 +228,7 @@ public class QueryHits {
 			collector = optionallyEnableFieldCacheOnTypes( collector, totalMaxDocs, maxDocs );
 			collector = optionallyEnableFieldCacheOnIds( collector, totalMaxDocs, maxDocs );
 			collector = optionallyEnableFacetingCollectors( collector );
+			collector = optionallyEnableDistanceCollector( collector, maxDocs );
 		}
 		else {
 			topDocCollector = null;
@@ -261,6 +281,15 @@ public class QueryHits {
 		}
 
 		return facetCollectors.get( facetCollectors.size() - 1 );
+	}
+
+	private Collector optionallyEnableDistanceCollector(Collector collector, int maxDocs) {
+		if ( spatialFieldName == null || spatialFieldName.isEmpty() || spatialSearchCenter == null) {
+			return collector;
+		}
+		distanceCollector = new DistanceCollector( collector, spatialSearchCenter, maxDocs, spatialFieldName );
+
+		return distanceCollector;
 	}
 
 	private boolean isImmediateTimeout() {

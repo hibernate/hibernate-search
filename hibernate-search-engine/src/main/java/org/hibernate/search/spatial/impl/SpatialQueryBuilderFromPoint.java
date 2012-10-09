@@ -22,8 +22,8 @@ package org.hibernate.search.spatial.impl;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.FilteredQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
@@ -108,7 +108,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	/**
 	 * Returns a Lucene Query which rely on Hibernate Search Spatial
 	 * grid indexation to filter document at radius by wrapping a
-	 * GridFilter into a ConstantScoreQuery
+	 * GridFilter
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
@@ -118,10 +118,9 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 *
 	 * @see org.apache.lucene.search.Query
 	 * @see org.hibernate.search.spatial.Coordinates
-	 * @see org.apache.lucene.search.ConstantScoreQuery
 	 */
 	public static Query buildGridQuery(Point center, double radius, String fieldName) {
-		return new ConstantScoreQuery( buildGridFilter( center, radius, fieldName ) );
+		return new FilteredQuery( new MatchAllDocsQuery(  ), buildGridFilter( center, radius, fieldName ) );
 	}
 
 
@@ -140,7 +139,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 */
 	public static Query buildDistanceQuery(Point center, double radius, String fieldName) {
 		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
-		return new ConstantScoreQuery( buildDistanceFilter( allFilter, center, radius, fieldName ) );
+		return new FilteredQuery( new MatchAllDocsQuery(  ), buildDistanceFilter( allFilter, center, radius, fieldName ) );
 	}
 
 	/**
@@ -158,7 +157,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildSpatialQueryByGrid(Point center, double radius, String fieldName) {
-		return new ConstantScoreQuery(
+		return new FilteredQuery( new MatchAllDocsQuery(  ),
 				buildDistanceFilter(
 						buildGridFilter( center, radius, fieldName ),
 						center,
@@ -210,7 +209,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 		boxQuery.add(latQuery, BooleanClause.Occur.MUST);
 		boxQuery.add(longQuery, BooleanClause.Occur.MUST);
 
-		return new ConstantScoreQuery(
+		return new FilteredQuery(
+				new MatchAllDocsQuery(  ),
 				buildDistanceFilter(
 						new QueryWrapperFilter( boxQuery ),
 						center,

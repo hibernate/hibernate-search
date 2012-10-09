@@ -290,6 +290,70 @@ org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
     </example>	
   </section>
   
+  <section id="spatial-distance">
+    <title>Returning distance to query point in the search results</title>
+    <section id="spatial-distance-projection">
+      <title>Returning distance to the center in the results</title>
+      <para>To get the distance to the center of the search returned with the results you just need to project it:</para>
+      <example>
+          <title>Distance projection example</title>
+          <programlisting language="JAVA" role="JAVA">double centerLatitude = 24.0d;
+double centerLongitude= 32.0d;
+
+final QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity( POI.class ).get();            
+org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+  .within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+hibQuery.setSpatialSearchCenter( centerLatitude, centerLongitude );
+List results = hibQuery.list();</programlisting>
+      </example>
+      <para>There is two calls to make:</para>
+      <itemizedlist>
+        <listitem>
+          <para>Call FullTextQuery.setProjection with FullTextQuery.SPATIAL_DISTANCE as one of the projected fields.</para>
+        </listitem>
+        <listitem>
+          <para>Call FullTextQuery.setSpatialSearchCenter with the latitude and longitude used to build the spatial query.
+          Note that using coordinates different than the center used for the query will have unexpected results.</para>
+        </listitem>
+      </itemizedlist>
+      <para>Using distance projection on non @Spatial enabled entities and/or with a non spatial Query will have also
+      unexpected results as entities non spatialy indexed and/or with null values for latitude or longitude will be 
+      considered to be at (0,0)/(lat,0)/(0,long)</para>
+      <para>Using distance projection with a spatial query on spatialy indexed entities having, eventually, null values for
+      latitude and/or longitude is safe as they will not be found by the spatial query and so won't have distance calculated</para>
+    </section>
+    <section id="spatial-distance-sort">
+      <title>Sorting by distance</title>
+      <para>To sort the results by distance to the center of the search you will have to build a Sort object using a 
+      DistanceSortField:</para>
+      <example>
+          <title>Distance sort example</title>
+          <programlisting language="JAVA" role="JAVA">        double centerLatitude= 24.0d;
+double centerLongitude= 32.0d;
+
+final QueryBuilder builder = fullTextSession.getSearchFactory()
+    .buildQueryBuilder().forEntity( POI.class ).get();            
+org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+    .within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude ));
+hibQuery.setSort( distanceSort );</programlisting>
+      </example>
+      <para>You shall build the DistanceSortField with the coordinates used to build the spatial query otherwise the sorting
+      will occur with another center than the query. This could lead to unexpected results.</para>
+      <para>Using distance sort on non @Spatial enabled entities and/or with a non spatial Query will have also
+      unexpected results as entities non spatialy indexed and/or with null values for latitude or longitude will be 
+      considered to be at (0,0)/(lat,0)/(0,long)</para>
+      <para>Using distance sort with a spatial query on spatialy indexed entities having, eventually, null values for
+      latitude and/or longitude is safe as they will not be found by the spatial query and so won't be sorted</para>
+    </section>
+  </section>
+  
   <section id="spatial-behind-curtain">
     <title>Grid - Behind the curtain</title>
     

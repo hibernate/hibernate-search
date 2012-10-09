@@ -23,23 +23,20 @@ package org.hibernate.search.test.spatial;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.spatial.Coordinates;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 /**
- * Hibernate Search spatial : Point Of Interest test entity
+ * Hibernate Search spatial : Non Geo enabled Point Of Interest test entity
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
 @Entity
 @Indexed
-@Spatial(name = "hotel_location", spatialMode = SpatialMode.GRID)
-public class Hotel implements Coordinates {
+public class NonGeoPOI {
 	@Id
 	Integer id;
 
@@ -49,10 +46,14 @@ public class Hotel implements Coordinates {
 	@Field(store = Store.YES, index = Index.YES)
 	String type;
 
-	double latitude;
-	double longitude;
+	@Field(store = Store.YES, index = Index.YES)
+	@NumericField
+	Double latitude;
+	@Field(store = Store.YES, index = Index.YES)
+	@NumericField
+	Double longitude;
 
-	public Hotel( Integer id, String name, double latitude, double longitude, String type ) {
+	public NonGeoPOI(Integer id, String name, Double latitude, Double longitude, String type) {
 		this.id = id;
 		this.name = name;
 		this.latitude = latitude;
@@ -60,7 +61,7 @@ public class Hotel implements Coordinates {
 		this.type= type;
 	}
 
-	public Hotel() {
+	public NonGeoPOI() {
 	}
 
 	public Integer getId() {
@@ -71,11 +72,11 @@ public class Hotel implements Coordinates {
 		return name;
 	}
 
-	public Double getLatitude() {
+	public double getLatitude() {
 		return latitude;
 	}
 
-	public Double getLongitude() {
+	public double getLongitude() {
 		return longitude;
 	}
 
