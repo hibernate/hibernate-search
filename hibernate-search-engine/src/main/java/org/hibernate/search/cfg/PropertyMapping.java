@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -65,6 +65,14 @@ public class PropertyMapping {
 
 	public PropertySpatialMapping spatial() {
 		return new PropertySpatialMapping(property, entity, mapping);
+	}
+
+	public PropertyLatitudeMapping latitude() {
+		return new PropertyLatitudeMapping(property, entity, mapping);
+	}
+
+	public PropertyLongitudeMapping longitude() {
+		return new PropertyLongitudeMapping(property, entity, mapping);
 	}
 
 	public DateBridgeMapping dateBridge(Resolution resolution) {
