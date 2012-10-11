@@ -33,8 +33,6 @@ import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.IndexingMonitor;
@@ -44,7 +42,6 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.impl.JNDIHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -53,12 +50,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JMSBackendQueueProcessor implements BackendQueueProcessor {
+public abstract class JMSBackendQueueProcessor implements BackendQueueProcessor {
 
 	private String jmsQueueName;
-	private String jmsConnectionFactoryName;
-	private static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
-	private Properties properties;
+	protected static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
 	private Queue jmsQueue;
 	private QueueConnectionFactory factory;
 	private String indexName;
@@ -76,16 +71,13 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
-		//TODO proper exception if jms queues and connections are not there
-		this.properties = props;
 		this.indexManager = indexManager;
-		this.jmsConnectionFactoryName = props.getProperty( JMS_CONNECTION_FACTORY );
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
 		this.searchFactory = context.getUninitializedSearchFactory();
 		this.factory = initializeJMSQueueConnectionFactory( props );
-		this.jmsQueue = initializeJMSQueue( props );
-		this.connection = initializeJMSConnection( props );
+		this.jmsQueue = initializeJMSQueue( factory, props );
+		this.connection = initializeJMSConnection( factory, props );
 	}
 
 	public Queue getJmsQueue() {
@@ -94,6 +86,10 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 
 	public String getJmsQueueName() {
 		return jmsQueueName;
+	}
+
+	public String getIndexName() {
+		return indexName;
 	}
 
 	public SearchFactoryImplementor getSearchFactory() {
@@ -143,56 +139,30 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 	/**
 	 * Initialises the JMS QueueConnectionFactory to be used for sending Lucene work operations to the master node.
 	 *
-	 * @param props configuration properties specific for this backend
-	 * @return
+	 * @param properties configuration properties specific for this backend
+	 *
+	 * @return the initialized {@link QueueConnectionFactory}
 	 */
-	protected QueueConnectionFactory initializeJMSQueueConnectionFactory(Properties props) {
-		try {
-			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
-			return ( QueueConnectionFactory ) initialContext.lookup( jmsConnectionFactoryName );
-		}
-		catch ( NamingException e ) {
-			throw log.jmsLookupException( jmsQueueName, jmsConnectionFactoryName, indexName, e );
-		}
-	}
+	abstract protected QueueConnectionFactory initializeJMSQueueConnectionFactory(Properties props);
 
 	/**
 	 * Initialises the JMS queue to be used for sending Lucene work operations to the master node.
 	 * Invoked after {@link #initializeJMSQueueConnectionFactory(Properties)}
 	 *
-	 * @param props configuration properties specific for this backend
-	 * @return
+	 * @param properties configuration properties specific for this backend
+	 *
+	 * @return the initialized {@link Queue}
 	 */
-	protected Queue initializeJMSQueue(Properties props) {
-		try {
-			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
-			return ( Queue ) initialContext.lookup( jmsQueueName );
-		}
-		catch ( NamingException e ) {
-			throw log.jmsLookupException( jmsQueueName, jmsConnectionFactoryName, indexName, e );
-		}
-	}
+	abstract protected Queue initializeJMSQueue(QueueConnectionFactory factory, Properties props);
 
 	/**
 	 * Initialises the JMS QueueConnection to be used for sending Lucene work operations to the master node.
 	 * This is invoked after {@link #initializeJMSQueue(Properties)}.
 	 *
-	 * @param props configuration properties specific for this backend
-	 * @return
+	 * @param properties configuration properties specific for this backend
+	 *
+	 * @return the initialized {@link QueueConnection}
 	 */
-	protected QueueConnection initializeJMSConnection(final Properties props) {
-		final String login = props.getProperty( JMS_CONNECTION_LOGIN );
-		final String password = props.getProperty( JMS_CONNECTION_PASSWORD );
-		try {
-			if ( login == null && password == null ) {
-				return factory.createQueueConnection();
-			}
-			else {
-				return factory.createQueueConnection( login, password );
-			}
-		} catch (JMSException e) {
-			throw log.unableToOpenJMSConnection( indexName, jmsQueueName, e );
-		}
-	}
+	abstract protected QueueConnection initializeJMSConnection(QueueConnectionFactory factory, Properties props);
 
 }

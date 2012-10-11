@@ -30,7 +30,7 @@ import org.hibernate.search.backend.impl.jgroups.AutoNodeSelector;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.MasterNodeSelector;
 import org.hibernate.search.backend.impl.jgroups.SlaveNodeSelector;
-import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jms.JndiJMSBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.batchindexing.impl.Executors;
@@ -58,7 +58,7 @@ public class BackendFactory {
 			backendQueueProcessor = new LuceneBackendQueueProcessor();
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
-			backendQueueProcessor = new JMSBackendQueueProcessor();
+			backendQueueProcessor = new JndiJMSBackendQueueProcessor();
 		}
 		else if ( "blackhole".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = new BlackHoleBackendQueueProcessor();

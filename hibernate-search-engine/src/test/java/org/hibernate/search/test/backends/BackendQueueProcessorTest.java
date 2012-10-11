@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.SlaveNodeSelector;
-import org.hibernate.search.backend.impl.jms.JMSBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jms.JndiJMSBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 
@@ -39,7 +39,7 @@ public class BackendQueueProcessorTest {
 		checkBackendBehaviour( new LuceneBackendQueueProcessor() );
 		checkBackendBehaviour( new BlackHoleBackendQueueProcessor() );
 		checkBackendBehaviour( new JGroupsBackendQueueProcessor( new SlaveNodeSelector() ) );
-		checkBackendBehaviour( new JMSBackendQueueProcessor() );
+		checkBackendBehaviour( new JndiJMSBackendQueueProcessor() );
 	}
 
 	private void checkBackendBehaviour(BackendQueueProcessor backend) {
