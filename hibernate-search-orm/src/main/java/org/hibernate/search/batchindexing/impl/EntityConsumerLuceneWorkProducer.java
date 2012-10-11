@@ -46,6 +46,8 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -154,6 +156,18 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 			// FIXME for improved performance: avoid loading them in an early phase.
 			return;
 		}
+
+		EntityIndexingInterceptor interceptor = entityIndexBinding.getEntityIndexingInterceptor();
+		if ( interceptor != null ) {
+			IndexingOverride onAdd = interceptor.onAdd( entity );
+			switch ( onAdd ) {
+			case REMOVE:
+			case SKIP:
+				return;
+			}
+			//default: continue indexing this instance
+		}
+
 		DocumentBuilderIndexedEntity docBuilder = entityIndexBinding.getDocumentBuilder();
 		TwoWayFieldBridge idBridge = docBuilder.getIdBridge();
 		conversionContext.pushProperty( docBuilder.getIdKeywordName() );
