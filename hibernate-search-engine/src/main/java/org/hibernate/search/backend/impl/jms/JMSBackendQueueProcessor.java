@@ -83,26 +83,9 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
 		this.searchFactory = context.getUninitializedSearchFactory();
-		try {
-			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
-			factory = ( QueueConnectionFactory ) initialContext.lookup( jmsConnectionFactoryName );
-			jmsQueue = ( Queue ) initialContext.lookup( jmsQueueName );
-		}
-		catch ( NamingException e ) {
-			throw log.jmsLookupException( jmsQueueName, jmsConnectionFactoryName, indexName, e );
-		}
-		final String login = props.getProperty( JMS_CONNECTION_LOGIN );
-		final String password = props.getProperty( JMS_CONNECTION_PASSWORD );
-		try {
-			if ( login == null && password == null ) {
-				connection = factory.createQueueConnection();
-			}
-			else {
-				connection = factory.createQueueConnection( login, password );
-			}
-		} catch (JMSException e) {
-			throw log.unableToOpenJMSConnection( indexName, jmsQueueName, e );
-		}
+		this.factory = initializeJMSQueueConnectionFactory( props );
+		this.jmsQueue = initializeJMSQueue( props );
+		this.connection = initializeJMSConnection( props );
 	}
 
 	public Queue getJmsQueue() {
@@ -154,6 +137,61 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 		}
 		catch ( JMSException e ) {
 			log.unableToCloseJmsConnection( jmsQueueName, e );
+		}
+	}
+
+	/**
+	 * Initialises the JMS QueueConnectionFactory to be used for sending Lucene work operations to the master node.
+	 *
+	 * @param props configuration properties specific for this backend
+	 * @return
+	 */
+	protected QueueConnectionFactory initializeJMSQueueConnectionFactory(Properties props) {
+		try {
+			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
+			return ( QueueConnectionFactory ) initialContext.lookup( jmsConnectionFactoryName );
+		}
+		catch ( NamingException e ) {
+			throw log.jmsLookupException( jmsQueueName, jmsConnectionFactoryName, indexName, e );
+		}
+	}
+
+	/**
+	 * Initialises the JMS queue to be used for sending Lucene work operations to the master node.
+	 * Invoked after {@link #initializeJMSQueueConnectionFactory(Properties)}
+	 *
+	 * @param props configuration properties specific for this backend
+	 * @return
+	 */
+	protected Queue initializeJMSQueue(Properties props) {
+		try {
+			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
+			return ( Queue ) initialContext.lookup( jmsQueueName );
+		}
+		catch ( NamingException e ) {
+			throw log.jmsLookupException( jmsQueueName, jmsConnectionFactoryName, indexName, e );
+		}
+	}
+
+	/**
+	 * Initialises the JMS QueueConnection to be used for sending Lucene work operations to the master node.
+	 * This is invoked after {@link #initializeJMSQueue(Properties)}.
+	 *
+	 * @param props configuration properties specific for this backend
+	 * @return
+	 */
+	protected QueueConnection initializeJMSConnection(final Properties props) {
+		final String login = props.getProperty( JMS_CONNECTION_LOGIN );
+		final String password = props.getProperty( JMS_CONNECTION_PASSWORD );
+		try {
+			if ( login == null && password == null ) {
+				return factory.createQueueConnection();
+			}
+			else {
+				return factory.createQueueConnection( login, password );
+			}
+		} catch (JMSException e) {
+			throw log.unableToOpenJMSConnection( indexName, jmsQueueName, e );
 		}
 	}
 
