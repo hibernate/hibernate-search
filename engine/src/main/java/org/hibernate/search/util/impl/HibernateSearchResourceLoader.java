@@ -31,9 +31,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.solr.common.ResourceLoader;
-import org.apache.solr.util.plugin.ResourceLoaderAware;
-
+import org.apache.lucene.analysis.util.ResourceLoader;
+import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.hibernate.search.SearchException;
 
 /**
@@ -102,5 +101,10 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 			( (ResourceLoaderAware) instance ).inform( this );
 		}
 		return instance;
+	}
+
+	@Override
+	public <T> T newInstance(String arg0, Class<T> arg1) {
+		return null; //TODO ?
 	}
 }

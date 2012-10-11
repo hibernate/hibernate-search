@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.util.ResourceLoader;
+import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.util.Version;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.solr.analysis.TokenizerChain;
 import org.apache.lucene.analysis.util.TokenizerFactory;
-import org.apache.solr.common.ResourceLoader;
-import org.apache.solr.util.plugin.ResourceLoaderAware;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.annotations.AnalyzerDef;
