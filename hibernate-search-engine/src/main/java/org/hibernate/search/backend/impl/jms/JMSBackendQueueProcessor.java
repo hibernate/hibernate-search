@@ -37,7 +37,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
@@ -88,19 +87,9 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
 			factory = ( QueueConnectionFactory ) initialContext.lookup( jmsConnectionFactoryName );
 			jmsQueue = ( Queue ) initialContext.lookup( jmsQueueName );
-
 		}
 		catch ( NamingException e ) {
-			throw new SearchException(
-					"Unable to lookup Search queue ("
-							+ ( jmsQueueName != null ?
-							jmsQueueName :
-							"null" ) + ") and connection factory ("
-							+ ( jmsConnectionFactoryName != null ?
-							jmsConnectionFactoryName :
-							"null" ) + ")",
-					e
-			);
+			throw log.jmsLookupException( jmsQueueName, jmsConnectionFactoryName, indexName, e );
 		}
 		final String login = props.getProperty( JMS_CONNECTION_LOGIN );
 		final String password = props.getProperty( JMS_CONNECTION_PASSWORD );
