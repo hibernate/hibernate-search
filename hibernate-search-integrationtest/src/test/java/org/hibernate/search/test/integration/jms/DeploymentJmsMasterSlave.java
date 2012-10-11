@@ -46,6 +46,7 @@ import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 /**
  * Create deployments for JMS Master/Slave configuration integration tests.
+ * Make sure to test fo a secured JMS environment.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
@@ -87,13 +88,25 @@ public class DeploymentJmsMasterSlave {
 						.name( "hibernate.search.default.worker.backend" )
 						.value( "jms" )
 						.up()
+					//We could use a Local ConnectionFactory but then we would bypass the authentication:
+					//we actually want to verify we're able to authenticate
 					.createProperty()
-					.	name( "hibernate.search.default.worker.jms.connection_factory" )
-						.value( "ConnectionFactory" )
+						.name( "hibernate.search.default.worker.jms.connection_factory" )
+						.value( "RemoteConnectionFactory" )
 						.up()
 					.createProperty()
 						.name( "hibernate.search.default.worker.jms.queue" )
 						.value( RegistrationConfiguration.DESTINATION_QUEUE )
+						.up()
+					//Authentication credentials are specified in the AS7 configuration files
+					//See properties files in server/standalone/configuration
+					.createProperty()
+						.name( "hibernate.search.default.worker.jms.login" )
+						.value( "guest" )
+						.up()
+					.createProperty()
+						.name( "hibernate.search.default.worker.jms.password" )
+						.value( "password" )
 						.up()
 					.up()
 				.up();
