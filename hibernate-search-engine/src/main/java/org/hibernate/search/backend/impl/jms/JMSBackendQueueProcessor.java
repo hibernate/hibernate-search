@@ -29,7 +29,9 @@ import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.jms.JMSException;
 import javax.jms.Queue;
+import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -62,8 +64,13 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 	private QueueConnectionFactory factory;
 	private String indexName;
 	private SearchFactoryImplementor searchFactory;
+	private QueueConnection connection;
+
 	public static final String JMS_CONNECTION_FACTORY = Environment.WORKER_PREFIX + "jms.connection_factory";
 	public static final String JMS_QUEUE = Environment.WORKER_PREFIX + "jms.queue";
+	public static final String JMS_CONNECTION_LOGIN = Environment.WORKER_PREFIX + "jms.login";
+	public static final String JMS_CONNECTION_PASSWORD = Environment.WORKER_PREFIX + "jms.password";
+
 	private IndexManager indexManager;
 
 	private static final Log log = LoggerFactory.make();
@@ -77,25 +84,6 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
 		this.searchFactory = context.getUninitializedSearchFactory();
-		prepareJMSTools();
-	}
-
-	public QueueConnectionFactory getJMSFactory() {
-		return factory;
-	}
-
-	public Queue getJmsQueue() {
-		return jmsQueue;
-	}
-
-	public String getJmsQueueName() {
-		return jmsQueueName;
-	}
-
-	public void prepareJMSTools() {
-		if ( jmsQueue != null && factory != null ) {
-			return;
-		}
 		try {
 			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
 			factory = ( QueueConnectionFactory ) initialContext.lookup( jmsConnectionFactoryName );
@@ -114,14 +102,30 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 					e
 			);
 		}
+		final String login = props.getProperty( JMS_CONNECTION_LOGIN );
+		final String password = props.getProperty( JMS_CONNECTION_PASSWORD );
+		try {
+			if ( login == null && password == null ) {
+				connection = factory.createQueueConnection();
+			}
+			else {
+				connection = factory.createQueueConnection( login, password );
+			}
+		} catch (JMSException e) {
+			throw log.unableToOpenJMSConnection( indexName, jmsQueueName, e );
+		}
+	}
+
+	public Queue getJmsQueue() {
+		return jmsQueue;
+	}
+
+	public String getJmsQueueName() {
+		return jmsQueueName;
 	}
 
 	public SearchFactoryImplementor getSearchFactory() {
 		return searchFactory;
-	}
-
-	public void close() {
-		// no need to release anything
 	}
 
 	@Override
@@ -148,6 +152,20 @@ public class JMSBackendQueueProcessor implements BackendQueueProcessor {
 	@Override
 	public void indexMappingChanged() {
 		// no-op
+	}
+
+	public QueueConnection getJMSConnection() {
+		return connection;
+	}
+
+	public void close() {
+		try {
+			if ( connection != null )
+				connection.close();
+		}
+		catch ( JMSException e ) {
+			log.unableToCloseJmsConnection( jmsQueueName, e );
+		}
 	}
 
 }

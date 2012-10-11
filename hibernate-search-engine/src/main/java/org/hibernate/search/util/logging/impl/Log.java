@@ -22,28 +22,27 @@
  */
 package org.hibernate.search.util.logging.impl;
 
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.TRACE;
+import static org.jboss.logging.Logger.Level.WARN;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.CorruptIndexException;
+import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.errors.EmptyQueryException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
-
-import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
-import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.errors.EmptyQueryException;
-
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.TRACE;
-import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -643,4 +642,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 161, value = "@Longitude definition for class '%1$s' is ambiguous: specified on both fields '%2$s' and '%3$s'")
 	SearchException ambiguousLongitudeDefinition(String beanXClassName, String firstField, String secondField);
+
+	@Message(id = 162, value = "Unable to open JMS connection on queue '%2$s' for index '%1$s'")
+	SearchException unableToOpenJMSConnection(String indexName, String jmsQueueName, @Cause Throwable e);
+
+	@Message(id = 163, value = "Unable to send Search work to JMS queue '%2$s' for index '%1$s'")
+	SearchException unableToSendJMSWork(String indexName, String jmsQueueName, @Cause Throwable e);
 }
