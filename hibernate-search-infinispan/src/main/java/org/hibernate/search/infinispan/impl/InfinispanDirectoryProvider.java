@@ -29,6 +29,7 @@ import org.infinispan.Cache;
 import org.infinispan.lucene.InfinispanDirectory;
 import org.infinispan.manager.EmbeddedCacheManager;
 
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.CacheManagerServiceProvider;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
@@ -53,7 +54,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	public static final String DEFAULT_INDEXESMETADATA_CACHENAME = "LuceneIndexesMetadata";
 
-	private BuildContext context;
+	private ServiceManager serviceManager;
 	private String directoryProviderName;
 
 	private String metadataCacheName;
@@ -68,7 +69,8 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.directoryProviderName = directoryProviderName;
-		this.context = context;
+		this.serviceManager = context.getServiceManager();
+		this.cacheManager = serviceManager.requestService( CacheManagerServiceProvider.class, context );
 		metadataCacheName = properties.getProperty( "metadata_cachename", DEFAULT_INDEXESMETADATA_CACHENAME );
 		dataCacheName = properties.getProperty( "data_cachename", DEFAULT_INDEXESDATA_CACHENAME );
 		lockingCacheName = properties.getProperty( "locking_cachename", DEFAULT_LOCKING_CACHENAME );
@@ -80,7 +82,6 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	@Override
 	public void start(DirectoryBasedIndexManager indexManager) {
 		log.debug( "Starting InfinispanDirectory" );
-		cacheManager = context.requestService( CacheManagerServiceProvider.class );
 		cacheManager.startCaches( metadataCacheName, dataCacheName, lockingCacheName );
 		Cache metadataCache = cacheManager.getCache( metadataCacheName );
 		Cache dataCache = cacheManager.getCache( dataCacheName );
@@ -93,7 +94,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	@Override
 	public void stop() {
 		directory.close();
-		context.releaseService( CacheManagerServiceProvider.class );
+		serviceManager.releaseService( CacheManagerServiceProvider.class );
 		log.debug( "Stopped InfinispanDirectory" );
 	}
 
