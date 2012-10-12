@@ -38,7 +38,6 @@ public interface TwoWayFieldBridge extends FieldBridge {
 	 *
 	 * @param name field name
 	 * @param document document
-	 *
 	 * @return The return value is the entity property value.
 	 */
 	Object get(String name, Document document);

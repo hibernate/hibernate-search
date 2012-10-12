@@ -38,8 +38,7 @@ public interface FieldLoadingStrategy {
 	 * load the next array of cached data.
 	 *
 	 * @param reader the {@code IndexReader} for which to load the new cache values
-	 *
-	 * @throws IOException in case an error occurs reading the cache values from the index
+	 * @throws java.io.IOException in case an error occurs reading the cache values from the index
 	 */
 	public void loadNewCacheValues(IndexReader reader) throws IOException;
 
@@ -48,7 +47,6 @@ public interface FieldLoadingStrategy {
 	 * Only at this point we convert primitives into an object if needed.
 	 *
 	 * @param relativeDocId the doc id relative to the current reader
-	 *
 	 * @return the cached field value for the document with the relative id {@code relativeDocId}.
 	 */
 	public Object collect(int relativeDocId);

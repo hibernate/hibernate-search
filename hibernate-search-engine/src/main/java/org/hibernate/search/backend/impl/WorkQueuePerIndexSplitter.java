@@ -30,9 +30,9 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
- * Used by {@link ContextAwareSelectionDelegate} to split a list of operations
+ * Used by {@link org.hibernate.search.backend.impl.ContextAwareSelectionDelegate} to split a list of operations
  * according to the multiple IndexManagers it needs to be routed to.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class WorkQueuePerIndexSplitter {
@@ -54,6 +54,8 @@ public class WorkQueuePerIndexSplitter {
 	/**
 	 * Send all operations stored so far to the backend to be performed, atomically and/or transactionally
 	 * if supported/enabled by each specific backend.
+	 *
+	 * @param monitor a {@link org.hibernate.search.backend.IndexingMonitor} object.
 	 */
 	public void commitOperations(IndexingMonitor monitor) {
 		// FIXME move executor here to parallel work - optionally? See HSEARCH-826

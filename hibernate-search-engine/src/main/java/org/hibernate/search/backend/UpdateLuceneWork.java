@@ -30,7 +30,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
  * Carries a Lucene update operation from the engine to the backend
- * 
+ *
  * @since 4.0
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */

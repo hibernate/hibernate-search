@@ -57,7 +57,6 @@ public class ClassLoaderHelper {
 	 *
 	 * @param resourceName the resource name
 	 * @param caller the caller
-	 *
 	 * @return found resource URLs
 	 */
 	public static Enumeration<URL> getResources(String resourceName, Class<?> caller) {
@@ -98,9 +97,7 @@ public class ClassLoaderHelper {
 	 * @param caller the class of the caller, needed for classloading purposes
 	 * @param componentDescription a meaningful description of the role the instance will have,
 	 * used to enrich error messages to describe the context of the error
-	 *
 	 * @return a new instance of classNameToLoad
-	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * classNotFound, missing proper constructor, wrong type, security errors.
 	 */
@@ -118,9 +115,7 @@ public class ClassLoaderHelper {
 	 * @param targetSuperType the created instance will be checked to be assignable to this type
 	 * @param classToLoad the class to be instantiated
 	 * @param componentDescription a role name/description to contextualize error messages
-	 *
 	 * @return a new instance of classToLoad
-	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * missing proper constructor, wrong type, security errors.
 	 */

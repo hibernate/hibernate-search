@@ -69,7 +69,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * Defines the underlying Lucene query
 	 *
 	 * @param query the Lucene query
-	 *
 	 * @return {@code this} to allow method chaining
 	 */
 	HSQuery luceneQuery(Query query);
@@ -78,7 +77,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * Defines the targeted entities. This helps to reduce the number of targeted indexes.
 	 *
 	 * @param classes the list of classes (indexes) targeted by this query
-	 *
 	 * @return {@code this} to allow for method chaining
 	 */
 	HSQuery targetedEntities(List<Class<?>> classes);
@@ -90,7 +88,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * order the Hibernate objects.
 	 *
 	 * @param sort The Lucene sort object.
-	 *
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery sort(Sort sort);
@@ -100,7 +97,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * Semi-deprecated? a preferred way is to use the @FullTextFilterDef approach
 	 *
 	 * @param filter The Lucene filter.
-	 *
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery filter(Filter filter);
@@ -110,7 +106,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * Defaults to returning {@link org.hibernate.search.query.engine.QueryTimeoutException}
 	 *
 	 * @param exceptionFactory the timeout exception factory to use
-	 *
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory);
@@ -126,7 +121,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * If the projected field is not a projectable field, null is returned in the object[]
 	 *
 	 * @param fields the projected field names
-	 *
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery projection(String... fields);
@@ -136,7 +130,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * retrieved beginning from element <tt>0</tt>.
 	 *
 	 * @param firstResult a element number, numbered from <tt>0</tt>
-	 *
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery firstResult(int firstResult);
@@ -217,7 +210,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * in the current query
 	 *
 	 * @param documentId Lucene Document id to be explain. This is NOT the object id
-	 *
 	 * @return Lucene Explanation
 	 */
 	Explanation explain(int documentId);
@@ -226,7 +218,6 @@ public interface HSQuery extends ProjectionConstants {
 	 * Enable a given filter by its name.
 	 *
 	 * @param name the name of the filter to enable
-	 *
 	 * @return Returns a {@code FullTextFilter} object that allows filter parameter injection
 	 */
 	FullTextFilter enableFullTextFilter(String name);
@@ -239,21 +230,25 @@ public interface HSQuery extends ProjectionConstants {
 	void disableFullTextFilter(String name);
 
 	/**
-	 * @return the {@code SearchFactoryImplementor} instance
+	 * <p>getSearchFactoryImplementor.</p>
 	 *
+	 * @return the {@code SearchFactoryImplementor} instance
 	 * @deprecated should be at most SearchFactoryIntegrator, preferably removed altogether
 	 */
 	SearchFactoryImplementor getSearchFactoryImplementor();
 
 	/**
-	 * @param searchFactory
+	 * <p>afterDeserialise.</p>
+	 *
+	 * @param searchFactory a {@link org.hibernate.search.engine.spi.SearchFactoryImplementor} object.
 	 */
 	void afterDeserialise(SearchFactoryImplementor searchFactory);
 
 	/**
+	 * <p>setSpatialParameters.</p>
+	 *
 	 * @param center center of the spatial search
 	 * @param fieldName name ot the spatial field
-	 *
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery setSpatialParameters(Point center, String fieldName);

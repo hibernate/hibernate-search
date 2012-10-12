@@ -22,6 +22,7 @@ package org.hibernate.search.query.dsl;
 
 /**
  * Units for DSL queries
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public enum Unit {

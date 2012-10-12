@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  * Defines the temporal resolution of a given field
  * Calendar are stored as String in GMT
  *
- * @author Amin Mohammed-Coleman 
+ * @author Amin Mohammed-Coleman
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( {ElementType.FIELD, ElementType.METHOD} )

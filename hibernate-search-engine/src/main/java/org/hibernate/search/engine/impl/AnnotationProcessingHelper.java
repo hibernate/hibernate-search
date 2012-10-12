@@ -60,7 +60,6 @@ public final class AnnotationProcessingHelper {
 	 * @param index is the field indexed or not
 	 * @param analyze should the field be analyzed
 	 * @param norms are norms to be added to index
-	 *
 	 * @return Returns the Lucene {@link org.apache.lucene.document.Field.Index} value for a given field
 	 */
 	public static Field.Index getIndex(Index index, Analyze analyze, Norms norms) {

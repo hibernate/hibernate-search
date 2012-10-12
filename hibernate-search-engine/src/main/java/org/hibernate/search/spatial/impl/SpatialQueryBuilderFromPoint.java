@@ -46,9 +46,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
-	 *
 	 * @return Lucene filter to be used in a Query
-	 *
 	 * @see org.apache.lucene.search.Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 * @see org.apache.lucene.search.Filter
@@ -68,9 +66,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
 	 * @param coordinatesField name of the Lucene Field implementing Coordinates
-	 *
 	 * @return Lucene filter to be used in a Query
-	 *
 	 * @param previousFilter	preceding filter in filter chain
 	 * Warning if passed null DistanceFilter constructor use a
 	 * filter wrapped match all query (time/resource consuming !)
@@ -90,9 +86,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @param radius distance max to center in km
 	 * @param latitudeField name of the Lucene Field hosting latitude
 	 * @param longitudeField name of the Lucene Field hosting longitude
-	 *
 	 * @return Lucene filter to be used in a Query
-	 *
 	 * @param previousFilter	preceding filter in filter chain
 	 * Warning if passed null DistanceFilter constructor use a
 	 * filter wrapped match all query (time/ressource consuming !)
@@ -113,9 +107,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
-	 *
 	 * @return Lucene Query to be used in a search
-	 *
 	 * @see org.apache.lucene.search.Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
@@ -131,9 +123,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
-	 *
 	 * @return Lucene Query to be used in a search
-	 *
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
@@ -150,9 +140,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
-	 *
 	 * @return Lucene Query to be used in a search
-	 *
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
@@ -174,9 +162,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
-	 *
 	 * @return Lucene Query to be used in a search
-	 *
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */

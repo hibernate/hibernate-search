@@ -27,13 +27,13 @@ import org.jgroups.View;
 
 
 /**
- * <p>This {@link NodeSelectorStrategy} is a static configuration for the local
+ * <p>This {@link org.hibernate.search.backend.impl.jgroups.NodeSelectorStrategy} is a static configuration for the local
  * node to always process index operations locally, and accept index operations
  * from remote nodes configured as slaves.</p>
- * 
+ *
  * <p>JGroups does not provide a persistent queue, if that level of reliability
  * is needed, use the JMS backend.</p>
- * 
+ *
  * <p>This implementation matches the {@literal jgroupsMaster} configuration property.</p>
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.

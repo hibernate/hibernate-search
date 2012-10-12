@@ -221,9 +221,8 @@ public abstract class FileHelper {
 	 * Reads the provided input stream into a string
 	 *
 	 * @param inputStream the input stream to read from
-	 *
 	 * @return the content of the input stream as string
-	 * @throws IOException in case an error occurs reading from the input stream
+	 * @throws java.io.IOException in case an error occurs reading from the input stream
 	 */
 	public static String readInputStream(InputStream inputStream) throws IOException {
 		Writer writer = new StringWriter();
@@ -244,6 +243,7 @@ public abstract class FileHelper {
 
 	/**
 	 * Load a resource from a specific classLoader
+	 *
 	 * @param resourceName the name of the resource
 	 * @param classLoader the classloader to use, or null to try the ContextClassloader first or the loading one second.
 	 * @return the resource contents as a String

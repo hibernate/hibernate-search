@@ -41,9 +41,7 @@ public final class Rectangle {
 	 *
 	 * @param center of the search area
 	 * @param radius of the search area
-	 *
 	 * @return a bounding box for the area
-	 *
 	 * @see <a href="http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates">Bouding box on Earth calculation</a>
 	 */
 	public static Rectangle fromBoundingCircle(Point center, double radius) {

@@ -66,7 +66,7 @@ public @interface ClassBridge {
 	Analyze analyze() default Analyze.YES;
 
 	/**
-	 * @return Returns a {@code StoreNorm} enum defining whether the norms should be stored in the index or not. Defaults to {@code StoreNorm.YES}
+	 * @return Returns a {@code Norms} enum defining whether the norms should be stored in the index or not. Defaults to {@code Norms.YES}
 	 */
 	Norms norms() default Norms.YES;
 

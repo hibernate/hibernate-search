@@ -67,7 +67,6 @@ public class ClassLoadingStrategySelector {
 	 * Extracts (if possible) the two way string bridge from a given two way field bridge
 	 *
 	 * @param fieldBridge the field bridge from which to extract (unwrap) the two way string bridge
-	 *
 	 * @return the underlying string bridge or {@code null} if we can't extract it
 	 */
 	public static TwoWayStringBridge getTwoWayStringBridge(TwoWayFieldBridge fieldBridge) {

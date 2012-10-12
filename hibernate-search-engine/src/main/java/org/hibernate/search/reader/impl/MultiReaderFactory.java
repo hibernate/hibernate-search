@@ -33,7 +33,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Creates and closes the IndexReaders encompassing multiple indexes.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class MultiReaderFactory {

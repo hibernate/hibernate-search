@@ -35,7 +35,7 @@ import org.hibernate.search.SearchException;
  * - to avoid managing NumberFormatException and similar code
  * - ensure consistent error messages across Configuration parsing problems
  * - locate resources
- * 
+ *
  * @author Sanne Grinovero
  * @author Steve Ebersole
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -94,6 +94,7 @@ public abstract class ConfigurationParseHelper {
 	
 	/**
 	 * Parses a String to get an int value.
+	 *
 	 * @param value A string containing an int value to parse
 	 * @param errorMsgOnParseFailure message being wrapped in a SearchException if value is null or not correct.
 	 * @return the parsed value
@@ -147,6 +148,7 @@ public abstract class ConfigurationParseHelper {
 
 	/**
 	 * Parses a string to recognize exactly either "true" or "false".
+	 *
 	 * @param value the string to be parsed
 	 * @param errorMsgOnParseFailure the message to be put in the exception if thrown
 	 * @return true if value is "true", false if value is "false"
@@ -170,9 +172,10 @@ public abstract class ConfigurationParseHelper {
 
 	/**
 	 * Extracts a boolean value from configuration properties
+	 *
 	 * @param cfg configuration Properties
 	 * @param key the property key
-	 * @param defaultValue
+	 * @param defaultValue a boolean.
 	 * @return the defaultValue if the property was not defined
 	 * @throws SearchException for invalid format or values.
 	 */

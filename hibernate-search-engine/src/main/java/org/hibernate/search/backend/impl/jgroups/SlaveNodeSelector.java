@@ -26,16 +26,16 @@ import org.jgroups.View;
 
 
 /**
- * <p>This {@link NodeSelectorStrategy} is a static configuration for the local
+ * <p>This {@link org.hibernate.search.backend.impl.jgroups.NodeSelectorStrategy} is a static configuration for the local
  * node to avoid processing any indexing operations locally.
  * It is assumed that some other node in the cluster will process it; which
  * node exactly is unknown, so messages are broadcasted to the group.</p>
- * 
+ *
  * <p>There is no guarantee of processing: if no master picks up the task,
  * the index update operation is skipped. This can be mitigated by making
  * sure at least one master is always online; if a persistent queue is
  * needed it's better to use the JMS backend.</p>
- * 
+ *
  * <p>This implementation matches the {@literal jgroupsSlave} configuration property.</p>
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.

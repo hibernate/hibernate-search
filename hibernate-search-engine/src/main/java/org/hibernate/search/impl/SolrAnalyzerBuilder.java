@@ -65,7 +65,6 @@ final class SolrAnalyzerBuilder {
 	 *
 	 * @param analyzerDef The <code>AnalyzerDef</code> annotation as found in the annotated domain class.
 	 * @param luceneMatchVersion The lucene version (required since Lucene 3.x)
-	 *
 	 * @return a Lucene <code>Analyzer</code>
 	 */
 	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) {

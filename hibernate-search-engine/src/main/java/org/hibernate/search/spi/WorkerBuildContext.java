@@ -42,7 +42,6 @@ public interface WorkerBuildContext extends BuildContext {
 	 * @return {@code true} if it is safe to assume that the information we have about
 	 * index metadata is accurate. This should be set to false for example if the index
 	 * could contain Documents related to types not known to this SearchFactory instance.
-	 *
 	 * @see org.hibernate.search.cfg.spi.SearchConfiguration#isIndexMetadateComplete
 	 */
 	boolean isIndexMetadataComplete();

@@ -26,10 +26,10 @@ import org.hibernate.search.spi.InstanceInitializer;
 
 /**
  * Suggested base class to create custom SearchConfiguration implementations.
- * We might need to add new methods to the {@link SearchConfiguration} interface,
+ * We might need to add new methods to the {@link org.hibernate.search.cfg.spi.SearchConfiguration} interface,
  * in that case we can add default implementations here to avoid breaking
  * integration code.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public abstract class SearchConfigurationBase implements SearchConfiguration {

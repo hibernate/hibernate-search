@@ -83,7 +83,6 @@ public final class DirectoryProviderHelper {
 	 * @param indexName the name of the index (directory) to create
 	 * @param properties the configuration properties
 	 * @param needWritePermissions when true the directory will be tested for read-write permissions.
-	 *
 	 * @return The file representing the source directory
 	 */
 	public static File getSourceDirectory(String indexName, Properties properties, boolean needWritePermissions) {
@@ -126,10 +125,8 @@ public final class DirectoryProviderHelper {
 	 *
 	 * @param indexDir the directory where to write a new index
 	 * @param properties the configuration properties
-	 *
 	 * @return the created {@code FSDirectory} instance
-	 *
-	 * @throws IOException if an error
+	 * @throws java.io.IOException if an error
 	 */
 	public static FSDirectory createFSIndex(File indexDir, Properties properties) throws IOException {
 		LockFactory lockFactory = createLockFactory( indexDir, properties );
@@ -146,6 +143,7 @@ public final class DirectoryProviderHelper {
 
 	/**
 	 * Initialize the Lucene Directory if it isn't already.
+	 *
 	 * @param directory the Directory to initialize
 	 * @throws SearchException in case of lock acquisition timeouts, IOException, or if a corrupt index is found
 	 */
@@ -177,11 +175,9 @@ public final class DirectoryProviderHelper {
 	 *
 	 * @param indexDir the directory to use to store locks, if needed by implementation
 	 * @param dirConfiguration the configuration of current DirectoryProvider
-	 *
 	 * @return the LockFactory as configured, or a SimpleFSLockFactory
 	 *         in case of configuration errors or as a default.
-	 *
-	 * @throws IOException
+	 * @throws IOException if any.
 	 */
 	public static LockFactory createLockFactory(File indexDir, Properties dirConfiguration) {
 		//For FS-based indexes default to "native", default to "single" otherwise.
@@ -231,10 +227,8 @@ public final class DirectoryProviderHelper {
 	 * @param annotatedIndexName The index name declared on the @Indexed annotation
 	 * @param properties The properties may override the indexname.
 	 * @param verifyIsWritable Verify the directory is writable
-	 *
 	 * @return the File representing the Index Directory
-	 *
-	 * @throws SearchException
+	 * @throws SearchException if any.
 	 */
 	public static File getVerifiedIndexDir(String annotatedIndexName, Properties properties, boolean verifyIsWritable) {
 		String indexBase = properties.getProperty( INDEX_BASE_PROP_NAME, "." );
@@ -321,7 +315,6 @@ public final class DirectoryProviderHelper {
 	 *
 	 * @param indexName the index name
 	 * @param properties the configuration properties
-	 *
 	 * @return the number of Bytes to use as "chunk size" in file copy operations.
 	 */
 	public static long getCopyBufferSize(String indexName, Properties properties) {

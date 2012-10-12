@@ -31,7 +31,7 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
  * The object source integration should catch this and throw a
  * relevant exception for the object source. For example in Hibernate Core, an
  * {@link org.hibernate.QueryTimeoutException}.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */

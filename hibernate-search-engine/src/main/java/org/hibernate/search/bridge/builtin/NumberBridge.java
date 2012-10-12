@@ -27,7 +27,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 
 /**
  * Base class for numbers - integer, double, etc.
- * 
+ *
  * @author Emmanuel Bernard
  */
 public abstract class NumberBridge implements TwoWayStringBridge {

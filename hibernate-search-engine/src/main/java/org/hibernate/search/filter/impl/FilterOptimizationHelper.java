@@ -34,7 +34,7 @@ import org.apache.lucene.util.OpenBitSet;
 /**
  * Helper class to apply some common optimizations when
  * several Filters are applied.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class FilterOptimizationHelper {
@@ -42,7 +42,8 @@ public class FilterOptimizationHelper {
 	/**
 	 * Returns a new list of DocIdSet, applying binary AND
 	 * on all DocIdSet implemented by using BitSet or OpenBitSet.
-	 * @param docIdSets
+	 *
+	 * @param docIdSets a {@link java.util.List} object.
 	 * @return the same list if no changes were done
 	 */
 	public static List<DocIdSet> mergeByBitAnds(List<DocIdSet> docIdSets) {

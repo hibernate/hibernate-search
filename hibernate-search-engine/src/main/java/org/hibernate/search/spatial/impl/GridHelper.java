@@ -45,7 +45,6 @@ public abstract class GridHelper {
 	 * @param coordinate position to compute the Index for
 	 * @param range range of the axis (-pi,pi)/(-90,90) => 2*pi/180 e.g
 	 * @param gridLevel Hox many time the range has been split in two
-	 *                  
 	 * @return the cell index on the axis
 	 */
 	public static int getCellIndex(double coordinate, double range, int gridLevel) {
@@ -57,7 +56,6 @@ public abstract class GridHelper {
 	 *
 	 * @param point position to compute the Grid Cell Id for
 	 * @param gridLevel Hox many time the dimensions have been split in two
-	 *                  
 	 * @return the cell id for the point at the given grid level
 	 */
 	public static String getGridCellId(Point point, int gridLevel) {
@@ -81,7 +79,6 @@ public abstract class GridHelper {
 	 * @param lowerLeft lower left corner of the bounding box
 	 * @param upperRight upper right corner of the bounding box
 	 * @param gridLevel grid level of the wanted cell ids
-	 *                  
 	 * @return List of ids of the cells containing the point
 	 */
 	public static List<String> getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel) {
@@ -159,7 +156,6 @@ public abstract class GridHelper {
 	 * @param center center of the search area
 	 * @param radius radius of the search area
 	 * @param gridLevel grid level of the wanted cell ids
-	 *                  
 	 * @return List of the ids of the cells covering the bounding box of the given search discus
 	 */
 	public static List<String> getGridCellsIds(Point center, double radius, int gridLevel) {
@@ -204,7 +200,6 @@ public abstract class GridHelper {
 	 * of the grid cells)
 	 *
 	 * @param searchRange search range to be covered by the grid cells
-	 *                    
 	 * @return Return the best Grid level for a given search radius.
 	 */
 	public static int findBestGridLevelForSearchRange(double searchRange) {
@@ -218,7 +213,6 @@ public abstract class GridHelper {
 	 * Project a degree latitude/longitude point into a sinusoidal projection planar space for grid cell ids computation
 	 *
 	 * @param point point to be projected
-	 *
 	 * @return array of projected coordinates
 	 */
 	public static double[] projectToIndexSpace(Point point) {

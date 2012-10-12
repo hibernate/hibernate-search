@@ -37,9 +37,7 @@ public interface TikaParseContextProvider {
 	 *
 	 * @param name the field name of the property which is processed by the Tika bridge
 	 * @param value the value to be indexed
-	 *
 	 * @return A {@code ParseContext} instance used by the Tika bridge to parse the data
-	 *
 	 * @see <a href="http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html">Tika API</a>
 	 */
 	public ParseContext getParseContext(String name, Object value);

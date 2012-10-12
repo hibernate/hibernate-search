@@ -40,7 +40,6 @@ public interface ConversionContext {
 	 * Decorates a FieldBridge.
 	 *
 	 * @param delegate set the bridge that shall be used by the decoration.
-	 *
 	 * @return a decorated FieldBridge which should be used instead of the original delegate.
 	 */
 	FieldBridge oneWayConversionContext(FieldBridge delegate);
@@ -49,7 +48,6 @@ public interface ConversionContext {
 	 * Decorates a TwoWayFieldBridge.
 	 *
 	 * @param delegate set the bridge that shall be used by the decoration.
-	 *
 	 * @return a decorated TwoWayFieldBridge which should be used instead of the original delegate.
 	 */
 	TwoWayFieldBridge twoWayConversionContext(TwoWayFieldBridge delegate);
@@ -58,7 +56,6 @@ public interface ConversionContext {
 	 * Decorates a StringBridge.
 	 *
 	 * @param delegate set the bridge that shall be used by the decoration.
-	 *
 	 * @return a decorated StringBridge which should be used instead of the original delegate.
 	 */
 	StringBridge stringConversionContext(StringBridge delegate);
@@ -67,7 +64,6 @@ public interface ConversionContext {
 	 * In case the next conversion fails, the error message will point to this type.
 	 *
 	 * @param beanClass the class type which is going to be converted
-	 *
 	 * @return this for method chaining.
 	 */
 	ConversionContext setClass(Class<?> beanClass);
@@ -88,7 +84,6 @@ public interface ConversionContext {
 	 * especially after exceptions.
 	 *
 	 * @param property the property which is being followed for embedded indexing
-	 *
 	 * @return this for method chaining.
 	 */
 	ConversionContext pushProperty(String property);

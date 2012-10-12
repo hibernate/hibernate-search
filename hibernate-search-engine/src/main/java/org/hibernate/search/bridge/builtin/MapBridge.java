@@ -25,7 +25,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
 /**
- * Each entry ({@code null included}) of the values in a {@link Map} is indexed using the specified {@link FieldBridge}.
+ * Each entry ({@code null included}) of the values in a {@link java.util.Map} is indexed using the specified {@link org.hibernate.search.bridge.FieldBridge}.
  * <br>
  * A {@code null} array is not indexed.
  *
@@ -37,7 +37,7 @@ public class MapBridge implements FieldBridge {
 
 	/**
 	 * @param bridge
-	 *            the {@link FieldBridge} used for each entry of a {@link java.util.Map} object.
+	 *            the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of a {@link java.util.Map} object.
 	 */
 	public MapBridge(FieldBridge bridge) {
 		this.bridge = bridge;

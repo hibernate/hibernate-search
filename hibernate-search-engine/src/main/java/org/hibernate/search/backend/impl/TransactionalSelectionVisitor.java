@@ -37,7 +37,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * This visitor applies the selection logic from the plugged IndexShardingStrategies to
  * transactional operations, so similar to StreamingSelectionVisitor but preparing a
  * context bound list of operations instead of sending all changes directly to the backend.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {

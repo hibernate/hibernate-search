@@ -40,7 +40,6 @@ public interface TermContext extends QueryCustomization<TermContext> {
 	 * fields need to be of the same type. For example, it is not possible to use this method with a mixture of
 	 * string and date properties. In the mixed case an alternative is to build multiple term queries and combine them
 	 * via {@link org.hibernate.search.query.dsl.QueryBuilder#bool()}
-	 *
 	 * @return {@code TermMatchingContext} to continue the term query
 	 */
 	TermMatchingContext onFields(String... field);

@@ -24,7 +24,7 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.builtin.IterableBridge;
 
 /**
- * An implementation of {@link IterableBridge} that can be used with Hibernate Search query DSL.
+ * An implementation of {@link org.hibernate.search.bridge.builtin.IterableBridge} that can be used with Hibernate Search query DSL.
  *
  * @author Davide D'Alto
  */
