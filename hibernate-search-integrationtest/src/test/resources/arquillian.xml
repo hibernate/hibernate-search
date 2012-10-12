@@ -15,7 +15,7 @@
         <configuration>
             <property name="jbossHome">${basedir}/target/jboss-as-${version.jboss.as}</property>
             <!-- Needed for JMS tests -->
-            <property name="serverConfig">standalone-full.xml</property>
+            <property name="serverConfig">standalone-securedjms.xml</property>
             <!-- To debug the Arquillian managed application server: -->
             <!-- <property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m -XX:MaxPermSize=128m</property> -->
         </configuration>

@@ -34,7 +34,6 @@ import javax.jms.QueueSession;
 
 import org.hibernate.search.util.logging.impl.Log;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
@@ -45,19 +44,19 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JMSBackendQueueTask implements Runnable {
+public class JmsBackendQueueTask implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
 
 	public static final String INDEX_NAME_JMS_PROPERTY = "HSearchIndexName";
 
 	private final Collection<LuceneWork> queue;
-	private final JMSBackendQueueProcessor processor;
+	private final JmsBackendQueueProcessor processor;
 	private final String indexName;
 	private final IndexManager indexManager;
 
-	public JMSBackendQueueTask(String indexName, Collection<LuceneWork> queue, IndexManager indexManager,
-					JMSBackendQueueProcessor jmsBackendQueueProcessor) {
+	public JmsBackendQueueTask(String indexName, Collection<LuceneWork> queue, IndexManager indexManager,
+					JmsBackendQueueProcessor jmsBackendQueueProcessor) {
 		this.indexName = indexName;
 		this.queue = queue;
 		this.indexManager = indexManager;
@@ -75,14 +74,13 @@ public class JMSBackendQueueTask implements Runnable {
 		if ( filteredQueue.size() == 0) return;
 		LuceneWorkSerializer serializer = indexManager.getSerializer();
 		byte[] data = serializer.toSerializedModel( filteredQueue );
-		processor.prepareJMSTools();
-		QueueConnection cnn = null;
 		QueueSender sender;
 		QueueSession session;
+		QueueConnection connection;
 		try {
-			cnn = processor.getJMSFactory().createQueueConnection();
+			connection = processor.getJMSConnection();
 			//TODO make transacted parameterized
-			session = cnn.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
+			session = connection.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
 			ObjectMessage message = session.createObjectMessage();
 			message.setObject( data );
 			message.setStringProperty( INDEX_NAME_JMS_PROPERTY, indexName );
@@ -93,16 +91,7 @@ public class JMSBackendQueueTask implements Runnable {
 			session.close();
 		}
 		catch (JMSException e) {
-			throw new SearchException( "Unable to send Search work to JMS queue: " + processor.getJmsQueueName(), e );
-		}
-		finally {
-			try {
-				if (cnn != null)
-					cnn.close();
-				}
-			catch ( JMSException e ) {
-				log.unableToCloseJmsConnection( processor.getJmsQueueName(), e );
-			}
+			throw log.unableToSendJMSWork( indexName, processor.getJmsQueueName(), e );
 		}
 	}
 }

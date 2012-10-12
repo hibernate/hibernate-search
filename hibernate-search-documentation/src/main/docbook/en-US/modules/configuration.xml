@@ -752,6 +752,20 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
             lookup the JMS queue from. The queue will be used to post work
             messages.</entry>
           </row>
+
+          <row>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jms.login</property></entry>
+
+            <entry>Optional for the JMS slaves. Use it when your queue requires login credentials
+            to define your login.</entry>
+          </row>
+
+          <row>
+            <entry><property>hibernate.search.&lt;indexName&gt;.​worker.jms.login</property></entry>
+
+            <entry>Optional for the JMS slaves. Use it when your queue requires login credentials
+            to define your password.</entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
@@ -813,6 +827,9 @@ hibernate.search.default.directory_provider = filesystem-slave
 hibernate.search.default.worker.backend = jms
 hibernate.search.default.worker.jms.connection_factory = /ConnectionFactory
 hibernate.search.default.worker.jms.queue = queue/hibernatesearch
+#optionally authentication credentials:
+hibernate.search.default.worker.jms.login = myname
+hibernate.search.default.worker.jms.password = wonttellyou
 #optional jndi configuration (check your JMS provider for more information)
 
 ## Optional asynchronous execution strategy
