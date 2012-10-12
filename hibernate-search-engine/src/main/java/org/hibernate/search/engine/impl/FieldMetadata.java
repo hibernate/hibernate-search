@@ -45,8 +45,6 @@ import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
-
 /**
  * Encapsulating the metadata for a single {@code @Field} annotation.
  *

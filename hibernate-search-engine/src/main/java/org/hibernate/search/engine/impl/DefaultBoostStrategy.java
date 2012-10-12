@@ -30,6 +30,12 @@ import org.hibernate.search.engine.BoostStrategy;
  */
 public final class DefaultBoostStrategy implements BoostStrategy {
 
+	public static final DefaultBoostStrategy INSTANCE = new DefaultBoostStrategy();
+
+	private DefaultBoostStrategy() {
+		//don't create unneeded instances
+	}
+
 	public float defineBoost(Object value) {
 		return 1.0f;
 	}
