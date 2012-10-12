@@ -83,9 +83,9 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	public void start(DirectoryBasedIndexManager indexManager) {
 		log.debug( "Starting InfinispanDirectory" );
 		cacheManager.startCaches( metadataCacheName, dataCacheName, lockingCacheName );
-		Cache metadataCache = cacheManager.getCache( metadataCacheName );
-		Cache dataCache = cacheManager.getCache( dataCacheName );
-		Cache lockingCache = cacheManager.getCache( lockingCacheName );
+		Cache<?,?> metadataCache = cacheManager.getCache( metadataCacheName );
+		Cache<?,?> dataCache = cacheManager.getCache( dataCacheName );
+		Cache<?,?> lockingCache = cacheManager.getCache( lockingCacheName );
 		directory = new InfinispanDirectory( metadataCache, dataCache, lockingCache, directoryProviderName, chunkSize );
 		DirectoryProviderHelper.initializeIndexIfNeeded( directory );
 		log.debugf( "Initialized Infinispan index: '%s'", directoryProviderName );
