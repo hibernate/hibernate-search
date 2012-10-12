@@ -112,7 +112,7 @@ public final class AnnotationProcessingHelper {
 	public static BoostStrategy getDynamicBoost(XProperty member) {
 		DynamicBoost boostAnnotation = member.getAnnotation( DynamicBoost.class );
 		if ( boostAnnotation == null ) {
-			return new DefaultBoostStrategy();
+			return DefaultBoostStrategy.INSTANCE;
 		}
 
 		Class<? extends BoostStrategy> boostStrategyClass = boostAnnotation.impl();

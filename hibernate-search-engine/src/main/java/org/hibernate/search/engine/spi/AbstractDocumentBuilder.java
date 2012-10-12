@@ -1134,7 +1134,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 		DynamicBoost boostAnnotation = element.getAnnotation( DynamicBoost.class );
 		if ( boostAnnotation == null ) {
-			return new DefaultBoostStrategy();
+			return DefaultBoostStrategy.INSTANCE;
 		}
 
 		Class<? extends BoostStrategy> boostStrategyClass = boostAnnotation.impl();
