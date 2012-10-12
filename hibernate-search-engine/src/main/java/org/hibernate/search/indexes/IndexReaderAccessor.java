@@ -23,7 +23,7 @@ package org.hibernate.search.indexes;
 import org.apache.lucene.index.IndexReader;
 
 /**
- * The {@code IndexReaderAccessor} exposes {@link IndexReader}s directly, making it possible to query the Lucene
+ * The {@code IndexReaderAccessor} exposes {@link org.apache.lucene.index.IndexReader}s directly, making it possible to query the Lucene
  * indexes directly bypassing Hibernate Search.
  * <p>
  * The returned IndexReader instances are always read-only and must be closed
@@ -55,10 +55,8 @@ public interface IndexReaderAccessor {
 	 * </p>
 	 *
 	 * @param entities the entity types for which to return a (multi)reader
-	 *
 	 * @return an IndexReader containing at least all listed entities
-	 *
-	 * @throws IllegalArgumentException if one of the specified classes is not indexed
+	 * @throws java.lang.IllegalArgumentException if one of the specified classes is not indexed
 	 */
 	IndexReader open(Class<?>... entities);
 
@@ -69,9 +67,7 @@ public interface IndexReaderAccessor {
 	 * queries on the combination of each index.
 	 *
 	 * @param indexNames At least one IndexManager name.
-	 *
 	 * @return an IndexReader instance.
-	 *
 	 * @throws org.hibernate.search.SearchException if the index manager to which the named index belongs failed to start
 	 */
 	IndexReader open(String... indexNames);

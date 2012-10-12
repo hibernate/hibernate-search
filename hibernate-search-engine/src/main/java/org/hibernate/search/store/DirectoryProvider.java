@@ -35,7 +35,7 @@ import org.hibernate.search.spi.BuildContext;
  * {@code equals()} and {@code hashCode()} must guaranty equality
  * between two providers pointing to the same underlying Lucene Store.
  * Besides that, {@code hashCode} ordering is used to avoid deadlock when locking a directory provider.
- * 
+ *
  * This class must be thread safe regarding {@code getDirectory()} calls
  *
  * @author Emmanuel Bernard

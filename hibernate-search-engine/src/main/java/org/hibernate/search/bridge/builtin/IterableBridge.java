@@ -24,7 +24,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 
 /**
  * Each entry ({@code null included}) of an {@link java.lang.Iterable} object is indexed using the specified
- * {@link FieldBridge}.
+ * {@link org.hibernate.search.bridge.FieldBridge}.
  * <br>
  * A {@code null} {@link java.lang.Iterable} object is not indexed.
  *
@@ -36,7 +36,7 @@ public class IterableBridge implements FieldBridge {
 
 	/**
 	 * @param bridge
-	 *            the {@link FieldBridge} used for each entry of the {@link java.lang.Iterable} object.
+	 *            the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of the {@link java.lang.Iterable} object.
 	 */
 	public IterableBridge(FieldBridge bridge) {
 		this.bridge = bridge;

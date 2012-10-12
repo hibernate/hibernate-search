@@ -36,6 +36,7 @@ import java.lang.annotation.Documented;
  * The factory method is used with a higher priority than a plain no-arg constructor when present
  * <br />
  * <code>&#64;Factory</code> currently works for &#64;FullTextFilterDef.impl classes
+ *
  * @see org.hibernate.search.annotations.Factory
  * @author Emmanuel Bernard
  */

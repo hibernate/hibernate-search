@@ -35,7 +35,7 @@ import org.hibernate.search.spi.ServiceProvider;
 
 /**
  * Wraps another SearchConfiguration to override it's ReflectionManager
- * 
+ *
  * @author Sanne Grinovero
  * @since 4.1
  */

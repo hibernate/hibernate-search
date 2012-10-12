@@ -61,7 +61,9 @@ public interface BackendQueueProcessor {
 	 * one was fully processed.
 	 * Work could be applied asynchronously according to capabilities and configuration of implementor.
 	 * A null parameter is not acceptable, implementations should throw an IllegalArgumentException.
+	 *
 	 * @param workList list of Lucene work instance which need to be applied to the index
+	 * @param monitor a {@link org.hibernate.search.backend.IndexingMonitor} object.
 	 */
 	void applyWork(List<LuceneWork> workList, IndexingMonitor monitor);
 
@@ -70,6 +72,7 @@ public interface BackendQueueProcessor {
 	 * even in parallel to a workList instance being processed by {@link #applyWork(List, IndexingMonitor)}
 	 *
 	 * @param singleOperation single Lucene work instance to be applied to the index
+	 * @param monitor a {@link org.hibernate.search.backend.IndexingMonitor} object.
 	 */
 	void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor);
 

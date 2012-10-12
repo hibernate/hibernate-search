@@ -26,7 +26,7 @@ import org.apache.lucene.util.Counter;
 
 /**
  * Lucene delegates responsibility for efficient time tracking to an external service;
- * this is needed for example by the {@link TimeLimitingCollector#TimeLimitingCollector(Collector, Counter, long)}
+ * this is needed for example by the {@link org.apache.lucene.search.TimeLimitingCollector#TimeLimitingCollector(Collector, Counter, long)}
  * used by Hibernate Search when time limits are enabled on fulltext queries.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
@@ -35,7 +35,7 @@ import org.apache.lucene.util.Counter;
 public interface TimingSource {
 
 	/**
-	 * Returns and approximation of {@link System#nanoTime()}.
+	 * Returns an approximation of {@link java.lang.System#nanoTime()}.
 	 * Performance should be preferred over accuracy by the implementation, but the value is monotonic
 	 * and expresses time in milliseconds, however, subsequent invocations could return the same value.
 	 *

@@ -52,6 +52,7 @@ import java.lang.annotation.Documented;
  *     Set<OrderLine> lines;<br>
  * }<br>
  * </code><br>
+ *
  * @see org.hibernate.search.annotations.Indexed
  * @see org.hibernate.search.annotations.IndexedEmbedded
  * @author Emmanuel Bernard

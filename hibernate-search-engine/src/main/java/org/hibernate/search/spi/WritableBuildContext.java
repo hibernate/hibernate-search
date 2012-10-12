@@ -25,7 +25,7 @@ package org.hibernate.search.spi;
 
 /**
  * Build context where new built element can be registered.
- * 
+ *
  * @author Emmanuel Bernard
  */
 public interface WritableBuildContext extends BuildContext {

@@ -119,6 +119,7 @@ public class WorkQueue {
 
 	/**
 	 * Returns an estimate of the to be performed operations
+	 *
 	 * @see org.hibernate.search.engine.impl.WorkPlan#size()
 	 * @return the approximate size
 	 */

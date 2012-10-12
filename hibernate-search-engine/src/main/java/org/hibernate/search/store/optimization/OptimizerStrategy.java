@@ -48,9 +48,7 @@ public interface OptimizerStrategy {
 	 * or at the start or end of a MassIndexer's work.
 	 *
 	 * @param writer the index writer
-	 *
 	 * @return {@code true} if optimisation occurred, {@code false} otherwise
-	 *
 	 * @throws SearchException in case of IO errors on the index
 	 */
 	boolean performOptimization(IndexWriter writer);

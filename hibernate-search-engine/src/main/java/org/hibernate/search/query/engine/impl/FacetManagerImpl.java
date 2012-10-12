@@ -45,7 +45,7 @@ import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 /**
- * Default implementation of the {@link FacetManager} implementation.
+ * Default implementation of the {@link org.hibernate.search.query.engine.spi.FacetManager} implementation.
  *
  * @author Hardy Ferentschik
  */

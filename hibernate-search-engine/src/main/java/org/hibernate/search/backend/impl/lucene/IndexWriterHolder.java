@@ -102,7 +102,6 @@ class IndexWriterHolder {
 	 *
 	 * @param errorContextBuilder might contain some context useful to provide when handling IOExceptions.
 	 * Is an optional parameter.
-	 *
 	 * @return a new IndexWriter or one already open.
 	 */
 	public IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {

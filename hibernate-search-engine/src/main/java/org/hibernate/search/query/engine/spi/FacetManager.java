@@ -39,7 +39,6 @@ public interface FacetManager {
 	 * Enable a facet request.
 	 *
 	 * @param facetingRequest the faceting request
-	 *
 	 * @return {@code this} to allow method chaining
 	 */
 	FacetManager enableFaceting(FacetingRequest facetingRequest);
@@ -55,10 +54,8 @@ public interface FacetManager {
 	 * Returns the {@code Facet}s for a given facet name
 	 *
 	 * @param facetingName the facet name for which to return the facet list
-	 *
 	 * @return the facet result list which corresponds to the facet request with the given name. The empty list
 	 *         is returned for an unknown facet name.
-	 *
 	 * @see #enableFaceting(org.hibernate.search.query.facet.FacetingRequest)
 	 */
 	List<Facet> getFacets(String facetingName);
@@ -69,7 +66,6 @@ public interface FacetManager {
 	 *
 	 * @param groupName the name the group. If the name is unknown an empty selection group is returned. {@code null}
 	 * is not allowed.
-	 *
 	 * @return the {@code FacetSelection} for this group name if it exists., otherwise a new selection is created.
 	 */
 	FacetSelection getFacetGroup(String groupName);

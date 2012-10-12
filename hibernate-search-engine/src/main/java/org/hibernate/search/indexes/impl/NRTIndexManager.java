@@ -37,14 +37,14 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * When using this work mode the IndexWriter does not need a full
  * flush at the end of each operation: new IndexReaders are able to
  * inspect the unflushed changes still pending in the IndexWriter buffers.
- * 
+ *
  * This improves write performance as the IndexWriter doesn't need
  * to commit as often, but has two limitations:
  * <ul>
  * <li>unsaved index data might be lost in case of crashes</li>
  * <li>is not useful for non-local (clustered) backends</li>
  * </ul>
- * 
+ *
  * @since 4.0
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */

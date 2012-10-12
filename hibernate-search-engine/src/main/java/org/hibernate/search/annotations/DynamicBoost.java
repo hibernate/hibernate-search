@@ -44,7 +44,6 @@ public @interface DynamicBoost {
 	/**
 	 * @return An implementation of <code>BoostStrategy</code> to apply a boost
 	 *         value as function of the annotated object.
-	 *
 	 * @see org.hibernate.search.engine.BoostStrategy
 	 */
 	public abstract Class<? extends BoostStrategy> impl();

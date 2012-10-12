@@ -28,7 +28,7 @@ import java.util.Map;
  * A simple LRU cache that implements the <code>Map</code> interface. Instances
  * are not thread-safe and should be synchronized externally, for instance by
  * using {@link java.util.Collections#synchronizedMap}.
- * 
+ *
  * @author Manuel Dominguez Sarmiento
  */
 public class LRUMap extends LinkedHashMap implements Serializable {

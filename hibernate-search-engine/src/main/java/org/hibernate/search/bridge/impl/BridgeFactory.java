@@ -245,7 +245,6 @@ public final class BridgeFactory {
 	 *
 	 * @param cb the class bridge annotation
 	 * @param clazz the {@code XClass} on which the annotation is defined on
-	 *
 	 * @return Returns the specified {@code FieldBridge} instance
 	 */
 	public static FieldBridge extractType(ClassBridge cb, XClass clazz) {
@@ -295,8 +294,9 @@ public final class BridgeFactory {
 	 *
 	 * @param spatial the {@code Spatial} annotation
 	 * @param clazz the {@code XClass} on which the annotation is defined on
-	 *
 	 * @return Returns the {@code SpatialFieldBridge} instance
+	 * @param latitudeField a {@link java.lang.String} object.
+	 * @param longitudeField a {@link java.lang.String} object.
 	 */
 	public static FieldBridge buildSpatialBridge(Spatial spatial, XClass clazz, String latitudeField, String longitudeField) {
 		FieldBridge bridge;
@@ -318,7 +318,6 @@ public final class BridgeFactory {
 	 *
 	 * @param spatial the {@code Spatial} annotation
 	 * @param member the {@code XMember} on which the annotation is defined on
-	 *
 	 * @return Returns the {@code SpatialFieldBridge} instance
 	 */
 	public static FieldBridge buildSpatialBridge(Spatial spatial, XMember member) {
@@ -340,8 +339,9 @@ public final class BridgeFactory {
 	 * This instantiates the SpatialFieldBridge from a {@code Spatial} annotation.
 	 *
 	 * @param spatial the {@code Spatial} annotation
-	 *
 	 * @return Returns the {@code SpatialFieldBridge} instance
+	 * @param latitudeField a {@link java.lang.String} object.
+	 * @param longitudeField a {@link java.lang.String} object.
 	 */
 	public static FieldBridge buildSpatialBridge(Spatial spatial, String latitudeField, String longitudeField) {
 		FieldBridge bridge = null;
@@ -791,12 +791,9 @@ public final class BridgeFactory {
 	 * @param fieldBridge the field bridge annotation
 	 * @param appliedOnType the type the bridge is applied on
 	 * @param reflectionManager The reflection manager instance
-	 *
 	 * @return a TwoWayFieldBridge instance if the Field Bridge is an instance of a TwoWayFieldBridge.
-	 *
 	 * @throws SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge.
 	 */
-
 	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge,
 													  XClass appliedOnType,
 													  ReflectionManager reflectionManager) {
@@ -816,7 +813,6 @@ public final class BridgeFactory {
 	 * @param fieldBridgeAnnotation the FieldBridge annotation
 	 * @param appliedOnType the type the bridge is applied on
 	 * @param reflectionManager The reflection manager instance
-	 *
 	 * @return FieldBridge
 	 */
 	public static FieldBridge extractType(org.hibernate.search.annotations.FieldBridge fieldBridgeAnnotation,

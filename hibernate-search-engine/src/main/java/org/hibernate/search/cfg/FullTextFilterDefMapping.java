@@ -48,7 +48,8 @@ public class FullTextFilterDefMapping {
 	
 	/**
 	 * Add cache implementation for fulltextfilterdef mapping
-	 * @param cache
+	 *
+	 * @param cache a {@link org.hibernate.search.annotations.FilterCacheModeType} object.
 	 * @return FullTextFilterDefMapping
 	 */
 	public FullTextFilterDefMapping cache(FilterCacheModeType cache) {

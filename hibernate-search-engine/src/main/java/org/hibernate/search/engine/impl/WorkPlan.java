@@ -107,7 +107,6 @@ public class WorkPlan {
 	 * This is meant for resource control for auto flushing of large pending batches.
 	 *
 	 * @return the approximation
-	 *
 	 * @see Environment#QUEUEINGPROCESSOR_BATCHSIZE
 	 */
 	public int size() {

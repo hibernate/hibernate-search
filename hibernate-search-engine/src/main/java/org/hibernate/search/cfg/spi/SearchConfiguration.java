@@ -76,7 +76,7 @@ public interface SearchConfiguration {
 	 * Returns a reflection manager if already available in the environment
 	 * null otherwise
 	 *
-     * @return ReflectionManager
+	 * @return ReflectionManager
 	 */
 	ReflectionManager getReflectionManager();
 
@@ -105,7 +105,7 @@ public interface SearchConfiguration {
 	/**
 	 * By default Hibernate Search expects to execute in the context of a transaction,
 	 * and will log warning when certain operations are executed out of such a scope.
-	 * 
+	 *
 	 * @return when returning {@code false} Search will avoid logging such warnings.
 	 */
 	boolean isTransactionManagerExpected();
@@ -121,7 +121,7 @@ public interface SearchConfiguration {
 
 	/**
 	 * @return {@code true} if we should treat indexed entities as implicitly annotated
-	 * with a {@link ProvidedId}, if no other Id is specified.
+	 * with a {@link org.hibernate.search.annotations.ProvidedId}, if no other Id is specified.
 	 */
 	boolean isIdProvidedImplicit();
 }

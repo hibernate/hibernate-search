@@ -97,7 +97,7 @@ public interface FullTextEntityManager extends EntityManager {
 	 * or all indexed entity types.
 	 * Instances cannot be reused.
 	 * @param types optionally restrict the operation to selected types
-	 * @return
+	 * @return a new MassIndexer
 	 */
 	public MassIndexer createIndexer(Class<?>... types);
 

@@ -31,7 +31,7 @@ import org.jgroups.View;
 /**
  * Abstract away message submission.
  * e.g. either via channel directly or using message dispatcher
- * 
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 public interface MessageSender {
@@ -48,22 +48,22 @@ public interface MessageSender {
 
 	/**
 	 * Send message.
-	 * 
+	 *
 	 * @param message the JGroups message
-	 * @throws Exception for any error
+	 * @throws java.lang.Exception for any error
 	 */
 	void send(Message message) throws Exception;
 
 	/**
 	 * Get sender's address.
-	 * 
+	 *
 	 * @return the sender's address
 	 */
 	Address getAddress();
 
 	/**
 	 * Get current view.
-	 * 
+	 *
 	 * @return the current cluster view
 	 */
 	View getView();

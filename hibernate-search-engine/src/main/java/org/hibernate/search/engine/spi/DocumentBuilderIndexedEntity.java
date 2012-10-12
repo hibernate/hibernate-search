@@ -435,8 +435,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param fieldToAnalyzerMap this maps gets populated while generating the <code>Document</code>.
 	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
 	 * @param objectInitializer used to ensure that all objects are initalized
-	 * @param conversionContext 
-	 *
+	 * @param conversionContext a {@link org.hibernate.search.bridge.spi.ConversionContext} object.
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
 	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer, ConversionContext conversionContext) {
@@ -720,10 +719,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * An IllegalStateException otherwise
 	 * <p/>
 	 * If the id is provided, we can't extract it from the entity
-	 *
-	 * @param entity The entity for which to return the id. Cannot be {@code null}.
-	 *
-	 * @return entity id
 	 */
 	@Override
 	public Serializable getId(Object entity) {

@@ -23,7 +23,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
 /**
- * Each entry ({@code null included}) of an array is indexed using the specified {@link FieldBridge}.
+ * Each entry ({@code null included}) of an array is indexed using the specified {@link org.hibernate.search.bridge.FieldBridge}.
  * <br>
  * A {@code null} array is not indexed.
  *
@@ -35,7 +35,7 @@ public class ArrayBridge implements FieldBridge {
 
 	/**
 	 * @param bridge
-	 *            the {@link FieldBridge} used for each entry of the array
+	 *            the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of the array
 	 */
 	public ArrayBridge(FieldBridge bridge) {
 		this.bridge = bridge;

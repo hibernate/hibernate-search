@@ -51,7 +51,7 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
 /**
  * This implementation of IndexManager is coupled to a
  * DirectoryProvider and a DirectoryBasedReaderProvider
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class DirectoryBasedIndexManager implements IndexManager {

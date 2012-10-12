@@ -33,7 +33,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Open a reader each time
- * 
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */

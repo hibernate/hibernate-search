@@ -30,7 +30,7 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 
 /**
  * Build context that can be used by some services at initialization
- * 
+ *
  * @author Emmanuel Bernard
  */
 public interface BuildContext {
@@ -52,7 +52,7 @@ public interface BuildContext {
 	 *   int size = directoryProviders.size();
 	 * }
 	 * </code>
-	 * where directoryProviders is a class variable. 
+	 * where directoryProviders is a class variable.
 	 */
 	SearchFactoryImplementor getUninitializedSearchFactory();
 
@@ -63,9 +63,8 @@ public interface BuildContext {
 	 * All callers of this method must call
 	 * (@link #releaseService}
 	 * or the service will not be released
-	 * 
-	 * @deprecated use {@link #getServiceManager()} instead
 	 *
+	 * @deprecated use {@link #getServiceManager()} instead
 	 * @param provider of the service
 	 * @param <T> class of the service
 	 * @return the service instance
@@ -76,9 +75,8 @@ public interface BuildContext {
 	/**
 	 * Release a service from duty. Each call to (@link #requestService} should be coupled with
 	 * a call to (@link #releaseService} when the service is no longer needed.
-	 * 
+	 *
 	 * @deprecated use {@link #getServiceManager()} instead
-	 * 
 	 * @param provider of the service
 	 */
 	@Deprecated
@@ -99,6 +97,7 @@ public interface BuildContext {
 	/**
 	 * For backends processing work asynchronously, they should catch all eventual errors in the ErrorHandler
 	 * to avoid losing information about the lost updates.
+	 *
 	 * @return the configured ErrorHandler
 	 */
 	ErrorHandler getErrorHandler();

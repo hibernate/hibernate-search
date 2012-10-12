@@ -48,13 +48,13 @@ public class SearchMappingBuilder {
 	 * This factory method takes a SearchConfiguration object
 	 * and returns a SearchMapping object which defines
 	 * the programmatic model for indexing entities and fields.
-	 * 
+	 *
 	 * Throws SearchException:
 	 * 1) No @Factory found
 	 * 2) Multiple @Factory found
 	 * 3) hibernate.search.model_mapping defines a class that cannot be found
 	 * 4) Cannot invoke the @Factory method to get new instance of SearchMapping
-	 * 
+	 *
 	 * @param cfg the search configuration
 	 * @return SearchMapping
 	 */

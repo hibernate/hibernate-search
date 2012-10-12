@@ -49,7 +49,6 @@ public final class JMXRegistrar {
 	 *
 	 * @param object the object to register
 	 * @param name the object name to register the bean under
-	 *
 	 * @return The registered object name
 	 */
 	public static String registerMBean(Object object, String name) {
@@ -68,8 +67,7 @@ public final class JMXRegistrar {
 	 * Unregister the MBean with the specified name.
 	 *
 	 * @param name The name of the bean to unregister. The {@code name} cannot be {@code null}
-	 *
-	 * @throws IllegalArgumentException In case the object name is {@code null}
+	 * @throws java.lang.IllegalArgumentException In case the object name is {@code null}
 	 */
 	public static void unRegisterMBean(String name) {
 		if ( name == null ) {
@@ -92,7 +90,7 @@ public final class JMXRegistrar {
 	 *
 	 * @param name the object name to check (as string)
 	 * @return {@code true} is there is a bean registered under the given name, {@code false} otherwise.
-	 * @throws IllegalArgumentException In case the object name is {@code null}
+	 * @throws java.lang.IllegalArgumentException In case the object name is {@code null}
 	 */
 	public static boolean isNameRegistered(String name) {
 		if ( name == null ) {

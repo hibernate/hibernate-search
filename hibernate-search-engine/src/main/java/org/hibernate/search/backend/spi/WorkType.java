@@ -25,8 +25,8 @@ package org.hibernate.search.backend.spi;
 
 /**
  * Enumeration of the different types of Lucene work. This enumeration is used to specify the type
- * of index operation to be executed. 
- * 
+ * of index operation to be executed.
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author John Griffin

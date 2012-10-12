@@ -55,7 +55,6 @@ import java.util.Set;
  * @author Dawid Kurzyniec
  * @author <a href="mailto:kabir.khan@jboss.org">Kabir Khan</a>
  * @author Emmanuel Bernard
-
  * @see		java.util.IdentityHashMap
  * @see		java.util.WeakHashMap
  */
@@ -178,7 +177,7 @@ public class WeakIdentityHashMap<K,V> /*extends AbstractMap*/ implements Map<K,V
 	 * sufficient to hold the mappings in the specified <tt>Map</tt>.
 	 *
 	 * @param t the map whose mappings are to be placed in this map.
-	 * @throws NullPointerException if the specified map is null.
+	 * @throws java.lang.NullPointerException if the specified map is null.
 	 */
 	public WeakIdentityHashMap(Map t) {
 		this( Math.max( (int) ( t.size() / DEFAULT_LOAD_FACTOR ) + 1, 16 ),

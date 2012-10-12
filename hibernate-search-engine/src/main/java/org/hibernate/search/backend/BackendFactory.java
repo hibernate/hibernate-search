@@ -97,7 +97,6 @@ public class BackendFactory {
 	 *
 	 * @param properties Might optionally contain configuration options for the ExecutorService
 	 * @param indexManagerName The indexManager going to be linked to this ExecutorService
-	 *
 	 * @return null if the work needs execution in sync
 	 */
 	public static ExecutorService buildWorkersExecutor(Properties properties, String indexManagerName) {

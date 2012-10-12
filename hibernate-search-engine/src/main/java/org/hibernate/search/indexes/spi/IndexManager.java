@@ -119,7 +119,6 @@ public interface IndexManager {
 	 * @param name the name of the analyzer to retrieve.
 	 *
 	 * @return Returns the {@code Analyzer} with the given name (see also {@link org.hibernate.search.annotations.AnalyzerDef})
-	 *
 	 * @throws org.hibernate.search.SearchException in case the analyzer name is unknown.
 	 */
 	Analyzer getAnalyzer(String name);

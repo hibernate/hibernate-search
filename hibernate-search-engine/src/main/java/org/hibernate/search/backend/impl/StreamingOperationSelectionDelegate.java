@@ -31,13 +31,14 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * Sends a single operation to the related backends, considering the sharding strategy.
  * This delegates to {@link org.hibernate.search.indexes.spi.IndexManager#performStreamOperation(LuceneWork, boolean)}
  * so it's suited for streams of many LuceneWork operations which don't need strict ordering.
- * 
+ *
  * @author Sanne Grinovero
  */
 public interface StreamingOperationSelectionDelegate {
 	
 	/**
 	 * The LuceneWork must be applied to different indexes.
+	 *
 	 * @param work the work to split.
 	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories.
 	 * @param monitor to receive notification of indexing operations
