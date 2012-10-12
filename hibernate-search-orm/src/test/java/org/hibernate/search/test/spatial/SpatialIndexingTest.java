@@ -33,7 +33,6 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.spatial.impl.DistanceSortField;
 import org.hibernate.search.test.SearchTestCase;
 
@@ -67,32 +66,32 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-        final QueryBuilder builder = fullTextSession.getSearchFactory()
-                .buildQueryBuilder().forEntity( POI.class ).get();
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( POI.class ).get();
 
-        org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
-                .within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-        org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
-                .within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, POI.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
 
-        org.apache.lucene.search.Query luceneQuery3 = builder.spatial().onCoordinates( "location" )
-                .within( 112, Unit.KM ).ofLatitude( 0.0d ).andLongitude( 180.0d ).createQuery();
+		org.apache.lucene.search.Query luceneQuery3 = builder.spatial().onCoordinates( "location" )
+				.within( 112, Unit.KM ).ofLatitude( 0.0d ).andLongitude( 180.0d ).createQuery();
 
-        org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, POI.class );
+		org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, POI.class );
 		List results3 = hibQuery3.list();
 		Assert.assertEquals( 2, results3.size() );
 
-        org.apache.lucene.search.Query luceneQuery4 = builder.spatial().onCoordinates( "location" )
-                .within( 100000, Unit.KM ).ofLatitude( 0.0d ).andLongitude( 0.0d ).createQuery();
+		org.apache.lucene.search.Query luceneQuery4 = builder.spatial().onCoordinates( "location" )
+				.within( 100000, Unit.KM ).ofLatitude( 0.0d ).andLongitude( 0.0d ).createQuery();
 
 		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, POI.class );
 		List results4 = hibQuery4.list();
@@ -269,18 +268,18 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-        final QueryBuilder builder = fullTextSession.getSearchFactory()
-                .buildQueryBuilder().forEntity( Event.class ).get();
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Event.class ).get();
 
-        org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
-                .within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Event.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-        org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
-                .within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Event.class );
 		List results2 = hibQuery2.list();
@@ -307,18 +306,18 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-        final QueryBuilder builder = fullTextSession.getSearchFactory()
-                .buildQueryBuilder().forEntity( User.class ).get();
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( User.class ).get();
 
-        org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "home" )
-                .within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "home" )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, User.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-        org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "home" )
-                .within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "home" )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, User.class );
 		List results2 = hibQuery2.list();
@@ -380,18 +379,18 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		tx = fullTextSession.beginTransaction();
 
-        final QueryBuilder builder = fullTextSession.getSearchFactory()
-                .buildQueryBuilder().forEntity( UserEx.class ).get();
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( UserEx.class ).get();
 
-        org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( UserEx.class.getName() )
-                .within( 100.0d, Unit.KM ).ofLatitude( 24.0d ).andLongitude( 31.5d ).createQuery();
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( UserEx.class.getName() )
+				.within( 100.0d, Unit.KM ).ofLatitude( 24.0d ).andLongitude( 31.5d ).createQuery();
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserEx.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 1, results.size() );
 
-        org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "work" )
-                .within( 100.0d, Unit.KM ).ofLatitude( 12.0d ).andLongitude( 27.5d ).createQuery();
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "work" )
+				.within( 100.0d, Unit.KM ).ofLatitude( 12.0d ).andLongitude( 27.5d ).createQuery();
 
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserEx.class );
 		List results2 = hibQuery2.list();
@@ -459,20 +458,20 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-        final QueryBuilder builder = fullTextSession.getSearchFactory()
-                .buildQueryBuilder().forEntity( Hotel.class ).get();
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Hotel.class ).get();
 
-        org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "hotel_location" )
-                .within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "hotel_location" )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Hotel.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-        org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "hotel_location" )
-                .within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "hotel_location" )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
-        org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Hotel.class );
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Hotel.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
 
@@ -501,36 +500,36 @@ public class SpatialIndexingTest extends SearchTestCase {
 		double centerLatitude= 24;
 		double centerLongitude= 31.5;
 
-        final QueryBuilder builder = fullTextSession.getSearchFactory()
-                .buildQueryBuilder().forEntity( RangeHotel.class ).get();
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( RangeHotel.class ).get();
 
-        org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
-                .within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, RangeHotel.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-        org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
-                .within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
-        org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, RangeHotel.class );
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, RangeHotel.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
 
 		double endOfTheWorldLatitude= 0.0d;
 		double endOfTheWorldLongitude= 180.0d;
 
-        org.apache.lucene.search.Query luceneQuery3 = builder.spatial().onCoordinates( "location" )
-                .within( 112, Unit.KM ).ofLatitude( endOfTheWorldLatitude ).andLongitude( endOfTheWorldLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery3 = builder.spatial().onCoordinates( "location" )
+				.within( 112, Unit.KM ).ofLatitude( endOfTheWorldLatitude ).andLongitude( endOfTheWorldLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, RangeHotel.class );
 		List results3 = hibQuery3.list();
 		Assert.assertEquals( 2, results3.size() );
 
-        org.apache.lucene.search.Query luceneQuery4 = builder.spatial().onCoordinates( "location" )
-                .within( 100000, Unit.KM ).ofLatitude( endOfTheWorldLatitude ).andLongitude( endOfTheWorldLongitude ).createQuery();
+		org.apache.lucene.search.Query luceneQuery4 = builder.spatial().onCoordinates( "location" )
+				.within( 100000, Unit.KM ).ofLatitude( endOfTheWorldLatitude ).andLongitude( endOfTheWorldLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, RangeHotel.class );
 		List results4 = hibQuery4.list();
