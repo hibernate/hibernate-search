@@ -260,6 +260,12 @@ List results = hibQuery.list();</programlisting>
     </example>
     
     <para>Sample code is at SpatialIndexingTest.testSpatialAnnotationOnClassLevel() and in Hotel class.</para>
+
+    <para>Pro Tip : For advanced usage, there is a Coordinates interface that can be used to pass latitude
+      and longitude to the @Spatial annotation instead of the @Latitude and @Longitude annotations.
+      It shall be used to extract and expose latitude and longtiude when their values are not fields of
+      the indexed bean.
+      See Hotel class in unit test for sample working code.</para>
     
   </section>
   
