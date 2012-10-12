@@ -651,4 +651,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 164, value = "Unable to lookup Search queue '%1$s' and connection factory '%2$s' for index '%3$s'")
 	SearchException jmsLookupException(String jmsQueueName, String jmsConnectionFactoryName, String indexName, @Cause Throwable e);
+
+	@Message(id = 165, value = "Illegal state for service initialization")
+	SearchException illegalServiceBuildPhase();
 }

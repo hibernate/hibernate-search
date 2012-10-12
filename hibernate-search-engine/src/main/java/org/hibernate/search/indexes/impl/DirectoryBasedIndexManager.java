@@ -36,6 +36,7 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.impl.EmptyBuildContext;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
@@ -84,7 +85,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		readers.stop();
 		backend.close();
 		directoryProvider.stop();
-		serviceManager.releaseService( SerializerService.class );
+		if ( serializer != null ) {
+			serviceManager.releaseService( SerializerService.class );
+		}
 	}
 
 	@Override
@@ -97,7 +100,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		directoryProvider.start( this );
 		readers = createIndexReader( indexName, cfg, buildContext );
 		serviceManager = buildContext.getServiceManager();
-		serializer = serviceManager.requestService( SerializerService.class, buildContext );
 	}
 
 	@Override
@@ -196,6 +198,10 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public LuceneWorkSerializer getSerializer() {
+		if ( serializer == null ) {
+			EmptyBuildContext buildContext = new EmptyBuildContext( serviceManager, boundSearchFactory );
+			serializer = serviceManager.requestService( SerializerService.class, buildContext );
+		}
 		return serializer;
 	}
 
