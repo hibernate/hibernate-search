@@ -132,40 +132,35 @@
     <para>To index your entities for range querying you:</para>
     <itemizedlist>
       <listitem>
-        <para>implement the <classname>Coordinates</classname> interface</para>
-      </listitem>
-      <listitem>
         <para>add the @Spatial annotation at class level</para>
       </listitem>
+      <listitem>
+        <para>add the @Latitude and @Longitude annotations at field level</para>
+      </listitem>
     </itemizedlist>
-    
-    <example>
-      <title>Coordinates interface</title>
 
-      <programlisting language="JAVA" role="JAVA">public interface Coordinates {
-  double getLatitude();
-  double getLongitude();
-}
-      </programlisting>
-    </example>
-    
     <example>
       <title>SimpleHotel class sample</title>
 
-      <programlisting language="JAVA" role="JAVA">import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.annotations.*;
+      <programlisting language="JAVA" role="JAVA">import org.hibernate.search.annotations.*;
 
 @Entity
 @Indexed
 @Spatial
-public class SimpleHotel implements Coordinates {
+public class SimpleHotel {
+
+  @Latitude
+  Double latitude
+
+  @Longitude
+  Double longitude
   [..]</programlisting>
     </example>
       
     <para>To query your entities, you :</para>
     <itemizedlist>
       <listitem>
-        <para>use SpatialQueryBuilder.buildSimpleSpatialQuery()
+        <para>use the DSL to build a spatial query
         with your search center and radius</para>
       </listitem>
       <listitem>
@@ -179,8 +174,15 @@ public class SimpleHotel implements Coordinates {
     <example>
       <title>SimpleHotel class sample</title>
 
-      <programlisting language="JAVA" role="JAVA">org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSimpleSpatialQuery(
-   centerLatitude, centerLongitude, radius);
+      <programlisting language="JAVA" role="JAVA">final QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity( SimpleHotel.class ).get();
+
+org.apache.lucene.search.Query luceneQuery = builder.spatial()
+  .onCoordinates( SimpleHotel.class.getName() )
+  .within( radius, Unit.KM )
+  .ofLatitude( centerLatitude )
+  .andLongitude( centerLongitude )
+  .createQuery();
 
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
    SimpleHotel.class );
@@ -199,11 +201,11 @@ List results = hibQuery.list();</programlisting>
     <para>To index your entities you:</para>
     <itemizedlist>
       <listitem>
-        <para>implement the <classname>Coordinates</classname> interface </para>
+        <para>add the @Spatial annotation at class level with a name for referencing the grid
+        field in the index and with the spatialMode set to GRID : @Spatial(name = "location", spatialMode = SpatialMode.GRID)</para>
       </listitem>
       <listitem>
-        <para>add the @Spatial annotation at class level with a name for referencing the grid
-        field in the index and with gridmode set to true: @Spatial(name = "location", spatialMode = SpatialMode.GRID)</para>
+        <para>add the @Latitude and @Longitude annotations at field level</para>
       </listitem>
     </itemizedlist>
     
@@ -213,17 +215,22 @@ List results = hibQuery.list();</programlisting>
       <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 @Spatial(name = "location", spatialMode = SpatialMode.GRID)
-public class Hotel implements Coordinates {
-   double latitude;
-   double longitude;
-   [...]
+public class Hotel implements {
+
+  @Latitude
+  Double latitude;
+
+  @Longitude
+  Double longitude;
+
+  [...]
 </programlisting>
     </example>
       
     <para>To query your entities, you:</para>
     <itemizedlist>
       <listitem>
-        <para>call SpatialQueryBuilder.buildSpatialQuery with your center, radius and the name
+        <para>use the DSL to build a spatial query with your center, radius and the name
         of the grid fields (location passed above)</para>
       </listitem>
       <listitem>
@@ -237,13 +244,16 @@ public class Hotel implements Coordinates {
     <example>
       <title>Querying grid indexed entities</title>
 
-      <programlisting language="JAVA" role="JAVA">org.apache.lucene.search.Query luceneQuery =
-   SpatialQueryBuilder.buildSpatialQuery(
-      centerLatitude,
-      centerLongitude,
-      50,
-      "location"
-   );
+      <programlisting language="JAVA" role="JAVA">final QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity( Hotel.class ).get();
+
+org.apache.lucene.search.Query luceneQuery = builder.spatial()
+  .onCoordinates( "location" )
+  .within( radius, Unit.KM )
+  .ofLatitude( centerLatitude )
+  .andLongitude( centerLongitude )
+  .createQuery();
+
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
    Hotel.class );
 List results = hibQuery.list();</programlisting>
@@ -256,7 +266,7 @@ List results = hibQuery.list();</programlisting>
   <section id="spatial-dsl">
     <title>Spatial query DSL</title>
     
-    <para>Beyond the spatial query builder, the Hibernate Search DSL has been extended to support the
+    <para>The Hibernate Search DSL has been extended to support the
     spatial feature. You can build a query for searching around a (latitude,longitude) or around an
     bean implementing the Coordinates interface :</para>
 
