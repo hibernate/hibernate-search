@@ -223,7 +223,7 @@ public class Hotel implements Coordinates {
     <para>To query your entities, you:</para>
     <itemizedlist>
       <listitem>
-        <para>call SpatialQueryBuilder.buildSpatialQuery with your center, radius and the name
+        <para>use the DSL to build a spatial query with your center, radius and the name
         of the grid fields (location passed above)</para>
       </listitem>
       <listitem>
@@ -237,13 +237,12 @@ public class Hotel implements Coordinates {
     <example>
       <title>Querying grid indexed entities</title>
 
-      <programlisting language="JAVA" role="JAVA">org.apache.lucene.search.Query luceneQuery =
-   SpatialQueryBuilder.buildSpatialQuery(
-      centerLatitude,
-      centerLongitude,
-      50,
-      "location"
-   );
+      <programlisting language="JAVA" role="JAVA">final QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity( Hotel.class ).get();
+
+org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+  .within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
    Hotel.class );
 List results = hibQuery.list();</programlisting>
