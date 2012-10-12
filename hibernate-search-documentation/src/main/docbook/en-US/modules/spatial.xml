@@ -260,7 +260,12 @@ List results = hibQuery.list();</programlisting>
     </example>
     
     <para>Sample code is at SpatialIndexingTest.testSpatialAnnotationOnClassLevel() and in Hotel class.</para>
-    
+
+    <tip><para>There is a <classname>Coordinates</classname> interface that can be used to pass latitude
+      and longitude to the @Spatial annotation instead of the @Latitude and @Longitude annotations.
+      This can be used to expose latitude and longitude when their values are not fields of
+      the indexed bean.
+      See the <literal>Hotel</literal> class in the testsuite for sample working code.</para></tip>
   </section>
   
   <section id="spatial-dsl">
@@ -272,7 +277,7 @@ List results = hibQuery.list();</programlisting>
 
     <example>
         <title>DSL example with latitude and longitude</title>
-        <programlisting language="JAVA" role="JAVA">final QueryBuilder builder = fullTextSession.getSearchFactory()
+        <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
    .buildQueryBuilder().forEntity( RangeEvent.class ).get();
 
 double centerLatitude= 24;
