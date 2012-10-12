@@ -39,7 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * JMSBackendQueueProcessor using JNDI to lookup the JMS components.
  */
-public class JndiJMSBackendQueueProcessor extends JMSBackendQueueProcessor {
+public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make();
 

@@ -50,7 +50,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public abstract class JMSBackendQueueProcessor implements BackendQueueProcessor {
+public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor {
 
 	private String jmsQueueName;
 	protected static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
@@ -102,7 +102,7 @@ public abstract class JMSBackendQueueProcessor implements BackendQueueProcessor 
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
 		//TODO review this integration with the old Runnable-style execution
-		Runnable operation = new JMSBackendQueueTask( indexName, workList, indexManager, this );
+		Runnable operation = new JmsBackendQueueTask( indexName, workList, indexManager, this );
 		operation.run();
 	}
 

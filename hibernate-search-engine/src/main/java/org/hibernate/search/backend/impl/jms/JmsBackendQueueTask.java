@@ -44,19 +44,19 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JMSBackendQueueTask implements Runnable {
+public class JmsBackendQueueTask implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
 
 	public static final String INDEX_NAME_JMS_PROPERTY = "HSearchIndexName";
 
 	private final Collection<LuceneWork> queue;
-	private final JMSBackendQueueProcessor processor;
+	private final JmsBackendQueueProcessor processor;
 	private final String indexName;
 	private final IndexManager indexManager;
 
-	public JMSBackendQueueTask(String indexName, Collection<LuceneWork> queue, IndexManager indexManager,
-					JMSBackendQueueProcessor jmsBackendQueueProcessor) {
+	public JmsBackendQueueTask(String indexName, Collection<LuceneWork> queue, IndexManager indexManager,
+					JmsBackendQueueProcessor jmsBackendQueueProcessor) {
 		this.indexName = indexName;
 		this.queue = queue;
 		this.indexManager = indexManager;
