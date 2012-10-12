@@ -78,7 +78,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 	 * JNDI retrieved cachemanagers are not started by us, so avoid attempting
 	 * to close them.
 	 */
-	private boolean manageCacheManager = false;
+	private volatile boolean manageCacheManager = false;
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
