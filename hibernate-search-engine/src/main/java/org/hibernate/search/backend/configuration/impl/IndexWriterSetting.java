@@ -168,9 +168,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * Specific parameters may override to provide additional keywords support.
 	 *
 	 * @param value the string value as in configuration file
-	 *
 	 * @return the integer value going to be set as parameter
-	 *
 	 * @throws SearchException for unrecognized values
 	 */
 	public Integer parseVal(String value) {

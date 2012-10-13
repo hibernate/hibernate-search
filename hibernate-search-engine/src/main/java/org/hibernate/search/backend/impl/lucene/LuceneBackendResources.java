@@ -154,7 +154,7 @@ public final class LuceneBackendResources {
 	 * reuses the same Workspace and ErrorHandler, but will use a new LuceneWorkVisitor.
 	 * The LuceneWorkVisitor contains the strategies we use to apply update operations on the index,
 	 * and we might need to change them after the backend is started.
-	 * 
+	 *
 	 * @return the new LuceneBackendResources to replace this one.
 	 */
 	public LuceneBackendResources onTheFlyRebuild() {

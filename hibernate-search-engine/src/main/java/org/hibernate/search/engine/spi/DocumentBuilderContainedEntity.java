@@ -53,6 +53,7 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	 * @param context Handle to default configuration settings.
 	 * @param reflectionManager Reflection manager to use for processing the annotations.
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
+	 * @param instanceInitializer a {@link org.hibernate.search.spi.InstanceInitializer} object.
 	 */
 	public DocumentBuilderContainedEntity(XClass xClass, ConfigContext context,
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {

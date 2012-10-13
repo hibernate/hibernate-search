@@ -68,7 +68,6 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik <hardy@hibernate.org>
- * @todo Implements setParameter()
  */
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
 

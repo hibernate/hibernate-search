@@ -140,6 +140,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * @param similarity The index level similarity
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList keeps track of types on which we need to disable collection events optimizations
+	 * @param instanceInitializer a {@link org.hibernate.search.spi.InstanceInitializer} object.
 	 */
 	public AbstractDocumentBuilder(XClass xClass, ConfigContext context, Similarity similarity,
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {
@@ -266,7 +267,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	 *
 	 * @param instance the instance to be indexed
 	 * @param workplan the current work plan
-	 * @param currentDepth the current {@link DepthValidator} object used to check the graph traversal
+	 * @param currentDepth the current {@link org.hibernate.search.engine.spi.DepthValidator} object used to check the graph traversal
 	 */
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan, DepthValidator currentDepth) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
@@ -1180,9 +1181,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * if the proposed change is possibly affecting the index.
 	 *
 	 * @param dirtyPropertyNames Contains the property name of each value which changed, or null for everything.
-	 *
 	 * @return true if it can't make sure the index doesn't need an update
-	 *
 	 * @since 3.4
 	 */
 	public boolean isDirty(String[] dirtyPropertyNames) {
@@ -1246,10 +1245,8 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * Returns true if the collection event is not going to affect the index state,
 	 * so that the indexing event can be skipped.
 	 *
-	 * @param collectionRole
-	 *
+	 * @param collectionRole a {@link java.lang.String} object.
 	 * @return true if the collection Role does not affect index state
-	 *
 	 * @since 3.4
 	 */
 	public boolean isCollectionRoleExcluded(String collectionRole) {

@@ -56,7 +56,6 @@ public final class DistanceFilter extends Filter {
 	 * @param center center of the search perimeter
 	 * @param radius radius of the search perimeter
 	 * @param coordinatesField name of the field implementing Coordinates
-	 *
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public DistanceFilter(Filter previousFilter, Point center, double radius, String coordinatesField) {
@@ -80,7 +79,6 @@ public final class DistanceFilter extends Filter {
 	 * @param radius radius of the search perimeter
 	 * @param latitudeField name of the field hosting latitude
 	 * @param longitudeField name of the field hosting longitude
-	 *
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public DistanceFilter(Filter previousFilter, Point center, double radius, String latitudeField, String longitudeField) {

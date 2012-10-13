@@ -45,6 +45,7 @@ public interface Workspace {
 
 	/**
 	 * Used by OptimizeLuceneWork to start an optimization process of the index.
+	 *
 	 * @param writer the IndexWriter to use for optimization
 	 * @see OptimizeLuceneWork
 	 * @see SearchFactory#optimize()
@@ -54,6 +55,7 @@ public interface Workspace {
 
 	/**
 	 * Gets the IndexWriter, opening one if needed.
+	 *
 	 * @return a new IndexWriter or an already open one, or null if an error happened.
 	 */
 	IndexWriter getIndexWriter();
@@ -61,6 +63,7 @@ public interface Workspace {
 	/**
 	 * Increment the counter of modification operations done on the index.
 	 * Used (currently only) by the OptimizerStrategy.
+	 *
 	 * @param modCount the increment to add to the counter.
 	 */
 	void incrementModificationCounter(int modCount);
@@ -75,7 +78,7 @@ public interface Workspace {
 	 * Invoked after all changes of a transaction are applied.
 	 * Must be invoked strictly once after every {@link #getIndexWriter()} in a finally block
 	 * as implementations might rely on counters to release the IndexWriter.
-	 * 
+	 *
 	 * @param someFailureHappened usually false, set to true if errors
 	 * where caught while using the IndexWriter
 	 * @param streaming if no immediate visibility of the change is required (hint for performance)
@@ -92,6 +95,7 @@ public interface Workspace {
 	 * This can be more efficient but can not work if there are multiple indexed types in the same
 	 * index possibly sharing the same id term, or if the index might contain entity types we don't
 	 * know.
+	 *
 	 * @return true if it's safe to do the single term operation.
 	 */
 	boolean areSingleTermDeletesSafe();

@@ -46,7 +46,7 @@ import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 /**
  * Create deployments for JMS Master/Slave configuration integration tests.
- * Make sure to test fo a secured JMS environment.
+ * Make sure to test for a secured JMS environment.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero

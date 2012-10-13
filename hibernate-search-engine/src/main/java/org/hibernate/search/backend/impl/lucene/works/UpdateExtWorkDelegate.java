@@ -42,11 +42,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This applies the index update operation using the Lucene operation
- * {@link IndexWriter#updateDocument(Term, org.apache.lucene.document.Document, org.apache.lucene.analysis.Analyzer)}
- * 
+ * {@link org.apache.lucene.index.IndexWriter#updateDocument(Term, org.apache.lucene.document.Document, org.apache.lucene.analysis.Analyzer)}
+ *
  * This is the most efficient way to update the index, but we can apply it only if the Document is uniquely identified
  * by a single term (so no index sharing across entities or Numeric ids).
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public final class UpdateExtWorkDelegate extends UpdateWorkDelegate {

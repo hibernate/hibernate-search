@@ -28,8 +28,8 @@ import org.hibernate.search.util.logging.impl.Log;
 
 /**
  * Wraps a FieldCacheCollector in such a way that {@link #getValue(int)} returns objects as transformed
- * by a {@link TwoWayStringBridge} to transform from String form to the object.
- * 
+ * by a {@link org.hibernate.search.bridge.TwoWayStringBridge} to transform from String form to the object.
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
@@ -41,7 +41,7 @@ public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
 
 	/**
 	 * @param delegate Actually uses the delegate Collector implementation
-	 * @param twoWayStringBridge Converts returned values using this {@link TwoWayStringBridge#stringToObject(String)}
+	 * @param twoWayStringBridge Converts returned values using this {@link org.hibernate.search.bridge.TwoWayStringBridge#stringToObject(String)}
 	 */
 	public TwoWayTransformingFieldCacheCollector(FieldCacheCollector delegate, TwoWayStringBridge twoWayStringBridge) {
 		super( delegate );

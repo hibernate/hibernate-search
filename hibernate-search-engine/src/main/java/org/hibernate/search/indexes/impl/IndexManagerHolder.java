@@ -58,7 +58,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * IndexManagers are started incrementally.
  * Stopping IndexManager can not currently happen decrementally: to stop the IndexManagers all of them
  * are stopped.
- * 
+ *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot
  * @author Hardy Ferentschik

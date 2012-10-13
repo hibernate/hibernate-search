@@ -39,7 +39,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * stream operations, as used by optimize() and batching operations.
  * Using a visitor/selector pattern for different implementations of addAsPayLoadsToQueue
  * depending on the type of LuceneWork.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperationSelectionDelegate> {

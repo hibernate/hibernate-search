@@ -37,6 +37,7 @@ import java.lang.annotation.Documented;
  * the given target object types are the same, the set of parameters are the same.
  *
  * &#64;Factory currently works for &#64;FullTextFilterDef.impl classes
+ *
  * @see org.hibernate.search.annotations.Factory
  * @author Emmanuel Bernard
  */

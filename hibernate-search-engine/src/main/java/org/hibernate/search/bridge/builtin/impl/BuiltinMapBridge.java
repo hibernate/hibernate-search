@@ -24,7 +24,7 @@ import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.builtin.MapBridge;
 
 /**
- * An implementation of {@link MapBridge} that can be used with Hibernate Search query DSL.
+ * An implementation of {@link org.hibernate.search.bridge.builtin.MapBridge} that can be used with Hibernate Search query DSL.
  *
  * @author Davide D'Alto
  */

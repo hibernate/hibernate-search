@@ -41,7 +41,7 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 /**
  * Contains helper to parse properties which should be read by the majority
  * of IndexManager implementations.
- *  
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class CommonPropertiesParse {
@@ -50,14 +50,19 @@ public class CommonPropertiesParse {
 		// no need to create instances
 	}
 	
+	/**
+	 * <p>isExclusiveIndexUsageEnabled.</p>
+	 *
+	 * @param indexProps a {@link java.util.Properties} object.
+	 */
 	public static boolean isExclusiveIndexUsageEnabled(Properties indexProps) {
 		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.EXCLUSIVE_INDEX_USE, true );
 	}
 
 	/**
-	 * Returns the configured value of {@link Environment#INDEX_METADATA_COMPLETE} for this specific index.
-	 * If no value is set, the default is defined by {@link SearchConfiguration#isIndexMetadataComplete()}.
-	 * 
+	 * Returns the configured value of {@link org.hibernate.search.Environment#INDEX_METADATA_COMPLETE} for this specific index.
+	 * If no value is set, the default is defined by {@link org.hibernate.search.cfg.spi.SearchConfiguration#isIndexMetadataComplete()}.
+	 *
 	 * @param indexProps The index configuration properties
 	 * @param context The WorkerBuildContext provides a view of the default setting
 	 * @return {@code true} when the index metadata is fully defined.

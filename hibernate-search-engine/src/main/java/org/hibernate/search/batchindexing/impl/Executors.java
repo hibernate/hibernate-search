@@ -36,7 +36,7 @@ import org.hibernate.search.util.logging.impl.Log;
 /**
  * Helper class to create threads;
  * these threads are grouped and named to be identified in a profiler.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class Executors {
@@ -52,7 +52,7 @@ public class Executors {
 	 * policy is set to CallerRunsPolicy for the case the queue is full.
 	 * These settings are required to cap the queue, to make sure the
 	 * timeouts are reasonable for most jobs.
-	 * 
+	 *
 	 * @param threads the number of threads
 	 * @param groupname a label to identify the threadpool; useful for profiling.
 	 * @return the new ExecutorService
@@ -61,13 +61,14 @@ public class Executors {
 		return newFixedThreadPool( threads, groupname, QUEUE_MAX_LENGTH );
 	}
 
-    /**
-     * Creates a new fixed size ThreadPoolExecutor
-     * @param threads the number of threads
-     * @param groupname a label to identify the threadpool; useful for profiling.
-     * @param queueSize the size of the queue to store Runnables when all threads are busy
-     * @return the new ExecutorService
-     */
+	/**
+	 * Creates a new fixed size ThreadPoolExecutor
+	 *
+	 * @param threads the number of threads
+	 * @param groupname a label to identify the threadpool; useful for profiling.
+	 * @param queueSize the size of the queue to store Runnables when all threads are busy
+	 * @return the new ExecutorService
+	 */
 	public static ThreadPoolExecutor newFixedThreadPool(int threads, String groupname, int queueSize) {
 		return new ThreadPoolExecutor(
 				threads,

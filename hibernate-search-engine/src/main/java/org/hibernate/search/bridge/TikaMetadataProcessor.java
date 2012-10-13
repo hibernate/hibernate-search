@@ -34,7 +34,6 @@ public interface TikaMetadataProcessor {
 	 * This method is called by the {@link org.hibernate.search.bridge.builtin.TikaBridge} prior to processing the data
 	 *
 	 * @return Tika metadata used for data processing. Additional metadata can be set here.
-	 *
 	 * @see <a href="http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html">Tika API</a>
 	 */
 	public Metadata prepareMetadata();

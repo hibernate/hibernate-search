@@ -120,7 +120,6 @@ public class SoftLimitMRUCache implements Serializable {
 	 * Gets an object from the cache.
 	 *
 	 * @param key the cache key.
-	 *
 	 * @return the stored value, or <code>null</code> if no entry exists.
 	 */
 	public synchronized Object get(Object key) {
@@ -148,7 +147,6 @@ public class SoftLimitMRUCache implements Serializable {
 	 *
 	 * @param key the key.
 	 * @param value the value.
-	 *
 	 * @return the previous value stored in the cache, if any.
 	 */
 	public synchronized Object put(Object key, Object value) {

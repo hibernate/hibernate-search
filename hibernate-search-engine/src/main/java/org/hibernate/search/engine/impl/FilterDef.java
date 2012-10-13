@@ -35,7 +35,7 @@ import org.hibernate.search.util.impl.ReflectionHelper;
 
 /**
  * A wrapper class which encapsulates all required information to create a defined filter.
- * 
+ *
  * @author Emmanuel Bernard
  */
 //TODO serialization

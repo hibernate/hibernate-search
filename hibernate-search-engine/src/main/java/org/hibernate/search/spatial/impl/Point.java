@@ -36,7 +36,6 @@ public final class Point implements Coordinates {
 	/**
 	 * @param latitude in degrees
 	 * @param longitude in degrees
-	 *
 	 * @return a point with coordinates given in degrees
 	 */
 	public static Point fromDegrees(double latitude, double longitude) {
@@ -46,7 +45,6 @@ public final class Point implements Coordinates {
 	/**
 	 * @param latitude in degrees
 	 * @param longitude in degrees
-	 *
 	 * @return a point with coordinates given in degrees
 	 */
 	public static Point fromDegreesInclusive(double latitude, double longitude) {
@@ -55,7 +53,6 @@ public final class Point implements Coordinates {
 
 	/**
 	 * @param longitude in degrees
-	 *
 	 * @return longitude normalized in ]-180;+180]
 	 */
 	public static double normalizeLongitude(double longitude) {
@@ -67,10 +64,9 @@ public final class Point implements Coordinates {
 	}
 
 	/**
-			 * @param longitude in degrees
-			 *
-			 * @return longitude normalized in [-180;+180]
-			 */
+	 * @param longitude in degrees
+	 * @return longitude normalized in [-180;+180]
+	 */
 	public static double normalizeLongitudeInclusive(double longitude) {
 
 		if( (longitude < -( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) || (longitude > ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) ) {
@@ -91,7 +87,6 @@ public final class Point implements Coordinates {
 
 	/**
 	 * @param latitude in degrees
-	 *
 	 * @return latitude normalized in [-90;+90]
 	 */
 	public static double normalizeLatitude(double latitude) {
@@ -114,7 +109,6 @@ public final class Point implements Coordinates {
 	/**
 	 * @param latitude in radians
 	 * @param longitude in radians
-	 *
 	 * @return a point with coordinates given in radians
 	 */
 	public static Point fromRadians(double latitude, double longitude) {
@@ -135,9 +129,7 @@ public final class Point implements Coordinates {
 	 *
 	 * @param distance to travel
 	 * @param heading of travel in decimal degree
-	 *
 	 * @return arrival point
-	 *
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Compute destination</a>
 	 */
 	public Point computeDestination(double distance, double heading) {
@@ -166,10 +158,7 @@ public final class Point implements Coordinates {
 	/**
 	 * Compute distance between two points
 	 *
-	 * @param other
-	 *
-	 * @return
-	 *
+	 * @param other a {@link org.hibernate.search.spatial.impl.Point} object.
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
 	public double getDistanceTo(Point other) {
@@ -181,9 +170,6 @@ public final class Point implements Coordinates {
 	 *
 	 * @param latitude in decimal degrees
 	 * @param longitude in decimal degrees
-	 *
-	 * @return
-	 *
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
 	public final double getDistanceTo(final double latitude,final double longitude) {

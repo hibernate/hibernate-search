@@ -113,10 +113,8 @@ public interface Statistics {
 	 * Returns the number of documents for the given entity.
 	 *
 	 * @param entity the fqc of the entity
-	 *
 	 * @return number of documents for the specified entity name
-	 *
-	 * @throws IllegalArgumentException in case the entity name is not valid
+	 * @throws java.lang.IllegalArgumentException in case the entity name is not valid
 	 */
 	int getNumberOfIndexedEntities(String entity);
 

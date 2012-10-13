@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 
 /**
  * Extension annotation for {@code @Field} for Hibernate Search Spatial Index
- * 
+ *
  * @experimental Spatial indexing in Hibernate Search is still in its first drafts
  * @author Nicolas Helleringer (nicolas.helleringer@novacodex.net)
  */

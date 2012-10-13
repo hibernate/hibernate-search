@@ -51,7 +51,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *   - keySet()
  *   - keys()
  * Other methods including methods returning Entries and values are not supported
- * 
+ *
  * @author Sanne Grinovero
  * @author Emmanuel Bernard
  */
@@ -68,8 +68,9 @@ public class MaskedProperty extends Properties implements Serializable {
 	/**
 	 * Provides a view to the provided Properties hiding
 	 * all keys not starting with some [mask.].
+	 *
 	 * @param propsToMask the Properties containing the values.
-	 * @param mask
+	 * @param mask a {@link java.lang.String} object.
 	 */
 	public MaskedProperty(Properties propsToMask, String mask) {
 		this( propsToMask, mask, null );

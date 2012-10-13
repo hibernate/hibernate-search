@@ -43,7 +43,7 @@ import org.jgroups.blocks.mux.Muxer;
 /**
  * Service to initialize a JGroups Channel. This needs to be centralized to
  * allow sharing of channels across different index managers.
- * 
+ *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  * @author Ales Justin

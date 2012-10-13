@@ -32,8 +32,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Provides a Serializer of LuceneWork instances consuming a SerializerProvider
- * This is commonly used to delegate indexing work to a different JVM. 
- * 
+ * This is commonly used to delegate indexing work to a different JVM.
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class SerializerService implements ServiceProvider<LuceneWorkSerializer> {

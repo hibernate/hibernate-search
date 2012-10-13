@@ -28,16 +28,19 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 
 /**
+ * <p>LuceneWorkDelegate interface.</p>
+ *
  * @author Sanne Grinovero
  */
 public interface LuceneWorkDelegate {
 
 	/**
 	 * Will perform work on an IndexWriter.
+	 *
 	 * @param work the LuceneWork to apply to the IndexWriter.
 	 * @param writer the IndexWriter to use.
 	 * @param monitor will be notified of performed operations
-	 * @throws UnsupportedOperationException when the work is not compatible with an IndexWriter.
+	 * @throws java.lang.UnsupportedOperationException when the work is not compatible with an IndexWriter.
 	 */
 	void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor);
 

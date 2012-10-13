@@ -139,9 +139,8 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 	/**
 	 * Initialises the JMS QueueConnectionFactory to be used for sending Lucene work operations to the master node.
 	 *
-	 * @param properties configuration properties specific for this backend
-	 *
-	 * @return the initialized {@link QueueConnectionFactory}
+	 * @return the initialized {@link javax.jms.QueueConnectionFactory}
+	 * @param props a {@link java.util.Properties} object.
 	 */
 	abstract protected QueueConnectionFactory initializeJMSQueueConnectionFactory(Properties props);
 
@@ -149,9 +148,9 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 	 * Initialises the JMS queue to be used for sending Lucene work operations to the master node.
 	 * Invoked after {@link #initializeJMSQueueConnectionFactory(Properties)}
 	 *
-	 * @param properties configuration properties specific for this backend
-	 *
-	 * @return the initialized {@link Queue}
+	 * @return the initialized {@link javax.jms.Queue}
+	 * @param factory a {@link javax.jms.QueueConnectionFactory} object.
+	 * @param props a {@link java.util.Properties} object.
 	 */
 	abstract protected Queue initializeJMSQueue(QueueConnectionFactory factory, Properties props);
 
@@ -159,9 +158,9 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 	 * Initialises the JMS QueueConnection to be used for sending Lucene work operations to the master node.
 	 * This is invoked after {@link #initializeJMSQueue(Properties)}.
 	 *
-	 * @param properties configuration properties specific for this backend
-	 *
-	 * @return the initialized {@link QueueConnection}
+	 * @return the initialized {@link javax.jms.QueueConnection}
+	 * @param factory a {@link javax.jms.QueueConnectionFactory} object.
+	 * @param props a {@link java.util.Properties} object.
 	 */
 	abstract protected QueueConnection initializeJMSConnection(QueueConnectionFactory factory, Properties props);
 

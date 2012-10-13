@@ -28,7 +28,7 @@ import org.hibernate.search.SearchException;
 /**
  * While we use the configured LuceneWorkSerializer to serialize the Work queue,
  * the JGroups backend needs to prefix the stream with the index name.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class MessageSerializationHelper {
@@ -37,6 +37,7 @@ public class MessageSerializationHelper {
 
 	/**
 	 * Byte encodes a String as a prefix for an existing byte buffer
+	 *
 	 * @param name the string to encode
 	 * @param data the existing buffer
 	 * @return a new buffer containing the length of the string buffer, the string buffer and then the data.
@@ -57,7 +58,8 @@ public class MessageSerializationHelper {
 	 * Extracts the string only from the header of a byte array.
 	 * Is the reverse operation of {@link #prependString(String, byte[])}
 	 * The buffer is not altered.
-	 * @param rawBuffer
+	 *
+	 * @param rawBuffer an array of byte.
 	 * @return the String, assuming it's encoded by this same class.
 	 */
 	public static String extractIndexName(final byte[] rawBuffer) {
@@ -69,7 +71,8 @@ public class MessageSerializationHelper {
 	 * Inverse operation of {@link #prependString(String, byte[]): extracts
 	 * the original buffer discarding the prefixed string.
 	 * The buffer is not altered.
-	 * @param rawBuffer
+	 *
+	 * @param rawBuffer an array of byte.
 	 * @return the smaller byte buffer
 	 */
 	public static byte[] extractSerializedQueue(final byte[] rawBuffer) {

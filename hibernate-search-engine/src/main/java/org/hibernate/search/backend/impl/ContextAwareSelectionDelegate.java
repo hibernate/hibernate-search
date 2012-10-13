@@ -29,15 +29,16 @@ import org.hibernate.search.store.IndexShardingStrategy;
 /**
  * Visitor interface to apply the configured sharding strategy to a list of LuceneWork;
  * this list is usually the set of operations to be applied in a transactional context.
- * 
+ *
  * @author Sanne Grinovero
  */
 public interface ContextAwareSelectionDelegate {
 	
 	/**
 	 * The LuceneWork must be applied to different indexes.
+	 *
 	 * @param work the work to split.
-	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories. 
+	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories.
 	 * @param context the transactional context where the pending changes are stored
 	 */
 	public void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, WorkQueuePerIndexSplitter context);

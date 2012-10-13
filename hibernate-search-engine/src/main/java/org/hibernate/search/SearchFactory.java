@@ -55,7 +55,7 @@ public interface SearchFactory {
 	 *
 	 * @param name the name of the analyzer
 	 * @return analyzer with the specified name
-	 * @throws SearchException if the definition name is unknown
+	 * @throws org.hibernate.search.SearchException if the definition name is unknown
 	 */
 	Analyzer getAnalyzer(String name);
 
@@ -63,10 +63,8 @@ public interface SearchFactory {
 	 * Retrieves the scoped analyzer for a given class.
 	 *
 	 * @param clazz The class for which to retrieve the analyzer.
-	 *
 	 * @return The scoped analyzer for the specified class.
-	 *
-	 * @throws IllegalArgumentException in case <code>clazz == null</code> or the specified
+	 * @throws java.lang.IllegalArgumentException in case <code>clazz == null</code> or the specified
 	 *                                  class is not an indexed entity.
 	 */
 	Analyzer getAnalyzer(Class<?> clazz);

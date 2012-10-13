@@ -26,7 +26,7 @@ import org.hibernate.search.backend.LuceneWork;
 
 /**
  * Applies an update operation to the IndexWriter
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class SingleTaskRunnable implements Runnable {

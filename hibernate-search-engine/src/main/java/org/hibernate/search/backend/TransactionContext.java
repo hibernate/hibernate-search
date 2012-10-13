@@ -43,8 +43,8 @@ public interface TransactionContext {
 
 	/**
 	 * Register the given synchronization.
-	 * 
- 	 * @param synchronization synchronization to register
+	 *
+	 * @param synchronization synchronization to register
 	 */
 	public void registerSynchronization(Synchronization synchronization);
 }

@@ -30,7 +30,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 /**
  * Keep the query builder contextual information
- * 
+ *
  * @author Emmanuel Bernard
  */
 public class QueryBuildingContext {

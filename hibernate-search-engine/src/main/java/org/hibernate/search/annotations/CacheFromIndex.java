@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  * Depending on the type of performed queries, it's often needed to extract
  * at least the entity type. Caches which aren't needed won't be used, but used
  * caches might take a significant amount of memory.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 @Retention( RetentionPolicy.RUNTIME )

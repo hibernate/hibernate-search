@@ -34,7 +34,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * We customize Lucene's ConcurrentMergeScheduler to route eventual exceptions to our configurable errorhandler.
- * 
+ *
  * @see ErrorHandler
  * @since 3.3
  * @author Sanne Grinovero
