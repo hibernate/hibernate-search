@@ -152,8 +152,7 @@ public class DeploymentJmsMasterSlave {
 	private static void addLibraries(WebArchive archive) {
 		if ( libraryFiles == null ) { //cache this as Maven resolution is painfully slow
 			MavenDependencyResolver resolver = DependencyResolvers
-					.use( MavenDependencyResolver.class )
-					.goOffline();
+					.use( MavenDependencyResolver.class );
 			String currentVersion = Version.getVersionString();
 			libraryFiles = resolver
 					.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
