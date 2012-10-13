@@ -22,6 +22,7 @@ package org.hibernate.search.test.spatial;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Latitude;
@@ -32,6 +33,7 @@ import org.hibernate.search.annotations.SpatialMode;
 @Spatial(name="home",  spatialMode = SpatialMode.GRID)
 @Entity
 @Indexed
+@Table(name="people")//User is a reserved name in most databases
 public class User {
 
 	@Id
