@@ -46,16 +46,16 @@ import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class WorkerTestCase extends SearchTestCase {
 	
-	private final AtomicBoolean allFine = new AtomicBoolean( true );
-
 	public void testConcurrency() throws Exception {
+		final AtomicBoolean allFine = new AtomicBoolean( true );
 		int nThreads = 15;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
-		Work work = new Work( getSessions() );
-		ReverseWork reverseWork = new ReverseWork( getSessions() );
+		Work work = new Work( getSessions(), allFine, isWorkerSync() );
+		ReverseWork reverseWork = new ReverseWork( getSessions(), allFine );
 		long start = System.nanoTime();
 		int iteration = 100;
 		for ( int i = 0; i < iteration; i++ ) {
@@ -72,11 +72,15 @@ public class WorkerTestCase extends SearchTestCase {
 		);
 	}
 
-	protected class Work implements Runnable {
-		private SessionFactory sf;
+	protected static final class Work implements Runnable {
+		private final SessionFactory sf;
+		private final AtomicBoolean allFine;
+		private final boolean isWorkerSync;
 
-		public Work(SessionFactory sf) {
+		public Work(SessionFactory sf, AtomicBoolean allFine, boolean isWorkerSync) {
 			this.sf = sf;
+			this.allFine = allFine;
+			this.isWorkerSync = isWorkerSync;
 		}
 
 		public void run() {
@@ -123,7 +127,7 @@ public class WorkerTestCase extends SearchTestCase {
 				boolean results = Search.getFullTextSession( s ).createFullTextQuery( query ).list().size() > 0;
 				// don't test because in case of async, it query happens before
 				// actual saving
-				if ( isWorkerSync() ) {
+				if ( isWorkerSync ) {
 					Assert.assertTrue( results );
 				}
 				tx.commit();
@@ -164,11 +168,13 @@ public class WorkerTestCase extends SearchTestCase {
 
 	}
 
-	protected class ReverseWork implements Runnable {
-		private SessionFactory sf;
+	protected static final class ReverseWork implements Runnable {
+		private final SessionFactory sf;
+		private final AtomicBoolean allFine;
 
-		public ReverseWork(SessionFactory sf) {
+		public ReverseWork(SessionFactory sf, AtomicBoolean allFine) {
 			this.sf = sf;
+			this.allFine = allFine;
 		}
 
 		public void run() {
