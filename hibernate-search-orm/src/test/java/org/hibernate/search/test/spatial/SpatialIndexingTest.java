@@ -405,7 +405,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 	}
 
 	public void testSpatialAnnotationOnFieldLevelRangeMode() throws Exception {
-		SimpleDateFormat dateFormat= new SimpleDateFormat("d M yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat( "d M yyyy" );
 		Date date = dateFormat.parse( "10 9 1976" );
 		RangeEvent event = new RangeEvent( 1, "Test", 24.0d, 32.0d, date );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
