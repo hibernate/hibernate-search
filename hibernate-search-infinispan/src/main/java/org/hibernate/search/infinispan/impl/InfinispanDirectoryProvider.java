@@ -32,6 +32,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.CacheManagerServiceProvider;
+import org.hibernate.search.infinispan.InfinispanIntegration;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.infinispan.logging.impl.Log;
@@ -48,11 +49,23 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	private static final Log log = LoggerFactory.make(Log.class);
 
-	public static final String DEFAULT_LOCKING_CACHENAME = "LuceneIndexesLocking";
+	/**
+	 * Use {@link InfinispanIntegration.DEFAULT_LOCKING_CACHENAME} instead.
+	 */
+	@Deprecated
+	public static final String DEFAULT_LOCKING_CACHENAME = InfinispanIntegration.DEFAULT_LOCKING_CACHENAME;
 
-	public static final String DEFAULT_INDEXESDATA_CACHENAME = "LuceneIndexesData";
+	/**
+	 * Use {@link InfinispanIntegration.DEFAULT_INDEXESDATA_CACHENAME} instead.
+	 */
+	@Deprecated
+	public static final String DEFAULT_INDEXESDATA_CACHENAME = InfinispanIntegration.DEFAULT_INDEXESDATA_CACHENAME;
 
-	public static final String DEFAULT_INDEXESMETADATA_CACHENAME = "LuceneIndexesMetadata";
+	/**
+	 * Use {@link InfinispanIntegration.DEFAULT_LOCKING_CACHENAME} instead.
+	 */
+	@Deprecated
+	public static final String DEFAULT_INDEXESMETADATA_CACHENAME = InfinispanIntegration.DEFAULT_LOCKING_CACHENAME;
 
 	private ServiceManager serviceManager;
 	private String directoryProviderName;
@@ -71,9 +84,9 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		this.directoryProviderName = directoryProviderName;
 		this.serviceManager = context.getServiceManager();
 		this.cacheManager = serviceManager.requestService( CacheManagerServiceProvider.class, context );
-		metadataCacheName = properties.getProperty( "metadata_cachename", DEFAULT_INDEXESMETADATA_CACHENAME );
-		dataCacheName = properties.getProperty( "data_cachename", DEFAULT_INDEXESDATA_CACHENAME );
-		lockingCacheName = properties.getProperty( "locking_cachename", DEFAULT_LOCKING_CACHENAME );
+		metadataCacheName = InfinispanIntegration.getMetadataCacheName( properties );
+		dataCacheName = InfinispanIntegration.getDataCacheName( properties );
+		lockingCacheName = InfinispanIntegration.getLockingCacheName( properties );
 		chunkSize = ConfigurationParseHelper.getIntValue(
 				properties, "chunk_size", InfinispanDirectory.DEFAULT_BUFFER_SIZE
 		);
