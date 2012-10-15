@@ -29,6 +29,8 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 
 import java.util.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -47,6 +49,7 @@ public class RangeEvent {
 	String name;
 
 	@Field(store = Store.YES, index = Index.YES)
+	@Column(name="realdate")
 	Date date;
 
 	@Field(store = Store.YES, index = Index.YES)

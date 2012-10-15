@@ -30,6 +30,8 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 
 import java.util.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -48,11 +50,13 @@ public class Event {
 	String name;
 
 	@Field(store = Store.YES, index = Index.YES)
+	@Column(name="realdate")
 	Date date;
 
 	@Field(store = Store.YES, index = Index.YES)
 	@NumericField
 	double latitude;
+
 	@Field(store = Store.YES, index = Index.YES)
 	@NumericField
 	double longitude;
