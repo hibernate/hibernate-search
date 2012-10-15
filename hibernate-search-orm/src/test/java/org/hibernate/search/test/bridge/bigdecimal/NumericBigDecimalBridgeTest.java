@@ -36,6 +36,9 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.dialect.SQLServer2008Dialect;
+import org.hibernate.dialect.Sybase11Dialect;
+import org.hibernate.dialect.SybaseASE15Dialect;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Field;
@@ -46,10 +49,13 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.testing.SkipForDialect;
 
 /**
  * @author Hardy Ferentschik
  */
+@SkipForDialect(value = { SybaseASE15Dialect.class, Sybase11Dialect.class, SQLServer2008Dialect.class },
+	comment = "Sybase and MSSQL don't support range large enough for this test")
 public class NumericBigDecimalBridgeTest extends SearchTestCase {
 
 	public void testNumericFieldWithBigDecimals() throws Exception {
