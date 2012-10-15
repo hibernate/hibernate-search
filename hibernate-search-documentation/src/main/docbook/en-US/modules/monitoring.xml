@@ -47,7 +47,12 @@
     Depending on your the configuration the
     <classname>IndexControlMBean</classname> and
     <classname>IndexingProgressMonitorMBean</classname> will also be
-    registered. Lets have a closer look at the different MBeans.<tip>
+    registered. In case you are having more than one JMX enabled Hibernate
+    Search instance running within a single JVM, you should also set
+    <property>hibernate.search.jmx_bean_suffix</property> to a different value
+    for each of the instances. The specified suffix will be used to
+    distinguish between the different MBean instances. Let's have a closer
+    look at the mentioned MBeans. <tip>
         <para>If you want to access your JMX beans remotely via JConsole make
         sure to set the system property
         <varname>com.sun.management.jmxremote</varname> to
@@ -66,7 +71,7 @@
 
       <para>This MBean allows to build, optimize and purge the index for a
       given entity. Indexing occurs via the mass indexing API (see<xref
-      linkend="search-batchindex-massindexer" />). A requirement for this bean
+      linkend="search-batchindex-massindexer"/>). A requirement for this bean
       to be registered in JMX is, that the Hibernate
       <classname>SessionFactory</classname> is bound to JNDI via the
       <literal>hibernate.session_factory_name</literal> property. Refer to the

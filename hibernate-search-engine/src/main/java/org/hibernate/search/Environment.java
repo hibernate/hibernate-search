@@ -159,6 +159,13 @@ public final class Environment {
 	public static final String JMX_ENABLED = "hibernate.search.jmx_enabled";
 
 	/**
+	 * If JMX bean deployment is enabled (see {@link #JMX_ENABLED}) the specified suffix will be appended to the registered
+	 * MBean names. This allows for running multiple apps on the same JVM each which JMX enabled. If not specified only the default
+	 * names are used.
+	 */
+	public static final String JMX_BEAN_SUFFIX = "hibernate.search.jmx_bean_suffix";
+
+	/**
 	 * If set to {@code true} the search statistic will be gathered.
 	 */
 	public static final String GENERATE_STATS = "hibernate.search.generate_statistics";

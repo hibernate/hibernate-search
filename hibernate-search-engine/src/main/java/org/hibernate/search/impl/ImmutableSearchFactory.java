@@ -30,43 +30,38 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
 
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engine.impl.FilterDef;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.IndexReaderAccessor;
-import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.stat.impl.StatisticsImpl;
-import org.hibernate.search.stat.spi.StatisticsImplementor;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.engine.spi.TimingSource;
-import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
+import org.hibernate.search.indexes.IndexReaderAccessor;
+import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
+import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
+import org.hibernate.search.query.engine.impl.HSQueryImpl;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
-import org.hibernate.search.query.engine.impl.HSQueryImpl;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -74,6 +69,10 @@ import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
+import org.hibernate.search.stat.impl.StatisticsImpl;
+import org.hibernate.search.stat.spi.StatisticsImplementor;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -113,6 +112,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final SearchMapping mapping;
 	private final boolean indexMetadataIsComplete;
 	private final boolean isIdProvidedImplicit;
+	private final String statisticsMBeanName;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -146,13 +146,10 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		);
 
 		if ( isJMXEnabled() ) {
-			// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
-			if ( JMXRegistrar.isNameRegistered( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME ) ) {
-				JMXRegistrar.unRegisterMBean( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME );
-			}
-			JMXRegistrar.registerMBean(
-					new StatisticsInfo( statistics ), StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME
-			);
+			statisticsMBeanName = registerMBeans();
+		}
+		else {
+			statisticsMBeanName = null;
 		}
 
 		this.indexReaderAccessor = new DefaultIndexReaderAccessor( this );
@@ -188,6 +185,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			}
 			for ( EntityIndexBinder entityBinder : this.indexBindingForEntities.values() ) {
 				entityBinder.getDocumentBuilder().close();
+			}
+
+			// unregister statistic mbean
+			if ( statisticsMBeanName != null ) {
+				JMXRegistrar.unRegisterMBean( statisticsMBeanName );
 			}
 		}
 	}
@@ -319,6 +321,22 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	public boolean isJMXEnabled() {
 		String enableJMX = getConfigurationProperties().getProperty( Environment.JMX_ENABLED );
 		return "true".equalsIgnoreCase( enableJMX );
+	}
+
+	private String registerMBeans() {
+		String mbeanNameSuffix = getConfigurationProperties().getProperty( Environment.JMX_BEAN_SUFFIX );
+		String objectName = JMXRegistrar.buildMBeanName(
+				StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME,
+				mbeanNameSuffix
+		);
+
+		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
+		if ( JMXRegistrar.isNameRegistered( objectName ) ) {
+			JMXRegistrar.unRegisterMBean( objectName );
+		}
+		StatisticsInfo statisticsInfo = new StatisticsInfo( statistics );
+		JMXRegistrar.registerMBean( statisticsInfo, objectName );
+		return objectName;
 	}
 
 	public boolean isDirtyChecksEnabled() {
