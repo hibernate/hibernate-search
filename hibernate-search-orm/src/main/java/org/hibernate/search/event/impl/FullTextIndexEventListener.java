@@ -32,17 +32,6 @@ import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
-import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.jmx.IndexControl;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.Session;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.cfg.Configuration;
@@ -65,13 +54,23 @@ import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
+import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.jmx.IndexControl;
+import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.impl.WeakIdentityHashMap;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.event.impl.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
@@ -95,6 +94,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	private static final Log log = LoggerFactory.make();
 	private final Installation installation;
+
+	private String indexControlMBeanName;
 
 	protected boolean used;
 	protected boolean skipDirtyChecks = true;
@@ -151,7 +152,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	}
 
 	private void enableIndexControlBean(Configuration cfg) {
-
 		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
 		if ( StringHelper.isEmpty( cfg.getProperty( "hibernate.session_factory_name" ) ) ) {
 			log.debug(
@@ -160,13 +160,20 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			return;
 		}
 
+		String mbeanNameSuffix = cfg.getProperty( Environment.JMX_BEAN_SUFFIX );
+		String objectName = JMXRegistrar.buildMBeanName(
+				IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME,
+				mbeanNameSuffix
+		);
+
 		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
-		if ( JMXRegistrar.isNameRegistered( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME ) ) {
-			JMXRegistrar.unRegisterMBean( IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		if ( JMXRegistrar.isNameRegistered( objectName ) ) {
+			JMXRegistrar.unRegisterMBean( objectName );
 		}
 
 		IndexControl indexCtrlBean = new IndexControl( cfg.getProperties() );
-		JMXRegistrar.registerMBean( indexCtrlBean, IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME );
+		JMXRegistrar.registerMBean( indexCtrlBean, objectName );
+		indexControlMBeanName = objectName;
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
@@ -202,16 +209,18 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Object entity = event.getEntity();
 			final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
-			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( getDirtyPropertyNames(
-					event
-			) ) ) ) {
+			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty(
+					getDirtyPropertyNames(
+							event
+					)
+			) ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
 			}
 		}
 	}
 
-    public String[] getDirtyPropertyNames(PostUpdateEvent event) {
+	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
 		EntityPersister persister = event.getPersister();
 		final int[] dirtyProperties = event.getDirtyProperties();
 		if ( dirtyProperties != null && dirtyProperties.length > 0 ) {
@@ -236,6 +245,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	public void cleanup() {
 		searchFactoryImplementor.close();
+		if ( indexControlMBeanName != null ) {
+			JMXRegistrar.unRegisterMBean( indexControlMBeanName );
+		}
 	}
 
 	public void onPostRecreateCollection(PostCollectionRecreateEvent event) {
@@ -262,7 +274,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			PersistentCollection persistentCollection = event.getCollection();
 			final String collectionRole;
 			if ( persistentCollection != null ) {
-				if ( ! persistentCollection.wasInitialized() ) {
+				if ( !persistentCollection.wasInitialized() ) {
 					// non-initialized collections will still trigger events, but we want to skip them
 					// as they won't contain new values affecting the index state
 					return;
@@ -273,8 +285,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 				collectionRole = null;
 			}
 			AbstractDocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
-			
-			if ( documentBuilder != null && ! documentBuilder.isCollectionRoleExcluded( collectionRole ) ) {
+
+			if ( documentBuilder != null && !documentBuilder.isCollectionRoleExcluded( collectionRole ) ) {
 				Serializable id = getId( entity, event );
 				if ( id == null ) {
 					log.idCannotBeExtracted( event.getAffectedOwnerEntityName() );
@@ -349,7 +361,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	 * It is not suggested to extend FullTextIndexEventListener, but when needed to implement special
 	 * use cases implementors might need this method. If you have to extent this, please report
 	 * your use case so that better long term solutions can be discussed.
+	 *
 	 * @param entity
+	 *
 	 * @return the DocumentBuilder for the specified entity
 	 */
 	protected AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
