@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.queryParser.QueryParser;
@@ -38,8 +37,8 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;

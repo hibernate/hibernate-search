@@ -124,9 +124,9 @@ public final class Environment {
 	 * Number of times we retry the logic looking for marker files in master's directory before
 	 * giving up and raising an exception.
 	 * This setting is the suffix of an index using FSSlaveDirectoryProvider
-	 *
+	 * <p/>
 	 * Note that we try again after 5 seconds.
-	 *
+	 * <p/>
 	 * Default to 0 (ie no retry).
 	 */
 	public static final String RETRY_MARKER_LOOKUP = "retry_marker_lookup";
@@ -157,6 +157,14 @@ public final class Environment {
 	 * get enabled.
 	 */
 	public static final String JMX_ENABLED = "hibernate.search.jmx_enabled";
+
+	/**
+	 * If JMX bean deployment is enabled (see {@link #JMX_ENABLED}) the specified suffix will be appended to the registered
+	 * MBean names. This allows for running multiple apps on the same JVM each which JMX enabled. If not specified only the default
+	 * names are used.
+	 */
+	public static final String JMX_BEAN_SUFFIX = "hibernate.search.jmx_bean_suffix";
+
 
 	/**
 	 * If set to {@code true} the search statistic will be gathered.

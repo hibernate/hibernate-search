@@ -52,7 +52,7 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.testing.TestForIssue;
+import org.hibernate.search.test.util.TestForIssue;
 
 /**
  * @author Emmanuel Bernard

@@ -28,9 +28,9 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.hibernate.search.util.logging.impl.Log;
-
+import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -44,11 +44,20 @@ public final class JMXRegistrar {
 	private JMXRegistrar() {
 	}
 
+	public static String buildMBeanName(String defaultName, String suffix) {
+		String objectName = defaultName;
+		if ( !StringHelper.isEmpty( suffix ) ) {
+			objectName += "[" + suffix + "]";
+		}
+		return objectName;
+	}
+
 	/**
 	 * Registers the specified object with the given name to the MBean server.
 	 *
 	 * @param object the object to register
 	 * @param name the object name to register the bean under
+	 *
 	 * @return The registered object name
 	 */
 	public static String registerMBean(Object object, String name) {
@@ -67,7 +76,9 @@ public final class JMXRegistrar {
 	 * Unregister the MBean with the specified name.
 	 *
 	 * @param name The name of the bean to unregister. The {@code name} cannot be {@code null}
-	 * @throws java.lang.IllegalArgumentException In case the object name is {@code null}
+	 *
+	 * @throws java.lang.IllegalArgumentException
+	 *          In case the object name is {@code null}
 	 */
 	public static void unRegisterMBean(String name) {
 		if ( name == null ) {
@@ -89,8 +100,11 @@ public final class JMXRegistrar {
 	 * Checks whether a bean is registered under the given  name.
 	 *
 	 * @param name the object name to check (as string)
+	 *
 	 * @return {@code true} is there is a bean registered under the given name, {@code false} otherwise.
-	 * @throws java.lang.IllegalArgumentException In case the object name is {@code null}
+	 *
+	 * @throws java.lang.IllegalArgumentException
+	 *          In case the object name is {@code null}
 	 */
 	public static boolean isNameRegistered(String name) {
 		if ( name == null ) {
