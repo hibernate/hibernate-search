@@ -28,9 +28,11 @@ import java.util.Properties;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -52,6 +54,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	private boolean transactionsExpected = true;
 	private boolean indexMetadataComplete = true;
 	private boolean idProvidedImplicit = false;
+	private final IndexManagerFactory indexManagerFactory = new DefaultIndexManagerFactory();
 
 	public ManualConfiguration() {
 		this(SimpleInitializer.INSTANCE);
@@ -138,6 +141,11 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	public ManualConfiguration setIdProvidedImplicit(boolean idProvidedImplicit) {
 		this.idProvidedImplicit = idProvidedImplicit;
 		return this;
+	}
+
+	@Override
+	public IndexManagerFactory getIndexManagerFactory() {
+		return indexManagerFactory;
 	}
 
 }

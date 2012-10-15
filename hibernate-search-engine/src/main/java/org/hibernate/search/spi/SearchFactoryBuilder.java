@@ -160,7 +160,7 @@ public class SearchFactoryBuilder {
 
 		final Properties configurationProperties = factoryState.getConfigurationProperties();
 		BuildContext buildContext = new BuildContext();
-		
+
 		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties, factoryState );
 
 		applySearchMappingToMetadata( cfg.getReflectionManager(), cfg.getProgrammaticMapping() );
@@ -353,6 +353,7 @@ public class SearchFactoryBuilder {
 			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );
 			factoryState.setTransactionManagerExpected( cfg.isTransactionManagerExpected() );
 			factoryState.setIdProvidedImplicit( cfg.isIdProvidedImplicit() );
+			factoryState.setIndexManagerFactory( cfg.getIndexManagerFactory() );
 		}
 	}
 

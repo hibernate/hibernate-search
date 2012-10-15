@@ -123,4 +123,11 @@ public interface SearchConfiguration {
 	 * with a {@link org.hibernate.search.annotations.ProvidedId}, if no other Id is specified.
 	 */
 	boolean isIdProvidedImplicit();
+
+	/**
+	 * @return the component responbile to create IndexManager instances; this might be a custom
+	 * component to allow for different default implementations, custom aliases, different
+	 * classloaders.
+	 */
+	IndexManagerFactory getIndexManagerFactory();
 }

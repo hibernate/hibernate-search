@@ -654,4 +654,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 165, value = "Illegal state for service initialization")
 	SearchException illegalServiceBuildPhase();
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 166, value = "IndexManager factory resolved alias '%1$s' to '%2$s'.")
+	void indexManagerAliasResolved(String alias, Class im);
 }

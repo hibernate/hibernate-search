@@ -31,6 +31,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -73,6 +74,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private SearchMapping mapping;
 	private boolean indexMetadataIsComplete;
 	private boolean isIdProvidedImplicit;
+	private IndexManagerFactory indexManagerFactory;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -95,6 +97,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		mapping = oldFactoryState.getProgrammaticMapping();
 		indexMetadataIsComplete = oldFactoryState.isIndexMetadataComplete();
 		isIdProvidedImplicit = oldFactoryState.isIdProvidedImplicit();
+		indexManagerFactory = oldFactoryState.getIndexManagerFactory();
 	}
 
 	public ServiceManager getServiceManager() {
@@ -279,6 +282,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setIdProvidedImplicit(boolean idProvidedImplicit) {
 		this.isIdProvidedImplicit = idProvidedImplicit;
+	}
+
+	@Override
+	public IndexManagerFactory getIndexManagerFactory() {
+		return indexManagerFactory;
+	}
+
+	public void setIndexManagerFactory(IndexManagerFactory indexManagerFactory) {
+		this.indexManagerFactory = indexManagerFactory;
 	}
 
 }

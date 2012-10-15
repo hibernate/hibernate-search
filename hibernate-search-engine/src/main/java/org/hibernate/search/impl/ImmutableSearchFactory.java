@@ -40,6 +40,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
@@ -113,6 +114,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final boolean indexMetadataIsComplete;
 	private final boolean isIdProvidedImplicit;
 	private final String statisticsMBeanName;
+	private final IndexManagerFactory indexManagerFactory;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -136,6 +138,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.statistics = new StatisticsImpl( this );
 		this.indexMetadataIsComplete = state.isIndexMetadataComplete();
 		this.isIdProvidedImplicit = state.isIdProvidedImplicit();
+		this.indexManagerFactory = state.getIndexManagerFactory();
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false
 		);
@@ -406,6 +409,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public boolean isIdProvidedImplicit() {
 		return isIdProvidedImplicit;
+	}
+
+	@Override
+	public IndexManagerFactory getIndexManagerFactory() {
+		return indexManagerFactory;
 	}
 
 }
