@@ -27,6 +27,7 @@ package org.hibernate.search.spi.internals;
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.TimingSource;
@@ -86,4 +87,6 @@ public interface SearchFactoryState {
 	boolean isIndexMetadataComplete();
 
 	boolean isIdProvidedImplicit();
+
+	IndexManagerFactory getIndexManagerFactory();
 }

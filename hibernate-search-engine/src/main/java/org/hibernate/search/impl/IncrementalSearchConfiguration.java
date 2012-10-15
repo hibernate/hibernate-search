@@ -33,6 +33,7 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -104,5 +105,10 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	@Override
 	public boolean isIdProvidedImplicit() {
 		return state.isIdProvidedImplicit();
+	}
+
+	@Override
+	public IndexManagerFactory getIndexManagerFactory() {
+		return state.getIndexManagerFactory();
 	}
 }

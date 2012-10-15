@@ -65,19 +65,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  */
 public class IndexManagerHolder {
-	
+
 	private static final Log log = LoggerFactory.make();
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
-	private static final String DEFAULT_INDEX_MANAGER_NAME = "directory-based";
-
-	private static final Map<String, String> defaultIndexManagerClasses;
-	static {
-		defaultIndexManagerClasses = new HashMap<String, String>( 3 );
-		defaultIndexManagerClasses.put( "", DirectoryBasedIndexManager.class.getName() );
-		defaultIndexManagerClasses.put( DEFAULT_INDEX_MANAGER_NAME, DirectoryBasedIndexManager.class.getName() );
-		defaultIndexManagerClasses.put( "near-real-time", NRTIndexManager.class.getName() );
-	}
 
 	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
 
@@ -227,15 +218,10 @@ public class IndexManagerHolder {
 		String indexManagerImplementationName = indexProps.getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
 		final IndexManager manager;
 		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
-			manager = new DirectoryBasedIndexManager();
+			manager = cfg.getIndexManagerFactory().createDefaultIndexManager();
 		}
 		else {
-			String longName = defaultIndexManagerClasses.get( indexManagerImplementationName );
-			if ( longName == null ) {
-				longName = indexManagerImplementationName;
-			}
-			manager = ClassLoaderHelper.instanceFromName( IndexManager.class, longName,
-						IndexManagerHolder.class, "index manager" );
+			manager = cfg.getIndexManagerFactory().createIndexManagerByName( indexManagerImplementationName );
 		}
 		try {
 			manager.initialize( indexName, indexProps, context );

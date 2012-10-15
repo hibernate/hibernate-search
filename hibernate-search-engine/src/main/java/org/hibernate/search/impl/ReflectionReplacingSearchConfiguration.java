@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
@@ -110,6 +111,11 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 	@Override
 	public boolean isIdProvidedImplicit() {
 		return cfg.isIdProvidedImplicit();
+	}
+
+	@Override
+	public IndexManagerFactory getIndexManagerFactory() {
+		return cfg.getIndexManagerFactory();
 	}
 
 }

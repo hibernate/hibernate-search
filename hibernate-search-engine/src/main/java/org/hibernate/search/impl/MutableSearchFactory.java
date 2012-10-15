@@ -34,6 +34,7 @@ import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -253,6 +254,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public boolean isIdProvidedImplicit() {
 		return delegate.isIdProvidedImplicit();
+	}
+
+	@Override
+	public IndexManagerFactory getIndexManagerFactory() {
+		return delegate.getIndexManagerFactory();
 	}
 
 }
