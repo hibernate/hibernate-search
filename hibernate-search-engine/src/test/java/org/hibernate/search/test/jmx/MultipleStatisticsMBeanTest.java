@@ -42,6 +42,7 @@ import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.test.util.TestForIssue;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -50,6 +51,7 @@ import static junit.framework.Assert.fail;
 /**
  * @author Hardy Ferentschik
  */
+@TestForIssue(jiraKey = "HSEARCH-1026")
 public class MultipleStatisticsMBeanTest {
 	private static File simpleJndiDir;
 	private static MBeanServer mbeanServer;

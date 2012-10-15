@@ -34,10 +34,12 @@ import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.test.util.TestForIssue;
 
 /**
  * @author Hardy Ferentschik
  */
+@TestForIssue(jiraKey = "HSEARCH-1026")
 public class IndexControlMBeanWithSuffixTest extends SearchTestCase {
 	MBeanServer mbeanServer;
 	ObjectName indexBeanObjectName;
