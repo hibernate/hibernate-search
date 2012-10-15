@@ -108,7 +108,7 @@ public class IndexManagerHolder {
 					directoryProviderName;
 			IndexManager indexManager = indexManagersRegistry.get( providerName );
 			if ( indexManager == null ) {
-				indexManager = createDirectoryManager( providerName, indexProps[index], context );
+				indexManager = createIndexManager( providerName, indexProps[index], context, cfg );
 				indexManagersRegistry.put( providerName, indexManager );
 			}
 			indexManager.addContainedEntity( mappedClass );
@@ -223,16 +223,16 @@ public class IndexManagerHolder {
 		manager.setSimilarity( newSimilarity );
 	}
 
-	private IndexManager createDirectoryManager(String indexName, Properties indexProps, WorkerBuildContext context) {
-		String indexManagerName = indexProps.getProperty( Environment.INDEX_MANAGER_IMPL_NAME, DEFAULT_INDEX_MANAGER_NAME);
+	private IndexManager createIndexManager(String indexName, Properties indexProps, WorkerBuildContext context, SearchConfiguration cfg) {
+		String indexManagerImplementationName = indexProps.getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
 		final IndexManager manager;
-		if ( StringHelper.isEmpty( indexManagerName ) ) {
+		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
 			manager = new DirectoryBasedIndexManager();
 		}
 		else {
-			String longName = defaultIndexManagerClasses.get( indexManagerName );
+			String longName = defaultIndexManagerClasses.get( indexManagerImplementationName );
 			if ( longName == null ) {
-				longName = indexManagerName;
+				longName = indexManagerImplementationName;
 			}
 			manager = ClassLoaderHelper.instanceFromName( IndexManager.class, longName,
 						IndexManagerHolder.class, "index manager" );
