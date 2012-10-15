@@ -54,7 +54,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	private boolean transactionsExpected = true;
 	private boolean indexMetadataComplete = true;
 	private boolean idProvidedImplicit = false;
-	private final IndexManagerFactory indexManagerFactory = new DefaultIndexManagerFactory();
+	private IndexManagerFactory indexManagerFactory = new DefaultIndexManagerFactory();
 
 	public ManualConfiguration() {
 		this(SimpleInitializer.INSTANCE);
@@ -146,6 +146,10 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	@Override
 	public IndexManagerFactory getIndexManagerFactory() {
 		return indexManagerFactory;
+	}
+
+	public void setIndexManagerFactory(IndexManagerFactory indexManagerFactory) {
+		this.indexManagerFactory = indexManagerFactory;
 	}
 
 }
