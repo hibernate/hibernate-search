@@ -124,9 +124,9 @@ public final class Environment {
 	 * Number of times we retry the logic looking for marker files in master's directory before
 	 * giving up and raising an exception.
 	 * This setting is the suffix of an index using FSSlaveDirectoryProvider
-	 *
+	 * <p/>
 	 * Note that we try again after 5 seconds.
-	 *
+	 * <p/>
 	 * Default to 0 (ie no retry).
 	 */
 	public static final String RETRY_MARKER_LOOKUP = "retry_marker_lookup";

@@ -152,7 +152,6 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	}
 
 	private void enableIndexControlBean(Configuration cfg) {
-
 		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
 		if ( StringHelper.isEmpty( cfg.getProperty( "hibernate.session_factory_name" ) ) ) {
 			log.debug(
@@ -210,16 +209,18 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		if ( used ) {
 			final Object entity = event.getEntity();
 			final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
-			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty( getDirtyPropertyNames(
-					event
-			) ) ) ) {
+			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty(
+					getDirtyPropertyNames(
+							event
+					)
+			) ) ) {
 				Serializable id = event.getId();
 				processWork( entity, id, WorkType.UPDATE, event, false );
 			}
 		}
 	}
 
-    public String[] getDirtyPropertyNames(PostUpdateEvent event) {
+	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
 		EntityPersister persister = event.getPersister();
 		final int[] dirtyProperties = event.getDirtyProperties();
 		if ( dirtyProperties != null && dirtyProperties.length > 0 ) {
@@ -273,7 +274,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			PersistentCollection persistentCollection = event.getCollection();
 			final String collectionRole;
 			if ( persistentCollection != null ) {
-				if ( ! persistentCollection.wasInitialized() ) {
+				if ( !persistentCollection.wasInitialized() ) {
 					// non-initialized collections will still trigger events, but we want to skip them
 					// as they won't contain new values affecting the index state
 					return;
@@ -284,8 +285,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 				collectionRole = null;
 			}
 			AbstractDocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
-			
-			if ( documentBuilder != null && ! documentBuilder.isCollectionRoleExcluded( collectionRole ) ) {
+
+			if ( documentBuilder != null && !documentBuilder.isCollectionRoleExcluded( collectionRole ) ) {
 				Serializable id = getId( entity, event );
 				if ( id == null ) {
 					log.idCannotBeExtracted( event.getAffectedOwnerEntityName() );
@@ -360,7 +361,9 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	 * It is not suggested to extend FullTextIndexEventListener, but when needed to implement special
 	 * use cases implementors might need this method. If you have to extent this, please report
 	 * your use case so that better long term solutions can be discussed.
+	 *
 	 * @param entity
+	 *
 	 * @return the DocumentBuilder for the specified entity
 	 */
 	protected AbstractDocumentBuilder getDocumentBuilder(final Object entity) {

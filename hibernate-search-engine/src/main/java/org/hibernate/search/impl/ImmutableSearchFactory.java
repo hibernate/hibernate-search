@@ -235,7 +235,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	public void optimize(Class entityType) {
 		EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( entityType );
-		for ( IndexManager im: entityIndexBinding.getIndexManagers() ) {
+		for ( IndexManager im : entityIndexBinding.getIndexManagers() ) {
 			im.optimize();
 		}
 	}
