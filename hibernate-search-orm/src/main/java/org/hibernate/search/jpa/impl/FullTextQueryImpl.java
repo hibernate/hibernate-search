@@ -72,6 +72,7 @@ import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
+import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -126,6 +127,19 @@ public class FullTextQueryImpl implements FullTextQuery {
 
 	public FullTextQuery setProjection(String... fields) {
 		query.setProjection( fields );
+		return this;
+	}
+	
+
+	@Override
+	public FullTextQuery setSpatialParameters(double latitude, double longitude, String fieldName) {
+		query.setSpatialParameters(latitude, longitude, fieldName);
+		return this;
+	}
+
+	@Override
+	public FullTextQuery setSpatialParameters(Point center, String fieldName) {
+		query.setSpatialParameters(center, fieldName);
 		return this;
 	}
 
