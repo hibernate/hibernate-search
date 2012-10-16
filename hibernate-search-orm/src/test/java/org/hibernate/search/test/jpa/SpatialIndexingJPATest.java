@@ -131,19 +131,6 @@ public class SpatialIndexingJPATest extends JPATestCase {
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.getResultList();
 
-//		Object[] firstResult = (Object[]) results.get(0);
-//		Object[] secondResult = (Object[]) results.get(1);
-//		Object[] thirdResult = (Object[]) results.get(2);
-//		Object[] fourthResult = (Object[]) results.get(3);
-//		Object[] fifthResult = (Object[]) results.get(4);
-//		Object[] sixthResult = (Object[]) results.get(5);
-//		Assert.assertEquals( ((Double)firstResult[1]), 0.0, 0.0001 );
-//		Assert.assertEquals( ((Double)secondResult[1]), 10.1582, 0.0001 );
-//		Assert.assertEquals( ((Double)thirdResult[1]), 11.1195, 0.0001 );
-//		Assert.assertEquals( ((Double)fourthResult[1]), 15.0636, 0.0001 );
-//		Assert.assertEquals( ((Double)fifthResult[1]), 22.239, 0.001 );
-//		Assert.assertEquals( ((Double)sixthResult[1]), 24.446, 0.001 );
-
 		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
 		for (Object entity : pois) {
 			em.remove( entity );
