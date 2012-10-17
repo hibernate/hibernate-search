@@ -51,8 +51,8 @@ import org.junit.Test;
  */
 public class LiveRunningTest {
 	
-	private static final int TEST_RUNS = 17;
-	private static final int MAX_SLAVES = 5;
+	private static final int TEST_RUNS = 13;
+	private static final int MAX_SLAVES = 4;
 	private static HashSet<Class<?>> entityTypes;
 	
 	private final FullTextSessionBuilder master = createClusterNode( entityTypes, true );
