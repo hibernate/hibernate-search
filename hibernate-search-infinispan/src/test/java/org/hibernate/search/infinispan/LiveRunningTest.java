@@ -55,7 +55,7 @@ public class LiveRunningTest {
 	private static final int MAX_SLAVES = 5;
 	private static HashSet<Class<?>> entityTypes;
 	
-	private final FullTextSessionBuilder master = createClusterNode( entityTypes );
+	private final FullTextSessionBuilder master = createClusterNode( entityTypes, true );
 	private final List<FullTextSessionBuilder> slaves = new LinkedList<FullTextSessionBuilder>();
 	
 	private boolean growCluster = true;
@@ -105,7 +105,7 @@ public class LiveRunningTest {
 				growCluster = false;
 			}
 			else {
-				slaves.add( createClusterNode( entityTypes ) );
+				slaves.add( createClusterNode( entityTypes, false ) );
 			}
 		}
 		else {
