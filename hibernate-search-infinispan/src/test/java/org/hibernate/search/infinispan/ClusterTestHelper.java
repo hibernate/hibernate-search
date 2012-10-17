@@ -51,7 +51,7 @@ public class ClusterTestHelper {
 	 * join the existing nodes.
 	 * @return a started FullTextSessionBuilder
 	 */
-	public static FullTextSessionBuilder createClusterNode(Set<Class<?>> entityTypes) {
+	public static FullTextSessionBuilder createClusterNode(Set<Class<?>> entityTypes, boolean exclusiveWrite) {
 		FullTextSessionBuilder node = new FullTextSessionBuilder()
 			.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
 			// fragment on every 7 bytes: don't use this on a real case!
@@ -59,6 +59,9 @@ public class ClusterTestHelper {
 			.setProperty( "hibernate.search.default.indexwriter.chunk_size", "13" )
 			// this schema is shared across nodes, so don't drop it on shutdown:
 			.setProperty( Environment.HBM2DDL_AUTO, "create" )
+			// if we should allow aggressive index locking:
+			.setProperty( "hibernate.search.default." + org.hibernate.search.Environment.EXCLUSIVE_INDEX_USE,
+					String.valueOf( exclusiveWrite ) )
 			// share the same in-memory database connection pool
 			.setProperty(
 					Environment.CONNECTION_PROVIDER,
