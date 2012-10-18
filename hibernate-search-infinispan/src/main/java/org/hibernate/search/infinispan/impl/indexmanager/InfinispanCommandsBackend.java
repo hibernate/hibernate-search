@@ -66,6 +66,8 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
+	private final InfinispanIndexManager infinispanIndexManager;
+
 	private EmbeddedCacheManager cacheManager;
 	private ServiceManager services;
 	private String indexName;
@@ -75,6 +77,12 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
 	private DirectoryBasedIndexManager indexManager;
 	private Cache<Object, Object> channeledCache;
 	private CacheManagerMuxer cacheMuxer;
+	private ClusterViewChangeListener clusterViewChangeListener;
+
+
+	public InfinispanCommandsBackend(InfinispanIndexManager infinispanIndexManager) {
+		this.infinispanIndexManager = infinispanIndexManager;
+	}
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
@@ -89,10 +97,14 @@ public class InfinispanCommandsBackend implements BackendQueueProcessor {
 		this.rpcManager = componentsRegistry.getComponent( RpcManager.class );
 		this.cacheName = componentsRegistry.getCacheName();
 		this.distributionManager = componentsRegistry.getComponent( DistributionManager.class );
+		this.clusterViewChangeListener = new ClusterViewChangeListener( infinispanIndexManager );
+		this.cacheManager.addListener( clusterViewChangeListener );
 	}
 
 	@Override
 	public void close() {
+		cacheManager.removeListener( clusterViewChangeListener );
+		clusterViewChangeListener = null;
 		cacheMuxer.disableIndexManager( indexName );
 		services.releaseService( CacheManagerServiceProvider.class );
 		services = null;

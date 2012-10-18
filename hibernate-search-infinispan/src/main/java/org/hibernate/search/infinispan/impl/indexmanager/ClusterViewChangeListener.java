@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -18,24 +18,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.infinispan.indexmanager;
+package org.hibernate.search.infinispan.impl.indexmanager;
 
-import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
-
-import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.hibernate.search.test.util.TestForIssue;
+import org.infinispan.notifications.Listener;
+import org.infinispan.notifications.cachemanagerlistener.annotation.ViewChanged;
+import org.infinispan.notifications.cachemanagerlistener.event.ViewChangedEvent;
 
 /**
- * Use these options to verify this test from your IDE:
- * -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -XX:MaxPermSize=256m
- *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-@TestForIssue(jiraKey = "HSEARCH-882")
-public class IndexManagerClusteredTest extends BaseLiveClusterTest {
+@Listener
+public class ClusterViewChangeListener {
 
-	protected FullTextSessionBuilder createNewNode() {
-		return createClusterNode( entityTypes, false, false, true );
+	private final InfinispanIndexManager infinispanIndexManager;
+
+	public ClusterViewChangeListener(InfinispanIndexManager infinispanIndexManager) {
+		this.infinispanIndexManager = infinispanIndexManager;
+	}
+
+	@ViewChanged
+	public void onViewChange(ViewChangedEvent event) {
+		System.out.println( "new Members: " + event.getNewMembers() );
+		System.out.println( "old Members: " + event.getOldMembers() );
 	}
 
 }

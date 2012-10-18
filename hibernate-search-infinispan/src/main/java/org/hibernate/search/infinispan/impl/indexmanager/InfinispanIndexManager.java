@@ -57,10 +57,11 @@ public class InfinispanIndexManager extends DirectoryBasedIndexManager {
 		super.destroy();
 	}
 
+	@Override
 	protected BackendQueueProcessor createBackend(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		//We'll actually create two backend processors and expose them as one wrapping them together:
 		BackendQueueProcessor localMaster = BackendFactory.createBackend( this, buildContext, cfg );
-		remoteMaster = new InfinispanCommandsBackend();
+		remoteMaster = new InfinispanCommandsBackend( this );
 		remoteMaster.initialize( cfg, buildContext, this );
 		// localMaster is already initialized by the BackendFactory
 		MasterSwitchDelegatingQueueProcessor joinedMaster = new MasterSwitchDelegatingQueueProcessor( localMaster, remoteMaster );
