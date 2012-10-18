@@ -99,7 +99,7 @@ public class SharedIndexTest {
 		entityTypes.add( Device.class );
 		entityTypes.add( Robot.class );
 		entityTypes.add( Toaster.class );
-		node = createClusterNode(entityTypes);
+		node = createClusterNode( entityTypes, true );
 		waitMembersCount( node, Toaster.class, 1 );
 	}
 
