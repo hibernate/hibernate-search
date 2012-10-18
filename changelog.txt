@@ -2,6 +2,59 @@ Hibernate Search Changelog
 ==========================
 
 
+Version 4.2.0.Beta2 (18-10-2012)
+------------------------
+
+** Bug
+    * [HSEARCH-1025] - StatisticsInfoMBean is never unregistered
+    * [HSEARCH-1026] - It's impossible to expose statistics via JMX from more than one application
+    * [HSEARCH-1179] - SearchBeforeIndexSynchronizationJmsMasterSlaveIT makes wrong test assumptions
+    * [HSEARCH-1183] - Documentation does not build in JDK 7
+    * [HSEARCH-1184] - JMS Master/Slave index replication mechanism doesn't pass user/password to remote server
+    * [HSEARCH-1190] - IndexingInterceptors not applied to MassIndexer
+    * [HSEARCH-1193] - Projection on Numeric fields should return Numbers
+    * [HSEARCH-1201] - MassIndexer: @IndexEmbedded, lazy field and FieldBridge problem
+    * [HSEARCH-1204] - New Spatial methods on FullTextQuery are not exposed on the JPA FullTextQuery
+    * [HSEARCH-1212] - Docbook maven plugin hangs
+
+** Improvement
+    * [HSEARCH-1100] - Serialization protocol version is logged twice
+    * [HSEARCH-1169] - Should expose the FullTextSessionBuilder on public API
+    * [HSEARCH-1170] - Mark API deprecated consistently to Hibernate ORM
+    * [HSEARCH-1175] - Return distance to search center in spatial queries
+    * [HSEARCH-1180] - Upgrade to Hibernate ORM 4.1.6.Final
+    * [HSEARCH-1181] - Upgrade to Infinispan 5.1.6.FINAL and JGroups 3.0.13.Final
+    * [HSEARCH-1186] - Document safety of refresh period on wrong estimate
+    * [HSEARCH-1196] - JMS connections should be reused
+    * [HSEARCH-1198] - MessageSender should be stopped when provider is stopped
+    * [HSEARCH-1199] - Convert the Serializer components into a managed Service
+    * [HSEARCH-1200] - BuildContext should be dereferenced after the SearchFactory has been initialized
+    * [HSEARCH-1207] - LuceneWorkSerializer service should be lazily initialized
+    * [HSEARCH-1208] - Avoid creating multiple instances of DefaultBoostStrategy
+    * [HSEARCH-1211] - Allow override of IndexManager aliases and factory methods as an extension point
+    * [HSEARCH-1215] - Update to Infinispan 5.1.8.Final and JGroups 3.0.14.Final
+
+** New Feature
+    * [HSEARCH-1130] - Support @Spatial without depending on the Coordinates class
+    * [HSEARCH-1171] - Tika StringBrigde
+    * [HSEARCH-1174] - Sorting by distance on spatial queries
+
+** Task
+    * [HSEARCH-970] - log4j version must be explicitly specified in all sub modules
+    * [HSEARCH-1000] - Update to Byteman 2.1
+    * [HSEARCH-1177] - Update to Apache Lucene 3.6.1
+    * [HSEARCH-1187] - Remove classloader helper which breaks in modular environments
+    * [HSEARCH-1192] - Update Maven build plugins and require explicit Maven version
+    * [HSEARCH-1194] - Some tests use a too long identifier
+    * [HSEARCH-1197] - Timing failures in test SearchBeforeIndexSynchronizationJmsMasterSlaveIT
+    * [HSEARCH-1202] - Document @Latitude and @Longitude features of Spatial
+    * [HSEARCH-1203] - SpatialQueryBuilder assumes usage of "km" units
+    * [HSEARCH-1206] - Fix some javadocs and coding consistency
+    * [HSEARCH-1209] - Integration test might fail to download dependencies
+    * [HSEARCH-1210] - Spatial test is using reserved table name in tests
+    * [HSEARCH-1216] - Minor cleanup in the Infinispan integration
+
+
 Version 4.2.0.Beta1 (21-6-2012)
 ------------------------
 
