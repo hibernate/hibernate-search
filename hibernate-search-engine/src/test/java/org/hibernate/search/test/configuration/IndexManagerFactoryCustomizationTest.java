@@ -28,8 +28,8 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.impl.DefaultIndexManagerFactory;
-import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -49,7 +49,7 @@ public class IndexManagerFactoryCustomizationTest {
 	@Test
 	public void testDefaultImplementation() {
 		ManualConfiguration cfg = new ManualConfiguration();
-		verifyIndexManagerTypeIs( DirectoryBasedIndexManager.class.getName(), cfg );
+		verifyIndexManagerTypeIs( DirectoryBasedIndexManager.class, cfg );
 	}
 
 	@Test
@@ -61,10 +61,10 @@ public class IndexManagerFactoryCustomizationTest {
 				return new NRTIndexManager();
 			}
 		} );
-		verifyIndexManagerTypeIs( NRTIndexManager.class.getName(), cfg );
+		verifyIndexManagerTypeIs( NRTIndexManager.class, cfg );
 	}
 
-	private void verifyIndexManagerTypeIs(String expectedIndexManagerClassName, ManualConfiguration cfg) {
+	private void verifyIndexManagerTypeIs(Class<? extends IndexManager> expectedIndexManagerClass, ManualConfiguration cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
 			.entity( Document.class ).indexed().indexName( "documents" )
@@ -74,24 +74,24 @@ public class IndexManagerFactoryCustomizationTest {
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.addClass( Document.class );
-		MutableSearchFactory sf = (MutableSearchFactory) new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 		try {
-			Assert.assertEquals( expectedIndexManagerClassName, extractDocumentIndexManagerClassName( sf, "documents" ) );
+			Assert.assertEquals( expectedIndexManagerClass, extractDocumentIndexManagerClassName( sf, "documents" ) );
 			// trigger a SearchFactory rebuild:
 			sf.addClasses( Dvd.class );
 			// and verify the option is not lost:
-			Assert.assertEquals( expectedIndexManagerClassName, extractDocumentIndexManagerClassName( sf, "dvds" ) );
-			Assert.assertEquals( expectedIndexManagerClassName, extractDocumentIndexManagerClassName( sf, "documents" ) );
+			Assert.assertEquals( expectedIndexManagerClass, extractDocumentIndexManagerClassName( sf, "dvds" ) );
+			Assert.assertEquals( expectedIndexManagerClass, extractDocumentIndexManagerClassName( sf, "documents" ) );
 		}
 		finally {
 			sf.close();
 		}
 	}
 
-	private String extractDocumentIndexManagerClassName(MutableSearchFactory sf, String indexName) {
+	private Class<? extends IndexManager> extractDocumentIndexManagerClassName(SearchFactoryImplementor sf, String indexName) {
 		IndexManager indexManager = sf.getAllIndexesManager().getIndexManager( indexName );
 		Assert.assertNotNull( indexManager );
-		return indexManager.getClass().getName();
+		return indexManager.getClass();
 	}
 
 	public static final class Document {
