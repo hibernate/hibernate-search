@@ -32,12 +32,10 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.cfg.spi.SearchConfigurationBase;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
-import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.ServiceProvider;
 
@@ -50,7 +48,6 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 	private final org.hibernate.cfg.Configuration cfg;
 	private ReflectionManager reflectionManager;
-	private final IndexManagerFactory indexManagerFactory = new DefaultIndexManagerFactory();
 
 	public SearchConfigurationFromHibernateCore(org.hibernate.cfg.Configuration cfg) {
 		if ( cfg == null ) throw new NullPointerException( "Configuration is null" );
@@ -142,11 +139,6 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	@Override
 	public boolean isIndexMetadataComplete() {
 		return true;
-	}
-
-	@Override
-	public IndexManagerFactory getIndexManagerFactory() {
-		return indexManagerFactory;
 	}
 
 }
