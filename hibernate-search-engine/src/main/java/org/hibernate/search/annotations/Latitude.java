@@ -39,6 +39,6 @@ public @interface Latitude {
 	/**
 	 * @return the referred spatial annotation field name (defaults to the JavaBean property name)
 	 */
-	String spatialName() default "";
+	String value() default "";
 }
 

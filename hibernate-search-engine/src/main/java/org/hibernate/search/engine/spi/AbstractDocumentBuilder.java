@@ -1006,13 +1006,13 @@ public abstract class AbstractDocumentBuilder<T> {
 			String latitudeField = null;
 			String longitudeField = null;
 			for ( XProperty property : propertyList ) {
-				if ( property.isAnnotationPresent( Latitude.class ) && ( property.getAnnotation( Latitude.class ) ).spatialName().equals( ann.name() ) ) {
+				if ( property.isAnnotationPresent( Latitude.class ) && ( property.getAnnotation( Latitude.class ) ).value().equals( ann.name() ) ) {
 					if ( latitudeField != null ) {
 						throw log.ambiguousLatitudeDefinition( this.beanXClassName, latitudeField, property.getName() );
 					}
 					latitudeField = property.getName();
 				}
-				if ( property.isAnnotationPresent( Longitude.class ) && ( property.getAnnotation( Longitude.class )).spatialName().equals( ann.name() ) ) {
+				if ( property.isAnnotationPresent( Longitude.class ) && ( property.getAnnotation( Longitude.class )).value().equals( ann.name() ) ) {
 					if ( longitudeField != null ) {
 						throw log.ambiguousLongitudeDefinition( this.beanXClassName, longitudeField, property.getName() );
 					}
