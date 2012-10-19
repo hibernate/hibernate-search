@@ -64,8 +64,7 @@ public final class DistanceComparator extends FieldComparator<Double> {
 
 	@Override
 	public void copy(final int slot, final int doc) throws IOException {
-		distances[ slot ] = center.getDistanceTo( latitudeValues[doc], longitudeValues[doc] );
-		return;
+		distances[slot] = center.getDistanceTo( latitudeValues[docBase + doc], longitudeValues[docBase + doc] );
 	}
 
 	@Override
@@ -77,7 +76,6 @@ public final class DistanceComparator extends FieldComparator<Double> {
 			latitudeValues[this.docBase + i] = unbasedLatitudeValues[i];
 			longitudeValues[this.docBase + i] = unbasedLongitudeValues[i];
 		}
-		return;
 	}
 
 	@Override
