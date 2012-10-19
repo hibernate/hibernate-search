@@ -48,7 +48,7 @@ public class PropertyLatitudeMapping {
 	}
 
 	public PropertyLatitudeMapping name(String fieldName) {
-		latitude.put( "spatialName", fieldName );
+		latitude.put( "of", fieldName );
 		return this;
 	}
 
