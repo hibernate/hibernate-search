@@ -47,10 +47,10 @@ public class UserEx {
 	@Longitude
 	Double homeLongitude;
 
-	@Latitude("work")
+	@Latitude(of="work")
 	Double workLatitude;
 
-	@Longitude("work")
+	@Longitude(of="work")
 	Double workLongitude;
 
 	public UserEx(Integer id, Double homeLatitude, Double homeLongitude, Double workLatitude, Double workLongitude) {

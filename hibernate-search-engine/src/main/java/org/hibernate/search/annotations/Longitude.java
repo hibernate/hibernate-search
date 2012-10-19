@@ -39,6 +39,6 @@ public @interface Longitude {
 	/**
 	 * @return the referred spatial annotation field name (defaults to the empty string, corresponding to the default field name in {@link Spatial#name()})
 	 */
-	String value() default "";
+	String of() default "";
 }
 

@@ -39,10 +39,10 @@ public class User {
 	@Id
 	Integer id;
 
-	@Latitude("home")
+	@Latitude(of="home")
 	Double homeLatitude;
 
-	@Longitude("home")
+	@Longitude(of="home")
 	Double homeLongitude;
 
 	public User(Integer id, Double homeLatitude, Double homeLongitude) {

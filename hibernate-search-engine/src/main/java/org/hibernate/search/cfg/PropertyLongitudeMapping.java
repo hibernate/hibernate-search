@@ -48,7 +48,7 @@ public class PropertyLongitudeMapping {
 	}
 
 	public PropertyLongitudeMapping name(String fieldName) {
-		longitude.put( "value", fieldName );
+		longitude.put( "of", fieldName );
 		return this;
 	}
 
