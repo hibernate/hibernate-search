@@ -36,6 +36,7 @@ import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.test.spatial.POI;
 import org.junit.Assert;
 
+import static org.hamcrest.CoreMatchers.*;
 /**
  * Hibernate Search spatial : unit tests on quering POIs
  *
@@ -156,6 +157,64 @@ public class SpatialQueringJPATest extends JPATestCase {
 		em.getTransaction().commit();
 		em.close();
 	}
+
+	public void testDistanceSort2() throws Exception {
+
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+
+		em.getTransaction().begin();
+		int cnt =0;
+		for(double[] c : new double[][] {
+
+				{41.04389845, -74.06328534},
+				{40.64383333, -73.75050000},
+				{40.75666667, -73.98650000},
+				{40.69416667, -73.78166667},
+				{40.75802992, -73.98532391},
+				{40.75802992, -73.98532391},
+				{50.77687257, 6.08431213},
+				{50.78361600, 6.07003500},
+				{50.76066667, 6.08866667},
+				{50.77683333, 6.08466667},
+				{50.77650000, 6.08416667},
+		}) {
+			em.persist(new POI(cnt, "Test_" + cnt, c[0], c[1], ""));
+			++cnt;
+		}
+		em.getTransaction().commit();
+
+
+		em.getTransaction().begin();
+		double centerLatitude = 50.7753455;
+		double centerLongitude = 6.083886799999959;
+
+		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+				.within( 1.8097233616663808, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
+		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
+		hibQuery.setSort( distanceSort );
+		hibQuery.setMaxResults(1000);
+		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
+		hibQuery.setSpatialParameters( Point.fromDegrees( centerLatitude, centerLongitude ), "location" );
+		List<Object[]> results = hibQuery.getResultList();
+		for(Object[] result : results) {
+			POI poi = (POI)result[0];
+			Assert.assertThat(poi.getName() + " (" +poi.getLatitude() + ", " + poi.getLongitude()+ ") is not at " + centerLatitude + ", " +centerLongitude,
+					((Double) result[1]).doubleValue(), is(not(0.0)));
+
+		}
+
+		List<?> pois = em.createQuery( "from " + POI.class.getName() ).getResultList();
+		for ( Object entity : pois ) {
+			em.remove( entity );
+		}
+		em.getTransaction().commit();
+		em.close();
+	}
+
 
 	@Override
 	public Class[] getAnnotatedClasses() {
