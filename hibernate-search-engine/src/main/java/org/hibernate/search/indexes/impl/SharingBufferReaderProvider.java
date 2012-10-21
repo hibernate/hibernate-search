@@ -58,6 +58,18 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 	 */
 	protected final Map<Directory, PerDirectoryLatestReader> currentReaders = new ConcurrentHashMap<Directory, PerDirectoryLatestReader>();
 
+	/**
+	 * Each actual IndexReader refresh will change this value. To what value exactly doesn't matter,
+	 * as long as it's not a value recently used, so we don't care for overflow conditions.
+	 * When a client needs to check for index freshness a lock is acquired to protect from
+	 * too many checks (which result in IO operations); when it is actually able to acquire
+	 * this lock it should check if the refreshOperationId changed: if so, a refresh can
+	 * be skipped and we release the lock quickly as the IndexReader was then for
+	 * sure updated in the time interval between this client arriving to request a reader
+	 * and actually being able to get one.
+	 */
+	private volatile int refreshOperationId = 0;
+
 	private DirectoryProvider directoryProvider;
 	private String indexName;
 	
@@ -219,15 +231,27 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 		 */
 		public IndexReader refreshAndGet() {
 			final IndexReader updatedReader;
+			//it's important that we read this volatile before acquiring the lock:
+			final int preAcquireVersionId = refreshOperationId;
+			ReaderUsagePair toCloseReaderPair = null;
 			lockOnReplaceCurrent.lock();
 			final IndexReader beforeUpdateReader = current.reader;
-			ReaderUsagePair toCloseReaderPair = null;
 			try {
-				try {
-					updatedReader = IndexReader.openIfChanged( beforeUpdateReader );
+				if ( refreshOperationId != preAcquireVersionId ) {
+					// We can take a good shortcut
+					current.usageCounter.incrementAndGet();
+					return beforeUpdateReader;
 				}
-				catch ( IOException e ) {
-					throw new SearchException( "Unable to reopen IndexReader", e );
+				else {
+					try {
+						//Guarded by the lockOnReplaceCurrent of current IndexReader
+						//technically the final value doesn't even matter, as long as we change it
+						refreshOperationId++;
+						updatedReader = IndexReader.openIfChanged( beforeUpdateReader );
+					}
+					catch ( IOException e ) {
+						throw new SearchException( "Unable to reopen IndexReader", e );
+					}
 				}
 				if ( updatedReader == null ) {
 					current.usageCounter.incrementAndGet();
