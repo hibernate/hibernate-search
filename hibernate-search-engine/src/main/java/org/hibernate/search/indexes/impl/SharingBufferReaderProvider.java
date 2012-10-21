@@ -218,26 +218,26 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 		 * @return the current IndexReader if it's in sync with underlying index, a new one otherwise.
 		 */
 		public IndexReader refreshAndGet() {
-			ReaderUsagePair previousCurrent;
-			IndexReader updatedReader;
+			final IndexReader updatedReader;
 			lockOnReplaceCurrent.lock();
+			final IndexReader beforeUpdateReader = current.reader;
+			ReaderUsagePair toCloseReaderPair = null;
 			try {
-				IndexReader beforeUpdateReader = current.reader;
 				try {
-					updatedReader = beforeUpdateReader.reopen();
+					updatedReader = IndexReader.openIfChanged( beforeUpdateReader );
 				}
 				catch ( IOException e ) {
 					throw new SearchException( "Unable to reopen IndexReader", e );
 				}
-				if ( beforeUpdateReader == updatedReader ) {
-					previousCurrent = null;
+				if ( updatedReader == null ) {
 					current.usageCounter.incrementAndGet();
+					return beforeUpdateReader;
 				}
 				else {
 					ReaderUsagePair newPair = new ReaderUsagePair( updatedReader );
 					//no need to increment usageCounter in newPair, as it is constructed with correct number 2.
 					assert newPair.usageCounter.get() == 2;
-					previousCurrent = current;
+					toCloseReaderPair = current;
 					current = newPair;
 					allReaders.put( updatedReader, newPair );//unfortunately still needs lock
 				}
@@ -246,8 +246,8 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 				lockOnReplaceCurrent.unlock();
 			}
 			// doesn't need lock:
-			if ( previousCurrent != null ) {
-				previousCurrent.close();// release a token as it's not the current any more.
+			if ( toCloseReaderPair != null ) {
+				toCloseReaderPair.close();// release a token as it's not the current any more.
 			}
 			return updatedReader;
 		}
