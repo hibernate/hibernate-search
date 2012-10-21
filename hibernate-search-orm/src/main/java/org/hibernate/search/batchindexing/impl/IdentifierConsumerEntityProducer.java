@@ -145,6 +145,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 				.setLockMode( LockMode.NONE )
 				.setCacheable( false )
 				.setFlushMode( FlushMode.MANUAL )
+				.setFetchSize( listIds.size() )
 				.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY )
 				.add( Restrictions.in( idName, listIds ) );
 		List<?> list = criteria.list();
