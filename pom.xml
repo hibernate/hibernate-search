@@ -180,6 +180,11 @@
                 <version>${luceneVersion}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-facet</artifactId>
+                <version>${luceneVersion}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-parsers</artifactId>
                 <version>${tikaVersion}</version>
