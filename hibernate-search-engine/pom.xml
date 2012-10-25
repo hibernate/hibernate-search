@@ -174,7 +174,7 @@
                     </systemProperties>
                     <additionalClasspathElements>
                         <!-- Needed by Byteman to load the agent on demand -->
-                        <additionalClasspathElement>${toolsjar}</additionalClasspathElement>
+                        <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
                     </additionalClasspathElements>
                 </configuration>
             </plugin>
@@ -223,7 +223,7 @@
                 </file>
             </activation>
             <properties>
-                <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+                <jdk-toolsjar>${java.home}/../lib/tools.jar</jdk-toolsjar>
             </properties>
         </profile>
         <profile>
@@ -234,7 +234,7 @@
                 </file>
             </activation>
             <properties>
-                <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
+                <jdk-toolsjar>${java.home}/../Classes/classes.jar</jdk-toolsjar>
             </properties>
         </profile>
     </profiles>
