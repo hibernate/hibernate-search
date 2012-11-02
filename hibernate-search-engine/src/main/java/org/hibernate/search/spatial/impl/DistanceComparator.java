@@ -21,6 +21,7 @@
 package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.FieldCache;
@@ -31,40 +32,40 @@ public final class DistanceComparator extends FieldComparator<Double> {
 	private final Point center;
 	private final String latitudeField;
 	private final String longitudeField;
-	private final double[] distances;
-	private final double[] latitudeValues;
-	private final double[] longitudeValues;
+	private HashMap<Integer,Double> distances;
+	private HashMap<Integer,Double> latitudeValues;
+	private HashMap<Integer,Double> longitudeValues;
 
 	private Double bottomDistance;
 	private int docBase = 0;
 
 	public DistanceComparator(Point center, int hitsCount, String fieldname) {
 		this.center = center;
-		this.distances = new double[ hitsCount ];
-		this.latitudeValues = new double[ hitsCount ];
-		this.longitudeValues = new double[ hitsCount ];
+		this.distances = new HashMap<Integer,Double>( hitsCount );
+		this.latitudeValues = new HashMap<Integer,Double>( hitsCount );
+		this.longitudeValues = new HashMap<Integer,Double>( hitsCount );
 		this.latitudeField = GridHelper.formatLatitude( fieldname );
 		this.longitudeField = GridHelper.formatLongitude(  fieldname );
 	}
 
 	@Override
 	public int compare(final int slot1, final int slot2) {
-		return Double.compare( distances[slot1], distances[slot2] );
+		return Double.compare( distances.get( slot1 ), distances.get( slot2 ) );
 	}
 
 	@Override
 	public void setBottom(final int slot) {
-		bottomDistance = center.getDistanceTo( latitudeValues[slot], longitudeValues[slot] );
+		bottomDistance = center.getDistanceTo( latitudeValues.get( slot ), longitudeValues.get( slot ) );
 	}
 
 	@Override
 	public int compareBottom(final int doc) throws IOException {
-		return Double.compare( bottomDistance, distances[doc] );
+		return Double.compare( bottomDistance, center.getDistanceTo( latitudeValues.get( docBase + doc ), longitudeValues.get( docBase + doc ) ) );
 	}
 
 	@Override
 	public void copy(final int slot, final int doc) throws IOException {
-		distances[slot] = center.getDistanceTo( latitudeValues[docBase + doc], longitudeValues[docBase + doc] );
+		distances.put( slot, center.getDistanceTo( latitudeValues.get( docBase + doc ), longitudeValues.get( docBase + doc ) ) );
 	}
 
 	@Override
@@ -73,13 +74,13 @@ public final class DistanceComparator extends FieldComparator<Double> {
 		double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( reader, longitudeField );
 		this.docBase = docBase;
 		for ( int i = 0; i < unbasedLatitudeValues.length; i++ ) {
-			latitudeValues[this.docBase + i] = unbasedLatitudeValues[i];
-			longitudeValues[this.docBase + i] = unbasedLongitudeValues[i];
+			latitudeValues.put( this.docBase + i,  unbasedLatitudeValues[i] );
+			longitudeValues.put( this.docBase + i, unbasedLongitudeValues[i] );
 		}
 	}
 
 	@Override
 	public Double value(final int slot) {
-		return center.getDistanceTo( latitudeValues[slot], longitudeValues[slot] );
+		return center.getDistanceTo( latitudeValues.get( slot ), longitudeValues.get( slot ) );
 	}
 }
