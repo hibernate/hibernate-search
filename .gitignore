@@ -1,6 +1,9 @@
 # Typically *NIX text editors, by default, append '~' to files on saving to make backups
 *~
 
+#Checkstyle
+.checkstyle
+
 # Gradle work directory
 .gradle
 buildSrc/.gradle
