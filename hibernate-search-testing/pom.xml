@@ -36,6 +36,10 @@
 
     <name>Hibernate Search Testing</name>
     <description>Hibernate Search Testing Utilities</description>
+
+    <properties>
+        <main.basedir>${project.parent.basedir}</main.basedir>
+    </properties>
     
     <dependencies>
         <dependency>
