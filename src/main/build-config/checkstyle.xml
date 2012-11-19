@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+
+    <module name="TreeWalker">
+        <property name="cacheFile" value="${checkstyle.cache.file}"/>
+
+        <module name="Regexp">
+            <property name="format"
+                      value="\A(/\*\n \* Hibernate, Relational Persistence for Idiomatic Java\n \*\n \* Copyright \(c\) \d{4}(-\d{4})?, Red Hat, Inc. and/or its affiliates or third-party contributors as\n \* indicated by the @author tags or express copyright attribution\n \* statements applied by the authors.  All third-party contributions are\n \* distributed under license by Red Hat, Inc.\n \*\n \* This copyrighted material is made available to anyone wishing to use, modify,\n \* copy, or redistribute it subject to the terms and conditions of the GNU\n \* Lesser General Public License, as published by the Free Software Foundation.\n \*\n \* This program is distributed in the hope that it will be useful,\n \* but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY\n \* or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License\n \* for more details.\n \*\n \* You should have received a copy of the GNU Lesser General Public License\n \* along with this distribution; if not, write to:\n \* Free Software Foundation, Inc.\n \* 51 Franklin Street, Fifth Floor\n \* Boston, MA  02110-1301  USA\n \*/)|(/\* ?\n \* Hibernate, Relational Persistence for Idiomatic Java\n \* ?\n \* JBoss, Home of Professional Open Source\n \* Copyright \d{4} Red Hat Inc. and/or its affiliates and other contributors\n \* as indicated by the @authors tag. All rights reserved.\n \* See the copyright.txt in the distribution for a\n \* full listing of individual contributors.\n \*\n \* This copyrighted material is made available to anyone wishing to use,\n \* modify, copy, or redistribute it subject to the terms and conditions\n \* of the GNU Lesser General Public License, v. 2.1.\n \* This program is distributed in the hope that it will be useful, but WITHOUT A\n \* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n \* PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.\n \* You should have received a copy of the GNU Lesser General Public License,\n \* v.2.1 along with this distribution; if not, write to the Free Software\n \* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,\n \* MA  02110-1301, USA.\n \*/)|(/\*\n \* Hibernate, Relational Persistence for Idiomatic Java\n \*\n \* JBoss, Home of Professional Open Source\n \* Copyright \d{4}(-\d{4})? Red Hat Inc. and/or its affiliates and other contributors\n \* as indicated by the @authors tag. All rights reserved.\n \* See the copyright.txt in the distribution for a\n \* full listing of individual contributors.\n \*\n \* This copyrighted material is made available to anyone wishing to use,\n \* modify, copy, or redistribute it subject to the terms and conditions\n \* of the GNU Lesser General Public License, v. 2.1.\n \* This program is distributed in the hope that it will be useful, but WITHOUT A\n \* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n \* PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.\n \* You should have received a copy of the GNU Lesser General Public License,\n \* v.2.1 along with this distribution; if not, write to the Free Software\n \* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,\n \* MA  02110-1301, USA.\n \*/)|(/\* ?\n \* JBoss, Home of Professional Open Source\n \* Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors\n \* as indicated by the @authors tag. All rights reserved.\n \* See the copyright.txt in the distribution for a\n \* full listing of individual contributors.\n \*\n \* This copyrighted material is made available to anyone wishing to use,\n \* modify, copy, or redistribute it subject to the terms and conditions\n \* of the GNU Lesser General Public License, v. 2.1.\n \* This program is distributed in the hope that it will be useful, but WITHOUT A\n \* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n \* PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.\n \* You should have received a copy of the GNU Lesser General Public License,\n \* v.2.1 along with this distribution; if not, write to the Free Software\n \* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,\n \* MA  02110-1301, USA.\n \*/)"/>
+            <property name="message" value="Correct header not found"/>
+        </module>
+
+        <!-- Checks for imports -->
+        <module name="AvoidStarImport"/>
+        <module name="RedundantImport"/>
+
+        <!-- Checks for blocks. You know, those {}'s -->
+        <module name="LeftCurly"/>
+
+        <!-- Checks for common coding problems -->
+        <module name="EqualsHashCode"/>
+        <module name="IllegalInstantiation"/>
+
+        <!-- Miscellaneous other checks. -->
+        <module name="PackageAnnotation"/>
+        <module name="CovariantEquals"/>
+    </module>
+
+</module>
