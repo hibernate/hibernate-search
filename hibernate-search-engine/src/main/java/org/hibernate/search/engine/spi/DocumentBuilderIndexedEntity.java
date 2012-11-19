@@ -254,7 +254,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			if ( isRoot ) {
 				if ( explicitDocumentId ) {
 					if ( idAnnotation instanceof DocumentId ) {
-						throw new SearchException( "More than one @DocumentId specified on entity " + getBeanClass().getName() );
+						throw log.duplicateDocumentIdFound( getBeanClass().getName() );
 					}
 					else {
 						//If it's not a DocumentId it's a JPA @Id: ignore it as we already have a @DocumentId

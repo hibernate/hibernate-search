@@ -660,4 +660,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 166, value = "IndexManager factory resolved alias '%1$s' to '%2$s'.")
 	void indexManagerAliasResolved(String alias, Class im);
+
+	@Message(id = 167, value = "More than one @DocumentId specified on entity '%1$s'")
+	SearchException duplicateDocumentIdFound(String beanXClassName);
 }
