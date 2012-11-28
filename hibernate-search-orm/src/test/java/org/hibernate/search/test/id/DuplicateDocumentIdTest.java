@@ -48,7 +48,7 @@ public class DuplicateDocumentIdTest extends SearchTestCase {
 		}
 		catch ( SearchException e ) { // getting a HibernateException here, because the listener registration fails
 			assertEquals(
-					"More than one @DocumentId specified on entity org.hibernate.search.test.id.Foo",
+					"HSEARCH000167: More than one @DocumentId specified on entity 'org.hibernate.search.test.id.Foo'",
 					e.getMessage()
 			);
 		}
