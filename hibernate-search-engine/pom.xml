@@ -37,6 +37,10 @@
     <name>Hibernate Search Engine</name>
     <description>the core of the Object/Lucene mapper, query engine and index management</description>
 
+    <properties>
+        <main.basedir>${project.parent.basedir}</main.basedir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -181,6 +185,10 @@
                         <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
                     </additionalClasspathElements>
                 </configuration>
+            </plugin>
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.bsc.maven</groupId>

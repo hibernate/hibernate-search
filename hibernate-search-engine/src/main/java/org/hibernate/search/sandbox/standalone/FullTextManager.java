@@ -23,9 +23,9 @@
  */
 package org.hibernate.search.sandbox.standalone;
 
-import org.hibernate.search.*;
-
 import java.io.Serializable;
+
+import org.hibernate.search.SearchFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -33,7 +33,7 @@ import java.io.Serializable;
 public interface FullTextManager {
 
 	/**
-	 * Returns the entity instance of a given type and id value  
+	 * Returns the entity instance of a given type and id value
 	 */
 	public <T> T get(Class<T> entityType, Serializable id);
 
@@ -44,7 +44,9 @@ public interface FullTextManager {
 	 * @param luceneQuery The native Lucene query to be rn against the Lucene index.
 	 * @param entities List of classes for type filtering. The query result will only return entities of
 	 * the specified types and their respective subtype. If no class is specified no type filtering will take place.
+	 *
 	 * @return A <code>FullTextQuery</code> wrapping around the native Lucene query.
+	 *
 	 * @throws java.lang.IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
 	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
@@ -55,8 +57,9 @@ public interface FullTextManager {
 	 * will not affect the index at least until commit.
 	 *
 	 * @param entity The entity to index - must not be <code>null</code>.
-	 * @throws java.lang.IllegalArgumentException if entity is null or not an @Indexed entity
 	 * @param <T> a T object.
+	 *
+	 * @throws java.lang.IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
 	<T> void index(T entity);
 

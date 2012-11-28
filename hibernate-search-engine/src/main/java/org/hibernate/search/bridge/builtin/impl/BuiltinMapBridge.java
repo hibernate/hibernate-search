@@ -1,4 +1,6 @@
 /*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -16,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-
 package org.hibernate.search.bridge.builtin.impl;
 
 import org.hibernate.search.bridge.FieldBridge;

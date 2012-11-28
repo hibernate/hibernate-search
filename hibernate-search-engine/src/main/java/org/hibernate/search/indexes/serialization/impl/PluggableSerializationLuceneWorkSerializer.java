@@ -45,7 +45,7 @@ import org.hibernate.search.indexes.serialization.spi.Serializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.*;
+import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.toByteArray;
 
 /**
  * Serializes List<LuceneWork> back and forth using
