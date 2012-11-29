@@ -60,7 +60,7 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 							null);
 					Method latitudeGetter = propertyDescriptor.getReadMethod();
 					if ( latitudeGetter != null ) {
-						return (Double) latitudeGetter.invoke( value, null );
+						return (Double) latitudeGetter.invoke( value );
 					}
 					else {
 						throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
@@ -101,7 +101,7 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 							null);
 					Method longitudeGetter = propertyDescriptor.getReadMethod();
 					if ( longitudeGetter != null ) {
-						return (Double) longitudeGetter.invoke( value, null );
+						return (Double) longitudeGetter.invoke( value );
 					} else {
 						throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
 					}
