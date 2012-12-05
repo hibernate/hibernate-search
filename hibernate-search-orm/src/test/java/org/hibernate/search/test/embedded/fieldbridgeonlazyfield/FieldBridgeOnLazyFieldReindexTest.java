@@ -32,7 +32,9 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.TestForIssue;
 
+@TestForIssue(jiraKey = "HSEARCH-1201")
 public class FieldBridgeOnLazyFieldReindexTest extends SearchTestCase {
 
 	public void testFieldBridgeOnLazyFieldReindexTest() throws InterruptedException {
@@ -50,7 +52,7 @@ public class FieldBridgeOnLazyFieldReindexTest extends SearchTestCase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction transaction = fullTextSession.beginTransaction();
-			Query q = new TermQuery( new Term( "name", "name" ) );
+			Query q = new TermQuery( new Term( fieldName, fieldValue ) );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q );
 			int resultSize = fullTextQuery.getResultSize();
 			assertEquals( 1, resultSize );

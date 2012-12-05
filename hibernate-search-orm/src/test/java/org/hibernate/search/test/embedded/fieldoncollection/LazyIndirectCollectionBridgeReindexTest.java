@@ -33,7 +33,9 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.embedded.depth.Person;
+import org.hibernate.search.test.util.TestForIssue;
 
+@TestForIssue(jiraKey = "HSEARCH-1030")
 public class LazyIndirectCollectionBridgeReindexTest extends SearchTestCase {
 
 	public void testLazyIndirectCollectionBridgeReindex() throws InterruptedException {
@@ -51,7 +53,7 @@ public class LazyIndirectCollectionBridgeReindexTest extends SearchTestCase {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction transaction = fullTextSession.beginTransaction();
-			Query q = new TermQuery( new Term( "name", "name" ) );
+			Query q = new TermQuery( new Term( fieldName, fieldValue ) );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q );
 			int resultSize = fullTextQuery.getResultSize();
 			assertEquals( 1, resultSize );
