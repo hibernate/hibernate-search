@@ -272,14 +272,15 @@ public abstract class AbstractDocumentBuilder<T> {
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan, DepthValidator currentDepth) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
+			Object unproxiedInstance = instanceInitalizer.unproxy( instance );
 
-			DepthValidator depth = updateDepth( instance, member, currentDepth );
+			DepthValidator depth = updateDepth( unproxiedInstance, member, currentDepth );
 			depth.increaseDepth();
 			
 			if (depth.isMaxDepthReached())
 				return;
 
-			Object value = ReflectionHelper.getMemberValue( instance, member );
+			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 
 			if ( value == null ) {
 				continue;
