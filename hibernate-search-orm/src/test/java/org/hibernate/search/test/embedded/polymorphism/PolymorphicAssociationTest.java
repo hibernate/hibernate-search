@@ -29,7 +29,9 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.TestForIssue;
 
+@TestForIssue(jiraKey = "HSEARCH-1241")
 public class PolymorphicAssociationTest extends SearchTestCase {
 
 	private static final String INIT_NAME = "initname";
