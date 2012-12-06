@@ -37,8 +37,8 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Latitude {
 	/**
-	 * @return the referred spatial annotation field name (defaults to the JavaBean property name)
+	 * @return the referred spatial annotation field name (defaults to the empty string, corresponding to the default field name in {@link Spatial#name()})
 	 */
-	String spatialName() default "";
+	String of() default "";
 }
 
