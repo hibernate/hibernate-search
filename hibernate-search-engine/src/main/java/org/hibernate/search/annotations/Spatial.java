@@ -31,37 +31,37 @@ import java.lang.annotation.Target;
 /**
  * Defines a spatial property.
  *
- * Spatial coordinates can be index as latitude / longitude fields and queried
- * via range queries. This is known as the SpatialMode.SIMPLE approach.
+ * Spatial coordinates can be indexed as latitude / longitude fields and queried
+ * via range queries. This is known as the {@code SpatialMode.RANGE} approach.
  *
  * Otherwise, they can be indexed using a quad-tree index. This is known as the
- * SpatialMode.GRID approach. The size of the grid can be adjusted with {@code topGridLevel}
+ * @code SpatialMode.GRID} approach. The size of the grid can be adjusted with {@code topGridLevel}
  * and {@code bottomGridLevel}.
  *
- * For more informations on which model to use, read the Hibernate Search reference documentation
+ * For more information on which model to use, read the Hibernate Search reference documentation.
  *
- * If your longitude and latitude informations are hosted on free properties,
- * Add {@code @Spatial} on the entity (class-level). The {@code @Latitude} and {@code @Longitude}
+ * If your longitude and latitude information are hosted on free properties,
+ * Add {@code &#064;Spatial} on the entity (class-level). The {@link Latitude} and {@link Longitude}
  * annotations must mark the properties.
  *
  * <pre>
- * @Entity
- * @Spatial(name="home")
+ * &#064;Entity
+ * &#064;Spatial(name="home")
  * public class User {
- *     @Latitude(of="home")
+ *     &#064;Latitude(of="home")
  *     public Double getHomeLatitude() { ... }
- *     @Longitude(of="home")
+ *     &#064;Longitude(of="home")
  *     public Double getHomeLongitude() { ... }
  * }
  * </pre>
  *
  * Alternatively, you can put the latitude / longitude information in a property of
- * type @{code Coordinates}.
+ * type {@link org.hibernate.search.spatial.Coordinates}.
  *
  * <pre>
-  * @Entity
+  * &#064;Entity
   * public class User {
-  *     @Spatial
+  *     &#064;Spatial
   *     public Coordinates getHome() { ... }
   * }
   * </pre>
@@ -90,7 +90,7 @@ public @interface Spatial {
 	Store store() default Store.NO;
 
 	/**
-	 * @return Returns a {@code Boost} annotation defining a float index time boost value
+	 * @return Returns a {@link Boost} annotation defining a float index time boost value
 	 */
 	Boost boost() default @Boost(value = 1.0F);
 
