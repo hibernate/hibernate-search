@@ -22,6 +22,7 @@ package org.hibernate.search.spatial;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.LuceneOptions;
+import org.hibernate.search.spatial.impl.GridHelper;
 
 /**
  * Hibernate Search Simple Spatial field bridge, binding a Coordinates to two numeric fields for latitude and Longitude
@@ -31,13 +32,11 @@ import org.hibernate.search.bridge.LuceneOptions;
 public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 
 	public SpatialFieldBridgeByRange() {
-		this.fieldMode = false;
 	}
 
 	public SpatialFieldBridgeByRange(String latitudeField, String longitudeField) {
 		this.latitudeField = latitudeField;
 		this.longitudeField = longitudeField;
-		this.fieldMode = true;
 	}
 
 	/**
@@ -58,13 +57,13 @@ public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 			if ( ( latitude != null ) && ( longitude != null ) ) {
 
 				luceneOptions.addNumericFieldToDocument(
-						name + "_HSSI_Latitude",
+						GridHelper.formatLatitude( name ),
 						latitude,
 						document
 				);
 
 				luceneOptions.addNumericFieldToDocument(
-						name + "_HSSI_Longitude",
+						GridHelper.formatLongitude( name ),
 						longitude,
 						document
 				);

@@ -38,43 +38,15 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 
 	private static final Log LOG = LoggerFactory.make();
 
-	protected boolean fieldMode;
 	protected String latitudeField;
 	protected String longitudeField;
 
 	@Override
 	public abstract void set(String name, Object value, Document document, LuceneOptions luceneOptions);
 
-	Double getLatitude(final Object value ){
-		if ( fieldMode ) {
-			Class<?> clazz = value.getClass();
-			try {
-				Field latitude = clazz.getField( latitudeField );
-				return (Double) latitude.get( value );
-			} catch ( NoSuchFieldException e ) {
-				try {
-					PropertyDescriptor propertyDescriptor =  new PropertyDescriptor(
-							latitudeField,
-							clazz,
-							"get" + capitalize( latitudeField ),
-							null);
-					Method latitudeGetter = propertyDescriptor.getReadMethod();
-					if ( latitudeGetter != null ) {
-						return (Double) latitudeGetter.invoke( value );
-					}
-					else {
-						throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
-					}
-				} catch ( IllegalAccessException ex ) {
-					throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
-				} catch ( InvocationTargetException ex ) {
-					throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
-				} catch ( IntrospectionException ex ) {
-					throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
-				}
-			} catch ( IllegalAccessException e ) {
-				throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
-			}
+	protected Double getLatitude(final Object value ) {
+		if ( useFieldMode() ) {
+			return getCoordinateFromField( latitudeField, value );
 		}
 		else {
 			try {
@@ -86,35 +58,40 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 		}
 	}
 
-	Double getLongitude(final Object value) {
-		if ( fieldMode ) {
-			Class<?> clazz = value.getClass();
+	private Double getCoordinateFromField(String coordinateField, Object value) {
+		Class<?> clazz = value.getClass();
+		try {
+			Field latitude = clazz.getField( coordinateField );
+			return (Double) latitude.get( value );
+		} catch ( NoSuchFieldException e ) {
 			try {
-				Field longitude = clazz.getField( longitudeField );
-				return (Double) longitude.get( value );
-			} catch ( NoSuchFieldException e )  {
-				try {
-					PropertyDescriptor propertyDescriptor =  new PropertyDescriptor(
-							longitudeField,
-							clazz,
-							"get" + capitalize( longitudeField ),
-							null);
-					Method longitudeGetter = propertyDescriptor.getReadMethod();
-					if ( longitudeGetter != null ) {
-						return (Double) longitudeGetter.invoke( value );
-					} else {
-						throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
-					}
-				} catch ( IntrospectionException ex ) {
-					throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
-				} catch ( IllegalAccessException ex ) {
-					throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
-				} catch ( InvocationTargetException ex ) {
-					throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
+				PropertyDescriptor propertyDescriptor =  new PropertyDescriptor(
+						coordinateField,
+						clazz,
+						"get" + capitalize( coordinateField ),
+						null);
+				Method latitudeGetter = propertyDescriptor.getReadMethod();
+				if ( latitudeGetter != null ) {
+					return (Double) latitudeGetter.invoke( value );
 				}
-			} catch ( IllegalAccessException e ) {
-				throw LOG.cannotReadFieldForClass( latitudeField, clazz.getName() );
+				else {
+					throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
+				}
+			} catch ( IllegalAccessException ex ) {
+				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
+			} catch ( InvocationTargetException ex ) {
+				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
+			} catch ( IntrospectionException ex ) {
+				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
 			}
+		} catch ( IllegalAccessException e ) {
+			throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
+		}
+	}
+
+	protected Double getLongitude(final Object value) {
+		if ( useFieldMode() ) {
+			return getCoordinateFromField( longitudeField, value );
 		}
 		else {
 			try {
@@ -124,6 +101,10 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 				throw LOG.cannotExtractCoordinateFromObject( value.getClass().getName() );
 			}
 		}
+	}
+
+	private boolean useFieldMode() {
+		return latitudeField != null && longitudeField != null;
 	}
 
 	public static String capitalize(final String name) {

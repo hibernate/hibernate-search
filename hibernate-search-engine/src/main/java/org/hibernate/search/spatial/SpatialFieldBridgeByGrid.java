@@ -46,13 +46,11 @@ public class SpatialFieldBridgeByGrid extends SpatialFieldBridge implements Para
 	private boolean numericFieldsIndex = true;
 
 	public SpatialFieldBridgeByGrid() {
-		this.fieldMode = false;
 	}
 
 	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel) {
 		this.topGridLevel = topGridLevel;
 		this.bottomGridLevel = bottomGridLevel;
-		this.fieldMode = false;
 	}
 
 	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel, String latitudeField, String longitudeField) {
@@ -60,7 +58,6 @@ public class SpatialFieldBridgeByGrid extends SpatialFieldBridge implements Para
 		this.bottomGridLevel = bottomGridLevel;
 		this.latitudeField = latitudeField;
 		this.longitudeField = longitudeField;
-		this.fieldMode = true;
 	}
 
 	/**
