@@ -27,9 +27,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Extension annotation for {@code @Field} for Hibernate Search Spatial Index
+ * Mark the property hosting the latitude of a specific spatial coordinate.
+ * The property must be of type {@code Double} (or its native version).
  *
- * @experimental Spatial indexing in Hibernate Search is still in its first drafts
+ * @experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer (nicolas.helleringer@novacodex.net)
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -37,7 +38,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Longitude {
 	/**
-	 * @return the referred spatial annotation field name (defaults to the empty string, corresponding to the default field name in {@link Spatial#name()})
+	 * @return the name of the spatial field (defined in @Spatial.name)
 	 */
 	String of() default "";
 }

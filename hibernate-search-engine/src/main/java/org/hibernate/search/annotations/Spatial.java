@@ -29,9 +29,44 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Extension annotation for {@code @Field} for Hibernate Search Spatial Index
+ * Defines a spatial property.
  *
- * @experimental Spatial indexing in Hibernate Search is still in its first drafts
+ * Spatial coordinates can be index as latitude / longitude fields and queried
+ * via range queries. This is known as the SpatialMode.SIMPLE approach.
+ *
+ * Otherwise, they can be indexed using a quad-tree index. This is known as the
+ * SpatialMode.GRID approach. The size of the grid can be adjusted with {@code topGridLevel}
+ * and {@code bottomGridLevel}.
+ *
+ * For more informations on which model to use, read the Hibernate Search reference documentation
+ *
+ * If your longitude and latitude informations are hosted on free properties,
+ * Add {@code @Spatial} on the entity (class-level). The {@code @Latitude} and {@code @Longitude}
+ * annotations must mark the properties.
+ *
+ * <pre>
+ * @Entity
+ * @Spatial(name="home")
+ * public class User {
+ *     @Latitude(of="home")
+ *     public Double getHomeLatitude() { ... }
+ *     @Longitude(of="home")
+ *     public Double getHomeLongitude() { ... }
+ * }
+ * </pre>
+ *
+ * Alternatively, you can put the latitude / longitude information in a property of
+ * type @{code Coordinates}.
+ *
+ * <pre>
+  * @Entity
+  * public class User {
+  *     @Spatial
+  *     public Coordinates getHome() { ... }
+  * }
+  * </pre>
+ *
+ * @experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer (nicolas.helleringer@novacodex.net)
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -39,6 +74,11 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Spatial {
 	/**
+	 * The name of the field prefix where spatial index
+	 * information is stored in a Lucene document.
+	 *
+	 * If {@code @Spatial} is hosted on a property, defaults to the property name.
+	 *
 	 * @return the field name
 	 */
 	String name() default "";
