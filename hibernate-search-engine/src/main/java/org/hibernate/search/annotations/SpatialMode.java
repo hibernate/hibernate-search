@@ -24,15 +24,15 @@
 package org.hibernate.search.annotations;
 
 /**
- * Defines whether the norms should be stored in the index
+ * Defines the index structure mode used for spatial information
  *
  * @author Hardy Ferentschik
  */
 public enum SpatialMode {
 	/**
-	 * Simple mode : double range query + distance filter
+	 * Range mode : double range query + distance filter
 	 */
-	SIMPLE,
+	RANGE,
 	/**
 	 * Grid mode : Quad Tree index query + distance filer
 	 */
