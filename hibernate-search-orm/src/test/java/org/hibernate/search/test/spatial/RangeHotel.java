@@ -31,7 +31,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 /**
- * Hibernate Search spatial : Hotel test entity with Simple Spatial indexation
+ * Hibernate Search spatial: Hotel test entity with Range Spatial indexation
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
