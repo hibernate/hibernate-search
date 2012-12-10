@@ -35,7 +35,7 @@ import org.apache.lucene.search.QueryWrapperFilter;
  * Use double lat,long field in the index from a Coordinates field declaration
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridgeByGrid
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
  * @see org.hibernate.search.spatial.Coordinates
  */
@@ -131,7 +131,7 @@ public final class DistanceFilter extends Filter {
 			return latitudeField;
 		}
 		else {
-			return GridHelper.formatLatitude( coordinatesField );
+			return SpatialHelper.formatLatitude(coordinatesField);
 		}
 	}
 
@@ -140,7 +140,7 @@ public final class DistanceFilter extends Filter {
 			return longitudeField;
 		}
 		else {
-			return GridHelper.formatLongitude( coordinatesField );
+			return SpatialHelper.formatLongitude(coordinatesField);
 		}
 	}
 

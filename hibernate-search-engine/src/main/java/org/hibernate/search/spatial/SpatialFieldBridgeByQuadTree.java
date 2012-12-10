@@ -24,38 +24,38 @@ import org.apache.lucene.document.Document;
 
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
-import org.hibernate.search.spatial.impl.GridHelper;
+import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.spatial.impl.Point;
 
 import java.util.Map;
 
 /**
- * Hibernate Search field bridge, binding a Coordinates to Grid field in the index
+ * Hibernate Search field bridge, binding a Coordinates to Quad Tree field in the index
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class SpatialFieldBridgeByGrid extends SpatialFieldBridge implements ParameterizedBridge {
+public class SpatialFieldBridgeByQuadTree extends SpatialFieldBridge implements ParameterizedBridge {
 
-	public static final int DEFAULT_TOP_GRID_LEVEL = 0;
-	public static final int DEFAULT_BOTTOM_GRID_LEVEL = 16;
+	public static final int DEFAULT_TOP_QUAD_TREE_LEVEL = 0;
+	public static final int DEFAULT_BOTTOM_QUAD_TREE_LEVEL = 16;
 
-	private int topGridLevel = DEFAULT_TOP_GRID_LEVEL;
-	private int bottomGridLevel = DEFAULT_BOTTOM_GRID_LEVEL;
+	private int topQuadTreeLevel = DEFAULT_TOP_QUAD_TREE_LEVEL;
+	private int bottomQuadTreeLevel = DEFAULT_BOTTOM_QUAD_TREE_LEVEL;
 
-	private boolean gridIndex = true;
+	private boolean quadTreeIndex = true;
 	private boolean numericFieldsIndex = true;
 
-	public SpatialFieldBridgeByGrid() {
+	public SpatialFieldBridgeByQuadTree() {
 	}
 
-	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel) {
-		this.topGridLevel = topGridLevel;
-		this.bottomGridLevel = bottomGridLevel;
+	public SpatialFieldBridgeByQuadTree(int topQuadTreeLevel, int bottomQuadTreeLevel) {
+		this.topQuadTreeLevel = topQuadTreeLevel;
+		this.bottomQuadTreeLevel = bottomQuadTreeLevel;
 	}
 
-	public SpatialFieldBridgeByGrid(int topGridLevel, int bottomGridLevel, String latitudeField, String longitudeField) {
-		this.topGridLevel = topGridLevel;
-		this.bottomGridLevel = bottomGridLevel;
+	public SpatialFieldBridgeByQuadTree(int topQuadTreeLevel, int bottomQuadTreeLevel, String latitudeField, String longitudeField) {
+		this.topQuadTreeLevel = topQuadTreeLevel;
+		this.bottomQuadTreeLevel = bottomQuadTreeLevel;
 		this.latitudeField = latitudeField;
 		this.longitudeField = longitudeField;
 	}
@@ -77,23 +77,23 @@ public class SpatialFieldBridgeByGrid extends SpatialFieldBridge implements Para
 
 			if ( ( latitude != null ) && ( longitude != null ) ) {
 
-				if ( gridIndex ) {
+				if (quadTreeIndex) {
 					Point point = Point.fromDegrees( latitude, longitude );
 
-					for ( int i = topGridLevel; i <= bottomGridLevel; i++ ) {
-						luceneOptions.addFieldToDocument( GridHelper.formatFieldName( i, name ), GridHelper.getGridCellId( point, i), document );
+					for ( int i = topQuadTreeLevel; i <= bottomQuadTreeLevel; i++ ) {
+						luceneOptions.addFieldToDocument( SpatialHelper.formatFieldName(i, name), SpatialHelper.getQuadTreeCellId(point, i), document );
 					}
 				}
 
 				if ( numericFieldsIndex ) {
 					luceneOptions.addNumericFieldToDocument(
-							GridHelper.formatLatitude( name ),
+							SpatialHelper.formatLatitude(name),
 							latitude,
 							document
 					);
 
 					luceneOptions.addNumericFieldToDocument(
-							GridHelper.formatLongitude( name ),
+							SpatialHelper.formatLongitude(name),
 							longitude,
 							document
 					);
@@ -103,23 +103,23 @@ public class SpatialFieldBridgeByGrid extends SpatialFieldBridge implements Para
 	}
 
 	/**
-	 * Override method for default min and max grid level
+	 * Override method for default min and max quad tree level
 	 *
-	 * @param parameters Map containing the topGridLevel and bottomGridLevel values
+	 * @param parameters Map containing the topQuadTreeLevel and bottomQuadTreeLevel values
 	 */
 	@Override
 	public void setParameterValues(final Map parameters) {
-		Object topGridLevel = parameters.get( "topGridLevel" );
-		if ( topGridLevel instanceof Integer ) {
-			this.topGridLevel = ( Integer ) topGridLevel;
+		Object topQuadTreeLevel = parameters.get( "topQuadTreeLevel" );
+		if ( topQuadTreeLevel instanceof Integer ) {
+			this.topQuadTreeLevel = ( Integer ) topQuadTreeLevel;
 		}
-		Object bottomGridLevel = parameters.get( "bottomGridLevel" );
-		if ( bottomGridLevel instanceof Integer ) {
-			this.bottomGridLevel = ( Integer ) bottomGridLevel;
+		Object bottomQuadTreeLevel = parameters.get( "bottomQuadTreeLevel" );
+		if ( bottomQuadTreeLevel instanceof Integer ) {
+			this.bottomQuadTreeLevel = ( Integer ) bottomQuadTreeLevel;
 		}
-		Object gridIndex = parameters.get( "gridIndex" );
-		if ( gridIndex instanceof Boolean ) {
-			this.gridIndex = ( Boolean ) gridIndex;
+		Object quadTreeIndex = parameters.get( "quadTreeIndex" );
+		if ( quadTreeIndex instanceof Boolean ) {
+			this.quadTreeIndex = ( Boolean ) quadTreeIndex;
 		}
 		Object numericFieldsIndex = parameters.get( "numericFieldsIndex" );
 		if ( numericFieldsIndex instanceof Boolean ) {

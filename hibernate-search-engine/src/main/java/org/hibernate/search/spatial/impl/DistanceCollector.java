@@ -48,8 +48,8 @@ public class DistanceCollector extends Collector {
 		this.distances = new IntToDoubleMap( hitsCount );
 		this.latitudeValues = new IntToDoubleMap( hitsCount );
 		this.longitudeValues = new IntToDoubleMap( hitsCount );
-		this.latitudeField = GridHelper.formatLatitude( fieldname );
-		this.longitudeField = GridHelper.formatLongitude(  fieldname );
+		this.latitudeField = SpatialHelper.formatLatitude(fieldname);
+		this.longitudeField = SpatialHelper.formatLongitude(fieldname);
 	}
 
 	@Override
