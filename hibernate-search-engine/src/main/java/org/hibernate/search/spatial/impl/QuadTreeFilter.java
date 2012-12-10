@@ -32,41 +32,41 @@ import java.util.List;
 
 /**
  * Lucene Filter for filtering documents which have been indexed with Hibernate Search Spatial SpatialFieldBridge
- * Use denormalized Grid Cell Ids to return a sub set of documents near the center
+ * Use denormalized Quad Tree Cell Ids to return a sub set of documents near the center
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridgeByGrid
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree
  * @see org.hibernate.search.spatial.Coordinates
  */
-public final class GridFilter extends Filter {
+public final class QuadTreeFilter extends Filter {
 
-	private final List<String> gridCellsIds;
+	private final List<String> quadTreeCellsIds;
 	private final String fieldName;
 
-	public GridFilter(List<String> gridCellsIds, String fieldName) {
-		this.gridCellsIds = gridCellsIds;
+	public QuadTreeFilter(List<String> quadTreeCellsIds, String fieldName) {
+		this.quadTreeCellsIds = quadTreeCellsIds;
 		this.fieldName = fieldName;
 	}
 
 	/**
-	 * Returns Doc Ids by searching the index for document having the correct Grid Cell Id at given grid level
+	 * Returns Doc Ids by searching the index for document having the correct Qud Tree Cell Id at given qud tree level
 	 *
 	 * @param reader reader to the index
 	 */
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
-		if ( gridCellsIds.size() == 0 ) {
+		if ( quadTreeCellsIds.size() == 0 ) {
 			return null;
 		}
 
 		OpenBitSet matchedDocumentsIds = new OpenBitSet( reader.maxDoc() );
 		Boolean found = false;
-		for ( int i = 0; i < gridCellsIds.size(); i++ ) {
-			Term gridCellTerm = new Term( fieldName, gridCellsIds.get( i ) );
-			TermDocs gridCellsDocs = reader.termDocs( gridCellTerm );
-			if ( gridCellsDocs != null ) {
-				while ( gridCellsDocs.next() ) {
-					matchedDocumentsIds.fastSet( gridCellsDocs.doc() );
+		for ( int i = 0; i < quadTreeCellsIds.size(); i++ ) {
+			Term quadTreeCellTerm = new Term( fieldName, quadTreeCellsIds.get( i ) );
+			TermDocs quadTreeCellsDocs = reader.termDocs( quadTreeCellTerm );
+			if ( quadTreeCellsDocs != null ) {
+				while ( quadTreeCellsDocs.next() ) {
+					matchedDocumentsIds.fastSet( quadTreeCellsDocs.doc() );
 					found = true;
 				}
 			}
@@ -83,8 +83,8 @@ public final class GridFilter extends Filter {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( "GridFilter" );
-		sb.append( "{gridCellsIds=" ).append( gridCellsIds );
+		sb.append( "QuadTreeFilter" );
+		sb.append( "{quadTreeCellsIds=" ).append(quadTreeCellsIds);
 		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();

@@ -74,12 +74,12 @@ public class EntitySpatialMapping {
 	}
 
 	public EntitySpatialMapping topGridLevel(int topGridLevel) {
-		spatial.put( "topGridLevel", topGridLevel );
+		spatial.put( "topQuadTreeLevel", topGridLevel );
 		return this;
 	}
 
 	public EntitySpatialMapping bottomGridLevel(int bottomGridLevel) {
-		spatial.put( "bottomGridLevel", bottomGridLevel );
+		spatial.put( "bottomQuadTreeLevel", bottomGridLevel );
 		return this;
 	}
 

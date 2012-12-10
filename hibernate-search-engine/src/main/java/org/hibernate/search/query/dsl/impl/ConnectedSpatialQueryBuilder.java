@@ -25,7 +25,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.SpatialTermination;
-import org.hibernate.search.spatial.SpatialFieldBridgeByGrid;
+import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
@@ -59,19 +59,19 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 		//FIXME that will have to change probably but today, if someone uses latitude / longitude
 		//      we use boolean style spatial queries
-		//      and on coordinates field, use grid query
+		//      and on coordinates field, use quad tree query
 		// FIXME in the future we will likely react to some state stored in SpatialFieldBridge (for the indexing strategy)
 		String coordinatesField = spatialContext.getCoordinatesField();
 		FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
-		if ( fieldBridge instanceof SpatialFieldBridgeByGrid ) {
-			return SpatialQueryBuilderFromPoint.buildSpatialQueryByGrid(
-					Point.fromDegrees(
-							spatialContext.getCoordinates().getLatitude(),
-							spatialContext.getCoordinates().getLongitude()
-					),
-					spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
-					coordinatesField
-			);
+		if ( fieldBridge instanceof SpatialFieldBridgeByQuadTree) {
+			return SpatialQueryBuilderFromPoint.buildSpatialQueryByQuadTree(
+                    Point.fromDegrees(
+                            spatialContext.getCoordinates().getLatitude(),
+                            spatialContext.getCoordinates().getLongitude()
+                    ),
+                    spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
+                    coordinatesField
+            );
 		}
 		else if ( fieldBridge instanceof SpatialFieldBridgeByRange ) {
 			return SpatialQueryBuilderFromPoint.buildSpatialQueryByRange(

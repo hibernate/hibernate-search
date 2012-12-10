@@ -29,19 +29,21 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 
-import org.hibernate.search.spatial.SpatialFieldBridgeByGrid;
+import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
 
 import java.util.List;
 
 /**
- * The SpatialQueryBuilder holds builder methods for Grid, Distance and Spatial (Grid+Distance) filters and queries
+ * The SpatialQueryBuilder holds builder methods for Quad Tree, Distance and Spatial (Quad Tree+Distance) filters
+ * and queries
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
 public abstract class SpatialQueryBuilderFromPoint {
+
 	/**
 	 * Returns a Lucene filter which rely on Hibernate Search Spatial
-	 * grid indexation to filter document at radius
+	 * quad tree indexation to filter document at radius
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
@@ -51,13 +53,13 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see org.hibernate.search.spatial.Coordinates
 	 * @see org.apache.lucene.search.Filter
 	 */
-	public static Filter buildGridFilter(Point center, double radius, String fieldName) {
-		int bestGridLevel = GridHelper.findBestGridLevelForSearchRange( 2.0d * radius );
-		if ( bestGridLevel > SpatialFieldBridgeByGrid.DEFAULT_BOTTOM_GRID_LEVEL ) {
-			bestGridLevel = SpatialFieldBridgeByGrid.DEFAULT_BOTTOM_GRID_LEVEL;
+	public static Filter buildQuadTreeFilter(Point center, double radius, String fieldName) {
+		int bestQuadTreeLevel = SpatialHelper.findBestQuadTreeLevelForSearchRange( 2.0d * radius );
+		if ( bestQuadTreeLevel > SpatialFieldBridgeByQuadTree.DEFAULT_BOTTOM_QUAD_TREE_LEVEL ) {
+			bestQuadTreeLevel = SpatialFieldBridgeByQuadTree.DEFAULT_BOTTOM_QUAD_TREE_LEVEL;
 		}
-		List<String> gridCellsIds = GridHelper.getGridCellsIds( center, radius, bestGridLevel );
-		return new GridFilter( gridCellsIds, GridHelper.formatFieldName( bestGridLevel, fieldName ) );
+		List<String> quadTreeCellsIds = SpatialHelper.getQuadTreeCellsIds( center, radius, bestQuadTreeLevel );
+		return new QuadTreeFilter( quadTreeCellsIds, SpatialHelper.formatFieldName( bestQuadTreeLevel, fieldName ) );
 	}
 
 	/**
@@ -101,8 +103,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 
 	/**
 	 * Returns a Lucene Query which rely on Hibernate Search Spatial
-	 * grid indexation to filter document at radius by wrapping a
-	 * GridFilter
+	 * quad tree indexation to filter document at radius by wrapping a
+	 * QuadTreeFilter
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
@@ -111,10 +113,9 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see org.apache.lucene.search.Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildGridQuery(Point center, double radius, String fieldName) {
-		return new FilteredQuery( new MatchAllDocsQuery(  ), buildGridFilter( center, radius, fieldName ) );
+	public static Query buildQuadTreeQuery(Point center, double radius, String fieldName) {
+		return new FilteredQuery( new MatchAllDocsQuery(  ), buildQuadTreeFilter(center, radius, fieldName) );
 	}
-
 
 	/**
 	 * Returns a Lucene Query searching directly by computing distance against
@@ -133,8 +134,8 @@ public abstract class SpatialQueryBuilderFromPoint {
 	}
 
 	/**
-	 * Returns a Lucene Query which rely on Hibernate Search Spatial
-	 * grid indexation to filter document at radius and filter its results
+	 * Returns a Lucene Query which relies on Hibernate Search Spatial
+	 * quad tree indexation to filter documents at radius and filter its results
 	 * by a fine DistanceFilter
 	 *
 	 * @param center center of the search discus
@@ -144,10 +145,10 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildSpatialQueryByGrid(Point center, double radius, String fieldName) {
+	public static Query buildSpatialQueryByQuadTree(Point center, double radius, String fieldName) {
 		return new FilteredQuery( new MatchAllDocsQuery(  ),
 				buildDistanceFilter(
-						buildGridFilter( center, radius, fieldName ),
+						buildQuadTreeFilter( center, radius, fieldName ),
 						center,
 						radius,
 						fieldName
@@ -181,22 +182,22 @@ public abstract class SpatialQueryBuilderFromPoint {
 		Query longQuery= null;
 		if ( boundingBox.getLowerLeft().getLongitude() <= boundingBox.getUpperRight().getLongitude() ) {
 			longQuery = NumericRangeQuery.newDoubleRange( longitudeFieldName, boundingBox.getLowerLeft().getLongitude(),
-					boundingBox.getUpperRight().getLongitude(), true, true);
+					boundingBox.getUpperRight().getLongitude(), true, true );
 		}
 		else {
 			longQuery= new BooleanQuery();
 			( (BooleanQuery) longQuery).add( NumericRangeQuery.newDoubleRange( longitudeFieldName, boundingBox.getLowerLeft().getLongitude(),
-					180.0, true, true), BooleanClause.Occur.SHOULD);
+					180.0, true, true ), BooleanClause.Occur.SHOULD );
 			( (BooleanQuery) longQuery).add( NumericRangeQuery.newDoubleRange( longitudeFieldName, -180.0,
-					boundingBox.getUpperRight().getLongitude(), true, true), BooleanClause.Occur.SHOULD);
+					boundingBox.getUpperRight().getLongitude(), true, true ), BooleanClause.Occur.SHOULD );
 		}
 
 		BooleanQuery boxQuery = new BooleanQuery();
-		boxQuery.add(latQuery, BooleanClause.Occur.MUST);
-		boxQuery.add(longQuery, BooleanClause.Occur.MUST);
+		boxQuery.add( latQuery, BooleanClause.Occur.MUST );
+		boxQuery.add( longQuery, BooleanClause.Occur.MUST );
 
 		return new FilteredQuery(
-				new MatchAllDocsQuery(  ),
+				new MatchAllDocsQuery(),
 				buildDistanceFilter(
 						new QueryWrapperFilter( boxQuery ),
 						center,

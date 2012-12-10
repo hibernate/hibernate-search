@@ -692,7 +692,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		centerLatitude = 24;
 		centerLongitude = 31.5;
 
-		luceneQuery = SpatialQueryBuilder.buildSpatialQueryByGrid(
+		luceneQuery = SpatialQueryBuilder.buildSpatialQueryByQuadTree(
 				centerLatitude,
 				centerLongitude,
 				50,
@@ -702,7 +702,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		results = hibQuery.list();
 		assertEquals( 0, results.size() );
 
-		luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByGrid(
+		luceneQuery2 = SpatialQueryBuilder.buildSpatialQueryByQuadTree(
 				centerLatitude,
 				centerLongitude,
 				51,

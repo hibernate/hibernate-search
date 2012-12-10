@@ -21,7 +21,7 @@
 package org.hibernate.search.spatial;
 
 /**
- * Minimum interface for a field/method to be grid indexable
+ * Minimum interface for a field/method to be quad tree indexable
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */

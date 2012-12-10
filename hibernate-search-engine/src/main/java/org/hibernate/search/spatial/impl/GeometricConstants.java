@@ -21,11 +21,11 @@
 package org.hibernate.search.spatial.impl;
 
 /**
- * Geometric constants to use in GridHelper calculation
+ * Geometric constants to use in SpatialHelper calculation
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  * @author Mathieu Perez <mathieu.perez@novacodex.net>
- * @see GridHelper
+ * @see SpatialHelper
  */
 public interface GeometricConstants {
 
