@@ -245,7 +245,7 @@ List results = hibQuery.list();</programlisting>
       <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 @Spatial(name="location", spatialMode = SpatialMode.QUAD)
-public class Hotel implements {
+public class Hotel {
 
   @Latitude(of="location")
   Double latitude;
