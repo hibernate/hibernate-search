@@ -92,7 +92,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 			String message = "Unable to remove " + entityType + "#" + id + " from index.";
 			throw new SearchException( message, e );
 		}
-		workspace.incrementModificationCounter( 1 );
+		workspace.notifyWorkApplied( work );
 	}
 
 	protected static boolean isIdNumeric(DocumentBuilderIndexedEntity<?> documentBuilder) {

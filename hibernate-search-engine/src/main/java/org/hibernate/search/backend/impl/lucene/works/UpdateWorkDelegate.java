@@ -36,7 +36,7 @@ public class UpdateWorkDelegate implements LuceneWorkDelegate {
 		this.addDelegate = addDelegate;
 	}
 
-	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+	public void performWork(final LuceneWork work, final IndexWriter writer, final IndexingMonitor monitor) {
 		// This is the slowest implementation, needing to remove and then add to the index;
 		// see also org.hibernate.search.backend.impl.lucene.works.UpdateExtWorkDelegate
 		this.deleteDelegate.performWork( work, writer, monitor );

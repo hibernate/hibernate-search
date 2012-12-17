@@ -20,18 +20,25 @@
  */
 package org.hibernate.search.test.reader.nrtreaders;
 
+import java.util.List;
+
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
@@ -47,6 +54,50 @@ import org.junit.Assert;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class BasicNRTFunctionalityTest extends SearchTestCase {
+
+	/**
+	 * Verify it's safe to not skip deletes even when a new entity
+	 * is stored reusing a stale documentId.
+	 */
+	public void testEntityResurrection() {
+		final Long id = 5l;
+		Session session = getSessions().openSession();
+		session.getTransaction().begin();
+
+		AlternateDocument docOnInfinispan = new AlternateDocument( id, "On Infinispan", "a book about Infinispan", "content" );
+		session.persist( docOnInfinispan );
+		session.getTransaction().commit();
+		session.clear();
+
+		session.getTransaction().begin();
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( AlternateDocument.class ).get();
+		Query luceneQuery = queryBuilder.keyword().onField( "Abstract" ).matching( "Infinispan" ).createQuery();
+		List list = fullTextSession.createFullTextQuery( luceneQuery ).list();
+		Assert.assertEquals( 1, list.size() );
+		session.getTransaction().commit();
+		session.clear();
+
+		session.getTransaction().begin();
+		Object loadedDocument = session.load( AlternateDocument.class, id );
+		session.delete( loadedDocument );
+		session.getTransaction().commit();
+		session.clear();
+
+		session.getTransaction().begin();
+		list = fullTextSession.createFullTextQuery( luceneQuery ).list();
+		Assert.assertEquals( 0, list.size() );
+
+		AlternateDocument docOnHibernate = new AlternateDocument( id, "On Hibernate", "a book about Hibernate", "content" );
+		session.persist( docOnHibernate );
+		session.getTransaction().commit();
+
+		session.getTransaction().begin();
+		list = fullTextSession.createFullTextQuery( luceneQuery ).list();
+		Assert.assertEquals( 0, list.size() );
+
+		session.close();
+	}
 
 	public void testMultipleEntitiesPerIndex() throws Exception {
 		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( ( SessionFactoryImplementor ) getSessions() );
@@ -92,22 +143,37 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 		s.getTransaction().commit();
 		s.close();
 
-		assertEquals( 0, getDocumentNbrFromFilesystem( indexManager ) );
-		assertEquals( 1, getDocumentNbrFromReaderProvider( indexManager ) );
-
 		s = getSessions().openSession();
 		s.getTransaction().begin();
+
+		assertEquals( 0, getDocumentNbrFromFilesystem( indexManager ) ); //filesystem only sees changes from a fully closed IW
+		assertEquals( 1, getDocumentNbrFromQuery( s ) ); //Hibernate Search has to return the right answer
+		assertEquals( 1, getDocumentNbrFromReaderProvider( indexManager ) ); //In-memory buffers might fail to see deletes
+
 		s.delete( s.createCriteria( Document.class ).uniqueResult() );
 		s.getTransaction().commit();
 		s.close();
 
+		s = getSessions().openSession();
+		s.getTransaction().begin();
+
 		assertEquals( 0, getDocumentNbrFromFilesystem( indexManager ) );
+		assertEquals( 0, getDocumentNbrFromQuery( s ) );
 		assertEquals( 0, getDocumentNbrFromReaderProvider( indexManager ) );
+
+		s.getTransaction().commit();
+		s.close();
 
 		ErrorHandler errorHandler = searchFactoryBySFI.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
 		Assert.assertNull( "Errors detected in the backend!", mockErrorHandler.getLastException() );
+	}
+
+	private int getDocumentNbrFromQuery(Session currentSession) {
+		MatchAllDocsQuery luceneQuery = new MatchAllDocsQuery();
+		FullTextQuery fullTextQuery = Search.getFullTextSession( currentSession ).createFullTextQuery( luceneQuery, Document.class );
+		return fullTextQuery.list().size();
 	}
 
 	private int getDocumentNbrFromReaderProvider(NRTIndexManager indexManager) {
