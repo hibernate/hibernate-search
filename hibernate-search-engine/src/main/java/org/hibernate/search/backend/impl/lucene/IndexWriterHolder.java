@@ -219,6 +219,8 @@ class IndexWriterHolder {
 	/**
 	 * Opens an IndexReader having visibility on uncommitted writes from
 	 * the IndexWriter, if any writer is open, or null if no IndexWriter is open.
+	 * @param applyDeletes Applying deletes is expensive, say no if you can deal with stale hits during queries
+	 * @return a new NRT IndexReader if an IndexWriter is available, or <code>null</code> otherwise
 	 */
 	public IndexReader openNRTIndexReader(boolean applyDeletes) {
 		final IndexWriter indexWriter = writer.get();

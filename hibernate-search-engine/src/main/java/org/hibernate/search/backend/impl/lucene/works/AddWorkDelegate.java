@@ -68,7 +68,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 		}
 		try {
 			writer.addDocument( work.getDocument(), analyzer );
-			workspace.incrementModificationCounter( 1 );
+			workspace.notifyWorkApplied( work );
 		}
 		catch ( IOException e ) {
 			throw new SearchException(
