@@ -20,10 +20,9 @@
  */
 package org.hibernate.search.backend.impl;
 
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -36,19 +35,20 @@ import org.hibernate.search.indexes.spi.IndexManager;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class WorkQueuePerIndexSplitter {
-	
-	private IdentityHashMap<IndexManager,List<LuceneWork>> queues = new IdentityHashMap<IndexManager,List<LuceneWork>>();
+
+	private final HashMap<String,WorkPlan> queues = new HashMap<String,WorkPlan>();
 
 	/**
 	 * @param indexManager
 	 */
-	public List<LuceneWork> getIndexManagerQueue(IndexManager indexManager) {
-		List<LuceneWork> list = queues.get( indexManager );
-		if ( list == null ) {
-			list = new LinkedList<LuceneWork>();
-			queues.put( indexManager, list );
+	public List<LuceneWork> getIndexManagerQueue(final IndexManager indexManager) {
+		final String indexName = indexManager.getIndexName();
+		WorkPlan plan = queues.get( indexName );
+		if ( plan == null ) {
+			plan = new WorkPlan( indexManager );
+			queues.put( indexName, plan );
 		}
-		return list;
+		return plan.queue;
 	}
 
 	/**
@@ -59,8 +59,16 @@ public class WorkQueuePerIndexSplitter {
 	 */
 	public void commitOperations(IndexingMonitor monitor) {
 		// FIXME move executor here to parallel work - optionally? See HSEARCH-826
-		for ( Entry<IndexManager,List<LuceneWork>> entry : queues.entrySet() ) {
-			entry.getKey().performOperations( entry.getValue(), monitor );
+		for ( WorkPlan plan : queues.values() ) {
+			plan.indexManager.performOperations( plan.queue, monitor );
+		}
+	}
+
+	private static class WorkPlan {
+		private final IndexManager indexManager;
+		private final LinkedList<LuceneWork> queue = new LinkedList<LuceneWork>();
+		WorkPlan(IndexManager indexManager) {
+			this.indexManager = indexManager;
 		}
 	}
 
