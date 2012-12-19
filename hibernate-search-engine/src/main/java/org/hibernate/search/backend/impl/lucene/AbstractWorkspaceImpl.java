@@ -62,7 +62,6 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	 */
 	private final AtomicLong operations = new AtomicLong( 0L );
 
-
 	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties cfg) {
 		this.indexManager = indexManager;
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
@@ -92,9 +91,8 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 		optimizerStrategy.performOptimization( writer );
 	}
 
-	@Override
-	public void incrementModificationCounter(int modCount) {
-		operations.addAndGet( modCount );
+	protected void incrementModificationCounter() {
+		operations.addAndGet( 1 );
 	}
 
 	@Override

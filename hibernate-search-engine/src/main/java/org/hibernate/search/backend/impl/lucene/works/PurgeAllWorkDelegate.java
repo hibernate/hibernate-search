@@ -63,7 +63,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 		catch (Exception e) {
 			throw new SearchException( "Unable to purge all from Lucene index: " + entityType, e );
 		}
-		workspace.incrementModificationCounter( 1 );
+		workspace.notifyWorkApplied( work );
 	}
 
 }

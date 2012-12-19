@@ -86,7 +86,7 @@ public final class UpdateExtWorkDelegate extends UpdateWorkDelegate {
 				analyzer = AddWorkDelegate.updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
 				writer.updateDocument( idTerm, work.getDocument(), analyzer );
 			}
-			workspace.incrementModificationCounter( 1 );
+			workspace.notifyWorkApplied( work );
 		}
 		catch ( Exception e ) {
 			String message = "Unable to update " + managedType + "#" + id + " in index.";

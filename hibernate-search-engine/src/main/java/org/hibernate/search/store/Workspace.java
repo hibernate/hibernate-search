@@ -25,6 +25,7 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 
@@ -61,14 +62,6 @@ public interface Workspace {
 	IndexWriter getIndexWriter();
 
 	/**
-	 * Increment the counter of modification operations done on the index.
-	 * Used (currently only) by the OptimizerStrategy.
-	 *
-	 * @param modCount the increment to add to the counter.
-	 */
-	void incrementModificationCounter(int modCount);
-
-	/**
 	 * @return The unmodifiable set of entity types being indexed
 	 * in the underlying IndexManager backing this Workspace.
 	 */
@@ -99,5 +92,12 @@ public interface Workspace {
 	 * @return true if it's safe to do the single term operation.
 	 */
 	boolean areSingleTermDeletesSafe();
+
+	/**
+	 * Some workspaces need this to determine for example the kind of flush operations which are safe
+	 * to apply. Generally used for statistics.
+	 * @param work the LuceneWork which was just processed
+	 */
+	void notifyWorkApplied(LuceneWork work);
 
 }

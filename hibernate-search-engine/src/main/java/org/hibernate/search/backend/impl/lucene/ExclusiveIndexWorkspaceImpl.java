@@ -22,6 +22,7 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.Properties;
 
+import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
@@ -49,6 +50,11 @@ public class ExclusiveIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 	@Override
 	public void flush() {
 		writerHolder.commitIndexWriter();
+	}
+
+	@Override
+	public void notifyWorkApplied(LuceneWork work) {
+		incrementModificationCounter();
 	}
 
 }
