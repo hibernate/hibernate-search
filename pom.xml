@@ -45,6 +45,7 @@
         <module>hibernate-search-infinispan</module>
         <module>hibernate-search-archetype</module>
         <module>hibernate-search-integrationtest</module>
+        <module>hibernate-search-modules</module>
     </modules>
 
     <issueManagement>
@@ -140,6 +141,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.6.1</luceneVersion>
+        <luceneRegexVersion>3.0.3</luceneRegexVersion>
+        <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
         <infinispanVersion>5.1.8.Final</infinispanVersion>
         <jgroupsVersion>3.0.14.Final</jgroupsVersion>
         <hibernateVersion>4.1.9.Final</hibernateVersion>
@@ -149,6 +152,15 @@
         <jbossLoggingVersion>3.1.0.GA</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.3.Final</jbossLoggingProcessorVersion>
         <jbossJTAVersion>4.16.4.Final</jbossJTAVersion>
+        <avroVersion>1.6.3</avroVersion>
+        <jacksonAslVersion>1.9.2</jacksonAslVersion>
+        <commonsIoVersion>1.4</commonsIoVersion>
+        <commonsCodecVersion>1.5</commonsCodecVersion>
+        <commonsLangVersion>2.6</commonsLangVersion>
+        <!-- Used in the hibernate-search-modules project -->
+        <paranamerVersion>2.3</paranamerVersion>
+        <snappyVersion>1.0.4.1</snappyVersion>
+        <guavaVersion>r05</guavaVersion>
     </properties>
 
     <dependencyManagement>
@@ -175,6 +187,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-regex</artifactId>
+                <version>${luceneRegexVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-spellchecker</artifactId>
                 <version>${luceneVersion}</version>
             </dependency>
@@ -191,19 +208,19 @@
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>1.6.3</version>
+                <version>${avroVersion}</version>
             </dependency>
             <dependency>
                 <!-- To force testing of Apache Avro integration with the version of Jackson used in AS 7.1 -->
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-core-asl</artifactId>
-                <version>1.9.2</version>
+                <version>${jacksonAslVersion}</version>
             </dependency>
             <dependency>
                 <!-- To force testing of Apache Avro integration with the version of Jackson used in AS 7.1 -->
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
-                <version>1.9.2</version>
+                <version>${jacksonAslVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -213,12 +230,12 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.5</version>
+                <version>${commonsCodecVersion}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>1.4</version>
+                <version>${commonsIoVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
