@@ -80,7 +80,7 @@ import org.hibernate.search.bridge.builtin.impl.BuiltinNumericIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinNumericMapBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
-import org.hibernate.search.spatial.SpatialFieldBridgeByGrid;
+import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -348,10 +348,10 @@ public final class BridgeFactory {
 		if ( spatial != null ) {
 			if ( spatial.spatialMode() == SpatialMode.GRID ) {
 				if ( latitudeField != null && longitudeField != null ) {
-					bridge = new SpatialFieldBridgeByGrid( spatial.topGridLevel(), spatial.bottomGridLevel(), latitudeField, longitudeField );
+					bridge = new SpatialFieldBridgeByQuadTree( spatial.topQuadTreeLevel(), spatial.bottomQuadTreeLevel(), latitudeField, longitudeField );
 				}
 				else {
-					bridge = new SpatialFieldBridgeByGrid( spatial.topGridLevel(), spatial.bottomGridLevel() );
+					bridge = new SpatialFieldBridgeByQuadTree( spatial.topQuadTreeLevel(), spatial.bottomQuadTreeLevel() );
                                 }
 			}
 			else {

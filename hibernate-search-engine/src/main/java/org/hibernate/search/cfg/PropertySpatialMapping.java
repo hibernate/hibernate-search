@@ -76,12 +76,12 @@ public class PropertySpatialMapping {
 	}
 
 	public PropertySpatialMapping topGridLevel(int topGridLevel) {
-		spatial.put( "topGridLevel", topGridLevel );
+		spatial.put( "topQuadTreeLevel", topGridLevel );
 		return this;
 	}
 
 	public PropertySpatialMapping bottomGridLevel(int bottomGridLevel) {
-		spatial.put( "bottomGridLevel", bottomGridLevel );
+		spatial.put( "bottomQuadTreeLevel", bottomGridLevel );
 		return this;
 	}
 

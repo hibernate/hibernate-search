@@ -24,110 +24,111 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Grid fields,Ids generator and geometric calculation methods for use in SpatialFieldBridge
+ * Spatial fields, ids generator and geometric calculation methods for use in SpatialFieldBridge
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  * @author Mathieu Perez <mathieu.perez@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridgeByGrid
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
  */
-public abstract class GridHelper {
+public abstract class SpatialHelper {
 
 	private static final double LOG2 = Math.log( 2 );
 
 	/**
-	 * Private construtor locking down utility class
+	 * Private constructor locking down utility class
 	 */
-	private GridHelper() {};
+	private SpatialHelper() {};
 
 	/**
 	 * Generate a Cell Index on one axis
 	 *
 	 * @param coordinate position to compute the Index for
 	 * @param range range of the axis (-pi,pi)/(-90,90) => 2*pi/180 e.g
-	 * @param gridLevel Hox many time the range has been split in two
+	 * @param quadTreeLevel Hox many time the range has been split in two
 	 * @return the cell index on the axis
 	 */
-	public static int getCellIndex(double coordinate, double range, int gridLevel) {
-		return ( int ) Math.floor( Math.pow( 2, gridLevel ) * coordinate / range );
+	public static int getCellIndex(double coordinate, double range, int quadTreeLevel) {
+		return ( int ) Math.floor( Math.pow( 2, quadTreeLevel ) * coordinate / range );
 	}
 
 	/**
-	 * Generate a Grid Cell Id (with both Cell Index on both dimension in it) for a position
+	 * Generate a Quad Tree Cell Id (with both Cell Index on both dimension in it) for a position
 	 *
-	 * @param point position to compute the Grid Cell Id for
-	 * @param gridLevel Hox many time the dimensions have been split in two
-	 * @return the cell id for the point at the given grid level
+	 * @param point position to compute the Quad Tree Cell Id for
+	 * @param quadTreeLevel Hox many time the dimensions have been split in two
+	 * @return the cell id for the point at the given quad tree level
 	 */
-	public static String getGridCellId(Point point, int gridLevel) {
+	public static String getQuadTreeCellId(Point point, int quadTreeLevel) {
 		double[] indexablesCoordinates = projectToIndexSpace( point );
 		int longitudeCellIndex = getCellIndex(
 				indexablesCoordinates[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 		int latitudeCellIndex = getCellIndex(
 				indexablesCoordinates[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
-		return formatGridCellId( longitudeCellIndex, latitudeCellIndex );
+		return formatQuadTreeCellId(longitudeCellIndex, latitudeCellIndex);
 	}
 
 	/**
-	 * Generate a Grid Cell Ids List covered by a bounding box
+	 * Generate a Quad Tree Cell Ids List covered by a bounding box
 	 *
 	 * @param lowerLeft lower left corner of the bounding box
 	 * @param upperRight upper right corner of the bounding box
-	 * @param gridLevel grid level of the wanted cell ids
+	 * @param quadTreeLevel quad tree level of the wanted cell ids
 	 * @return List of ids of the cells containing the point
 	 */
-	public static List<String> getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel) {
+	public static List<String> getQuadTreeCellsIds(Point lowerLeft, Point upperRight, int quadTreeLevel) {
 		double[] projectedLowerLeft = projectToIndexSpace( lowerLeft );
 		int lowerLeftXIndex = getCellIndex(
 				projectedLowerLeft[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 		int lowerLeftYIndex = getCellIndex(
 				projectedLowerLeft[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 
 		double[] projectedUpperRight = projectToIndexSpace( upperRight );
 		int upperRightXIndex = getCellIndex(
 				projectedUpperRight[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 		int upperRightYIndex = getCellIndex(
 				projectedUpperRight[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 
 		double[] projectedLowerRight= projectToIndexSpace( Point.fromDegrees( lowerLeft.getLatitude(), upperRight.getLongitude() ) );
 		int lowerRightXIndex = getCellIndex(
 				projectedLowerRight[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 		int lowerRightYIndex = getCellIndex(
 				projectedLowerRight[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 
 		double[] projectedUpperLeft = projectToIndexSpace( Point.fromDegrees( upperRight.getLatitude(), lowerLeft.getLongitude() ) );
 		int upperLeftXIndex = getCellIndex(
 				projectedUpperLeft[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 		int upperLeftYIndex = getCellIndex(
 				projectedUpperLeft[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				gridLevel
+				quadTreeLevel
 		);
 
 
@@ -139,26 +140,26 @@ public abstract class GridHelper {
 		startY= Math.min(Math.min(Math.min(lowerLeftYIndex,upperLeftYIndex),upperRightYIndex),lowerRightYIndex);
 		endY= Math.max(Math.max(Math.max(lowerLeftYIndex,upperLeftYIndex),upperRightYIndex),lowerRightYIndex);
 
-		List<String> gridCellsIds = new ArrayList<String>((endX+1-startX)*(endY+1-startY));
+		List<String> quadTreeCellsIds = new ArrayList<String>((endX+1-startX)*(endY+1-startY));
 		int xIndex, yIndex;
 		for ( xIndex = startX; xIndex <= endX; xIndex++ ) {
 			for ( yIndex = startY; yIndex <= endY; yIndex++ ) {
-				gridCellsIds.add( formatGridCellId( xIndex, yIndex ) );
+				quadTreeCellsIds.add(formatQuadTreeCellId(xIndex, yIndex));
 			}
 		}
 
-		return gridCellsIds;
+		return quadTreeCellsIds;
 	}
 
 	/**
-	 * Generate a Grid Cell Ids List for the bounding box of a circular search area
+	 * Generate a Quad Tree Cell Ids List for the bounding box of a circular search area
 	 *
 	 * @param center center of the search area
 	 * @param radius radius of the search area
-	 * @param gridLevel grid level of the wanted cell ids
+	 * @param quadTreeLevel Quad Tree level of the wanted cell ids
 	 * @return List of the ids of the cells covering the bounding box of the given search discus
 	 */
-	public static List<String> getGridCellsIds(Point center, double radius, int gridLevel) {
+	public static List<String> getQuadTreeCellsIds(Point center, double radius, int quadTreeLevel) {
 
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
@@ -168,41 +169,41 @@ public abstract class GridHelper {
 		double upperRightLongitude = boundingBox.getUpperRight().getLongitude();
 
 		if ( upperRightLongitude < lowerLeftLongitude ) { // Box cross the 180 meridian
-			List<String> gridCellsIds;
-			gridCellsIds = getGridCellsIds(
-					Point.fromDegreesInclusive( lowerLeftLatitude, lowerLeftLongitude ),
-					Point.fromDegreesInclusive( upperRightLatitude, GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ),
-					gridLevel
-			);
-			gridCellsIds.addAll(
-					getGridCellsIds(
-							Point.fromDegreesInclusive(
-									lowerLeftLatitude,
-									-GeometricConstants.LONGITUDE_DEGREE_RANGE / 2
-							), Point.fromDegreesInclusive( upperRightLatitude, upperRightLongitude ), gridLevel
-					)
-			);
-			return gridCellsIds;
+			List<String> quadTreeCellsIds;
+			quadTreeCellsIds = getQuadTreeCellsIds(
+                    Point.fromDegreesInclusive(lowerLeftLatitude, lowerLeftLongitude),
+                    Point.fromDegreesInclusive(upperRightLatitude, GeometricConstants.LONGITUDE_DEGREE_RANGE / 2),
+                    quadTreeLevel
+            );
+			quadTreeCellsIds.addAll(
+                    getQuadTreeCellsIds(
+                            Point.fromDegreesInclusive(
+                                    lowerLeftLatitude,
+                                    -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2
+                            ), Point.fromDegreesInclusive(upperRightLatitude, upperRightLongitude), quadTreeLevel
+                    )
+            );
+			return quadTreeCellsIds;
 		}
 		else {
-			return getGridCellsIds(
-					Point.fromDegreesInclusive( lowerLeftLatitude, lowerLeftLongitude ),
-					Point.fromDegreesInclusive( upperRightLatitude, upperRightLongitude ),
-					gridLevel
-			);
+			return getQuadTreeCellsIds(
+                    Point.fromDegreesInclusive(lowerLeftLatitude, lowerLeftLongitude),
+                    Point.fromDegreesInclusive(upperRightLatitude, upperRightLongitude),
+                    quadTreeLevel
+            );
 		}
 	}
 
 	/**
-	 * If point are searched at d distance from a point, a certain grid cell level will problem grid cell that are
-	 * big enough to contain the search area but the smallest possible. By returning this level we ensure 4 Grid Cell
-	 * maximum will be needed to cover the search area (2 max on each axis because of search area crossing fixed bonds
-	 * of the grid cells)
+	 * If point are searched at d distance from a point, a certain quad tree cell level will problem quad tree cell
+     * that are big enough to contain the search area but the smallest possible. By returning this level we ensure
+     * 4 Quad Tree Cell maximum will be needed to cover the search area (2 max on each axis because of search area
+     * crossing fixed bonds of the quad tree cells)
 	 *
-	 * @param searchRange search range to be covered by the grid cells
-	 * @return Return the best Grid level for a given search radius.
+	 * @param searchRange search range to be covered by the quad tree cells
+	 * @return Return the best Quad Tree level for a given search radius.
 	 */
-	public static int findBestGridLevelForSearchRange(double searchRange) {
+	public static int findBestQuadTreeLevelForSearchRange(double searchRange) {
 
 		double iterations = GeometricConstants.EARTH_EQUATOR_CIRCUMFERENCE_KM / ( 2.0d * searchRange );
 
@@ -210,7 +211,8 @@ public abstract class GridHelper {
 	}
 
 	/**
-	 * Project a degree latitude/longitude point into a sinusoidal projection planar space for grid cell ids computation
+	 * Project a degree latitude/longitude point into a sinusoidal projection planar space for quad tree cell ids
+     * computation
 	 *
 	 * @param point point to be projected
 	 * @return array of projected coordinates
@@ -224,8 +226,8 @@ public abstract class GridHelper {
 		return projectedCoordinates;
 	}
 
-	public static String formatFieldName(int gridLevel, String fieldName) {
-		return fieldName+"_HSSI_"+gridLevel;
+	public static String formatFieldName(int quadTreeLevel, String fieldName) {
+		return fieldName+"_HSSI_"+quadTreeLevel;
 	}
 
 	public static String formatLatitude(String fieldName) {
@@ -236,7 +238,7 @@ public abstract class GridHelper {
 		return fieldName+"_HSSI_Longitude";
 	}
 
-	public static String formatGridCellId(int xIndex, int yIndex) {
+	public static String formatQuadTreeCellId(int xIndex, int yIndex) {
 		return xIndex+"|"+yIndex;
 	}
 }
