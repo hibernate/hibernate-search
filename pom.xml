@@ -140,7 +140,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4jVersion>1.6.1</slf4jVersion>
-        <luceneVersion>3.6.1</luceneVersion>
+        <luceneVersion>3.6.2</luceneVersion>
         <luceneRegexVersion>3.0.3</luceneRegexVersion>
         <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
         <infinispanVersion>5.1.8.Final</infinispanVersion>
