@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.worker;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -217,9 +216,7 @@ public class WorkerTestCase extends SearchTestCase {
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
-		cfg.setProperty( "hibernate.search.Clock.directory_provider", "filesystem" );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.show_sql", "false" );
 		cfg.setProperty( "hibernate.format_sql", "false" );
