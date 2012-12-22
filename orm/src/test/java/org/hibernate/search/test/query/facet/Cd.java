@@ -46,7 +46,6 @@ import org.hibernate.search.annotations.Resolution;
 @Entity
 @Indexed
 public class Cd {
-	private static final DateFormat formatter = new SimpleDateFormat( "yyyy" );
 
 	@Id
 	@GeneratedValue
@@ -72,6 +71,7 @@ public class Cd {
 	public Cd(String name, int price, String releaseYear) {
 		this.name = name;
 		this.price = price;
+		DateFormat formatter = new SimpleDateFormat( "yyyy" );
 		try {
 			this.releaseYear = formatter.parse( releaseYear );
 		}
@@ -108,5 +108,3 @@ public class Cd {
 		return sb.toString();
 	}
 }
-
-
