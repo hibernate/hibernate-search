@@ -372,7 +372,7 @@ org.apache.lucene.search.Query luceneQuery = builder.spatial()
 
 FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
 hibQuery.setProjection(FullTextQuery.SPATIAL_DISTANCE, FullTextQuery.THIS);
-hibQuery.setSpatialSearchCenter(centerLatitude, centerLongitude);
+hibQuery.setSpatialParameters(centerLatitude, centerLongitude, "location");
 List results = hibQuery.list();</programlisting>
       </example>
 
@@ -386,10 +386,10 @@ List results = hibQuery.list();</programlisting>
 
         <listitem>
           <para>Call
-          <classname>FullTextQuery</classname>.<literal>setSpatialSearchCenter</literal>
-          with the latitude and longitude used to build the spatial query.
-          Note that using coordinates different than the center used for the
-          query will have unexpected results.</para>
+          <classname>FullTextQuery</classname>.<literal>setSpatialParameters</literal>
+          with the latitude, longitude and the name of the spatial field used 
+		  to build the spatial query. Note that using coordinates different than 
+		  the center used for the query will have unexpected results.</para>
         </listitem>
       </itemizedlist>
 
