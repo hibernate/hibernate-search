@@ -427,14 +427,16 @@ org.apache.lucene.search.Query luceneQuery = builder.spatial()
    .createQuery();
 
 FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
-Sort distanceSort = new Sort(new DistanceSortField(centerLatitude,centerLongitude));
+Sort distanceSort = new Sort(
+	new DistanceSortField(centerLatitude, centerLongitude, "location"));
 hibQuery.setSort(distanceSort);</programlisting>
       </example>
 
       <para>The <classname>DistanceSortField</classname> must be constructed
-      using the same coordinates used to build the spatial query otherwise the
-      sorting will occur with another center than the query. This repetition
-      is needed to allow you to define Queries with any tool.</para>
+      using the same coordinates on the same spatial field used to build the
+      spatial query otherwise the sorting will occur with another center than
+      the query. This repetition is needed to allow you to define Queries with
+      any tool.</para>
 
       <para>Using distance sort on non @Spatial enabled entities and/or with a
       non spatial Query will have also unexpected results as entities non
