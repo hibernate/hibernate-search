@@ -372,7 +372,7 @@ org.apache.lucene.search.Query luceneQuery = builder.spatial()
 
 FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
 hibQuery.setProjection(FullTextQuery.SPATIAL_DISTANCE, FullTextQuery.THIS);
-hibQuery.setSpatialSearchCenter(centerLatitude, centerLongitude);
+hibQuery.setSpatialParameters(centerLatitude, centerLongitude, "location");
 List results = hibQuery.list();</programlisting>
       </example>
 
@@ -386,10 +386,10 @@ List results = hibQuery.list();</programlisting>
 
         <listitem>
           <para>Call
-          <classname>FullTextQuery</classname>.<literal>setSpatialSearchCenter</literal>
-          with the latitude and longitude used to build the spatial query.
-          Note that using coordinates different than the center used for the
-          query will have unexpected results.</para>
+          <classname>FullTextQuery</classname>.<literal>setSpatialParameters</literal>
+          with the latitude, longitude and the name of the spatial field used 
+		  to build the spatial query. Note that using coordinates different than 
+		  the center used for the query will have unexpected results.</para>
         </listitem>
       </itemizedlist>
 
@@ -427,14 +427,16 @@ org.apache.lucene.search.Query luceneQuery = builder.spatial()
    .createQuery();
 
 FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
-Sort distanceSort = new Sort(new DistanceSortField(centerLatitude,centerLongitude));
+Sort distanceSort = new Sort(
+	new DistanceSortField(centerLatitude, centerLongitude, "location"));
 hibQuery.setSort(distanceSort);</programlisting>
       </example>
 
       <para>The <classname>DistanceSortField</classname> must be constructed
-      using the same coordinates used to build the spatial query otherwise the
-      sorting will occur with another center than the query. This repetition
-      is needed to allow you to define Queries with any tool.</para>
+      using the same coordinates on the same spatial field used to build the 
+	  spatial query otherwise the sorting will occur with another center than 
+	  the query. This repetition is needed to allow you to define Queries with
+	  any tool.</para>
 
       <para>Using distance sort on non @Spatial enabled entities and/or with a
       non spatial Query will have also unexpected results as entities non
