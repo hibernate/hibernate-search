@@ -320,8 +320,8 @@ List results = hibQuery.list();</programlisting>
       <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
    .buildQueryBuilder().forEntity( RangeEvent.class ).get();
 
-double centerLatitude= 24;
-double centerLongitude= 31.5;
+double centerLatitude = 24;
+double centerLongitude = 31.5;
 
 org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
    .within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude )
@@ -414,11 +414,11 @@ List results = hibQuery.list();</programlisting>
       <example>
         <title>Distance sort example</title>
 
-        <programlisting language="JAVA" role="JAVA">double centerLatitude= 24.0d;
-double centerLongitude= 32.0d;
+        <programlisting language="JAVA" role="JAVA">double centerLatitude = 24.0d;
+double centerLongitude = 32.0d;
 
 final QueryBuilder builder = fullTextSession.getSearchFactory()
-   .buildQueryBuilder().forEntity( POI.class ).get();            
+   .buildQueryBuilder().forEntity( POI.class ).get();
 org.apache.lucene.search.Query luceneQuery = builder.spatial()
       .onCoordinates("location")
       .within(100, Unit.KM)
