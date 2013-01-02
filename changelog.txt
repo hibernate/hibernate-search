@@ -1,6 +1,36 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.2.0.CR1 (03-01-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1048] - More than one DocumentId found while only one is declared
+    * [HSEARCH-1219] - new DistanceSortField doesn't work with FullTextQuery#setMaxResults
+    * [HSEARCH-1220] - Search Distance Projection doesn't work as expected with some sets of coordinates
+    * [HSEARCH-1221] - Change in SearchConfiguration SPI broke integrators
+    * [HSEARCH-1228] - Build fails on mac: jdk tools.jar not properly detected
+    * [HSEARCH-1238] - Checkstyle integration haves Eclipse fail the project import
+    * [HSEARCH-1240] - Regression in the Mass indexer due to the fix for HSEARCH-1201
+    * [HSEARCH-1241] - Polymorphism, lazy initialization and @ContainedIn don't work well together
+    * [HSEARCH-1252] - Documentation of spatial sort and projection feature contains old api
+
+** Improvement
+    * [HSEARCH-1222] - Readability of @Latitude and @Longitude
+    * [HSEARCH-1223] - Coaleshing of refresh operations can save some disk reads on SharingBufferReaderProvider.PerDirectoryLatestReader.refreshAndGet()
+    * [HSEARCH-1226] - Apply JDBC fetch size hinting in the MassIndexer
+    * [HSEARCH-1246] - NRT performance: avoid flushing unnecessary delete operations
+    * [HSEARCH-1247] - NRT performance: avoid refreshing an IndexReader aggressively
+    * [HSEARCH-1248] - WorkQueuePerIndexSplitter doesn't need to use IdentityHashMap
+    * [HSEARCH-1251] - Update to Apache Lucene 3.6.2
+
+** Task
+    * [HSEARCH-1178] - Integrate checkstyle into the build process
+    * [HSEARCH-1218] - Assemble as a JBoss Module during releases
+    * [HSEARCH-1229] - Update to Hibernate ORM 4.1.8.Final
+    * [HSEARCH-1230] - Better tests for IndexReader passed to Filter to be consistent with latest writes
+    * [HSEARCH-1250] - Update to Hibernate ORM 4.1.9.Final
+
 
 Version 4.2.0.Beta2 (18-10-2012)
 ------------------------
