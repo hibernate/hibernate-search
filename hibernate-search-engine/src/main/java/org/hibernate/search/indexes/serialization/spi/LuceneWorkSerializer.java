@@ -42,4 +42,9 @@ public interface LuceneWorkSerializer {
 	 */
 	List<LuceneWork> toLuceneWorks(byte[] data);
 
+	/**
+	 * @return a short label of this implementation and optionally version
+	 */
+	String describeSerializer();
+
 }

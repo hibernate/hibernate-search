@@ -39,6 +39,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.errors.EmptyQueryException;
+import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -378,7 +379,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 78, value = "Timed out waiting to flush all operations to the backend of index %1$s")
 	void unableToShutdownAsynchronousIndexingByTimeout(String indexName);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = Level.DEBUG)
 	@Message(id = 79, value = "Serialization protocol version %1$d.%2$d initialized")
 	void serializationProtocol(int major, int minor);
 
@@ -663,4 +664,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 167, value = "More than one @DocumentId specified on entity '%1$s'")
 	SearchException duplicateDocumentIdFound(String beanXClassName);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = 168, value = "Serialization service %2$s being used for index '%1$s'")
+	void indexManagerUsesSerializationService(String indexName, String serializerDescription);
+
 }
