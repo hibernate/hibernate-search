@@ -1961,7 +1961,7 @@ assertTrue(cds.size() == 2);</programlisting>
       </listitem>
 
       <listitem>
-        <para>the number of object loaded: use pagination (always ;-) ) or
+        <para>the number of object loaded: use pagination and / or
         index projection (if needed)</para>
       </listitem>
 
