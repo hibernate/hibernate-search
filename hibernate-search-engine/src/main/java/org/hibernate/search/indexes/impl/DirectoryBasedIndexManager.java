@@ -48,6 +48,8 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This implementation of IndexManager is coupled to a
@@ -56,7 +58,9 @@ import org.hibernate.search.store.optimization.OptimizerStrategy;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class DirectoryBasedIndexManager implements IndexManager {
-	
+
+	private static Log log = LoggerFactory.make();
+
 	private String indexName;
 	private DirectoryProvider directoryProvider;
 	private Similarity similarity;
@@ -201,6 +205,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		if ( serializer == null ) {
 			EmptyBuildContext buildContext = new EmptyBuildContext( serviceManager, boundSearchFactory );
 			serializer = serviceManager.requestService( SerializerService.class, buildContext );
+			log.indexManagerUsesSerializationService( this.indexName, this.serializer.describeSerializer() );
 		}
 		return serializer;
 	}

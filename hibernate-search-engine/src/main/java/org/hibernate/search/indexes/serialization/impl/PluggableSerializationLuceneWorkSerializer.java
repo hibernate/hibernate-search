@@ -221,4 +221,9 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 		}
 		serializer.addDocument( document.getBoost() );
 	}
+
+	@Override
+	public String describeSerializer() {
+		return provider.toString();
+	}
 }

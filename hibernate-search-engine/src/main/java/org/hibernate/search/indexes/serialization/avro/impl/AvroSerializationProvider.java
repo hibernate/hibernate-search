@@ -140,4 +140,9 @@ public class AvroSerializationProvider implements SerializationProvider {
 		result.append( str.substring( s ) );
 		return result.toString();
 	}
+
+	@Override
+	public String toString() {
+		return "Avro SerializationProvider v" + getMajorVersion() + "." + getMinorVersion();
+	}
 }

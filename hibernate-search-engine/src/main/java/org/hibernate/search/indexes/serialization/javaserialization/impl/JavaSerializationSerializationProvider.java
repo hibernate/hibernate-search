@@ -37,4 +37,9 @@ public class JavaSerializationSerializationProvider implements SerializationProv
 	public Deserializer getDeserializer() {
 		return new JavaSerializationDeserializer();
 	}
+
+	@Override
+	public String toString() {
+		return "Simple Java based SerializationProvider";
+	}
 }
