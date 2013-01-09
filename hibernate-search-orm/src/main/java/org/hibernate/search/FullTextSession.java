@@ -26,6 +26,7 @@ package org.hibernate.search;
 import java.io.Serializable;
 
 import org.hibernate.Session;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 
 /**
  * Extends the Hibernate {@link Session} with fulltext search and indexing capabilities.
@@ -52,6 +53,9 @@ public interface FullTextSession extends Session {
 	 * Force the (re)indexing of a given <b>managed</b> object.
 	 * Indexation is batched per transaction: if a transaction is active, the operation
 	 * will not affect the index at least until commit.
+	 * 
+	 * Any {@link EntityIndexingInterceptor} registered on the entity will be ignored:
+	 * this method forces an index operation.
 	 *
 	 * @param entity The entity to index - must not be <code>null</code>.
 	 *
@@ -69,6 +73,9 @@ public interface FullTextSession extends Session {
 	 * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
 	 * case this method behaves like {@link #purgeAll(Class)}.
 	 *
+	 * Any {@link EntityIndexingInterceptor} registered on the entity will be ignored:
+	 * this method forces a purge operation.
+	 *
 	 * @param entityType The type of the entity to delete.
 	 * @param id The id of the entity to delete.
 	 *
@@ -78,6 +85,8 @@ public interface FullTextSession extends Session {
 
 	/**
 	 * Remove all entities from of particular class and all its subclasses from the index.
+	 *
+	 * Any {@link EntityIndexingInterceptor} registered on the entity type will be ignored.
 	 *
 	 * @param entityType The class of the entities to remove.
 	 *
@@ -89,11 +98,15 @@ public interface FullTextSession extends Session {
 	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
 	 */
 	public void flushToIndexes();
-	
+
 	/**
 	 * Creates a MassIndexer to rebuild the indexes of some
 	 * or all indexed entity types.
 	 * Instances cannot be reused.
+	 *
+	 * Any {@link EntityIndexingInterceptor} registered on the entity types are applied: each instance will trigger
+	 * an {@link EntityIndexingInterceptor#onAdd(Object)} event from where you can customize the indexing operation.
+	 *
 	 * @param types optionally restrict the operation to selected types
 	 * @return a new MassIndexer
 	 */
