@@ -66,6 +66,12 @@ tx.commit(); //index only updated at commit time</programlisting>
     types, the recommended approach is to use a
     <classname>MassIndexer</classname>: see <xref
     linkend="search-batchindex-massindexer"/> for more details.</para>
+
+    <para>The method <methodname>FullTextSession.index(T
+    entity)</methodname> is considered an explicit indexing operation, so any
+    registered <classname>EntityIndexingInterceptor</classname> won't be applied
+    in this case. For more information on <classname>EntityIndexingInterceptor</classname>
+    see <xref linkend="search-mapping-indexinginterceptor"/>.</para>
   </section>
 
   <section>
@@ -106,8 +112,15 @@ Transaction tx = fullTextSession.beginTransaction();
 tx.commit(); //index changes are applied at commit time    </programlisting>
     </example>
 
-    <para>It is recommended to optimize the index after such an
-    operation.</para>
+    <para>As in the previous example, it is suggested to optimize the index
+    after many purge operation to actually free the used space.</para>
+
+    <para>As is the case with method <methodname>FullTextSession.index(T
+    entity)</methodname>, also <methodname>purge</methodname> and
+    <methodname>purgeAll</methodname> are considered explicit indexinging
+    operations: any registered <classname>EntityIndexingInterceptor</classname>
+    won't be applied. For more information on <classname>EntityIndexingInterceptor</classname>
+    see <xref linkend="search-mapping-indexinginterceptor"/>.</para>
 
     <note>
       <para>Methods <methodname>index</methodname>,
