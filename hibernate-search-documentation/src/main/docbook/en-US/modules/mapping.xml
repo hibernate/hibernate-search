@@ -2306,6 +2306,12 @@ public class Blog {
       changed. The reason is simple, your interceptor might depend on a non
       indexed property which would be ignored by this optimization.</para>
     </note>
+
+    <warning><para>An <classname>EntityIndexingInterceptor</classname> can
+    never override an explicit indexing operation such as
+    <methodname>index(T)</methodname>, <methodname>purge(T, id)</methodname>
+    or <methodname>purgeAll(class)</methodname>.</para>
+    </warning>
   </section>
 
   <section id="provided-id">
