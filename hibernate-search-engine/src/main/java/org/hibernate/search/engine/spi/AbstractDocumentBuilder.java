@@ -979,7 +979,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 	private void bindSpatialAnnotation(String prefix, PropertiesMetadata propertiesMetadata, Spatial ann, XClass clazz, ConfigContext context) {
 		String fieldName;
-		if( !ann.name().isEmpty() ){
+		if ( !ann.name().isEmpty() ) {
 			fieldName = prefix + ann.name();
 		}
 		else {
@@ -996,7 +996,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		propertiesMetadata.classIndexes.add( index );
 		propertiesMetadata.classTermVectors.add( AnnotationProcessingHelper.getTermVector( TermVector.NO ) );
-		FieldBridge spatialBridge = null;
+		final FieldBridge spatialBridge;
 		if ( reflectionManager.toXClass( Coordinates.class ).isAssignableFrom( clazz ) ) {
 			spatialBridge = BridgeFactory.buildSpatialBridge( ann, clazz, null, null );
 		}
@@ -1021,8 +1021,11 @@ public abstract class AbstractDocumentBuilder<T> {
 				}
 			}
 
-			if ( latitudeField != null && longitudeField != null) {
+			if ( latitudeField != null && longitudeField != null ) {
 				spatialBridge = BridgeFactory.buildSpatialBridge( ann, clazz, latitudeField, longitudeField );
+			}
+			else {
+				spatialBridge = null;
 			}
 		}
 		if ( spatialBridge == null ) {
