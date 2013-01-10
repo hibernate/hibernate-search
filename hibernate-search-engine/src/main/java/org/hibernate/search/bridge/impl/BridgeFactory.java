@@ -352,7 +352,7 @@ public final class BridgeFactory {
 				}
 				else {
 					bridge = new SpatialFieldBridgeByQuadTree( spatial.topQuadTreeLevel(), spatial.bottomQuadTreeLevel() );
-                                }
+				}
 			}
 			else {
 				if ( latitudeField != null && longitudeField != null ) {

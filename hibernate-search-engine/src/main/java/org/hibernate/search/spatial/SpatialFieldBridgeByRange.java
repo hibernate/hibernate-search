@@ -57,13 +57,13 @@ public class SpatialFieldBridgeByRange extends SpatialFieldBridge {
 			if ( ( latitude != null ) && ( longitude != null ) ) {
 
 				luceneOptions.addNumericFieldToDocument(
-                        SpatialHelper.formatLatitude(name),
+						SpatialHelper.formatLatitude( name ),
 						latitude,
 						document
 				);
 
 				luceneOptions.addNumericFieldToDocument(
-                        SpatialHelper.formatLongitude(name),
+						SpatialHelper.formatLongitude( name ),
 						longitude,
 						document
 				);
