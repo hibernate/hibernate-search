@@ -31,6 +31,7 @@ import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
 public abstract class SpatialQueryBuilder {
+
 	/**
 	 * Returns a Lucene Query which relies on Hibernate Search Spatial
 	 * quad tree indexation to find candidate documents and filter its results
@@ -46,13 +47,12 @@ public abstract class SpatialQueryBuilder {
 	 * @see	Query
 	 * @see	Coordinates
 	 */
-	public static Query buildSpatialQueryByQuadTree(double latitude, double longitude, double radius,
-                                                    String fieldName) {
-		return SpatialQueryBuilderFromPoint.buildSpatialQueryByQuadTree(
-                Point.fromDegrees(latitude, longitude),
-                radius,
-                fieldName
-        );
+	public static Query buildSpatialQueryByQuadTree(double latitude, double longitude, double radius, String fieldName) {
+		return SpatialQueryBuilderFromPoint
+				.buildSpatialQueryByQuadTree(
+						Point.fromDegrees( latitude, longitude ),
+						radius,
+						fieldName );
 	}
 
 	/**
