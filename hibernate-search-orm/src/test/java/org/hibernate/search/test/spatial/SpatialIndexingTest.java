@@ -347,14 +347,14 @@ public class SpatialIndexingTest extends SearchTestCase {
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( UserRange.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( UserRange.class.getName() )
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onDefaultCoordinates()
 				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserRange.class );
 		List results = hibQuery.list();
 		Assert.assertEquals( 0, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( UserRange.class.getName() )
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onDefaultCoordinates()
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserRange.class );
@@ -369,7 +369,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
-	public void testSpatiaslAnnotation() throws Exception {
+	public void testSpatialsAnnotation() throws Exception {
 		UserEx user = new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
@@ -382,7 +382,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( UserEx.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( UserEx.class.getName() )
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onDefaultCoordinates()
 				.within( 100.0d, Unit.KM ).ofLatitude( 24.0d ).andLongitude( 31.5d ).createQuery();
 
 		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserEx.class );

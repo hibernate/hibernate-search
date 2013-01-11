@@ -106,6 +106,12 @@ import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFie
  * @author Sanne Grinovero
  */
 public abstract class AbstractDocumentBuilder<T> {
+
+	/**
+	 * Prefix used to generate field names for a default {@link Spatial} annotation
+	 */
+	public static final String COORDINATES_DEFAULT_FIELD = "_hibernate_default_coordinates";
+
 	private static final Log log = LoggerFactory.make();
 	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = new DefaultStringBridge();
 	private static final String EMPTY = "";
@@ -113,7 +119,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	private final XClass beanXClass;
 	protected final String beanXClassName;
 	protected final Class<?> beanClass;
-	protected final InstanceInitializer instanceInitalizer;
+	protected final InstanceInitializer instanceInitializer;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
@@ -151,7 +157,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		final Version luceneVersion = context.getLuceneMatchVersion();
 
 		this.passThroughAnalyzer = new PassThroughAnalyzer( luceneVersion );
-		this.instanceInitalizer = instanceInitializer;
+		this.instanceInitializer = instanceInitializer;
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanXClass = xClass;
 		this.beanXClassName = xClass.getName();
@@ -272,7 +278,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan, DepthValidator currentDepth) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
-			Object unproxiedInstance = instanceInitalizer.unproxy( instance );
+			Object unproxiedInstance = instanceInitializer.unproxy( instance );
 
 			DepthValidator depth = updateDepth( unproxiedInstance, member, currentDepth );
 			depth.increaseDepth();
@@ -983,7 +989,7 @@ public abstract class AbstractDocumentBuilder<T> {
 			fieldName = prefix + ann.name();
 		}
 		else {
-			fieldName = clazz.getName();
+			fieldName = COORDINATES_DEFAULT_FIELD;
 		}
 
 		if ( spatialNames.contains( ann.name() ) ) {

@@ -160,14 +160,14 @@
     </itemizedlist>
 
     <example>
-      <title>SimpleHotel class sample</title>
+      <title>Hotel class sample</title>
 
       <programlisting language="JAVA" role="JAVA">import org.hibernate.search.annotations.*;
 
 @Entity
 @Indexed
 @Spatial
-public class SimpleHotel {
+public class Hotel {
 
   @Latitude
   Double latitude
@@ -196,27 +196,27 @@ public class SimpleHotel {
     </itemizedlist>
 
     <example>
-      <title>SimpleHotel class sample</title>
+      <title>Hotel class sample</title>
 
       <programlisting language="JAVA" role="JAVA">final QueryBuilder builder = fullTextSession.getSearchFactory()
-  .buildQueryBuilder().forEntity( SimpleHotel.class ).get();
+  .buildQueryBuilder().forEntity( Hotel.class ).get();
 
 org.apache.lucene.search.Query luceneQuery = builder.spatial()
-  .onCoordinates( SimpleHotel.class.getName() )
+  .onDefaultCoordinates()
   .within( radius, Unit.KM )
   .ofLatitude( centerLatitude )
   .andLongitude( centerLongitude )
   .createQuery();
 
 org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
-   SimpleHotel.class );
+   Hotel.class );
 List results = hibQuery.list();</programlisting>
     </example>
 
     <para>A fully working example can be found in the source code, in the
     testsuite. See
-    <methodname>SpatialIndexingTest.testSimpleSpatialAnnotationOnClassLevel()</methodname>
-    and in <classname>SimpleHotel</classname> class.</para>
+    <methodname>SpatialIndexingTest.testSpatialAnnotationOnClassLevel()</methodname>
+    and in <classname>Hotel</classname> class.</para>
   </section>
 
   <section id="spatial-two-stages-quad-tree">

@@ -20,11 +20,33 @@
  */
 package org.hibernate.search.query.dsl;
 
+import org.hibernate.search.annotations.Spatial;
+
 /**
+ * @experimental This API might change in minor versions
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public interface SpatialContext extends QueryCustomization<SpatialContext> {
+
 	//TODO score by proximity
 
+	/**
+	 * Used to create Spatial Queries on the default coordinates of
+	 * an entity. This is the one to use when {@link Spatial} is being used
+	 * without defining a custom value for {@link Spatial#name()}.
+	 * @return
+	 */
+	SpatialMatchingContext onDefaultCoordinates();
+
+	/**
+	 * An entity can have multiple {@link Spatial} annotations defining
+	 * different sets of coordinates.
+	 * Each non-default Spatial instance has a name to identify it,
+	 * use this method to pick one of these non-default coordinate fields.
+	 * @param field The name of the set of coordinates to target for the query
+	 * @return
+	 */
 	SpatialMatchingContext onCoordinates(String field);
+
 }
