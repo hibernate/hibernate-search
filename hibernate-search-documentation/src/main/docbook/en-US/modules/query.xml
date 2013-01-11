@@ -1846,7 +1846,7 @@ FacetingRequest labelFacetingRequest = builder.facet()
           case:<programlisting>...
 @Fields({
   @Field(name="price"),
-  @Field(name="price.facet", analyze=Analyze.NO)
+  @Field(name="price_facet", analyze=Analyze.NO)
 })
 @NumericFields({
   @NumericField(forField="price")
@@ -1880,7 +1880,7 @@ private int price;
             .get();
 FacetingRequest priceFacetingRequest = builder.facet()
     .name( "priceFaceting" )
-    .onField( "price" )
+    .onField( "price_facet" )
     .range()
     .below( 1000 )
     .from( 1001 ).to( 1500 )
