@@ -29,6 +29,7 @@ import org.hibernate.search.query.dsl.SpatialMatchingContext;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class ConnectedSpatialContext implements SpatialContext {
+
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final SpatialQueryContext spatialContext;
@@ -45,7 +46,13 @@ public class ConnectedSpatialContext implements SpatialContext {
 
 	@Override
 	public SpatialMatchingContext onCoordinates(String field) {
-		spatialContext.setCoordinatesField(field);
+		spatialContext.setCoordinatesField( field );
+		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext, queryBuilder );
+	}
+
+	@Override
+	public SpatialMatchingContext onDefaultCoordinates() {
+		spatialContext.setDefaultCoordinatesField();
 		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext, queryBuilder );
 	}
 

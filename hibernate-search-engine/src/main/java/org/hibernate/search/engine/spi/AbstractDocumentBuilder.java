@@ -106,6 +106,12 @@ import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFie
  * @author Sanne Grinovero
  */
 public abstract class AbstractDocumentBuilder<T> {
+
+	/**
+	 * Prefix used to generate field names for a default {@link Spatial} annotation
+	 */
+	public static final String COORDINATES_DEFAULT_FIELD = "_hibernate_default_coordinates";
+
 	private static final Log log = LoggerFactory.make();
 	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = new DefaultStringBridge();
 	private static final String EMPTY = "";
@@ -983,7 +989,7 @@ public abstract class AbstractDocumentBuilder<T> {
 			fieldName = prefix + ann.name();
 		}
 		else {
-			fieldName = clazz.getName();
+			fieldName = COORDINATES_DEFAULT_FIELD;
 		}
 
 		if ( spatialNames.contains( ann.name() ) ) {

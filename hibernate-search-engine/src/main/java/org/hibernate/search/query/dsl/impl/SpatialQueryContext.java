@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
+import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.Coordinates;
 
@@ -38,6 +39,10 @@ public class SpatialQueryContext {
 
 	public void setCoordinatesField(String coordinatesField) {
 		this.coordinatesField = coordinatesField;
+	}
+
+	public void setDefaultCoordinatesField() {
+		this.coordinatesField = AbstractDocumentBuilder.COORDINATES_DEFAULT_FIELD;
 	}
 
 	public double getRadiusDistance() {
