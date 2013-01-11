@@ -119,7 +119,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	private final XClass beanXClass;
 	protected final String beanXClassName;
 	protected final Class<?> beanClass;
-	protected final InstanceInitializer instanceInitalizer;
+	protected final InstanceInitializer instanceInitializer;
 	private Set<Class<?>> mappedSubclasses = new HashSet<Class<?>>();
 	private int level = 0;
 	private int maxLevel = Integer.MAX_VALUE;
@@ -157,7 +157,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		final Version luceneVersion = context.getLuceneMatchVersion();
 
 		this.passThroughAnalyzer = new PassThroughAnalyzer( luceneVersion );
-		this.instanceInitalizer = instanceInitializer;
+		this.instanceInitializer = instanceInitializer;
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanXClass = xClass;
 		this.beanXClassName = xClass.getName();
@@ -278,7 +278,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workplan, DepthValidator currentDepth) {
 		for ( int i = 0; i < metadata.containedInGetters.size(); i++ ) {
 			XMember member = metadata.containedInGetters.get( i );
-			Object unproxiedInstance = instanceInitalizer.unproxy( instance );
+			Object unproxiedInstance = instanceInitializer.unproxy( instance );
 
 			DepthValidator depth = updateDepth( unproxiedInstance, member, currentDepth );
 			depth.increaseDepth();

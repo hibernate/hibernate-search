@@ -370,10 +370,10 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
 		}
 		else if ( add && !delete) {
-			queue.add( createAddWork( entityClass, entity, id, idInString, this.instanceInitalizer, contextualBridge ) );
+			queue.add( createAddWork( entityClass, entity, id, idInString, this.instanceInitializer, contextualBridge ) );
 		}
 		else if ( add && delete ) {
-			queue.add( createUpdateWork( entityClass, entity, id, idInString, this.instanceInitalizer, contextualBridge ) );
+			queue.add( createUpdateWork( entityClass, entity, id, idInString, this.instanceInitializer, contextualBridge ) );
 		}
 	}
 
@@ -450,7 +450,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		Document doc = new Document();
-		this.instanceInitalizer.getClass( instance );
+		this.instanceInitializer.getClass( instance );
 		final Class<?> entityType = objectInitializer.getClass( instance );
 		doc.setBoost( getMetadata().getClassBoost( instance ) );
 
@@ -731,7 +731,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( entity == null || idGetter == null || idProvided ) {
 			throw new IllegalStateException( "Cannot guess id from entity" );
 		}
-		Object unproxiedEntity = this.instanceInitalizer.unproxy( entity );
+		Object unproxiedEntity = this.instanceInitializer.unproxy( entity );
 		return (Serializable) ReflectionHelper.getMemberValue( unproxiedEntity, idGetter );
 	}
 	
