@@ -606,7 +606,7 @@ Query luceneQuery = mythQB
       <title>Building a Hibernate Search query</title>
 
       <para>So far we only covered the process of how to create your Lucene
-      query (see <xref linkend="section-building-lucene-queries" />). However,
+      query (see <xref linkend="section-building-lucene-queries"/>). However,
       this is only the first step in the chain of actions. Let's now see how
       to build the Hibernate Search query from the Lucene query.</para>
 
@@ -640,7 +640,7 @@ fullTextQuery = fullTextSession
     .createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
         </example>
 
-        <para>In <xref linkend="example-filtering-by-entity-type" /> the first
+        <para>In <xref linkend="example-filtering-by-entity-type"/> the first
         example returns only matching <classname>Customer</classname>s, the
         second returns matching <classname>Actor</classname>s and
         <classname>Item</classname>s. The type restriction is fully
@@ -700,7 +700,7 @@ List results = query.list();
 
         <tip>
           <para>Be aware that fields used for sorting must not be tokenized
-          (see <xref linkend="field-annotation" />).</para>
+          (see <xref linkend="field-annotation"/>).</para>
         </tip>
       </section>
 
@@ -1072,7 +1072,8 @@ catch (javax.persistence.QueryTimeoutException e) {
         </section>
 
         <section>
-          <title>Limit the number of results when the time limit is reached</title>
+          <title>Limit the number of results when the time limit is
+          reached</title>
 
           <para>Alternatively, you can return the number of results which have
           already been fetched by the time the limit is reached. Note that
@@ -1128,7 +1129,6 @@ if ( query.hasPartialResults() ) {
           <methodname>limitExecutionTimeTo</methodname> and
           <methodname>hasPartialResults</methodname> are also available to
           you.</para>
-
         </section>
       </section>
     </section>
@@ -1216,16 +1216,16 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; </program
       </example>
 
       <note>
-        <para>Like Google, the number of results is an approximation if the index
-        is not fully up-to-date with the database (asynchronous cluster for
-        example).</para>
+        <para>Like Google, the number of results is an approximation if the
+        index is not fully up-to-date with the database (asynchronous cluster
+        for example).</para>
       </note>
     </section>
 
     <section>
       <title>ResultTransformer</title>
 
-      <para>As seen in <xref linkend="projections" /> projection results are
+      <para>As seen in <xref linkend="projections"/> projection results are
       returns as <classname>Object</classname> arrays. This data structure is
       not always matching the application needs. In this cases It is possible
       to apply a <classname>ResultTransformer</classname> which post query
@@ -1675,7 +1675,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
       <para>The second step is simply to activate the filter at query time.
       While the filter can be a regular filter (as defined in <xref
-      linkend="query-filter" />) which also filters Lucene results after the
+      linkend="query-filter"/>) which also filters Lucene results after the
       query, you can make use of a special filter that will only be passed to
       the sharding strategy and otherwise ignored for the rest of the query.
       Simply use the <classname>ShardSensitiveOnlyFilter</classname> class
@@ -1705,21 +1705,22 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
 
     <para><ulink url="http://en.wikipedia.org/wiki/Faceted_search">Faceted
     search</ulink> is a technique which allows to divide the results of a
-    query into multiple categories. This categorisation includes the
+    query into multiple categories. This categorization includes the
     calculation of hit counts for each category and the ability to further
     restrict search results based on these facets (categories). <xref lang=""
-    linkend="example-amazon-facets" /> shows a faceting example. The search
-    results in fifteen hits which are displayed on the main part of the page.
-    The navigation bar on the left, however, shows the category<emphasis>
-    Computers &amp; Internet</emphasis> with its subcategories
-    <emphasis>Programming</emphasis>, <emphasis>Computer Science</emphasis>,
-    <emphasis>Databases</emphasis>, <emphasis>Software</emphasis>,
-    <emphasis>Web Development,</emphasis> <emphasis>Networking</emphasis> and
-    <emphasis>Home Computing</emphasis>. For each of these subcategories the
-    number of books is shown matching the main search criteria and belonging
-    to the respective subcategory. This division of the category
-    <emphasis>Computers &amp; Internet</emphasis> is one concrete search
-    facet. Another one is for example the average customer review.</para>
+    linkend="example-amazon-facets"/> shows a faceting example. The search for
+    'Hibernate Search' results in fifteen hits which are displayed on the main
+    part of the page. The navigation bar on the left, however, shows the
+    category<emphasis> Computers &amp; Internet</emphasis> with its
+    subcategories <emphasis>Programming</emphasis>, <emphasis>Computer
+    Science</emphasis>, <emphasis>Databases</emphasis>,
+    <emphasis>Software</emphasis>, <emphasis>Web Development,</emphasis>
+    <emphasis>Networking</emphasis> and <emphasis>Home Computing</emphasis>.
+    For each of these subcategories the number of books is shown matching the
+    main search criteria and belonging to the respective subcategory. This
+    division of the category <emphasis>Computers &amp; Internet</emphasis> is
+    one facet of this search. Another one is for example the average customer
+    review rating.</para>
 
     <example id="example-amazon-facets">
       <title>Search for <emphasis>'Hibernate Search'</emphasis> on
@@ -1727,17 +1728,17 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
 
       <mediaobject>
         <imageobject role="fo">
-          <imagedata align="center" fileref="faceting.png" width="14cm" />
+          <imagedata align="center" fileref="faceting.png" width="14cm"/>
         </imageobject>
 
         <imageobject role="html">
-          <imagedata align="center" depth="3cm" fileref="faceting.png" />
+          <imagedata align="center" depth="3cm" fileref="faceting.png"/>
         </imageobject>
       </mediaobject>
     </example>
 
     <para>In Hibernate Search the classes <classname>QueryBuilder</classname>
-    and <classname>FullTextQuery</classname> are the entry point into the
+    and <classname>FullTextQuery</classname> are the entry point to the
     faceting API. The former allows to create faceting requests whereas the
     latter gives access to the so called <classname>FacetManager</classname>.
     With the help of the <classname>FacetManager</classname> faceting requests
@@ -1745,7 +1746,7 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
     query in order to refine search results. The following sections will
     describe the faceting process in more detail. The examples will use the
     entity <classname>Cd</classname> as shown in <xref
-    linkend="example-faceting-entity" />:</para>
+    linkend="example-faceting-entity"/>:</para>
 
     <example id="example-faceting-entity">
       <title>Entity Cd</title>
@@ -1765,7 +1766,6 @@ public class Cd {
     private String name;
 
     @Field(analyze = Analyze.NO)
-    @NumericField
     private int price;
 
     Field(analyze = Analyze.NO)
@@ -1787,16 +1787,20 @@ public class Cd {
       <classname>FacetingRequest</classname>. Currently two types of faceting
       requests are supported. The first type is called <emphasis>discrete
       faceting</emphasis> and the second type <emphasis>range
-      faceting</emphasis> request. In the case of a discrete faceting request
-      you specify on which index field you want to facet (categorize) and
-      which faceting options to apply. An example for a discrete faceting
-      request can be seen in <xref
-      linkend="example-discrete-faceting" />:</para>
+      faceting</emphasis> request.</para>
 
-      <example id="example-discrete-faceting">
-        <title>Creating a discrete faceting request</title>
+      <section id="discrete-faceting-request">
+        <title>Discrete faceting request</title>
 
-        <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
+        <para>In the case of a discrete faceting request you specify on which
+        index field you want to facet (categorize) and which faceting options
+        to apply. An example for a discrete faceting request can be seen in
+        <xref linkend="example-discrete-faceting"/>:</para>
+
+        <example id="example-discrete-faceting">
+          <title>Creating a discrete faceting request</title>
+
+          <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
     .buildQueryBuilder()
         .forEntity( Cd.class )
             .get();
@@ -1808,51 +1812,69 @@ FacetingRequest labelFacetingRequest = builder.facet()
     .includeZeroCounts( false )
     .maxFacetCount( 1 )
     .createFacetingRequest();</programlisting>
-      </example>
+        </example>
 
-      <para>When executing this faceting request a
-      <classname>Facet</classname> instance will be created for each discrete
-      value for the indexed field <constant>label</constant>. The
-      <classname>Facet</classname> instance will record the actual field value
-      including how often this particular field value occurs within the
-      original query results. <methodname>orderedBy</methodname>,
-      <methodname>includeZeroCounts</methodname> and
-      <methodname>maxFacetCount</methodname> are optional parameters which can
-      be applied on any faceting request. <methodname>orderedBy</methodname> allows to specify in which
-      order the created facets will be returned. The default is
-      <constant>FacetSortOrder.COUNT_DESC</constant>, but you can also sort on
-      the field value or the order in which ranges were specified.
-      <methodname>includeZeroCount</methodname> determines whether facets with a
-      count of 0 will be included in the result (per default they are) and
-      <methodname>maxFacetCount</methodname> allows to limit the maximum amount of
-      facets returned.</para>
+        <para>When executing this faceting request a
+        <classname>Facet</classname> instance will be created for each
+        discrete value for the indexed field <constant>label</constant>. The
+        <classname>Facet</classname> instance will record the actual field
+        value including how often this particular field value occurs within
+        the original query results. <methodname>orderedBy</methodname>,
+        <methodname>includeZeroCounts</methodname> and
+        <methodname>maxFacetCount</methodname> are optional parameters which
+        can be applied on any faceting request.
+        <methodname>orderedBy</methodname> allows to specify in which order
+        the created facets will be returned. The default is
+        <constant>FacetSortOrder.COUNT_DESC</constant>, but you can also sort
+        on the field value or the order in which ranges were specified.
+        <methodname>includeZeroCount</methodname> determines whether facets
+        with a count of 0 will be included in the result (per default they
+        are) and <methodname>maxFacetCount</methodname> allows to limit the
+        maximum amount of facets returned.</para>
 
-      <tip>
-        <para>At the moment there are several preconditions an indexed field
-        has to meet in order to apply faceting on it. The indexed property
-        must be of type <classname>String</classname>,
-        <classname>Date</classname> or a subtype of
-        <classname>Number</classname> and <constant>null</constant> values
-        should be avoided. Furthermore the property has to be indexed with
-        <constant>Analyze.NO</constant> and in case of a numeric property
-        <classname>@NumericField</classname> needs to be specified.</para>
-      </tip>
+        <note>
+          <para>At the moment there are several preconditions an indexed field
+          has to meet in order to apply faceting on it. The indexed property
+          must be of type <classname>String</classname>,
+          <classname>Date</classname> or a subtype of
+          <classname>Number</classname> and <constant>null</constant> values
+          should be avoided. Furthermore the property has to be indexed with
+          <constant>Analyze.NO</constant> and in case of discrete faceting on
+          a numeric property <classname>@NumericField</classname> cannot be
+          used. In the latter case it is recommended to index the property
+          twice and use the appropriate field depending on the use
+          case:<programlisting>...
+@Fields({
+  @Field(name="price"),
+  @Field(name="price.facet", analyze=Analyze.NO)
+})
+@NumericFields({
+  @NumericField(forField="price")
+})
+private int price;
+...</programlisting></para>
+        </note>
+      </section>
 
-      <para>The creation of a range faceting request is quite similar except
-      that we have to specify ranges for the field values we are faceting on.
-      A range faceting request can be seen in <xref
-      linkend="example-range-faceting" /> where three different price ranges
-      are specified. <methodname>below</methodname> and
-      <methodname>above</methodname> can only be specified once, but you can
-      specify as many <methodname>from</methodname> -
-      <methodname>to</methodname> ranges as you want. For each range boundary
-      you can also specify via <methodname>excludeLimit</methodname> whether
-      it is included into the range or not.</para>
-
-      <example id="example-range-faceting">
+      <section id="range-faceting-request">
         <title>Creating a range faceting request</title>
 
-        <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
+        <para>The creation of a range faceting request is quite similar except
+        that we have to specify ranges for the field values we are faceting
+        on. A range faceting request can be seen in <xref
+        linkend="example-range-faceting"/>. There three different price ranges
+        are specified. <methodname>below</methodname> and
+        <methodname>above</methodname> can only be specified once, but you can
+        specify as many <methodname>from</methodname> -
+        <methodname>to</methodname> ranges as you want. For each range
+        boundary you can also specify via
+        <methodname>excludeLimit</methodname> whether it is included into the
+        range or not.</para>
+
+        <example id="example-range-faceting">
+          <title>Creating a range faceting request</title>
+
+          <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
     .buildQueryBuilder()
         .forEntity( Cd.class )
             .get();
@@ -1864,17 +1886,18 @@ FacetingRequest priceFacetingRequest = builder.facet()
     .from( 1001 ).to( 1500 )
     .above( 1500 ).excludeLimit()
     .createFacetingRequest();</programlisting>
-      </example>
+        </example>
+      </section>
     </section>
 
     <section id="section-applying-faceting-request">
       <title>Applying a faceting request</title>
 
-      <para>In <xref linkend="section-creating-faceting-request" /> we have
+      <para>In <xref linkend="section-creating-faceting-request"/> we have
       seen how to create a faceting request. Now it is time to apply it on a
       query. The key is the <classname>FacetManager</classname> which can be
       retrieved via the <classname>FullTextQuery</classname> (see <xref
-      linkend="example-applying-faceting" />).</para>
+      linkend="example-applying-faceting"/>).</para>
 
       <example id="example-applying-faceting">
         <title>Applying a faceting request</title>
@@ -1917,7 +1940,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets( "priceFaceting" );
       restrictions (<methodname>clearSelectedFacets</methodname>) and retrieve
       all currently selected facets
       (<methodname>getSelectedFacets</methodname>). <xref
-      linkend="example-restricting-query-results" /> shows an example.</para>
+      linkend="example-restricting-query-results"/> shows an example.</para>
 
       <example id="example-restricting-query-results">
         <title>Restricting query results via the application of a
@@ -1961,19 +1984,19 @@ assertTrue(cds.size() == 2);</programlisting>
       </listitem>
 
       <listitem>
-        <para>the number of object loaded: use pagination and / or
-        index projection (if needed)</para>
+        <para>the number of object loaded: use pagination and / or index
+        projection (if needed)</para>
       </listitem>
 
       <listitem>
         <para>the way Hibernate Search interacts with the Lucene readers:
         defines the appropriate <xref
-        linkend="search-architecture-readerstrategy" />.</para>
+        linkend="search-architecture-readerstrategy"/>.</para>
       </listitem>
 
       <listitem>
         <para>caching frequently extracted values from the index: see <xref
-        linkend="query-fieldcaches" />.</para>
+        linkend="query-fieldcaches"/>.</para>
       </listitem>
     </itemizedlist>
 
@@ -1990,7 +2013,7 @@ assertTrue(cds.size() == 2);</programlisting>
       some other cases might be a good candidate for caching.</para>
 
       <para>What is exactly needed depends on the kind of Projections being
-      used (see <xref linkend="projections" />), and in some cases the Class
+      used (see <xref linkend="projections"/>), and in some cases the Class
       type is not needed as it can be inferred from the query context or other
       means.</para>
 
