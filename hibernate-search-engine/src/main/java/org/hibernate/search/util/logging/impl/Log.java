@@ -35,9 +35,11 @@ import java.util.Properties;
 
 import org.apache.lucene.index.CorruptIndexException;
 import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.errors.EmptyQueryException;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.jboss.logging.BasicLogger;
@@ -668,5 +670,9 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.INFO)
 	@Message(id = 168, value = "Serialization service %2$s being used for index '%1$s'")
 	void indexManagerUsesSerializationService(String indexName, String serializerDescription);
+
+	@Message(id = 169, value = "FieldBridge '%1$s' does not have a objectToString method: field '%2$s' in '%3$s'" +
+			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" )
+	SearchException fieldBridgeNotTwoWay(Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
 
 }
