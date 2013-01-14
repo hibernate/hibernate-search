@@ -1774,6 +1774,44 @@ public class Meeting {
       <para><classname>TikaParseContextProvider</classname> as well as
       <classname>TikaMetadataProcessor</classname> implementation classes can
       both be specified as parameters on the TikaBridge annotation.</para>
+
+        <example id="example-tika-mapping">
+          <title>Example mapping with Apache Tika</title>
+
+      <programlisting language="JAVA" role="JAVA">@Entity
+@Indexed
+public class Song {
+    @Id
+    @GeneratedValue
+    long id;
+
+    @Field
+    <emphasis role="bold">@TikaBridge(metadataProcessor = Mp3TikaMetadataProcessor.class)</emphasis>
+    String mp3FileName;
+
+    [...]
+}</programlisting>
+<programlisting language="JAVA" role="JAVA">QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
+    .buildQueryBuilder()
+    .forEntity( Song.class )
+    .get();
+Query query = queryBuilder.keyword()
+    .onField( "mp3FileName" )
+    <emphasis role="bold">.ignoreFieldBridge()</emphasis>   //mandatory
+    .matching( "Apes" )
+    .createQuery();
+List result = fullTextSession.createFullTextQuery( query ).list();</programlisting>
+</example>
+
+    <para>In the <xref linkend="example-tika-mapping"/> the property
+    <methodname>mp3FileName</methodname> represents a path to an MP3 file;
+    the headers of this file will be indexed and so the performed query will be
+    able to match the MP3 metadata.</para>
+
+    <warning><para>TikaBridge does not implement TwoWayFieldBridge: queries built using the
+    DSL (as in the <xref linkend="example-tika-mapping"/>) need to explicitly enable the option
+    <methodname>ignoreFieldBridge()</methodname>.</para></warning>
+
     </section>
 
     <section>

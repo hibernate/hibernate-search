@@ -752,10 +752,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
 					return objectToString( (StringBridge) bridge, fieldName, value, conversionContext );
 				}
-				throw new SearchException(
-						"FieldBridge " + bridgeClass + " does not have a objectToString method: field "
-								+ fieldName + " in " + getBeanXClass()
-				);
+				throw log.fieldBridgeNotTwoWay( bridgeClass, fieldName, getBeanXClass() );
 			}
 		}
 		throw new SearchException( "Unable to find field " + fieldName + " in " + getBeanXClass() );

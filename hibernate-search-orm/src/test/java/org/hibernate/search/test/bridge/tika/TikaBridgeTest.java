@@ -50,11 +50,15 @@ import org.hibernate.search.annotations.TikaBridge;
 import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.test.util.TestForIssue;
+import org.junit.Assert;
 
 /**
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 public class TikaBridgeTest extends SearchTestCase {
 	private static final String TEST_MP3_DOCUMENT = "/org/hibernate/search/test/bridge/tika/mysong.mp3";
@@ -75,6 +79,24 @@ public class TikaBridgeTest extends SearchTestCase {
 
 		persistSong( session );
 		searchSong( session );
+
+		session.close();
+	}
+
+	public void testIndexMp3MetaTagsDSL() throws Exception {
+		Session session = openSession();
+
+		persistSong( session );
+		searchSongDsl( session );
+
+		session.close();
+	}
+
+	public void testIndexMp3MetaTagsDSLErrorMessage() throws Exception {
+		Session session = openSession();
+
+		persistSong( session );
+		searchSongDsl( session );
 
 		session.close();
 	}
@@ -136,6 +158,45 @@ public class TikaBridgeTest extends SearchTestCase {
 
 		tx.commit();
 	}
+
+	private void searchSongDsl(Session session) throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		Transaction tx = session.beginTransaction();
+
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Song.class ).get();
+
+		Query queryEmmanuel = queryBuilder.keyword().onField( "mp3FileName" ).ignoreFieldBridge().matching( "Emmanuel" ).createQuery();
+
+		List<Song> result = fullTextSession.createFullTextQuery( queryEmmanuel ).list();
+		assertEquals( "Emmanuel is not an artist", 0, result.size() );
+
+		Query queryHardy = queryBuilder.keyword().onField( "mp3FileName" ).ignoreFieldBridge().matching( "Hardy" ).createQuery();
+
+		result = fullTextSession.createFullTextQuery( queryHardy ).list();
+		assertEquals( "Hardy is the artist", 1, result.size() );
+
+		tx.commit();
+	}
+
+	@TestForIssue(jiraKey="HSEARCH-1256")
+	private void searchSongDslErrorMessage(Session session) throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		Transaction tx = session.beginTransaction();
+
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Song.class ).get();
+
+		boolean exceptionCaught = false;
+		try {
+			queryBuilder.keyword().onField( "mp3FileName" ).ignoreFieldBridge().matching( "Emmanuel" ).createQuery();
+		} catch (Exception e) {
+			exceptionCaught = true;
+			Assert.assertTrue( e instanceof SearchException );
+			Assert.assertTrue( e.getMessage().contains( "The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" ) );
+		}
+		Assert.assertTrue( exceptionCaught );
+		tx.commit();
+	}
+
 
 	@Entity
 	@Indexed
