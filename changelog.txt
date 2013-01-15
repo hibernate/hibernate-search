@@ -1,6 +1,25 @@
 Hibernate Search Changelog
 ==========================
 
+
+Version 4.2.0.Final (15-01-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1256] - Improve error handling and error message in ConnectedMultiFieldsTermQueryBuilder#buildSearchTerm
+    * [HSEARCH-1258] - Document faceting limitation for @NumericField
+
+** Improvement
+    * [HSEARCH-1168] - Improve documentation on Spatial integrations
+    * [HSEARCH-1225] - Clarify effect of conditional indexing interceptor on index() method
+    * [HSEARCH-1242] - Improve details on the spatial feature
+    * [HSEARCH-1255] - Warn about skipping field bridges when querying a Tika field
+
+** Task
+    * [HSEARCH-943] - Consolidate tests against more database dialects
+    * [HSEARCH-1224] - Modernize recommendations about optimizing in the documentation
+    * [HSEARCH-1249] - Serialization protocol version being logged without enough context
+
 Version 4.2.0.CR1 (03-01-2013)
 ------------------------
 
