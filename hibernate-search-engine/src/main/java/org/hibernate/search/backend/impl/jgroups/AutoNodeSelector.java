@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -74,7 +74,7 @@ public class AutoNodeSelector implements NodeSelectorStrategy {
 		else {
 			// exclude cluster coordinator (the first)
 			int selectionRange = members.size() - 1;
-			int selected = ( indexName.hashCode() % selectionRange) + 1;
+			int selected = Math.abs(indexName.hashCode() % selectionRange) + 1;
 			masterAddress = members.get( selected );
 		}
 	}
