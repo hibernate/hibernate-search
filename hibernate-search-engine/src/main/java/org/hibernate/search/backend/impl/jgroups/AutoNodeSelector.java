@@ -74,7 +74,7 @@ public class AutoNodeSelector implements NodeSelectorStrategy {
 		else {
 			// exclude cluster coordinator (the first)
 			int selectionRange = members.size() - 1;
-			int selected = ( indexName.hashCode() % selectionRange) + 1;
+			int selected = Math.abs( indexName.hashCode() % selectionRange ) + 1;
 			masterAddress = members.get( selected );
 		}
 	}
