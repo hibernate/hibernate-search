@@ -460,7 +460,7 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
       have a single centralized one shared by each node.</para>
 
       <para>See the <ulink
-      url="https://docs.jboss.org/author/display/ISPN51/Home"> Infinispan
+      url="https://docs.jboss.org/author/display/ISPN/Home"> Infinispan
       documentation</ulink> for all Infinispan configuration options.</para>
 
       <section>
