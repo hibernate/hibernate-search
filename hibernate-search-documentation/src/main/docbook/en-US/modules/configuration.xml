@@ -29,6 +29,64 @@
 ]>
 <chapter id="search-configuration">
   <title>Configuration</title>
+  <section>
+    <title>Deploying Search applications on JBoss AS 7</title>
+
+    <para>Provided you're deploying on JBoss AS 7.1.x or JBoss EAP6, there is an additional way to add the search dependencies to your application.</para>
+
+    <para>In JBoss AS 7 class loading is based on modules that have to define explicit dependencies on other modules.
+    Modules allow to share the same artifacts across multiple applications getting you smaller and quicker deloyments.</para>
+
+    <para>More details about modules are described in <ulink url="https://docs.jboss.org/author/display/AS72/Class+Loading+in+AS7">Class Loading in AS7</ulink>.</para>
+
+    <para>You can download the pre-packaged Hibernate Search modules from:</para>
+    <itemizedlist>
+      <listitem>
+        <para><ulink url="http://downloads.sourceforge.net/project/hibernate/hibernate-search/&version;/hibernate-search-modules-&version;-jbossas-71-dist.zip">Sourceforge</ulink></para>
+      </listitem>
+      <listitem>
+        <para>Maven: <ulink url="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~">org.hibernate:hibernate-search-modules-&version;-jbossas-71-dist:zip</ulink></para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Unpack the modules in your JBoss AS directory, this will create modules for Hibernate Search, Apache Lucene and some useful Solr libraries. The Hibernate search modules are:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis>org.hibernate.search.orm:main</emphasis>, for users of Hibernate Search with Hibernate; this will transitively include Hibernate ORM.</para>
+      </listitem>
+      <listitem>
+        <para><emphasis>org.hibernate.search.engine:main</emphasis>, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>There are two ways to include the dependencies in your project:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>Using the manifest</term>
+        <listitem>
+          <para>Add this entry to the MANIFEST.MF in your archive:</para>
+          <programlisting>Dependencies: org.hibernate.search.orm services</programlisting>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Using jboss-deployment-structure.xml</term>
+        <listitem>
+          <para>This is a proprietary JBoss AS descriptor, add a WEB-INF/jboss-deployment-structure.xml in your archive with content:</para>
+          <programlisting language="XML" role="XML">&lt;jboss-deployment-structure&gt;
+      &lt;deployment&gt;
+          &lt;dependencies&gt;
+              &lt;module name="org.hibernate.search.orm" services="export" /&gt;
+          &lt;/dependencies&gt;
+      &lt;/deployment&gt;
+  &lt;/jboss-deployment-structure&gt;
+          </programlisting>
+          <para>More information about the descriptor can be found in the  <ulink url="https://docs.jboss.org/author/display/AS72/Class+Loading+in+AS7">JBoss AS 7 documentation</ulink>.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
 
   <section id="search-configuration-event" revision="2">
     <title>Enabling Hibernate Search and automatic indexing</title>
