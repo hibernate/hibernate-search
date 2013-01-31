@@ -30,6 +30,7 @@ Mattias Arbin
 Nabeel Ali Memon
 Navin Surtani
 Nick Vincent
+Nicolas Helleringer
 Oliver Siegmar
 Richard Hallier
 Samppa Saarela
