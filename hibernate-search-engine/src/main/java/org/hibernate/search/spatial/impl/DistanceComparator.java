@@ -55,7 +55,7 @@ public final class DistanceComparator extends FieldComparator<Double> {
 
 	@Override
 	public void setBottom(final int slot) {
-		bottomDistance = center.getDistanceTo( latitudeValues.get( slot ), longitudeValues.get( slot ) );
+		bottomDistance = distances.get( slot );
 	}
 
 	@Override
