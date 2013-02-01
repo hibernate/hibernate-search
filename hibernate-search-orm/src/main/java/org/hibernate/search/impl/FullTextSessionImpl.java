@@ -81,6 +81,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
+import org.hibernate.search.spi.MassIndexerFactory;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.stat.SessionStatistics;
@@ -205,12 +206,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	public MassIndexer createIndexer(Class<?>... types) {
-		if ( types.length == 0 ) {
-			return new MassIndexerImpl( getSearchFactoryImplementor(), getSessionFactory(), Object.class );
-		}
-		else {
-			return new MassIndexerImpl( getSearchFactoryImplementor(), getSessionFactory(), types );
-		}
+		MassIndexerFactory factory = requestService( MassIndexerFactory.class );
+		return factory.createMassIndexer( getSearchFactoryImplementor(), getSessionFactory(), types );
+	}
+
+	private MassIndexerFactory requestService(Class<MassIndexerFactory> serviceRole) {
+		return sessionImplementor.getFactory().getServiceRegistry().getService( serviceRole );
 	}
 
 	public SearchFactory getSearchFactory() {

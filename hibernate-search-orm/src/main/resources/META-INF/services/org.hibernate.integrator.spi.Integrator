@@ -1,1 +1,2 @@
 org.hibernate.search.hcore.impl.HibernateSearchIntegrator
+org.hibernate.search.hcore.impl.MassIndexerFactoryIntegrator
