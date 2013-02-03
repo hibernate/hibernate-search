@@ -21,7 +21,7 @@ package org.hibernate.search.query.collector.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
@@ -55,11 +55,6 @@ public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
 	}
 
 	@Override
-	public void setNextReader(IndexReader reader, int docBase) throws IOException {
-		delegate.setNextReader( reader, docBase );
-	}
-
-	@Override
 	public Object getValue(int docId) {
 		String value = (String) privateDelegate.getValue( docId );
 		if ( value == null ) {
@@ -67,6 +62,11 @@ public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
 			return null;
 		}
 		return stringBridge.stringToObject( value );
+	}
+
+	@Override
+	public void setNextReader(AtomicReaderContext context) throws IOException {
+		delegate.setNextReader( context );
 	}
 
 }

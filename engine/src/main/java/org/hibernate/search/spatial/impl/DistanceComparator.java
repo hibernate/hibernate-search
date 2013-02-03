@@ -22,7 +22,8 @@ package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.facet.collections.IntToDoubleMap;
@@ -69,18 +70,30 @@ public final class DistanceComparator extends FieldComparator<Double> {
 	}
 
 	@Override
-	public void setNextReader(IndexReader reader, int docBase) throws IOException {
-		double[] unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( reader, latitudeField );
-		double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( reader, longitudeField );
-		this.docBase = docBase;
+	public DistanceComparator setNextReader(final AtomicReaderContext newContext) throws IOException {
+		final AtomicReader atomicReader = newContext.reader();
+		final double[] unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
+		final double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
+		this.docBase = newContext.docBase;
 		for ( int i = 0; i < unbasedLatitudeValues.length; i++ ) {
 			latitudeValues.put( this.docBase + i, unbasedLatitudeValues[i] );
 			longitudeValues.put( this.docBase + i, unbasedLongitudeValues[i] );
 		}
+		return this;
 	}
 
 	@Override
 	public Double value(final int slot) {
 		return center.getDistanceTo( latitudeValues.get( slot ), longitudeValues.get( slot ) );
+	}
+
+	@Override
+	public int compareDocToValue(final int doc, final Double value) throws IOException {
+		if ( value == null ) {
+			return 1; //we consider any doc "higher" than null
+		}
+		//doc seems to be relative in this case
+		final double distanceTo = center.getDistanceTo( latitudeValues.get( doc ), longitudeValues.get( doc ) );
+		return Double.compare( distanceTo, value.doubleValue() );
 	}
 }

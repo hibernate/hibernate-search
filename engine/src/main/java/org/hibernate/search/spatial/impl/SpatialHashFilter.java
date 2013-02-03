@@ -20,11 +20,14 @@
  */
 package org.hibernate.search.spatial.impl;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.Term;
-//TermDocs was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.search.DocIdSet;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.OpenBitSet;
 
 import java.io.IOException;
@@ -54,20 +57,28 @@ public final class SpatialHashFilter extends Filter {
 	 * @param reader reader to the index
 	 */
 	@Override
-	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
 		if ( spatialHashCellsIds.size() == 0 ) {
 			return null;
 		}
 
-		OpenBitSet matchedDocumentsIds = new OpenBitSet( reader.maxDoc() );
+		final AtomicReader atomicReader = context.reader();
+
+		OpenBitSet matchedDocumentsIds = new OpenBitSet( atomicReader.maxDoc() );
 		Boolean found = false;
 		for ( int i = 0; i < spatialHashCellsIds.size(); i++ ) {
 			Term spatialHashCellTerm = new Term( fieldName, spatialHashCellsIds.get( i ) );
-			TermDocs spatialHashCellsDocs = reader.termDocs( spatialHashCellTerm );
+			DocsEnum spatialHashCellsDocs = atomicReader.termDocsEnum( spatialHashCellTerm );
 			if ( spatialHashCellsDocs != null ) {
-				while ( spatialHashCellsDocs.next() ) {
-					matchedDocumentsIds.fastSet( spatialHashCellsDocs.doc() );
-					found = true;
+				while ( true ) {
+					final int docId = spatialHashCellsDocs.nextDoc();
+					if ( docId == DocIdSetIterator.NO_MORE_DOCS ) {
+						break;
+					}
+					else {
+						matchedDocumentsIds.fastSet( docId );
+						found = true;
+					}
 				}
 			}
 		}
