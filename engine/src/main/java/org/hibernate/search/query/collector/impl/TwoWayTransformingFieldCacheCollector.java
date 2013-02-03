@@ -55,11 +55,6 @@ public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
 	}
 
 	@Override
-	public void setNextReader(IndexReader reader, int docBase) throws IOException {
-		delegate.setNextReader( reader, docBase );
-	}
-
-	@Override
 	public Object getValue(int docId) {
 		String value = (String) privateDelegate.getValue( docId );
 		if ( value == null ) {
@@ -67,6 +62,11 @@ public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
 			return null;
 		}
 		return stringBridge.stringToObject( value );
+	}
+
+	@Override
+	public void setNextReader(AtomicReaderContext context) throws IOException {
+		delegate.setNextReader( context );
 	}
 
 }
