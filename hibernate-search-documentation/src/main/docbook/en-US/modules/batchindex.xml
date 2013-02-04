@@ -287,6 +287,46 @@ transaction.commit();</programlisting>
         able to find results and the system load might be too high
         anyway.</para>
       </note>
+
+      <section id="search-batchindex-custommassindexer">
+        <title>Custom</title>
+        <para>It is possible to use a custom implementation of the <classname>MassIndexer</classname> instead of using the one shipped with Hibernate Search.
+        The steps to follow are:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>create an implementation of the <classname>org.hibernate.search.spi.MassIndexerFactory</classname> interface;</para>
+          </listitem>
+          <listitem>
+            <para>set the property <code>hibernate.search.massindexer.factoryclass</code> with the qualified class name of the factory implementation.</para>
+          </listitem>
+        </orderedlist>
+
+        <example>
+          <title>Custom <code>MassIndexerFactory</code> example</title>
+          <programlisting language="JAVA" role="JAVA">package org.myproject
+
+import org.hibernate.search.spi.MassIndexerFactory
+
+...
+
+public class CustomIndexerFactory implements MassIndexerFactory {
+
+  public void initialize(Properties properties) {
+  }
+
+  public MassIndexer createMassIndexer(...) {
+    return new CustomIndexer();
+  }
+
+}       </programlisting> 
+        </example>
+
+        <example>
+          <title>Set the factory class name in a properties file</title>
+          <programlisting>hibernate.search.massindexer.factoryclass = org.myproject.CustomIndexerFactory</programlisting>
+        </example>
+      </section>
     </section>
 
     <section>
