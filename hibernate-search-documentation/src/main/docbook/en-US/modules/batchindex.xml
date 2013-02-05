@@ -287,65 +287,99 @@ transaction.commit();</programlisting>
         able to find results and the system load might be too high
         anyway.</para>
       </note>
+
+      <section id="search-batchindex-custommassindexer">
+        <title>Custom</title>
+        <para>It is possible to use a custom implementation of the <classname>MassIndexer</classname> instead of using the one shipped with Hibernate Search.
+        The steps to follow are:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>create an implementation of the <classname>org.hibernate.search.spi.MassIndexerFactory</classname> interface;</para>
+          </listitem>
+          <listitem>
+            <para>set the property <code>hibernate.search.massindexer.factoryclass</code> with the qualified class name of the factory implementation.</para>
+          </listitem>
+        </orderedlist>
+
+        <example>
+          <title>Custom <code>MassIndexerFactory</code> example</title>
+          <programlisting language="JAVA" role="JAVA">package org.myproject
+
+import org.hibernate.search.spi.MassIndexerFactory
+
+...
+
+public class CustomIndexerFactory implements MassIndexerFactory {
+
+  public void initialize(Properties properties) {
+  }
+
+  public MassIndexer createMassIndexer(...) {
+    return new CustomIndexer();
+  }
+
+}       </programlisting> 
+        </example>
+
+        <example>
+          <title>Set the factory class name in a properties file</title>
+          <programlisting>hibernate.search.massindexer.factoryclass = org.myproject.CustomIndexerFactory</programlisting>
+        </example>
+      </section>
     </section>
 
-    <para>Other parameters which affect indexing time and memory consumption
-    are:</para>
+    <section>
+      <title>Useful parameters for batch indexing</title>
+      <para>Other parameters which affect indexing time and memory consumption
+      are:</para>
 
-    <itemizedlist>
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].exclusive_index_use</literal>
-      </listitem>
+      <itemizedlist>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].exclusive_index_use</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_buffered_docs</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_merge_docs</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_factor</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_min_size</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_max_size</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_max_optimize_size</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_calibrate_by_deletes</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.ram_buffer_size</literal></para>
+        </listitem>
+        <listitem>
+          <para><literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.term_index_interval</literal></para>
+        </listitem>
+      </itemizedlist>
 
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_buffered_docs</literal>
-      </listitem>
+      <para>Previous versions also had a <literal>max_field_length</literal> but
+      this was removed from Lucene, it's possible to obtain a similar effect by
+      using a <classname>LimitTokenCountAnalyzer</classname>.</para>
 
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.max_merge_docs</literal>
-      </listitem>
+      <para>All <literal>.indexwriter</literal> parameters are Lucene specific
+      and Hibernate Search is just passing these parameters through - see <xref
+      linkend="lucene-indexing-performance"/> for more details.</para>
 
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_factor</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_min_size</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_max_size</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_max_optimize_size</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.merge_calibrate_by_deletes</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.ram_buffer_size</literal>
-      </listitem>
-
-      <listitem>
-        <literal>hibernate.search.[default|&lt;indexname&gt;].indexwriter.term_index_interval</literal>
-      </listitem>
-    </itemizedlist>
-
-    <para>Previous versions also had a <literal>max_field_length</literal> but
-    this was removed from Lucene, it's possible to obtain a similar effect by
-    using a <classname>LimitTokenCountAnalyzer</classname>.</para>
-
-    <para>All <literal>.indexwriter</literal> parameters are Lucene specific
-    and Hibernate Search is just passing these parameters through - see <xref
-    linkend="lucene-indexing-performance"/> for more details.</para>
-
-    <para>The <classname>MassIndexer</classname> uses a forward only
-    scrollable result to iterate on the primary keys to be loaded, but MySQL's
-    JDBC driver will load all values in memory; to avoid this "optimisation"
-    set <literal>idFetchSize</literal> to
-    <literal>Integer.MIN_VALUE</literal>.</para>
+      <para>The <classname>MassIndexer</classname> uses a forward only
+      scrollable result to iterate on the primary keys to be loaded, but MySQL's
+      JDBC driver will load all values in memory; to avoid this "optimisation"
+      set <literal>idFetchSize</literal> to
+      <literal>Integer.MIN_VALUE</literal>.</para>
+    </section>
   </section>
 </chapter>

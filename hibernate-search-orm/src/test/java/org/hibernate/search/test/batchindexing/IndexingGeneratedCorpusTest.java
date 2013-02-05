@@ -23,6 +23,9 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -42,8 +45,10 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.impl.MassIndexerImpl;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.textbuilder.SentenceInventor;
@@ -154,6 +159,13 @@ public class IndexingGeneratedCorpusTest {
 		verifyResultNumbers(); //..same numbers again
 		verifyIndexIsLocked( false, Dvd.class ); //non exclusive index configured
 		verifyIndexIsLocked( true, Book.class ); //exclusive index enabled
+	}
+
+	@Test
+	public void testCreationOfTheDefaultMassIndexer() throws Exception {
+		FullTextSession fullTextSession = builder.openFullTextSession();
+		MassIndexer indexer = fullTextSession.createIndexer( Object.class );
+		assertThat( indexer, is( MassIndexerImpl.class ) );
 	}
 
 	private void reindexAll() throws InterruptedException {

@@ -100,11 +100,39 @@ public class ClassLoaderHelper {
 	 * @return a new instance of classNameToLoad
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * classNotFound, missing proper constructor, wrong type, security errors.
+	 *
+	 * @deprecated Use {@link ClassLoaderHelper#instanceFromName(Class, String, ClassLoader, String)} instead
 	 */
+	@Deprecated
 	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad,
 										 Class<?> caller, String componentDescription) {
-		final Class<?> clazzDef;
-		clazzDef = classForName( classNameToLoad, caller.getClassLoader(), componentDescription );
+		return instanceFromName( targetSuperType, classNameToLoad, caller.getClassLoader(), componentDescription );
+	}
+
+	/**
+	 * Creates an instance of a target class specified by the fully qualified class name using a {@link ClassLoader}
+	 * as fallback when the class cannot be found in the context one.
+	 *
+	 * @param <T>
+	 *            matches the type of targetSuperType: defines the return type
+	 * @param targetSuperType
+	 *            the return type of the function, the classNameToLoad will be checked
+	 *            to be assignable to this type.
+	 * @param classNameToLoad
+	 *            a fully qualified class name, whose type is assignable to targetSuperType
+	 * @param fallbackClassLoader
+	 *            the ClassLoader used when the class cannot be found in the context one
+	 * @param componentDescription
+	 *            a meaningful description of the role the instance will have,
+	 *            used to enrich error messages to describe the context of the error
+	 * @return a new instance of classNameToLoad
+	 * @throws SearchException
+	 *             wrapping other error types with a proper error message for all kind of problems, like
+	 *             classNotFound, missing proper constructor, wrong type, security errors.
+	 */
+	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad, ClassLoader fallbackClassLoader,
+			String componentDescription) {
+		final Class<?> clazzDef = classForName( classNameToLoad, fallbackClassLoader, componentDescription );
 		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
 	}
 
