@@ -145,7 +145,7 @@
         <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
         <infinispanVersion>5.2.0.CR2</infinispanVersion>
         <jgroupsVersion>3.2.6.Final</jgroupsVersion>
-        <hibernateVersion>4.1.9.Final</hibernateVersion>
+        <hibernateVersion>4.2.0.CR1</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.1.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.1</tikaVersion>
         <bytemanVersion>2.1.0</bytemanVersion>
