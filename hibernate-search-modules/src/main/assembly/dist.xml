@@ -88,7 +88,7 @@
 			<unpack>false</unpack>
 			<includes>
 				<include>org.apache.lucene:*</include>
-                                <include>jakarta-regexp:jakarta-regexp:*</include>
+				<include>jakarta-regexp:jakarta-regexp:*</include>
 			</includes>
 		</dependencySet>
 
