@@ -98,14 +98,14 @@ public class Essay {
 
         <itemizedlist>
           <listitem>
-            <para><literal>name</literal> : describe under which name, the
+            <para><literal>name</literal>: describe under which name the
             property should be stored in the Lucene Document. The default
             value is the property name (following the JavaBeans
             convention)</para>
           </listitem>
 
           <listitem>
-            <para><literal>store</literal> : describe whether or not the
+            <para><literal>store</literal>: describe whether or not the
             property is stored in the Lucene index. You can store the value
             <literal>Store.YES</literal> (consuming more space in the index
             but allowing projection, see <xref linkend="projections"/>), store
@@ -118,12 +118,12 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para>index: describe whether the property is indexed or not. The
-            different values are <literal>Index.NO</literal> (no indexing, ie
-            cannot be found by a query), <literal>Index.YES</literal> (the
-            element gets indexed and is searchable). The default value is
+            <para><literal>index</literal>: describe whether the property
+            is indexed or not. The different values are <literal>Index.NO</literal>
+            (no indexing, ie cannot be found by a query), <literal>Index.YES</literal>
+            (the element gets indexed and is searchable). The default value is
             <literal>Index.YES</literal>. <literal>Index.NO</literal> can be
-            useful for cases where a property does is not required to be
+            useful for cases where a property is not required to be
             searchable, but should be available for projection.</para>
 
             <tip>
@@ -136,7 +136,7 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para>analyze: determines whether the property is analyzed
+            <para><literal>analyze</literal>: determines whether the property is analyzed
             (<literal>Analyze.YES</literal>) or not
             (<literal>Analyze.NO</literal>). The default value is
             <literal>Analyze.YES</literal>.<tip>
@@ -151,7 +151,7 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para>norms: describes whether index time boosting information
+            <para><literal>norms</literal>: describes whether index time boosting information
             should be stored (<literal>Norms.YES</literal>) or not
             (<literal>Norms.NO</literal>). Not storing it can save a
             considerable amount of memory, but there won't be any index time
@@ -160,7 +160,7 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para>termVector: describes collections of term-frequency pairs.
+            <para><literal>termVector</literal>: describes collections of term-frequency pairs.
             This attribute enables the storing of the term vectors within the
             documents during indexing. The default value is
             <literal>TermVector.NO</literal>.</para>
@@ -224,7 +224,7 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para><literal>indexNullAs</literal> : Per default null values are
+            <para><literal>indexNullAs</literal>: Per default null values are
             ignored and not indexed. However, using
             <parameter>indexNullAs</parameter> you can specify a string which
             will be inserted as token for the <constant>null</constant> value.
@@ -1602,7 +1602,8 @@ org.apache.lucene.search.Query luceneQuery =
 org.hibernate.Query fullTextQuery = 
     fullTextSession.createFullTextQuery( luceneQuery, Song.class );
 
-List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
+List result = fullTextQuery.list(); //return a list of managed objects
+</programlisting>
       </example>
 
       <para>In the example above, the song title is indexed in two fields: the
@@ -1625,9 +1626,9 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
     <para>When discussing the basic mapping for an entity one important fact
     was so far disregarded. In Lucene all index fields have to be represented
     as strings. All entity properties annotated with <literal>@Field</literal>
-    have to be converted to strings in order to be indexed. The reason we have
-    not mentioned it so far is, that for most of your properties Hibernate
-    Search does the translation job for you thanks to set of built-in bridges.
+    have to be converted to strings to be indexed. The reason we have not
+    mentioned it so far is, that for most of your properties Hibernate Search
+    does the translation job for you thanks to a set of built-in bridges.
     However, in some cases you need a more fine grained control over the
     translation process.</para>
 
@@ -1666,7 +1667,7 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
             <para>Numbers are converted into their string representation. Note
             that numbers cannot be compared by Lucene (ie used in ranged
             queries) out of the box: they have to be padded <note>
-                <para>Using a Range query is debatable and has drawbacks, an
+                <para>Using a Range query has drawbacks; an
                 alternative approach is to use a Filter query which will
                 filter the result query to the appropriate range.</para>
 

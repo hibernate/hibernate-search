@@ -80,17 +80,18 @@ FullTextSession fullTextSession = Search.getFullTextSession(session);    </progr
   <para>If you use the Hibernate Search query DSL, it will look like
   this:</para>
 
-  <programlisting language="JAVA" role="JAVA"><emphasis role="bold">final QueryBuilder b = fullTextSession.getSearchFactory()
+  <programlisting language="JAVA" role="JAVA">QueryBuilder b = fullTextSession.getSearchFactory()
     .buildQueryBuilder().forEntity( Myth.class ).get();
 
 org.apache.lucene.search.Query luceneQuery =
     b.keyword()
         .onField("history").boostedTo(3)
         .matching("storm")
-        .createQuery();</emphasis>
+        .createQuery();
 
 org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
-List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
+List result = fullTextQuery.list(); //return a list of managed objects
+</programlisting>
 
   <para>You can alternatively write your Lucene query either using the Lucene
   query parser or Lucene programmatic API.</para>
@@ -99,7 +100,8 @@ List result = fullTextQuery.list(); //return a list of managed objects    </prog
     <title>Creating a Lucene query via the
     <classname>QueryParser</classname></title>
 
-    <programlisting language="JAVA" role="JAVA"><emphasis role="bold">SearchFactory searchFactory = fullTextSession.getSearchFactory();
+<programlisting language="JAVA" role="JAVA">
+SearchFactory searchFactory = fullTextSession.getSearchFactory();
 org.apache.lucene.queryParser.QueryParser parser = 
     new QueryParser("title", searchFactory.getAnalyzer(Myth.class) );
 try {
@@ -107,7 +109,7 @@ try {
 }
 catch (ParseException e) {
     //handle parsing failure
-}</emphasis>
+}
 
 org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery(luceneQuery);
 List result = fullTextQuery.list(); //return a list of managed objects    </programlisting>
@@ -134,7 +136,7 @@ FullTextEntityManager fullTextEntityManager =
     org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 
 ...
-final QueryBuilder b = fullTextEntityManager.getSearchFactory()
+QueryBuilder b = fullTextEntityManager.getSearchFactory()
     .buildQueryBuilder().forEntity( Myth.class ).get();
 
 org.apache.lucene.search.Query luceneQuery =
@@ -606,7 +608,7 @@ Query luceneQuery = mythQB
       <title>Building a Hibernate Search query</title>
 
       <para>So far we only covered the process of how to create your Lucene
-      query (see <xref linkend="section-building-lucene-queries"/>). However,
+      query (see <xref linkend="section-building-lucene-queries" />). However,
       this is only the first step in the chain of actions. Let's now see how
       to build the Hibernate Search query from the Lucene query.</para>
 
@@ -640,7 +642,7 @@ fullTextQuery = fullTextSession
     .createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
         </example>
 
-        <para>In <xref linkend="example-filtering-by-entity-type"/> the first
+        <para>In <xref linkend="example-filtering-by-entity-type" /> the first
         example returns only matching <classname>Customer</classname>s, the
         second returns matching <classname>Actor</classname>s and
         <classname>Item</classname>s. The type restriction is fully
@@ -700,7 +702,7 @@ List results = query.list();
 
         <tip>
           <para>Be aware that fields used for sorting must not be tokenized
-          (see <xref linkend="field-annotation"/>).</para>
+          (see <xref linkend="field-annotation" />).</para>
         </tip>
       </section>
 
@@ -737,7 +739,7 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
           other restriction. While it is known to work as of Hibernate Search
           4, using restriction (ie a where clause) on your
           <classname>Criteria</classname> query should be avoided when
-          possible. <methodname>getResultSize()</methodname> will return a
+          possible. <methodname>getResultSize()</methodname> will throw a
           <classname>SearchException</classname> if used in conjunction with a
           <classname>Criteria</classname> with restriction.</para>
         </important>
@@ -1225,7 +1227,7 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; </program
     <section>
       <title>ResultTransformer</title>
 
-      <para>As seen in <xref linkend="projections"/> projection results are
+      <para>As seen in <xref linkend="projections" /> projection results are
       returns as <classname>Object</classname> arrays. This data structure is
       not always matching the application needs. In this cases It is possible
       to apply a <classname>ResultTransformer</classname> which post query
@@ -1287,7 +1289,7 @@ for(BookView view : results) {
         mess up these two notions.</para>
       </warning>
 
-      <para>The second approach let's you project the
+      <para>In the second approach you project the
       <classname>Explanation</classname> object using the
       <literal>FullTextQuery.EXPLANATION</literal> constant.</para>
 
@@ -1650,7 +1652,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
   */
  public IndexManager[] getIndexManagersForQuery(
      FullTextFilterImplementor[] filters) {
-   FFullTextFilter filter = getCustomerFilter(filters, "customer");
+   FullTextFilter filter = getCustomerFilter(filters, "customer");
    if (filter == null) {
      return getIndexManagersForAllShards();
    }
@@ -1675,7 +1677,7 @@ fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParamete
 
       <para>The second step is simply to activate the filter at query time.
       While the filter can be a regular filter (as defined in <xref
-      linkend="query-filter"/>) which also filters Lucene results after the
+      linkend="query-filter" />) which also filters Lucene results after the
       query, you can make use of a special filter that will only be passed to
       the sharding strategy and otherwise ignored for the rest of the query.
       Simply use the <classname>ShardSensitiveOnlyFilter</classname> class
@@ -1746,7 +1748,7 @@ List&lt;Customer&gt; results = query.getResultList();</programlisting>
     query in order to refine search results. The following sections will
     describe the faceting process in more detail. The examples will use the
     entity <classname>Cd</classname> as shown in <xref
-    linkend="example-faceting-entity"/>:</para>
+    linkend="example-faceting-entity" />:</para>
 
     <example id="example-faceting-entity">
       <title>Entity Cd</title>
@@ -1893,11 +1895,11 @@ FacetingRequest priceFacetingRequest = builder.facet()
     <section id="section-applying-faceting-request">
       <title>Applying a faceting request</title>
 
-      <para>In <xref linkend="section-creating-faceting-request"/> we have
+      <para>In <xref linkend="section-creating-faceting-request" /> we have
       seen how to create a faceting request. Now it is time to apply it on a
       query. The key is the <classname>FacetManager</classname> which can be
       retrieved via the <classname>FullTextQuery</classname> (see <xref
-      linkend="example-applying-faceting"/>).</para>
+      linkend="example-applying-faceting" />).</para>
 
       <example id="example-applying-faceting">
         <title>Applying a faceting request</title>
@@ -1940,7 +1942,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets( "priceFaceting" );
       restrictions (<methodname>clearSelectedFacets</methodname>) and retrieve
       all currently selected facets
       (<methodname>getSelectedFacets</methodname>). <xref
-      linkend="example-restricting-query-results"/> shows an example.</para>
+      linkend="example-restricting-query-results" /> shows an example.</para>
 
       <example id="example-restricting-query-results">
         <title>Restricting query results via the application of a
@@ -1991,12 +1993,12 @@ assertTrue(cds.size() == 2);</programlisting>
       <listitem>
         <para>the way Hibernate Search interacts with the Lucene readers:
         defines the appropriate <xref
-        linkend="search-architecture-readerstrategy"/>.</para>
+        linkend="search-architecture-readerstrategy" />.</para>
       </listitem>
 
       <listitem>
         <para>caching frequently extracted values from the index: see <xref
-        linkend="query-fieldcaches"/>.</para>
+        linkend="query-fieldcaches" />.</para>
       </listitem>
     </itemizedlist>
 
@@ -2013,7 +2015,7 @@ assertTrue(cds.size() == 2);</programlisting>
       some other cases might be a good candidate for caching.</para>
 
       <para>What is exactly needed depends on the kind of Projections being
-      used (see <xref linkend="projections"/>), and in some cases the Class
+      used (see <xref linkend="projections" />), and in some cases the Class
       type is not needed as it can be inferred from the query context or other
       means.</para>
 
