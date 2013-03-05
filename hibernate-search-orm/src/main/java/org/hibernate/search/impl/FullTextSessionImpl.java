@@ -414,12 +414,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public ScrollableResults scroll(CriteriaImpl criteria, ScrollMode scrollMode) {
+	public ScrollableResults scroll(Criteria criteria, ScrollMode scrollMode) {
 		return sessionImplementor.scroll( criteria, scrollMode );
 	}
 
 	@Override
-	public List list(CriteriaImpl criteria) {
+	public List list(Criteria criteria) {
 		return sessionImplementor.list( criteria );
 	}
 
