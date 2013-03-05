@@ -134,7 +134,8 @@ public class StoredIndexTest {
 
 	/**
 	 * Closes the SessionFactory, SearchFactory and Infinispan CacheManagers.
-	 * Only service to survive is the H2 in memory database.
+	 * Only service to survive is the H2 in memory database, and the data stored by the
+	 * CacheLoader enabled in the Infinispan configuration.
 	 */
 	public void stopNode() {
 		if ( node != null ) {
