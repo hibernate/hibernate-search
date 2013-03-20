@@ -457,7 +457,7 @@ QueryBuilder qb = fullTextSession.getSearchFactory()
 org.apache.lucene.search.Query query = qb
   .keyword()
   .onFields("title", "subtitle", "authors.name")
-  .matching("Java rocks!");
+  .matching("Java rocks!")
   .createQuery();
 
 // wrap Lucene query in a org.hibernate.Query
