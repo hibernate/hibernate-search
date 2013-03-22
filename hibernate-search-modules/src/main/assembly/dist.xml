@@ -50,6 +50,11 @@
 			<outputDirectory>/modules/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
 			<filtered>true</filtered>
 		</file>
+		<file>
+			<source>${module.xml.basedir}/infinispan/lucene-directory/module.xml</source>
+			<outputDirectory>/modules/org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
+			<filtered>true</filtered>
+		</file>
 	</files>
 
 	<dependencySets>
@@ -81,6 +86,17 @@
 				<include>org.hibernate:hibernate-search-orm</include>
 			</includes>
 		</dependencySet>
+
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<outputDirectory>/modules/org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
+			<useTransitiveFiltering>false</useTransitiveFiltering>
+			<unpack>false</unpack>
+			<includes>
+				<include>org.infinispan:infinispan-lucene-directory</include>
+			</includes>
+		</dependencySet>
+
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
 			<outputDirectory>modules/org/apache/lucene/${luceneVersion}</outputDirectory>
