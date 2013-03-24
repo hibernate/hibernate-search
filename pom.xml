@@ -669,20 +669,6 @@
                                 <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.6 -target 1.6</compilerArguments>
                             </configuration>
                         </execution>
-                        <!-- Run annotation processors on src/test/java sources -->
-                        <execution>
-                            <id>process-test</id>
-                            <goals>
-                                <goal>process-test</goal>
-                            </goals>
-                            <phase>generate-test-sources</phase>
-                            <configuration>
-                                <processors>
-                                    <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
-                                </processors>
-                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.6 -target 1.6</compilerArguments>
-                            </configuration>
-                        </execution>
                     </executions>
                     <dependencies>
                         <dependency>
