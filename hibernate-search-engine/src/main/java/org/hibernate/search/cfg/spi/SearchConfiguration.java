@@ -125,7 +125,7 @@ public interface SearchConfiguration {
 	boolean isIdProvidedImplicit();
 
 	/**
-	 * @return the component responbile to create IndexManager instances; this might be a custom
+	 * @return the component responsible to create IndexManager instances; this might be a custom
 	 * component to allow for different default implementations, custom aliases, different
 	 * classloaders.
 	 */
