@@ -41,8 +41,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-release-version>3.0.6.RELEASE</spring-release-version>
-        <version.jboss.as>7.1.1.Final</version.jboss.as>
-        <version.arquillian>1.0.0.Final</version.arquillian>
+        <version.jboss.as>7.2.0.Alpha1-redhat-4</version.jboss.as>
+        <version.arquillian>1.0.3.Final</version.arquillian>
         <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
     </properties>
 
@@ -141,7 +141,7 @@
                                     <classifier>jbossas-71-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/jboss-as-${version.jboss.as}</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/jboss-eap-6.1/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -160,7 +160,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/jboss-as-${version.jboss.as}</outputDirectory>
+                            <outputDirectory>${basedir}/target/jboss-eap-6.1</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -349,7 +349,7 @@
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-arquillian-container-managed</artifactId>
-            <version>${version.jboss.as}</version>
+            <version>7.2.0.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -159,7 +159,6 @@ public class DeploymentJmsMasterSlave {
 					.exclusion( "org.hibernate:hibernate-entitymanager" )
 					.exclusion( "org.hibernate:hibernate-core" )
 					.exclusion( "org.hibernate:hibernate-search-analyzers" )
-					.exclusion( "org.hibernate.common:hibernate-commons-annotations" )
 					.exclusion( "org.jboss.logging:jboss-logging" )
 					.exclusion( "org.slf4j:slf4j-api" )
 					.resolveAsFiles();

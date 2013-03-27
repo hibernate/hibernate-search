@@ -32,27 +32,27 @@
     <files>
         <file>
             <source>${module.xml.basedir}/lucene/module.xml</source>
-            <outputDirectory>/modules/org/apache/lucene/${luceneVersion}</outputDirectory>
+            <outputDirectory>/org/apache/lucene/${luceneVersion}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/solr/module.xml</source>
-            <outputDirectory>/modules/org/apache/solr/${luceneVersion}</outputDirectory>
+            <outputDirectory>/org/apache/solr/${luceneVersion}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/engine/module.xml</source>
-            <outputDirectory>/modules/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/orm/module.xml</source>
-            <outputDirectory>/modules/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/infinispan/lucene-directory/module.xml</source>
-            <outputDirectory>/modules/org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
+            <outputDirectory>/org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -60,7 +60,7 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>modules/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
@@ -79,7 +79,7 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>modules/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
@@ -89,7 +89,7 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>/modules/org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
+            <outputDirectory>org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
@@ -99,7 +99,7 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>modules/org/apache/lucene/${luceneVersion}</outputDirectory>
+            <outputDirectory>org/apache/lucene/${luceneVersion}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
@@ -110,7 +110,7 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>modules/org/apache/solr/${luceneVersion}</outputDirectory>
+            <outputDirectory>org/apache/solr/${luceneVersion}</outputDirectory>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
