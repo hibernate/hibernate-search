@@ -24,7 +24,7 @@
   -->
 <module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.orm" slot="${hibernate.search.module.slot}">
     <resources>
-        <resource-root path="hibernate-search-orm-${hibernate.search.version}.jar" />
+        <resource-root path="hibernate-search-orm-${project.version}.jar" />
     </resources>
     <dependencies>
         <module name="javax.transaction.api" />

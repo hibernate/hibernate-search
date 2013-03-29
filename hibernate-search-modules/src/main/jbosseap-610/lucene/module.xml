@@ -21,9 +21,8 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-<module xmlns="urn:jboss:module:1.1" name="org.apache.lucene" slot="${luceneVersion}">
+<module xmlns="urn:jboss:module:1.2" name="org.apache.lucene" slot="${luceneVersion}">
     <resources>
-        <resource-root path="lucene-core-${luceneVersion}.jar" />
         <resource-root path="lucene-core-${luceneVersion}.jar" />
         <resource-root path="lucene-analyzers-${luceneVersion}.jar" />
         <resource-root path="lucene-highlighter-${luceneVersion}.jar" />
