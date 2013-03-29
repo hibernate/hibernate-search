@@ -13,6 +13,7 @@ target
 build
 bin
 test-output
+test-tmp
 
 # IntelliJ specific files/directories
 /out
