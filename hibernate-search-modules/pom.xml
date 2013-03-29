@@ -36,9 +36,13 @@
     <description>Hibernate Search modules creation to use in JBoss AS</description>
 
     <properties>
-        <module.xml.basedir>src/main/modules</module.xml.basedir>
-        <hibernate.search.version>${project.version}</hibernate.search.version>
         <hibernate.search.module.slot>main</hibernate.search.module.slot>
+
+        <hibernate.search.as71.src.dir>src/main/jbossas-71</hibernate.search.as71.src.dir>
+        <hibernate.search.as71.target.dir>modules</hibernate.search.as71.target.dir>
+
+        <hibernate.search.eap610.src.dir>src/main/jbosseap-610</hibernate.search.eap610.src.dir>
+        <hibernate.search.eap610.target.dir>modules</hibernate.search.eap610.target.dir>
     </properties>
 
     <dependencies>
@@ -46,12 +50,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-infinispan</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>infinispan-lucene-directory</artifactId>
-                    <groupId>org.infinispan</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -88,6 +86,10 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <finalName>${project.artifactId}-${project.version}</finalName>
+                    <descriptors>
+                        <descriptor>src/main/assembly/jbossas-71.xml</descriptor>
+                        <descriptor>src/main/assembly/jbosseap-610.xml</descriptor>
+                    </descriptors>
                 </configuration>
                 <executions>
                     <execution>

@@ -24,14 +24,15 @@
   -->
 <module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.engine" slot="${hibernate.search.module.slot}">
     <resources>
-        <resource-root path="hibernate-search-engine-${hibernate.search.version}.jar" />
-        <resource-root path="hibernate-search-infinispan-${hibernate.search.version}.jar" />
-        <resource-root path="hibernate-search-analyzers-${hibernate.search.version}.jar" />
+        <resource-root path="hibernate-search-engine-${project.version}.jar" />
+        <resource-root path="hibernate-search-infinispan-${project.version}.jar" />
+        <resource-root path="hibernate-search-analyzers-${project.version}.jar" />
         <resource-root path="avro-${avroVersion}.jar" />
         <resource-root path="jackson-core-asl-${jacksonAslVersion}.jar" />
         <resource-root path="jackson-mapper-asl-${jacksonAslVersion}.jar" />
         <resource-root path="paranamer-${paranamerVersion}.jar" />
         <resource-root path="snappy-java-${snappyVersion}.jar" />
+        <resource-root path="infinispan-lucene-directory-${infinispanVersion}.jar" />
     </resources>
     <dependencies>
         <module name="javax.transaction.api" />

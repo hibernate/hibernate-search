@@ -31,23 +31,23 @@
 
 	<files>
 		<file>
-			<source>${module.xml.basedir}/lucene/module.xml</source>
-			<outputDirectory>/modules/org/apache/lucene/${luceneVersion}</outputDirectory>
+			<source>${hibernate.search.as71.src.dir}/lucene/module.xml</source>
+			<outputDirectory>${hibernate.search.as71.target.dir}/org/apache/lucene/${luceneVersion}</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 		<file>
-			<source>${module.xml.basedir}/solr/module.xml</source>
-			<outputDirectory>/modules/org/apache/solr/${luceneVersion}</outputDirectory>
+			<source>${hibernate.search.as71.src.dir}/solr/module.xml</source>
+			<outputDirectory>${hibernate.search.as71.target.dir}/org/apache/solr/${luceneVersion}</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 		<file>
-			<source>${module.xml.basedir}/search/engine/module.xml</source>
-			<outputDirectory>/modules/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
+			<source>${hibernate.search.as71.src.dir}/search/engine/module.xml</source>
+			<outputDirectory>${hibernate.search.as71.target.dir}/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 		<file>
-			<source>${module.xml.basedir}/search/orm/module.xml</source>
-			<outputDirectory>/modules/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
+			<source>${hibernate.search.as71.src.dir}/search/orm/module.xml</source>
+			<outputDirectory>${hibernate.search.as71.target.dir}/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 	</files>
@@ -55,7 +55,7 @@
 	<dependencySets>
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
-			<outputDirectory>modules/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
+			<outputDirectory>${hibernate.search.as71.target.dir}/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
 			<useTransitiveFiltering>true</useTransitiveFiltering>
 			<unpack>false</unpack>
 			<includes>
@@ -69,12 +69,17 @@
 				<exclude>org.hibernate.common:*</exclude>
 				<exclude>org.slf4j:slf4j-api:*</exclude>
 				<exclude>org.jboss.logging:*</exclude>
+				<exclude>org.jgroups:*</exclude>
+				<exclude>org.jboss:*</exclude>
+				<exclude>org.jboss.marshalling:*</exclude>
+				<exclude>org.jboss.spec.javax.transaction:*</exclude>
+				<exclude>org.infinispan:infinispan-core:*</exclude>
 			</excludes>
 		</dependencySet>
 
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
-			<outputDirectory>modules/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
+			<outputDirectory>${hibernate.search.as71.target.dir}/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
 			<useTransitiveFiltering>false</useTransitiveFiltering>
 			<unpack>false</unpack>
 			<includes>
@@ -83,18 +88,18 @@
 		</dependencySet>
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
-			<outputDirectory>modules/org/apache/lucene/${luceneVersion}</outputDirectory>
+			<outputDirectory>${hibernate.search.as71.target.dir}/org/apache/lucene/${luceneVersion}</outputDirectory>
 			<useTransitiveFiltering>false</useTransitiveFiltering>
 			<unpack>false</unpack>
 			<includes>
 				<include>org.apache.lucene:*</include>
-                                <include>jakarta-regexp:jakarta-regexp:*</include>
+                <include>jakarta-regexp:jakarta-regexp:*</include>
 			</includes>
 		</dependencySet>
 
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
-			<outputDirectory>modules/org/apache/solr/${luceneVersion}</outputDirectory>
+			<outputDirectory>${hibernate.search.as71.target.dir}/org/apache/solr/${luceneVersion}</outputDirectory>
 			<useTransitiveFiltering>true</useTransitiveFiltering>
 			<unpack>false</unpack>
 			<includes>
