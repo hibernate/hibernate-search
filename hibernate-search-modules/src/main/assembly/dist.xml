@@ -22,7 +22,7 @@
   ~ Boston, MA  02110-1301  USA
   -->
 <assembly>
-    <id>jbossas-71-dist</id>
+    <id>jbossas-72-dist</id>
     <formats>
         <format>zip</format>
     </formats>

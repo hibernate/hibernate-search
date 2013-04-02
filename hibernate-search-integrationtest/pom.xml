@@ -138,7 +138,7 @@
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-search-modules</artifactId>
                                     <version>${project.version}</version>
-                                    <classifier>jbossas-71-dist</classifier>
+                                    <classifier>jbossas-72-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/jboss-eap-6.1/modules</outputDirectory>
