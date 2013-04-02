@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
  * @author Sanne Grinovero
  */
 public class FiltersOptimizationTest {
-	
+
 	/**
 	 * in some cases optimizations are not possible,
 	 * test that mergeByBitAnds returns the same instance
@@ -59,7 +59,7 @@ public class FiltersOptimizationTest {
 		List<DocIdSet> merge = FilterOptimizationHelper.mergeByBitAnds( dataIn );
 		assertSame( dataIn, merge );
 	}
-	
+
 	/**
 	 * In case two filters are of OpenBitSet implementation,
 	 * they should be AND-ed by using bit operations
@@ -75,12 +75,12 @@ public class FiltersOptimizationTest {
 		dataIn.add( unmergedSet );
 		List<DocIdSet> merge = FilterOptimizationHelper.mergeByBitAnds( dataIn );
 		assertNotSame( dataIn, merge );
-		
+
 		assertEquals( 2, merge.size() );
 		assertSame( unmergedSet, merge.get( 0 ) );
 		assertTrue( isIdSetSequenceSameTo( merge.get( 1 ), 1,2,5,8,11 ) );
 	}
-	
+
 	/**
 	 * In case two filters are of OpenBitSet implementation,
 	 * they should be AND-ed by using bit operations
@@ -96,12 +96,12 @@ public class FiltersOptimizationTest {
 		dataIn.add( unmergedSet );
 		List<DocIdSet> merge = FilterOptimizationHelper.mergeByBitAnds( dataIn );
 		assertNotSame( dataIn, merge );
-		
+
 		assertEquals( 2, merge.size() );
 		assertSame( unmergedSet, merge.get( 0 ) );
 		assertTrue( isIdSetSequenceSameTo( merge.get( 1 ), 1,2,5,8,11 ) );
 	}
-	
+
 	/**
 	 * Used to this test the testcase's helper method isIdSetSequenceSameTo
 	 * @throws IOException
@@ -118,7 +118,7 @@ public class FiltersOptimizationTest {
 				makeOpenBitSetTestSet( 1,2,3,5,8,11 ),
 				1,2,3,5,8 ) );
 	}
-	
+
 	/**
 	 * Verifies if the docIdSet is representing a specific
 	 * sequence of docIds.
@@ -166,7 +166,7 @@ public class FiltersOptimizationTest {
 		}
 		return set;
 	}
-	
+
 	/**
 	 * test helper, makes a prefilled DocIdBitSet
 	 * using the java.lang.BitSet
@@ -195,12 +195,12 @@ public class FiltersOptimizationTest {
 		DocIdSetHiddenType(DocIdSet wrapped) {
 			this.bitSet = wrapped;
 		}
-		
+
 		@Override
 		public DocIdSetIterator iterator() throws IOException {
 			return bitSet.iterator();
 		}
-		
+
 	}
 
 }

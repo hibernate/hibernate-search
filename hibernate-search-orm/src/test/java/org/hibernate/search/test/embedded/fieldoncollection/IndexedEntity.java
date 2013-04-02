@@ -49,7 +49,7 @@ import org.hibernate.search.annotations.Store;
 @Entity
 @Indexed
 public class IndexedEntity {
-	
+
 	public static final String FIELD1_FIELD_NAME = "field1";
 	public static final String FIELD2_FIELD_NAME = "field2";
 
@@ -65,7 +65,7 @@ public class IndexedEntity {
 	@JoinTable(name = "ent_collection_field")
 	@Field(bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO)
 	private List<CollectionItem> itemsWithFieldAnnotation = new ArrayList<CollectionItem>();
-	
+
 	@ManyToMany(targetEntity = CollectionItem.class)
 	@JoinTable(name = "ent_collection_fields")
 	@Fields({
@@ -73,7 +73,7 @@ public class IndexedEntity {
 			@Field(name = FIELD2_FIELD_NAME, bridge = @FieldBridge(impl = CollectionItemFieldBridge.class), analyze = Analyze.NO)
 	})
 	private List<CollectionItem> itemsWithFieldsAnnotation = new ArrayList<CollectionItem>();
-	
+
 	@ElementCollection
 	@Column(name="keyword")
 	@CollectionTable(name="indexedentity_keyword", joinColumns = { @JoinColumn( name = "indexedentity" ) })
@@ -132,7 +132,7 @@ public class IndexedEntity {
 			this.addItemsWithFieldsAnnotation( item );
 		}
 	}
-	
+
 	public void addItemsWithFieldsAnnotation(CollectionItem item) {
 		if ( !this.itemsWithFieldsAnnotation.contains( item ) ) {
 			this.itemsWithFieldsAnnotation.add( item );
@@ -145,12 +145,12 @@ public class IndexedEntity {
 
 	public void setKeywords(Set<String> keywords) {
 		this.keywords.clear();
-		
+
 		for (String keyword : keywords) {
 			this.addKeyword( keyword );
 		}
 	}
-	
+
 	public void addKeyword(String keyword) {
 		this.keywords.add(keyword);
 	}

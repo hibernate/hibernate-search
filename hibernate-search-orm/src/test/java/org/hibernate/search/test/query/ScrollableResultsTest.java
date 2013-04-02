@@ -42,12 +42,12 @@ import static org.junit.Assert.*;
 
 /**
  * Test for org.hibernate.search.query.ScrollableResultsImpl
- * 
+ *
  * @see org.hibernate.search.query.hibernate.impl.ScrollableResultsImpl
  * @author Sanne Grinovero
  */
 public class ScrollableResultsTest {
-	
+
 	private FullTextSessionBuilder builder;
 	private FullTextSession sess;
 
@@ -70,7 +70,7 @@ public class ScrollableResultsTest {
 		}
 		tx.commit();
 	}
-	
+
 	@After
 	public void tearDown() {
 		builder.close();
@@ -109,7 +109,7 @@ public class ScrollableResultsTest {
 		scrollableResults.close();
 		tx.commit();
 	}
-	
+
 	/**
 	 * Verify inverse-order scrolling.
 	 * TODO to verify correct FetchSize behavior I've been debugging
@@ -141,7 +141,7 @@ public class ScrollableResultsTest {
 		scrollableResults.close();
 		tx.commit();
 	}
-	
+
 	/**
 	 * Test that all entities returned by a ScrollableResults
 	 * are always attached to Session
@@ -186,7 +186,7 @@ public class ScrollableResultsTest {
 		assertEquals( 323, position );
 		tx.commit();
 	}
-	
+
 	/**
 	 * Verify scrolling works correctly when combined with Projection
 	 * and that the projected entities are managed, even in case
@@ -241,7 +241,7 @@ public class ScrollableResultsTest {
 			sess.contains( objs[2] );
 			assertTrue( objs[4] instanceof Employee );
 			sess.contains( objs[4] );
-			assertTrue( objs[2]==objs[4] ); 
+			assertTrue( objs[2]==objs[4] );
 		}
 		assertEquals( -1, position );
 		scrollableResults.close();

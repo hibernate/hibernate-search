@@ -34,14 +34,14 @@ public class ProvidedIdMapping {
 	private final SearchMapping searchMapping;
 	private final Map<String,Object> providedIdMapping;
 	private EntityDescriptor entity;
-	
+
 	public ProvidedIdMapping(SearchMapping searchMapping, EntityDescriptor entity) {
 		this.searchMapping = searchMapping;
 		this.entity =entity;
 		providedIdMapping = new HashMap<String,Object>();
 		entity.setProvidedId(providedIdMapping);
 	}
-	
+
 	public ProvidedIdMapping name(String name) {
 		this.providedIdMapping.put("name", name);
 		return this;
@@ -50,11 +50,11 @@ public class ProvidedIdMapping {
 	public FieldBridgeMapping bridge(Class<?> impl) {
 		return new FieldBridgeMapping( impl, providedIdMapping, null, null, entity, searchMapping );
 	}
-	
+
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
 		return new FullTextFilterDefMapping(searchMapping, name, impl);
 	}
-	
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping(name, type, entity, searchMapping);
 	}
@@ -66,5 +66,5 @@ public class ProvidedIdMapping {
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping(entityType, searchMapping);
 	}
-	
+
 }

@@ -52,7 +52,7 @@ public class InstanceBasedExcludeAllFilter extends Filter implements Serializabl
 	public static void reset() {
 		constructorCount = 0;
 	}
-	
+
 	public static void assertConstructorInvoked(int times) {
 		if ( constructorCount != times ) {
 			throw new SearchException( "test failed, constructor invoked " + constructorCount + ", expected " + times );

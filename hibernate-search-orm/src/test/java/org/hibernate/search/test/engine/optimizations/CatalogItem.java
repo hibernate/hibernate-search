@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -35,7 +35,7 @@ import org.hibernate.annotations.Proxy;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
- * 
+ *
  * @author Tom Waterhouse
  */
 @Entity
@@ -55,7 +55,7 @@ public class CatalogItem {
 	@LazyToOne(LazyToOneOption.PROXY)
 	@NaturalId
 	private Item item;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "catalogId")
 	@NaturalId

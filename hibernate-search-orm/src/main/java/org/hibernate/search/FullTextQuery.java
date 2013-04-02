@@ -131,7 +131,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 
 	/**
 	 * Enable a given filter by its name.
-	 * 
+	 *
 	 * @param name the name of the filter to enable
 	 * @return Returns a {@code FullTextFilter} object that allows filter parameter injection
 	 * @throws SearchException in case the filter with the specified name is not defined

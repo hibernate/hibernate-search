@@ -33,7 +33,7 @@ import java.util.ArrayList;
 /**
  * Transaction context that contains transaction boundaries methods.
  * While not "transactional" it allows to call Synchronization elements
- * 
+ *
  * @author Emmanuel Bernard
  */
 public class InstanceTransactionContext implements TransactionContext {

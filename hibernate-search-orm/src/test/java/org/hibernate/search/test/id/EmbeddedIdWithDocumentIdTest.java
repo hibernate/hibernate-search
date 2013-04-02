@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -35,7 +35,7 @@ import org.hibernate.search.test.util.LeakingLuceneBackend;
 /**
  * Related to HSEARCH-1050: check we deal nicely with weird DocumentId
  * configurations.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class EmbeddedIdWithDocumentIdTest extends SearchTestCase {
@@ -63,7 +63,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestCase {
 		assertEquals( "AB123", luceneWork.getIdInString() );
 
 		tx = s.beginTransaction();
-		
+
 		QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( PersonCustomDocumentId.class ).get();
 		Query query = queryBuilder.keyword().onField( "id" ).ignoreAnalyzer().matching( "AB123" ).createQuery();
 

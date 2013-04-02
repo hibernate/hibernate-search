@@ -282,7 +282,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 			DepthValidator depth = updateDepth( unproxiedInstance, member, currentDepth );
 			depth.increaseDepth();
-			
+
 			if (depth.isMaxDepthReached())
 				return;
 
@@ -455,7 +455,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		if ( classBridgeAnn != null ) {
 			bindClassBridgeAnnotation( prefix, propertiesMetadata, classBridgeAnn, clazz, context );
 		}
-		
+
 		//Check for Spatial annotation on class level
 		Spatial spatialAnn = clazz.getAnnotation( Spatial.class );
 		if ( spatialAnn != null ) {
@@ -1063,7 +1063,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, fieldAnnotation, numericFieldAnnotation, null, context, reflectionManager );
 		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
 		addToScopedAnalyzer( fieldMetadata.getFieldName(), fieldMetadata.getAnalyzer(), fieldMetadata.getIndex() );
-		
+
 		if ( member.isCollection() ) {
 			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 		}

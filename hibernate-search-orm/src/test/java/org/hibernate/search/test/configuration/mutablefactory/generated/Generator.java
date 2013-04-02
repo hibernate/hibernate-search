@@ -39,7 +39,7 @@ public class Generator {
 			.append("import org.hibernate.search.annotations.DocumentId;\n")
 			.append( "import org.hibernate.search.annotations.Field;\n" )
 			.append( "import org.hibernate.search.annotations.Indexed;\n\n" )
-			.append( "/** Class generated container 100 inner classes */" )	
+			.append( "/** Class generated container 100 inner classes */" )
 			.append("public class Generated {\n");
 
 		StringBuilder inner = new StringBuilder( );

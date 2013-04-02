@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class MultiReaderFactory {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	public static IndexReader openReader(IndexManager... indexManagers) {

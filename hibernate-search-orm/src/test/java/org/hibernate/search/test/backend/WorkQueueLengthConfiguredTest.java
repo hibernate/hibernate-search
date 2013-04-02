@@ -31,7 +31,7 @@ import org.junit.Test;
 /**
  * Verifies the is <code>max_queue_length</code> parameter for Lucene backend is read.
  * (see HSEARCH-520)
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class WorkQueueLengthConfiguredTest extends SearchTestCase {

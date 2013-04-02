@@ -28,7 +28,7 @@ import org.jgroups.JChannel;
 
 /**
  * Test auto injected mux supported channel.
- * 
+ *
  * @author Ales Justin
  */
 public class AutoMuxChannelTest extends MuxChannelTest {

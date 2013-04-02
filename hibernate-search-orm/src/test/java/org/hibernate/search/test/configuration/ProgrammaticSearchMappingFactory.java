@@ -44,7 +44,7 @@ import org.hibernate.search.cfg.ConcatStringBridge;
 import org.hibernate.search.cfg.SearchMapping;
 
 public class ProgrammaticSearchMappingFactory {
-		
+
 	@Factory
 	public SearchMapping build() {
 		SearchMapping mapping = new SearchMapping();

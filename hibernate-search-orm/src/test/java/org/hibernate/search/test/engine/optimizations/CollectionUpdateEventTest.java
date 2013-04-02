@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -37,7 +37,7 @@ import static org.fest.assertions.Assertions.assertThat;
  * Updating a collection in an entity which is not indexed, but has some other property marked
  * as containedIn, should generally not trigger indexing of the containedIn objects, unless
  * we can't tell for sure the index state is not going to be affected.
- * 
+ *
  * @author Sanne Grinovero
  * @author Tom Waterhouse
  */
@@ -51,7 +51,7 @@ public class CollectionUpdateEventTest {
 	public void testWithClassBridge() {
 		testScenario( true, 2, false );
 	}
-	
+
 	/**
 	 * The indexing should be skipped when no custom bridges are used.
 	 */
@@ -59,7 +59,7 @@ public class CollectionUpdateEventTest {
 	public void testWithoutClassBridge() {
 		testScenario( false, 2, false );
 	}
-	
+
 	/**
 	 * Test having a depth which is not enough to reach the dirty collection.
 	 * We should be able to optimize this case.
@@ -68,7 +68,7 @@ public class CollectionUpdateEventTest {
 	public void testWithNoEnoughDepth() {
 		testScenario( true, 1, false );
 	}
-	
+
 	/**
 	 * Test again with a no-enough-depth scenario, but having the classbridge
 	 * defined close to the collection (far from the root entity)
@@ -77,7 +77,7 @@ public class CollectionUpdateEventTest {
 	public void testWithDeepClassBridge() {
 		testScenario( false, 1, true );
 	}
-	
+
 	private void testScenario(boolean usingClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
 		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth, usingClassbridgeOnEmbedded );
 		try {
@@ -111,7 +111,7 @@ public class CollectionUpdateEventTest {
 			fulltextSessionBuilder.close();
 		}
 	}
-	
+
 	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( Catalog.class )
@@ -147,42 +147,42 @@ public class CollectionUpdateEventTest {
 
 	/**
 	 * Initialize the test data.
-	 * @param fulltextSessionBuilder 
+	 * @param fulltextSessionBuilder
 	 */
 	private void initializeData(FullTextSessionBuilder fulltextSessionBuilder) {
 		FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
 			try {
 			final Transaction transaction = fullTextSession.beginTransaction();
-	
+
 			Catalog catalog = new Catalog();
 			catalog.setCatalogId( 1L );
 			catalog.setName( "parts" );
 			fullTextSession.persist( catalog );
-	
+
 			for ( int i = 0; i < 5; i++ ) {
 				Item item = new Item();
 				item.setName( "battery" );
 				fullTextSession.persist( item );
-	
+
 				CatalogItem catalogItem = new CatalogItem();
 				catalogItem.setCatalog( catalog );
 				catalogItem.setItem( item );
 				fullTextSession.persist( catalogItem );
-	
+
 				item.getCatalogItems().add( catalogItem );
 				fullTextSession.merge( item );
-	
+
 				catalog.getCatalogItems().add( catalogItem );
 				fullTextSession.merge( catalog );
 			}
-	
+
 			transaction.commit();
 		}
 		finally {
 			fullTextSession.close();
 		}
 	}
-	
+
 	/**
 	 * Update a non-indexed collection of an entity contained in a collection. No indexing work should be created.
 	 */
@@ -199,6 +199,6 @@ public class CollectionUpdateEventTest {
 
 		transaction.commit();
 	}
-	
+
 }
 

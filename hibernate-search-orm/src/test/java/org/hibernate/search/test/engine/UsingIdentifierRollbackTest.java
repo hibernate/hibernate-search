@@ -40,7 +40,7 @@ import org.hibernate.search.test.errorhandling.MockErrorHandler;
 /**
  * When using hibernate.use_identifier_rollback=true special care must be applied during event processing to get a
  * reference to the identifiers of deleted entities. See HSEARCH-650.
- * 
+ *
  * @author Sanne Grinovero
  * @since 3.3.1, 3.4.0
  */
@@ -49,13 +49,13 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 	public void testEntityDeletionWithoutIdentifier() {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
 		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
-		
+
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
 		s.persist( new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" ) );
 		s.getTransaction().commit();
 		s.close();
-		
+
 		s = getSessions().openSession();
 		s.getTransaction().begin();
 		Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
@@ -69,13 +69,13 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 	public void testRolledBackIdentifiersOnUnusualDocumentId() {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
 		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
-		
+
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
 		s.persist( new PersonWithBrokenSocialSecurityNumber( Long.valueOf( 2 ), "This guy is unaffected by identifier rollback" ) );
 		s.getTransaction().commit();
 		s.close();
-		
+
 		s = getSessions().openSession();
 		s.getTransaction().begin();
 		PersonWithBrokenSocialSecurityNumber entity = (PersonWithBrokenSocialSecurityNumber) s.get( PersonWithBrokenSocialSecurityNumber.class, Long.valueOf( 2 ) );
@@ -89,11 +89,11 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 		LuceneWork luceneWork = processedQueue.get( 0 );
 		Assert.assertEquals( "100", luceneWork.getIdInString() );
 	}
-	
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class, PersonWithBrokenSocialSecurityNumber.class };
 	}
-	
+
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.use_identifier_rollback", "true" );

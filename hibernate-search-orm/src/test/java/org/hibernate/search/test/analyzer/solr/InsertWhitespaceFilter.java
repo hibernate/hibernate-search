@@ -37,7 +37,7 @@ import org.apache.lucene.analysis.tokenattributes.TermAttribute;
  * @author Sanne Grinovero
  */
 public final class InsertWhitespaceFilter extends TokenFilter {
-	
+
 	private TermAttribute termAtt;
 
 	public InsertWhitespaceFilter(TokenStream in) {
@@ -56,5 +56,5 @@ public final class InsertWhitespaceFilter extends TokenFilter {
 			return false;
 		}
 	}
-	
+
 }

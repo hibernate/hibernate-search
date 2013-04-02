@@ -39,7 +39,7 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  * @author Hardy Ferentschik
  */
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
-	
+
 	Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity();
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
@@ -71,7 +71,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * Can be disabled to get pre-3.4 behavior (always rebuild document)
 	 */
 	boolean isDirtyChecksEnabled();
-	
+
 	IndexManagerHolder getAllIndexesManager();
 
 	/**

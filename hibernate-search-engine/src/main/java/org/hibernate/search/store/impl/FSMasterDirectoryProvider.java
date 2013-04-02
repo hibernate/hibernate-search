@@ -58,17 +58,17 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 //TODO rename copy?
 public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory> {
-	
+
 	private static final String CURRENT1 = "current1";
 	private static final String CURRENT2 = "current2";
 	// defined to have CURRENT_DIR_NAME[1] == "current"+"1":
 	private static final String[] CURRENT_DIR_NAME = { null, CURRENT1, CURRENT2 };
-	
+
 	private static final Log log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
-	
+
 	private volatile int current;
-	
+
 	//variables having visibility granted by a read of "current"
 	private FSDirectory directory;
 	private String indexName;
@@ -199,7 +199,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				log.skippingDirectorySynchronization( indexName );
 			}
 		}
-		
+
 		public void stop() {
 			executor.shutdownNow();
 		}

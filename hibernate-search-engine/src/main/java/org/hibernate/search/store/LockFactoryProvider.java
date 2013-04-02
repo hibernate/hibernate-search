@@ -38,7 +38,7 @@ import org.apache.lucene.store.LockFactory;
  * @author Sanne Grinovero
  */
 public interface LockFactoryProvider {
-	
+
 	/**
 	 * Creates a LockFactory implementation.
 	 * A different LockFactory is created for each DirectoryProvider.

@@ -34,10 +34,10 @@ import org.hibernate.search.annotations.FilterCacheModeType;
  * FullTextFilterDef annotation.
  */
 public class FullTextFilterDefMapping {
-	
+
 	private final SearchMapping mapping;
 	private final Map<String,Object> fullTextFilterDef;
-	
+
 	public FullTextFilterDefMapping(SearchMapping mapping, String name, Class<?> impl) {
 		this.mapping = mapping;
 		this.fullTextFilterDef =new HashMap<String, Object>();
@@ -45,7 +45,7 @@ public class FullTextFilterDefMapping {
 		this.fullTextFilterDef.put("impl", impl);
 		mapping.addFulltextFilterDef(fullTextFilterDef);
 	}
-	
+
 	/**
 	 * Add cache implementation for fulltextfilterdef mapping
 	 *

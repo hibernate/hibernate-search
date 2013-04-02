@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -37,20 +37,20 @@ import org.hibernate.annotations.Proxy;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
- * 
+ *
  * @author Tom Waterhouse
  */
 @Entity
 @Proxy(lazy = false)
 @Table(name="catalog")
 public class Catalog {
-	
+
 	@Id()
 	private Long catalogId;
 
 	@Column(length = 255)
 	private String name;
-	
+
 	@OneToMany(mappedBy="catalog", cascade={ CascadeType.REMOVE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
 	private Set<CatalogItem> catalogItems = new HashSet<CatalogItem>();
 

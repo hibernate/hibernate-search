@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -38,10 +38,10 @@ import java.lang.annotation.Target;
 @Target( {ElementType.TYPE} )
 @Documented
 public @interface CacheFromIndex {
-	
+
 	/**
 	 * @return Returns a {@code FieldCache} enum type indicating what kind of caching we should use for index stored metadata. Defaults to {@code FieldCache.CLASS}.
 	 */
 	FieldCacheType[] value() default { FieldCacheType.CLASS };
-	
+
 }

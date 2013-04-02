@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -26,9 +26,9 @@ import org.hibernate.search.SearchException;
 /**
  * This Exception is thrown when an empty TermQuery (keyword query) is created,
  * or if any string query only returns whitespace after applying Analyzers.
- * 
+ *
  * Applications should validate user input before running such a Query;
- * 
+ *
  * @see org.hibernate.search.util.AnalyzerUtils
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */

@@ -44,7 +44,7 @@ public class Puppy {
 
 	@Field
 	private String name;
-	
+
 	public Puppy() {
 	}
 

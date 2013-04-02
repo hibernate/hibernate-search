@@ -46,7 +46,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 	private SearchFactoryImplementor searchFactory;
 
 	public ConfigurationReadTestCase() {
-		
+
 	}
 
 	@Override
@@ -87,12 +87,12 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 		LuceneIndexingParameters luceneIndexingParameters = indexManager.getIndexingParameters();
 		return luceneIndexingParameters.getIndexParameters().getCurrentValueFor( setting );
 	}
-	
+
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 	}
-	
+
 	public static void assertCfgIsInvalid(Configuration configuration, Class[] mapping) {
 		try {
 			for ( Class annotated : mapping ) {

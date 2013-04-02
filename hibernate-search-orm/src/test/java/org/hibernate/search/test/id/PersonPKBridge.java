@@ -57,10 +57,10 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 		luceneOptions.addFieldToDocument( name + ".firstName", id.getFirstName(), document );
 
 		luceneOptions.addFieldToDocument( name + ".lastName", id.getLastName(), document );
-		
+
 		//store the unique string representation in the named field
 		luceneOptions.addFieldToDocument( name, objectToString( id ), document );
 
 	}
-	
+
 }

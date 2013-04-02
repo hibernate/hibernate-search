@@ -33,28 +33,28 @@ import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 /**
  * This backend wraps the default Lucene backend to leak out the last performed list of work for testing purposes: tests
  * can inspect the queue being sent to a backend.
- * 
+ *
  * @author Sanne Grinovero
- * 
+ *
  */
 public class LeakingLuceneBackend extends LuceneBackendQueueProcessor {
-	
+
 	private static volatile List<LuceneWork> lastProcessedQueue = new ArrayList<LuceneWork>();
-	
+
 	@Override
 	public void close() {
 		lastProcessedQueue = new ArrayList<LuceneWork>();
 		super.close();
 	}
-	
+
 	public static List<LuceneWork> getLastProcessedQueue() {
 		return lastProcessedQueue;
 	}
-	
+
 	public static void reset() {
 		lastProcessedQueue = new ArrayList<LuceneWork>();
 	}
-	
+
 	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		super.applyWork( workList, monitor );

@@ -50,16 +50,16 @@ import org.hibernate.search.test.SearchTestCase;
 /**
  * Test to verify the configured ErrorHandler is used in the Lucene
  * backend, and the backend exceptions are logged as expected.
- * 
+ *
  * @see Environment#ERROR_HANDLER
- * 
+ *
  * @author Sanne Grinovero
  * @since 3.2
  */
 public class LuceneErrorHandlingTest extends SearchTestCase {
-	
+
 	static final AtomicInteger workcounter = new AtomicInteger();
-	
+
 	public void testErrorHandling() {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
 		EntityIndexBinder mappingForEntity = searchFactory.getIndexBindingForEntity( Document.class );
@@ -73,7 +73,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		workcounter.set( 0 ); // reset work counter
 		indexManager.performOperations( queue, null );
 		Assert.assertEquals( 2, workcounter.get() );
-		
+
 		workcounter.set( 0 ); // reset work counter
 		final FailingWork firstFailure = new FailingWork( "firstFailure" );
 		queue.add( firstFailure );
@@ -86,7 +86,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Throwable exception = mockErrorHandler.getLastException();
-		
+
 		StringBuilder expectedErrorMessage = new StringBuilder();
 		expectedErrorMessage.append( "Exception occurred " ).append ( exception ).append ("\n");
 		expectedErrorMessage.append( "Primary Failure:\n");
@@ -105,12 +105,12 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class };
 	}
-	
+
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
-	
+
 	/**
 	 * A LuceneWork which doesn't fail and delegates to a NoOp
 	 * operation on the index.
@@ -132,14 +132,14 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 				return (T) new NoOpLuceneWorkDelegate();
 			}
 		}
-		
+
 		@Override
 		public String toString() {
 			return "HarmlessWork: " + this.getIdInString();
 		}
-		
+
 	}
-	
+
 	static class NoOpLuceneWorkDelegate implements LuceneWorkDelegate {
 
 		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
@@ -148,9 +148,9 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 			workcounter.incrementAndGet();
 		}
-		
+
 	}
-	
+
 	/**
 	 * A LuceneWork which will throw a SearchException when applied to
 	 * the index, which is the type thrown to wrap real IOExceptions.
@@ -172,14 +172,14 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 				return (T) new FailingLuceneWorkDelegate();
 			}
 		}
-		
+
 		@Override
 		public String toString() {
 			return "FailingWork: " + this.getIdInString();
 		}
-		
+
 	}
-	
+
 	static class FailingLuceneWorkDelegate implements LuceneWorkDelegate {
 
 		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
@@ -188,7 +188,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 			throw new SearchException( "failed work message" );
 		}
-		
+
 	}
 
 }

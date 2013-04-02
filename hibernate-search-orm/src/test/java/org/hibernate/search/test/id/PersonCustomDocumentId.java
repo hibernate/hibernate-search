@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -31,7 +31,7 @@ import org.hibernate.search.annotations.Indexed;
  * Entity to verify for HSEARCH-1050 : Having an EmbeddedId but override
  * the index id with a DocumentId.
  * Renaming the doc-id field as "id" just to make it more tricky.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 @Entity

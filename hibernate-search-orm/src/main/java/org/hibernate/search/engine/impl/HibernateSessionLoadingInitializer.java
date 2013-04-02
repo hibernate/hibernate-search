@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -32,7 +32,7 @@ import org.hibernate.search.spi.InstanceInitializer;
 /**
  * This EntityInitializer is relative to a specific Hibernate Session,
  * so it's able to attach detached collections to it's Session.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class HibernateSessionLoadingInitializer extends HibernateStatelessInitializer implements InstanceInitializer {
@@ -42,7 +42,7 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 	public HibernateSessionLoadingInitializer(SessionImplementor hibernateSession) {
 		this.hibernateSession = hibernateSession;
 	}
-	
+
 	@Override
 	public Object unproxy(Object instance) {
 		if ( instance instanceof HibernateProxy ) {
@@ -60,7 +60,7 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 		}
 		return instance;
 	}
-	
+
 	@Override
 	public <T> Collection<T> initializeCollection(Collection<T> value) {
 		if ( value instanceof PersistentCollection ) {
@@ -76,7 +76,7 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 		}
 		return value;
 	}
-	
+
 	private void preparePersistentCollection( PersistentCollection value ) {
 		// we have to check that it's not already associated, might have happened via cascading:
 		if ( value.setCurrentSession( hibernateSession ) ) {
@@ -85,5 +85,5 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 			hibernateSession.getPersistenceContext().addInitializedDetachedCollection( collectionPersister, value );
 		}
 	}
-	
+
 }

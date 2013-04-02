@@ -51,7 +51,7 @@ public class PropertyDescriptor {
 
 	public PropertyDescriptor(String name, ElementType type) {
 	}
-	
+
 	public void setDocumentId(Map<String, Object> documentId) {
 		this.documentId = documentId;
 	}
@@ -70,7 +70,7 @@ public class PropertyDescriptor {
 	public void setCalendarBridge(Map<String,Object> calendarBridge) {
 		this.calendarBridge = calendarBridge;
 	}
-	
+
 	public Collection<Map<String, Object>> getFields() {
 		return fields;
 	}
@@ -87,19 +87,19 @@ public class PropertyDescriptor {
 		return analyzerDiscriminator;
 	}
 
-	
+
 	public Map<String, Object> getDateBridge() {
 		return dateBridge;
 	}
 	public Map<String, Object> getCalendarBridge() {
 		return calendarBridge;
 	}
-	
-	
+
+
 	public void setAnalyzerDiscriminator(Map<String, Object> analyzerDiscriminator) {
 		this.analyzerDiscriminator = analyzerDiscriminator;
 	}
-	
+
 	public Map<String, Object> getIndexEmbedded() {
 		return indexEmbedded;
 	}
@@ -118,7 +118,7 @@ public class PropertyDescriptor {
 	public void setDynamicBoost(Map<String, Object> dynamicBoostAnn) {
 		this.dynamicBoost = dynamicBoostAnn;
 	}
-	
+
 	public Map<String,Object> getDynamicBoost() {
 		return this.dynamicBoost;
 	}

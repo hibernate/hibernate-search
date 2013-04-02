@@ -40,12 +40,12 @@ import org.hibernate.search.util.logging.impl.Log;
  * @author Sanne Grinovero
  */
 public class Executors {
-	
+
 	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
 	public static final int QUEUE_MAX_LENGTH = 1000;
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	/**
 	 * Creates a new fixed size ThreadPoolExecutor.
 	 * It's using a blockingqueue of maximum 1000 elements and the rejection
@@ -78,12 +78,12 @@ public class Executors {
 	            new SearchThreadFactory( groupname ),
 	            new BlockPolicy() );
 	}
-	
+
 	/**
      * The thread factory, used to customize thread names
      */
     private static class SearchThreadFactory implements ThreadFactory {
-    	
+
         final ThreadGroup group;
         final AtomicInteger threadNumber = new AtomicInteger( 1 );
         final String namePrefix;
@@ -96,14 +96,14 @@ public class Executors {
         }
 
         public Thread newThread(Runnable r) {
-            Thread t = new Thread( group, r, 
+            Thread t = new Thread( group, r,
                                   namePrefix + threadNumber.getAndIncrement(),
                                   0 );
             return t;
         }
-        
+
     }
-    
+
     /**
      * A handler for rejected tasks that will have the caller block until
      * space is available.
@@ -131,5 +131,5 @@ public class Executors {
 			}
         }
     }
-	
+
 }

@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -45,11 +45,11 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class CommonPropertiesParse {
-	
+
 	private CommonPropertiesParse() {
 		// no need to create instances
 	}
-	
+
 	/**
 	 * <p>isExclusiveIndexUsageEnabled.</p>
 	 *
@@ -115,7 +115,7 @@ public class CommonPropertiesParse {
 			return optimizerStrategy;
 		}
 	}
-	
+
 	/**
 	 * Creates a new <code>LuceneIndexingParameters</code> instance for the specified provider.
 	 * If there are no matching properties in the configuration default values will be applied.

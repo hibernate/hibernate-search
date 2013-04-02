@@ -78,18 +78,18 @@ public class PropertyMapping {
 	public DateBridgeMapping dateBridge(Resolution resolution) {
 		return new DateBridgeMapping( mapping, entity, property, resolution );
 	}
-	
+
 	public CalendarBridgeMapping calendarBridge(Resolution resolution) {
 		return new CalendarBridgeMapping( mapping, entity, property, resolution );
 	}
-	
+
 	public PropertyMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
 		Map<String, Object> analyzerDiscriminatorAnn = new HashMap<String, Object>();
 		analyzerDiscriminatorAnn.put( "impl", discriminator );
 		property.setAnalyzerDiscriminator(analyzerDiscriminatorAnn);
 		return this;
 	}
-	
+
 	public PropertyMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
 		final Map<String, Object> dynamicBoostAnn = new HashMap<String, Object>();
 		dynamicBoostAnn.put("impl", impl);

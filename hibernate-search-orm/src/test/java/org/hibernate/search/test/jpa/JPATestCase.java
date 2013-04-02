@@ -133,7 +133,7 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 
 		return config;
 	}
-	
+
 	public static Version getTargetLuceneVersion() {
 		return TestConstants.getTargetLuceneVersion();
 	}

@@ -30,7 +30,7 @@ import org.jgroups.View;
 
 /**
  * Abstract Channel based message sender.
- * 
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 abstract class AbstractMessageSender implements MessageSender {

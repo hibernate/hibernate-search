@@ -28,7 +28,7 @@ import org.jgroups.JChannel;
 
 /**
  * Test master / slave injected mux supported channel.
- * 
+ *
  * @author Ales Justin
  */
 public class MSMuxChannelTest extends MuxChannelTest {

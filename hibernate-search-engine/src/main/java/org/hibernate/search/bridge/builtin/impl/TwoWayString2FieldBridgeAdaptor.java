@@ -34,7 +34,7 @@ import org.hibernate.search.engine.impl.DocumentBuilderHelper;
  *
  * @author Emmanuel Bernard
  */
-//TODO use Generics to avoid double declaration of stringBridge 
+//TODO use Generics to avoid double declaration of stringBridge
 public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor implements TwoWayFieldBridge {
 
 	private final TwoWayStringBridge stringBridge;
@@ -62,5 +62,5 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 	public TwoWayStringBridge unwrap() {
 		return stringBridge;
 	}
-	
+
 }

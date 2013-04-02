@@ -44,7 +44,7 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Emmanuel Bernard
  */
 public class IndexTestDontRun extends SearchTestCase {
-	
+
 	private static final int TOTAL_SEARCHES = 800;
 	private static final int SEARCH_THREADS = 100;
 
@@ -64,7 +64,7 @@ public class IndexTestDontRun extends SearchTestCase {
 		s.close();
 		System.out.println( " init time = " + TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - time ) );
 	}
-	
+
 	public void testPerformance() throws Exception {
 		measure(true);//JVM warmup
 		measure(false);//JVM warmup

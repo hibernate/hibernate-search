@@ -31,32 +31,32 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Implements a blocking queue capable of storing
  * a "poison" token to signal consumer threads
  * that the task is finished.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class ProducerConsumerQueue<T> {
-	
+
 	private static final int DEFAULT_BUFF_LENGHT = 1000;
 	private static final Object exitToken = new Object();
-	
+
 	//doesn't use generics here as exitToken needs to be put in the queue too:
 	@SuppressWarnings("unchecked")
 	private final BlockingQueue queue;
 	private final AtomicInteger producersToWaitFor;
-	
+
 	/**
 	 * @param producersToWaitFor The number of producer threads.
 	 */
 	public ProducerConsumerQueue( int producersToWaitFor ) {
 		this( DEFAULT_BUFF_LENGHT, producersToWaitFor );
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public ProducerConsumerQueue( int queueLenght, int producersToWaitFor ) {
 		queue = new ArrayBlockingQueue( queueLenght );
 		this.producersToWaitFor = new AtomicInteger( producersToWaitFor );
 	}
-	
+
 	/**
 	 * Blocks until an object is available; when null
 	 * is returned the client thread should quit.
@@ -75,7 +75,7 @@ public class ProducerConsumerQueue<T> {
 			return (T)obj;
 		}
 	}
-	
+
 	/**
 	 * Adds a new object to the queue, blocking if no space is
 	 * available.
@@ -108,5 +108,5 @@ public class ProducerConsumerQueue<T> {
 			}
 		}
 	}
-	
+
 }

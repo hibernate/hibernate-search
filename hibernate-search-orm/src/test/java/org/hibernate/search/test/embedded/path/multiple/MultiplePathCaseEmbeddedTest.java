@@ -100,7 +100,7 @@ public class MultiplePathCaseEmbeddedTest extends SearchTestCase {
 		}
 	}
 
-	
+
 	public void testEmbeddedNotIndexedIfNotInPath() throws Exception {
 		try {
 			search( s, "b.skipped.indexed", "indexed" );

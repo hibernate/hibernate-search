@@ -301,7 +301,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			return queryHits.doc( index );
 		}
 	}
-	
+
 	/**
 	 * In rare cases the Lucene FieldCache might fail to return a value, at this point we already extracted
 	 * the Document so we need to repeat the process to extract the missing field only.

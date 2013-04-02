@@ -220,7 +220,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		assertEquals( "[1.01, 1.5]", facets.get( 1 ).getValue() );
 		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
 	}
-	
+
 	public void testRangeQueryRangeDefOrderHigherMaxCount() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )

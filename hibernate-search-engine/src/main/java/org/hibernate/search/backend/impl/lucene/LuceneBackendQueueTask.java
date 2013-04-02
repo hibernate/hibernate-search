@@ -92,10 +92,10 @@ final class LuceneBackendQueueTask implements Runnable {
 	 */
 	private void applyUpdates() throws InterruptedException, ExecutionException {
 		AbstractWorkspaceImpl workspace = resources.getWorkspace();
-		
+
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
 		errorContextBuilder.allWorkToBeDone( queue );
-		
+
 		IndexWriter indexWriter = workspace.getIndexWriter( errorContextBuilder );
 		if ( indexWriter == null ) {
 			log.cannotOpenIndexWriterCausePreviousError();

@@ -30,7 +30,7 @@ import org.jgroups.blocks.RequestOptions;
 
 /**
  * Channel message sender.
- * 
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 class DispatcherMessageSender extends AbstractMessageSender {

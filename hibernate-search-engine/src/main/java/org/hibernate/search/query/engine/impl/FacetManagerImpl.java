@@ -99,7 +99,7 @@ public class FacetManagerImpl implements FacetManager {
 		if ( facetRequests.isEmpty() || !facetRequests.containsKey( facetingName ) ) {
 			return Collections.emptyList();
 		}
-		
+
 		List<Facet> facets = null;
 		if ( facetResults != null ) {
 			facets = facetResults.get( facetingName );

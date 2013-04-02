@@ -73,7 +73,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-	
+
 	public void testObjectTypeFiltering() throws Exception {
 		Session sess = openSession();
 		Transaction tx = sess.beginTransaction();
@@ -119,5 +119,5 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 				Book.class
 		};
 	}
-	
+
 }

@@ -49,7 +49,7 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 	 * Create a new SearchConfiguration which returns the same values as the provided SearchConfiguration
 	 * instance, with the exception of {@link #getReflectionManager()} which will return the constructor
 	 * defined ReflectionManager.
-	 * 
+	 *
 	 * @param reflectionManager
 	 * @param cfg
 	 */

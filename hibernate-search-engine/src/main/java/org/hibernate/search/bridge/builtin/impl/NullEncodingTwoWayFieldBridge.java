@@ -62,7 +62,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 			return fieldBridge.objectToString( object );
 		}
 	}
-	
+
 	public TwoWayFieldBridge unwrap() {
 		return fieldBridge;
 	}

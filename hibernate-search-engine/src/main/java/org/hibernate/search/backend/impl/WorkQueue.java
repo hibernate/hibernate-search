@@ -60,7 +60,7 @@ public class WorkQueue {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.plan = new WorkPlan( searchFactoryImplementor );
 	}
-	
+
 	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor, WorkPlan plan) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.plan = plan;
@@ -138,5 +138,5 @@ public class WorkQueue {
 			setSealedQueue( luceneWorkPlan );
 		}
 	}
-	
+
 }

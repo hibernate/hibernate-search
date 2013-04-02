@@ -371,15 +371,15 @@ public class SearchFactoryBuilder {
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
 		final Map<XClass, Class> classMappings = initializeClassMappings( cfg, cfg.getReflectionManager() );
-		
+
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
 		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
-		
+
 		for ( Map.Entry<XClass, Class> mapping : classMappings.entrySet() ) {
 
 			XClass mappedXClass = mapping.getKey();
 			Class mappedClass = mapping.getValue();
-			
+
 			if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
 
 				if ( mappedXClass.isAbstract() ) {
@@ -404,12 +404,12 @@ public class SearchFactoryBuilder {
 			bindFilterDefs( mappedXClass );
 			//TODO should analyzer def for classes at their same level???
 		}
-		
+
 		IndexManagerHolder indexesFactory = factoryState.getAllIndexesManager();
-		
+
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
-			
+
 			Class mappedClass = classMappings.get( mappedXClass );
 			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
 			//interceptor might use non indexed state
@@ -432,7 +432,7 @@ public class SearchFactoryBuilder {
 
 			documentBuildersIndexedEntities.put( mappedClass, mappedEntity );
 		}
-		
+
 		disableBlackListedTypesOptimization( classMappings, optimizationBlackListedTypes, documentBuildersIndexedEntities, documentBuildersContainedEntities );
 		factoryState.setAnalyzers( context.initLazyAnalyzers() );
 	}

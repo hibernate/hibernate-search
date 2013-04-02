@@ -86,10 +86,10 @@ public class NumericFieldTest extends SearchTestCase {
 		assertEquals("Query long exact", 4, doExactQuery("myCounter",4L).getId() );
 		assertEquals("Query multifield exact", 5, doExactQuery("strMultiple",0.1d).getId() );
 		assertEquals("Query on custom bridge exact", 3, doExactQuery("visibleStars", 1000L).getId() );
-		
+
 		tx.commit();
 		fullTextSession.clear();
-		
+
 		// Delete operation on Numeric Id with overriden field name:
 		tx = fullTextSession.beginTransaction();
 		List allLocations = fullTextSession.createCriteria( Location.class ).list();
@@ -99,7 +99,7 @@ public class NumericFieldTest extends SearchTestCase {
 		tx.commit();
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();
-		
+
 		assertEquals("Check for deletion on Query", 0, numericQueryFor("overriddenFieldName", 1, 6).size());
 		// and now check also for the real index contents:
 		Query query = NumericFieldUtils.createNumericRangeQuery("overriddenFieldName", 1, 6, true, true);
@@ -107,7 +107,7 @@ public class NumericFieldTest extends SearchTestCase {
 			.createFullTextQuery( query, Location.class )
 			.setProjection( ProjectionConstants.DOCUMENT );
 		assertEquals("Check for deletion on index projection", 0, fullTextQuery.list().size() );
-		
+
 		tx.commit();
 	}
 
@@ -193,11 +193,11 @@ public class NumericFieldTest extends SearchTestCase {
 		fullTextSession.save(loc3);
 		fullTextSession.save(loc4);
 		fullTextSession.save(loc5);
-		
+
 		tx.commit();
 		fullTextSession.clear();
 	}
-	
+
 	private Country countryFor(String name, double idh) {
 		return new Country( name, idh );
 	}

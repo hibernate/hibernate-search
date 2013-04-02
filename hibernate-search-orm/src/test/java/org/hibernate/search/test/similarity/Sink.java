@@ -43,7 +43,7 @@ public class Sink {
 	@DocumentId
 	@GeneratedValue
 	private Integer id;
-	
+
 	@Field
 	private String name;
 

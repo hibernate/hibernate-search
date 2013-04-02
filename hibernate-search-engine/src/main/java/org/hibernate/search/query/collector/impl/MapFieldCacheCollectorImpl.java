@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -38,7 +38,7 @@ import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
  * @see org.hibernate.search.query.collector.BigArrayFieldCacheCollectorImpl
  */
 final class MapFieldCacheCollectorImpl extends FieldCacheCollector {
-	
+
 	private final FieldLoadingStrategy collectorStrategy;
 	private final Map<Integer, Object> valuePerDocumentId = newHashMap();
 

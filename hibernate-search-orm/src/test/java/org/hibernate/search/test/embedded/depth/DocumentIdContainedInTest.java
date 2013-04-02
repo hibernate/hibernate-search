@@ -37,7 +37,7 @@ import org.hibernate.search.test.util.LeakingLuceneBackend;
  * @author Sanne Grinovero
  */
 public class DocumentIdContainedInTest extends RecursiveGraphTest {
-	
+
 	public void testCorrectDepthIndexed() {
 		Session session = openSession();
 		try {
@@ -56,10 +56,10 @@ public class DocumentIdContainedInTest extends RecursiveGraphTest {
 		Assert.assertEquals( "100", processedQueue.get( 0 ).getId() );
 		Assert.assertTrue( processedQueue.get( 0 ) instanceof AddLuceneWork );
 	}
-	
+
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { PersonWithBrokenSocialSecurityNumber.class };
 	}
-	
+
 }

@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -33,7 +33,7 @@ import org.apache.lucene.store.RAMDirectory;
 /**
  * This Directory keeps track of opened IndexInput and IndexOutput
  * instances, making it possible to verify if any file was left open.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class FileMonitoringDirectory extends RAMDirectory {
@@ -158,7 +158,7 @@ public class FileMonitoringDirectory extends RAMDirectory {
 	}
 
 	private class IndexInputDelegate extends IndexInput {
-	
+
 		private final IndexInput delegate;
 
 		public IndexInputDelegate(IndexInput delegate) {

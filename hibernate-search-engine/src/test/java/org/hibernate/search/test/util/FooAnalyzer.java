@@ -32,11 +32,11 @@ import org.apache.lucene.analysis.TokenStream;
  * @author Hardy Ferentschik
  */
 public final class FooAnalyzer extends Analyzer {
-	
+
 	public FooAnalyzer() {
 		super();
 	}
-	
+
 	@Override
 	public TokenStream tokenStream(String fieldName, Reader reader) {
 		return null;

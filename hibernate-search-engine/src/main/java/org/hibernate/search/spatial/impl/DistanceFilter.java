@@ -69,7 +69,7 @@ public final class DistanceFilter extends Filter {
 		this.radius = radius;
 		this.coordinatesField = coordinatesField;
 	}
-	
+
 	/**
 	 * Construct a Distance Filter to match document distant at most of radius from center Point
 	 *

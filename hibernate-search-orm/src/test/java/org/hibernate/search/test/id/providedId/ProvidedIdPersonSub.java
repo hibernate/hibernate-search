@@ -29,5 +29,5 @@ import org.hibernate.search.annotations.Indexed;
  * @author Navin Surtani (<a href="mailto:nsurtani@redhat.com">nsurtani@redhat.com</a>)
  */
 @Indexed
-public class ProvidedIdPersonSub extends ProvidedIdPerson {   
+public class ProvidedIdPersonSub extends ProvidedIdPerson {
 }

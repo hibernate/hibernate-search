@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -39,7 +39,7 @@ import org.hibernate.search.annotations.Field;
 /**
  * Related to test case of HSEARCH-782; indexed properties are defined
  * via a programmatic configuration.
- * 
+ *
  * @author Adam Harris
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */

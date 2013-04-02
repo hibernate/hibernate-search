@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  * @author Sanne Grinovero
  */
 public class CustomBackendTest {
-	
+
 	@Test
 	public void test() {
 		verifyBackendUsage( "blackhole", BlackHoleBackendQueueProcessor.class );
@@ -47,7 +47,7 @@ public class CustomBackendTest {
 		verifyBackendUsage( BlackHoleBackendQueueProcessor.class );
 		verifyBackendUsage( LuceneBackendQueueProcessor.class );
 	}
-	
+
 	private void verifyBackendUsage(String name, Class<? extends BackendQueueProcessor> backendType) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		FullTextSession ftSession = builder

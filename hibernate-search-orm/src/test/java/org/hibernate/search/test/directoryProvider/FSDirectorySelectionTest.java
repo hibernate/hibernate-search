@@ -80,7 +80,7 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		EntityIndexBinder snowIndexBinder = searchFactoryIntegrator.getIndexBindingForEntity( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertTrue( "Wrong number of directory providers", indexManagers.length == 1 );
-		
+
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 		Directory directory = indexManager.getDirectoryProvider().getDirectory();
 		assertEquals( "Wrong directory provider type", className, directory.getClass().getName() );

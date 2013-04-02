@@ -102,7 +102,7 @@ public class EmbeddedIdTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		// we need a query which has at least the size of two. 
+		// we need a query which has at least the size of two.
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term( "favoriteColor", "blue" ) )
 		).list();

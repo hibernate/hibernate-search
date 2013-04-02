@@ -64,7 +64,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final String idNameOfIndexedType;
 
 	// status control
-	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index 
+	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index
 	private final CountDownLatch endAllSignal; //released when we release all locks and IndexWriter
 
 	// progress monitor

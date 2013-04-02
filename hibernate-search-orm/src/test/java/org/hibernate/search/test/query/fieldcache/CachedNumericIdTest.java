@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -45,14 +45,14 @@ import org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class CachedNumericIdTest extends SearchTestCase {
-	
+
 	private static final int NUM_LOCATIONS = 50;
-	
+
 	public void setUp() throws Exception {
 		super.setUp();
 		prepareData();
 	}
-	
+
 	public void testLocationLoading() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
@@ -72,7 +72,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		tx.commit();
 		session.close();
 	}
-	
+
 	private void prepareData() {
 		Session session = openSession();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
@@ -85,7 +85,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		transaction.commit();
 		session.close();
 	}
-	
+
 	private void cleanData() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
@@ -93,17 +93,17 @@ public class CachedNumericIdTest extends SearchTestCase {
 		tx.commit();
 		session.close();
 	}
-	
+
 	public void tearDown() throws Exception {
 		cleanData();
 		super.tearDown();
 	}
-	
+
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { PinPoint.class, Location.class };
 	}
-	
+
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		// force multiple segments to also verify the docId transformations

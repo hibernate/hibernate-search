@@ -18,7 +18,7 @@ public class ConcurrentData {
 	private String data;
 
 	public ConcurrentData(){}
-	
+
 	public ConcurrentData(String data) {
 		this.data = data;
 	}

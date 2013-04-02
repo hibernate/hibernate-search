@@ -94,7 +94,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Document.class, 0, MAX_BUFFERED_DOCS, 58 );
 		assertValueIsSet( Document.class, 1, MAX_BUFFERED_DOCS, 12 );
 	}
-	
+
 	private static DirectoryProvider getDirectoryProvider(IndexManager indexManager) {
 		DirectoryBasedIndexManager dpBasedManager = (DirectoryBasedIndexManager) indexManager;
 		return dpBasedManager.getDirectoryProvider();

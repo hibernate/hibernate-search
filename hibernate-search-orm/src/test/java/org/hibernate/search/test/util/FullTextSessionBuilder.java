@@ -55,12 +55,12 @@ import org.hibernate.testing.cache.CachingRegionFactory;
  * Use the builder pattern to provide a SessionFactory.
  * This is meant to use only ram-based index and databases, for those test
  * which need to use several differently configured SessionFactories.
- * 
+ *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
 public class FullTextSessionBuilder {
-	
+
 	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 
 	public static final File indexRootDirectory;
@@ -70,7 +70,7 @@ public class FullTextSessionBuilder {
 	private SessionFactory sessionFactory;
 	private boolean usingFileSystem = false;
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
-	
+
 	static {
 		String buildDir = System.getProperty( "build.dir" );
 		if ( buildDir == null ) {
@@ -80,23 +80,23 @@ public class FullTextSessionBuilder {
 		indexRootDirectory = new File( current, "indextemp" );
 		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
 	}
-	
+
 	public FullTextSessionBuilder() {
 		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
-		
+
 		//cache:
 		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
 		cfg.setProperty( Environment.CACHE_REGION_FACTORY,
 				CachingRegionFactory.class.getCanonicalName() );
 		cfg.setProperty( Environment.USE_QUERY_CACHE, "true" );
-		
+
 		//search specific:
 		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS,
 				StopAnalyzer.class.getName() );
 		useRAMDirectoryProvider( true );
 	}
-	
+
 	/**
 	 * @param use if true, use indexes in RAM otherwise use FSDirectoryProvider
 	 * @return the same builder (this).
@@ -113,7 +113,7 @@ public class FullTextSessionBuilder {
 		 }
 		return this;
 	}
-	
+
 	/**
 	 * Override before building any parameter, or add new ones.
 	 * @param key Property name.
@@ -124,7 +124,7 @@ public class FullTextSessionBuilder {
 		cfg.setProperty( key, value );
 		return this;
 	}
-	
+
 	/**
 	 * Adds classes to the SessionFactory being built.
 	 * @param annotatedClass The annotated class to add to the configuration.
@@ -134,7 +134,7 @@ public class FullTextSessionBuilder {
 		annotatedClasses.add( annotatedClass );
 		return this;
 	}
-	
+
 	/**
 	 * @return a new FullTextSession based upon the built configuration.
 	 */
@@ -145,7 +145,7 @@ public class FullTextSessionBuilder {
 		Session session = sessionFactory.openSession();
 		return Search.getFullTextSession( session );
 	}
-	
+
 	/**
 	 * Closes the SessionFactory.
 	 * Make sure you close all sessions first
