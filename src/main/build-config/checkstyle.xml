@@ -49,4 +49,9 @@
         <module name="CovariantEquals"/>
     </module>
 
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$" />
+        <property name="message" value="White spaces at the end of line" />
+    </module>
+
 </module>
