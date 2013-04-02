@@ -25,20 +25,22 @@ package org.hibernate.search.infinispan;
 
 import java.io.IOException;
 import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.infinispan.manager.DefaultCacheManager;
-import org.infinispan.manager.EmbeddedCacheManager;
-
 import org.hibernate.search.SearchException;
+import org.hibernate.search.infinispan.impl.InfinispanConfigurationParser;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.JNDIHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
+import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.manager.EmbeddedCacheManager;
 
 /**
  * Provides access to Infinispan's CacheManager; one CacheManager is needed for all caches,
@@ -90,8 +92,9 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 					DEFAULT_INFINISPAN_CONFIGURATION_RESOURCENAME
 			);
 			try {
-				cacheManager = new DefaultCacheManager( cfgName );
-				cacheManager.start();
+				InfinispanConfigurationParser ispnConfiguration = new InfinispanConfigurationParser( CacheManagerServiceProvider.class.getClassLoader() );
+				ConfigurationBuilderHolder configurationBuilderHolder = ispnConfiguration.parseFile( cfgName );
+				cacheManager = new DefaultCacheManager( configurationBuilderHolder, true );
 				manageCacheManager = true;
 			}
 			catch ( IOException e ) {

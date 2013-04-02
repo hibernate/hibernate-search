@@ -2,7 +2,7 @@
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
-  ~ Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  ~ Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
   ~ indicated by the @author tags or express copyright attribution
   ~ statements applied by the authors.  All third-party contributions are
   ~ distributed under license by Red Hat, Inc.
@@ -22,16 +22,13 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-<module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.orm" slot="${hibernate.search.module.slot}">
+<module xmlns="urn:jboss:module:1.1" name="org.infinispan.lucene-directory" slot="${infinispanVersion}">
     <resources>
-        <resource-root path="hibernate-search-orm-${hibernate.search.version}.jar" />
+        <resource-root path="infinispan-lucene-directory-${infinispanVersion}.jar" />
     </resources>
     <dependencies>
-        <module name="javax.transaction.api" />
-        <module name="org.hibernate" />
-        <module name="org.hibernate.commons-annotations" />
-        <module name="org.hibernate.search.engine" export="true" services="import" slot="${hibernate.search.module.slot}" />
+        <module name="org.apache.lucene" slot="${luceneVersion}" />
+        <module name="org.infinispan" />
         <module name="org.jboss.logging" />
-        <module name="javax.persistence.api" />
     </dependencies>
 </module>

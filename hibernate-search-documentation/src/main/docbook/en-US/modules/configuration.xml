@@ -1657,9 +1657,9 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
   </section>
 
   <section id="search-configuration-deploy-on-AS7">
-    <title>How to package Hibernate Search applications for JBoss AS 7</title>
+    <title>How to package Hibernate Search applications for JBoss AS 7.1</title>
 
-    <para>Provided you're deploying on JBoss AS 7.1.x or JBoss EAP6, there is an additional way to add the search dependencies to your application.</para>
+    <para>Provided you're deploying on JBoss AS 7.2.x or JBoss EAP 6.1, there is an additional way to add the search dependencies to your application.</para>
 
     <para>In JBoss AS 7 class loading is based on modules that have to define explicit dependencies on other modules.
     Modules allow to share the same artifacts across multiple applications getting you smaller and quicker deloyments.</para>
@@ -1669,14 +1669,14 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
     <para>You can download the pre-packaged Hibernate Search modules from:</para>
     <itemizedlist>
       <listitem>
-        <para><ulink url="https://downloads.sourceforge.net/project/hibernate/hibernate-search/&version;/hibernate-search-modules-&version;-jbossas-71-dist.zip">Sourceforge</ulink></para>
+        <para><ulink url="https://downloads.sourceforge.net/project/hibernate/hibernate-search/&version;/hibernate-search-modules-&version;-jbossas-72-dist.zip">Sourceforge</ulink></para>
       </listitem>
       <listitem>
-        <para>Maven: <ulink url="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~">org.hibernate:hibernate-search-modules-&version;-jbossas-71-dist:zip</ulink></para>
+        <para>Maven: <ulink url="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~">org.hibernate:hibernate-search-modules-&version;-jbossas-72-dist:zip</ulink></para>
       </listitem>
     </itemizedlist>
 
-    <para>Unpack the modules in your JBoss AS directory, this will create modules for Hibernate Search, Apache Lucene and some useful Solr libraries. The Hibernate Search modules are:</para>
+    <para>Unpack the modules in your JBoss AS <literal>modules</literal> directory: this will create modules for Hibernate Search, Apache Lucene and some useful Solr libraries. The Hibernate Search modules are:</para>
 
     <itemizedlist>
       <listitem>

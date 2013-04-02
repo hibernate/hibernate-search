@@ -1,26 +1,23 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- *  Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
- *  indicated by the @author tags or express copyright attribution
- *  statements applied by the authors.  All third-party contributions are
- *  distributed under license by Red Hat, Inc.
+ * JBoss, Home of Professional Open Source
+ * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
+ * as indicated by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- *  This copyrighted material is made available to anyone wishing to use, modify,
- *  copy, or redistribute it subject to the terms and conditions of the GNU
- *  Lesser General Public License, as published by the Free Software Foundation.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- *  for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this distribution; if not, write to:
- *  Free Software Foundation, Inc.
- *  51 Franklin Street, Fifth Floor
- *  Boston, MA  02110-1301  USA
- */
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+*/
 package org.hibernate.search.test.integration.jbossas7;
 
 import static org.junit.Assert.assertEquals;
@@ -32,7 +29,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.Version;
 import org.hibernate.search.test.integration.jbossas7.controller.MemberRegistration;
 import org.hibernate.search.test.integration.jbossas7.model.Member;
 import org.hibernate.search.test.integration.jbossas7.util.Resources;
@@ -43,43 +39,38 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
+import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Example of an integration test using JBoss AS 7 and Arquillian.
+ * Test the Hibernate Search module in JBoss AS
+ * combined with an Infinispan Directory usage.
  *
- * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-public class MemberRegistrationIT {
+public class InfinispanModuleMemberRegistrationIT {
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		String currentVersion = Version.getVersionString();
 		WebArchive archive = ShrinkWrap
-				.create( WebArchive.class, MemberRegistrationIT.class.getSimpleName() + ".war" )
+				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsLibraries(
-						DependencyResolvers.use( MavenDependencyResolver.class )
-								.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
-								.exclusion( "org.hibernate:hibernate-entitymanager" )
-								.exclusion( "org.hibernate:hibernate-core" )
-								.exclusion( "org.hibernate:hibernate-search-analyzers" )
-								.exclusion( "org.jboss.logging:jboss-logging" )
-								.resolveAs( JavaArchive.class ) )
+				.add( manifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
-		// To debug dependencies, have it dump a zip export:
-		//archive.as( ZipExporter.class ).exportTo( new File("test-app.war"), true );
 		return archive;
+	}
+
+	private static Asset manifest() {
+		String manifest =  Descriptors.create( ManifestDescriptor.class )
+				.attribute( "Dependencies", "org.hibernate.search.orm services" )
+				.exportAsString();
+		return new StringAsset( manifest );
 	}
 
 	private static Asset persistenceXml() {
@@ -91,7 +82,8 @@ public class MemberRegistrationIT {
 				.getOrCreateProperties()
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
-					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
+					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "infinispan" ).up()
+					.createProperty().name( "hibernate.search.autoregister_listeners" ).value( "true" ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );

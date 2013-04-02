@@ -143,7 +143,7 @@
         <luceneVersion>3.6.2</luceneVersion>
         <luceneRegexVersion>3.0.3</luceneRegexVersion>
         <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
-        <infinispanVersion>5.2.1.Final</infinispanVersion>
+        <infinispanVersion>5.2.5.Final</infinispanVersion>
         <jgroupsVersion>3.2.7.Final</jgroupsVersion>
         <hibernateVersion>4.2.0.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.1.Final</hibernateCommonsAnnotationVersion>
