@@ -35,11 +35,11 @@ import org.hibernate.search.test.SearchTestCase;
 /**
  * Verify index changes queued during a transaction are canceled
  * when the transaction is rolled back.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class RollbackTransactionTest extends SearchTestCase {
-	
+
 	public void testTransactionBehaviour() {
 		assertEquals( 0, countBusLinesByFullText() );
 		assertEquals( 0, countBusLineByDatabaseCount() );
@@ -56,7 +56,7 @@ public class RollbackTransactionTest extends SearchTestCase {
 		assertEquals( 12, countBusLinesByFullText() );
 		assertEquals( 12, countBusLineByDatabaseCount() );
 	}
-	
+
 	private void createBusLines(int number, boolean rollback) {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
@@ -84,7 +84,7 @@ public class RollbackTransactionTest extends SearchTestCase {
 		fullTextSession.close();
 		return count;
 	}
-	
+
 	public int countBusLineByDatabaseCount() {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
@@ -93,13 +93,13 @@ public class RollbackTransactionTest extends SearchTestCase {
 		fullTextSession.close();
 		return count;
 	}
-	
+
 	// Test setup options - Entities
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { BusLine.class, BusStop.class };
 	}
-	
+
 	// Test setup options - SessionFactory Properties
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration configuration) {

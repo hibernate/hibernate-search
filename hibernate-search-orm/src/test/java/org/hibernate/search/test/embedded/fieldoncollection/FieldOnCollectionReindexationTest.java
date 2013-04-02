@@ -47,7 +47,7 @@ public class FieldOnCollectionReindexationTest extends SearchTestCase {
 		CollectionItem item1 = new CollectionItem();
 		CollectionItem item2 = new CollectionItem();
 		CollectionItem item3 = new CollectionItem();
-		
+
 		Transaction tx = hibernateSession.beginTransaction();
 		hibernateSession.save( item1 );
 		hibernateSession.save( item2 );
@@ -59,7 +59,7 @@ public class FieldOnCollectionReindexationTest extends SearchTestCase {
 		items.add( item3 );
 
 		indexedEntity.setItemsWithFieldAnnotation( items );
-		
+
 		tx = hibernateSession.beginTransaction();
 		hibernateSession.save( indexedEntity );
 		tx.commit();
@@ -194,7 +194,7 @@ public class FieldOnCollectionReindexationTest extends SearchTestCase {
 
 		hibernateSession.close();
 	}
-	
+
 	@TestForIssue(jiraKey = "HSEARCH-1004")
 	public void testUpdatingElementCollectionWithFieldAnnotationReindexesEntity() {
 		Session hibernateSession = openSession();

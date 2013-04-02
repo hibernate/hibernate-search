@@ -38,11 +38,11 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Indexed
 @Entity
 public class Book implements TitleAble {
-	
+
 	private long id;
-	
+
 	private String title;
-	
+
 	private Nation firstPublishedIn;
 
 	@Id @GeneratedValue
@@ -69,7 +69,7 @@ public class Book implements TitleAble {
 	public Nation getFirstPublishedIn() {
 		return firstPublishedIn;
 	}
-	
+
 	public void setFirstPublishedIn(Nation firstPublishedIn) {
 		this.firstPublishedIn = firstPublishedIn;
 	}

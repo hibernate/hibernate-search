@@ -30,7 +30,7 @@ import org.jgroups.blocks.RequestHandler;
 
 /**
  * Delegate request to listener.
- * 
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
 class MessageListenerToRequestHandlerAdapter implements RequestHandler {

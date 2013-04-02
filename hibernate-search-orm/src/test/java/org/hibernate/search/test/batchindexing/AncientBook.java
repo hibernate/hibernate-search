@@ -35,7 +35,7 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Indexed
 public class AncientBook extends Book {
-	
+
 	public String catalogueGroupName = "";
 	public Set<String> alternativeTitles = new HashSet<String>();
 
@@ -51,9 +51,9 @@ public class AncientBook extends Book {
 	public Set<String> getAlternativeTitles() {
 		return alternativeTitles;
 	}
-	
+
 	public void setAlternativeTitles(Set<String> alternativeTitles) {
 		this.alternativeTitles = alternativeTitles;
 	}
-	
+
 }

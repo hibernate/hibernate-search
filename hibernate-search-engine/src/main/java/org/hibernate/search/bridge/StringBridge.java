@@ -34,7 +34,7 @@ package org.hibernate.search.bridge;
  * @author Emmanuel Bernard
  */
 public interface StringBridge {
-	
+
 	/**
 	 * Converts the object representation to a string.
 	 *

@@ -56,5 +56,5 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 			luceneOptions.addFieldToDocument( name, indexedString, document );
 		}
 	}
-	
+
 }

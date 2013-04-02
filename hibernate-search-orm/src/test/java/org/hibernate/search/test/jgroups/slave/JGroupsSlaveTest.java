@@ -54,7 +54,7 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 public class JGroupsSlaveTest extends SearchTestCase {
 
 	private Channel channel;
-	
+
 	/** makes sure that different tests don't join **/
 	private final String CHANNEL_NAME = UUID.randomUUID().toString();
 

@@ -43,7 +43,7 @@ public class Trash {
 	@DocumentId
 	@GeneratedValue
 	private Integer id;
-	
+
 	@Field
 	private String name;
 

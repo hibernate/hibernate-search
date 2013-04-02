@@ -38,7 +38,7 @@ public class Departments {
 	@Id
 	@GeneratedValue
 	private int deptsId;
-	
+
 	private String network;
 	private String manufacturer;
 	private String branchHead;

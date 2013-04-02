@@ -39,7 +39,7 @@ import java.text.ParseException;
 public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 
 	public static final String RESOLUTION_PARAMETER = "resolution";
-	
+
 	private DateTools.Resolution resolution;
 	public static final TwoWayStringBridge CALENDAR_YEAR = new CalendarBridge( Resolution.YEAR );
 	public static final TwoWayStringBridge CALENDAR_MONTH = new CalendarBridge( Resolution.MONTH );

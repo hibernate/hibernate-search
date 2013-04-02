@@ -118,7 +118,7 @@ public class LuceneIndexingParameters implements Serializable {
 				}
 			}
 		}
-		
+
 		/**
 		 * Creates a new LogByteSizeMergePolicy as configured by this property set.
 		 * @return a new LogByteSizeMergePolicy instance.

@@ -63,7 +63,7 @@ public class Entity2ForDoc0 {
 		this.name = name;
 	}
 
-	
+
 	public long getUid() {
 		return uid;
 	}

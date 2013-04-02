@@ -59,11 +59,11 @@ public class SearchMapping {
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping(name, tokenizerFactory, this);
 	}
-	
+
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping(entityType, this);
 	}
-	
+
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
 		return new FullTextFilterDefMapping(this, name, impl );
 	}
@@ -101,5 +101,5 @@ public class SearchMapping {
 	void addFulltextFilterDef(Map<String, Object> fullTextFilterDef) {
 		fullTextFilterDefs.add(fullTextFilterDef);
 	}
-	
+
 }

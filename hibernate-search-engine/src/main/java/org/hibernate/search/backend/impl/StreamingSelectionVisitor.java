@@ -43,14 +43,14 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Sanne Grinovero
  */
 public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperationSelectionDelegate> {
-	
+
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final AllSelectionDelegate allManagersDelegate = new AllSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
-	
+
 	public static final StreamingSelectionVisitor INSTANCE = new StreamingSelectionVisitor();
-	
+
 	private StreamingSelectionVisitor() {
 		// use INSTANCE as this delegator is stateless
 	}
@@ -58,7 +58,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	public StreamingOperationSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
-	
+
 	public StreamingOperationSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
@@ -93,7 +93,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 		}
 
 	}
-	
+
 	private static class DeleteSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		public final void performStreamOperation(LuceneWork work,
@@ -109,7 +109,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 		}
 
 	}
-	
+
 	private static class AllSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		public final void performStreamOperation(LuceneWork work,

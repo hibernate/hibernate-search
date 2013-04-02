@@ -129,7 +129,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.timeoutExceptionFactory = searchFactoryImplementor.getDefaultTimeoutExceptionFactory();
 	}
-	
+
 	public void afterDeserialise(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}

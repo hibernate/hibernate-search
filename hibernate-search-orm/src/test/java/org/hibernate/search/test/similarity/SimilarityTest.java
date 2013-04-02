@@ -99,7 +99,7 @@ public class SimilarityTest extends SearchTestCase {
 		s.close();
 
 	}
-	
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Trash.class,

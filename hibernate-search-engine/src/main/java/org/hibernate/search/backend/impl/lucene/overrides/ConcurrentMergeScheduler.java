@@ -46,12 +46,12 @@ public class ConcurrentMergeScheduler extends org.apache.lucene.index.Concurrent
 
 	private final ErrorHandler errorHandler;
 	private final String indexName;
-	
+
 	public ConcurrentMergeScheduler(ErrorHandler errorHandler, String indexName) {
 		this.errorHandler = errorHandler;
 		this.indexName = indexName;
 	}
-	
+
 	@Override
 	protected void handleMergeException(Throwable t) {
 		try {

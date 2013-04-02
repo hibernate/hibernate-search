@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -47,17 +47,17 @@ import static junit.framework.Assert.*;
 
 /**
  * ReaderProvider to inspect the type of FieldSelector being applied.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider implements ReaderProvider {
-	
+
 	private static volatile FieldSelector fieldSelector;
-	
+
 	public static void resetFieldSelector() {
 		fieldSelector = null;
 	}
-	
+
 	/**
 	 * Verifies the FieldSelector being used contains the listed fieldnames (and no more).
 	 * Note that DocumentBuilder.CLASS_FIELDNAME is always used.
@@ -89,11 +89,11 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			assertEquals( expectedFieldNames.length, fieldSelections.size() );
 		}
 	}
-	
+
 	public static void assertFieldSelectorDisabled() {
 		assertNull( FieldSelectorLeakingReaderProvider.fieldSelector );
 	}
-	
+
 	@Override
 	public IndexReader openIndexReader() {
 		IndexReader indexReader = super.openIndexReader();
@@ -108,7 +108,7 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 	 * - the last ones: can't delegate as the method is not visible
 	 */
 	private static class LeakingIndexReader extends IndexReader {
-		
+
 		private final IndexReader delegate;
 
 		LeakingIndexReader(IndexReader wrapped) {
@@ -235,7 +235,7 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		public Object getCoreCacheKey() {
 			return delegate.getCoreCacheKey();
 		}
-		
+
 		public Object getDeletesCacheKey() {
 			return delegate.getDeletesCacheKey();
 		}

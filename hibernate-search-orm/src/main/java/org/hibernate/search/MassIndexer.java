@@ -33,11 +33,11 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
  * data contained in the database.
  * This process is expensive: all indexed entities and their
  * indexedEmbedded properties are scrolled from database.
- * 
+ *
  * @author Sanne Grinovero
  */
 public interface MassIndexer {
-	
+
 	/**
 	 * Set the number of threads to be used to load
 	 * the root entities.
@@ -45,14 +45,14 @@ public interface MassIndexer {
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer threadsToLoadObjects(int numberOfThreads);
-	
+
 	/**
 	 * Sets the batch size used to load the root entities.
 	 * @param batchSize
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer batchSizeToLoadObjects(int batchSize);
-	
+
 	/**
 	 * Sets the number of threads used to load the lazy collections
 	 * related to the indexed entities.
@@ -60,7 +60,7 @@ public interface MassIndexer {
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer threadsForSubsequentFetching(int numberOfThreads);
-	
+
 	/**
 	 * Deprecated: value is ignored.
 	 * To have more threads working on the IndexWriter, use the worker.thread_pool.size
@@ -68,22 +68,22 @@ public interface MassIndexer {
 	 */
 	@Deprecated
 	MassIndexer threadsForIndexWriter(int numberOfThreads);
-	
+
 	/**
 	 * Override the default <code>MassIndexerProgressMonitor</code>.
-	 * 
+	 *
 	 * @param monitor this instance will receive updates about the massindexing progress.
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer progressMonitor(MassIndexerProgressMonitor monitor);
-	
+
 	/**
 	 * Sets the cache interaction mode for the data loading tasks.
 	 * Defaults to <tt>CacheMode.IGNORE</tt>.
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer cacheMode(CacheMode cacheMode);
-	
+
 	/**
 	 * If index optimization has to be started at the end
 	 * of the indexing process.
@@ -92,7 +92,7 @@ public interface MassIndexer {
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer optimizeOnFinish(boolean optimize);
-	
+
 	/**
 	 * If index optimization should be run before starting,
 	 * after the purgeAll. Has no effect if <tt>purgeAll</tt> is set to false.
@@ -101,7 +101,7 @@ public interface MassIndexer {
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer optimizeAfterPurge(boolean optimize);
-	
+
 	/**
 	 * If all entities should be removed from the index before starting
 	 * using purgeAll. Set it to false only if you know there are no
@@ -111,10 +111,10 @@ public interface MassIndexer {
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer purgeAllOnStart(boolean purgeAll);
-	
+
 	/**
 	 * EXPERIMENTAL method: will probably change
-	 * 
+	 *
 	 * Will stop indexing after having indexed a set amount of objects.
 	 * As a results the index will not be consistent
 	 * with the database: use only for testing on an (undefined) subset of database data.
@@ -131,7 +131,7 @@ public interface MassIndexer {
 	 * cancel() is currently not implemented.
 	 */
 	Future<?> start();
-	
+
 	/**
 	 * Starts the indexing process, and then block until it's finished.
 	 * Can be called only once.

@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -35,7 +35,7 @@ import org.junit.Test;
  * To verify a new instance of a SearchFactory is still able to deal with programmatic mapping
  * such as defined by SearchMapping @see {@link SearchMapping}, both initially and after triggering
  * an internal mutation of a MutableSearchFactory.
- * 
+ *
  * @author Sanne Grinovero
  * @since 4.1
  */

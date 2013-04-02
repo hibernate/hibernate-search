@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -36,21 +36,21 @@ import org.hibernate.annotations.Proxy;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
- * 
+ *
  * @author Tom Waterhouse
  */
 @Entity
 @Proxy(lazy = false)
 @Table(name="item")
 public class Item {
-	
+
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long itemId;
 
 	@OneToMany(mappedBy="item", cascade={ CascadeType.REMOVE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
 	private Set<CatalogItem> catalogItems = new HashSet<CatalogItem>();
-	
+
 	@Column(length = 255)
 	private String name;
 
@@ -72,7 +72,7 @@ public class Item {
 	public void setColor(String kind) {
 		this.color = kind;
 	}
-	
+
 	public Long getItemId() {
 		return itemId;
 	}

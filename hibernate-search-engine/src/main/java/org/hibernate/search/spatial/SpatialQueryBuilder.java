@@ -37,8 +37,8 @@ public abstract class SpatialQueryBuilder {
 	 * quad tree indexation to find candidate documents and filter its results
 	 * in radius range by a DistanceFilter
 	 *
-	 * @param latitude WGS84 latitude of the center of the search 
-	 * @param longitude WGS84 longitude of the center of the search 
+	 * @param latitude WGS84 latitude of the center of the search
+	 * @param longitude WGS84 longitude of the center of the search
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 *

@@ -36,7 +36,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
 /**
  * Shards an index containing data for multiple customers by customerID. customerID is
  * provided as a property on all indexes entities, and is also defined as a Filter.
- * 
+ *
  * The number of shards should be configured to be MAX(customerID).
  *
  * @author Chase Seibert
@@ -45,7 +45,7 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 
 	// stored IndexManagers in a array indexed by customerID
 	private IndexManager[] indexManagers;
-	
+
 	@Override
 	public void initialize(Properties properties, IndexManager[] indexManagers) {
 		this.indexManagers = indexManagers;
@@ -68,7 +68,7 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 	}
 
 	/**
-	 * Optimization; don't search ALL shards and union the results; in this case, we 
+	 * Optimization; don't search ALL shards and union the results; in this case, we
 	 * can be certain that all the data for a particular customer Filter is in a single
 	 * shard; simply return that shard by customerID.
 	 */

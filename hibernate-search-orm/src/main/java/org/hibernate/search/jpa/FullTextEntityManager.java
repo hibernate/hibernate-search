@@ -35,7 +35,7 @@ import org.hibernate.search.SearchFactory;
  * @author Emmanuel Bernard
  */
 public interface FullTextEntityManager extends EntityManager {
-	
+
 	/**
 	 * Create a fulltext query on top of a native Lucene query returning the matching objects
 	 * of type <code>entities</code> and their respective subclasses.
@@ -91,7 +91,7 @@ public interface FullTextEntityManager extends EntityManager {
 	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
 	 */
 	public void flushToIndexes();
-	
+
 	/**
 	 * Creates a MassIndexer to rebuild the indexes of some
 	 * or all indexed entity types.

@@ -38,43 +38,43 @@ import org.hibernate.search.annotations.Indexed;
 @Table(name = "PERSON_BROKEN_SSN")
 @Indexed
 public class PersonWithBrokenSocialSecurityNumber {
-	
+
 	private Long id;
 	private String name;
-	
+
 	public PersonWithBrokenSocialSecurityNumber() {
 	}
-	
+
 	public PersonWithBrokenSocialSecurityNumber(Long id, String name) {
 		this.id = id;
 		this.name = name;
 	}
-	
+
 	@Id
 	public Long getId() {
 		return id;
 	}
-	
+
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	@Field
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	@DocumentId
 	public String getSSN() {
 		// returning a constant to have changes overwrite each other in the test
 		return "100";
 	}
-	
+
 	public void setSSN(String securityNumber) {
 	}
-	
+
 }

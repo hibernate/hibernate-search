@@ -49,7 +49,7 @@ class Helper {
 	 */
 	static String getAnalyzedTerm(String fieldName, String value, String name, Analyzer queryAnalyzer, FieldContext fieldContext) {
 		if ( fieldContext.isIgnoreAnalyzer() ) return value;
-		
+
 		try {
 			final List<String> termsFromText = getAllTermsFromText(
 					fieldName, value.toString(), queryAnalyzer

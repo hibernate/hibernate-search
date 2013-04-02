@@ -38,7 +38,7 @@ public interface StatisticsImplementor {
 	 * @param time time in nanoseconds to load the objects
 	 */
 	void objectLoadExecuted(long numberOfObjectsLoaded, long time);
-	
+
 	/**
 	 * Callback for an executed Lucene search.
 	 *

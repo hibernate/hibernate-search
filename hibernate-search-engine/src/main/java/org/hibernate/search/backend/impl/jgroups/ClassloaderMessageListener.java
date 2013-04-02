@@ -32,7 +32,7 @@ import org.jgroups.MessageListener;
 
 /**
  * Wrap deserialization into explict CL TCCL.
- * 
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  * @author Sanne Grinovero
  */

@@ -49,7 +49,7 @@ public class NullEmbeddedTest extends SearchTestCase {
 		Puppy kittenOne = new Puppy( "kitten one" );
 		Puppy KittenTwo = new Puppy( "kitten two" );
 		cat.addPuppy( kittenOne ).addPuppy( KittenTwo );
-		
+
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( withoutPuppies );
@@ -95,7 +95,7 @@ public class NullEmbeddedTest extends SearchTestCase {
 		Puppy puppy1 = new Puppy( "puppy one" );
 		Puppy puppy2 = new Puppy( "puppy two" );
 		cat.addPuppy( puppy1 ).addPuppy( puppy2 );
-		
+
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( withPet );
@@ -107,7 +107,7 @@ public class NullEmbeddedTest extends SearchTestCase {
 		tx.commit();
 
 		List<Man> result = findNullsFor( s, "pet.puppies", "_null_" );
-		
+
 		assertEquals( "Wrong number of results found", 1, result.size() );
 		assertEquals( "Wrong result returned", withPet, result.get( 0 ) );
 
@@ -119,7 +119,7 @@ public class NullEmbeddedTest extends SearchTestCase {
 		s.delete( s.get( Pet.class, dog.getId() ) );
 		s.delete( s.get( Pet.class, cat.getId() ) );
 		s.delete( s.get( Puppy.class, puppy1.getId() ) );
-		s.delete( s.get( Puppy.class, puppy2.getId() ) );		
+		s.delete( s.get( Puppy.class, puppy2.getId() ) );
 		tx.commit();
 
 		s.close();
@@ -137,7 +137,7 @@ public class NullEmbeddedTest extends SearchTestCase {
 		Puppy puppy1 = new Puppy( "puppy one" );
 		Puppy puppy2 = new Puppy( "puppy two" );
 		cat.addPuppy( puppy1 ).addPuppy( puppy2 );
-		
+
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		s.persist( me );

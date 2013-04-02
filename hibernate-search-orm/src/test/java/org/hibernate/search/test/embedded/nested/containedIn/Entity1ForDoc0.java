@@ -57,7 +57,7 @@ public class Entity1ForDoc0 implements Serializable {
 	@org.hibernate.search.annotations.IndexedEmbedded
 	private java.util.List<Entity2ForDoc0> entities2 = new java.util.ArrayList<Entity2ForDoc0>();
 
-	
+
 	public long getUid() {
 		return uid;
 	}

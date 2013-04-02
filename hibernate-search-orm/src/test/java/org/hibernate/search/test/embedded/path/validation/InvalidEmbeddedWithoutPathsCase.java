@@ -33,7 +33,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
  * @author zkurey
- * 
+ *
  */
 @Entity
 @Indexed

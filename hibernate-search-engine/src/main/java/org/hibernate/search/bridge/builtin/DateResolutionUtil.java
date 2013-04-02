@@ -28,10 +28,10 @@ import org.apache.lucene.document.DateTools.Resolution;
 import org.hibernate.annotations.common.AssertionFailure;
 
 public class DateResolutionUtil {
-	
+
 	private DateResolutionUtil() {}
-	
-	
+
+
 	public static Resolution getLuceneResolution(org.hibernate.search.annotations.Resolution hibResolution) {
 		Resolution resolution = null;
 		switch (hibResolution) {

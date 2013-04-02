@@ -47,7 +47,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public abstract class AbstractJMSHibernateSearchController implements MessageListener {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	/**

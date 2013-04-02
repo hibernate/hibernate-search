@@ -65,7 +65,7 @@ import org.hibernate.type.Type;
  * <li>last()</li>
  * <li>first()</li>
  * </ul>
- * 
+ *
  * @see org.hibernate.Query
  *
  * @author Emmanuel Bernard
@@ -73,7 +73,7 @@ import org.hibernate.type.Type;
  * @author Sanne Grinovero
  */
 public class ScrollableResultsImpl implements ScrollableResults {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	private final int first;
@@ -82,13 +82,13 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	private final Loader loader;
 	private final DocumentExtractor documentExtractor;
 	private final SessionImplementor session;
-	
+
 	/**
 	 * Caches result rows and EntityInfo from
 	 * <code>first</code> to <code>max</code>
 	 */
 	private final LoadedObject[] resultsContext;
-	
+
 	private int current;
 
 	public ScrollableResultsImpl(int fetchSize, DocumentExtractor extractor,
@@ -135,7 +135,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		}
 		return resultsContext[ current - first ];
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -417,12 +417,12 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		}
 		return current >= first && current <= max;
 	}
-	
+
 	private final class LoadedObject {
-		
+
 		private Reference<Object[]> entity; //never==null but Reference.get can return null
 		private Reference<EntityInfo> einfo; //never==null but Reference.get can return null
-		
+
 		/**
 		 * Gets the objects from cache if it is available and attached to session,
 		 * or reload them and update the cache entry.
@@ -464,7 +464,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		}
 
 	}
-	
+
 	private boolean areAllEntitiesManaged(Object[] objects,	EntityInfo entityInfo) {
 		//check if all entities are session-managed and skip the check on projected values
 		org.hibernate.Session hibSession = (org.hibernate.Session) session;
@@ -482,5 +482,5 @@ public class ScrollableResultsImpl implements ScrollableResults {
 			return hibSession.contains( objects[0] );
 		}
 	}
-	
+
 }

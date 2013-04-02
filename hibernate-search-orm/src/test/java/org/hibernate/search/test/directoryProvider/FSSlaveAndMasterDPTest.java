@@ -171,7 +171,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	private Session getSlaveSession() {
 		return getSessionFactories()[1].openSession();
 	}
-	
+
 	static File prepareDirectories(String testId) {
 
 		String superRootPath = TestConstants.getIndexDirectory();
@@ -204,7 +204,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		if ( !slaveUnreadyFile.mkdirs() ) {
 			throw new HibernateException( "Unable to setup slave directory" );
 		}
-		
+
 		return root;
 	}
 

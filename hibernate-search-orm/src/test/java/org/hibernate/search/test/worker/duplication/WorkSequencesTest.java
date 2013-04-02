@@ -44,18 +44,18 @@ import org.hibernate.search.test.session.Domain;
  * queue are all executed; having special care about different entities
  * being deleted/persisted but sharing the same PK (to replace the old
  * instance with another one).
- * 
+ *
  * @author Sanne Grinovero
  */
 public class WorkSequencesTest extends SearchTestCase {
-	
+
 	private SearchFactory searchFactory;
 
 	public void testComplexTransactionSequence() throws IOException {
 		Session classicSession = openSession( );
 		FullTextSession session = Search.getFullTextSession( classicSession );
 		searchFactory = session.getSearchFactory();
-		
+
 		// create some different domains:
 		{
 			session.beginTransaction();
@@ -68,7 +68,7 @@ public class WorkSequencesTest extends SearchTestCase {
 		assertEquals( 2, countDomainsByFullText( "jboss" ) );
 		assertEquals( 1, countDomainsByFullText( "hibernate" ) );
 		assertEquals( 1, countDomainsByFullText( "geocities" ) );
-		
+
 		// now create some and delete others:
 		{
 			session.beginTransaction();
@@ -87,7 +87,7 @@ public class WorkSequencesTest extends SearchTestCase {
 		assertEquals( 1, countDomainsByFullText( "sun" ) );
 		assertEquals( 1, countDomainsByFullText( "mysql" ) );
 		assertEquals( 1, countDomainsByFullText( "oracle" ) );
-		
+
 		// use create/update/delete:
 		{
 			session.beginTransaction();
@@ -105,7 +105,7 @@ public class WorkSequencesTest extends SearchTestCase {
 		assertEquals( 1, countDomainsByFullText( "myhql" ) );
 		assertEquals( 1, countDomainsByFullText( "community" ) );
 		assertEquals( 0, countDomainsByFullText( "mysql" ) );
-		
+
 		// now creating and deleting the "same" (as by pk) entity several times in same transaction:
 		{
 			session.beginTransaction();
@@ -119,10 +119,10 @@ public class WorkSequencesTest extends SearchTestCase {
 			session.getTransaction().commit();
 		}
 		assertEquals( 1, countDomainsByFullText(  "somethingnew" ) );
-		
+
 		session.close();
 	}
-	
+
 	//helper method to verify how many instances are found in the index by doing a simple FT query
 	private int countDomainsByFullText(String name) throws IOException {
 		Query luceneQuery = new TermQuery( new Term( "name", name ) );
@@ -136,12 +136,12 @@ public class WorkSequencesTest extends SearchTestCase {
 			searchFactory.getIndexReaderAccessor().close( indexReader );
 		}
 	}
-	
+
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Domain.class
 		};
 	}
-	
+
 }

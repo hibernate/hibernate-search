@@ -259,7 +259,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	}
 
 	class InitTask extends TimerTask {
-	
+
 		@Override
 		public void run() {
 			try {
@@ -275,7 +275,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			}
 		}
 	}
-	
+
 	/**
 	 * @return true if both initialize and start succeeded
 	 */
@@ -316,7 +316,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				}
 			}
 		}
-		
+
 		public void stop() {
 			executor.shutdownNow();
 		}
@@ -412,7 +412,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		closeDirectory( directory1 );
 		closeDirectory( directory2 );
 	}
-	
+
 	private void closeDirectory(Directory directory) {
 		if ( directory != null ) {
 			try {
@@ -422,9 +422,9 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			}
 		}
 	}
-	
+
 	protected void scheduleTask(TimerTask task, long period) {
 		timer.schedule( task, period, period );
 	}
-	
+
 }

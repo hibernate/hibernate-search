@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -30,13 +30,13 @@ import org.hibernate.search.util.impl.HibernateHelper;
  * To be used for Hibernate initializations which don't need a specific Session.
  * {@link #initializeCollection(Collection)} and {@link #initializeMap(Map)}
  * are not supported.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class HibernateStatelessInitializer implements InstanceInitializer {
-	
+
 	public static final HibernateStatelessInitializer INSTANCE = new HibernateStatelessInitializer();
-	
+
 	protected HibernateStatelessInitializer() {
 		// should not create instances, but allow for extension
 	}

@@ -42,13 +42,13 @@ import org.hibernate.search.spi.ServiceProvider;
  *
  * The current list of methods are SPI compatible with Hibernate
  * Search version 4.1.0.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class SearchConfigurationContractTester extends SearchConfigurationBase implements SearchConfiguration {
 
 	//DON'T ADD NEW METHODS HERE - read file header first.
-	
+
 	@Override
 	public Iterator<Class<?>> getClassMappings() {
 		return null;

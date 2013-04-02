@@ -61,7 +61,7 @@ public class SearcherThread implements Runnable {
 
 	/**
 	 * Initialize with thread-id, queryString, indexSearcher
-	 * @param startSignal 
+	 * @param startSignal
 	 */
 	public SearcherThread(int threadId, String queryString, SessionFactory sf, IndexSearcher indexSearcher, boolean isLucene, CountDownLatch startSignal) {
 		this.isLucene = isLucene;
@@ -170,5 +170,5 @@ public class SearcherThread implements Runnable {
 	public synchronized void setTime(long time) {
 		this.time = time;
 	}
-	
+
 }

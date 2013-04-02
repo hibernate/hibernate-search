@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -30,11 +30,11 @@ import org.junit.Test;
 
 /**
  * Verifies the configured IndexManager implementation is used for each index
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class IndexManagerOverrideTest {
-	
+
 	@Test
 	public void verifyIndexExclusivity() {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();

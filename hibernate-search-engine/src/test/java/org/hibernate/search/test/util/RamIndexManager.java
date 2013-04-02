@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -39,7 +39,7 @@ import org.hibernate.search.spi.WorkerBuildContext;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class RamIndexManager extends DirectoryBasedIndexManager {
-	
+
 	private static final LogErrorHandler logErrorHandler = new LogErrorHandler();
 
 	public static RamIndexManager makeRamDirectory() {
@@ -49,7 +49,7 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		ramIndexManager.initialize( "testIndex", properties, new EmptyWorkerBuildContext() );
 		return ramIndexManager;
 	}
-	
+
 	private static class EmptyWorkerBuildContext implements WorkerBuildContext {
 
 		@Override

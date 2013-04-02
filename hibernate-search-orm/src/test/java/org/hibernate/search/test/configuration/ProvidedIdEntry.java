@@ -37,7 +37,7 @@ public class ProvidedIdEntry implements Serializable {
 	@Id
 	@GeneratedValue
 	private long id;
-	
+
 	private String name;
 	private String blurb;
 	private int age;

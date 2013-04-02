@@ -36,19 +36,19 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class QueryTimeoutException extends SearchException {
-	
+
 	public static final TimeoutExceptionFactory DEFAULT_TIMEOUT_EXCEPTION_FACTORY = new DefaultSearchTimeoutException();
-	
+
 	private QueryTimeoutException(String message, Query query) {
 		super( message + " \"" + query + '\"' );
 	}
-	
+
 	private static class DefaultSearchTimeoutException implements TimeoutExceptionFactory {
 
 		public QueryTimeoutException createTimeoutException(String message, Query query) {
 			return new QueryTimeoutException( message, query );
 		}
-		
+
 	}
 
 }

@@ -35,7 +35,7 @@ import org.hibernate.search.annotations.Indexed;
 @Indexed(index="DVDS")
 @Entity
 public class Dvd implements TitleAble {
-	
+
 	private long unusuallyNamedIdentifier;
 	private String title;
 	private Nation firstPublishedIn;
@@ -54,7 +54,7 @@ public class Dvd implements TitleAble {
 	public String getTitle() {
 		return title;
 	}
-	
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -63,9 +63,9 @@ public class Dvd implements TitleAble {
 	public Nation getFirstPublishedIn() {
 		return firstPublishedIn;
 	}
-	
+
 	public void setFirstPublishedIn(Nation firstPublishedIn) {
 		this.firstPublishedIn = firstPublishedIn;
 	}
-	
+
 }

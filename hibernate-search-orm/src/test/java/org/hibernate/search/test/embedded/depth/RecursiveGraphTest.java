@@ -45,11 +45,11 @@ import org.hibernate.search.test.util.LeakingLuceneBackend;
  * requested.
  * See the Genealogy graph at http://en.wikipedia.org/wiki/John,_King_of_England to visualize the data
  * used as test case.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class RecursiveGraphTest extends SearchTestCase {
-	
+
 	public void testCorrectDepthIndexed() {
 		prepareGenealogyTree();
 		verifyMatchExistsWithName( 1L, "name", "John of England" );
@@ -58,17 +58,17 @@ public class RecursiveGraphTest extends SearchTestCase {
 		verifyMatchExistsWithName( 1L, "parents.parents.name", "Geoffrey V of Anjou" );
 		verifyMatchExistsWithName( 2L, "parents.parents.name", "Fulk V of Anjou" );
 		verifyNoMatchExists( "parents.parents.parents.name", "Fulk V of Anjou" );
-		
+
 		LeakingLuceneBackend.reset();
 		renamePerson( 1L, "John Lackland" );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
 		assertEquals( 0, countWorksDoneOnPerson( 2L ) );
-		
+
 		LeakingLuceneBackend.reset();
 		renamePerson( 2L, "Henry II of New England" );
 		assertEquals( 1, countWorksDoneOnPerson( 1L ) );
 		assertEquals( 1, countWorksDoneOnPerson( 2L ) );
-		
+
 		LeakingLuceneBackend.reset();
 		renamePerson( 16L, "Fulk 4th of Anjou" );
 		assertEquals( 1, countWorksDoneOnPerson( 16L ) );
@@ -78,7 +78,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 		assertEquals( 0, countWorksDoneOnPerson( 2L ) );
 		assertEquals( 0, countWorksDoneOnPerson( 1L ) );
 	}
-	
+
 	/**
 	 * rename a person having id to a new name
 	 */
@@ -114,7 +114,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 			fullTextSession.close();
 		}
 	}
-	
+
 	void verifyMatchExistsWithName(Long expectedId, String fieldName, String fieldValue) {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
@@ -132,7 +132,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 			fullTextSession.close();
 		}
 	}
-	
+
 	void prepareGenealogyTree() {
 		Session session = openSession();
 		Transaction transaction = session.beginTransaction();
@@ -155,7 +155,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 		ps[15] = new Person( 15L, "Dangereuse de L'Isle Bouchard" );
 		ps[16] = new Person( 16L, "Fulk IV of Anjou" );
 		ps[17] = new Person( 17L, "Bertrade de Montfort" );
-		
+
 		ps[1].addParents( ps[2], ps[3] );
 		ps[2].addParents( ps[4], ps[5] );
 		ps[3].addParents( ps[6], ps[7] );
@@ -173,7 +173,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 			assertEquals( 1, countWorksDoneOnPerson( Long.valueOf( i ) ) );
 		}
 	}
-	
+
 	private int countWorksDoneOnPerson(Long pk) {
 		List<LuceneWork> processedQueue = LeakingLuceneBackend.getLastProcessedQueue();
 		int count = 0;
@@ -185,15 +185,15 @@ public class RecursiveGraphTest extends SearchTestCase {
 		}
 		return count;
 	}
-	
+
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class };
 	}
-	
+
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
 	}
-	
+
 }

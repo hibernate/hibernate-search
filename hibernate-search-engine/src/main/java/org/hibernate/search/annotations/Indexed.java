@@ -47,7 +47,7 @@ public @interface Indexed {
 	/**
 	 * Custom converter to change operations upon indexing
 	 * Useful for soft deletes and similar patterns
-	 * 
+	 *
 	 * @experimental : This feature is experimental
 	 */
 	Class<? extends EntityIndexingInterceptor> interceptor() default DefaultEntityInterceptor.class;

@@ -629,7 +629,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 155, value = "Unable to configure %1$s")
 	SearchException unableToConfigureTikaBridge(String bridgeName, @Cause Throwable e);
-	
+
 	@Message(id = 156, value = "Cannot read %1$s field from a %2$s object : does getter exists and is it public ?")
 	SearchException cannotReadFieldForClass(String fieldName, String className);
 

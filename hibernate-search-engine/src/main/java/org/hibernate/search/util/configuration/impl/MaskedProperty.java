@@ -56,7 +56,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class MaskedProperty extends Properties implements Serializable {
-	
+
 	private static final long serialVersionUID = -593307257383085113L;
 	private static final Log log = LoggerFactory.make();
 
@@ -64,7 +64,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	private final Properties fallBack;
 	private final String radix;
 	private transient Set<Object> propertyNames;
-	
+
 	/**
 	 * Provides a view to the provided Properties hiding
 	 * all keys not starting with some [mask.].
@@ -75,7 +75,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	public MaskedProperty(Properties propsToMask, String mask) {
 		this( propsToMask, mask, null );
 	}
-	
+
 	/**
 	 * Provides a view to the provided Properties hiding
 	 * all keys not starting with some [mask.].
@@ -93,7 +93,7 @@ public class MaskedProperty extends Properties implements Serializable {
 		this.radix = mask + ".";
 		this.fallBack = propsFallBack;
 	}
-	
+
 	@Override
 	public String getProperty(String key) {
 		String compositeKey = radix + key;
@@ -191,7 +191,7 @@ public class MaskedProperty extends Properties implements Serializable {
 		}
 		propertyNames = Collections.unmodifiableSet( maskedProperties );
 	}
-	
+
 	/**
 	 * @throws UnsupportedOperationException
 	 */
@@ -400,5 +400,5 @@ public class MaskedProperty extends Properties implements Serializable {
 			return false;
 		return true;
 	}
-	
+
 }

@@ -98,7 +98,7 @@ public @interface Spatial {
 	 * @return the mode used for Spatial indexing
 	 */
 	SpatialMode spatialMode() default SpatialMode.RANGE;
-	
+
 	/**
 	 * @return top range quad tree level for spatial indexing
 	 */

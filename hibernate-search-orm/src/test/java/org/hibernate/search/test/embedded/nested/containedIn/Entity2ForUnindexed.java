@@ -69,7 +69,7 @@ public class Entity2ForUnindexed {
 	 *
 	 * @return long : Renvoie uid.
 	 */
-	
+
 	public long getUid() {
 		return uid;
 	}

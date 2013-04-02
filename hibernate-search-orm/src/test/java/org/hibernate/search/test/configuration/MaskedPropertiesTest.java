@@ -62,7 +62,7 @@ public class MaskedPropertiesTest {
 		Properties newStyleTransaction = new MaskedProperty( transaction, "indexwriter", transaction );
 		Properties newStyleTransactionInShard2 = new MaskedProperty(
 				transactionInShard2, "indexwriter", transactionInShard2 );
-		
+
 		assertEquals( "7" , newStyleTransaction.getProperty( "max_field_length" ) );
 		assertEquals( "7" , newStyleTransactionInShard2.getProperty( "max_field_length" ) );
 		assertEquals( "5" , transaction.getProperty( "max_merge_docs" ) );
@@ -74,7 +74,7 @@ public class MaskedPropertiesTest {
 			System.out.println( propertyNames.nextElement() );
 		}
 	}
-	
+
 	@Test
 	public void testSerializability() throws IOException, ClassNotFoundException {
 		Properties cfg = new Properties();
@@ -85,7 +85,7 @@ public class MaskedPropertiesTest {
 		//this is also testing the logger (transient) has been restored:
 		assertEquals( "value", theCopy.getProperty( "key" ) );
 	}
-	
+
 	@Test
 	public void testListingKeys() {
 		Properties defaultProp = new Properties();
@@ -96,21 +96,21 @@ public class MaskedPropertiesTest {
 		Properties fallbackProp = new Properties();
 		fallbackProp.put( "default.long.dotted.prop3", "hello!" );
 		Properties masked = new MaskedProperty( rootProp, "some", fallbackProp );
-		
+
 		assertTrue( masked.keySet().contains( "long.dotted.prop1" ) );
 		assertTrue( masked.keySet().contains( "default.long.dotted.prop3" ) );
 		assertTrue( masked.keySet().contains( "inherited.prop" ) );
 		assertFalse( masked.keySet().contains( "hidden.long.dotted.prop2" ) );
 		assertFalse( masked.keySet().contains( "long.dotted.prop2" ) );
-		
+
 		Properties maskedAgain = new MaskedProperty( masked, "long.dotted", masked ); //falling back to same instance for **
 		assertTrue( maskedAgain.keySet().contains( "prop1" ) );
 		assertTrue( maskedAgain.keySet().contains( "long.dotted.prop1" ) ); //**: prop 1 should be visible in both ways
 		assertTrue( maskedAgain.keySet().contains( "default.long.dotted.prop3" ) );
-		
+
 		Properties maskingAll = new MaskedProperty( masked, "secured" );
 		assertTrue( maskingAll.keySet().isEmpty() );
 		assertTrue( maskingAll.isEmpty() );
 	}
-	
+
 }

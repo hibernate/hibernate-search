@@ -48,7 +48,7 @@ class BooleanQueryBuilder implements MustJunction {
 		clauses = new ArrayList<BooleanClause>(5);
 		queryCustomizer = new QueryCustomizer();
 	}
-	
+
 	public BooleanJunction not() {
 		final int lastIndex = clauses.size() -1;
 		final BooleanClause last = clauses.get(lastIndex);

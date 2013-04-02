@@ -224,7 +224,7 @@ public class MapBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned from a collection of Date", withoutNull.getName(), results.get( 0 )
 				.getName() );
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<MapBridgeTestEntity> findEmbeddedNullResults(String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
@@ -232,7 +232,7 @@ public class MapBridgeTest extends SearchTestCase {
 		Query query = queryBuilder.keyword().onField( fieldName ).ignoreAnalyzer().matching( value ).createQuery();
 		return fullTextSession.createFullTextQuery( query, MapBridgeTestEntity.class ).list();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<MapBridgeTestEntity> findResults(String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
