@@ -46,7 +46,7 @@ public enum WorkType {
 	 * class from an index.
 	 */
 	PURGE_ALL(false),
-	
+
 	/**
 	 * This type is used for batch indexing.
 	 */

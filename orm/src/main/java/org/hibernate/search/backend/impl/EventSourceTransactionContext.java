@@ -48,17 +48,17 @@ import org.hibernate.service.jta.platform.spi.JtaPlatform;
 
 /**
  * Implementation of the transactional context on top of an EventSource (Session)
- * 
+ *
  * @author Navin Surtani  - navin@surtani.org
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
 public class EventSourceTransactionContext implements TransactionContext, Serializable {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	private final EventSource eventSource;
-	
+
 	//this transient is required to break recursive serialization
 	private transient FullTextIndexEventListener flushListener;
 
@@ -68,7 +68,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	//will behave as "out of transaction" in the whole session lifespan.
 	private boolean realTxInProgress = false;
 	private boolean realTxInProgressInitialized = false;
-	
+
 	public EventSourceTransactionContext(EventSource eventSource) {
 		this.eventSource = eventSource;
 		this.flushListener = getIndexWorkFlushEventListener();
@@ -162,7 +162,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 		// either it is a real transaction, or if we are capable to manage this in the IndexWorkFlushEventListener
 		return getIndexWorkFlushEventListener() != null || isRealTransactionInProgress();
 	}
-	
+
 	private boolean isRealTransactionInProgress() {
 		if ( ! realTxInProgressInitialized ) {
 			realTxInProgress = eventSource.isTransactionInProgress();
@@ -220,5 +220,5 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			//do not delegate
 		}
 	}
-	
+
 }

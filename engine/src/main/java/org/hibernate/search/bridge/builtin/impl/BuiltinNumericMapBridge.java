@@ -25,7 +25,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 
 /**
  * It manages an {@link java.util.Map} object annotated with {@link org.hibernate.search.annotations.NumericField}
- * 
+ *
  * @author Davide D'Alto
  */
 public class BuiltinNumericMapBridge extends BuiltinMapBridge {

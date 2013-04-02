@@ -91,7 +91,7 @@ public abstract class ConfigurationParseHelper {
 		// Anywhere else we should look?
 		return url;
 	}
-	
+
 	/**
 	 * Parses a String to get an int value.
 	 *
@@ -112,7 +112,7 @@ public abstract class ConfigurationParseHelper {
 			}
 		}
 	}
-	
+
 	/**
 	 * Parses a String to get an long value.
 	 *
@@ -167,7 +167,7 @@ public abstract class ConfigurationParseHelper {
 			return parseLong( value, errorMsgOnParseFailure );
 		}
 	}
-	
+
 	/**
 	 * Looks for a numeric value in the Properties, returning
 	 * defValue if not found or if an empty string is found.

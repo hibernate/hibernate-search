@@ -36,11 +36,11 @@ import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 @Indexed(index="Email")
 @FullTextFilterDef(name="shard", impl= ShardSensitiveOnlyFilter.class)
 public class Email {
-	
+
 	@Id
 	@DocumentId
 	private Integer id;
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -48,7 +48,7 @@ public class Email {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
 	@Field
 	private String body;
 
@@ -58,6 +58,6 @@ public class Email {
 
 	public void setBody(String body) {
 		this.body = body;
-	}	
+	}
 
 }

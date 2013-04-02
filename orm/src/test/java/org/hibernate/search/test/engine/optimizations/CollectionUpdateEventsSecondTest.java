@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -40,7 +40,7 @@ import org.junit.Test;
 
 /**
  * Related to HSEARCH-782: make sure we don't unnecessarily index entities or load unrelated entities
- * 
+ *
  * @author Adam Harris
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -50,7 +50,7 @@ public class CollectionUpdateEventsSecondTest {
 
 	@Test
 	public void testScenario() {
-		
+
 		FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory();
 		try {
 			//check no operations are done:
@@ -129,7 +129,7 @@ public class CollectionUpdateEventsSecondTest {
 
 	/**
 	 * Initialize the test data.
-	 * 
+	 *
 	 * @param fulltextSessionBuilder
 	 */
 	private void initializeData(FullTextSessionBuilder fulltextSessionBuilder) {
@@ -194,7 +194,7 @@ public class CollectionUpdateEventsSecondTest {
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Location.class );
 		int resultSize = fullTextQuery.getResultSize();
 		transaction.commit();
-		
+
 		Assert.assertEquals( expectedFoundLocations, resultSize );
 	}
 

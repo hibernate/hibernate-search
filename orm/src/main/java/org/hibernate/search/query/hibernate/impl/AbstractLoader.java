@@ -70,7 +70,7 @@ public abstract class AbstractLoader implements Loader {
 		}
 
 		List loadedObjects = executeLoad( entityInfos );
-		
+
 		if ( takeTimings ) {
 			statisticsImplementor.objectLoadExecuted( loadedObjects.size(), System.nanoTime() - startTime );
 		}

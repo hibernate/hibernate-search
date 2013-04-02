@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -55,7 +55,7 @@ import org.junit.Test;
  * Note that filters operate on per-segment subreaders, while we usually expose
  * top level (recursive) global IndexReader views: this usually should not affect
  * their usage but is relevant to how we test them.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
  * @since 4.2
  */
@@ -153,7 +153,7 @@ public class FreshReadersProvidedTest {
 	/**
 	 * Verifies that the current RecordingFilter has been fed all the same sub-readers
 	 * which would be obtained from a freshly checked out IndexReader.
-	 * 
+	 *
 	 * @param filter
 	 */
 	private void checkFilterInspectedAllSegments(RecordingFilter filter) {

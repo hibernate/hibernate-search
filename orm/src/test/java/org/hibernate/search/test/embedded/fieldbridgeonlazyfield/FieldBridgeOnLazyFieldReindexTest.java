@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -40,7 +40,7 @@ public class FieldBridgeOnLazyFieldReindexTest extends SearchTestCase {
 	public void testFieldBridgeOnLazyFieldReindexTest() throws InterruptedException {
 		prepareEntities();
 		verifyMatchExistsWithName( "name", "name" );
-		
+
 		Session session = openSession();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		MassIndexer massIndexer = fullTextSession.createIndexer( Root.class );

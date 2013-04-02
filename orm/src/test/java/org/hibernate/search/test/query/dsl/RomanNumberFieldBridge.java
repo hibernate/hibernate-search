@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -23,7 +23,7 @@ import org.hibernate.search.bridge.StringBridge;
 
 /**
  * Example of a StringBridge expecting to be applied on numeric objects.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class RomanNumberFieldBridge implements StringBridge {
@@ -48,5 +48,5 @@ public class RomanNumberFieldBridge implements StringBridge {
 		// ... I bet someone has written a smarter converter
 		return null;
 	}
-	
+
 }

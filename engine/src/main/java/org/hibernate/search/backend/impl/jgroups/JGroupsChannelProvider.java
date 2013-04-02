@@ -140,7 +140,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	 * Reads configuration and builds channel with its base.
 	 * In order of preference - we first look for an external JGroups file, then a set of XML properties, and
 	 * finally the legacy JGroups String properties.
-	 * 
+	 *
 	 * @param props configuration file
 	 * @return the ChannelContainer to manage the JGroups JChannel
 	 */

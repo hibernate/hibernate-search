@@ -185,7 +185,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			final Object entity = event.getEntity();
 			if ( getDocumentBuilder( entity ) != null ) {
 				// FIXME The engine currently needs to know about details such as identifierRollbackEnabled
-				// but we should not move the responsibility to figure out the proper id to the engine  
+				// but we should not move the responsibility to figure out the proper id to the engine
 				boolean identifierRollbackEnabled = event.getSession()
 						.getFactory()
 						.getSettings()

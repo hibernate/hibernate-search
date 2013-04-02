@@ -57,7 +57,7 @@ public interface ProjectionConstants {
 	 * @experimental If you use this constant/feature, please speak up in the forum
 	 */
 	public String DOCUMENT_ID = "__HSearch_DocumentId";
-	
+
 	/**
 	 * Lucene {@link org.apache.lucene.search.Explanation} object describing the score computation for
 	 * the matching object/document

@@ -37,7 +37,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
 public class UpdateLuceneWork extends LuceneWork implements Serializable {
 
 	private static final long serialVersionUID = -5267394465359187688L;
-	
+
 	private final Map<String, String> fieldToAnalyzerMap;
 
 	public UpdateLuceneWork(Serializable id, String idInString, Class<?> entity, Document document) {
@@ -58,7 +58,7 @@ public class UpdateLuceneWork extends LuceneWork implements Serializable {
 	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
 		return visitor.getDelegate( this );
 	}
-	
+
 	@Override
 	public String toString() {
 		return "UpdateLuceneWork: " + this.getEntityClass().getName() + "#" + this.getIdInString();

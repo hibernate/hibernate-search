@@ -128,9 +128,9 @@ public abstract class MultipleSFTestCase extends TestCase {
 	public static SessionFactory[] getSessionFactories() {
 		return sessionFactories;
 	}
-	
+
 	public static Version getTargetLuceneVersion() {
 		return TestConstants.getTargetLuceneVersion();
 	}
-	
+
 }

@@ -42,32 +42,32 @@ public class SecurityFilterFactory {
 	private static final long serialVersionUID = -19238668272676998L;
 
 	private String ownerName;
-	
+
 	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
 	}
-	
+
 	@Factory
 	public Filter buildSecurityFilter() {
 		SecurityFilter securityFilter = new SecurityFilter(ownerName);
 		return new CachingWrapperFilter(securityFilter);
 	}
-	
+
 	@Key
 	public FilterKey getKey() {
 		StandardFilterKey key = new StandardFilterKey();
 		key.addParameter(ownerName);
 		return key;
 	}
-	
+
 	private static final class SecurityFilter extends Filter {
 		private static final long serialVersionUID = -5105989141875576599L;
 		private final String ownerName;
-		
+
 		private SecurityFilter(final String ownerName) {
 			this.ownerName = ownerName;
 		}
-		
+
 		public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 			OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
 			TermDocs termDocs = reader.termDocs( new Term( "owner", ownerName ) );
@@ -76,7 +76,7 @@ public class SecurityFilterFactory {
 			}
 			return bitSet;
 		}
-		
+
 	}
 
 }

@@ -39,7 +39,7 @@ import org.junit.Test;
 
 /**
  * Emulates a stress condition on the SharingBufferReaderProvider, to make sure index lifecycle is properly managed.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class SharingBufferIndexProviderTest {
@@ -52,7 +52,7 @@ public class SharingBufferIndexProviderTest {
 	private final AtomicInteger countDoneSearches = new AtomicInteger();
 	private final AtomicInteger countDoneIndexmods = new AtomicInteger();
 	private static final int SEARCHES_NUM = 10000;
-	
+
 	@Test
 	public void testStressingMock() throws InterruptedException {
 		readerProvider.initialize(null, null);
@@ -103,7 +103,7 @@ public class SharingBufferIndexProviderTest {
 			countDoneSearches.incrementAndGet();
 		}
 	}
-	
+
 	private class ChangeTask extends SearchTask {
 		public void run() {
 			super.run();
@@ -112,7 +112,7 @@ public class SharingBufferIndexProviderTest {
 			countDoneIndexmods.incrementAndGet();
 		}
 	}
-	
+
 	private class DirectorySwitchTask extends ChangeTask {
 		public void run() {
 			super.run();

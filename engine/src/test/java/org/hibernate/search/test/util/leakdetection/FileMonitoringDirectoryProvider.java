@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -26,7 +26,7 @@ import org.hibernate.search.store.impl.RAMDirectoryProvider;
 /**
  * This DirectoryProvider enables us to check that all files have been properly closed,
  * both after writes and reads.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class FileMonitoringDirectoryProvider extends RAMDirectoryProvider {

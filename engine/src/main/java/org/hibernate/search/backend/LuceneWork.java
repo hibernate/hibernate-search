@@ -77,7 +77,7 @@ public abstract class LuceneWork implements Serializable {
 	public String getIdInString() {
 		return idInString;
 	}
-	
+
 	public abstract <T> T getWorkDelegate(WorkVisitor<T> visitor);
 
 	public Map<String, String> getFieldToAnalyzerMap() {

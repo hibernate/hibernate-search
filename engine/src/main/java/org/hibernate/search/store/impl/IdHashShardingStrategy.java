@@ -34,11 +34,11 @@ import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * This implementation use idInString as the hashKey.
- * 
+ *
  * @author Emmanuel Bernard
  */
 public class IdHashShardingStrategy implements IndexShardingStrategy {
-	
+
 	private IndexManager[] providers;
 	public void initialize(Properties properties, IndexManager[] providers) {
 		this.providers = providers;

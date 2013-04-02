@@ -198,7 +198,7 @@ public abstract class SpatialHelper {
 	 * that are big enough to contain the search area but the smallest possible. By returning this level we ensure
 	 * 4 Quad Tree Cell maximum will be needed to cover the search area (2 max on each axis because of search area
 	 * crossing fixed bonds of the quad tree cells)
-	 * 
+	 *
 	 * @param searchRange
 	 *            search range to be covered by the quad tree cells
 	 * @return Return the best Quad Tree level for a given search radius.
@@ -213,7 +213,7 @@ public abstract class SpatialHelper {
 	/**
 	 * Project a degree latitude/longitude point into a sinusoidal projection planar space for quad tree cell ids
 	 * computation
-	 * 
+	 *
 	 * @param point
 	 *            point to be projected
 	 * @return array of projected coordinates

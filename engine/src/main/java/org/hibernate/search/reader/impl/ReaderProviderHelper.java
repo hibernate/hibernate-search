@@ -41,11 +41,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public abstract class ReaderProviderHelper {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	private static final Field subReadersField = getSubReadersField();
-	
+
 	private static Field getSubReadersField() {
 		try {
 			Field field = MultiReader.class.getDeclaredField( "subReaders" );
@@ -56,7 +56,7 @@ public abstract class ReaderProviderHelper {
 			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not available", e );
 		}
 	}
-	
+
 	public static IndexReader[] getSubReadersFromMultiReader(MultiReader parentReader) {
 		try {
 			return (IndexReader[]) subReadersField.get( parentReader );
@@ -64,7 +64,7 @@ public abstract class ReaderProviderHelper {
 			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not accessible", e );
 		}
 	}
-	
+
 	public static IndexReader buildMultiReader(int length, IndexReader[] readers, ReaderProvider[] managers) {
 		if ( length == 0 ) {
 			return null;

@@ -30,7 +30,6 @@ import org.jgroups.View;
 
 /**
  * Abstract away message submission.
- * e.g. either via channel directly or using message dispatcher
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */

@@ -33,7 +33,7 @@ import org.hibernate.search.annotations.Similarity;
 @Entity
 @Similarity(impl = DummySimilarity2.class)
 public class LittleTrash extends Trash {
-	
+
 	//extends Trash, but declares a different similarity
 
 }

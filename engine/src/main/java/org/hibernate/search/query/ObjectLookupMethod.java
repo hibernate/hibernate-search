@@ -35,7 +35,7 @@ public enum ObjectLookupMethod {
 	 * skip checking (default)
 	 */
 	SKIP,
-	
+
 	/**
 	 * check whether an object is already in the persistence context
 	 * before initializing it

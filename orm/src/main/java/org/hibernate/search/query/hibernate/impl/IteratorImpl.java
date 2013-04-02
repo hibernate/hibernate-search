@@ -32,7 +32,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 /**
  * @author Emmanuel Bernard
  */
-//TODO load the next batch-size elements to benefit from batch-size 
+//TODO load the next batch-size elements to benefit from batch-size
 public class IteratorImpl implements Iterator<Object> {
 
 	private final List<EntityInfo> entityInfos;

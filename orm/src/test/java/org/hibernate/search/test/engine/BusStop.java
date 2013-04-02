@@ -51,7 +51,7 @@ public class BusStop {
 	private String serviceComments = "nothing";
 	private Date startingDate = new Date();
 	private transient int numMethodCalls = 0;
-	
+
 	@Id
 	@GeneratedValue
 	public Long getId() {
@@ -80,7 +80,7 @@ public class BusStop {
 	public void setBusses(Set<BusLine> busses) {
 		this.busses = busses;
 	}
-	
+
 	public String getServiceComments() {
 		return serviceComments;
 	}
@@ -88,7 +88,7 @@ public class BusStop {
 	public void setServiceComments(String serviceComments) {
 		this.serviceComments = serviceComments;
 	}
-	
+
 	@Field
 	public Date getStartingDate() {
 		return startingDate;

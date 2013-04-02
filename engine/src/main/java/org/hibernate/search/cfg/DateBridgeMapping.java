@@ -32,7 +32,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Resolution;
 
 public class DateBridgeMapping {
-	
+
 	private final SearchMapping mapping;
 	private final Map<String, Object> resolution;
 	private EntityDescriptor entity;
@@ -49,8 +49,8 @@ public class DateBridgeMapping {
 		this.resolution.put("resolution", resolution);
 		property.setDateBridge(this.resolution);
 	}
-	
-	
+
+
 	public FieldMapping field() {
 		return new FieldMapping(property, entity, mapping);
 	}

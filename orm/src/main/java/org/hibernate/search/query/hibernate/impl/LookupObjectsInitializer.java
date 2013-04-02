@@ -39,11 +39,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class LookupObjectsInitializer implements ObjectsInitializer {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	public static final LookupObjectsInitializer INSTANCE = new LookupObjectsInitializer();
-	
+
 	private LookupObjectsInitializer() {
 		// use INSTANCE instead of constructor
 	}

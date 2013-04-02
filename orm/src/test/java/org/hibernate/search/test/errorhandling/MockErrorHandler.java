@@ -29,12 +29,12 @@ import org.hibernate.search.exception.impl.LogErrorHandler;
  * This is a LogErrorHandler used for testing only,
  * NOT to be used as a template or example for a real
  * error handler.
- * 
+ *
  * @author Sanne Grinovero
  * @since 3.2
  */
 public class MockErrorHandler extends LogErrorHandler {
-	
+
 	private volatile String errorMessage;
 	private volatile Throwable lastException;
 
@@ -47,7 +47,7 @@ public class MockErrorHandler extends LogErrorHandler {
 	public String getErrorMessage() {
 		return errorMessage;
 	}
-	
+
 	public Throwable getLastException() {
 		return lastException;
 	}

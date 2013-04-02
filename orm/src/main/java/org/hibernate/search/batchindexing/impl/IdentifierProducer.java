@@ -48,11 +48,11 @@ import org.hibernate.search.util.logging.impl.Log;
  * Produced identifiers are put in the destination queue grouped in List
  * instances: the reason for this is to load them in batches
  * in the next step and reduce contention on the queue.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class IdentifierProducer implements StatelessSessionAwareRunnable {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	private final ProducerConsumerQueue<List<Serializable>> destination;
@@ -89,7 +89,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 				this.idFetchSize = idFetchSize;
 				log.trace( "created" );
 	}
-	
+
 	public void run(StatelessSession upperSession) {
 		log.trace( "started" );
 		try {
@@ -131,20 +131,20 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			.setProjection( Projections.rowCount() )
 			.setCacheable( false )
 			.uniqueResult();
-		long totalCount = countAsNumber.longValue(); 
+		long totalCount = countAsNumber.longValue();
 		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
 			totalCount = objectsLimit;
 		}
 		if ( log.isDebugEnabled() )
 			log.debugf( "going to fetch %d primary keys", totalCount);
 		monitor.addToTotalCount( totalCount );
-		
+
 		Criteria criteria = session
 			.createCriteria( indexedType )
 			.setProjection( Projections.id() )
 			.setCacheable( false )
 			.setFetchSize( idFetchSize );
-		
+
 		ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY );
 		ArrayList<Serializable> destinationList = new ArrayList<Serializable>( batchSize );
 		long counter = 0;
@@ -154,7 +154,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 				destinationList.add( id );
 				if ( destinationList.size() == batchSize ) {
 					enqueueList( destinationList );
-					destinationList = new ArrayList<Serializable>( batchSize ); 
+					destinationList = new ArrayList<Serializable>( batchSize );
 				}
 				counter++;
 				if ( counter == totalCount ) {
@@ -167,7 +167,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		}
 		enqueueList( destinationList );
 	}
-	
+
 	private void enqueueList(final List<Serializable> idsList) throws InterruptedException {
 		if ( ! idsList.isEmpty() ) {
 			destination.put( idsList );

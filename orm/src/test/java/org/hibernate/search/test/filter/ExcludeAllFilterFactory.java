@@ -30,10 +30,10 @@ import org.hibernate.search.annotations.Factory;
  * @author Emmanuel Bernard
  */
 public class ExcludeAllFilterFactory {
-	
+
 	@Factory
 	public Filter getFilter() {
 		return new ExcludeAllFilter();
 	}
-	
+
 }

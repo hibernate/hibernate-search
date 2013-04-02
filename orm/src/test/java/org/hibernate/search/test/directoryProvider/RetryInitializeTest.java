@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -44,15 +44,15 @@ import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest
  * Verifies basic behavior of FSSlaveDirectoryProvider around
  * {@link org.hibernate.search.store.impl.DirectoryProviderHelper#getRetryInitializePeriod(java.util.Properties, String)}
  * (HSEARCH-323)
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class RetryInitializeTest {
-	
+
 	private FullTextSessionBuilder slave;
 	private FullTextSessionBuilder master;
 	private File root;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		root = FSSlaveAndMasterDPTest.prepareDirectories( getClass().getSimpleName() );
@@ -64,18 +64,18 @@ public class RetryInitializeTest {
 		if ( master != null ) master.close();
 		FSSlaveAndMasterDPTest.cleanupDirectories( root );
 	}
-	
+
 	@Test
 	public void testStandardInitialization() {
 		master = createMasterNode();
 		slave = createSlaveNode( false );
 	}
-	
+
 	@Test(expected=SearchException.class)
 	public void testInitiallyFailing() {
 		slave = createSlaveNode( false );
 	}
-	
+
 	@Test
 	public void testMasterDelayedInitialization() {
 		slave = createSlaveNode(true);
@@ -84,9 +84,9 @@ public class RetryInitializeTest {
 		Long scheduledPeriod = FSSlaveDirectoryProviderTestingExtension.taskScheduledPeriod;
 		assertNotNull( scheduledPeriod );
 		assertEquals( Long.valueOf( 12000L ), scheduledPeriod );
-		
+
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) slave.getSearchFactory();
-		
+
 		EntityIndexBinder snowIndexBinder = searchFactory.getIndexBindingForEntity( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
@@ -105,7 +105,7 @@ public class RetryInitializeTest {
 		directory = dp.getDirectory();
 		assertTrue( directory instanceof FSDirectory );
 	}
-	
+
 	private FullTextSessionBuilder createMasterNode() {
 		return new FullTextSessionBuilder()
 			.addAnnotatedClass( SnowStorm.class )
@@ -114,7 +114,7 @@ public class RetryInitializeTest {
 			.setProperty( "hibernate.search.default.directory_provider", "filesystem-master" )
 			.build();
 	}
-	
+
 	private FullTextSessionBuilder createSlaveNode(boolean enableRetryInitializePeriod) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 			.addAnnotatedClass( SnowStorm.class )

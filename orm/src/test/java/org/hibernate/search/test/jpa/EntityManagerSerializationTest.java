@@ -34,7 +34,7 @@ import org.hibernate.search.test.TestConstants;
 
 /**
  * Serialization test for entity manager. HSEARCH-117.
- * 
+ *
  * @author Hardy Ferentschik
  */
 public class EntityManagerSerializationTest extends JPATestCase {
@@ -42,7 +42,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	/**
 	 * Test that a entity manager can successfully be serialized and
 	 * deserialized.
-	 * 
+	 *
 	 * @throws Exception
 	 *             in case the test fails.
 	 */
@@ -66,7 +66,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	/**
 	 * Helper method for testing the entity manager before and after
 	 * serialization.
-	 * 
+	 *
 	 * @param em
 	 * @throws Exception
 	 */

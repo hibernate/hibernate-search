@@ -31,7 +31,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  * @author Emmanuel Bernard
  */
 public class DeleteLuceneWork extends LuceneWork implements Serializable {
-	
+
 	private static final long serialVersionUID = -854604138119230246L;
 
 	public DeleteLuceneWork(Serializable id, String idInString, Class<?> entity) {
@@ -42,10 +42,10 @@ public class DeleteLuceneWork extends LuceneWork implements Serializable {
 	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
 		return visitor.getDelegate( this );
 	}
-	
+
 	@Override
 	public String toString() {
 		return "DeleteLuceneWork: " + this.getEntityClass().getName() + "#" + this.getIdInString();
 	}
-	
+
 }

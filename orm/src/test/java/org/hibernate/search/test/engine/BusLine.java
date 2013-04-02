@@ -81,7 +81,7 @@ public class BusLine {
 	public void setStops(Set<BusStop> stops) {
 		this.stops = stops;
 	}
-	
+
 	public Integer getBusLineCode() {
 		return busLineCode;
 	}
@@ -89,7 +89,7 @@ public class BusLine {
 	public void setBusLineCode(Integer busLineCode) {
 		this.busLineCode = busLineCode;
 	}
-	
+
 	@Field
 	public boolean isOperating() {
 		return operating;

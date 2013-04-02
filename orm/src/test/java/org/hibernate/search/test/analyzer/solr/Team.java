@@ -178,7 +178,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 						@CharFilterDef(factory = MappingCharFilterFactory.class, params = {
 								@Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
 						})
-				},		
+				},
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class)
 		)
 })

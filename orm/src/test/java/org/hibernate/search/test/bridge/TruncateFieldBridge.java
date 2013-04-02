@@ -32,7 +32,7 @@ import org.hibernate.search.bridge.LuceneOptions;
  * @author Emmanuel Bernard
  */
 public class TruncateFieldBridge implements FieldBridge {
-	
+
 	public Object get(String name, Document document) {
 		Fieldable field = document.getFieldable( name );
 		return field.stringValue();
@@ -45,5 +45,5 @@ public class TruncateFieldBridge implements FieldBridge {
 			luceneOptions.addFieldToDocument( name, indexedString, document );
 		}
 	}
-	
+
 }

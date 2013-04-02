@@ -54,7 +54,7 @@ import org.hibernate.search.store.impl.RAMDirectoryProvider;
 /**
  * Testable extension of SharingBufferReaderProvider to make sure IndexReaders
  * are only opened when needed, and always correctly closed.
- * 
+ *
  * @see SharingBufferIndexProviderTest
  * @author Sanne Grinovero
  */
@@ -66,7 +66,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	private final RAMDirectoryProvider[] directories = new RAMDirectoryProvider[ NUM_DIRECTORY_PROVIDERS ];
 	private final AtomicInteger currentDirectoryIndex = new AtomicInteger();
 	private volatile RAMDirectoryProvider currentDirectory;
-	
+
 	public ExtendedSharingBufferReaderProvider() {
 		for ( int i = 0; i < NUM_DIRECTORY_PROVIDERS; i++ ) {
 			TestManipulatorPerDP tm = new TestManipulatorPerDP( i );
@@ -83,7 +83,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		private final AtomicBoolean isIndexReaderCurrent = new AtomicBoolean( false );//starts at true, see MockIndexReader constructor
 		private final AtomicBoolean isReaderCreated = new AtomicBoolean( false );
 		private final RAMDirectoryProvider dp = new RAMDirectoryProvider();
-		
+
 		TestManipulatorPerDP(int seed) {
 			dp.initialize( String.valueOf( seed ), null, null );
 		}
@@ -153,12 +153,12 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	public class MockDirectoryBasedIndexManager extends DirectoryBasedIndexManager {
 
 		private MockDirectoryProvider provider = new MockDirectoryProvider();
-		
+
 		@Override
 		public DirectoryProvider getDirectoryProvider() {
 			return provider;
 		}
-		
+
 	}
 
 	public class MockDirectoryProvider implements DirectoryProvider<RAMDirectory> {

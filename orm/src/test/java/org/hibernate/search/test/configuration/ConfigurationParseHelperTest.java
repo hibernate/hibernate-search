@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  * @author Sanne Grinovero
  */
 public class ConfigurationParseHelperTest {
-	
+
 	@Test
 	public void testIntegerParsers() {
 		assertEquals( 0, ConfigurationParseHelper.parseInt( "   0 ", "not important") );
@@ -53,7 +53,7 @@ public class ConfigurationParseHelperTest {
 		}
 		assertTrue( exceptionLaunched );
 	}
-	
+
 	@Test
 	public void testBooleanParsers() {
 		assertTrue( ConfigurationParseHelper.parseBoolean( "true", null ) );

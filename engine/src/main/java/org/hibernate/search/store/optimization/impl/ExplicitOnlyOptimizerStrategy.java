@@ -40,7 +40,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * This OptimizerStrategy will only optimize the index when forced to,
  * using an explicit invocation to {@link SearchFactory#optimize()} or
  * {@link SearchFactory#optimize(Class)}
- * 
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */

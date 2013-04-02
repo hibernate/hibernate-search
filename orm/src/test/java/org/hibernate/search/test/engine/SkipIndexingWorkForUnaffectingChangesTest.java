@@ -81,7 +81,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		busStop.setRoadName( "Mill Road" );
 		tx.commit();
 		Assert.assertEquals( 1, LeakingLuceneBackend.getLastProcessedQueue().size() );
-		
+
 		LeakingLuceneBackend.reset();
 		fullTextSession.clear();
 		tx = fullTextSession.beginTransaction();

@@ -57,7 +57,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 class DeleteWorkDelegate implements LuceneWorkDelegate {
 
-	private static final Log log = LoggerFactory.make();	
+	private static final Log log = LoggerFactory.make();
 	protected final Workspace workspace;
 
 	DeleteWorkDelegate(Workspace workspace) {

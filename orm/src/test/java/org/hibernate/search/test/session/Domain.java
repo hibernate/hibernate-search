@@ -41,9 +41,9 @@ public class Domain {
 	private Integer id;
 	@Field
 	private String name;
-	
+
 	public Domain(){ }
-	
+
 	public Domain(Integer id, String name) {
 		this.id = id;
 		this.name = name;

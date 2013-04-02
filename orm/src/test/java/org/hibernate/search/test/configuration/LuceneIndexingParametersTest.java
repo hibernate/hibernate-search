@@ -43,30 +43,30 @@ import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting
  * @author Sanne Grinovero
  */
 public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
-	
+
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		
+
 		cfg.setProperty( "hibernate.search.default.indexwriter.ram_buffer_size", "1" );
 		cfg.setProperty( "hibernate.search.default.indexwriter.use_compound_file", "false" );
 //set by super : cfg.setProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
 		cfg.setProperty( "hibernate.search.default.indexwriter.max_merge_docs", "9" );
 //set by super : cfg.setProperty( "hibernate.search.default.indexwriter.merge_factor", "100" );
-		
+
 		cfg.setProperty( "hibernate.search.Book.indexwriter.max_merge_docs", "12" );
 		cfg.setProperty( "hibernate.search.Book.indexwriter.use_compound_file", "false" );
 		cfg.setProperty( "hibernate.search.Book.indexwriter.merge_factor", "13" );
 		cfg.setProperty( "hibernate.search.Book.indexwriter.max_buffered_docs", "14" );
 		cfg.setProperty( "hibernate.search.Book.indexwriter.ram_buffer_size", "4" );
 		cfg.setProperty( "hibernate.search.Book.indexwriter.merge_max_optimize_size", "256");
-		
+
 		cfg.setProperty( "hibernate.search.Documents.indexwriter.ram_buffer_size", "default" );
 		cfg.setProperty( "hibernate.search.Documents.indexwriter.merge_factor", "6" );
 		cfg.setProperty( "hibernate.search.Documents.indexwriter.max_buffered_docs", "7" );
 		cfg.setProperty( "hibernate.search.Documents.indexwriter.max_merge_docs", "9" );
 		cfg.setProperty( "hibernate.search.Documents.indexwriter.max_field_length", "9" );
 	}
-	
+
 	public void testDefaultIndexProviderParameters() {
 		assertValueIsSet( Author.class, USE_COMPOUND_FILE, 0 );
 		assertValueIsSet( Author.class, RAM_BUFFER_SIZE, 1 );
@@ -74,7 +74,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Author.class, MAX_BUFFERED_DOCS,  1000 );
 		assertValueIsSet( Author.class, MERGE_FACTOR,  100 );
 	}
-	
+
 	public void testSpecificTypeParametersOverride() {
 		assertValueIsSet( Book.class, MAX_MERGE_DOCS, 12 );
 		assertValueIsSet( Book.class, MAX_BUFFERED_DOCS, 14 );
@@ -83,18 +83,18 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Book.class, RAM_BUFFER_SIZE, 4 );
 		assertValueIsSet( Book.class, MERGE_MAX_OPTIMIZE_SIZE, 256 );
 	}
-	
+
 	public void testDefaultKeywordOverwritesInherited() {
 		assertValueIsDefault( Document.class, RAM_BUFFER_SIZE );
 	}
-	
+
 	public void testSerializability() throws IOException, ClassNotFoundException {
 		LuceneIndexingParameters param = new LuceneIndexingParameters( new Properties() );
 		LuceneIndexingParameters paramCopy = (LuceneIndexingParameters)
 			SerializationTestHelper.duplicateBySerialization( param );
 		assertEquals( param.getIndexParameters(), paramCopy.getIndexParameters() );
 	}
-	
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,
@@ -102,5 +102,5 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 				Document.class
 		};
 	}
-	
+
 }

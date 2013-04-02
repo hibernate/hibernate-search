@@ -35,7 +35,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
- * 
+ *
  * @author Hardy Ferentschik
  */
 @Entity
@@ -45,17 +45,17 @@ public class StateCandidate implements Person {
 	@Id @GeneratedValue
 	@DocumentId
 	private int id;
-	
+
 	@Field
 	private String name;
-	
+
 	@OneToOne(cascade = CascadeType.ALL)
 	private Address address;
-	
+
 	@IndexedEmbedded
 	@OneToOne(cascade = CascadeType.ALL)
 	private State state;
-	
+
 	public State getState() {
 		return state;
 	}

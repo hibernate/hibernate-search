@@ -56,7 +56,7 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Hardy Ferentschik
  */
 public class StatisticsImpl implements Statistics, StatisticsImplementor {
-	
+
 	private AtomicLong searchQueryCount = new AtomicLong();
 	private AtomicLong searchExecutionTotalTime = new AtomicLong();
 	private AtomicLong searchExecutionMaxTime = new AtomicLong();

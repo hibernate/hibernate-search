@@ -31,7 +31,7 @@ import org.hibernate.search.test.SearchTestCase;
  * TestCase to verify proper management of saving of complex relations and collections. See HSEARCH-476
  */
 public class RecursiveGraphTest extends SearchTestCase {
-	
+
 	public void testCreateParentAndChild() throws Exception {
 		Person[] people = new Person[2];
 		Person parent = new Person();
@@ -44,14 +44,14 @@ public class RecursiveGraphTest extends SearchTestCase {
 		savePeople( people );
 		assertEquals( 2, getDocumentNbr( Person.class ) );
 	}
-	
+
 	private void connectChildToParent(Person child, Person parent) {
 		Event birthEvent = child.getBirthEvent();
 		child.setBirthEvent( birthEvent );
 		ParentOfBirthEvent parentOfBirthEvent = new ParentOfBirthEvent( parent, child.getBirthEvent() );
 		parent.getParentOfBirthEvents().add( parentOfBirthEvent );
 	}
-	
+
 	public void savePeople(Person... people) {
 		for ( Person person : people ) {
 			if ( person == null ) {
@@ -64,12 +64,12 @@ public class RecursiveGraphTest extends SearchTestCase {
 			s.close();
 		}
 	}
-	
+
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Event.class, Person.class, ParentOfBirthEvent.class };
 	}
-	
+
 	private int getDocumentNbr(Class type) throws Exception {
 		IndexReader reader = IndexReader.open( getDirectory( type ), false );
 		try {
@@ -79,5 +79,5 @@ public class RecursiveGraphTest extends SearchTestCase {
 			reader.close();
 		}
 	}
-	
+
 }

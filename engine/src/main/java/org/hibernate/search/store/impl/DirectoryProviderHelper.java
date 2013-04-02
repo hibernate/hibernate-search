@@ -153,7 +153,7 @@ public final class DirectoryProviderHelper {
 		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
 		try {
 			if ( ! IndexReader.indexExists( directory ) ) {
-				IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE ); 
+				IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE );
 				IndexWriter iw = new IndexWriter( directory, iwriterConfig );
 				iw.close();
 			}
@@ -278,11 +278,11 @@ public final class DirectoryProviderHelper {
 			);
 		}
 	}
-	
+
 	/**
 	 * @param properties the configuration of the DirectoryProvider
 	 * @param directoryProviderName the name of the DirectoryProvider, used for error reporting
-	 * @return The period in milliseconds to keep retrying initialization of a DirectoryProvider 
+	 * @return The period in milliseconds to keep retrying initialization of a DirectoryProvider
 	 */
 	static long getRetryInitializePeriod(Properties properties, String directoryProviderName) {
 		int retry_period_seconds = ConfigurationParseHelper.getIntValue( properties, RETRY_INITIALIZE_PROP_NAME, 0 );

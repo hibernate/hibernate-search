@@ -49,5 +49,5 @@ public class InvalidNonLeafUseCase {
 			"b.c"        // invalid path, dne doesn't exist
 	})
 	public A a;
-	
+
 }

@@ -48,7 +48,7 @@ public class Country {
 	}
 
 	private String name;
-	
+
 	@OneToMany(mappedBy = "country")
 	private Set<Address> addresses = new HashSet<Address>();
 
@@ -59,11 +59,11 @@ public class Country {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public void addAddress(Address address) {
 		addresses.add( address );
 	}
-	
+
 	public Set<Address> getAddresses() {
 		return this.addresses;
 	}

@@ -76,7 +76,7 @@ import org.hibernate.testing.SkipForDialect;
  */
 @SkipForDialect(comment="looks like a database deadlock", value=org.hibernate.dialect.SybaseASE15Dialect.class, jiraKey="HSEARCH-1107")
 public class WorkDoneOnEntitiesTest extends SearchTestCase {
-	
+
 	private Session session = null;
 
 	public void testEmployeesIndexingInDepth() throws Exception {
@@ -210,7 +210,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		ps[15] = new WorkingPerson( 15, "Dangereuse de L'Isle Bouchard" );
 		ps[16] = new WorkingPerson( 16, "Fulk IV of Anjou" );
 		ps[17] = new WorkingPerson( 17, "Bertrade de Montfort" );
-		
+
 		ps[18] = new WorkingPerson( 18, "Real estate director" );
 		ps[19] = new WorkingPerson( 19, "Financial Director" );
 		ps[20] = new WorkingPerson( 20, "Technical Manager" );
@@ -236,7 +236,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		ps[2].addEmployees( ps[24] );
 		ps[5].addEmployees( ps[25] );
 		ps[25].addEmployees( ps[26] );
-		
+
 		ps[18].addEmployees( ps[20], ps[21] );
 		ps[19].addEmployees( ps[22], ps[23] );
 
@@ -306,10 +306,10 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { WorkingPerson.class };
 	}
-	
+
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );
 	}
-	
+
 }

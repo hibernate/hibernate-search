@@ -505,7 +505,7 @@ public class LuceneQueryTest extends SearchTestCase {
 
 		result = hibQuery.list();
         assertTrue( "We should get the empty result list", result.isEmpty() );
-		
+
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
 			s.delete( element );

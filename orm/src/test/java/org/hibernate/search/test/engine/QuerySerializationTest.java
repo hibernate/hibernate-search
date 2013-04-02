@@ -46,7 +46,7 @@ import org.junit.Test;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class QuerySerializationTest extends SearchTestCase {
-	
+
 	@Test
 	public void testQueryObjectIsSerializable() throws IOException, ClassNotFoundException {
 		Session s = getSessions().openSession();
@@ -56,25 +56,25 @@ public class QuerySerializationTest extends SearchTestCase {
 		s.persist( document );
 		s.getTransaction().commit();
 		s.close();
-		
+
 		TermQuery query = new TermQuery( new Term( "Abstract", "hibernate" ) );
-		
+
 		FullTextSession fullTextSession = Search.getFullTextSession( s );
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
-		
+
 		//this is *not* the standard way to create a Query:
 		HSQuery hsQuery = searchFactory.createHSQuery().luceneQuery( query ).targetedEntities( new ArrayList<Class<?>>() );
 		int size = extractResultSize(hsQuery);
-		
+
 		assertEquals( "Should have found a match", 1, size );
-		
+
 		HSQuery hsQueryDuplicate = (HSQuery) SerializationTestHelper.duplicateBySerialization(hsQuery);
 		hsQueryDuplicate.afterDeserialise(searchFactory);
 		int sizeOfDuplicate = extractResultSize(hsQueryDuplicate);
-		
+
 		assertEquals( "Should have found a match", 1, sizeOfDuplicate );
 	}
-	
+
 	private int extractResultSize(HSQuery hsQuery) {
 		DocumentExtractor documentExtractor = hsQuery.queryDocumentExtractor();
 		TopDocs topDocs = documentExtractor.getTopDocs();

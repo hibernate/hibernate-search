@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -30,7 +30,7 @@ import org.hibernate.search.backend.LuceneWork;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class SingleTaskRunnable implements Runnable {
-	
+
 	private final LuceneWork work;
 	private final LuceneBackendResources resources;
 	private final IndexWriter indexWriter;

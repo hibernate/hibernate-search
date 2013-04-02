@@ -132,9 +132,9 @@ public class WorkDuplicationTest extends SearchTestCase {
 		person.addEmailAddress( emailAddress );
 
 		WorkQueue plannerEngine = new WorkQueue( searchFactory );
-		
+
 		plannerEngine.add( new Work<SpecialPerson>( person, 1, WorkType.ADD ) );
-		
+
 		plannerEngine.prepareWorkPlan();
 		List<LuceneWork> sealedQueue = plannerEngine.getSealedQueue();
 
@@ -148,8 +148,8 @@ public class WorkDuplicationTest extends SearchTestCase {
 		assertEquals("Jobs should have countered each other", 0, sealedQueue.size());
 
 		fullTextSession.close();
-	}	
-	
+	}
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
 	}

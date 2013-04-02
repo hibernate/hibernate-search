@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -25,20 +25,20 @@ import org.hibernate.search.store.impl.FSSlaveDirectoryProvider;
 
 /**
  * Extending FSSlaveDirectoryProvider to test it via static fields.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class FSSlaveDirectoryProviderTestingExtension extends FSSlaveDirectoryProvider {
-	
+
 	public static volatile TimerTask taskScheduled = null;
 	public static volatile Long taskScheduledPeriod = null;
-	
+
 	@Override
 	protected void scheduleTask(TimerTask task, long period) {
 		taskScheduled = task;
 		taskScheduledPeriod = Long.valueOf( period );
 	}
-	
+
 	void triggerTimerAction() {
 		super.attemptInitializeAndStart();
 	}

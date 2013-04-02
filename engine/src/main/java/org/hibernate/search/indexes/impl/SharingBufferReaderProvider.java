@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -72,7 +72,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 
 	private DirectoryProvider directoryProvider;
 	private String indexName;
-	
+
 	@Override
 	public IndexReader openIndexReader() {
 		log.debugf( "Opening IndexReader for directoryProvider %s", indexName );

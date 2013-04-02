@@ -45,25 +45,25 @@ public class FilterOnDirectoryTest extends SearchTestCase {
 		FullTextSession fts = Search.getFullTextSession( openSession() );
 		Transaction tx = fts.beginTransaction();
 		Query q = new TermQuery( new Term( "name", "doe" ) );
-		
+
 		assertEquals( 2, fts.createFullTextQuery( q ).getResultSize() );
 		assertEquals( 2, fts.createFullTextQuery( q, Detective.class, Suspect.class ).getResultSize() );
-		
+
 		FullTextQuery detectiveQuery = fts.createFullTextQuery( q, Detective.class );
 		assertEquals( 1, detectiveQuery.getResultSize() );
 		assertTrue( detectiveQuery.list().get(0) instanceof Detective );
-		
+
 		FullTextQuery suspectQuery = fts.createFullTextQuery( q, Suspect.class );
 		assertEquals( 1, suspectQuery.getResultSize() );
 		assertTrue( suspectQuery.list().get(0) instanceof Suspect );
-		
+
 		assertEquals( 2, fts.createFullTextQuery( q ).getResultSize() );
 		assertEquals( 2, fts.createFullTextQuery( q, Detective.class, Suspect.class ).getResultSize() );
-		
+
 		tx.commit();
 		fts.close();
 	}
-	
+
 	private void createDoeFamily() {
 		Session s = openSession( );
 		Transaction tx = s.beginTransaction();
@@ -82,7 +82,7 @@ public class FilterOnDirectoryTest extends SearchTestCase {
 		cfg.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getName() );
 	}
-	
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Detective.class,

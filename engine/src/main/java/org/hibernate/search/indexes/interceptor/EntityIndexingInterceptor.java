@@ -27,7 +27,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
  * Implementations must be thread safe and should have a no-arg constructor.
  *
  * Typical use case include so called soft deletes.
- * 
+ *
  * The interceptor is applied to a MassIndexer operation, but is ignored when using
  * the explicit indexing control API such <code>org.hibernate.search.FullTextSession.index(T)</code>
  * or <code>purge</code>, <purgeAll>.
@@ -42,7 +42,7 @@ public interface EntityIndexingInterceptor<T> {
 	 * Triggered when an entity instance T should be added to the index, either by an event listener or by the
 	 * MassIndexer.
 	 * This is not triggered by an explicit API call such as FullTextSession.index(T).
-	 * 
+	 *
 	 * @param entity
 	 *            The entity instance
 	 * @return Return {@link IndexingOverride#APPLY_DEFAULT} to have the instance be added to the index as normal; return a
@@ -52,7 +52,7 @@ public interface EntityIndexingInterceptor<T> {
 
 	/**
 	 * Triggered when an entity instance T should be updated in the index.
-	 * 
+	 *
 	 * @param entity
 	 *            The entity instance
 	 * @return Return {@link IndexingOverride#APPLY_DEFAULT} to have the instance removed and re-added to the index as
@@ -62,7 +62,7 @@ public interface EntityIndexingInterceptor<T> {
 
 	/**
 	 * Triggered when an entity instance T should be deleted from the index.
-	 * 
+	 *
 	 * @param entity
 	 *            The entity instance
 	 * @return Return {@link IndexingOverride#APPLY_DEFAULT} to have the instance removed from the index as normal;
@@ -74,7 +74,7 @@ public interface EntityIndexingInterceptor<T> {
 	 * A CollectionUpdate event is fired on collections included in an indexed entity, for example when using
 	 * {@link IndexedEmbedded} This event is triggered on each indexed domain instance T contained in such a collection;
 	 * this is generally similar to a {@link #onUpdate(Object)} event.
-	 * 
+	 *
 	 * @param entity
 	 *            The entity instance
 	 * @return Return {@link IndexingOverride#APPLY_DEFAULT} to have the instance removed and re-added to the index as

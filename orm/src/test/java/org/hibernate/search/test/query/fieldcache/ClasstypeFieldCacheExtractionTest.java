@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -46,21 +46,21 @@ import org.junit.Test;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class ClasstypeFieldCacheExtractionTest {
-	
+
 	@Test
 	public void testWithoutFieldCacheOnMixedIds() {
 		// no caches, mixed classes and multiple id fieldnames
 		Mapping.enableFieldCache = new FieldCacheType[0];
 		wrapper( true, "id", "addressId", ProjectionConstants.OBJECT_CLASS );
 	}
-	
+
 	@Test
 	public void testWithFieldCacheOnTypOnMixedIds() {
 		// multiple id fieldnames, multiple classes but cached
 		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS };
 		wrapper( true, "id", "addressId" );
 	}
-	
+
 	@Test
 	public void testWithFieldCacheOnTypeAndIdOnMixedIds() {
 		// works the same as CLASS because one of the entities uses a different fieldname
@@ -68,28 +68,28 @@ public class ClasstypeFieldCacheExtractionTest {
 		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS, FieldCacheType.ID };
 		wrapper( true, "id", "addressId" );
 	}
-	
+
 	@Test
 	public void testWithoutFieldCache() {
 		// single type: doesn't need classtype even without caches
 		Mapping.enableFieldCache = new FieldCacheType[0];
 		wrapper( false, "id" );
 	}
-	
+
 	@Test
 	public void testWithFieldCacheOnType() {
 		// single type: doesn't need classtype cache
 		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS };
 		wrapper( false, "id" );
 	}
-	
+
 	@Test
 	public void testWithFieldCacheOnTypeAndId() {
 		// nothing needs to be extracted, full cache
 		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS, FieldCacheType.ID };
 		wrapper( false );
 	}
-	
+
 	public void wrapper(boolean usingMixedIds, String... expectedLoadedFields) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		if ( usingMixedIds ) {
@@ -110,7 +110,7 @@ public class ClasstypeFieldCacheExtractionTest {
 			builder.close();
 		}
 	}
-	
+
 	private void performtest(FullTextSessionBuilder builder, String... expectedLoadedFields) {
 		QueryBuilder queryBuilder = builder.getSearchFactory().buildQueryBuilder().forEntity( Item.class ).get();
 		Query query = queryBuilder.all().createQuery();
@@ -140,7 +140,7 @@ public class ClasstypeFieldCacheExtractionTest {
 
 	// trick to perform the same test on three different configurations:
 	public static class Mapping {
-		
+
 		static FieldCacheType[] enableFieldCache;
 
 		@Factory
@@ -161,7 +161,7 @@ public class ClasstypeFieldCacheExtractionTest {
 						.cacheFromIndex( enableFieldCache );
 			return mapping;
 		}
-		
+
 	}
-	
+
 }

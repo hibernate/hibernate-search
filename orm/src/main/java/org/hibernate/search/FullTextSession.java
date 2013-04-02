@@ -34,7 +34,7 @@ import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
  * @author Emmanuel Bernard
  */
 public interface FullTextSession extends Session {
-	
+
 	/**
 	 * Create a fulltext query on top of a native Lucene query returning the matching objects
 	 * of type <code>entities</code> and their respective subclasses.
@@ -53,7 +53,7 @@ public interface FullTextSession extends Session {
 	 * Force the (re)indexing of a given <b>managed</b> object.
 	 * Indexation is batched per transaction: if a transaction is active, the operation
 	 * will not affect the index at least until commit.
-	 * 
+	 *
 	 * Any {@link EntityIndexingInterceptor} registered on the entity will be ignored:
 	 * this method forces an index operation.
 	 *

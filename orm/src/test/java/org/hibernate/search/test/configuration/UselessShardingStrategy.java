@@ -37,7 +37,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
  * @author Sanne Grinovero
  */
 public class UselessShardingStrategy implements IndexShardingStrategy {
-	
+
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return null;
 	}
@@ -69,7 +69,7 @@ public class UselessShardingStrategy implements IndexShardingStrategy {
 				counter++;
 			}
 		}
-		if (counter != 2) throw new IllegalStateException( "keySet() fails" );		
+		if (counter != 2) throw new IllegalStateException( "keySet() fails" );
 	}
 
 	private int checkEnumeration(Enumeration<?> propertyNames) {

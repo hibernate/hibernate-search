@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  * Similarity implementation.
  * Also when opening a multireader on multiple indexes, all of these should
  * use the same Similarity implementation.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class IllegalSimilarityConfigurationTest {
@@ -55,7 +55,7 @@ public class IllegalSimilarityConfigurationTest {
 		}
 		assertTrue( "A valid configuration could not be started.", configurationIsLegal );
 	}
-	
+
 	@Test
 	public void testInconsistentSimilarityInClassHierarchy() {
 		boolean configurationIsLegal = true;
@@ -74,7 +74,7 @@ public class IllegalSimilarityConfigurationTest {
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: same similarity"
 				+ " must be used across class hierarchy", configurationIsLegal );
 	}
-	
+
 	@Test
 	public void testInconsistentSimilarityInClassSharingAnIndex() {
 		boolean configurationIsLegal = true;
@@ -93,7 +93,7 @@ public class IllegalSimilarityConfigurationTest {
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: two entities"
 				+ "sharing the same index are using a different similarity", configurationIsLegal );
 	}
-	
+
 	@Test
 	public void testImplicitSimilarityInheritanceIsValid() {
 		boolean configurationIsLegal = true;
@@ -111,7 +111,7 @@ public class IllegalSimilarityConfigurationTest {
 		}
 		assertTrue( "Valid configuration could not be built", configurationIsLegal );
 	}
-	
+
 	@Test
 	public void testInvalidToOverrideParentsSimilarity() {
 		boolean configurationIsLegal = true;

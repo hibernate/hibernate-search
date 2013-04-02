@@ -36,7 +36,7 @@ import org.hibernate.search.test.SearchTestCase;
  * @author John Griffin
  */
 public class TermVectorTest extends SearchTestCase {
-   
+
    public void testPositionOffsets() throws Exception {
       FullTextSession s = Search.getFullTextSession(openSession());
       createIndex(s);
