@@ -183,7 +183,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 	public abstract void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge);
 
-	abstract protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context, PathsContext pathsContext);
+	protected abstract void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context, PathsContext pathsContext);
 
 	/**
 	 * In case of an indexed entity, return the value of it's identifier: what is marked as @Id or @DocumentId;
@@ -195,7 +195,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	 *
 	 * @throws IllegalStateException when used with a @ProvidedId annotated entity
 	 */
-	abstract public Serializable getId(Object entity);
+	public abstract Serializable getId(Object entity);
 
 	public boolean isRoot() {
 		return isRoot;

@@ -110,7 +110,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	// final because it's initialization should be published to other threads.
 	// ! update the readObject() method in case of name changes !
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
-	private transient final Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>(
+	private final transient Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>(
 			0
 	);
 

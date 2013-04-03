@@ -201,7 +201,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		return (AnalyzerDef) createAnnotation( analyzerDefAnnotation );
 	}
 
-	static private void addParamsToAnnotation(AnnotationDescriptor annotationDescriptor, Map.Entry<String, Object> entry) {
+	private static void addParamsToAnnotation(AnnotationDescriptor annotationDescriptor, Map.Entry<String, Object> entry) {
 		@SuppressWarnings("unchecked") Parameter[] paramsArray = createParams( (List<Map<String, Object>>) entry.getValue() );
 		annotationDescriptor.setValue( "params", paramsArray );
 	}
