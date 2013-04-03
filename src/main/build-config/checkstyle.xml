@@ -49,6 +49,7 @@
         <module name="GenericWhitespace" />
         <module name="PackageAnnotation" />
         <module name="CovariantEquals" />
+        <module name="ModifiedControlVariable" />
     </module>
 
     <module name="NewlineAtEndOfFile">
