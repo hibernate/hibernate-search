@@ -50,6 +50,12 @@
         <module name="PackageAnnotation" />
         <module name="CovariantEquals" />
         <module name="ModifiedControlVariable" />
+
+        <module name="MethodParamPad">
+            <property name="option" value="nospace" />
+            <property name="allowLineBreaks" value="false" />
+        </module>
+
     </module>
 
     <module name="NewlineAtEndOfFile">
