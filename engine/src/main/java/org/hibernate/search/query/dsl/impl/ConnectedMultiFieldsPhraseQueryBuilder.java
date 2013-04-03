@@ -105,8 +105,8 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 				}
 
 				if ( positionIncrement > 0 ) {
-					position+=positionIncrement;
-					termsAtSamePosition = termsPerPosition.get(position);
+					position += positionIncrement;
+					termsAtSamePosition = termsPerPosition.get( position );
 				}
 
 				if (termsAtSamePosition == null) {
@@ -172,7 +172,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 				query.setSlop(  phraseContext.getSlop() );
 				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
 					final List<Term> value = entry.getValue();
-					query.add( value.get(0), entry.getKey() );
+					query.add( value.get( 0 ), entry.getKey() );
 				}
 				perFieldQuery = query;
 			}

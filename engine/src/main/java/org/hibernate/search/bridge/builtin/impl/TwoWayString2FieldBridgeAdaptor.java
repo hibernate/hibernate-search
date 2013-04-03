@@ -54,7 +54,7 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 			return stringBridge.stringToObject( null );
 		}
 		else {
-			String stringValue = DocumentBuilderHelper.extractStringFromFieldable(field);
+			String stringValue = DocumentBuilderHelper.extractStringFromFieldable( field );
 			return stringBridge.stringToObject( stringValue );
 		}
 	}

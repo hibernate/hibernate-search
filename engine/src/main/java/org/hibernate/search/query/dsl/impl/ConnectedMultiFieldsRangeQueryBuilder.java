@@ -97,13 +97,13 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 
-		FieldBridge fieldBridge = documentBuilder.getBridge(fieldContext.getField());
+		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
 
 
 		final Object fromObject = rangeContext.getFrom();
 		final Object toObject = rangeContext.getTo();
 
-		if (fieldBridge!=null && NumericFieldBridge.class.isAssignableFrom(fieldBridge.getClass())) {
+		if ( fieldBridge != null && NumericFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 			perFieldQuery = NumericFieldUtils.createNumericRangeQuery(
 					fieldName,
 					fromObject,

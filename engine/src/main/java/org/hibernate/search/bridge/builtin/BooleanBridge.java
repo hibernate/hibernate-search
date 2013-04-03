@@ -34,7 +34,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 public class BooleanBridge implements TwoWayStringBridge {
 
 	public Boolean stringToObject(String stringValue) {
-		if ( StringHelper.isEmpty(stringValue) ) return null;
+		if ( StringHelper.isEmpty( stringValue ) ) return null;
 		return Boolean.valueOf( stringValue );
 	}
 

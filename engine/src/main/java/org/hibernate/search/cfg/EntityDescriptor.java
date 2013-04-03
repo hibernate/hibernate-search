@@ -119,7 +119,7 @@ public class EntityDescriptor {
 	}
 
 	public void addSpatial(Map<String,Object> spatial) {
-		spatials.add(spatial);
+		spatials.add( spatial );
 	}
 
 	public Set<Map<String, Object>> getSpatials() {

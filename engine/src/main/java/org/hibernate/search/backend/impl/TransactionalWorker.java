@@ -74,7 +74,7 @@ public class TransactionalWorker implements Worker {
 				&& factory.getDocumentBuilderContainedEntity( entityType ) == null ) {
 			throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityType );
 		}
-		work = interceptWork(indexBindingForEntity, work);
+		work = interceptWork( indexBindingForEntity, work );
 		if (work == null) {
 			//nothing to do
 			return;

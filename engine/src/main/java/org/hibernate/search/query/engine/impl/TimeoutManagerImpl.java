@@ -62,7 +62,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	}
 
 	public Long getTimeoutLeftInSeconds() {
-		return getTimeoutLeft(1000000000);
+		return getTimeoutLeft( 1000000000 );
 	}
 
 	private Long getTimeoutLeft(long factor) {

@@ -60,7 +60,7 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 	}
 
 	public PhraseTermination sentence(String sentence) {
-		phraseContext.setSentence(sentence);
+		phraseContext.setSentence( sentence );
 		return new ConnectedMultiFieldsPhraseQueryBuilder( phraseContext, queryCustomizer, fieldContexts, queryContext );
 	}
 

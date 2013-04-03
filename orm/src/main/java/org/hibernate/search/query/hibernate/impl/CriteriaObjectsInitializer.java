@@ -99,7 +99,7 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 			Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
 			if ( timeLeftInSecond != null ) {
 				if (timeLeftInSecond == 0) {
-					timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting(null);
+					timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting( null );
 				}
 				criteria.setTimeout( timeLeftInSecond.intValue() );
 			}

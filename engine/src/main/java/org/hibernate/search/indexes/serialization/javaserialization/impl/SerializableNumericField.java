@@ -27,6 +27,7 @@ import org.hibernate.search.indexes.serialization.spi.SerializableStore;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public abstract class SerializableNumericField implements SerializableFieldable {
+
 	private String name;
 	private int precisionStep;
 	private SerializableStore store;

@@ -60,7 +60,7 @@ public class ProjectionLoader implements Loader {
 					 ObjectLoaderBuilder loaderBuilder,
 					 String[] aliases,
 					 TimeoutManager timeoutManager) {
-		init(session, searchFactoryImplementor, null, timeoutManager); //TODO why do we call this method?
+		init( session, searchFactoryImplementor, null, timeoutManager ); // TODO why do we call this method?
 		this.transformer = transformer;
 		this.aliases = aliases;
 		this.loaderBuilder = loaderBuilder;
@@ -74,7 +74,7 @@ public class ProjectionLoader implements Loader {
 			entityInfo.populateWithEntityInstance( entityInstance );
 		}
 		if ( transformer != null ) {
-			return transformer.transformTuple(entityInfo.getProjection(), aliases);
+			return transformer.transformTuple( entityInfo.getProjection(), aliases );
 		}
 		else {
 			return entityInfo.getProjection();
@@ -82,7 +82,7 @@ public class ProjectionLoader implements Loader {
 	}
 
 	public Object loadWithoutTiming(EntityInfo entityInfo) {
-		throw new AssertionFailure("This method is not meant to be used on ProjectionLoader");
+		throw new AssertionFailure( "This method is not meant to be used on ProjectionLoader" );
 	}
 
 	private boolean projectionEnabledOnThis(final EntityInfo entityInfo) {
@@ -95,22 +95,22 @@ public class ProjectionLoader implements Loader {
 
 	public List load(EntityInfo... entityInfos) {
 		//no need to timeouManage here, the underlying loader is the real time consumer
-		List results = new ArrayList(entityInfos.length);
+		List results = new ArrayList( entityInfos.length );
 		if (entityInfos.length == 0) {
 			return results;
 		}
 
 		if ( projectionEnabledOnThis( entityInfos[0] ) ) {
 			Loader objectLoader = getObjectLoader();
-			objectLoader.load(entityInfos); // load by batch
-			for (EntityInfo entityInfo : entityInfos) {
+			objectLoader.load( entityInfos ); // load by batch
+			for ( EntityInfo entityInfo : entityInfos ) {
 				final Object entityInstance = objectLoader.loadWithoutTiming( entityInfo );
 				entityInfo.populateWithEntityInstance( entityInstance );
 			}
 		}
-		for (EntityInfo entityInfo : entityInfos) {
-			if (transformer != null) {
-				results.add( transformer.transformTuple(entityInfo.getProjection(), aliases) );
+		for ( EntityInfo entityInfo : entityInfos ) {
+			if ( transformer != null ) {
+				results.add( transformer.transformTuple( entityInfo.getProjection(), aliases ) );
 			}
 			else {
 				results.add( entityInfo.getProjection() );

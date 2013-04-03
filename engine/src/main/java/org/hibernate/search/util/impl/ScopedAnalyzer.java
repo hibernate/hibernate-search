@@ -84,7 +84,7 @@ public final class ScopedAnalyzer extends Analyzer {
 	}
 
 	private Analyzer getAnalyzer( String fieldName ) {
-		Analyzer analyzer = scopedAnalyzers.get(fieldName);
+		Analyzer analyzer = scopedAnalyzers.get( fieldName );
 		if ( analyzer == null ) {
 			analyzer = globalAnalyzer;
 		}

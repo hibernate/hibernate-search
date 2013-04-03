@@ -77,23 +77,23 @@ public class SpatialFieldBridgeByQuadTree extends SpatialFieldBridge implements 
 
 			if ( ( latitude != null ) && ( longitude != null ) ) {
 
-				if (quadTreeIndex) {
+				if ( quadTreeIndex ) {
 					Point point = Point.fromDegrees( latitude, longitude );
 
 					for ( int i = topQuadTreeLevel; i <= bottomQuadTreeLevel; i++ ) {
-						luceneOptions.addFieldToDocument( SpatialHelper.formatFieldName(i, name), SpatialHelper.getQuadTreeCellId(point, i), document );
+						luceneOptions.addFieldToDocument( SpatialHelper.formatFieldName( i, name ), SpatialHelper.getQuadTreeCellId( point, i ), document );
 					}
 				}
 
 				if ( numericFieldsIndex ) {
 					luceneOptions.addNumericFieldToDocument(
-							SpatialHelper.formatLatitude(name),
+							SpatialHelper.formatLatitude( name ),
 							latitude,
 							document
 					);
 
 					luceneOptions.addNumericFieldToDocument(
-							SpatialHelper.formatLongitude(name),
+							SpatialHelper.formatLongitude( name ),
 							longitude,
 							document
 					);

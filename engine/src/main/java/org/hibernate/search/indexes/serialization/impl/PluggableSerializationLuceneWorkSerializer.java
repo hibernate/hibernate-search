@@ -84,17 +84,17 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 					serializer.addPurgeAll( work.getEntityClass().getName() );
 				}
 				else if (work instanceof DeleteLuceneWork) {
-					processId(work, serializer);
+					processId( work, serializer );
 					serializer.addDelete( work.getEntityClass().getName() );
 				}
 				else if (work instanceof AddLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
-					processId(work, serializer);
+					processId( work, serializer );
 					serializer.addAdd( work.getEntityClass().getName(),  work.getFieldToAnalyzerMap() );
 				}
 				else if (work instanceof UpdateLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
-					processId(work, serializer);
+					processId( work, serializer );
 					serializer.addUpdate( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
 				}
 			}

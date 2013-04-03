@@ -70,7 +70,7 @@ public class ConnectedSpatialContext implements SpatialContext {
 
 	@Override
 	public SpatialContext filteredBy(Filter filter) {
-		queryCustomizer.filteredBy(filter);
+		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 }

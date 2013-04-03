@@ -115,7 +115,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 			return;
 		}
 		finally {
-			cleanSessionIfNeeded(session);
+			cleanSessionIfNeeded( session );
 		}
 	}
 

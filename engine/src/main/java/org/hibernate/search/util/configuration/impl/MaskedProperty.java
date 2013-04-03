@@ -176,7 +176,7 @@ public class MaskedProperty extends Properties implements Serializable {
 			if ( String.class.isInstance( key ) ) {
 				String maskedProperty = (String) key;
 				if ( maskedProperty.startsWith( radix ) ) {
-					maskedProperties.add(maskedProperty.substring( radix.length(), maskedProperty.length() ) );
+					maskedProperties.add( maskedProperty.substring( radix.length(), maskedProperty.length() ) );
 				}
 			}
 		}

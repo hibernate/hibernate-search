@@ -142,11 +142,11 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 	}
 
 	private TransactionManager getTransactionManager() {
-		return factory.getServiceRegistry().getService(JtaPlatform.class).retrieveTransactionManager();
+		return factory.getServiceRegistry().getService( JtaPlatform.class ).retrieveTransactionManager();
 	}
 
 	boolean wrapInTransaction() {
-		final TransactionFactory transactionFactory = factory.getServiceRegistry().getService(TransactionFactory.class);
+		final TransactionFactory transactionFactory = factory.getServiceRegistry().getService( TransactionFactory.class );
 		if ( !transactionFactory.compatibleWithJtaSynchronization() ) {
 			//Today we only require a TransactionManager on JTA based transaction factories
 			log.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );

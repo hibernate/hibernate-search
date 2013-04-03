@@ -40,7 +40,7 @@ public class AnalyzerDefMapping {
 	AnalyzerDefMapping(String name, Class<? extends TokenizerFactory> tokenizerFactory, SearchMapping mapping) {
 		this.mapping = mapping;
 		this.analyzerDef = new HashMap<String, Object>();
-		mapping.addAnalyzerDef(analyzerDef);
+		mapping.addAnalyzerDef( analyzerDef );
 		analyzerDef.put( "name", name );
 		tokenizer = new HashMap<String, Object>();
 		tokenizer.put( "factory", tokenizerFactory );
@@ -51,9 +51,9 @@ public class AnalyzerDefMapping {
 	 * {@code &#064;TokenizerDef(, ... params={&#064;Parameter(name="name", value="value"), ...}) }
 	 */
 	public AnalyzerDefMapping tokenizerParam(String name, String value) {
-		Map<String, Object> param = SearchMapping.addElementToAnnotationArray(tokenizer, "params");
-		param.put("name", name);
-		param.put("value", value);
+		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( tokenizer, "params" );
+		param.put( "name", name );
+		param.put( "value", value );
 		return this;
 	}
 
@@ -61,15 +61,15 @@ public class AnalyzerDefMapping {
 	 * {@code &#064;TokenFilterDef(factory=factory) }
 	 */
 	public TokenFilterDefMapping filter(Class<? extends TokenFilterFactory> factory) {
-		return new TokenFilterDefMapping(factory, analyzerDef, mapping);
+		return new TokenFilterDefMapping( factory, analyzerDef, mapping );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType,mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 
 }

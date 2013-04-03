@@ -68,7 +68,7 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	}
 
 	public String getProperty(String propertyName) {
-		return properties.getProperty(propertyName );
+		return properties.getProperty( propertyName );
 	}
 
 	public Properties getProperties() {

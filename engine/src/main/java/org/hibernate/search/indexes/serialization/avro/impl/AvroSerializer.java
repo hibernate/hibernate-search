@@ -192,7 +192,7 @@ public class AvroSerializer implements Serializer {
 			encoder.flush();
 		}
 		catch ( IOException e ) {
-			throw log.unableToSerializeInAvro(e);
+			throw log.unableToSerializeInAvro( e );
 		}
 		return out.toByteArray();
 	}
@@ -280,7 +280,7 @@ public class AvroSerializer implements Serializer {
 			for(AttributeImpl attr : attrs) {
 				elements.add( buildAttributeImpl( attr ) );
 			}
-			value.add(elements);
+			value.add( elements );
 		}
 		field.put( "value", value );
 		field.put( "termVector", context.getTermVector() );
@@ -301,48 +301,48 @@ public class AvroSerializer implements Serializer {
 		else if (attr instanceof CharTermAttributeImpl) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "CharTermAttribute" ) );
 			CharTermAttribute charAttr = (CharTermAttribute) attr;
-			record.put("sequence", charAttr.toString() );
+			record.put( "sequence", charAttr.toString() );
 			return record;
 		}
 		else if (attr instanceof PayloadAttribute) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "PayloadAttribute" ) );
 			PayloadAttribute payloadAttr = (PayloadAttribute) attr;
-			record.put("payload", ByteBuffer.wrap( payloadAttr.getPayload().toByteArray() ) );
+			record.put( "payload", ByteBuffer.wrap( payloadAttr.getPayload().toByteArray() ) );
 			return record;
 		}
 		else if (attr instanceof KeywordAttribute) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "KeywordAttribute" ) );
 			KeywordAttribute narrowedAttr = (KeywordAttribute) attr;
-			record.put("isKeyword", narrowedAttr.isKeyword() );
+			record.put( "isKeyword", narrowedAttr.isKeyword() );
 			return record;
 		}
 		else if (attr instanceof PositionIncrementAttribute ) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "PositionIncrementAttribute" ) );
 			PositionIncrementAttribute narrowedAttr = (PositionIncrementAttribute) attr;
-			record.put("positionIncrement", narrowedAttr.getPositionIncrement() );
+			record.put( "positionIncrement", narrowedAttr.getPositionIncrement() );
 			return record;
 		}
 		else if (attr instanceof FlagsAttribute ) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "FlagsAttribute" ) );
 			FlagsAttribute narrowedAttr = (FlagsAttribute) attr;
-			record.put("flags", narrowedAttr.getFlags() );
+			record.put( "flags", narrowedAttr.getFlags() );
 			return record;
 		}
 		else if (attr instanceof TypeAttribute ) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "TypeAttribute" ) );
 			TypeAttribute narrowedAttr = (TypeAttribute) attr;
-			record.put("type", narrowedAttr.type() );
+			record.put( "type", narrowedAttr.type() );
 			return record;
 		}
 		else if (attr instanceof OffsetAttribute ) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "OffsetAttribute" ) );
 			OffsetAttribute narrowedAttr = (OffsetAttribute) attr;
-			record.put("startOffset", narrowedAttr.startOffset() );
-			record.put("endOffset", narrowedAttr.endOffset() );
+			record.put( "startOffset", narrowedAttr.startOffset() );
+			record.put( "endOffset", narrowedAttr.endOffset() );
 			return record;
 		}
 		else if (attr instanceof Serializable) {
-			return ByteBuffer.wrap( toByteArray(attr) );
+			return ByteBuffer.wrap( toByteArray( attr ) );
 		}
 		else {
 			throw log.attributeNotRecognizedNorSerializable( attr.getClass() );

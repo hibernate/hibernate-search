@@ -84,10 +84,10 @@ public class AvroDeserializer implements Deserializer {
 		}
 
 		Decoder decoder = DecoderFactory.get().binaryDecoder( inputStream, null );
-		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>( protocol.getType("Message") );
+		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>( protocol.getType( "Message" ) );
 		GenericRecord result;
 		try {
-			result = reader.read(null, decoder);
+			result = reader.read( null, decoder );
 		}
 		catch ( IOException e ) {
 			throw log.unableToDeserializeAvroStream( e );
@@ -105,7 +105,7 @@ public class AvroDeserializer implements Deserializer {
 				hydrator.addPurgeAllLuceneWork( asClass( operation, "class" ) );
 			}
 			else if ( "Delete".equals( schema ) ) {
-				processId(operation, hydrator);
+				processId( operation, hydrator );
 				hydrator.addDeleteLuceneWork(
 						asClass( operation, "class" ), conversionContext
 				);
@@ -113,7 +113,7 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "Add".equals( schema ) ) {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
 				Map<String, String> analyzers = getAnalyzers( operation );
-				processId(operation, hydrator);
+				processId( operation, hydrator );
 				hydrator.addAddLuceneWork(
 						asClass( operation, "class" ),
 						analyzers,
@@ -123,7 +123,7 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "Update".equals( schema ) ) {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
 				Map<String, String> analyzers = getAnalyzers( operation );
-				processId(operation, hydrator);
+				processId( operation, hydrator );
 				hydrator.addUpdateLuceneWork(
 						asClass( operation, "class" ),
 						analyzers,
@@ -142,16 +142,16 @@ public class AvroDeserializer implements Deserializer {
 	}
 
 	private List<Utf8> asListOfString(GenericRecord result, String attribute) {
-		return (List<Utf8>) result.get(attribute);
+		return (List<Utf8>) result.get( attribute );
 	}
 
 	private void processId(GenericRecord operation, LuceneWorksBuilder hydrator) {
-		GenericRecord id = (GenericRecord)operation.get("id");
+		GenericRecord id = (GenericRecord) operation.get( "id" );
 		Object value = id.get( "value" );
-		if (value instanceof ByteBuffer) {
+		if ( value instanceof ByteBuffer ) {
 			hydrator.addIdAsJavaSerialized( asByteArray( ( ByteBuffer ) value ) );
 		}
-		else if (value instanceof Utf8) {
+		else if ( value instanceof Utf8 ) {
 			hydrator.addId( value.toString() );
 		}
 		else {
@@ -196,7 +196,7 @@ public class AvroDeserializer implements Deserializer {
 							asString( field, "name" ),
 							asInt( field, "precisionStep" ),
 							asStore( field ),
-							asBoolean(field, "indexed"),
+							asBoolean( field, "indexed" ),
 							asFloat( field, "boost" ),
 							asBoolean( field, "omitNorms" ),
 							asBoolean( field, "omitTermFreqAndPositions" )
@@ -208,7 +208,7 @@ public class AvroDeserializer implements Deserializer {
 							asString( field, "name" ),
 							asInt( field, "precisionStep" ),
 							asStore( field ),
-							asBoolean(field, "indexed"),
+							asBoolean( field, "indexed" ),
 							asFloat( field, "boost" ),
 							asBoolean( field, "omitNorms" ),
 							asBoolean( field, "omitTermFreqAndPositions" )
@@ -250,7 +250,7 @@ public class AvroDeserializer implements Deserializer {
 				);
 			}
 			else if ( "TokenStreamField".equals( schema ) ) {
-				buildAttributes(field, "value", hydrator);
+				buildAttributes( field, "value", hydrator );
 				hydrator.addFieldWithTokenStreamData(
 						asString( field, "name" ),
 						asTermVector( field ),
@@ -270,7 +270,7 @@ public class AvroDeserializer implements Deserializer {
 				);
 			}
 			else {
-				throw log.cannotDeserializeField(schema);
+				throw log.cannotDeserializeField( schema );
 			}
 		}
 	}
@@ -278,7 +278,7 @@ public class AvroDeserializer implements Deserializer {
 	private void buildAttributes(GenericRecord record, String field, LuceneWorksBuilder hydrator) {
 		List<List<?>> tokens = (List<List<?>>) record.get( field );
 		for ( List<?> token : tokens ) {
-			for(Object attribute : token) {
+			for ( Object attribute : token ) {
 				buildAttribute( attribute, hydrator );
 			}
 			hydrator.addToken();
@@ -296,22 +296,22 @@ public class AvroDeserializer implements Deserializer {
 				hydrator.addCharTermAttribute( (CharSequence) record.get( "sequence" ) );
 			}
 			else if ( "PayloadAttribute".equals( name ) ) {
-				hydrator.addPayloadAttribute( asByteArray(record, "payload") );
+				hydrator.addPayloadAttribute( asByteArray( record, "payload") );
 			}
 			else if ( "KeywordAttribute".equals( name ) ) {
-				hydrator.addKeywordAttribute( asBoolean(record, "isKeyword") );
+				hydrator.addKeywordAttribute( asBoolean( record, "isKeyword") );
 			}
 			else if ( "PositionIncrementAttribute".equals( name ) ) {
-				hydrator.addPositionIncrementAttribute( asInt(record, "positionIncrement") );
+				hydrator.addPositionIncrementAttribute( asInt( record, "positionIncrement") );
 			}
 			else if ( "FlagsAttribute".equals( name ) ) {
-				hydrator.addFlagsAttribute( asInt(record, "flags") );
+				hydrator.addFlagsAttribute( asInt( record, "flags") );
 			}
 			else if ( "TypeAttribute".equals( name ) ) {
-				hydrator.addTypeAttribute( asString(record, "type") );
+				hydrator.addTypeAttribute( asString( record, "type") );
 			}
 			else if ( "OffsetAttribute".equals( name ) ) {
-				hydrator.addOffsetAttribute( asInt(record, "startOffset"), asInt(record, "endOffset") );
+				hydrator.addOffsetAttribute( asInt( record, "startOffset"), asInt( record, "endOffset" ) );
 			}
 			else {
 				log.unknownAttributeSerializedRepresentation( name );
@@ -326,54 +326,54 @@ public class AvroDeserializer implements Deserializer {
 	}
 
 	private GenericRecord asGenericRecord(GenericRecord operation, String field) {
-		return (GenericRecord) operation.get(field);
+		return (GenericRecord) operation.get( field );
 	}
 
 	private List<GenericRecord> asListOfGenericRecords(GenericRecord result, String field) {
-		return (List<GenericRecord>) result.get(field);
+		return (List<GenericRecord>) result.get( field );
 	}
 
 	private float asFloat(GenericRecord record, String field) {
-		return ( (Float) record.get(field) ).floatValue();
+		return ( (Float) record.get( field ) ).floatValue();
 	}
 
 	private int asInt(GenericRecord record, String field) {
-		return ( (Integer) record.get(field) ).intValue();
+		return ( (Integer) record.get( field ) ).intValue();
 	}
 
 	private long asLong(GenericRecord record, String field) {
-		return ( (Long) record.get(field) ).longValue();
+		return ( (Long) record.get( field ) ).longValue();
 	}
 
 	private double asDouble(GenericRecord record, String field) {
-		return ( (Double) record.get(field) ).doubleValue();
+		return ( (Double) record.get( field ) ).doubleValue();
 	}
 
 	private String asString(GenericRecord record, String field) {
-		return record.get(field).toString();
+		return record.get( field ).toString();
 	}
 
 	private boolean asBoolean(GenericRecord record, String field) {
-		return ( (Boolean) record.get(field) ).booleanValue();
+		return ( (Boolean) record.get( field ) ).booleanValue();
 	}
 
 	private SerializableStore asStore(GenericRecord field) {
-		String string = field.get("store").toString();
+		String string = field.get( "store" ).toString();
 		return SerializableStore.valueOf( string );
 	}
 
 	private SerializableIndex asIndex(GenericRecord field) {
-		String string = field.get("index").toString();
+		String string = field.get( "index" ).toString();
 		return SerializableIndex.valueOf( string );
 	}
 
 	private SerializableTermVector asTermVector(GenericRecord field) {
-		String string = field.get("termVector").toString();
+		String string = field.get( "termVector" ).toString();
 		return SerializableTermVector.valueOf( string );
 	}
 
 	private byte[] asByteArray(GenericRecord operation, String field) {
-		ByteBuffer buffer = (ByteBuffer) operation.get(field);
+		ByteBuffer buffer = (ByteBuffer) operation.get( field );
 		return asByteArray( buffer );
 	}
 

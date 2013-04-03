@@ -41,7 +41,7 @@ public class ContainedInMapping {
 		this.property = property;
 		this.entity = entity;
 		Map<String, Object> containedIn = new HashMap<String, Object>();
-		property.setContainedIn(containedIn);
+		property.setContainedIn( containedIn );
 	}
 
 	public FieldMapping field() {

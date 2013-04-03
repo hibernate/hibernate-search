@@ -27,6 +27,7 @@ import org.hibernate.search.indexes.serialization.spi.SerializableTermVector;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableReaderField extends SerializableField {
+
 	private byte[] value;
 	private SerializableTermVector termVector;
 

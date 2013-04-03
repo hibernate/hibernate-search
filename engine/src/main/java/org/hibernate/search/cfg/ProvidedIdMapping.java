@@ -37,13 +37,13 @@ public class ProvidedIdMapping {
 
 	public ProvidedIdMapping(SearchMapping searchMapping, EntityDescriptor entity) {
 		this.searchMapping = searchMapping;
-		this.entity =entity;
+		this.entity = entity;
 		providedIdMapping = new HashMap<String,Object>();
-		entity.setProvidedId(providedIdMapping);
+		entity.setProvidedId( providedIdMapping );
 	}
 
 	public ProvidedIdMapping name(String name) {
-		this.providedIdMapping.put("name", name);
+		this.providedIdMapping.put( "name", name );
 		return this;
 	}
 
@@ -52,19 +52,19 @@ public class ProvidedIdMapping {
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
-		return new FullTextFilterDefMapping(searchMapping, name, impl);
+		return new FullTextFilterDefMapping( searchMapping, name, impl );
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, searchMapping);
+		return new PropertyMapping( name, type, entity, searchMapping );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, searchMapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, searchMapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, searchMapping);
+		return new EntityMapping( entityType, searchMapping );
 	}
 
 }

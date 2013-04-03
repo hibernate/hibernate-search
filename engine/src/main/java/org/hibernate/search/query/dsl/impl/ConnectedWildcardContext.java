@@ -40,7 +40,7 @@ class ConnectedWildcardContext implements WildcardContext {
 	public ConnectedWildcardContext(QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
-		this.termContext = new TermQueryContext(TermQueryContext.Approximation.WILDCARD);
+		this.termContext = new TermQueryContext( TermQueryContext.Approximation.WILDCARD );
 	}
 
 	public TermMatchingContext onField(String field) {
@@ -58,7 +58,7 @@ class ConnectedWildcardContext implements WildcardContext {
 	}
 
 	public WildcardContext filteredBy(Filter filter) {
-		queryCustomizer.filteredBy(filter);
+		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 }

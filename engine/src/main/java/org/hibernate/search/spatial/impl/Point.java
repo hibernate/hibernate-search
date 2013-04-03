@@ -179,7 +179,7 @@ public final class Point implements Coordinates {
 		final double dLon= (destinationLongitudeRadians - getLongitudeRad())/2.0d;
 		final double a= Math.pow( Math.sin( dLat ), 2) +
 				Math.pow( Math.sin( dLon ), 2) * Math.cos( getLatitudeRad()) * Math.cos( destinationLatitudeRadians );
-		final double c= 2.0d * Math.atan2(Math.sqrt( a ), Math.sqrt( 1.0d - a ));
+		final double c = 2.0d * Math.atan2( Math.sqrt( a ), Math.sqrt( 1.0d - a ) );
 		return c * GeometricConstants.EARTH_MEAN_RADIUS_KM;
 	}
 

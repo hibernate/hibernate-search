@@ -44,11 +44,11 @@ class ConnectedFuzzyContext implements FuzzyContext {
 	}
 
 	public TermMatchingContext onField(String field) {
-		return new ConnectedTermMatchingContext(termContext, field, queryCustomizer, queryContext);
+		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext );
 	}
 
 	public TermMatchingContext onFields(String... fields) {
-		return new ConnectedTermMatchingContext(termContext, fields, queryCustomizer, queryContext);
+		return new ConnectedTermMatchingContext( termContext, fields, queryCustomizer, queryContext );
 	}
 
 	public ConnectedFuzzyContext withThreshold(float threshold) {
@@ -72,7 +72,7 @@ class ConnectedFuzzyContext implements FuzzyContext {
 	}
 
 	public FuzzyContext filteredBy(Filter filter) {
-		queryCustomizer.filteredBy(filter);
+		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 

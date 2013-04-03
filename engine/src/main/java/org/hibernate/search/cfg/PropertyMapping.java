@@ -46,7 +46,7 @@ public class PropertyMapping {
 	public PropertyMapping(String name, ElementType type, EntityDescriptor entity, SearchMapping mapping) {
 		this.mapping = mapping;
 		this.entity = entity;
-		this.property = entity.getProperty(name, type);
+		this.property = entity.getProperty( name, type );
 	}
 
 	protected PropertyMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
@@ -86,35 +86,35 @@ public class PropertyMapping {
 	public PropertyMapping analyzerDiscriminator(Class<? extends Discriminator> discriminator) {
 		Map<String, Object> analyzerDiscriminatorAnn = new HashMap<String, Object>();
 		analyzerDiscriminatorAnn.put( "impl", discriminator );
-		property.setAnalyzerDiscriminator(analyzerDiscriminatorAnn);
+		property.setAnalyzerDiscriminator( analyzerDiscriminatorAnn );
 		return this;
 	}
 
 	public PropertyMapping dynamicBoost(Class<? extends BoostStrategy> impl) {
 		final Map<String, Object> dynamicBoostAnn = new HashMap<String, Object>();
-		dynamicBoostAnn.put("impl", impl);
-		property.setDynamicBoost(dynamicBoostAnn);
+		dynamicBoostAnn.put( "impl", impl );
+		property.setDynamicBoost( dynamicBoostAnn );
 		return this;
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, mapping);
+		return new PropertyMapping( name, type, entity, mapping );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 
 	public IndexEmbeddedMapping indexEmbedded() {
-		return new IndexEmbeddedMapping(mapping,property,entity);
+		return new IndexEmbeddedMapping( mapping, property, entity );
 	}
 
 	public ContainedInMapping containedIn() {
-		return new ContainedInMapping(mapping, property, entity);
+		return new ContainedInMapping( mapping, property, entity );
 	}
 
 	public PropertyMapping bridge(Class<? extends FieldBridge> fieldBridge) {

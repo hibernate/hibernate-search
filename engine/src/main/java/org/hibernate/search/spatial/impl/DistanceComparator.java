@@ -44,8 +44,8 @@ public final class DistanceComparator extends FieldComparator<Double> {
 		this.distances = new IntToDoubleMap( hitsCount );
 		this.latitudeValues = new IntToDoubleMap( hitsCount );
 		this.longitudeValues = new IntToDoubleMap( hitsCount );
-		this.latitudeField = SpatialHelper.formatLatitude(fieldname);
-		this.longitudeField = SpatialHelper.formatLongitude(fieldname);
+		this.latitudeField = SpatialHelper.formatLatitude( fieldname );
+		this.longitudeField = SpatialHelper.formatLongitude( fieldname );
 	}
 
 	@Override

@@ -93,7 +93,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	public void run(StatelessSession upperSession) {
 		log.trace( "started" );
 		try {
-			inTransactionWrapper(upperSession);
+			inTransactionWrapper( upperSession );
 		}
 		catch (Throwable e) {
 			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );

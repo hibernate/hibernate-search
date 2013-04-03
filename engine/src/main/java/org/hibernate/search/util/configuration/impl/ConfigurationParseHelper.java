@@ -53,10 +53,10 @@ public abstract class ConfigurationParseHelper {
 	 */
 	public static URL locateConfig(final String path) {
 		try {
-			return new URL(path);
+			return new URL( path );
 		}
-		catch(MalformedURLException e) {
-			return findAsResource(path);
+		catch ( MalformedURLException e ) {
+			return findAsResource( path );
 		}
 	}
 
@@ -74,19 +74,19 @@ public abstract class ConfigurationParseHelper {
 		// First, try to locate this resource through the current
 		// context classloader.
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-		if (contextClassLoader!=null) {
-			url = contextClassLoader.getResource(path);
+		if ( contextClassLoader != null ) {
+			url = contextClassLoader.getResource( path );
 		}
-		if (url != null)
+		if ( url != null )
 			return url;
 
 		// Next, try to locate this resource through this class's classloader
-		url = ConfigurationParseHelper.class.getClassLoader().getResource(path);
-		if (url != null)
+		url = ConfigurationParseHelper.class.getClassLoader().getResource( path );
+		if ( url != null )
 			return url;
 
 		// Next, try to locate this resource through the system classloader
-		url = ClassLoader.getSystemClassLoader().getResource(path);
+		url = ClassLoader.getSystemClassLoader().getResource( path );
 
 		// Anywhere else we should look?
 		return url;

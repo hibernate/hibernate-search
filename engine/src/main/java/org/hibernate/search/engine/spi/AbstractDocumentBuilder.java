@@ -1061,7 +1061,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 
 		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, fieldAnnotation, numericFieldAnnotation, null, context, reflectionManager );
-		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
+		fieldMetadata.appendToPropertiesMetadata( propertiesMetadata );
 		addToScopedAnalyzer( fieldMetadata.getFieldName(), fieldMetadata.getAnalyzer(), fieldMetadata.getIndex() );
 
 		if ( member.isCollection() ) {
@@ -1082,7 +1082,7 @@ public abstract class AbstractDocumentBuilder<T> {
 
 		FieldMetadata fieldMetadata = new FieldMetadata( prefix, member, null, null,
 				spatialAnnotation, context, reflectionManager );
-		fieldMetadata.appendToPropertiesMetadata(propertiesMetadata);
+		fieldMetadata.appendToPropertiesMetadata( propertiesMetadata );
 		if ( member.isCollection() ) {
 			fieldCollectionRoles.add( StringHelper.qualify( classHostingMember.getName(), member.getName() ) );
 		}

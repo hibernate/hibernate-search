@@ -71,7 +71,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		}
 
 		public RangeTerminationExcludable to(T to) {
-			mother.rangeContext.setTo(to);
+			mother.rangeContext.setTo( to );
 			return new ConnectedMultiFieldsRangeQueryBuilder(
 					mother.rangeContext,
 					mother.queryCustomizer,

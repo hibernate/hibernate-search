@@ -46,7 +46,7 @@ public class SerializationHelper {
 			stream.close();
 		}
 		catch ( IOException e ) {
-			throw log.failToSerializeObject(instance.getClass(), e);
+			throw log.failToSerializeObject( instance.getClass(), e );
 		}
 		return out.toByteArray();
 	}
@@ -58,10 +58,10 @@ public class SerializationHelper {
 			return (T) in.readObject();
 		}
 		catch ( IOException e ) {
-			throw log.failToDeserializeObject(e);
+			throw log.failToDeserializeObject( e );
 		}
 		catch ( ClassNotFoundException e ) {
-			throw log.failToDeserializeObject(e);
+			throw log.failToDeserializeObject( e );
 		}
 	}
 
@@ -72,10 +72,10 @@ public class SerializationHelper {
 			return (Serializable) in.readObject();
 		}
 		catch ( IOException e ) {
-			throw log.failToDeserializeObject(e);
+			throw log.failToDeserializeObject( e );
 		}
 		catch ( ClassNotFoundException e ) {
-			throw log.failToDeserializeObject(e);
+			throw log.failToDeserializeObject( e );
 		}
 	}
 

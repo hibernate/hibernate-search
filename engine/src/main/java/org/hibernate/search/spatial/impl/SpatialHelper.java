@@ -71,7 +71,7 @@ public abstract class SpatialHelper {
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
 				quadTreeLevel
 		);
-		return formatQuadTreeCellId(longitudeCellIndex, latitudeCellIndex);
+		return formatQuadTreeCellId( longitudeCellIndex, latitudeCellIndex );
 	}
 
 	/**
@@ -131,19 +131,16 @@ public abstract class SpatialHelper {
 				quadTreeLevel
 		);
 
-		int startX, endX;
-		startX= Math.min(Math.min(Math.min(lowerLeftXIndex,upperLeftXIndex),upperRightXIndex),lowerRightXIndex);
-		endX= Math.max(Math.max(Math.max(lowerLeftXIndex,upperLeftXIndex),upperRightXIndex),lowerRightXIndex);
+		final int startX = Math.min( Math.min( Math.min( lowerLeftXIndex, upperLeftXIndex ), upperRightXIndex ), lowerRightXIndex );
+		final int endX = Math.max( Math.max( Math.max( lowerLeftXIndex, upperLeftXIndex ), upperRightXIndex ), lowerRightXIndex );
 
-		int startY, endY;
-		startY= Math.min(Math.min(Math.min(lowerLeftYIndex,upperLeftYIndex),upperRightYIndex),lowerRightYIndex);
-		endY= Math.max(Math.max(Math.max(lowerLeftYIndex,upperLeftYIndex),upperRightYIndex),lowerRightYIndex);
+		final int startY = Math.min( Math.min( Math.min( lowerLeftYIndex, upperLeftYIndex ), upperRightYIndex ), lowerRightYIndex );
+		final int endY = Math.max( Math.max( Math.max( lowerLeftYIndex, upperLeftYIndex ), upperRightYIndex ), lowerRightYIndex );
 
-		List<String> quadTreeCellsIds = new ArrayList<String>((endX+1-startX)*(endY+1-startY));
-		int xIndex, yIndex;
-		for ( xIndex = startX; xIndex <= endX; xIndex++ ) {
-			for ( yIndex = startY; yIndex <= endY; yIndex++ ) {
-				quadTreeCellsIds.add(formatQuadTreeCellId(xIndex, yIndex));
+		List<String> quadTreeCellsIds = new ArrayList<String>( ( endX + 1 - startX ) * ( endY + 1 - startY ) );
+		for ( int xIndex = startX; xIndex <= endX; xIndex++ ) {
+			for ( int yIndex = startY; yIndex <= endY; yIndex++ ) {
+				quadTreeCellsIds.add( formatQuadTreeCellId( xIndex, yIndex ) );
 			}
 		}
 

@@ -58,7 +58,7 @@ public class LookupObjectsInitializer implements ObjectsInitializer {
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
 			if ( traceEnabled )
-				log.tracef("No object to initialize", maxResults);
+				log.tracef( "No object to initialize", maxResults );
 			return;
 		}
 

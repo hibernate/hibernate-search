@@ -41,17 +41,18 @@ import org.hibernate.search.query.dsl.MustJunction;
  * @author Emmanuel Bernard
  */
 class BooleanQueryBuilder implements MustJunction {
+
 	private final List<BooleanClause> clauses;
 	private final QueryCustomizer queryCustomizer;
 
 	BooleanQueryBuilder() {
-		clauses = new ArrayList<BooleanClause>(5);
+		clauses = new ArrayList<BooleanClause>( 5 );
 		queryCustomizer = new QueryCustomizer();
 	}
 
 	public BooleanJunction not() {
 		final int lastIndex = clauses.size() -1;
-		final BooleanClause last = clauses.get(lastIndex);
+		final BooleanClause last = clauses.get( lastIndex );
 		if ( ! last.getOccur().equals( BooleanClause.Occur.MUST ) ) {
 			throw new AssertionFailure( "Cannot negate class: " + last.getOccur() );
 		}
@@ -80,7 +81,7 @@ class BooleanQueryBuilder implements MustJunction {
 	}
 
 	public MustJunction filteredBy(Filter filter) {
-		queryCustomizer.filteredBy(filter);
+		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 
@@ -102,8 +103,8 @@ class BooleanQueryBuilder implements MustJunction {
 			}
 		}
 
-		BooleanQuery query = new BooleanQuery( );
-		for (BooleanClause clause : clauses) {
+		BooleanQuery query = new BooleanQuery();
+		for ( BooleanClause clause : clauses ) {
 			query.add( clause );
 		}
 		return queryCustomizer.setWrappedQuery( query ).createQuery();

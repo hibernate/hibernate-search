@@ -80,7 +80,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			}
 		}
 		else {
-			safeEntityTypes.addAll(entityTypes);
+			safeEntityTypes.addAll( entityTypes );
 		}
 		entityMatadata = new ArrayList<RootEntityMetadata>( safeEntityTypes.size() );
 		for (Class clazz :  safeEntityTypes) {

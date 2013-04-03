@@ -56,7 +56,7 @@ public class ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 		boolean acquired = optimizerIsBusy.compareAndSet( false, true );
 		if ( acquired ) {
 			try {
-				writer.forceMerge(1, true);
+				writer.forceMerge( 1, true );
 			}
 			catch (IOException e) {
 				throw new SearchException( "Unable to optimize directoryProvider: " + indexName, e );

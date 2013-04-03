@@ -114,7 +114,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildQuadTreeQuery(Point center, double radius, String fieldName) {
-		return new FilteredQuery( new MatchAllDocsQuery(  ), buildQuadTreeFilter(center, radius, fieldName) );
+		return new FilteredQuery( new MatchAllDocsQuery(), buildQuadTreeFilter( center, radius, fieldName ) );
 	}
 
 	/**

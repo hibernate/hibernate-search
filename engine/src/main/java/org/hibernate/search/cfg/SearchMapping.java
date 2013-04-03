@@ -92,14 +92,14 @@ public class SearchMapping {
 	EntityDescriptor getEntity(Class<?> entityType) {
 		EntityDescriptor entity = entities.get( entityType );
 		if (entity == null) {
-			entity = new EntityDescriptor(entityType);
+			entity = new EntityDescriptor( entityType );
 			entities.put( entityType, entity );
 		}
 		return entity;
 	}
 
 	void addFulltextFilterDef(Map<String, Object> fullTextFilterDef) {
-		fullTextFilterDefs.add(fullTextFilterDef);
+		fullTextFilterDefs.add( fullTextFilterDef );
 	}
 
 }

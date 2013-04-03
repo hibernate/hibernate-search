@@ -29,7 +29,7 @@ public class SerializableFloatField extends SerializableNumericField {
 	private float value;
 
 	public SerializableFloatField(float value, LuceneNumericFieldContext context) {
-		super(context);
+		super( context );
 		this.value = value;
 	}
 

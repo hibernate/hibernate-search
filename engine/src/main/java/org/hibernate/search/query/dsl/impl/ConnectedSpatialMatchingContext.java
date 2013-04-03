@@ -59,8 +59,8 @@ public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 
 		@Override
 		public SpatialTermination ofCoordinates(Coordinates coordinates) {
-			mother.spatialContext.setCoordinates(coordinates);
-			return new ConnectedSpatialQueryBuilder(mother.spatialContext, mother.queryCustomizer, mother.queryContext, mother.queryBuilder);
+			mother.spatialContext.setCoordinates( coordinates );
+			return new ConnectedSpatialQueryBuilder( mother.spatialContext, mother.queryCustomizer, mother.queryContext, mother.queryBuilder );
 		}
 
 		@Override
@@ -71,8 +71,8 @@ public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 
 		@Override
 		public SpatialTermination andLongitude(double longitude) {
-			mother.spatialContext.setCoordinates( Point.fromDegrees(latitude, longitude) );
-			return new ConnectedSpatialQueryBuilder(mother.spatialContext, mother.queryCustomizer, mother.queryContext, mother.queryBuilder);
+			mother.spatialContext.setCoordinates( Point.fromDegrees( latitude, longitude ) );
+			return new ConnectedSpatialQueryBuilder( mother.spatialContext, mother.queryCustomizer, mother.queryContext, mother.queryBuilder );
 		}
 	}
 }

@@ -40,10 +40,10 @@ public class FullTextFilterDefMapping {
 
 	public FullTextFilterDefMapping(SearchMapping mapping, String name, Class<?> impl) {
 		this.mapping = mapping;
-		this.fullTextFilterDef =new HashMap<String, Object>();
-		this.fullTextFilterDef.put("name", name);
-		this.fullTextFilterDef.put("impl", impl);
-		mapping.addFulltextFilterDef(fullTextFilterDef);
+		this.fullTextFilterDef = new HashMap<String, Object>();
+		this.fullTextFilterDef.put( "name", name );
+		this.fullTextFilterDef.put( "impl", impl );
+		mapping.addFulltextFilterDef( fullTextFilterDef );
 	}
 
 	/**
@@ -53,19 +53,19 @@ public class FullTextFilterDefMapping {
 	 * @return FullTextFilterDefMapping
 	 */
 	public FullTextFilterDefMapping cache(FilterCacheModeType cache) {
-		this.fullTextFilterDef.put("cache", cache);
+		this.fullTextFilterDef.put( "cache", cache );
 		return this;
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
-		return new FullTextFilterDefMapping(mapping, name, impl);
+		return new FullTextFilterDefMapping( mapping, name, impl );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 }

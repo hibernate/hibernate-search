@@ -33,7 +33,7 @@ public abstract class NumericFieldBridge implements TwoWayFieldBridge {
 
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if (value != null) {
-			luceneOptions.addNumericFieldToDocument(name, value, document);
+			luceneOptions.addNumericFieldToDocument( name, value, document );
 		}
 	}
 

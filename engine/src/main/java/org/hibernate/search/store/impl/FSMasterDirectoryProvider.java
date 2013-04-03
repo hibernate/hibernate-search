@@ -222,7 +222,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				long start = System.nanoTime();//keep time after lock is acquired for correct measure
 				int oldIndex = current;
 				int index = oldIndex == 1 ? 2 : 1;
-				File destinationFile = new File( destination, Integer.valueOf(index).toString() );
+				File destinationFile = new File( destination, Integer.valueOf( index ).toString() );
 				try {
 					log.tracef( "Copying %s into %s", source, destinationFile );
 					FileHelper.synchronize( source, destinationFile, true, copyChunkSize );

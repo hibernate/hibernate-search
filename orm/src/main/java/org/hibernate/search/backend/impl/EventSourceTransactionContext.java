@@ -131,12 +131,12 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 
 	private boolean isLocalTransaction() {
 		//TODO make it better but I don't know how we can optimize it.
-		final TransactionManager transactionManager = getService(JtaPlatform.class).retrieveTransactionManager();
+		final TransactionManager transactionManager = getService( JtaPlatform.class ).retrieveTransactionManager();
 		return transactionManager == null;
 	}
 
 	private <T extends Service> T getService(Class<T> serviceClass) {
-		return eventSource.getFactory().getServiceRegistry().getService(serviceClass);
+		return eventSource.getFactory().getServiceRegistry().getService( serviceClass );
 	}
 
 	private FullTextIndexEventListener getIndexWorkFlushEventListener() {
@@ -144,8 +144,8 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			//for the "transient" case: might have been nullified.
 			return flushListener;
 		}
-		final Iterable<FlushEventListener> listeners = getService(EventListenerRegistry.class)
-				.getEventListenerGroup(EventType.FLUSH).listeners();
+		final Iterable<FlushEventListener> listeners = getService( EventListenerRegistry.class )
+				.getEventListenerGroup( EventType.FLUSH ).listeners();
 		for ( FlushEventListener listener : listeners ) {
 			if ( FullTextIndexEventListener.class.isAssignableFrom( listener.getClass() ) ) {
 				return (FullTextIndexEventListener) listener;

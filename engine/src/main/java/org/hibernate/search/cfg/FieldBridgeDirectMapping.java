@@ -45,8 +45,8 @@ public class FieldBridgeDirectMapping extends PropertyMapping {
 
 	public FieldBridgeDirectMapping param(String name, String value) {
 		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( fieldBridgeAnn, "params" );
-		param.put("name", name);
-		param.put("value", value);
+		param.put( "name", name );
+		param.put( "value", value );
 		return this;
 	}
 

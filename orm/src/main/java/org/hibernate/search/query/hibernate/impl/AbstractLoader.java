@@ -58,7 +58,7 @@ public abstract class AbstractLoader implements Loader {
 	}
 
 	public Object loadWithoutTiming(EntityInfo entityInfo) {
-		return executeLoad(entityInfo);
+		return executeLoad( entityInfo );
 	}
 
 	public abstract Object executeLoad(EntityInfo entityInfo);

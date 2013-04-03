@@ -57,9 +57,9 @@ public class FieldBridgeMapping {
 	}
 
 	public FieldBridgeMapping param(String name, String value) {
-		Map<String, Object> param = SearchMapping.addElementToAnnotationArray(bridge, "params");
-		param.put("name", name);
-		param.put("value", value);
+		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( bridge, "params" );
+		param.put( "name", name );
+		param.put( "value", value );
 		return this;
 	}
 

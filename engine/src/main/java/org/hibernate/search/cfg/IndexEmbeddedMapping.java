@@ -41,38 +41,38 @@ public class IndexEmbeddedMapping {
 		this.indexEmbedded = new HashMap<String, Object>();
 		this.property = property;
 		this.entity = entity;
-		this.property.setIndexEmbedded(indexEmbedded);
+		this.property.setIndexEmbedded( indexEmbedded );
 	}
 
 	public IndexEmbeddedMapping prefix(String prefix) {
-		this.indexEmbedded.put("prefix",prefix);
+		this.indexEmbedded.put( "prefix", prefix );
 		return this;
 	}
 
 	public IndexEmbeddedMapping targetElement(Class<?> targetElement) {
-		this.indexEmbedded.put("targetElement",targetElement);
+		this.indexEmbedded.put( "targetElement", targetElement );
 		return this;
 	}
 
 	public IndexEmbeddedMapping depth(int depth) {
-		this.indexEmbedded.put("depth", depth);
+		this.indexEmbedded.put( "depth", depth );
 		return this;
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
-		return new PropertyMapping(name, type, entity, mapping);
+		return new PropertyMapping( name, type, entity, mapping );
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
-		return new EntityMapping(entityType, mapping);
+		return new EntityMapping( entityType, mapping );
 	}
 
 	public FieldMapping field() {
-		return new FieldMapping(property, entity, mapping);
+		return new FieldMapping( property, entity, mapping );
 	}
 
 }

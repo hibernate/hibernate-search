@@ -76,7 +76,7 @@ public class NumericFieldUtils {
 	 * @return the created Query
 	 */
 	public static Query createExactMatchQuery(String fieldName, Object value) {
-		return createNumericRangeQuery(fieldName, value, value, true, true);
+		return createNumericRangeQuery( fieldName, value, value, true, true );
 	}
 
 	public static void setNumericValue(Object value, NumericField numericField) {
