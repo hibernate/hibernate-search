@@ -57,7 +57,7 @@ import org.hibernate.search.test.TestConstants;
 /**
  * @author Emmanuel Bernard
  */
-public class BridgeTest extends SearchTestCase {
+public class l extends SearchTestCase {
 	public void testDefaultAndNullBridges() throws Exception {
 		Cloud cloud = new Cloud();
 		cloud.setMyDate( null );
