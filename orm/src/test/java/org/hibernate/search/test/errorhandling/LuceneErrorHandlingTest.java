@@ -88,12 +88,12 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		Throwable exception = mockErrorHandler.getLastException();
 
 		StringBuilder expectedErrorMessage = new StringBuilder();
-		expectedErrorMessage.append( "Exception occurred " ).append ( exception ).append ("\n");
-		expectedErrorMessage.append( "Primary Failure:\n");
-		LogErrorHandler.appendFailureMessage(expectedErrorMessage, firstFailure);
+		expectedErrorMessage.append( "Exception occurred " ).append( exception ).append( "\n" );
+		expectedErrorMessage.append( "Primary Failure:\n" );
+		LogErrorHandler.appendFailureMessage( expectedErrorMessage, firstFailure );
 
 		expectedErrorMessage.append( "Subsequent failures:\n" );
-		LogErrorHandler.appendFailureMessage(expectedErrorMessage, firstFailure);
+		LogErrorHandler.appendFailureMessage( expectedErrorMessage, firstFailure );
 
 		// should verify the errorHandler logs the work which was not processed (third and fourth)
 		// and which work was failing

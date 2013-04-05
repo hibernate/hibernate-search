@@ -23,9 +23,11 @@
  */
 package org.hibernate.search.test.similarity;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Verifies that SearchFactory properly checks for illegal combinations
@@ -44,13 +46,13 @@ public class IllegalSimilarityConfigurationTest {
 		FullTextSessionBuilder builder = null;
 		try {
 			builder = new FullTextSessionBuilder()
-					.addAnnotatedClass(Can.class)
-					.addAnnotatedClass(Trash.class).build();
+					.addAnnotatedClass( Can.class )
+					.addAnnotatedClass( Trash.class ).build();
 		} catch (Exception e) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertTrue( "A valid configuration could not be started.", configurationIsLegal );
@@ -68,7 +70,7 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: same similarity"

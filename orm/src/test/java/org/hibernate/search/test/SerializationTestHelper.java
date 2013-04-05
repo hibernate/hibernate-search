@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.test;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,9 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.test.SerializationTestHelper.Foo.TestInnerClass;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Sanne Grinovero
@@ -69,10 +69,10 @@ public class SerializationTestHelper {
 	@Test
 	public void testSelf() throws IOException, ClassNotFoundException {
 		Foo a = new Foo();
-		a.list.add( new TestInnerClass(30) );
+		a.list.add( new TestInnerClass( 30 ) );
 		Foo b = (Foo) duplicateBySerialization( a );
-		assertEquals( Integer.valueOf(6), a.integer);
-		assertEquals( Integer.valueOf(7), b.integer);
+		assertEquals( Integer.valueOf( 6 ), a.integer );
+		assertEquals( Integer.valueOf( 7 ), b.integer );
 		assertEquals( a.list, b.list );
 	}
 
@@ -89,7 +89,7 @@ public class SerializationTestHelper {
 			}
 
 			public void print() {
-				System.out.println(v);
+				System.out.println( v );
 			}
 
 			public String toString(){

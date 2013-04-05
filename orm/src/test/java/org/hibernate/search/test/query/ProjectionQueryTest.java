@@ -74,23 +74,23 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 		Transaction tx = s.beginTransaction();
 		Spouse spouse = new Spouse();
-		spouse.setFirstName("Christina");
-		s.save(spouse);
+		spouse.setFirstName( "Christina" );
+		s.save( spouse );
 		Husband h = new Husband();
-		h.setLastName("Roberto");
-		h.setSpouse(spouse);
-		s.save(h);
+		h.setLastName( "Roberto" );
+		h.setSpouse( spouse );
+		s.save( h );
 		tx.commit();
 
 		s.clear();
 		tx = s.beginTransaction();
-		final QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity(Husband.class).get();
-		Query query = qb.keyword().onField("lastName").matching("Roberto").createQuery();
+		final QueryBuilder qb = s.getSearchFactory().buildQueryBuilder().forEntity( Husband.class ).get();
+		Query query = qb.keyword().onField( "lastName" ).matching( "Roberto" ).createQuery();
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Husband.class );
 		hibQuery.setProjection( FullTextQuery.THIS );
-		Criteria fetchingStrategy = s.createCriteria(Husband.class);
-		fetchingStrategy.setFetchMode("spouse", FetchMode.JOIN);
-		hibQuery.setCriteriaQuery(fetchingStrategy);
+		Criteria fetchingStrategy = s.createCriteria( Husband.class );
+		fetchingStrategy.setFetchMode( "spouse", FetchMode.JOIN );
+		hibQuery.setCriteriaQuery( fetchingStrategy );
 
 		resetFieldSelector();
 		List result = hibQuery.list();
@@ -503,11 +503,11 @@ public class ProjectionQueryTest extends SearchTestCase {
 		Query query = NumericFieldUtils.createNumericRangeQuery( "debtInMillions", 600d, 800d, true, true );
 
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, FootballTeam.class );
-		hibQuery.setProjection("nrTitles", "name", "debtInMillions");
+		hibQuery.setProjection( "nrTitles", "name", "debtInMillions" );
 
 		List result = hibQuery.list();
 		assertFieldSelectorEnabled( "nrTitles", "name", "debtInMillions" );
-		assertEquals(1, result.size());
+		assertEquals( 1, result.size() );
 
 		Object[] projection = ( Object[] ) result.get( 0 );
 		assertNotNull( projection );
@@ -515,9 +515,9 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertTrue( "String Field not projected", projection[1] instanceof String );
 		assertTrue( "Numeric double Field not projected", projection[2] instanceof Double );
 
-		assertEquals(18, projection[0]);
-		assertEquals("Manchester United", projection[1]);
-		assertEquals(700.5d, projection[2]);
+		assertEquals( 18, projection[0] );
+		assertEquals( "Manchester United", projection[1] );
+		assertEquals( 700.5d, projection[2] );
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + FootballTeam.class.getName() ).list() ) {

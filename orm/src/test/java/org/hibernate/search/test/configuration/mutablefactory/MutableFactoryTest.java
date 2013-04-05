@@ -275,9 +275,9 @@ public class MutableFactoryTest {
 					final int i = factorOfClassesPerThread*nbrOfClassesPerThread + index;
 					final Class<?> aClass = MutableFactoryTest.getClassAByNumber( i );
 					factory.addClasses( aClass );
-					Object entity = aClass.getConstructor( Integer.class, String.class ).newInstance(i, "Emmanuel" + i);
+					Object entity = aClass.getConstructor( Integer.class, String.class ).newInstance( i, "Emmanuel" + i );
 					ManualTransactionContext context = new ManualTransactionContext();
-					MutableFactoryTest.doIndexWork(entity, i, factory, context );
+					MutableFactoryTest.doIndexWork( entity, i, factory, context );
 					context.end();
 
 					EntityIndexBinder indexBindingForEntity = factory.getIndexBindingForEntity( aClass );

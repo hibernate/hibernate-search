@@ -43,7 +43,9 @@ import org.hibernate.search.indexes.impl.NotSharedReaderProvider;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.util.impl.ReflectionHelper;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 
 /**
  * ReaderProvider to inspect the type of FieldSelector being applied.

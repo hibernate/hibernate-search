@@ -24,7 +24,9 @@
 package org.hibernate.search.test.util.textbuilder;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests WordDictionary and WordInventor,

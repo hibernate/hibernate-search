@@ -64,13 +64,13 @@ public class QuerySerializationTest extends SearchTestCase {
 
 		//this is *not* the standard way to create a Query:
 		HSQuery hsQuery = searchFactory.createHSQuery().luceneQuery( query ).targetedEntities( new ArrayList<Class<?>>() );
-		int size = extractResultSize(hsQuery);
+		int size = extractResultSize( hsQuery );
 
 		assertEquals( "Should have found a match", 1, size );
 
-		HSQuery hsQueryDuplicate = (HSQuery) SerializationTestHelper.duplicateBySerialization(hsQuery);
-		hsQueryDuplicate.afterDeserialise(searchFactory);
-		int sizeOfDuplicate = extractResultSize(hsQueryDuplicate);
+		HSQuery hsQueryDuplicate = (HSQuery) SerializationTestHelper.duplicateBySerialization( hsQuery );
+		hsQueryDuplicate.afterDeserialise( searchFactory );
+		int sizeOfDuplicate = extractResultSize( hsQueryDuplicate );
 
 		assertEquals( "Should have found a match", 1, sizeOfDuplicate );
 	}

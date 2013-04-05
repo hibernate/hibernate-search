@@ -46,7 +46,7 @@ public class ManualTransactionContext implements TransactionContext {
 	}
 
 	public void registerSynchronization(Synchronization synchronization) {
-		syncs.add(synchronization);
+		syncs.add( synchronization );
 	}
 
 	public void end() {

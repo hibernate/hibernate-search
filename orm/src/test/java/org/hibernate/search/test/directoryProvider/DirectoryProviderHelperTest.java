@@ -23,15 +23,16 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Properties;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
 import org.hibernate.search.util.impl.FileHelper;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Gavin King

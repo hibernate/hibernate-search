@@ -152,6 +152,6 @@ public class IndexedEntity {
 	}
 
 	public void addKeyword(String keyword) {
-		this.keywords.add(keyword);
+		this.keywords.add( keyword );
 	}
 }

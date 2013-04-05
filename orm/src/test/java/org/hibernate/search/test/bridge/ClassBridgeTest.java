@@ -43,6 +43,7 @@ import org.hibernate.search.test.TestConstants;
  * @author John Griffin
  */
 public class ClassBridgeTest extends SearchTestCase {
+
 	/**
 	 * This tests that a field created by a user-supplied
 	 * EquipmentType class has been created and is a translation
@@ -63,7 +64,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		tx = s.beginTransaction();
 		FullTextSession session = Search.getFullTextSession( s );
 
-		// The equipment field is the manufacturer field  in the
+		// The equipment field is the manufacturer field in the
 		// Departments entity after being massaged by passing it
 		// through the EquipmentType class. This field is in
 		// the Lucene document but not in the Department entity itself.
@@ -75,8 +76,8 @@ public class ClassBridgeTest extends SearchTestCase {
 		List<Departments> result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "incorrect number of results returned", 2, result.size() );
-		for (Departments d : result) {
-			assertEquals("incorrect manufacturer", "C", d.getManufacturer());
+		for ( Departments d : result ) {
+			assertEquals( "incorrect manufacturer", "C", d.getManufacturer() );
 		}
 
 		// No data cross-ups.
@@ -93,7 +94,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertTrue( "incorrect entity returned, wrong branch head", result.size() == 1 );
-		assertEquals("incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead());
+		assertEquals( "incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead() );
 
 		// Check other ClassBridge annotation.
 		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "branchnetwork", TestConstants.simpleAnalyzer );
@@ -105,8 +106,9 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertEquals( "incorrect entity returned, wrong branch", "St. George", ( result.get( 0 ) ).getBranch() );
 		assertEquals( "incorrect number of results returned", 1, result.size() );
 
-		//cleanup
-		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) s.delete( element );
+		// cleanup
+		for ( Object element : s.createQuery( "from " + Departments.class.getName() ).list() )
+			s.delete( element );
 		tx.commit();
 		s.close();
 	}
@@ -154,10 +156,10 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertEquals( "id incorrect", 1, ((Departments)projection[0]).getId() );
 		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
-		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getFieldable("equiptype") );
-		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getFieldable("equiptype" ).stringValue() );
-		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getFieldable("branchnetwork") );
-		assertEquals( "branchnetwork incorrect", "Salt Lake City 1A", ( (Document) projection[1] ).getFieldable("branchnetwork" ).stringValue() );
+		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getFieldable( "equiptype" ) );
+		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getFieldable( "equiptype" ).stringValue() );
+		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getFieldable( "branchnetwork" ) );
+		assertEquals( "branchnetwork incorrect", "Salt Lake City 1A", ( (Document) projection[1] ).getFieldable( "branchnetwork" ).stringValue() );
 
 		projections.next();
 		projection = projections.get();
@@ -166,12 +168,12 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertEquals( "id incorrect", 4, ((Departments)projection[0]).getId() );
 		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
-		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getFieldable("equiptype") );
-		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getFieldable("equiptype" ).stringValue() );
-		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getFieldable("branchnetwork") );
-		assertEquals( "branchnetwork incorrect", "St. George 1D", ( (Document) projection[1] ).getFieldable("branchnetwork" ).stringValue() );
+		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getFieldable( "equiptype" ) );
+		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getFieldable( "equiptype" ).stringValue() );
+		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getFieldable( "branchnetwork" ) );
+		assertEquals( "branchnetwork incorrect", "St. George 1D", ( (Document) projection[1] ).getFieldable( "branchnetwork" ).stringValue() );
 
-		assertTrue("incorrect result count returned", projections.isLast());
+		assertTrue( "incorrect result count returned", projections.isLast() );
 		//cleanup
 		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) s.delete( element );
 		tx.commit();
@@ -234,7 +236,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertTrue( "incorrect entity returned, wrong branch head", result.size() == 1 );
-		assertEquals("incorrect entity returned", "Kent Lewin", ( (Department) result.get( 0 ) ).getBranchHead());
+		assertEquals( "incorrect entity returned", "Kent Lewin", ( (Department) result.get( 0 ) ).getBranchHead() );
 
 		//cleanup
 		for (Object element : s.createQuery( "from " + Department.class.getName() ).list()) s.delete( element );

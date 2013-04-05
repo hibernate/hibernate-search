@@ -20,6 +20,10 @@
  */
 package org.hibernate.search.test.serialization;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.search.test.serialization.AvroUtils.parseProtocol;
+import static org.hibernate.search.test.serialization.AvroUtils.parseSchema;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -42,9 +46,6 @@ import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.util.Utf8;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.search.test.serialization.AvroUtils.*;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -160,10 +161,10 @@ public class AvroTest {
 		tokens.add( attrs );
 		GenericData.Record attr = new GenericData.Record( tokenTrackingAttribute );
 		List<Integer> positions = new ArrayList<Integer>();
-		positions.add(1);
-		positions.add(2);
-		positions.add(3);
-		positions.add(4);
+		positions.add( 1 );
+		positions.add( 2 );
+		positions.add( 3 );
+		positions.add( 4 );
 		attr.put( "positions", positions);
 		attrs.add( attr );
 		attrs.add( ByteBuffer.wrap( serializableSample ) );
@@ -300,7 +301,7 @@ public class AvroTest {
 				assertThat( field.getSchema().getName() ).isEqualTo( "TokenStreamField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( List.class );
 				List<List<Object>> l1 = ( List<List<Object>> ) field.get( "value" );
-				assertThat( l1.get( 0 ) ).as("Wrong attribute impl list").hasSize( 2 );
+				assertThat( l1.get( 0 ) ).as( "Wrong attribute impl list" ).hasSize( 2 );
 				Object object = l1.get( 0 ).get( 0 );
 				assertThat( object ).isNotNull();
 				assertTermVector( field );

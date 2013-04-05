@@ -69,6 +69,6 @@ public class ProductCatalog {
 	}
 
 	public void addItem(Item item) {
-		this.items.add(item);
+		this.items.add( item );
 	}
 }

@@ -32,19 +32,23 @@ public class SpecificShardingStrategy extends IdHashShardingStrategy {
 
 	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] filters) {
-
-		FullTextFilter filter = getFilter(filters, "shard");
-		if (filter == null) {
+		FullTextFilter filter = getFilter( filters, "shard" );
+		if ( filter == null ) {
 			return getIndexManagersForAllShards();
 		}
 		else {
-			return new IndexManager[] { getIndexManagersForAllShards()[Integer.parseInt(filter.getParameter("index").toString())] };
+			return new IndexManager[] {
+						getIndexManagersForAllShards()[Integer.parseInt( filter.getParameter( "index" )
+					.toString() )]
+				};
 		}
 	}
 
 	private FullTextFilter getFilter(FullTextFilterImplementor[] filters, String name) {
-		for (FullTextFilterImplementor filter: filters) {
-			if (filter.getName().equals(name)) return filter;
+		for ( FullTextFilterImplementor filter : filters ) {
+			if ( filter.getName().equals( name ) ) {
+				return filter;
+			}
 		}
 		return null;
 	}

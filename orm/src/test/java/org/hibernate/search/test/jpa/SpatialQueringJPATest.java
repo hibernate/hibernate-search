@@ -254,7 +254,7 @@ public class SpatialQueringJPATest extends JPATestCase {
         hibQuery.setSort( distanceSort );
         hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
         // Set max results to 3 when 6 documents are stored:
-        hibQuery.setMaxResults(3);
+		hibQuery.setMaxResults( 3 );
         hibQuery.setSpatialParameters( Point.fromDegrees( centerLatitude, centerLongitude ), "location" );
         List results = hibQuery.getResultList();
         Object[] firstResult = (Object[]) results.get( 0 );

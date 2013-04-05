@@ -78,7 +78,7 @@ public class DirectoryProviderForQueryTest extends SearchTestCase {
 		assertEquals( "Query with no filter should bring back results from both shards.", 2, results.size() );
 
 		// index is not a field on the entity; the only way to filter on this is by shard
-		fullTextQuery.enableFullTextFilter("shard").setParameter("index", 0);
+		fullTextQuery.enableFullTextFilter( "shard" ).setParameter( "index", 0 );
 		assertEquals( "Query with filter should bring back results from only one shard.", 1, fullTextQuery.list().size() );
 
 		for (Object o : results) s.delete( o );

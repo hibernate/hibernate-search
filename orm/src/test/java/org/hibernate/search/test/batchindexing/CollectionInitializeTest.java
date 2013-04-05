@@ -48,7 +48,7 @@ public class CollectionInitializeTest extends SearchTestCase {
 			Assert.assertEquals( 1, resultSize );
 		}
 		finally {
-			clearData(fullTextSession);
+			clearData( fullTextSession );
 			fullTextSession.close();
 		}
 	}
@@ -60,7 +60,7 @@ public class CollectionInitializeTest extends SearchTestCase {
 		id.setPlantId( "2" );
 		fullTextSession.delete( fullTextSession.get( LegacyCarPlant.class, id ) );
 		for (int i = 1 ; i < 4 ; i++) {
-			fullTextSession.delete( fullTextSession.get(LegacyCar.class, "" + i ) );
+			fullTextSession.delete( fullTextSession.get( LegacyCar.class, "" + i ) );
 		}
 		transaction.commit();
 	}

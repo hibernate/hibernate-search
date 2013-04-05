@@ -80,7 +80,7 @@ public class BenchWithGeonames {
 		BufferedReader buffRead = null;
 		SessionFactory sessionFactory = null;
 		try {
-			sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
+			sessionFactory = new Configuration().configure( hibernateConfigurationFile ).buildSessionFactory();
 
 			session = sessionFactory.openSession();
 			session.createSQLQuery( "delete from MemberLevelTestPoI" ).executeUpdate();
@@ -149,7 +149,7 @@ public class BenchWithGeonames {
 		SessionFactory sessionFactory = null;
 		try {
 
-			sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
+			sessionFactory = new Configuration().configure( hibernateConfigurationFile ).buildSessionFactory();
 
 			session = sessionFactory.openSession();
 			session.beginTransaction();
@@ -305,16 +305,16 @@ public class BenchWithGeonames {
 
 					List<Integer> rangeIds = new ArrayList<Integer>();
 					for( int index= 0; index< rangeResults.size(); index++ ) {
-						rangeIds.add((Integer)((Object [])rangeResults.get( index ))[0]);
+						rangeIds.add( (Integer) ( (Object[]) rangeResults.get( index ) )[0] );
 					}
 					List<Integer> quadTreeIds = new ArrayList<Integer>();
 					for( int index= 0; index< quadTreeResults.size(); index++ ) {
-						quadTreeIds.add((Integer) ((Object[]) quadTreeResults.get(index))[0]);
+						quadTreeIds.add( (Integer) ( (Object[]) quadTreeResults.get( index ) )[0] );
 					}
 
 					rangeIds.removeAll( quadTreeIds );
 
-					System.out.println( "Missing Ids : " + rangeIds);
+					System.out.println( "Missing Ids : " + rangeIds );
 				}
 
 			}
@@ -372,7 +372,7 @@ public class BenchWithGeonames {
 		SessionFactory sessionFactory = null;
 
 		try {
-			sessionFactory = new Configuration().configure(hibernateConfigurationFile).buildSessionFactory();
+			sessionFactory = new Configuration().configure( hibernateConfigurationFile ).buildSessionFactory();
 
 			session = sessionFactory.openSession();
 			session.beginTransaction();

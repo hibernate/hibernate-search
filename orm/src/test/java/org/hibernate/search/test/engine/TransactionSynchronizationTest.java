@@ -53,17 +53,17 @@ public class TransactionSynchronizationTest extends SearchTestCase {
 		final Transaction transaction = fts.beginTransaction();
 		try {
 			Test test = new Test();
-			test.setIncorrectType("not a class");
-			fts.persist(test);
+			test.setIncorrectType( "not a class" );
+			fts.persist( test );
 			transaction.commit();
-			fail("An exception should have been raised");
+			fail( "An exception should have been raised" );
 		}
 		catch (Exception e) {
 			//good
 			raised = true;
 			transaction.rollback();
 		}
-		assertTrue("An exception should have been raised", raised);
+		assertTrue( "An exception should have been raised", raised );
 		fts.close();
 	}
 

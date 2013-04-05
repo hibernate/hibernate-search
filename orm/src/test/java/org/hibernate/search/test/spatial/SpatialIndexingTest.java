@@ -140,12 +140,12 @@ public class SpatialIndexingTest extends SearchTestCase {
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.list();
-		Object[] firstResult = (Object[]) results.get(0);
-		Object[] secondResult = (Object[]) results.get(1);
-		Object[] thirdResult = (Object[]) results.get(2);
-		Object[] fourthResult = (Object[]) results.get(3);
-		Object[] fifthResult = (Object[]) results.get(4);
-		Object[] sixthResult = (Object[]) results.get(5);
+		Object[] firstResult = (Object[]) results.get( 0 );
+		Object[] secondResult = (Object[]) results.get( 1 );
+		Object[] thirdResult = (Object[]) results.get( 2 );
+		Object[] fourthResult = (Object[]) results.get( 3 );
+		Object[] fifthResult = (Object[]) results.get( 4 );
+		Object[] sixthResult = (Object[]) results.get( 5 );
 		Assert.assertEquals( ((Double)firstResult[1]), 0.0, 0.0001 );
 		Assert.assertEquals( ((Double)secondResult[1]), 10.1582, 0.0001 );
 		Assert.assertEquals( ((Double)thirdResult[1]), 11.1195, 0.0001 );
@@ -154,7 +154,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( ((Double)sixthResult[1]), 24.446, 0.001 );
 
 		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for (Object entity : pois) {
+		for ( Object entity : pois ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();

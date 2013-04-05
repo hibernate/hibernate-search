@@ -23,13 +23,16 @@
  */
 package org.hibernate.search.test.configuration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Properties;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 /**
  * @author Sanne Grinovero
  */

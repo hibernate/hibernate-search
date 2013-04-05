@@ -50,7 +50,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class SearcherThread implements Runnable {
-	private static final Log log = LoggerFactory.make(Log.class);
+
+	private static final Log log = LoggerFactory.make( Log.class );
+
 	private final int threadId;
 	private final String queryString;
 	private final SessionFactory sf;

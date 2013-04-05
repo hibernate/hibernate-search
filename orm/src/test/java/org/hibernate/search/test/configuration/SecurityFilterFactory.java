@@ -56,7 +56,7 @@ public class SecurityFilterFactory {
 	@Key
 	public FilterKey getKey() {
 		StandardFilterKey key = new StandardFilterKey();
-		key.addParameter(ownerName);
+		key.addParameter( ownerName );
 		return key;
 	}
 

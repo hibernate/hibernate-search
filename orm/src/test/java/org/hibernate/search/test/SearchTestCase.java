@@ -118,7 +118,7 @@ public abstract class SearchTestCase extends TestCase {
 			}
 			session.close();
 			session = null;
-			log.debug("Closing open session. Make sure to close sessions explicitly in your tests!");
+			log.debug( "Closing open session. Make sure to close sessions explicitly in your tests!" );
 		}
 		else {
 			session = null;

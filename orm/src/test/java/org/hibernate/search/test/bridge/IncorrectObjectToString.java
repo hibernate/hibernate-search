@@ -24,12 +24,14 @@
 
 package org.hibernate.search.test.bridge;
 
-import org.hibernate.search.annotations.*;
-import org.hibernate.search.bridge.TwoWayStringBridge;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.bridge.TwoWayStringBridge;
 
 /**
  * @author Emmanuel Bernard
@@ -37,6 +39,7 @@ import javax.persistence.Id;
 @Entity
 @Indexed
 public class IncorrectObjectToString {
+
 	@Id @GeneratedValue @Field( bridge = @FieldBridge(impl = ErrorOnGetBridge.class) )
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }

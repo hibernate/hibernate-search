@@ -47,13 +47,13 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	 *             in case the test fails.
 	 */
 	public void testSerialization() throws Exception {
-		FullTextEntityManager em = Search.getFullTextEntityManager(factory.createEntityManager());
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 
-		indexSearchAssert(em);
+		indexSearchAssert( em );
 
 		FullTextEntityManager clone = SerializationTestHelper.duplicateBySerialization( em );
 
-		indexSearchAssert(clone);
+		indexSearchAssert( clone );
 
 		clone.close();
 		em.close();
@@ -72,26 +72,28 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	 */
 	private static void indexSearchAssert(FullTextEntityManager em) throws Exception {
 		em.getTransaction().begin();
-		Bretzel bretzel = new Bretzel(23, 34);
-		em.persist(bretzel);
+		Bretzel bretzel = new Bretzel( 23, 34 );
+		em.persist( bretzel );
 		em.getTransaction().commit();
 		em.clear();
 		em.getTransaction().begin();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
-		Query query = parser.parse("saltQty:noword");
-		assertEquals(0, em.createFullTextQuery(query).getResultList().size());
-		query = new TermQuery(new Term("saltQty", "23.0"));
-		assertEquals("getResultList", 1, em.createFullTextQuery(query)
-				.getResultList().size());
-		assertEquals("getSingleResult and object retrieval", 23f, ((Bretzel) em
-				.createFullTextQuery(query).getSingleResult()).getSaltQty());
-		assertEquals(1, em.createFullTextQuery(query).getResultSize());
+		Query query = parser.parse( "saltQty:noword" );
+		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
+		query = new TermQuery( new Term( "saltQty", "23.0" ) );
+		assertEquals( "getResultList", 1, em.createFullTextQuery( query )
+				.getResultList().size() );
+		assertEquals( "getSingleResult and object retrieval", 23f, ( (Bretzel) em
+				.createFullTextQuery( query )
+				.getSingleResult() )
+				.getSaltQty() );
+		assertEquals( 1, em.createFullTextQuery( query ).getResultSize() );
 		em.getTransaction().commit();
 
 		em.clear();
 
 		em.getTransaction().begin();
-		em.remove(em.find(Bretzel.class, bretzel.getId()));
+		em.remove( em.find( Bretzel.class, bretzel.getId() ) );
 		em.getTransaction().commit();
 	}
 }

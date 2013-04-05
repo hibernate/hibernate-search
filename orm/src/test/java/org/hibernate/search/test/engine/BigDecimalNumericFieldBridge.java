@@ -27,7 +27,8 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 
 public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
-	private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
+
+	private static final BigDecimal storeFactor = BigDecimal.valueOf( 100 );
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {

@@ -20,12 +20,13 @@
  */
 package org.hibernate.search.test.query.initandlookup;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.fest.assertions.Condition;
-
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -41,8 +42,6 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.GatedLuceneBackend;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
-
-import static org.fest.assertions.Assertions.*;
 
 /**
  * Test second level cache and persistence context lookup methods
@@ -76,7 +75,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 			.isEqualTo( 1 );
 
 		transaction.commit();
-		clearData(session);
+		clearData( session );
 		session.close();
 	}
 
@@ -106,7 +105,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 			.isEqualTo( 0 );
 
 		transaction.commit();
-		clearData(session);
+		clearData( session );
 		session.close();
 	}
 
@@ -142,7 +141,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 				.isEqualTo( 0 );
 
 		transaction.commit();
-		clearData(session);
+		clearData( session );
 		session.close();
 	}
 
@@ -180,7 +179,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 				.isEqualTo( 0 );
 
 		transaction.commit();
-		clearData(session);
+		clearData( session );
 		session.close();
 	}
 
@@ -263,7 +262,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 			.isEqualTo( 2 );
 
 		transaction.commit();
-		clearData(session);
+		clearData( session );
 		session.close();
 	}
 

@@ -60,7 +60,7 @@ public class BytemanHelper extends Helper {
 
 	public void assertBooleanValue(boolean actual, boolean expected) {
 		if ( actual != expected ) {
-			fail("Unexpected boolean value");
+			fail( "Unexpected boolean value" );
 		}
 	}
 

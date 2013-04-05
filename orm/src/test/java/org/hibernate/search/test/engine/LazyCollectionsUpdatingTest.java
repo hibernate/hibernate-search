@@ -104,7 +104,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		assertEquals( 1, query.list().size() );
 		List results = query.list();
 		assertFieldSelectorEnabled( "busLineName" );
-		String resultName = (String) ((Object[])results.get(0))[0];
+		String resultName = (String) ( (Object[]) results.get( 0 ) )[0];
 		assertEquals( "Linea 64", resultName );
 		tx.commit();
 		fullTextSession.close();

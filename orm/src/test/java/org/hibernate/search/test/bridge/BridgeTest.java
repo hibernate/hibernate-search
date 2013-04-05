@@ -231,8 +231,8 @@ public class BridgeTest extends SearchTestCase {
 		c.set( Calendar.MILLISECOND, 5 );
 
 
-		cloud.setMyCalendar(c); //5 millisecond
-		cloud.setCalendarDay(c);
+		cloud.setMyCalendar( c ); // 5 millisecond
+		cloud.setCalendarDay( c );
 		cloud.setCalendarHour( c );
 		cloud.setCalendarMillisecond( c );
 		cloud.setCalendarMinute( c );
@@ -283,8 +283,8 @@ public class BridgeTest extends SearchTestCase {
 
 	public void testIncorrectSetBridge() throws Exception {
 		IncorrectSet incorrect = new IncorrectSet();
-		incorrect.setSubIncorrect(new IncorrectSet.SubIncorrect());
-		incorrect.getSubIncorrect().setName("This is a name not a class");
+		incorrect.setSubIncorrect( new IncorrectSet.SubIncorrect() );
+		incorrect.getSubIncorrect().setName( "This is a name not a class" );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -292,35 +292,35 @@ public class BridgeTest extends SearchTestCase {
 			s.persist( incorrect );
 			s.flush();
 			s.flushToIndexes();
-			fail("Incorrect bridge should fail");
+			fail( "Incorrect bridge should fail" );
 		}
 		catch (BridgeException e) {
 			tx.rollback();
 		}
 		catch (HibernateException e) {
 			final Throwable throwable = e.getCause();
-			if (throwable instanceof BridgeException) {
+			if ( throwable instanceof BridgeException ) {
 				//expected
 				assertTrue( throwable.getMessage().contains( "class: " + IncorrectSet.class.getName() ) );
-				assertTrue( throwable.getMessage().contains("path: subIncorrect.name") );
+				assertTrue( throwable.getMessage().contains( "path: subIncorrect.name" ) );
 				tx.rollback();
 			}
 			else {
 				e.printStackTrace();
-				fail("Incorrect bridge should raise a SearchException: " + e.toString() );
+				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
 			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			fail("Incorrect bridge should raise a SearchException");
+			fail( "Incorrect bridge should raise a SearchException" );
 		}
 		s.close();
 	}
 
 	public void testIncorrectGetBridge() throws Exception {
 		IncorrectGet incorrect = new IncorrectGet();
-		incorrect.setSubIncorrect(new IncorrectGet.SubIncorrect());
-		incorrect.getSubIncorrect().setName("This is a name not a class");
+		incorrect.setSubIncorrect( new IncorrectGet.SubIncorrect() );
+		incorrect.getSubIncorrect().setName( "This is a name not a class" );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -328,13 +328,13 @@ public class BridgeTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 		tx = s.beginTransaction();
-		final QueryBuilder builder = s.getSearchFactory().buildQueryBuilder().forEntity(IncorrectGet.class).get();
-		final Query query = builder.keyword().onField("subIncorrect.name").matching("name").createQuery();
+		final QueryBuilder builder = s.getSearchFactory().buildQueryBuilder().forEntity( IncorrectGet.class ).get();
+		final Query query = builder.keyword().onField( "subIncorrect.name" ).matching( "name" ).createQuery();
 
 		try {
-			final FullTextQuery textQuery = s.createFullTextQuery(query, IncorrectGet.class).setProjection("subIncorrect.name");
+			final FullTextQuery textQuery = s.createFullTextQuery( query, IncorrectGet.class ).setProjection( "subIncorrect.name" );
 			textQuery.list();
-			fail("Incorrect bridge should fail");
+			fail( "Incorrect bridge should fail" );
 		}
 		catch (BridgeException e) {
 			tx.rollback();
@@ -345,17 +345,17 @@ public class BridgeTest extends SearchTestCase {
 				//expected
 				//System.out.println( throwable.getMessage() );
 				assertTrue( throwable.getMessage().contains( "class: " + IncorrectGet.class.getName() ) );
-				assertTrue( throwable.getMessage().contains("path: subIncorrect.name") );
+				assertTrue( throwable.getMessage().contains( "path: subIncorrect.name" ) );
 				tx.rollback();
 			}
 			else {
 				e.printStackTrace();
-				fail("Incorrect bridge should raise a SearchException: " + e.toString() );
+				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
 			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			fail("Incorrect bridge should raise a SearchException");
+			fail( "Incorrect bridge should raise a SearchException" );
 		}
 
 		tx = s.beginTransaction();
@@ -366,7 +366,7 @@ public class BridgeTest extends SearchTestCase {
 
 	public void testIncorrectObjectToStringBridge() throws Exception {
 		IncorrectObjectToString incorrect = new IncorrectObjectToString();
-		incorrect.setName("test");
+		incorrect.setName( "test" );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -374,7 +374,7 @@ public class BridgeTest extends SearchTestCase {
 			s.persist( incorrect );
 			s.flush();
 			s.flushToIndexes();
-			fail("Incorrect bridge should fail");
+			fail( "Incorrect bridge should fail" );
 		}
 		catch (BridgeException e) {
 			tx.rollback();
@@ -384,17 +384,17 @@ public class BridgeTest extends SearchTestCase {
 			if (throwable instanceof BridgeException) {
 				//expected
 				assertTrue( throwable.getMessage().contains( "class: " + IncorrectObjectToString.class.getName() ) );
-				assertTrue( throwable.getMessage().contains("path: id") );
+				assertTrue( throwable.getMessage().contains( "path: id" ) );
 				tx.rollback();
 			}
 			else {
 				e.printStackTrace();
-				fail("Incorrect bridge should raise a SearchException: " + e.toString() );
+				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
 			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			fail("Incorrect bridge should raise a SearchException");
+			fail( "Incorrect bridge should raise a SearchException" );
 		}
 		s.close();
 	}

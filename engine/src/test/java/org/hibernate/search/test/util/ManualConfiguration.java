@@ -57,7 +57,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	private IndexManagerFactory indexManagerFactory = new DefaultIndexManagerFactory();
 
 	public ManualConfiguration() {
-		this(SimpleInitializer.INSTANCE);
+		this( SimpleInitializer.INSTANCE );
 	}
 
 	public ManualConfiguration(InstanceInitializer init) {

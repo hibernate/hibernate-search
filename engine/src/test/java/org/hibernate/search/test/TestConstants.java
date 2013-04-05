@@ -53,7 +53,7 @@ public class TestConstants {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 		// get a URL reference to something we now is part of the classpath (our own classes)
 		String currentTestName = new RuntimeException().getStackTrace()[1].getClassName();
-		int hopsToRoot = currentTestName.split("\\.").length;
+		int hopsToRoot = currentTestName.split( "\\." ).length;
 		URL myUrl = contextClassLoader.getResource( currentTestName.replace( '.', '/' ) + ".class" );
 		File myPath = new File( myUrl.getFile() );
 		// navigate back to '/target'

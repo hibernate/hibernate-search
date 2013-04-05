@@ -62,7 +62,7 @@ public class WordDictionary {
 	}
 
 	public String randomWord() {
-		int position = Math.abs((int) ( r.nextGaussian() * gaussFactor ) );
+		int position = Math.abs( (int) ( r.nextGaussian() * gaussFactor ) );
 		if ( position < maxSize ) {
 			return positionalWords[position];
 		}

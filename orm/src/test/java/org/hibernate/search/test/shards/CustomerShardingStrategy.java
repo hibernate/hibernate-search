@@ -58,7 +58,7 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 
 	@Override
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-		Integer customerID = Integer.parseInt(document.getFieldable("customerID").stringValue());
+		Integer customerID = Integer.parseInt( document.getFieldable( "customerID" ).stringValue() );
 		return indexManagers[customerID];
 	}
 
@@ -74,18 +74,20 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 	 */
 	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] filters) {
-		FullTextFilter filter = getCustomerFilter(filters, "customer");
+		FullTextFilter filter = getCustomerFilter( filters, "customer" );
 		if (filter == null) {
 			return getIndexManagersForAllShards();
 		}
 		else {
-			return new IndexManager[] { indexManagers[Integer.parseInt(filter.getParameter("customerID").toString())] };
+			return new IndexManager[] { indexManagers[Integer.parseInt( filter.getParameter( "customerID" ).toString() )] };
 		}
 	}
 
 	private FullTextFilter getCustomerFilter(FullTextFilterImplementor[] filters, String name) {
 		for (FullTextFilterImplementor filter: filters) {
-			if (filter.getName().equals(name)) return filter;
+			if ( filter.getName().equals( name ) ) {
+				return filter;
+			}
 		}
 		return null;
 	}

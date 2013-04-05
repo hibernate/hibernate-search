@@ -67,7 +67,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 
 		EmailAddress emailAddress = new EmailAddress();
 		emailAddress.setAddress( "foo@foobar.com" );
-		emailAddress.setDefaultAddress(true);
+		emailAddress.setDefaultAddress( true );
 
 		person.addEmailAddress( emailAddress );
 
@@ -127,7 +127,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 
 		EmailAddress emailAddress = new EmailAddress();
 		emailAddress.setAddress( "foo@foobar.com" );
-		emailAddress.setDefaultAddress(true);
+		emailAddress.setDefaultAddress( true );
 
 		person.addEmailAddress( emailAddress );
 
@@ -138,14 +138,14 @@ public class WorkDuplicationTest extends SearchTestCase {
 		plannerEngine.prepareWorkPlan();
 		List<LuceneWork> sealedQueue = plannerEngine.getSealedQueue();
 
-		assertEquals("There should only be one job in the queue", 1, sealedQueue.size());
-		assertTrue("Wrong job type", sealedQueue.get(0) instanceof AddLuceneWork );
+		assertEquals( "There should only be one job in the queue", 1, sealedQueue.size() );
+		assertTrue( "Wrong job type", sealedQueue.get( 0 ) instanceof AddLuceneWork );
 
 		plannerEngine.add( new Work<SpecialPerson>( person, 1, WorkType.DELETE ) );
 		plannerEngine.prepareWorkPlan();
 		sealedQueue = plannerEngine.getSealedQueue();
 
-		assertEquals("Jobs should have countered each other", 0, sealedQueue.size());
+		assertEquals( "Jobs should have countered each other", 0, sealedQueue.size() );
 
 		fullTextSession.close();
 	}

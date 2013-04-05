@@ -23,11 +23,15 @@
  */
 package org.hibernate.search.test.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.DefaultSimilarity;
 import org.apache.lucene.search.Similarity;
-
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -37,9 +41,7 @@ import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Tests for {@code ClassLoaderHelper}. Verifying amongst other that it throws easy to understand exceptions.

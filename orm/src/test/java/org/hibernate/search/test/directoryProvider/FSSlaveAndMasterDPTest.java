@@ -55,22 +55,22 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 	/**
 	 * The lucene index directory which is shared between master and slave.
 	 */
-	final static String masterCopy = "/master/copy";
+	static final String masterCopy = "/master/copy";
 
 	/**
 	 * The lucene index directory which is specific to the master node.
 	 */
-	final static String masterMain = "/master/main";
+	static final String masterMain = "/master/main";
 
 	/**
 	 * The lucene index directory which is specific to the slave node.
 	 */
-	final static String slave = "/slave";
+	static final String slave = "/slave";
 
 	/**
 	 * The lucene index directory which is specific to the slave node.
 	 */
-	final static String slaveUnready = "/slaveUnready";
+	static final String slaveUnready = "/slaveUnready";
 
 	private File root;
 

@@ -64,7 +64,7 @@ public class UselessShardingStrategy implements IndexShardingStrategy {
 		counter = 0;
 		for (Object key :  properties.keySet() ) {
 			if ( ! String.class.isInstance( key ) ) continue;
-			if ( String.class.cast( key ).startsWith("test.") ) {
+			if ( String.class.cast( key ).startsWith( "test." ) ) {
 				System.out.println( key );
 				counter++;
 			}
@@ -78,7 +78,7 @@ public class UselessShardingStrategy implements IndexShardingStrategy {
 			Object key = propertyNames.nextElement();
 			if ( ! String.class.isInstance( key ) ) continue;
 			String propertyName = (String) key;
-			if ( propertyName.startsWith("test.") ) {
+			if ( propertyName.startsWith( "test." ) ) {
 				counter++;
 			}
 		}

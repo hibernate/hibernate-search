@@ -23,6 +23,12 @@
  */
 package org.hibernate.search.test.filter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -33,9 +39,7 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.hibernate.search.filter.impl.FilterOptimizationHelper;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Used to test org.hibernate.search.filter.FiltersOptimizationHelper

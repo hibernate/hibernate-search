@@ -66,8 +66,8 @@ public class IndexTestDontRun extends SearchTestCase {
 	}
 
 	public void testPerformance() throws Exception {
-		measure(true);//JVM warmup
-		measure(false);//JVM warmup
+		measure( true );// JVM warmup
+		measure( false );// JVM warmup
 		long measureLucene = measure( true );
 		long measureSearch = measure( false );
 		System.out.println( "Totaltime Lucene = " + measureLucene );

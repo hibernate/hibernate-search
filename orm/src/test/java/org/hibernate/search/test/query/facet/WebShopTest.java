@@ -51,7 +51,8 @@ import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
  * @author Hardy Ferentschik
  */
 public class WebShopTest extends AbstractFacetTest {
-	private static final Log log = LoggerFactory.make(Log.class);
+
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	public void testSimulateClient() {
 		// get hold of the search service

@@ -51,11 +51,11 @@ public class FilterOnDirectoryTest extends SearchTestCase {
 
 		FullTextQuery detectiveQuery = fts.createFullTextQuery( q, Detective.class );
 		assertEquals( 1, detectiveQuery.getResultSize() );
-		assertTrue( detectiveQuery.list().get(0) instanceof Detective );
+		assertTrue( detectiveQuery.list().get( 0 ) instanceof Detective );
 
 		FullTextQuery suspectQuery = fts.createFullTextQuery( q, Suspect.class );
 		assertEquals( 1, suspectQuery.getResultSize() );
-		assertTrue( suspectQuery.list().get(0) instanceof Suspect );
+		assertTrue( suspectQuery.list().get( 0 ) instanceof Suspect );
 
 		assertEquals( 2, fts.createFullTextQuery( q ).getResultSize() );
 		assertEquals( 2, fts.createFullTextQuery( q, Detective.class, Suspect.class ).getResultSize() );

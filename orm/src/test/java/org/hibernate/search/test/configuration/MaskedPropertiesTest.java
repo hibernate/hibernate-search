@@ -23,15 +23,17 @@
  */
 package org.hibernate.search.test.configuration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
-import java.util.Properties;
 import java.util.Enumeration;
+import java.util.Properties;
 
-import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.test.SerializationTestHelper;
-
+import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Sanne Grinovero

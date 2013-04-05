@@ -19,6 +19,12 @@
 
 package org.hibernate.search.test.directoryProvider;
 
+import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterCopy;
+import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterMain;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 
 import org.apache.lucene.store.Directory;
@@ -30,15 +36,9 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterCopy;
-import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterMain;
 
 /**
  * Verifies basic behavior of FSSlaveDirectoryProvider around
@@ -78,7 +78,7 @@ public class RetryInitializeTest {
 
 	@Test
 	public void testMasterDelayedInitialization() {
-		slave = createSlaveNode(true);
+		slave = createSlaveNode( true );
 
 		assertNotNull( FSSlaveDirectoryProviderTestingExtension.taskScheduled );
 		Long scheduledPeriod = FSSlaveDirectoryProviderTestingExtension.taskScheduledPeriod;

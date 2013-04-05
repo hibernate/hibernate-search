@@ -23,11 +23,12 @@
  */
 package org.hibernate.search.test.bridge;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.SearchException;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Emmanuel Bernard
