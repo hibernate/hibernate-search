@@ -69,6 +69,7 @@ public class IndexManagerHolder {
 	private static final Log log = LoggerFactory.make();
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
+	public static final String DYNAMIC_SHARDING = "dynamic";
 
 	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
@@ -91,19 +92,27 @@ public class IndexManagerHolder {
 		Properties[] indexProps = getDirectoryProperties( cfg, directoryProviderName );
 
 		//set up the IndexManagers
-		int nbrOfProviders = indexProps.length;
-		IndexManager[] providers = new IndexManager[nbrOfProviders];
-		for ( int index = 0; index < nbrOfProviders; index++ ) {
-			String providerName = nbrOfProviders > 1 ?
-					directoryProviderName + "." + index :
-					directoryProviderName;
-			IndexManager indexManager = indexManagersRegistry.get( providerName );
-			if ( indexManager == null ) {
-				indexManager = createIndexManager( providerName, indexProps[index], context, cfg );
-				indexManagersRegistry.put( providerName, indexManager );
+		final boolean isDynamicSharding = isDynamicSharding( indexProps[0] );
+
+		IndexManager[] providers;
+		if (isDynamicSharding) {
+			providers = new IndexManager[0];
+		}
+		else {
+			int nbrOfProviders = indexProps.length;
+			providers = new IndexManager[nbrOfProviders];
+			for ( int index = 0; index < nbrOfProviders; index++ ) {
+				String providerName = nbrOfProviders > 1 ?
+						directoryProviderName + "." + index :
+						directoryProviderName;
+				IndexManager indexManager = indexManagersRegistry.get( providerName );
+				if ( indexManager == null ) {
+					indexManager = createIndexManager( providerName, indexProps[index], context, cfg );
+					indexManagersRegistry.put( providerName, indexManager );
+				}
+				indexManager.addContainedEntity( mappedClass );
+				providers[index] = indexManager;
 			}
-			indexManager.addContainedEntity( mappedClass );
-			providers[index] = indexManager;
 		}
 
 		//define sharding strategy for this entity:
@@ -111,7 +120,11 @@ public class IndexManagerHolder {
 		//any indexProperty will do, the indexProps[0] surely exists.
 		String shardingStrategyName = indexProps[0].getProperty( SHARDING_STRATEGY );
 		if ( shardingStrategyName == null ) {
-			if ( indexProps.length == 1 ) {
+			if ( isDynamicSharding ) {
+				//TODO
+				shardingStrategy = null;
+			}
+			else if ( indexProps.length == 1 ) {
 				shardingStrategy = new NotShardedStrategy();
 			}
 			else {
@@ -119,11 +132,15 @@ public class IndexManagerHolder {
 			}
 		}
 		else {
+			if ( isDynamicSharding ) {
+				throw new SearchException( "Cannot define a ShardingStrategy with a dynamic sharding" );
+			}
 			shardingStrategy = ClassLoaderHelper.instanceFromName(
 					IndexShardingStrategy.class,
 					shardingStrategyName, DirectoryProviderFactory.class, "IndexShardingStrategy"
 			);
 		}
+		//TODO
 		shardingStrategy.initialize(
 				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers
 		);
@@ -167,8 +184,18 @@ public class IndexManagerHolder {
 				providers,
 				shardingStrategy,
 				similarityInstance,
-				interceptor
+				interceptor,
+				isDynamicSharding,
+				indexProps[0] //useful for dynamic sharding situations
 		);
+	}
+
+	public static boolean isDynamicSharding(String shardsCountValue) {
+		return DYNAMIC_SHARDING.equals(shardsCountValue);
+	}
+
+	public static boolean isDynamicSharding(Properties properties) {
+		return isDynamicSharding( properties.getProperty( NBR_OF_SHARDS ) );
 	}
 
 	private Class<? extends EntityIndexingInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
@@ -274,8 +301,8 @@ public class IndexManagerHolder {
 		Properties globalProperties = new MaskedProperty( rootCfg, "default" );
 		Properties directoryLocalProperties = new MaskedProperty( rootCfg, directoryProviderName, globalProperties );
 		final String shardsCountValue = directoryLocalProperties.getProperty( NBR_OF_SHARDS );
-		if ( shardsCountValue == null ) {
-			// no shards: finished.
+		if ( shardsCountValue == null || isDynamicSharding( shardsCountValue ) ) {
+			// no shard or dynamic shards: finished.
 			return new Properties[] { directoryLocalProperties };
 		}
 		else {

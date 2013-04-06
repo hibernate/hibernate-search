@@ -725,4 +725,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 183, value = "Unable to index instance of type %s while batch indexing: %s")
 	String massIndexerUnableToIndexInstance(String clazz, String value);
 
+	@Message(id = 184, value = "Cannot define an entity with 0 shard on '%1$s'")
+	SearchException entityWithNoShard(Class<?> type);
 }
