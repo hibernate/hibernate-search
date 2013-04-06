@@ -55,14 +55,14 @@ public class EntityIndexBindingFactory {
 			return null;
 		}
 		else {
-			return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
+			return new DefaultMutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
 		}
 	}
 
 	@SuppressWarnings( "unchecked" )
 	public static <T> MutableEntityIndexBinding<T> copyEntityIndexBindingReplacingSimilarity(EntityIndexBinding entityMapping, Similarity entitySimilarity) {
 		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) entityMapping.getEntityIndexingInterceptor();
-		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
+		MutableEntityIndexBinding<T> newMapping = new DefaultMutableEntityIndexBinding<T>(
 				entityMapping.getSelectionStrategy(),
 				entitySimilarity,
 				entityMapping.getIndexManagers(),
