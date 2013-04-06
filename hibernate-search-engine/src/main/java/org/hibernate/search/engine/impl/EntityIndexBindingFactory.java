@@ -26,6 +26,10 @@ import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import java.util.Properties;
 
 /**
  * Build the expected {@link EntityIndexBinder} depending in the configuration
@@ -34,17 +38,29 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class EntityIndexBindingFactory {
 
+	private static final Log log = LoggerFactory.make();
+
 	@SuppressWarnings( "unchecked" )
 	public static <T,U> MutableEntityIndexBinding<T> buildEntityIndexBinder(Class<T> type, IndexManager[] providers,
 																			  IndexShardingStrategy shardingStrategy,
 																			  Similarity similarityInstance,
-																			  EntityIndexingInterceptor<U> interceptor) {
+																			  EntityIndexingInterceptor<U> interceptor,
+																			  boolean isDynamicSharding,
+																			  Properties properties) {
+		if ( !isDynamicSharding && providers.length == 0 ) {
+			throw log.entityWithNoShard( type );
+		}
 		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T> ) interceptor;
-		return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
+		if (isDynamicSharding) {
+			return null;
+		}
+		else {
+			return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
+		}
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> MutableEntityIndexBinding<T> copyEntityIndexBindingReplacingSimilarity(Class<T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
+	public static <T> MutableEntityIndexBinding<T> copyEntityIndexBindingReplacingSimilarity( Class <T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
 		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) entityMapping.getEntityIndexingInterceptor();
 		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
 				entityMapping.getSelectionStrategy(),
@@ -56,4 +72,6 @@ public class EntityIndexBindingFactory {
 		newMapping.setDocumentBuilderIndexedEntity( documentBuilder );
 		return newMapping;
 	}
+
+
 }
