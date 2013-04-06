@@ -44,6 +44,7 @@ import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
+import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.impl.StandardServiceManager;
@@ -280,7 +281,7 @@ public class SearchFactoryBuilder {
 				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
 				entitySimilarity = entityMapping.getDocumentBuilder().getSimilarity();
 				if ( entitySimilarity != null ) {
-					MutableEntityIndexBinding newMapping = buildTypeSafeMutableEntityBinder(
+					MutableEntityIndexBinding newMapping = EntityIndexBindingFactory.copyEntityIndexBindingReplacingSimilarity(
 							clazz,
 							entityMapping,
 							entitySimilarity
@@ -304,20 +305,6 @@ public class SearchFactoryBuilder {
 				}
 			}
 		}
-	}
-
-	@SuppressWarnings( "unchecked" )
-	private <T> MutableEntityIndexBinding<T> buildTypeSafeMutableEntityBinder(Class<T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
-		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) entityMapping.getEntityIndexingInterceptor();
-		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
-				entityMapping.getSelectionStrategy(),
-				entitySimilarity,
-				entityMapping.getIndexManagers(),
-				interceptor
-		);
-		DocumentBuilderIndexedEntity<T> documentBuilder = (DocumentBuilderIndexedEntity<T>) entityMapping.getDocumentBuilder();
-		newMapping.setDocumentBuilderIndexedEntity( documentBuilder );
-		return newMapping;
 	}
 
 	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {
