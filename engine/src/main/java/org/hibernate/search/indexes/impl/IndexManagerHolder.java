@@ -34,6 +34,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
@@ -161,7 +162,7 @@ public class IndexManagerHolder {
 				);
 			}
 		}
-		return buildTypesafeMutableEntityBinder(
+		return EntityIndexBindingFactory.buildEntityIndexBinder(
 				entity.getClass(),
 				providers,
 				shardingStrategy,
@@ -185,15 +186,6 @@ public class IndexManagerHolder {
 					result;
 		}
 		return result;
-	}
-
-	@SuppressWarnings( "unchecked" )
-	private <T,U> MutableEntityIndexBinding<T> buildTypesafeMutableEntityBinder(Class<T> type, IndexManager[] providers,
-																		IndexShardingStrategy shardingStrategy,
-																		Similarity similarityInstance,
-																		EntityIndexingInterceptor<U> interceptor) {
-		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T>) interceptor;
-		return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
 	}
 
 	/**
