@@ -678,4 +678,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 170, value = "Cannot define an entity with 0 shard on '%1$s'")
 	SearchException entityWithNoShard(Class<?> type);
 
+	@Message(id = 171, value = "Cannot set a sharding strategy when using dynamic sharding on '%1$s'")
+	SearchException illegalStragegyWhenUsingDynamicSharding(Class<?> type);
+
 }
