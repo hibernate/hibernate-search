@@ -675,4 +675,7 @@ public interface Log extends BasicLogger {
 			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" )
 	SearchException fieldBridgeNotTwoWay(Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
 
+	@Message(id = 170, value = "Cannot define an entity with 0 shard on '%1$s'")
+	SearchException entityWithNoShard(Class<?> type);
+
 }
