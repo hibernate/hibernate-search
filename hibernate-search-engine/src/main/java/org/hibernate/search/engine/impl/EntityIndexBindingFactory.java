@@ -21,11 +21,15 @@
 package org.hibernate.search.engine.impl;
 
 import org.apache.lucene.search.Similarity;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -43,35 +47,50 @@ public class EntityIndexBindingFactory {
 	@SuppressWarnings( "unchecked" )
 	public static <T,U> MutableEntityIndexBinding<T> buildEntityIndexBinder(Class<T> type, IndexManager[] providers,
 																			  IndexShardingStrategy shardingStrategy,
+																			  ShardIdentifierProvider shardIdentifierProvider,
 																			  Similarity similarityInstance,
 																			  EntityIndexingInterceptor<U> interceptor,
 																			  boolean isDynamicSharding,
-																			  Properties properties) {
+																			  Properties properties,
+																			  String rootDirectoryProviderName,
+																			  WorkerBuildContext context,
+																			  IndexManagerHolder indexManagerHolder,
+																			  IndexManagerFactory indexManagerFactory) {
 		if ( !isDynamicSharding && providers.length == 0 ) {
 			throw log.entityWithNoShard( type );
 		}
-		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T> ) interceptor;
+		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T>) interceptor;
 		if (isDynamicSharding) {
-			return null;
+			return new DynamicShardingEntityIndexBinding<T>( shardIdentifierProvider, similarityInstance, safeInterceptor,
+					properties, indexManagerFactory, context.getUninitializedSearchFactory(), indexManagerHolder,
+					rootDirectoryProviderName );
 		}
 		else {
-			return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
+			return new DefaultMutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
 		}
 	}
 
 	@SuppressWarnings( "unchecked" )
 	public static <T> MutableEntityIndexBinding<T> copyEntityIndexBindingReplacingSimilarity( Class <T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
 		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) entityMapping.getEntityIndexingInterceptor();
-		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
-				entityMapping.getSelectionStrategy(),
-				entitySimilarity,
-				entityMapping.getIndexManagers(),
-				interceptor
-		);
+		boolean isDynamicSharding = entityMapping instanceof DynamicShardingEntityIndexBinding;
+		MutableEntityIndexBinding<T> newMapping;
+		if (isDynamicSharding) {
+			newMapping = ( (DynamicShardingEntityIndexBinding<T>) entityMapping ).cloneWithSimilarity(entitySimilarity);
+
+		}
+		else {
+			newMapping = new DefaultMutableEntityIndexBinding<T>(
+					entityMapping.getSelectionStrategy(),
+					entitySimilarity,
+					entityMapping.getIndexManagers(),
+					interceptor
+			);
+		}
 		DocumentBuilderIndexedEntity<T> documentBuilder = (DocumentBuilderIndexedEntity<T>) entityMapping.getDocumentBuilder();
 		newMapping.setDocumentBuilderIndexedEntity( documentBuilder );
 		return newMapping;
 	}
-
-
 }
+
+

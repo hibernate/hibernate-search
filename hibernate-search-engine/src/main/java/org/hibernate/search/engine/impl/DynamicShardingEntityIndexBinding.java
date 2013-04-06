@@ -70,7 +70,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 			EntityIndexingInterceptor<? super T> entityIndexingInterceptor,
 			Properties properties,
 			IndexManagerFactory indexManagerFactory,
-			WorkerBuildContext context,
+			SearchFactoryImplementor searchFactory,
 			IndexManagerHolder indexManagerHolder,
 			String rootDirectoryProviderName) {
 		this.shardIdentityProvider = shardIdentityProvider;
@@ -78,7 +78,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 		this.entityIndexingInterceptor = entityIndexingInterceptor;
 		this.shardingStrategy = new DynamicShardsShardingStrategy(); //no need to initialize it
 		this.properties = properties;
-		this.searchFactory = context.getUninitializedSearchFactory();
+		this.searchFactory = searchFactory;
 		this.indexManagerFactory = indexManagerFactory;
 		this.indexManagerHolder = indexManagerHolder;
 		this.rootDirectoryProviderName = rootDirectoryProviderName;
@@ -134,6 +134,19 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 
 	public IndexManagerFactory getIndexManagerFactory() {
 		return indexManagerFactory;
+	}
+
+	public <T> MutableEntityIndexBinding<T> cloneWithSimilarity(Similarity entitySimilarity) {
+		return new DynamicShardingEntityIndexBinding<T>(
+				shardIdentityProvider,
+				entitySimilarity,
+				entityIndexingInterceptor,
+				properties,
+				indexManagerFactory,
+				searchFactory,
+				indexManagerHolder,
+				rootDirectoryProviderName
+		);
 	}
 
 	private class DynamicShardsShardingStrategy implements IndexShardingStrategy {
