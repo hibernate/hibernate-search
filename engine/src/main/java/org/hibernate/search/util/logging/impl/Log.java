@@ -704,4 +704,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 176, value = "Document could not be parsed")
 	SearchException unableToParseDocument(@Cause Throwable cause);
 
+	@Message(id = 177, value = "Cannot define an entity with 0 shard on '%1$s'")
+	SearchException entityWithNoShard(Class<?> type);
+
 }
