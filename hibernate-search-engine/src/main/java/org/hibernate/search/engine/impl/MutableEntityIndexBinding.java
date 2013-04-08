@@ -1,8 +1,8 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
- * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -20,81 +20,12 @@
  */
 package org.hibernate.search.engine.impl;
 
-import java.util.Set;
-
-import org.apache.lucene.search.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
-import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class MutableEntityIndexBinding<T> implements EntityIndexBinder {
-
-	private final IndexShardingStrategy shardingStrategy;
-	private final Similarity similarityInstance;
-	private DocumentBuilderIndexedEntity<T> documentBuilder;
-	private final IndexManager[] indexManagers;
-	private final EntityIndexingInterceptor entityIndexingInterceptor;
-
-	/**
-	 * @param shardingStrategy
-	 * @param similarityInstance
-	 * @param providers
-	 */
-	public MutableEntityIndexBinding(
-			IndexShardingStrategy shardingStrategy,
-			Similarity similarityInstance,
-			IndexManager[] providers,
-			EntityIndexingInterceptor<? super T> entityIndexingInterceptor) {
-				this.shardingStrategy = shardingStrategy;
-				this.similarityInstance = similarityInstance;
-				this.indexManagers = providers;
-				this.entityIndexingInterceptor = entityIndexingInterceptor;
-	}
-
-	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder) {
-		this.documentBuilder = documentBuilder;
-	}
-
-	@Override
-	public Similarity getSimilarity() {
-		return similarityInstance;
-	}
-
-	@Override
-	public IndexShardingStrategy getSelectionStrategy() {
-		return shardingStrategy;
-	}
-
-	@Override
-	public DocumentBuilderIndexedEntity<T> getDocumentBuilder() {
-		return documentBuilder;
-	}
-
-	@Override
-	public FieldCacheCollectorFactory getIdFieldCacheCollectionFactory() {
-		//TODO remove this stuff from the DocumentBuilder, bring it here.
-		return documentBuilder.getIdFieldCacheCollectionFactory();
-	}
-
-	@Override
-	public void postInitialize(Set<Class<?>> indexedClasses) {
-		documentBuilder.postInitialize( indexedClasses );
-	}
-
-	@Override
-	public IndexManager[] getIndexManagers() {
-		return indexManagers;
-	}
-
-	@Override
-	public EntityIndexingInterceptor getEntityIndexingInterceptor() {
-		return entityIndexingInterceptor;
-	}
-
+public interface MutableEntityIndexBinding<T> extends EntityIndexBinder {
+	void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder);
 }

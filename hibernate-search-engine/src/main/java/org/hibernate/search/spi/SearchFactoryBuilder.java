@@ -24,43 +24,7 @@
 
 package org.hibernate.search.spi;
 
-import java.beans.Introspector;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.lucene.search.Similarity;
-import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
-import org.hibernate.search.backend.impl.QueueingProcessor;
-import org.hibernate.search.backend.impl.WorkerFactory;
-import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.engine.impl.DefaultTimingSource;
-import org.hibernate.search.engine.impl.FilterDef;
-import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
-import org.hibernate.search.engine.impl.StandardServiceManager;
-import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
-import org.hibernate.search.engine.spi.EntityState;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.filter.impl.CachingWrapperFilter;
-import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
-import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -77,11 +41,28 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Key;
+import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
+import org.hibernate.search.backend.impl.QueueingProcessor;
+import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.impl.DefaultTimingSource;
+import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
+import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
+import org.hibernate.search.engine.impl.StandardServiceManager;
+import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityState;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.filter.impl.CachingWrapperFilter;
+import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.impl.ImmutableSearchFactory;
 import org.hibernate.search.impl.IncrementalSearchConfiguration;
@@ -95,7 +76,25 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import java.beans.Introspector;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Build a search factory following the builder pattern.
@@ -280,7 +279,7 @@ public class SearchFactoryBuilder {
 				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
 				entitySimilarity = entityMapping.getDocumentBuilder().getSimilarity();
 				if ( entitySimilarity != null ) {
-					MutableEntityIndexBinding newMapping = buildTypeSafeMutableEntityBinder(
+					MutableEntityIndexBinding newMapping = EntityIndexBindingFactory.copyEntityIndexBindingReplacingSimilarity(
 							clazz,
 							entityMapping,
 							entitySimilarity
@@ -304,20 +303,6 @@ public class SearchFactoryBuilder {
 				}
 			}
 		}
-	}
-
-	@SuppressWarnings( "unchecked" )
-	private <T> MutableEntityIndexBinding<T> buildTypeSafeMutableEntityBinder(Class<T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
-		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) entityMapping.getEntityIndexingInterceptor();
-		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
-				entityMapping.getSelectionStrategy(),
-				entitySimilarity,
-				entityMapping.getIndexManagers(),
-				interceptor
-		);
-		DocumentBuilderIndexedEntity<T> documentBuilder = (DocumentBuilderIndexedEntity<T>) entityMapping.getDocumentBuilder();
-		newMapping.setDocumentBuilderIndexedEntity( documentBuilder );
-		return newMapping;
 	}
 
 	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {
