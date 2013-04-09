@@ -1,22 +1,26 @@
-/* 
- * JBoss, Home of Professional Open Source
- * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
- * as indicated by the @authors tag. All rights reserved.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
  *
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
+ * Copyright (c) 2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ *
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
  */
-
 package org.hibernate.search.infinispan;
 
 import static junit.framework.Assert.assertEquals;
@@ -40,36 +44,36 @@ import org.junit.Test;
 /**
  * In this test we initially start a master node which will stay alive
  * for the full test duration and constantly indexing new entities.
- * 
+ *
  * After that we add and remove additional new nodes, still making more
  * index changes checking that each node is always able
  * to see changes as soon as committed by the main node; this
  * results in a very stressfull test as the cluster topology is changed
  * at each step (though it doesn't rehash as it's replicating).
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class LiveRunningTest {
-	
+
 	private static final int TEST_RUNS = 17;
 	private static final int MAX_SLAVES = 5;
 	private static HashSet<Class<?>> entityTypes;
-	
+
 	private final FullTextSessionBuilder master = createClusterNode( entityTypes, true );
 	private final List<FullTextSessionBuilder> slaves = new LinkedList<FullTextSessionBuilder>();
-	
+
 	private boolean growCluster = true;
-	
+
 	private int storedEmailsCount = 0;
-	
+
 	@Test
 	public void liveRun() {
 		try {
 			for ( int i = 0; i < TEST_RUNS; i++ ) {
-			writeOnMaster();
-			adjustSlavesNumber(i);
-			assertViews();
-		}
+				writeOnMaster();
+				adjustSlavesNumber( i );
+				assertViews();
+			}
 		}
 		finally {
 			master.close();
@@ -135,7 +139,7 @@ public class LiveRunningTest {
 			fullTextSession.close();
 		}
 	}
-	
+
 	private void waitForAllJoinsCompleted() {
 		int expectedSize = slaves.size() + 1;
 		waitMembersCount( master, SimpleEmail.class, expectedSize );
@@ -157,3 +161,4 @@ public class LiveRunningTest {
 	}
 
 }
+

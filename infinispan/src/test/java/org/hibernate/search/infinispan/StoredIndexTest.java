@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -78,7 +78,7 @@ public class StoredIndexTest {
 	/**
 	 * Verifies a query on a specific term returns an expected amount of results.
 	 * We do actually load entities from database, so both database and index are tested.
-	 * 
+	 *
 	 * @param termMatch
 	 * @param expectedMatches
 	 */

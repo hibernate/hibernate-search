@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -37,11 +37,11 @@ import org.infinispan.remoting.transport.Address;
  * Helpers to setup several instances of Hibernate Search using
  * clustering to connect the index, and sharing the same H2
  * database instance.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class ClusterTestHelper {
-	
+
 	/**
 	 * Create a clustered Hibernate Search instance.
 	 * Note the configuration used is not optimal for performance,

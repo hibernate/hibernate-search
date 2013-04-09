@@ -76,7 +76,7 @@ public abstract class Device {
 		if ( !( obj instanceof Device ) )
 			return false;
 		Device other = (Device) obj;
-		
+
 		if ( manufacturer == null ) {
 			if ( other.manufacturer != null )
 				return false;
