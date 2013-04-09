@@ -13,25 +13,20 @@ public class BoxDAO {
 
 	@Transactional
 	public void persist(Box box) {
-		entityManager.persist(box);
-//		entityManager.flush();
+		entityManager.persist( box );
 	}
 
 	@Transactional
 	public Box merge(Box box) {
-		Box result = entityManager.merge(box);
-		
-//		entityManager.flush();
-		
+		Box result = entityManager.merge( box );
 		return result;
 	}
 
 	@Transactional
 	public void remove(Box box) {
-		entityManager.remove(box);
-//		entityManager.flush();
+		entityManager.remove( box );
 	}
-	
+
 	public EntityManager getEntityManager() {
 		return entityManager;
 	}

@@ -25,10 +25,10 @@ public class Doughnut {
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long doughnutId;
-	
+
 	@ManyToOne
 	private Box box;
-	
+
 	@Column(length = 255,nullable=false)
 	private String kind;
 
@@ -73,5 +73,5 @@ public class Doughnut {
 	public void setKind(String kind) {
 		this.kind = kind;
 	}
-	
+
 }

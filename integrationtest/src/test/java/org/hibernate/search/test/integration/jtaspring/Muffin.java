@@ -19,16 +19,17 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 //@Indexed(index="Muffin")
 //@Analyzer(impl = StandardAnalyzer.class)
 public class Muffin {
+
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long muffinId;
-	
+
 	@ManyToOne
 	private Box box;
-	
+
 	@Column(length = 255,nullable=false)
 	private String kind;
-	
+
 	public Muffin() {
 	}
 
@@ -73,6 +74,5 @@ public class Muffin {
 	public void setKind(String kind) {
 		this.kind = kind;
 	}
-	
-	
+
 }

@@ -24,11 +24,11 @@ public class Box extends Container {
 	@OneToMany(mappedBy="box", cascade={ CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST }, fetch=FetchType.LAZY)
 	@ForeignKey(name="FK_Box_Muffins")
 	private Set<Muffin> muffinSet;
-	
+
 	@OneToMany(mappedBy="box", cascade={ CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST }, fetch=FetchType.LAZY)
 	@ForeignKey(name="FK_Box_Doughnuts")
 	private Set<Doughnut> doughnutSet;
-	
+
 	public Box() {
 	}
 
@@ -36,13 +36,12 @@ public class Box extends Container {
 	 * @return the color
 	 */
 	public void addMuffin(Muffin muffin) {
-		if (muffinSet == null) {
+		if ( muffinSet == null ) {
 			muffinSet = new HashSet<Muffin>();
 		}
-		
-		muffinSet.add(muffin);
+		muffinSet.add( muffin );
 	}
-	
+
 	/**
 	 * @return the muffinSet
 	 */
@@ -72,10 +71,9 @@ public class Box extends Container {
 	}
 
 	public void addDoughnut(Doughnut doughnut) {
-		if (doughnutSet == null) {
+		if ( doughnutSet == null ) {
 			doughnutSet = new HashSet<Doughnut>();
 		}
-		
-		doughnutSet.add(doughnut);
-	}	
+		doughnutSet.add( doughnut );
+	}
 }

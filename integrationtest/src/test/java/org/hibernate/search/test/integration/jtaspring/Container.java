@@ -33,7 +33,7 @@ public class Container extends AbstractEntity {
 
 	@Column(length = 255)
 	private String color;
-	
+
 	/**
 	 * @return the containerId
 	 */

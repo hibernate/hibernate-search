@@ -13,16 +13,16 @@ public class MuffinDAO {
 
 	@Transactional
 	public void persist(Muffin muffin) {
-		entityManager.persist(muffin);
+		entityManager.persist( muffin );
 	}
 
 	@Transactional
 	public void merge(Muffin muffin) {
-		entityManager.merge(muffin);
+		entityManager.merge( muffin );
 	}
 
 	@Transactional
 	public void remove(Muffin muffin) {
-		entityManager.remove(muffin);
+		entityManager.remove( muffin );
 	}
 }

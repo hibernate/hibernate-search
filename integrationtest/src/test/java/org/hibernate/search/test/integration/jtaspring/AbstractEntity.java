@@ -10,10 +10,10 @@ import org.hibernate.annotations.NaturalId;
 @MappedSuperclass
 public abstract class AbstractEntity {
 
-	@NaturalId(mutable=true) 
+	@NaturalId(mutable=true)
 	@Column(length=36)
 	private String magicKey_;
-	
+
 	/**
 	 * Sets the magic key for the instance
 	 */

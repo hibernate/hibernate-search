@@ -8,21 +8,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class SnertDAO {
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Transactional
 	public void persist(Snert snert) {
-		entityManager.persist(snert);
+		entityManager.persist( snert );
 	}
 
 	@Transactional
 	public void merge(Snert snert) {
-		entityManager.merge(snert);
+		entityManager.merge( snert );
 	}
 
 	@Transactional
 	public void remove(Snert snert) {
-		entityManager.remove(snert);
+		entityManager.remove( snert );
 	}
 }

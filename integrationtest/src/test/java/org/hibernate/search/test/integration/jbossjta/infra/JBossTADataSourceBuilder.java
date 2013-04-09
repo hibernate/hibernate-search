@@ -35,7 +35,7 @@ public class JBossTADataSourceBuilder {
 	}
 
 	public DataSource createDataSource() throws SQLException {
-		TxControl.setDefaultTimeout(timeout);
+		TxControl.setDefaultTimeout( timeout );
 		DataSourceProvider.initialize( xaDataSource );
 		DataSourceProvider dsProvider = new DataSourceProvider();
 		final XADataSource dataSource = dsProvider.getDataSource( dsProvider.getDataSourceName() );

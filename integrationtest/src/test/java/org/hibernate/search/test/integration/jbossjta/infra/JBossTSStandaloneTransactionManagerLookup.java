@@ -18,7 +18,7 @@ public class JBossTSStandaloneTransactionManagerLookup implements TransactionMan
 	public TransactionManager getTransactionManager(Properties props) throws HibernateException {
 		try {
 			//Call jtaPropertyManager.getJTAEnvironmentBean().getTransactionManager();
-			
+
 			//improper camel case name for the class
 			Class<?> propertyManager = Class.forName( "com.arjuna.ats.jta.common.jtaPropertyManager" );
 			final Method getJTAEnvironmentBean = propertyManager.getMethod( "getJTAEnvironmentBean" );
