@@ -26,7 +26,6 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.Similarity;
-import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -36,7 +35,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.impl.DefaultMutableEntityIndexBinding;
 import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
@@ -251,7 +249,7 @@ public class IndexManagerHolder {
 			context = ( WorkerBuildContext ) searchFactory;
 		}
 		else {
-			throw new AssertionFailure( "SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext: " + searchFactory.getClass() );
+			throw log.assertionFailureCannotCastToWorkerBuilderContext( searchFactory.getClass() );
 		}
 		indexManager = doGetOrCreateIndexManager(
 				providerName,
