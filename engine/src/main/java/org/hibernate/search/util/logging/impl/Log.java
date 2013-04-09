@@ -731,6 +731,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 185, value = "Cannot set a sharding strategy when using dynamic sharding on '%1$s'")
 	SearchException illegalStrategyWhenUsingDynamicSharding(Class<?> type);
 
-	@Message(id = 172, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext. Actual class is %1$s")
+	@Message(id = 186, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext. Actual class is %1$s")
 	SearchException assertionFailureCannotCastToWorkerBuilderContext(Class<?> type);
 }

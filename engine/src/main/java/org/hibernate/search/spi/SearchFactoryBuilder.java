@@ -288,6 +288,8 @@ public class SearchFactoryBuilder {
 					documentBuildersIndexedEntities.put( clazz, entityIndexBinding );
 				}
 			}
+			//note that calling EIB.getIndexManagers() will eagerly load all known shard IndexManagers
+			//which is a good thing and should be retained
 			IndexManager[] indexManagers = entityIndexBinding.getIndexManagers();
 			for ( IndexManager indexManager : indexManagers ) {
 				Similarity indexSimilarity = indexManager.getSimilarity();
