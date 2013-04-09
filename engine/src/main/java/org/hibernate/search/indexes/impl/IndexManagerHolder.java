@@ -26,7 +26,6 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.Similarity;
-import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -250,7 +249,7 @@ public class IndexManagerHolder {
 			context = ( WorkerBuildContext ) searchFactory;
 		}
 		else {
-			throw new AssertionFailure( "SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext: " + searchFactory.getClass() );
+			throw log.assertionFailureCannotCastToWorkerBuilderContext( searchFactory.getClass() );
 		}
 		indexManager = doGetOrCreateIndexManager(
 				providerName,
