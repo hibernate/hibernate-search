@@ -126,8 +126,11 @@ public class IndexManagerHolder {
 						directoryProviderName + "." + index :
 						directoryProviderName;
 				Properties indexProp = indexProps[index];
-				IndexManager indexManager = doGetOrCreateIndexManager( providerName, mappedClass, similarityInstance,
-						indexProp, cfg.getIndexManagerFactory(), context );
+				IndexManager indexManager = doGetAndEnlistIndexManagerOrNull( providerName, mappedClass );
+				if ( indexManager == null ) {
+					indexManager = doGetOrCreateIndexManager( providerName, mappedClass, similarityInstance,
+							indexProp, cfg.getIndexManagerFactory(), context );
+				}
 				providers[index] = indexManager;
 			}
 		}
@@ -208,7 +211,10 @@ public class IndexManagerHolder {
 		);
 	}
 
-	//TODO what would be a less aggressive way to init the index manager in a thread safe way?
+	/**
+	 * Clients of this method should primarily use doGetAndEnlistIndexManagerOrNull and only proceed
+	 * if it returns null. This will decrease the contention on the lock.
+	 */
 	private synchronized IndexManager doGetOrCreateIndexManager(String providerName, Class<?> mappedClass, Similarity similarityInstance, Properties indexProp, IndexManagerFactory indexManagerFactory, WorkerBuildContext context) {
 		IndexManager indexManager = indexManagersRegistry.get( providerName );
 		if ( indexManager == null ) {
@@ -222,16 +228,32 @@ public class IndexManagerHolder {
 		return indexManager;
 	}
 
+	/**
+	 * If this method returns null, use doGetOrCreateIndexManager.
+	 */
+	private synchronized IndexManager doGetAndEnlistIndexManagerOrNull(String providerName, Class<?> mappedClass) {
+		IndexManager indexManager = indexManagersRegistry.get( providerName );
+		if ( indexManager != null ) {
+			indexManager.addContainedEntity( mappedClass );
+		}
+		return indexManager;
+	}
+
 	public IndexManager getOrCreateLateIndexManager(String providerName, DynamicShardingEntityIndexBinding entityIndexBinder) {
+		IndexManager indexManager = doGetAndEnlistIndexManagerOrNull( providerName, entityIndexBinder.getDocumentBuilder().getBeanClass() );
+		if ( indexManager != null ) {
+			return indexManager;
+		}
 		SearchFactoryImplementor searchFactory = entityIndexBinder.getSearchFactory();
 		WorkerBuildContext context;
+		//known implementations of SearchFactory passed are MutableSearchFactory and ImmutableSearchFactory
 		if ( WorkerBuildContext.class.isAssignableFrom( searchFactory.getClass() ) ) {
 			context = ( WorkerBuildContext ) searchFactory;
 		}
 		else {
 			throw new AssertionFailure( "SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext: " + searchFactory.getClass() );
 		}
-		IndexManager indexManager = doGetOrCreateIndexManager(
+		indexManager = doGetOrCreateIndexManager(
 				providerName,
 				entityIndexBinder.getDocumentBuilder().getBeanClass(),
 				entityIndexBinder.getSimilarity(), entityIndexBinder.getProperties(),
