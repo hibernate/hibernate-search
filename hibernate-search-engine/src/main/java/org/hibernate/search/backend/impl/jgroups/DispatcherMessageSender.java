@@ -46,8 +46,9 @@ class DispatcherMessageSender extends AbstractMessageSender {
 		dispatcher.stop();
 	}
 
-	public void send(final Message message) throws Exception {
-		dispatcher.castMessage( null, message, RequestOptions.ASYNC() );
+	public void send(final Message message, final boolean synchronous) throws Exception {
+		final RequestOptions options = synchronous ? RequestOptions.SYNC() : RequestOptions.ASYNC();
+		dispatcher.castMessage( null, message, options );
 	}
 
 	@Override

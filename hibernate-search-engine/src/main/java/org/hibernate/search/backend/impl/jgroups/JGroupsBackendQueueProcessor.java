@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 
+import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
@@ -35,6 +36,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -51,6 +53,20 @@ import org.jgroups.Address;
  */
 public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
+	/**
+	 * Configuration property specific the the backend instance. When enabled
+	 * the invoker thread will use JGroups in synchronous mode waiting for the
+	 * ACK from the other parties; when disabled it is going to behave
+	 * as fire and forget: delegates reliability to the JGroups configuration and returns
+	 * immediately.
+	 *
+	 * The default value depends on the backend configuration: if it's set to async,
+	 * then block_waiting_ack defaults to false.
+	 *
+	 * @see org.hibernate.search.Environment#WORKER_EXECUTION
+	 */
+	public static final String BLOCK_WAITING_ACK = "block_waiting_ack";
+
 	private static final Log log = LoggerFactory.make();
 
 	private final NodeSelectorStrategy selectionStrategy;
@@ -64,7 +80,6 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	private JGroupsBackendQueueTask jgroupsProcessor;
 	private LuceneBackendQueueProcessor luceneBackendQueueProcessor;
-
 
 	public JGroupsBackendQueueProcessor(NodeSelectorStrategy selectionStrategy) {
 		this.selectionStrategy = selectionStrategy;
@@ -80,7 +95,11 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
 		selectionStrategy.viewAccepted( messageSender.getView() ); // set current view?
-		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector );
+
+		final boolean sync = BackendFactory.isConfiguredAsSync( props );
+		final boolean block = ConfigurationParseHelper.getBooleanValue( props, BLOCK_WAITING_ACK, sync );
+
+		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, block );
 		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 		luceneBackendQueueProcessor.initialize( props, context, indexManager );
 	}
@@ -149,5 +168,9 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 				|| jgroupsCfg.containsKey( "clusterName" ) ) {
 			throw log.legacyJGroupsConfigurationDefined( indexName );
 		}
+	}
+
+	public boolean blocksForACK() {
+		return jgroupsProcessor.blocksForACK();
 	}
 }

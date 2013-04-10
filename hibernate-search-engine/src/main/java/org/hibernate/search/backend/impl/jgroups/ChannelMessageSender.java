@@ -28,6 +28,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Channel;
 import org.jgroups.Message;
+import org.jgroups.Message.Flag;
 
 /**
  * Channel message sender.
@@ -67,7 +68,10 @@ final class ChannelMessageSender extends AbstractMessageSender {
 		}
 	}
 
-	public void send(final Message message) throws Exception {
+	public void send(final Message message, final boolean synchronous) throws Exception {
+		if ( synchronous ) {
+			message.setFlag( Flag.RSVP );
+		}
 		channel.send( message );
 	}
 }

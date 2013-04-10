@@ -1,0 +1,169 @@
+/* 
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
+ * JBoss, Home of Professional Open Source
+ * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
+ * as indicated by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ */
+package org.hibernate.search.test.backends.jgroups;
+
+import java.io.Serializable;
+
+import junit.framework.Assert;
+
+import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.test.programmaticmapping.TestingSearchFactoryHolder;
+import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.test.util.TestForIssue;
+import org.jgroups.TimeoutException;
+import org.junit.Rule;
+import org.junit.Test;
+
+
+/**
+ * Verifies sync / async guarantees of the JGroups backend.
+ * The JGroups stack used needs to have the RSVP protocol with ack_on_delivery enabled
+ * (the default configuration we use does).
+ *
+ * Run the test using JVM parameters:
+ * -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
+ *
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
+ * @since 4.3
+ */
+@TestForIssue(jiraKey = "HSEARCH-1296")
+public class SyncJGroupsBackendTest {
+
+	@Rule
+	public TestingSearchFactoryHolder slaveNode = new TestingSearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
+		.withProperty( "hibernate.search.default.worker.backend", "jgroupsSlave" )
+		.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
+		.withProperty( "hibernate.search.books.worker.execution", "async" )
+		.withProperty( "hibernate.search.drinks." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
+		.withProperty( "hibernate.search.stars." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
+		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "jgroups-testing-udp.xml" )
+		;
+
+	@Rule
+	public TestingSearchFactoryHolder masterNode = new TestingSearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
+		.withProperty( "hibernate.search.default.worker.backend", JGroupsReceivingMockBackend.class.getName() )
+		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "jgroups-testing-udp.xml" )
+		;
+
+	@Test
+	public void testSynchAsConfigured() {
+		JGroupsBackendQueueProcessor dvdsBackend = extractJGroupsBackend( "dvds" );
+		Assert.assertTrue( "dvds index was configured with a syncronous JGroups backend", dvdsBackend.blocksForACK() );
+		JGroupsBackendQueueProcessor booksBackend = extractJGroupsBackend( "books" );
+		Assert.assertFalse( "books index was configured with an asyncronous JGroups backend", booksBackend.blocksForACK() );
+		JGroupsBackendQueueProcessor drinksBackend = extractJGroupsBackend( "drinks" );
+		Assert.assertTrue( "drinks index was configured with a syncronous JGroups backend", drinksBackend.blocksForACK() );
+		JGroupsBackendQueueProcessor starsBackend = extractJGroupsBackend( "stars" );
+		Assert.assertFalse( "stars index was configured with an asyncronous JGroups backend", starsBackend.blocksForACK() );
+
+		JGroupsReceivingMockBackend.resetThreadTrap();
+		boolean timeoutTriggered = false;
+		try {
+			//DVDs are sync operations so they will timeout:
+			storeDvd( 1, "Hibernate Search in Action" );
+		}
+		catch (SearchException se) {
+			//Expected: we're inducing the RPC into timeout by blocking receiver processing
+			Throwable cause = se.getCause();
+			Assert.assertTrue( cause instanceof TimeoutException );
+			timeoutTriggered = true;
+		}
+		finally {
+			//release the receiver
+			JGroupsReceivingMockBackend.countDownAndJoin();
+		}
+		Assert.assertTrue( timeoutTriggered );
+
+		JGroupsReceivingMockBackend.resetThreadTrap();
+		//Books are async so they should not timeout
+		storeBook( 1, "Hibernate Search in Action" );
+
+		//Block our own thread awaiting for the receiver.
+		//If we raced past it we would release the receiver, not bad either
+		//as it would also proof we are async.
+		JGroupsReceivingMockBackend.countDownAndJoin();
+	}
+
+	private JGroupsBackendQueueProcessor extractJGroupsBackend(String indexName) {
+		IndexManager indexManager = slaveNode.getSearchFactory().getAllIndexesManager().getIndexManager( indexName );
+		Assert.assertNotNull( indexManager );
+		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;
+		BackendQueueProcessor backendQueueProcessor = dbi.getBackendQueueProcessor();
+		Assert.assertTrue( "Backend not using JGroups!", backendQueueProcessor instanceof JGroupsBackendQueueProcessor );
+		return (JGroupsBackendQueueProcessor) backendQueueProcessor;
+	}
+
+	private void storeBook(int id, String string) {
+		Book book = new Book();
+		book.id = id;
+		book.title = string;
+		storeObject( book, id );
+	}
+
+	private void storeDvd(int id, String dvdTitle) {
+		Dvd dvd1 = new Dvd();
+		dvd1.id = id;
+		dvd1.title = dvdTitle;
+		storeObject( dvd1, id );
+	}
+
+	private void storeObject(Object entity, Serializable id) {
+		Work work = new Work( entity, id, WorkType.UPDATE, false );
+		ManualTransactionContext tc = new ManualTransactionContext();
+		slaveNode.getSearchFactory().getWorker().performWork( work, tc );
+		tc.end();
+	}
+
+	@Indexed(index="dvds")
+	public static final class Dvd {
+		@DocumentId long id;
+		@Field String title;
+	}
+
+	@Indexed(index="books")
+	public static final class Book {
+		@DocumentId long id;
+		@Field String title;
+	}
+
+	@Indexed(index="drinks")
+	public static final class Drink {
+		@DocumentId long id;
+		@Field String title;
+	}
+
+	@Indexed(index="stars")
+	public static final class Star {
+		@DocumentId long id;
+		@Field String title;
+	}
+
+}
