@@ -50,9 +50,10 @@ public interface MessageSender {
 	 * Send message.
 	 *
 	 * @param message the JGroups message
+	 * @param synchronous set to true if we need to block until an ACK is received
 	 * @throws java.lang.Exception for any error
 	 */
-	void send(Message message) throws Exception;
+	void send(Message message, boolean synchronous) throws Exception;
 
 	/**
 	 * Get sender's address.
