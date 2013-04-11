@@ -35,7 +35,7 @@ import org.jgroups.View;
  */
 final class NodeSelectorStrategyHolderImplementation implements NodeSelectorStrategyHolder {
 
-	private ConcurrentHashMap<String,NodeSelectorStrategy> register = new ConcurrentHashMap<String,NodeSelectorStrategy>( 16, 0.75f, 2 );
+	private final ConcurrentHashMap<String,NodeSelectorStrategy> register = new ConcurrentHashMap<String,NodeSelectorStrategy>( 16, 0.75f, 2 );
 	private Address address;
 	private View view;
 

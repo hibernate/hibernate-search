@@ -20,6 +20,10 @@
  */
 package org.hibernate.search.test.programmaticmapping;
 
+import java.util.Properties;
+
+import junit.framework.Assert;
+
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
@@ -35,8 +39,9 @@ import org.junit.rules.ExternalResource;
 public class TestingSearchFactoryHolder extends ExternalResource {
 
 	private final SearchMapping buildMappingDefinition;
-	private SearchFactoryImplementor sf;
 	private final Class<?>[] entities;
+	private final Properties configuration;
+	private SearchFactoryImplementor sf;
 
 	public TestingSearchFactoryHolder(Class<?>... entities) {
 		this( null, entities );
@@ -45,6 +50,9 @@ public class TestingSearchFactoryHolder extends ExternalResource {
 	public TestingSearchFactoryHolder(SearchMapping buildMappingDefinition, Class<?>... entities) {
 		this.buildMappingDefinition = buildMappingDefinition;
 		this.entities = entities;
+		this.configuration = new Properties();
+		this.configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		this.configuration.setProperty( "hibernate.search.lucene_version", "LUCENE_CURRENT" );
 	}
 
 	public SearchFactoryImplementor getSearchFactory() {
@@ -55,7 +63,9 @@ public class TestingSearchFactoryHolder extends ExternalResource {
 	protected void before() throws Throwable {
 		ManualConfiguration cfg = new ManualConfiguration();
 		cfg.setProgrammaticMapping( buildMappingDefinition );
-		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		for ( String key : configuration.stringPropertyNames() ) {
+			cfg.addProperty( key, configuration.getProperty( key ) );
+		}
 		for ( Class<?> c : entities ) {
 			cfg.addClass( c );
 		}
@@ -65,6 +75,12 @@ public class TestingSearchFactoryHolder extends ExternalResource {
 	@Override
 	protected void after() {
 		sf.close();
+	}
+
+	public TestingSearchFactoryHolder withProperty(String key, Object value) {
+		Assert.assertNull( "SessionFactory already initialized", sf );
+		configuration.put( key, value );
+		return this;
 	}
 
 }

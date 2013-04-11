@@ -49,10 +49,13 @@ public class JGroupsBackendQueueTask {
 	private final String indexName;
 	private final IndexManager indexManager;
 	private final NodeSelectorStrategy masterNodeSelector;
+	private final boolean sync; //true if this backend is synchronous
 
-	public JGroupsBackendQueueTask(JGroupsBackendQueueProcessor factory, IndexManager indexManager, NodeSelectorStrategyHolder masterNodeSelector) {
+	public JGroupsBackendQueueTask(JGroupsBackendQueueProcessor factory, IndexManager indexManager,
+			NodeSelectorStrategyHolder masterNodeSelector, boolean sync) {
 		this.factory = factory;
 		this.indexManager = indexManager;
+		this.sync = sync;
 		this.indexName = indexManager.getIndexName();
 		this.masterNodeSelector = masterNodeSelector.getMasterNodeSelector( indexName );
 	}
@@ -88,7 +91,7 @@ public class JGroupsBackendQueueTask {
 
 		try {
 			Message message =  masterNodeSelector.createMessage( data );
-			factory.getMessageSender().send( message );
+			factory.getMessageSender().send( message, sync );
 			if ( trace ) {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );
 			}
@@ -96,6 +99,10 @@ public class JGroupsBackendQueueTask {
 		catch ( Exception e ) {
 			throw log.unableToSendWorkViaJGroups( e );
 		}
+	}
+
+	public boolean isSynch() {
+		return sync;
 	}
 
 }

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 
+import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
@@ -80,7 +81,8 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
 		selectionStrategy.viewAccepted( messageSender.getView() ); // set current view?
-		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector );
+		final boolean sync = BackendFactory.isConfiguredAsSync( props );
+		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, sync );
 		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 		luceneBackendQueueProcessor.initialize( props, context, indexManager );
 	}
@@ -149,5 +151,9 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 				|| jgroupsCfg.containsKey( "clusterName" ) ) {
 			throw log.legacyJGroupsConfigurationDefined( indexName );
 		}
+	}
+
+	public boolean isSynch() {
+		return jgroupsProcessor.isSynch();
 	}
 }
