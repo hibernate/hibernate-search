@@ -59,6 +59,4 @@ public interface ShardIdentifierProvider {
 	 * The list can vary between calls.
 	 */
 	public String[] getAllShardIdentifiers();
-
-	public String buildIndexManagerNameFromShard(String directoryProviderRoot, String shard);
 }
