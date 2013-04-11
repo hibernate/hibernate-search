@@ -28,9 +28,9 @@
         <resource-root path="solr-core-${luceneVersion}.jar" />
         <resource-root path="solr-solrj-${luceneVersion}.jar" />
         <resource-root path="guava-${guavaVersion}.jar" />
-        <resource-root path="jcommons-io-${commonsIoVersion}.jar" />
-        <resource-root path="jcommons-codec-${commonsCodecVersion}.jar" />
-        <resource-root path="jcommons-lang-${commonsLangVersion}.jar" />
+        <resource-root path="commons-io-${commonsIoVersion}.jar" />
+        <resource-root path="commons-codec-${commonsCodecVersion}.jar" />
+        <resource-root path="commons-lang-${commonsLangVersion}.jar" />
     </resources>
     <dependencies>
         <module name="org.apache.lucene" />
