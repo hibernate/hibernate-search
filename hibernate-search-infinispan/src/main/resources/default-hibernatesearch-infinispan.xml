@@ -22,10 +22,10 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
   -->
-  <infinispan
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="urn:infinispan:config:5.2 http://www.infinispan.org/schemas/infinispan-config-5.2.xsd"
-      xmlns="urn:infinispan:config:5.2">
+<infinispan
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:infinispan:config:5.2 http://www.infinispan.org/schemas/infinispan-config-5.2.xsd"
+    xmlns="urn:infinispan:config:5.2">
 
     <!-- *************************** -->
     <!-- System-wide global settings -->
@@ -37,7 +37,7 @@
             of Hibernate Search applications work - if possible it would be better to use JNDI to share 
             the CacheManager across applications -->
         <globalJmxStatistics
-            enabled="true"
+            enabled="false"
             cacheManagerName="HibernateSearch"
             allowDuplicateDomains="true" />
 
@@ -75,9 +75,8 @@
             concurrencyLevel="500"
             useLockStriping="false" />
 
-        <!-- Invocation batching is required for use with the Lucene Directory -->
         <invocationBatching
-            enabled="true" />
+            enabled="false" />
 
         <!-- This element specifies that the cache is clustered. modes supported: distribution 
             (d), replication (r) or invalidation (i). Don't use invalidation to store Lucene indexes (as 
