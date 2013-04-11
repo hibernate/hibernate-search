@@ -188,7 +188,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 		}
 
 		private final String getProviderName(String shard) {
-			return shardIdentityProvider.buildIndexManagerNameFromShard(rootDirectoryProviderName, shard);
+			return rootDirectoryProviderName + "." + shard;
 		}
 	}
 }
