@@ -258,6 +258,7 @@ public class IndexManagerHolder {
 				entityIndexBinder.getIndexManagerFactory(),
 				context
 		);
+		indexManager.setSearchFactory( searchFactory );
 		return indexManager;
 	}
 
