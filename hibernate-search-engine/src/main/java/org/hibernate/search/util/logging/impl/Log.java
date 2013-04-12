@@ -675,4 +675,16 @@ public interface Log extends BasicLogger {
 			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" )
 	SearchException fieldBridgeNotTwoWay(Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
 
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 170, value = "Starting JGroups channel using configuration '%1$s'")
+	void startingJGroupsChannel(Object cfg);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 171, value = "Using JGroups channel having configuration '%1$s'")
+	void jgroupsFullConfiguration(String printProtocolSpecAsXML);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 172, value = "JGroups backend configured for index '%1$s' using block_for_ack '%2$s'")
+	void jgroupsBlockWaitingForAck(String indexName, boolean block);
+
 }

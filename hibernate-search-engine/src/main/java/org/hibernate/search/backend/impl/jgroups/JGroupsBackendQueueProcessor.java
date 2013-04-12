@@ -99,6 +99,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		final boolean sync = BackendFactory.isConfiguredAsSync( props );
 		final boolean block = ConfigurationParseHelper.getBooleanValue( props, BLOCK_WAITING_ACK, sync );
 
+		log.jgroupsBlockWaitingForAck( indexName, block );
 		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, block );
 		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
 		luceneBackendQueueProcessor.initialize( props, context, indexManager );
