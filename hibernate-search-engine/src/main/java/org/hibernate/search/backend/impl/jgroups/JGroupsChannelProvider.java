@@ -108,6 +108,9 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 		if ( !channel.flushSupported() ) {
 			log.jGroupsFlushNotPresentInStack();
 		}
+		if ( log.isDebugEnabled() ) {
+			log.jgroupsFullConfiguration( channel.getProtocolStack().printProtocolSpecAsXML() );
+		}
 	}
 
 	@Override
