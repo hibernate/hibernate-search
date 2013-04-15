@@ -26,6 +26,7 @@ package org.hibernate.search.util.logging.impl;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.TRACE;
 import static org.jboss.logging.Logger.Level.WARN;
 
@@ -41,7 +42,6 @@ import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.errors.EmptyQueryException;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -75,9 +75,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 4, value = "Exception attempting to instantiate Similarity '%1$s' set for %2$s")
 	void similarityInstantiationException(String similarityName, String beanXClassName);
 
-	@LogMessage(level = INFO)
-	@Message(id = 5, value = "Starting JGroups Channel")
-	void jGroupsStartingChannel();
+	@LogMessage(level = DEBUG)
+	@Message(id = 5, value = "Starting JGroups ChannelProvider")
+	void jGroupsStartingChannelProvider();
 
 	@LogMessage(level = INFO)
 	@Message(id = 6, value = "Connected to cluster [ %1$s ]. The node address is %2$s")

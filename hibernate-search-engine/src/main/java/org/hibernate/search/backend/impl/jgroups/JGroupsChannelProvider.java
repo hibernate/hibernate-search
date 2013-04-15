@@ -69,7 +69,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	@Override
 	public void start(Properties props, BuildContext context) {
 		serviceManager = context.getServiceManager();
-		log.jGroupsStartingChannel();
+		log.jGroupsStartingChannelProvider();
 
 		boolean channelIsManaged = buildChannel( props );
 		String clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
@@ -158,6 +158,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 			if ( props.containsKey( JGroupsChannelProvider.CONFIGURATION_FILE ) ) {
 				String cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_FILE );
 				try {
+					log.startingJGroupsChannel( cfg );
 					channel = new JChannel( ConfigurationParseHelper.locateConfig( cfg ) );
 				}
 				catch ( Exception e ) {
@@ -171,6 +172,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 			try {
 				URL fileUrl = ConfigurationParseHelper.locateConfig( JGroupsChannelProvider.DEFAULT_JGROUPS_CONFIGURATION_FILE );
 				if ( fileUrl != null ) {
+					log.startingJGroupsChannel( fileUrl );
 					channel = new JChannel( fileUrl );
 				}
 				else {
