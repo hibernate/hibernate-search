@@ -57,6 +57,8 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-1296")
 public class SyncJGroupsBackendTest {
 
+	private static final String JGROUPS_CONFIGURATION = "jgroups-testing-udp.xml";
+
 	@Rule
 	public TestingSearchFactoryHolder slaveNode = new TestingSearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", "jgroupsSlave" )
@@ -64,13 +66,13 @@ public class SyncJGroupsBackendTest {
 		.withProperty( "hibernate.search.books.worker.execution", "async" )
 		.withProperty( "hibernate.search.drinks." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
 		.withProperty( "hibernate.search.stars." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
-		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "jgroups-testing-udp.xml" )
+		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
 		;
 
 	@Rule
 	public TestingSearchFactoryHolder masterNode = new TestingSearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", JGroupsReceivingMockBackend.class.getName() )
-		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "jgroups-testing-udp.xml" )
+		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
 		;
 
 	@Test
@@ -84,11 +86,15 @@ public class SyncJGroupsBackendTest {
 		JGroupsBackendQueueProcessor starsBackend = extractJGroupsBackend( "stars" );
 		Assert.assertFalse( "stars index was configured with an asyncronous JGroups backend", starsBackend.blocksForACK() );
 
-		JGroupsReceivingMockBackend.resetThreadTrap();
+		JGroupsReceivingMockBackend dvdBackendMock = extractMockBackend( "dvds" );
+
+		dvdBackendMock.resetThreadTrap();
 		boolean timeoutTriggered = false;
 		try {
 			//DVDs are sync operations so they will timeout:
+			System.out.println( "[PRESEND] Timestamp: " + System.nanoTime() );
 			storeDvd( 1, "Hibernate Search in Action" );
+			System.out.println( "[POSTSEND] Timestamp: " + System.nanoTime() );
 		}
 		catch (SearchException se) {
 			//Expected: we're inducing the RPC into timeout by blocking receiver processing
@@ -98,18 +104,42 @@ public class SyncJGroupsBackendTest {
 		}
 		finally {
 			//release the receiver
-			JGroupsReceivingMockBackend.countDownAndJoin();
+			dvdBackendMock.releaseBlockedThreads();
 		}
 		Assert.assertTrue( timeoutTriggered );
 
-		JGroupsReceivingMockBackend.resetThreadTrap();
+		JGroupsReceivingMockBackend booksBackendMock = extractMockBackend( "books" );
+		booksBackendMock.resetThreadTrap();
 		//Books are async so they should not timeout
 		storeBook( 1, "Hibernate Search in Action" );
 
 		//Block our own thread awaiting for the receiver.
 		//If we raced past it we would release the receiver, not bad either
 		//as it would also proof we are async.
-		JGroupsReceivingMockBackend.countDownAndJoin();
+		booksBackendMock.countDownAndJoin();
+
+		dvdBackendMock.induceFailure();
+		boolean npeTriggered = false;
+		try {
+			storeDvd( 2, "Byteman in Action" ); //not actually needing Byteman here
+		}
+		catch (SearchException se) {
+			//Expected: we're inducing the RPC into NPE
+			Throwable cause = se.getCause().getCause();
+			Assert.assertTrue( cause instanceof NullPointerException );
+			Assert.assertEquals( "Simulated Failure", cause.getMessage() );
+			npeTriggered = true;
+		}
+		Assert.assertTrue( npeTriggered );
+	}
+
+	private JGroupsReceivingMockBackend extractMockBackend(String indexName) {
+		IndexManager indexManager = masterNode.getSearchFactory().getAllIndexesManager().getIndexManager( indexName );
+		Assert.assertNotNull( indexManager );
+		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;
+		BackendQueueProcessor backendQueueProcessor = dbi.getBackendQueueProcessor();
+		Assert.assertTrue( "Backend not using the configured Mock!", backendQueueProcessor instanceof JGroupsReceivingMockBackend );
+		return (JGroupsReceivingMockBackend) backendQueueProcessor;
 	}
 
 	private JGroupsBackendQueueProcessor extractJGroupsBackend(String indexName) {

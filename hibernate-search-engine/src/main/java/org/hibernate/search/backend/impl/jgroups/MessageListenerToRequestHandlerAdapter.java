@@ -33,7 +33,7 @@ import org.jgroups.blocks.RequestHandler;
  * 
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-class MessageListenerToRequestHandlerAdapter implements RequestHandler {
+final class MessageListenerToRequestHandlerAdapter implements RequestHandler {
 
 	private final MessageListener delegate;
 

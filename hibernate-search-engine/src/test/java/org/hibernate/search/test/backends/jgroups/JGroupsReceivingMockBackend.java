@@ -40,7 +40,8 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
  */
 public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
-	private static volatile CountDownLatch threadTrap;
+	private volatile CountDownLatch threadTrap;
+	private volatile boolean failOnMessage = false;
 
 	public JGroupsReceivingMockBackend() {
 		super( new MasterNodeSelector() );
@@ -57,14 +58,18 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 		countDownAndJoin();
 	}
 
-	public static void resetThreadTrap() {
+	public void resetThreadTrap() {
 		threadTrap = new CountDownLatch( 2 );
 	}
 
-	public static void countDownAndJoin() {
+	public void countDownAndJoin() {
+		if ( failOnMessage ) {
+			throw new NullPointerException( "Simulated Failure" );
+		}
+		System.out.println( "[PREJOIN] Timestamp: " + System.nanoTime() );
 		try {
 			threadTrap.countDown();
-			//Basically we want to wait forever untile we are awoken; we
+			//Basically we want to wait forever until we are awoken; we
 			//cap the definition of "forever" to 2 minutes to abort the test
 			//but this should not be necessary.
 			//The main test thread will release us ASAP so a large timeout should not
@@ -73,7 +78,21 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 		}
 		catch ( InterruptedException e ) {
 			Thread.currentThread().interrupt();
+			e.printStackTrace();
 		}
+		System.out.println( "[POSTJOIN] Timestamp: " + System.nanoTime() );
+	}
+
+	public int releaseBlockedThreads() {
+		int count = (int) threadTrap.getCount();
+		for ( int i=0; i<count; i++) {
+			threadTrap.countDown();
+		}
+		return count;
+	}
+
+	public void induceFailure() {
+		failOnMessage = true;
 	}
 
 }
