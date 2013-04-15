@@ -32,7 +32,6 @@ import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.jgroups.Channel;
 import org.jgroups.JChannel;
 import org.jgroups.MessageListener;
 import org.jgroups.UpHandler;
@@ -62,20 +61,22 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	private static final String DEFAULT_JGROUPS_CONFIGURATION_FILE = "flush-udp.xml";
 	private static final String DEFAULT_CLUSTER_NAME = "Hibernate Search Cluster";
 
-	private Channel channel;
+	private ChannelContainer channelContainer;
 	private MessageSender sender;
 	private ServiceManager serviceManager;
 
 	@Override
 	public void start(Properties props, BuildContext context) {
-		serviceManager = context.getServiceManager();
 		log.jGroupsStartingChannelProvider();
+		serviceManager = context.getServiceManager();
 
-		boolean channelIsManaged = buildChannel( props );
-		String clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
+		channelContainer = buildChannel( props );
+		channelContainer.start();
 
 		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
 		JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener( context, masterNodeSelector );
+
+		JChannel channel = channelContainer.getChannel();
 
 		UpHandler handler = channel.getUpHandler();
 		if ( handler instanceof Muxer ) {
@@ -96,14 +97,12 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 			sender = new DispatcherMessageSender( dispatcher );
 		}
 		else {
-			// TODO -- perhaps port previous multi-handling?
-			channel.setReceiver( listener );
-			sender = new ChannelMessageSender( channel, channelIsManaged, clusterName);
+			MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( listener );
+			MessageDispatcher standardDispatcher = new MessageDispatcher( channel, listener, listener, adapter );
+			sender = new DispatcherMessageSender( standardDispatcher );
 		}
-		sender.start();
 
 		masterNodeSelector.setLocalAddress( channel.getAddress() );
-		log.jGroupsConnectedToCluster( clusterName, channel.getAddress() );
 
 		if ( !channel.flushSupported() ) {
 			log.jGroupsFlushNotPresentInStack();
@@ -123,11 +122,13 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 		serviceManager.releaseService( MasterSelectorServiceProvider.class );
 		serviceManager = null;
 		try {
-			channel = null;
-
 			if ( sender != null ) {
 				sender.stop();
 				sender = null;
+			}
+			if ( channelContainer != null ) {
+				channelContainer.close();
+				channelContainer = null;
 			}
 		}
 		catch ( Exception toLog ) {
@@ -141,28 +142,27 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	 * finally the legacy JGroups String properties.
 	 * 
 	 * @param props configuration file
-	 * @return true if channel is managed, false otherwise
+	 * @return the ChannelContainer to manage the JGroups JChannel
 	 */
-	private boolean buildChannel(Properties props) {
-		boolean channelIsManaged = true;
+	private static ChannelContainer buildChannel(Properties props) {
+		final String clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
 
 		if ( props != null ) {
-			if ( props.containsKey( JGroupsChannelProvider.CHANNEL_INJECT ) ) {
-				Object channelObject = props.get( JGroupsChannelProvider.CHANNEL_INJECT );
+			final Object channelObject = props.get( JGroupsChannelProvider.CHANNEL_INJECT );
+			if ( channelObject != null ) {
 				try {
-					channel = (org.jgroups.JChannel) channelObject;
-					channelIsManaged = false;
+					return new InjectedChannelContainer( (org.jgroups.JChannel) channelObject );
 				}
 				catch ( ClassCastException e ) {
 					throw log.jGroupsChannelInjectionError( e, channelObject.getClass() );
 				}
 			}
 
-			if ( props.containsKey( JGroupsChannelProvider.CONFIGURATION_FILE ) ) {
-				String cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_FILE );
+			final String cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_FILE );
+			if ( cfg != null ) {
 				try {
 					log.startingJGroupsChannel( cfg );
-					channel = new JChannel( ConfigurationParseHelper.locateConfig( cfg ) );
+					return new ManagedChannelContainer( new JChannel( ConfigurationParseHelper.locateConfig( cfg ) ), clusterName );
 				}
 				catch ( Exception e ) {
 					throw log.jGroupsChannelCreationUsingFileError( cfg, e );
@@ -170,25 +170,93 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 			}
 		}
 
-		if ( channel == null ) {
-			log.jGroupsConfigurationNotFoundInProperties( props );
-			try {
-				URL fileUrl = ConfigurationParseHelper.locateConfig( JGroupsChannelProvider.DEFAULT_JGROUPS_CONFIGURATION_FILE );
-				if ( fileUrl != null ) {
-					log.startingJGroupsChannel( fileUrl );
-					channel = new JChannel( fileUrl );
-				}
-				else {
-					log.jGroupsDefaultConfigurationFileNotFound();
-					channel = new JChannel();
-				}
+		log.jGroupsConfigurationNotFoundInProperties( props );
+		try {
+			URL fileUrl = ConfigurationParseHelper.locateConfig( JGroupsChannelProvider.DEFAULT_JGROUPS_CONFIGURATION_FILE );
+			if ( fileUrl != null ) {
+				log.startingJGroupsChannel( fileUrl );
+				return new ManagedChannelContainer( new JChannel( fileUrl ), clusterName );
 			}
-			catch ( Exception e ) {
-				throw log.unableToStartJGroupsChannel( e );
+			else {
+				log.jGroupsDefaultConfigurationFileNotFound();
+				return new ManagedChannelContainer( new JChannel(), clusterName );
 			}
 		}
+		catch ( Exception e ) {
+			throw log.unableToStartJGroupsChannel( e );
+		}
+	}
 
-		return channelIsManaged;
+	private interface ChannelContainer {
+		JChannel getChannel();
+		void close();
+		void start();
+	}
+
+	private static class ManagedChannelContainer implements ChannelContainer {
+		private final JChannel channel;
+		private final String clusterName;
+
+		ManagedChannelContainer(JChannel channel, String clusterName) {
+			if ( channel == null ) {
+				throw new NullPointerException( "channel must not be null" );
+			}
+			if ( clusterName == null ) {
+				throw new NullPointerException( "clusterName must not be null" );
+			}
+			this.channel = channel;
+			this.clusterName = clusterName;
+		}
+
+		@Override
+		public JChannel getChannel() {
+			return channel;
+		}
+
+		@Override
+		public void close() {
+			log.jGroupsDisconnectingAndClosingChannel( clusterName );
+			channel.disconnect();
+			channel.close();
+		}
+
+		@Override
+		public void start() {
+			try {
+				channel.connect( clusterName );
+				log.jGroupsConnectedToCluster( clusterName, channel.getAddress() );
+			}
+			catch ( Exception e ) {
+				throw log.unableConnectingToJGroupsCluster( clusterName, e );
+			}
+		}
+	}
+
+	private static class InjectedChannelContainer implements ChannelContainer {
+
+		private final JChannel channel;
+
+		InjectedChannelContainer(JChannel channel) {
+			if ( channel == null ) {
+				throw new NullPointerException( "channel must not be null" );
+			}
+			this.channel = channel;
+		}
+
+		@Override
+		public JChannel getChannel() {
+			return channel;
+		}
+
+		@Override
+		public void close() {
+			//No-Op
+		}
+
+		@Override
+		public void start() {
+			//No-Op
+		}
 	}
 
 }

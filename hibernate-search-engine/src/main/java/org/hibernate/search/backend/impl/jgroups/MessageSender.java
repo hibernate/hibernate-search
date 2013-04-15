@@ -37,11 +37,6 @@ import org.jgroups.View;
 public interface MessageSender {
 
 	/**
-	 * Start sender.
-	 */
-	void start();
-
-	/**
 	 * Stop sender.
 	 */
 	void stop();

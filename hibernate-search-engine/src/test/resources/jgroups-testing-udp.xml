@@ -1,8 +1,7 @@
 
 <!--
   Inspired by the default configuration: udp.xml as distributed in JGroups v. 3.2.7.Final
-  - disabled diagnostics
-  - set ttl to 1
+  - set ttl to 0
   - RSVP timeouts set very low to speedup timeout-inducing tests
   - PING discovery set to 2 nodes and aggressive timeouts
   - UDP buffers set very low
@@ -18,12 +17,12 @@
          ucast_send_buf_size="20K"
          mcast_recv_buf_size="20K"
          mcast_send_buf_size="20K"
-         loopback="true"
+         loopback="false"
          max_bundle_size="64K"
          max_bundle_timeout="30"
-         ip_ttl="1"
+         ip_ttl="0"
          enable_bundling="true"
-         enable_diagnostics="false"
+         enable_diagnostics="true"
          thread_naming_pattern="cl"
 
          timer_type="old"

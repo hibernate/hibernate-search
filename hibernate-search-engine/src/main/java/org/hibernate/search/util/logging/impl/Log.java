@@ -48,6 +48,9 @@ import org.jboss.logging.LogMessage;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
+import org.jgroups.Address;
+import org.jgroups.SuspectedException;
+import org.jgroups.TimeoutException;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -80,7 +83,7 @@ public interface Log extends BasicLogger {
 	void jGroupsStartingChannelProvider();
 
 	@LogMessage(level = INFO)
-	@Message(id = 6, value = "Connected to cluster [ %1$s ]. The node address is %2$s")
+	@Message(id = 6, value = "Connected to cluster [ %1$s ]. The local Address is %2$s")
 	void jGroupsConnectedToCluster(String clusterName, Object address);
 
 	@LogMessage(level = WARN)
@@ -686,5 +689,14 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 172, value = "JGroups backend configured for index '%1$s' using block_for_ack '%2$s'")
 	void jgroupsBlockWaitingForAck(String indexName, boolean block);
+
+	@Message(id = 173, value = "Remote JGroups peer '%1$s' is suspected to have left '")
+	SuspectedException jgroupsSuspectingPeer(Address sender);
+
+	@Message(id = 174, value = "Timeout sending synchronous message to JGroups peer '%1$s''")
+	TimeoutException jgroupsRpcTimeout(Address sender);
+
+	@Message(id = 175, value = "Exception reported from remote JGroups node '%1$s' : '%2$s'")
+	SearchException jgroupsRemoteException(Address sender, Throwable exception, @Cause Throwable cause);
 
 }
