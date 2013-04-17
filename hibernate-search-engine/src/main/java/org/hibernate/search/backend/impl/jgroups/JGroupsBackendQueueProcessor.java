@@ -31,7 +31,6 @@ import java.util.concurrent.locks.Lock;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -54,6 +53,12 @@ import org.jgroups.Address;
 public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	/**
+	 * All configuration properties need to be prefixed with <blockquote>.jgroups
+	 * </blockquote> to be interpreted by this backend.
+	 */
+	private static final String JGROUPS_CONFIGURATION_SPACE = "jgroups";
+
+	/**
 	 * Configuration property specific the the backend instance. When enabled
 	 * the invoker thread will use JGroups in synchronous mode waiting for the
 	 * ACK from the other parties; when disabled it is going to behave
@@ -67,6 +72,24 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	 */
 	public static final String BLOCK_WAITING_ACK = "block_waiting_ack";
 
+	/**
+	 * This JGroups backend is meant to delegate to a different backend on the
+	 * master node. Generally this is expected to be the Lucene backend,
+	 * but this property allows to specify a different implementation for the delegate.
+	 */
+	public static final String DELEGATE_BACKEND = "delegate_backend";
+
+	/**
+	 * Specifies the timeout defined on messages sent to other nodes via the JGroups
+	 * Channel. Value interpreted in milliseconds.
+	 */
+	public static final String MESSAGE_TIMEOUT_MS = "messages_timeout";
+
+	/**
+	 * Default value for the {@link #MESSAGE_TIMEOUT_MS} configuration property.
+	 */
+	public static final int DEFAULT_MESSAGE_TIMEOUT = 20000;
+
 	private static final Log log = LoggerFactory.make();
 
 	private final NodeSelectorStrategy selectionStrategy;
@@ -79,7 +102,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	private ServiceManager serviceManager;
 
 	private JGroupsBackendQueueTask jgroupsProcessor;
-	private LuceneBackendQueueProcessor luceneBackendQueueProcessor;
+	private BackendQueueProcessor delegatedBackend;
 
 	public JGroupsBackendQueueProcessor(NodeSelectorStrategy selectionStrategy) {
 		this.selectionStrategy = selectionStrategy;
@@ -87,9 +110,9 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
+		this.indexManager = indexManager;
 		this.indexName = indexManager.getIndexName();
 		assertLegacyOptionsNotUsed( props, indexName );
-		this.indexManager = indexManager;
 		serviceManager = context.getServiceManager();
 		this.messageSender = serviceManager.requestService( JGroupsChannelProvider.class, context );
 		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
@@ -97,18 +120,22 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		selectionStrategy.viewAccepted( messageSender.getView() ); // set current view?
 
 		final boolean sync = BackendFactory.isConfiguredAsSync( props );
-		final boolean block = ConfigurationParseHelper.getBooleanValue( props, BLOCK_WAITING_ACK, sync );
+		final Properties jgroupsProperties = new MaskedProperty( props, JGROUPS_CONFIGURATION_SPACE );
+		final boolean block = ConfigurationParseHelper.getBooleanValue( jgroupsProperties, BLOCK_WAITING_ACK, sync );
+
+		final long messageTimeout = ConfigurationParseHelper.getLongValue( jgroupsProperties, MESSAGE_TIMEOUT_MS, DEFAULT_MESSAGE_TIMEOUT );
 
 		log.jgroupsBlockWaitingForAck( indexName, block );
-		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, block );
-		luceneBackendQueueProcessor = new LuceneBackendQueueProcessor();
-		luceneBackendQueueProcessor.initialize( props, context, indexManager );
+		jgroupsProcessor = new JGroupsBackendQueueTask( this, indexManager, masterNodeSelector, block, messageTimeout );
+
+		String backend = ConfigurationParseHelper.getString( jgroupsProperties, DELEGATE_BACKEND, "lucene" );
+		delegatedBackend = BackendFactory.createBackend( backend, indexManager, context, props );
 	}
 
 	public void close() {
 		serviceManager.releaseService( MasterSelectorServiceProvider.class );
 		serviceManager.releaseService( JGroupsChannelProvider.class );
-		luceneBackendQueueProcessor.close();
+		delegatedBackend.close();
 	}
 
 	MessageSender getMessageSender() {
@@ -135,7 +162,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
 		if ( selectionStrategy.isIndexOwnerLocal() ) {
-			luceneBackendQueueProcessor.applyWork( workList, monitor );
+			delegatedBackend.applyWork( workList, monitor );
 		}
 		else {
 			if ( workList == null ) {
@@ -148,7 +175,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		if ( selectionStrategy.isIndexOwnerLocal() ) {
-			luceneBackendQueueProcessor.applyStreamWork( singleOperation, monitor );
+			delegatedBackend.applyStreamWork( singleOperation, monitor );
 		}
 		else {
 			//TODO optimize for single operation?
@@ -158,7 +185,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public Lock getExclusiveWriteLock() {
-		return luceneBackendQueueProcessor.getExclusiveWriteLock();
+		return delegatedBackend.getExclusiveWriteLock();
 	}
 
 	private static void assertLegacyOptionsNotUsed(Properties props, String indexName) {
@@ -174,4 +201,13 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	public boolean blocksForACK() {
 		return jgroupsProcessor.blocksForACK();
 	}
+
+	public BackendQueueProcessor getDelegatedBackend() {
+		return delegatedBackend;
+	}
+
+	public long getMessageTimeout() {
+		return jgroupsProcessor.getMessageTimeout();
+	}
+
 }

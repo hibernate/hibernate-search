@@ -67,9 +67,10 @@ final class DispatcherMessageSender implements MessageSender {
 		dispatcher.stop();
 	}
 
-	public void send(final Message message, final boolean synchronous) throws Exception {
+	public void send(final Message message, final boolean synchronous, final long timeout) throws Exception {
 		final RequestOptions options = synchronous ? RequestOptions.SYNC() : RequestOptions.ASYNC();
 		options.setExclusionList( dispatcher.getChannel().getAddress() );
+		options.setTimeout( timeout );
 		RspList<Object> rspList = dispatcher.castMessage( null, message, options );
 		//JGroups won't throw these automatically as it would with a JChannel usage,
 		//so we provide the same semantics by throwing the JGroups specific exceptions
