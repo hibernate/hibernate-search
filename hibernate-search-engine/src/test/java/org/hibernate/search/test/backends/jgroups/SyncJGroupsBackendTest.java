@@ -28,6 +28,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
@@ -63,6 +64,8 @@ public class SyncJGroupsBackendTest {
 	public TestingSearchFactoryHolder slaveNode = new TestingSearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", "jgroupsSlave" )
 		.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
+		.withProperty( "hibernate.search.dvds.delegate_backend", "blackhole" )
+		.withProperty( "hibernate.search.dvds.messages_timeout", "200" )
 		.withProperty( "hibernate.search.books.worker.execution", "async" )
 		.withProperty( "hibernate.search.drinks." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
 		.withProperty( "hibernate.search.stars." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
@@ -133,22 +136,39 @@ public class SyncJGroupsBackendTest {
 		Assert.assertTrue( npeTriggered );
 	}
 
+	@Test
+	public void alternativeBackendConfiguration() {
+		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, "dvds" );
+		JGroupsBackendQueueProcessor jgroupsProcessor = (JGroupsBackendQueueProcessor) backendQueueProcessor;
+		BackendQueueProcessor delegatedBackend = jgroupsProcessor.getDelegatedBackend();
+		Assert.assertTrue ( "dvds backend was configured with a deleage to blackhole but it's not using it", delegatedBackend instanceof BlackHoleBackendQueueProcessor );
+	}
+
+	@Test
+	public void alternativeJGroupsTimeoutConfiguration() {
+		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, "dvds" );
+		JGroupsBackendQueueProcessor jgroupsProcessor = (JGroupsBackendQueueProcessor) backendQueueProcessor;
+		long messageTimeout = jgroupsProcessor.getMessageTimeout();
+		Assert.assertEquals( "message timeout configuration property not applied",  200,  messageTimeout );
+	}
+
 	private JGroupsReceivingMockBackend extractMockBackend(String indexName) {
-		IndexManager indexManager = masterNode.getSearchFactory().getAllIndexesManager().getIndexManager( indexName );
-		Assert.assertNotNull( indexManager );
-		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;
-		BackendQueueProcessor backendQueueProcessor = dbi.getBackendQueueProcessor();
+		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( masterNode, indexName );
 		Assert.assertTrue( "Backend not using the configured Mock!", backendQueueProcessor instanceof JGroupsReceivingMockBackend );
 		return (JGroupsReceivingMockBackend) backendQueueProcessor;
 	}
 
 	private JGroupsBackendQueueProcessor extractJGroupsBackend(String indexName) {
-		IndexManager indexManager = slaveNode.getSearchFactory().getAllIndexesManager().getIndexManager( indexName );
-		Assert.assertNotNull( indexManager );
-		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;
-		BackendQueueProcessor backendQueueProcessor = dbi.getBackendQueueProcessor();
+		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, indexName );
 		Assert.assertTrue( "Backend not using JGroups!", backendQueueProcessor instanceof JGroupsBackendQueueProcessor );
 		return (JGroupsBackendQueueProcessor) backendQueueProcessor;
+	}
+
+	private static BackendQueueProcessor  extractBackendQueue(TestingSearchFactoryHolder node, String indexName) {
+		IndexManager indexManager = node.getSearchFactory().getAllIndexesManager().getIndexManager( indexName );
+		Assert.assertNotNull( indexManager );
+		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;
+		return dbi.getBackendQueueProcessor();
 	}
 
 	private void storeBook(int id, String string) {
