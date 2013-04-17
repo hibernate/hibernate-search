@@ -76,6 +76,18 @@ public class JGroupsConfigurationTest {
 		bootConfiguration( cfg );
 	}
 
+	@Test
+	public void alternativeBackendDelegation() throws Throwable {
+		ManualConfiguration cfg = new ManualConfiguration()
+			.addClass( Dvd.class )
+			.addClass( Book.class )
+			.addProperty( "hibernate.search.default.directory_provider", "ram" )
+			.addProperty( "hibernate.search.dvds.worker.backend", "jgroups" )
+			.addProperty( "hibernate.search.dvds.delegate_backend", "blackhole" )
+			;
+		bootConfiguration( cfg );
+	}
+
 	/**
 	 * Attempts to start a SearchFactory, and make sure we close it if it happens to start
 	 * correctly.
@@ -106,4 +118,9 @@ public class JGroupsConfigurationTest {
 		@Field String title;
 	}
 
+	@Indexed(index = "books")
+	public static final class Book {
+		@DocumentId long id;
+		@Field String title;
+	}
 }

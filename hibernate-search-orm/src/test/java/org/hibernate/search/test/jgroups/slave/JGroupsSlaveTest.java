@@ -29,12 +29,15 @@ import junit.framework.Assert;
 
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
+import org.jgroups.blocks.MessageDispatcher;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
+import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+import org.hibernate.search.backend.impl.jgroups.MessageListenerToRequestHandlerAdapter;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -75,9 +78,6 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		s.persist( ts );
 		s.persist( ts2 );
 		tx.commit();
-
-		//need to sleep for the message consumption
-		Thread.sleep( JGroupsCommonTest.NETWORK_WAIT_MILLISECONDS );
 
 		boolean failed = true;
 		for ( int i = 0; i < JGroupsCommonTest.MAX_WAITS; i++ ) {
@@ -128,7 +128,9 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	private void prepareJGroupsChannel() throws Exception {
 		channel = new JChannel( ConfigurationParseHelper.locateConfig( "testing-flush-loopback.xml" ) );
 		channel.connect( CHANNEL_NAME );
-		channel.setReceiver( new JGroupsReceiver(getSearchFactoryImpl()) );
+		JGroupsReceiver listener = new JGroupsReceiver(getSearchFactoryImpl());
+		MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( listener );
+		MessageDispatcher standardDispatcher = new MessageDispatcher( channel, listener, listener, adapter );
 	}
 
 	@Override
@@ -154,6 +156,8 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
+		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" );
+		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.MESSAGE_TIMEOUT_MS, "100" );
 		cfg.setProperty( JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
 		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}

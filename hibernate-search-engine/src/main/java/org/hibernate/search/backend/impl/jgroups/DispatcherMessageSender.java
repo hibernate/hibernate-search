@@ -24,33 +24,69 @@
 
 package org.hibernate.search.backend.impl.jgroups;
 
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.jgroups.Address;
+import org.jgroups.Channel;
 import org.jgroups.Message;
+import org.jgroups.View;
 import org.jgroups.blocks.MessageDispatcher;
 import org.jgroups.blocks.RequestOptions;
+import org.jgroups.util.Rsp;
+import org.jgroups.util.RspList;
 
 /**
  * Channel message sender.
  * 
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
  */
-class DispatcherMessageSender extends AbstractMessageSender {
+class DispatcherMessageSender implements MessageSender {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final MessageDispatcher dispatcher;
+	private final Channel channel;
 
 	DispatcherMessageSender(final MessageDispatcher dispatcher) {
-		super( dispatcher.getChannel() );
 		this.dispatcher = dispatcher;
+		this.channel = dispatcher.getChannel();
+	}
+
+	public Address getAddress() {
+		return channel.getAddress();
+	}
+
+	public View getView() {
+		return channel.getView();
 	}
 
 	public void stop() {
 		dispatcher.stop();
 	}
 
-	public void send(final Message message) throws Exception {
-		dispatcher.castMessage( null, message, RequestOptions.ASYNC() );
+	public void send(final Message message, final boolean synchronous, final long timeout) throws Exception {
+		final RequestOptions options = synchronous ? RequestOptions.SYNC() : RequestOptions.ASYNC();
+		options.setExclusionList( dispatcher.getChannel().getAddress() );
+		options.setTimeout( timeout );
+		RspList<Object> rspList = dispatcher.castMessage( null, message, options );
+		if ( synchronous ) {
+			for ( Rsp rsp : rspList.values() ) {
+				if ( !rsp.wasReceived() ) {
+					if ( rsp.wasSuspected() ) {
+						throw log.jgroupsSuspectingPeer( rsp.getSender() );
+					}
+					else {
+						throw log.jgroupsRpcTimeout( rsp.getSender() );
+					}
+				}
+				else {
+					if ( rsp.hasException() ) {
+						throw log.jgroupsRemoteException( rsp.getSender(), rsp.getException(), rsp.getException() );
+					}
+				}
+			}
+		}
 	}
 
-	@Override
-	public void start() {
-	}
 }
