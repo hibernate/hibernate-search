@@ -700,14 +700,17 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
             linkend="table-jms-backend-configuration"/> for additional
             configuration options and <xref linkend="jms-backend"/> for a more
             detailed descripton of this
-            setup.</para><para><literal>jgroupsMaster</literal> or
-            <literal>jgroupsSlave</literal>: Backend using <ulink
+            setup.</para>
+            <para><literal>jgroupsMaster</literal>, <literal>jgroupsSlave</literal>
+            or <literal>jgroups</literal>: Backend using <ulink
             url="http://www.jgroups.org/">JGroups</ulink> as communication
             layer. See <xref linkend="jgroups-backend"/> for a more detailed
             description of this
-            setup.</para><para><literal>blackhole</literal>: Mainly a
+            setup.</para>
+            <para><literal>blackhole</literal>: Mainly a
             test/developer setting which ignores all indexing
-            work</para><para>You can also specify the fully qualified name of
+            work</para>
+            <para>You can also specify the fully qualified name of
             a class implementing <classname>BackendQueueProcessor</classname>.
             This way you can implement your own communication layer. The
             implementation is responsilbe for returning a
@@ -922,18 +925,77 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
       <title>JGroups Master/Slave back end</title>
 
       <para>This section describes how to configure the JGroups Master/Slave
-      back end. The configuration examples illustrated in <xref
-      linkend="jms-backend"/> also apply here, only a different backend
+      back end. The master and slave roles are similar to what is illustrated in <xref
+      linkend="jms-backend"/>, only a different backend
       (<constant>hibernate.search.worker.backend</constant>) needs to be
       set.</para>
 
-      <para>All backends configured to use JGroups share the same Channel. The
+      <para>A specific backend can be configured to act either as a slave
+      using <literal>jgroupsSlave</literal>, as a master using
+      <literal>jgroupsMaster</literal>, or can automatically switch
+      between the roles as needed by using <literal>jgroups</literal>.</para>
+
+      <note><para>
+       Either you specify a single <literal>jgroupsMaster</literal> and a set of
+       <literal>jgroupsSlave</literal> instances, or you specify all instances as
+       <literal>jgroups</literal>. Never mix the two approaches!</para>
+      </note>
+
+      <para>All backends configured to use JGroups share the same channel. The
       JGroups <classname>JChannel</classname> is the main communication link
       across all nodes participating in the same cluster group; since it is
-      convenient and more efficient to have just one channel shared across all
+      convenient to have just one channel shared across all
       backends, the Channel configuration properties are not defined on a
-      per-worker section but globally. See <xref
+      per-worker section but are defined globally. See <xref
       linkend="jgroups-channel-configuration"/>.</para>
+
+     <para>Table <xref
+      linkend="table-jgroups-backend-configuration"/> contains all configuration
+      options which can be set independently on each index backend. These
+      apply to all three variants of the backend: <literal>jgroupsSlave</literal>,
+      <literal>jgroupsMaster</literal>, <literal>jgroups</literal>. It is very unlikely
+      that you need to change any of these from their defaults.</para>
+
+    <table id="table-jgroups-backend-configuration">
+      <title>JGroups backend configuration properties</title>
+
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry><emphasis role="bold">Property</emphasis></entry>
+
+            <entry><emphasis role="bold">Description</emphasis></entry>
+          </row>
+
+          <row>
+            <entry><property>hibernate.search.&lt;indexName&gt;.jgroups.block_waiting_ack</property></entry>
+
+            <entry>Set to either <literal>true</literal> or <literal>false</literal>. False
+            is more efficient but will not wait for the operation to be delivered to
+            the peers. Defaults to <literal>true</literal> when the backend is synchronous,
+            to <literal>false</literal> when the backend is <literal>async</literal>.</entry>
+          </row>
+
+          <row>
+            <entry><property>hibernate.search.&lt;indexName&gt;.jgroups.​messages_timeout</property></entry>
+
+            <entry>The timeout of waiting for a single command to be acknowledged and executed
+            when <literal>block_waiting_ack</literal> is <literal>true</literal>, or just
+            acknowledged otherwise.
+            Value in milliseconds, defaults to <literal>20000</literal>.</entry>
+          </row>
+
+          <row>
+            <entry><property>hibernate.search.&lt;indexName&gt;.jgroups.delegate_backend</property></entry>
+
+            <entry>The master node receiving indexing operations forwards them to a standard backend
+            to be performed. Defaults to <literal>lucene</literal>. See also <xref linkend="table-backend-configuration"/>
+            for other options, but probably the only useful option is <literal>blackhole</literal>,
+            or a custom implementation, to help isolating network latency problems.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
 
       <section>
         <title>Slave nodes</title>
@@ -969,6 +1031,49 @@ hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
         </example>
       </section>
 
+      <section>
+        <title>Automatic master election</title>
+
+        <important>
+        <para>This feature is considered experimental. In particular during a
+        re-election process there is a small window of time in which indexing
+        requests could be lost.</para>
+        </important>
+
+        <para>In this mode the different nodes will autonomously elect
+        a master node. When a master fails, a new node is elected automatically.</para>
+
+        <para>When setting this backend it is expected that all Hibernate Search
+        instances in the same cluster use the same backend for each
+        specific index: this configuration is an alternative to the static
+        <literal>jgroupsMaster</literal> and <literal>jgroupsSlave</literal>
+        approach so make sure to not mix them.</para>
+        <para>To synchronize the indexes in this configuration avoid
+        <literal>filesystem-master</literal> and <literal>filesystem-slave</literal>
+        directory providers as their behaviour can not be switched dynamically;
+        use the Infinispan <literal>Directory</literal> instead, which has no need
+        for different configurations on each instance and allows dynamic
+        switching of writers; see also <xref linkend="infinispan-directories"/>.
+        </para>
+
+        <example>
+          <title>JGroups configuration for automatic master configuration</title>
+
+          <programlisting>### automatic configuration
+hibernate.search.default.worker.backend = jgroups  </programlisting>
+        </example>
+
+        <tip><para>Should you use <literal>jgroups</literal> or the couple
+        <literal>jgroupsMaster</literal>, <literal>jgroupsSlave</literal>?</para>
+        <para>The dynamic <literal>jgroups</literal> backend is better
+        suited for environments in which your master is more likely to need
+        to failover to a different machine, as in clouds. The static configuration
+        has the benefit of keeping the master at a well known location: your
+        architecture might take advantage of it by sending most write requests
+        to the known master. Also optimisation and MassIndexer
+        operations need to be triggered on the master node.</para></tip>
+      </section>
+
       <section id="jgroups-channel-configuration">
         <title>JGroups channel configuration</title>
 
@@ -989,15 +1094,17 @@ hibernate.search.default.worker.backend = jgroupsMaster   </programlisting>
           details.</para>
         </tip>
 
-        <para>The default channel name is <literal>Hibernate Search
+        <para>The default cluster name is <literal>Hibernate Search
         Cluster</literal> which can be configured as seen in <xref
-        linkend="example-jgroups-channel-name"/>.</para>
+        linkend="example-jgroups-cluster-name"/>.</para>
 
-        <example id="example-jgroups-channel-name">
-          <title>JGroups channel name configuration</title>
+        <example id="example-jgroups-cluster-name">
+          <title>JGroups cluster name configuration</title>
 
           <programlisting>hibernate.search.services.jgroups.clusterName = My-Custom-Cluster-Id</programlisting>
         </example>
+        <para>The cluster name is what identifies a group: by changing the name
+        you can run different clusters in the same network in isolation.</para>
 
         <section>
           <title>JGroups channel instance injection</title>

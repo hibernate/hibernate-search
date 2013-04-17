@@ -207,10 +207,21 @@
       i.e. JNDI service is not available.</para>
 
       <para>Note that while JMS can usually be configured to use persistent queues,
-      JGroups can only talk directly with the other nodes over network: it does
-      guarantee message delivery to other participants, but if no master node
-      is available, index update operations will be silently discarded.
-      A new mode for auto-election of a master node is being developed.</para>
+      JGroups talks directly to other nodes over network. Message delivery to
+      other reachable nodes is guaranteed, but if no master node is
+      available, index operations are silently discarded. This backend
+      can be configured to use asynchronous messages, or to wait for each
+      indexing operation to be completed on the remote node before returning.</para>
+
+      <para>The JGroups backend can be configured with static master or slave roles,
+      or can be setup to perform an auto-election of the master. This mode is
+      particularly useful to have the system automatically pick a new master
+      in case of failure, but during a reelection process some indexing
+      operations might be lost. For this reason this mode is not suited for use cases
+      requiring strong consistency guarantees. When configured to perform an
+      automatic election, the master node is defined as an hash on the index name:
+      the role is therefore possibly different for each index or shard.
+      </para>
     </section>
   </section>
 
