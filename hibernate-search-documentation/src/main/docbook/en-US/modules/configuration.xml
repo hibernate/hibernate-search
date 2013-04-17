@@ -1657,7 +1657,7 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
   </section>
 
   <section id="search-configuration-deploy-on-AS7">
-    <title>How to package Hibernate Search applications for JBoss AS 7.1</title>
+    <title>How to package Hibernate Search applications for JBoss AS 7.2</title>
 
     <para>Provided you're deploying on JBoss AS 7.2.x or JBoss EAP 6.1, there is an additional way to add the search dependencies to your application.</para>
 
