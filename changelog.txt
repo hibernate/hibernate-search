@@ -1,6 +1,42 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.3.0.Alpha1 (19-04-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1261] - Array Index Out Of Bound in JGroups Backend AutoNodeSelect
+    * [HSEARCH-1267] - Spatial search with sort by distance and paging orders entities incorrectly and repeats them
+    * [HSEARCH-1281] - Invalid code in search example - Getting Start section of documentation
+    * [HSEARCH-1289] - Infinispan module can't parse Infinispan configuration files in a modular environment
+    * [HSEARCH-1297] - The Solr module from the AS7 kit contains a set of incorrect dependencies
+
+** Improvement
+    * [HSEARCH-1304] - Allow configuration of JGroups message timeout
+    * [HSEARCH-1305] - JGroups backends should be able to delegate also to the non-default one
+
+** New Feature
+    * [HSEARCH-1268] - Make it possible to plug in a custom MassIndexer implementation
+    * [HSEARCH-1287] - Include Infinispan Directory in published JBoss Module
+    * [HSEARCH-1296] - Provide an option on the JGroups backend for synchronous updates
+
+** Patch
+    * [HSEARCH-1277] - Apply minor style and typo fixes to documentation
+    * [HSEARCH-1285] - Disable annotation processors of test classes
+
+** Task
+    * [HSEARCH-1262] - Upgrade to Infinispan 5.2.CR2
+    * [HSEARCH-1264] - Document usage of JBoss AS 7 module
+    * [HSEARCH-1272] - Upgrade to Hibernate ORM 4.2.0.CR1
+    * [HSEARCH-1274] - Update to Infinispan 5.2.1.Final and related JGroups 3.2.7.Final
+    * [HSEARCH-1280] - Upgrade to Hibernate ORM 4.2.0.CR2
+    * [HSEARCH-1283] - Update to Hibernate ORM 4.2.0.Final
+    * [HSEARCH-1284] - Add an executable example of a sort on a date field
+    * [HSEARCH-1286] - Update integration tests to JBoss AS 7.2 alpha1
+    * [HSEARCH-1288] - Upgrade to Infinispan 5.2.5.Final
+    * [HSEARCH-1299] - Upgrade to JGroups 3.2.8.Final
+    * [HSEARCH-1300] - Reference Infinispan configuration no longer requires batching
+
 
 Version 4.2.0.Final (15-01-2013)
 ------------------------
