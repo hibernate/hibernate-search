@@ -67,7 +67,8 @@ public class JGroupsMasterMessageListener implements Receiver {
 		final String indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
 		final NodeSelectorStrategy nodeSelector = selector.getMasterNodeSelector( indexName );
 		try {
-			if ( nodeSelector.isIndexOwnerLocal() ) {
+			//nodeSelector can be null if we receive the message during shutdown
+			if ( nodeSelector != null && nodeSelector.isIndexOwnerLocal() ) {
 				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
 				final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
 				if ( indexManager != null ) {

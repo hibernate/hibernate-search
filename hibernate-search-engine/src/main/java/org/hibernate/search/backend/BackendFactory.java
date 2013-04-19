@@ -49,8 +49,12 @@ public class BackendFactory {
 	private static final Log log = LoggerFactory.make();
 
 	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties properties) {
-
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
+		return createBackend( backend, indexManager, context, properties );
+	}
+
+	public static BackendQueueProcessor createBackend(String backend, DirectoryBasedIndexManager indexManager, WorkerBuildContext context,
+			Properties properties) {
 
 		final BackendQueueProcessor backendQueueProcessor;
 

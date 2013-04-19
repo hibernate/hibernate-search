@@ -26,6 +26,7 @@ package org.hibernate.search.util.logging.impl;
 
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.TRACE;
 import static org.jboss.logging.Logger.Level.WARN;
 
@@ -41,13 +42,15 @@ import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.errors.EmptyQueryException;
-import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
+import org.jgroups.Address;
+import org.jgroups.SuspectedException;
+import org.jgroups.TimeoutException;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -75,12 +78,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 4, value = "Exception attempting to instantiate Similarity '%1$s' set for %2$s")
 	void similarityInstantiationException(String similarityName, String beanXClassName);
 
-	@LogMessage(level = INFO)
-	@Message(id = 5, value = "Starting JGroups Channel")
-	void jGroupsStartingChannel();
+	@LogMessage(level = DEBUG)
+	@Message(id = 5, value = "Starting JGroups ChannelProvider")
+	void jGroupsStartingChannelProvider();
 
 	@LogMessage(level = INFO)
-	@Message(id = 6, value = "Connected to cluster [ %1$s ]. The node address is %2$s")
+	@Message(id = 6, value = "Connected to cluster [ %1$s ]. The local Address is %2$s")
 	void jGroupsConnectedToCluster(String clusterName, Object address);
 
 	@LogMessage(level = WARN)
@@ -674,5 +677,26 @@ public interface Log extends BasicLogger {
 	@Message(id = 169, value = "FieldBridge '%1$s' does not have a objectToString method: field '%2$s' in '%3$s'" +
 			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" )
 	SearchException fieldBridgeNotTwoWay(Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 170, value = "Starting JGroups channel using configuration '%1$s'")
+	void startingJGroupsChannel(Object cfg);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 171, value = "Using JGroups channel having configuration '%1$s'")
+	void jgroupsFullConfiguration(String printProtocolSpecAsXML);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 172, value = "JGroups backend configured for index '%1$s' using block_for_ack '%2$s'")
+	void jgroupsBlockWaitingForAck(String indexName, boolean block);
+
+	@Message(id = 173, value = "Remote JGroups peer '%1$s' is suspected to have left '")
+	SuspectedException jgroupsSuspectingPeer(Address sender);
+
+	@Message(id = 174, value = "Timeout sending synchronous message to JGroups peer '%1$s''")
+	TimeoutException jgroupsRpcTimeout(Address sender);
+
+	@Message(id = 175, value = "Exception reported from remote JGroups node '%1$s' : '%2$s'")
+	SearchException jgroupsRemoteException(Address sender, Throwable exception, @Cause Throwable cause);
 
 }

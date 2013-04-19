@@ -114,6 +114,27 @@ public abstract class ConfigurationParseHelper {
 	}
 	
 	/**
+	 * Parses a String to get an long value.
+	 *
+	 * @param value A string containing an long value to parse
+	 * @param errorMsgOnParseFailure message being wrapped in a SearchException if value is null or not correct.
+	 * @return the parsed value
+	 * @throws SearchException both for null values and for Strings not containing a valid int.
+	 */
+	public static final long parseLong(String value, String errorMsgOnParseFailure) {
+		if ( value == null ) {
+			throw new SearchException( errorMsgOnParseFailure );
+		}
+		else {
+			try {
+				return Long.parseLong( value.trim() );
+			} catch (NumberFormatException nfe) {
+				throw new SearchException( errorMsgOnParseFailure, nfe );
+			}
+		}
+	}
+	
+	/**
 	 * In case value is null or an empty string the defValue is returned
 	 * @param value
 	 * @param defValue
@@ -127,6 +148,23 @@ public abstract class ConfigurationParseHelper {
 		}
 		else {
 			return parseInt( value, errorMsgOnParseFailure );
+		}
+	}
+
+	/**
+	 * In case value is null or an empty string the defValue is returned
+	 * @param value
+	 * @param defValue
+	 * @param errorMsgOnParseFailure
+	 * @return the converted long.
+	 * @throws SearchException if value can't be parsed.
+	 */
+	public static final long parseLong(String value, long defValue, String errorMsgOnParseFailure) {
+		if ( StringHelper.isEmpty( value ) ) {
+			return defValue;
+		}
+		else {
+			return parseLong( value, errorMsgOnParseFailure );
 		}
 	}
 	
@@ -144,6 +182,22 @@ public abstract class ConfigurationParseHelper {
 	public static final int getIntValue(Properties cfg, String key, int defValue) {
 		String propValue = cfg.getProperty( key );
 		return parseInt( propValue, defValue, "Unable to parse " + key + ": " + propValue );
+	}
+
+	/**
+	 * Looks for a numeric value in the Properties, returning
+	 * defValue if not found or if an empty string is found.
+	 * When the key the value is found but not in valid format
+	 * a standard error message is generated.
+	 * @param cfg
+	 * @param key
+	 * @param defValue
+	 * @return the converted long value.
+	 * @throws SearchException for invalid format.
+	 */
+	public static long getLongValue(Properties cfg, String key, long defaultValue) {
+		String propValue = cfg.getProperty( key );
+		return parseLong( propValue, defaultValue, "Unable to parse " + key + ": " + propValue );
 	}
 
 	/**
@@ -196,4 +250,5 @@ public abstract class ConfigurationParseHelper {
 		String propValue = cfg.getProperty( key );
 		return propValue == null ? defaultValue : propValue;
 	}
+
 }
