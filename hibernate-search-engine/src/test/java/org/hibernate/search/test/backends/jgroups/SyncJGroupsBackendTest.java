@@ -102,7 +102,7 @@ public class SyncJGroupsBackendTest {
 		catch (SearchException se) {
 			//Expected: we're inducing the RPC into timeout by blocking receiver processing
 			Throwable cause = se.getCause();
-			Assert.assertTrue( cause instanceof TimeoutException );
+			Assert.assertTrue( "Cause was not a TimeoutException but a " + cause, cause instanceof TimeoutException );
 			timeoutTriggered = true;
 		}
 		finally {
@@ -129,7 +129,7 @@ public class SyncJGroupsBackendTest {
 		catch (SearchException se) {
 			//Expected: we're inducing the RPC into NPE
 			Throwable cause = se.getCause().getCause();
-			Assert.assertTrue( cause instanceof NullPointerException );
+			Assert.assertTrue( "Cause was not a NullPointerException but a " + cause, cause instanceof NullPointerException );
 			Assert.assertEquals( "Simulated Failure", cause.getMessage() );
 			npeTriggered = true;
 		}
