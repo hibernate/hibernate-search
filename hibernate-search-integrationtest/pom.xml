@@ -177,8 +177,8 @@
     <dependencies>
         <!-- JBoss TS -->
         <dependency>
-            <groupId>org.jboss.jbossts</groupId>
-            <artifactId>jbossjta</artifactId>
+            <groupId>org.jboss.jbossts.jta</groupId>
+            <artifactId>narayana-jta</artifactId>
         </dependency>
 
         <dependency>

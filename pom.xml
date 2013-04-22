@@ -151,7 +151,7 @@
         <bytemanVersion>2.1.0</bytemanVersion>
         <jbossLoggingVersion>3.1.0.GA</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.3.Final</jbossLoggingProcessorVersion>
-        <jbossJTAVersion>4.16.4.Final</jbossJTAVersion>
+        <narayanaVersion>4.17.4.Final</narayanaVersion>
         <avroVersion>1.6.3</avroVersion>
         <jacksonAslVersion>1.9.2</jacksonAslVersion>
         <commonsIoVersion>1.4</commonsIoVersion>
@@ -374,13 +374,21 @@
                 <version>${bytemanVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.jbossts</groupId>
-                <artifactId>jbossjta</artifactId>
-                <version>${jbossJTAVersion}</version>
+                <groupId>org.jboss.jbossts.jta</groupId>
+                <artifactId>narayana-jta</artifactId>
+                <version>${narayanaVersion}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.jboss.ws.native</groupId>
                         <artifactId>jbossws-native-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.jboss.byteman</groupId>
+                        <artifactId>byteman</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.jboss.byteman</groupId>
+                        <artifactId>byteman-submit</artifactId>
                     </exclusion>
                     <exclusion>
                         <artifactId>emma</artifactId>
@@ -395,8 +403,16 @@
                         <groupId>org.hornetq</groupId>
                     </exclusion>
                     <exclusion>
+                        <artifactId>hornetq-journal</artifactId>
+                        <groupId>org.hornetq</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>hornetq-commons</artifactId>
+                        <groupId>org.hornetq</groupId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>netty</artifactId>
-                        <groupId>org.jboss.netty</groupId>
+                        <groupId>io.netty</groupId>
                     </exclusion>
                     <exclusion>
                         <artifactId>wrapper</artifactId>
@@ -445,6 +461,14 @@
                     <exclusion>
                         <groupId>org.jboss.logging</groupId>
                         <artifactId>jboss-logging-generator</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.jboss.logmanager</groupId>
+                        <artifactId>jboss-logmanager</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>jfree</groupId>
+                        <artifactId>jcommon</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
