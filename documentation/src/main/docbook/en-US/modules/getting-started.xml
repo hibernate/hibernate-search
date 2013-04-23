@@ -155,28 +155,6 @@
     Infinispan dependencies which are currently not mirrored by
     <literal>central</literal>.</para>
 
-    <section>
-      <title>Using a Maven Archetype</title>
-
-      <para>Using a Maven Archetype it is possible to generate a Maven project
-      from scratch, already containing the basic configuration files and some
-      sample code and tests. Most development environments integrating maven
-      support a graphical option to do this; the <literal>groupId</literal> is
-      <literal>org.hibernate</literal> and the <literal>artifactId</literal>
-      is <literal>hibernate-search-quickstart</literal></para>
-
-      <example>
-        <title>Generating a sample project using the Maven Archetype</title>
-
-        <programlisting>
-mvn archetype:generate                                 \
-   -DarchetypeGroupId=org.hibernate                    \
-   -DarchetypeArtifactId=hibernate-search-quickstart   \
-   -DarchetypeVersion=&version;                          \
-   -DarchetypeRepository=http://repository.jboss.org/nexus/content/groups/public-jboss/
-</programlisting>
-      </example>
-    </section>
   </section>
 
   <section>

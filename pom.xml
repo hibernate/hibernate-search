@@ -43,7 +43,6 @@
         <module>analyzers</module>
         <module>testing</module>
         <module>infinispan</module>
-        <module>archetype</module>
         <module>integrationtest</module>
         <module>modules</module>
     </modules>
@@ -707,35 +706,6 @@
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-maven-plugin</artifactId>
                     <version>2.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-archetype-plugin</artifactId>
-                    <version>2.2</version>
-                    <executions>
-                        <execution>
-                            <id>generate-archetype-install</id>
-                            <phase>install</phase>
-                            <configuration>
-                                <archetypePostPhase>install</archetypePostPhase>
-                                <propertyFile>archetype.properties</propertyFile>
-                            </configuration>
-                            <goals>
-                                <goal>create-from-project</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>generate-archetype-deploy</id>
-                            <phase>deploy</phase>
-                            <configuration>
-                                <archetypePostPhase>deploy</archetypePostPhase>
-                                <propertyFile>archetype.properties</propertyFile>
-                            </configuration>
-                            <goals>
-                                <goal>create-from-project</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
