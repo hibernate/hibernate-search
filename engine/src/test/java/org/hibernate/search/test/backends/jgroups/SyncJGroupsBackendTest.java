@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -141,7 +141,7 @@ public class SyncJGroupsBackendTest {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, "dvds" );
 		JGroupsBackendQueueProcessor jgroupsProcessor = (JGroupsBackendQueueProcessor) backendQueueProcessor;
 		BackendQueueProcessor delegatedBackend = jgroupsProcessor.getDelegatedBackend();
-		Assert.assertTrue ( "dvds backend was configured with a deleage to blackhole but it's not using it", delegatedBackend instanceof BlackHoleBackendQueueProcessor );
+		Assert.assertTrue( "dvds backend was configured with a deleage to blackhole but it's not using it", delegatedBackend instanceof BlackHoleBackendQueueProcessor );
 	}
 
 	@Test

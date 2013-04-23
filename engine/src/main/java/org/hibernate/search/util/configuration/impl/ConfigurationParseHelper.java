@@ -133,7 +133,7 @@ public abstract class ConfigurationParseHelper {
 			}
 		}
 	}
-	
+
 	/**
 	 * In case value is null or an empty string the defValue is returned
 	 * @param value
