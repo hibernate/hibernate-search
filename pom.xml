@@ -37,15 +37,15 @@
     <inceptionYear>2006</inceptionYear>
 
     <modules>
-        <module>hibernate-search</module>
-        <module>hibernate-search-engine</module>
-        <module>hibernate-search-orm</module>
-        <module>hibernate-search-analyzers</module>
-        <module>hibernate-search-testing</module>
-        <module>hibernate-search-infinispan</module>
-        <module>hibernate-search-archetype</module>
-        <module>hibernate-search-integrationtest</module>
-        <module>hibernate-search-modules</module>
+        <module>legacy</module>
+        <module>engine</module>
+        <module>orm</module>
+        <module>analyzers</module>
+        <module>testing</module>
+        <module>infinispan</module>
+        <module>archetype</module>
+        <module>integrationtest</module>
+        <module>modules</module>
     </modules>
 
     <issueManagement>
@@ -906,7 +906,7 @@
         <profile>
             <id>docs</id>
             <modules>
-                <module>hibernate-search-documentation</module>
+                <module>documentation</module>
             </modules>
         </profile>
 
