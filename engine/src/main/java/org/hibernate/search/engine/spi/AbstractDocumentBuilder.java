@@ -360,8 +360,8 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private void initializeClass(XClass clazz, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix,
-								 Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList,
-								 boolean disableOptimizationsArg, PathsContext pathsContext) {
+								Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList,
+								boolean disableOptimizationsArg, PathsContext pathsContext) {
 		List<XClass> hierarchy = new LinkedList<XClass>();
 		XClass next;
 		for ( XClass previousClass = clazz; previousClass != null; previousClass = next ) {
@@ -478,8 +478,8 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private void initializeMemberLevelAnnotations(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot,
-												  String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList,
-												  boolean disableOptimizations, PathsContext pathsContext) {
+												String prefix, Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList,
+												boolean disableOptimizations, PathsContext pathsContext) {
 		checkForField( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForFields( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
 		checkForSpatial( classHostingMember, member, propertiesMetadata, prefix, context, pathsContext );
@@ -769,8 +769,8 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private void checkForIndexedEmbedded(XClass classHostingMember, XProperty member, PropertiesMetadata propertiesMetadata, String prefix,
-										 Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList,
-										 boolean disableOptimizations, PathsContext pathsContext ) {
+										Set<XClass> processedClasses, ConfigContext context, Set<XClass> optimizationBlackList,
+										boolean disableOptimizations, PathsContext pathsContext ) {
 		IndexedEmbedded embeddedAnn = member.getAnnotation( IndexedEmbedded.class );
 		if ( embeddedAnn != null ) {
 			//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
@@ -1047,12 +1047,12 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private void bindFieldAnnotation(XClass classHostingMember,
-									 XProperty member,
-									 PropertiesMetadata propertiesMetadata,
-									 String prefix,
-									 org.hibernate.search.annotations.Field fieldAnnotation,
-									 NumericField numericFieldAnnotation,
-									 ConfigContext context) {
+									XProperty member,
+									PropertiesMetadata propertiesMetadata,
+									String prefix,
+									org.hibernate.search.annotations.Field fieldAnnotation,
+									NumericField numericFieldAnnotation,
+									ConfigContext context) {
 
 		if ( isPropertyTransient( member, context ) ) {
 			//If the indexed values are derived from a Transient field, we can't rely on dirtyness of properties.
@@ -1070,11 +1070,11 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private void bindSpatialAnnotation(XClass classHostingMember,
-									 XProperty member,
-									 PropertiesMetadata propertiesMetadata,
-									 String prefix,
-									 Spatial spatialAnnotation,
-									 ConfigContext context) {
+									XProperty member,
+									PropertiesMetadata propertiesMetadata,
+									String prefix,
+									Spatial spatialAnnotation,
+									ConfigContext context) {
 		if ( spatialNames.contains( spatialAnnotation.name() )) {
 			throw log.cannotHaveTwoSpatialsWithDefaultOrSameName( classHostingMember.getName() );
 		}

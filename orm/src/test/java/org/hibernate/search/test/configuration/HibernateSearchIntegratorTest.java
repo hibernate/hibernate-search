@@ -247,7 +247,7 @@ public class HibernateSearchIntegratorTest {
 		@Override
 		public <R extends Service> R getService(Class<R> serviceRole) {
 			if ( EventListenerRegistry.class.equals( serviceRole ) ) {
-				return ( R ) eventListenerRegistry;
+				return (R) eventListenerRegistry;
 			}
 			else {
 				return null;

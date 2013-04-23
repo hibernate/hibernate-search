@@ -51,8 +51,8 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	private final QueryBuildingContext queryContext;
 
 	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext rangeContext,
-												 QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts,
-												 QueryBuildingContext queryContext) {
+												QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts,
+												QueryBuildingContext queryContext) {
 		this.rangeContext = rangeContext;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldContexts = fieldContexts;

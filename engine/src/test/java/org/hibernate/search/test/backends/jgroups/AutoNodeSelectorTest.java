@@ -47,7 +47,7 @@ import junit.framework.Assert;
  * @author Pedro Ruivo
  * @since 4.3
  */
-@TestForIssue(jiraKey="HSEARCH-1261")
+@TestForIssue(jiraKey = "HSEARCH-1261")
 public class AutoNodeSelectorTest {
 
 	private static final String NEGATIVE_HASH_CODE_INDEX_NAME = "test.Book";

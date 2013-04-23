@@ -113,9 +113,9 @@ public class TikaBridgeTest extends SearchTestCase {
 		catch ( HibernateException e ) {
 			// hmm, a lot of exception wrapping going on
 			assertTrue( e.getCause() instanceof BridgeException );
-			BridgeException bridgeException = ( BridgeException ) e.getCause();
+			BridgeException bridgeException = (BridgeException) e.getCause();
 			assertTrue( e.getCause() instanceof SearchException );
-			SearchException searchException = ( SearchException ) bridgeException.getCause();
+			SearchException searchException = (SearchException) bridgeException.getCause();
 			assertTrue( "Wrong root cause", searchException.getMessage().startsWith( "HSEARCH000151" ) );
 		}
 		finally {

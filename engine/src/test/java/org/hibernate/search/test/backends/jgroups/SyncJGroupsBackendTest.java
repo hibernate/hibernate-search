@@ -192,25 +192,25 @@ public class SyncJGroupsBackendTest {
 		tc.end();
 	}
 
-	@Indexed(index="dvds")
+	@Indexed(index = "dvds")
 	public static final class Dvd {
 		@DocumentId long id;
 		@Field String title;
 	}
 
-	@Indexed(index="books")
+	@Indexed(index = "books")
 	public static final class Book {
 		@DocumentId long id;
 		@Field String title;
 	}
 
-	@Indexed(index="drinks")
+	@Indexed(index = "drinks")
 	public static final class Drink {
 		@DocumentId long id;
 		@Field String title;
 	}
 
-	@Indexed(index="stars")
+	@Indexed(index = "stars")
 	public static final class Star {
 		@DocumentId long id;
 		@Field String title;

@@ -118,7 +118,7 @@ public class BusLine {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		BusLine other = ( BusLine ) obj;
+		BusLine other = (BusLine) obj;
 		if ( busLineName == null ) {
 			if ( other.busLineName != null ) {
 				return false;

@@ -178,14 +178,14 @@ public abstract class ReaderPerfTestCase extends SearchTestCase {
 				List result = query.list();
 				Object object = result.get( 0 );
 				if ( insert && object instanceof Detective ) {
-					Detective detective = ( Detective ) object;
+					Detective detective = (Detective) object;
 					detective.setPhysicalDescription(
 							detective.getPhysicalDescription() + " Eye"
 									+ firstResult
 					);
 				}
 				else if ( insert && object instanceof Suspect ) {
-					Suspect suspect = ( Suspect ) object;
+					Suspect suspect = (Suspect) object;
 					suspect.setPhysicalDescription(
 							suspect.getPhysicalDescription() + " Eye"
 									+ firstResult

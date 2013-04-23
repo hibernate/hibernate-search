@@ -490,12 +490,12 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	private void buildDocumentFields(Object instance,
-									 Document doc,
-									 PropertiesMetadata propertiesMetadata,
-									 Map<String, String> fieldToAnalyzerMap,
-									 Set<String> processedFieldNames,
-									 ConversionContext conversionContext,
-									 InstanceInitializer objectInitializer) {
+									Document doc,
+									PropertiesMetadata propertiesMetadata,
+									Map<String, String> fieldToAnalyzerMap,
+									Set<String> processedFieldNames,
+									ConversionContext conversionContext,
+									InstanceInitializer objectInitializer) {
 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );

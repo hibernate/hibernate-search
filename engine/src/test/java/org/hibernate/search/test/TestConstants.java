@@ -39,12 +39,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class TestConstants {
 
-	private static final Log log = LoggerFactory.make();
-
 	public static final Analyzer standardAnalyzer = new StandardAnalyzer( TestConstants.getTargetLuceneVersion() );
 	public static final Analyzer stopAnalyzer = new StopAnalyzer( TestConstants.getTargetLuceneVersion() );
 	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer( TestConstants.getTargetLuceneVersion() );
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
+
+	private static final Log log = LoggerFactory.make();
 
 	private static File targetDir;
 	private static final String indexDirPath;

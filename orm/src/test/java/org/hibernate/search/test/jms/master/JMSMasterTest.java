@@ -129,13 +129,13 @@ public class JMSMasterTest extends SearchTestCase {
 
 	private Queue getMessageQueue() throws Exception {
 		Context ctx = getJndiInitialContext();
-		return ( Queue ) ctx.lookup( QUEUE_NAME );
+		return (Queue) ctx.lookup( QUEUE_NAME );
 	}
 
 	private QueueSession getQueueSession() throws Exception {
 		if ( queueSession == null ) {
 			Context ctx = getJndiInitialContext();
-			QueueConnectionFactory factory = ( QueueConnectionFactory ) ctx.lookup( CONNECTION_FACTORY_NAME );
+			QueueConnectionFactory factory = (QueueConnectionFactory) ctx.lookup( CONNECTION_FACTORY_NAME );
 			QueueConnection conn = factory.createQueueConnection();
 			conn.start();
 			queueSession = conn.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
@@ -203,7 +203,7 @@ public class JMSMasterTest extends SearchTestCase {
 				statement.close();
 			}
 		} );
-		TShirt ts = ( TShirt ) s.get( TShirt.class, 1 );
+		TShirt ts = (TShirt) s.get( TShirt.class, 1 );
 		s.getTransaction().commit();
 		s.close();
 		return ts;

@@ -64,7 +64,7 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 	@Override
 	public <T> Collection<T> initializeCollection(Collection<T> value) {
 		if ( value instanceof PersistentCollection ) {
-			preparePersistentCollection( ( PersistentCollection ) value );
+			preparePersistentCollection( (PersistentCollection) value );
 		}
 		return value;
 	}
@@ -72,7 +72,7 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 	@Override
 	public <K,V> Map<K,V> initializeMap(Map<K,V> value) {
 		if ( value instanceof PersistentCollection ) {
-			preparePersistentCollection( ( PersistentCollection ) value );
+			preparePersistentCollection( (PersistentCollection) value );
 		}
 		return value;
 	}

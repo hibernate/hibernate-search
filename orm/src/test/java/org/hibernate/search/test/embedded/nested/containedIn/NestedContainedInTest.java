@@ -94,7 +94,7 @@ public class NestedContainedInTest extends SearchTestCase {
 		Query termQuery = new TermQuery( new Term( "tags.tag.name", tagName ) );
 		FullTextQuery fullTextQuery =
 				fullTextSession.createFullTextQuery( termQuery, HelpItem.class );
-		HelpItem check = ( HelpItem ) fullTextQuery.uniqueResult();
+		HelpItem check = (HelpItem) fullTextQuery.uniqueResult();
 		assertNotNull( "No HelpItem with Tag '" + tagName + "' found in Lucene index.", check );
 		assertTrue( check.getTags().get( 0 ).getTag().getName().equals( tagName ) );
 		tx.commit();

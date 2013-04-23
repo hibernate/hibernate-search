@@ -69,7 +69,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestCase {
 
 		List results = Search.getFullTextSession( s ).createFullTextQuery( query, PersonCustomDocumentId.class ).list();
 		assertEquals( 1, results.size() );
-		johnDoe = ( PersonCustomDocumentId ) results.get( 0 );
+		johnDoe = (PersonCustomDocumentId) results.get( 0 );
 		johnDoe.setFavoriteColor( "Red" );
 		tx.commit();
 		s.clear();
@@ -77,7 +77,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestCase {
 		tx = s.beginTransaction();
 		results = Search.getFullTextSession( s ).createFullTextQuery( query, PersonCustomDocumentId.class ).list();
 		assertEquals( 1, results.size() );
-		johnDoe = ( PersonCustomDocumentId ) results.get( 0 );
+		johnDoe = (PersonCustomDocumentId) results.get( 0 );
 		assertEquals( "Red", johnDoe.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();

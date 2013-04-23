@@ -149,7 +149,7 @@ public class AvroDeserializer implements Deserializer {
 		GenericRecord id = (GenericRecord) operation.get( "id" );
 		Object value = id.get( "value" );
 		if ( value instanceof ByteBuffer ) {
-			hydrator.addIdAsJavaSerialized( asByteArray( ( ByteBuffer ) value ) );
+			hydrator.addIdAsJavaSerialized( asByteArray( (ByteBuffer) value ) );
 		}
 		else if ( value instanceof Utf8 ) {
 			hydrator.addId( value.toString() );

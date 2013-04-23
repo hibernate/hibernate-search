@@ -88,7 +88,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 		// Now try to delete
 		tx = s.beginTransaction();
 		int id = person.getId();
-		person = ( SpecialPerson ) s.get( SpecialPerson.class, id );
+		person = (SpecialPerson) s.get( SpecialPerson.class, id );
 		s.delete( person );
 		tx.commit();
 
@@ -119,7 +119,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 	 */
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
-		SearchFactoryImplementor searchFactory = ( SearchFactoryImplementor ) fullTextSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 
 		// create test entity
 		SpecialPerson person = new SpecialPerson();

@@ -20,8 +20,6 @@
  */
 package org.hibernate.search.indexes.interceptor;
 
-import org.hibernate.search.annotations.IndexedEmbedded;
-
 /**
  * This interceptor is called upon indexing operations to optionally change the behavior.
  * Implementations must be thread safe and should have a no-arg constructor.

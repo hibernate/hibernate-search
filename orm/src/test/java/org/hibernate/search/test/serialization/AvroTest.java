@@ -116,7 +116,7 @@ public class AvroTest {
 
 		byte[] serializableSample = new byte[10];
 		for ( int i = 0; i < 10; i++ ) {
-			serializableSample[i] = ( byte ) i;
+			serializableSample[i] = (byte) i;
 		}
 
 		List<String> classReferences = new ArrayList<String>(  );
@@ -227,24 +227,24 @@ public class AvroTest {
 				assertThat( result ).isNotNull();
 				//operations
 				assertThat( result.get( "operations" ) ).isNotNull().isInstanceOf( List.class );
-				List<?> ops = ( List<?> ) result.get( "operations" );
+				List<?> ops = (List<?>) result.get( "operations" );
 				assertThat( ops ).hasSize( 4 );
 
 				//Delete
 				assertThat( ops.get( 2 ) ).isInstanceOf( GenericRecord.class );
-				GenericRecord deleteOp = ( GenericRecord ) ops.get( 2 );
+				GenericRecord deleteOp = (GenericRecord) ops.get( 2 );
 				assertThat( deleteOp.getSchema().getName() ).isEqualTo( "Delete" );
-				Object actual = ( ( GenericRecord ) deleteOp.get( "id" ) ).get( "value" );
+				Object actual = ( (GenericRecord) deleteOp.get( "id" ) ).get( "value" );
 				assertThat( actual ).isInstanceOf( Long.class );
 				assertThat( actual ).isEqualTo( Long.valueOf( 30 ) );
 
 				//Add
 				assertThat( ops.get( 3 ) ).isInstanceOf( GenericRecord.class );
-				GenericRecord addOp = ( GenericRecord ) ops.get( 3 );
+				GenericRecord addOp = (GenericRecord) ops.get( 3 );
 				assertThat( addOp.getSchema().getName() ).isEqualTo( "Add" );
-				actual = ( ( GenericRecord ) addOp.get( "id" ) ).get( "value" );
+				actual = ( (GenericRecord) addOp.get( "id" ) ).get( "value" );
 				assertThat( actual ).isInstanceOf( ByteBuffer.class );
-				ByteBuffer bb = ( ByteBuffer ) actual;
+				ByteBuffer bb = (ByteBuffer) actual;
 				assertThat( bb.hasArray() ).isTrue();
 				byte[] copy = new byte[bb.remaining()];
 				bb.get( copy );
@@ -252,62 +252,62 @@ public class AvroTest {
 
 				//fieldToAnalyzerMap
 				assertThat( addOp.get( "fieldToAnalyzerMap" ) ).isInstanceOf( Map.class );
-				assertThat( ( Map ) addOp.get( "fieldToAnalyzerMap" ) ).hasSize( 2 );
+				assertThat( (Map) addOp.get( "fieldToAnalyzerMap" ) ).hasSize( 2 );
 
 				//document
 				assertThat( addOp.get( "document" ) ).isNotNull();
-				GenericRecord document = ( GenericRecord ) addOp.get( "document" );
+				GenericRecord document = (GenericRecord) addOp.get( "document" );
 				assertThat( document.get( "boost" ) ).isEqualTo( 2.3f );
 
 				//numeric fields
 				assertThat( document.get( "fieldables" ) ).isNotNull().isInstanceOf( List.class );
-				List<?> fields = ( List<?> ) document.get( "fieldables" );
+				List<?> fields = (List<?>) document.get( "fieldables" );
 
 				assertThat( fields ).hasSize( 9 ); //custom + 4 numerics + 4 fields
 
-				field = ( GenericRecord ) fields.get( 0 );
+				field = (GenericRecord) fields.get( 0 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "CustomFieldable" );
-				field = ( GenericRecord ) fields.get( 1 );
+				field = (GenericRecord) fields.get( 1 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "NumericIntField" );
 				assertThat( field.get( "value" ) ).isEqualTo( 3 );
 				assertNumericField( field );
-				field = ( GenericRecord ) fields.get( 2 );
+				field = (GenericRecord) fields.get( 2 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "NumericLongField" );
 				assertThat( field.get( "value" ) ).isEqualTo( 3l );
 				assertNumericField( field );
-				field = ( GenericRecord ) fields.get( 3 );
+				field = (GenericRecord) fields.get( 3 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "NumericFloatField" );
 				assertThat( field.get( "value" ) ).isEqualTo( 2.3f );
 				assertNumericField( field );
-				field = ( GenericRecord ) fields.get( 4 );
+				field = (GenericRecord) fields.get( 4 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "NumericDoubleField" );
 				assertThat( field.get( "value" ) ).isEqualTo( 2.3d );
 				assertNumericField( field );
 
 				//fields
-				field = ( GenericRecord ) fields.get( 5 );
+				field = (GenericRecord) fields.get( 5 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "BinaryField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( ByteBuffer.class );
 				assertField( field );
 
-				field = ( GenericRecord ) fields.get( 6 );
+				field = (GenericRecord) fields.get( 6 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "StringField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( Utf8.class );
 				assertTermVector( field );
 				assertIndexAndStore( field );
 				assertField( field );
 
-				field = ( GenericRecord ) fields.get( 7 );
+				field = (GenericRecord) fields.get( 7 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "TokenStreamField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( List.class );
-				List<List<Object>> l1 = ( List<List<Object>> ) field.get( "value" );
+				List<List<Object>> l1 = (List<List<Object>>) field.get( "value" );
 				assertThat( l1.get( 0 ) ).as( "Wrong attribute impl list" ).hasSize( 2 );
 				Object object = l1.get( 0 ).get( 0 );
 				assertThat( object ).isNotNull();
 				assertTermVector( field );
 				assertField( field );
 
-				field = ( GenericRecord ) fields.get( 8 );
+				field = (GenericRecord) fields.get( 8 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "ReaderField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( ByteBuffer.class );
 				assertTermVector( field );

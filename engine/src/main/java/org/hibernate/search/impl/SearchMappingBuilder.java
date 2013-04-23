@@ -95,7 +95,8 @@ public class SearchMappingBuilder {
 			LOG.debugf( "invoking factory method [ %s.%s ] to get search mapping instance", clazz.getName(), method.getName() );
 			Object instance = clazz.newInstance();
 			mapping = (SearchMapping) method.invoke( instance );
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new SearchException( "Unable to call the factory method: " + clazz.getName() + "." + method.getName(), e );
 		}
 		return mapping;
@@ -113,7 +114,7 @@ public class SearchMappingBuilder {
 	private static Class<?> getProgrammaticMappingClass(Object programmaticConfig) {
 		Class<?> clazz = null;
 		if (programmaticConfig instanceof String) {
-			final String className = ( String ) programmaticConfig;
+			final String className = (String) programmaticConfig;
 			try {
 				clazz = ClassLoaderHelper.classForName( className, SearchMappingBuilder.class.getClassLoader() );
 			} catch (ClassNotFoundException e) {

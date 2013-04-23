@@ -55,7 +55,7 @@ public class ProxyTest extends SearchTestCase {
 		session.clear();
 
 		tx = session.beginTransaction();
-		IAuthor loadedAuthor = ( IAuthor ) session.get( Author.class, author.getId() );
+		IAuthor loadedAuthor = (IAuthor) session.get( Author.class, author.getId() );
 		//author = (Author) loadedBook.getAuthors().iterator().next();
 		session.delete( loadedAuthor );
 

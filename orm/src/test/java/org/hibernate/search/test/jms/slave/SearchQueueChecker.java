@@ -60,7 +60,7 @@ public class SearchQueueChecker implements MessageListener {
 		if ( !( message instanceof ObjectMessage ) ) {
 			return;
 		}
-		ObjectMessage objectMessage = ( ObjectMessage ) message;
+		ObjectMessage objectMessage = (ObjectMessage) message;
 
 		List<LuceneWork> queue;
 		try {

@@ -111,19 +111,19 @@ public class SpatialFieldBridgeByQuadTree extends SpatialFieldBridge implements 
 	public void setParameterValues(final Map parameters) {
 		Object topQuadTreeLevel = parameters.get( "topQuadTreeLevel" );
 		if ( topQuadTreeLevel instanceof Integer ) {
-			this.topQuadTreeLevel = ( Integer ) topQuadTreeLevel;
+			this.topQuadTreeLevel = (Integer) topQuadTreeLevel;
 		}
 		Object bottomQuadTreeLevel = parameters.get( "bottomQuadTreeLevel" );
 		if ( bottomQuadTreeLevel instanceof Integer ) {
-			this.bottomQuadTreeLevel = ( Integer ) bottomQuadTreeLevel;
+			this.bottomQuadTreeLevel = (Integer) bottomQuadTreeLevel;
 		}
 		Object quadTreeIndex = parameters.get( "quadTreeIndex" );
 		if ( quadTreeIndex instanceof Boolean ) {
-			this.quadTreeIndex = ( Boolean ) quadTreeIndex;
+			this.quadTreeIndex = (Boolean) quadTreeIndex;
 		}
 		Object numericFieldsIndex = parameters.get( "numericFieldsIndex" );
 		if ( numericFieldsIndex instanceof Boolean ) {
-			this.numericFieldsIndex = ( Boolean ) numericFieldsIndex;
+			this.numericFieldsIndex = (Boolean) numericFieldsIndex;
 		}
 	}
 }

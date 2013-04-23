@@ -65,7 +65,6 @@ public class AnalyzerTest extends SearchTestCase {
 		Set<Article> references = new HashSet<Article>();
 		references.add( germanArticle );
 
-
 		Article englishArticle = new Article();
 		englishArticle.setLanguage( "en" );
 		englishArticle.setText( "acknowledgment" );
@@ -168,7 +167,7 @@ public class AnalyzerTest extends SearchTestCase {
 
 		// test border cases
 		try {
-			searchFactory.getAnalyzer( ( Class ) null );
+			searchFactory.getAnalyzer( (Class) null );
 		}
 		catch ( IllegalArgumentException iae ) {
 			log.debug( "success" );

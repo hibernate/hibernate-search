@@ -65,7 +65,7 @@ public class OptimizerStrategyLoadTest {
 		verifyOptimizerImplementationIs( IncrementalOptimizerStrategy.class, cfg );
 	}
 
-	@Test(expected=SearchException.class)
+	@Test(expected = SearchException.class)
 	public void testIllegalImplementation() {
 		ManualConfiguration cfg = new ManualConfiguration();
 		cfg.addProperty( "hibernate.search.default.optimizer.implementation", "5" );

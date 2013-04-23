@@ -25,7 +25,7 @@ public class JBossTSStandaloneTransactionManagerLookup implements TransactionMan
 			//static method
 			final Object jtaEnvironmentBean = getJTAEnvironmentBean.invoke( null );
 			final Method getTransactionManager = jtaEnvironmentBean.getClass().getMethod( "getTransactionManager" );
-			return ( TransactionManager ) getTransactionManager.invoke( jtaEnvironmentBean );
+			return (TransactionManager) getTransactionManager.invoke( jtaEnvironmentBean );
 		}
 		catch ( Exception e ) {
 			throw new HibernateException( "Could not obtain JBoss Transactions transaction manager instance", e );

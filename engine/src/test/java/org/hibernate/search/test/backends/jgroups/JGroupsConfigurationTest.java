@@ -95,8 +95,9 @@ public class JGroupsConfigurationTest {
 			throw se.getCause();
 		}
 		finally {
-			if ( buildSearchFactory != null )
+			if ( buildSearchFactory != null ) {
 				buildSearchFactory.close();
+			}
 		}
 	}
 

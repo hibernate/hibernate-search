@@ -51,19 +51,19 @@ public class SerializationTestHelper {
 	 * @throws ClassNotFoundException
 	 */
 	public static <T> T duplicateBySerialization(T o) throws IOException, ClassNotFoundException {
-		//Serialize to buffer:
+		// Serialize to buffer:
 		java.io.ByteArrayOutputStream outStream = new java.io.ByteArrayOutputStream();
-	    ObjectOutputStream objectOutStream = new ObjectOutputStream( outStream );
-	    objectOutStream.writeObject( o );
-	    objectOutStream.flush();
-	    objectOutStream.close();
-	    //buffer version of Object:
-	    byte[] objectBuffer = outStream.toByteArray();
-	    //deserialize to new instance:
-	    java.io.ByteArrayInputStream inStream = new ByteArrayInputStream( objectBuffer );
-	    ObjectInputStream objectInStream = new ObjectInputStream( inStream );
-	    T copy = (T) objectInStream.readObject();
-	    return copy;
+		ObjectOutputStream objectOutStream = new ObjectOutputStream( outStream );
+		objectOutStream.writeObject( o );
+		objectOutStream.flush();
+		objectOutStream.close();
+		// buffer version of Object:
+		byte[] objectBuffer = outStream.toByteArray();
+		// deserialize to new instance:
+		java.io.ByteArrayInputStream inStream = new ByteArrayInputStream( objectBuffer );
+		ObjectInputStream objectInStream = new ObjectInputStream( inStream );
+		T copy = (T) objectInStream.readObject();
+		return copy;
 	}
 
 	@Test

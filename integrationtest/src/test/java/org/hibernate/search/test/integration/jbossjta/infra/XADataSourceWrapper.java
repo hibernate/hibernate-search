@@ -161,7 +161,7 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		if ( isWrapperFor( iface ) ) {
-			return ( T ) getUnwrappedXADataSource();
+			return (T) getUnwrappedXADataSource();
 		}
 		else {
 			throw new SQLException( "Not a wrapper for " + iface.getCanonicalName() );

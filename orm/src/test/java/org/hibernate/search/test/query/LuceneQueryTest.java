@@ -498,13 +498,13 @@ public class LuceneQueryTest extends SearchTestCase {
 		hibQuery.setMaxResults( 0 );
 
 		List result = hibQuery.list();
-        assertTrue( "We should get the empty result list", result.isEmpty() );
+		assertTrue( "We should get the empty result list", result.isEmpty() );
 
 		hibQuery.setFirstResult( 1 );
 		hibQuery.setMaxResults( 0 );
 
 		result = hibQuery.list();
-        assertTrue( "We should get the empty result list", result.isEmpty() );
+		assertTrue( "We should get the empty result list", result.isEmpty() );
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {

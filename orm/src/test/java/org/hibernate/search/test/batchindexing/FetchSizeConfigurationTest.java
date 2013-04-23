@@ -31,7 +31,6 @@ import org.hibernate.testing.RequiresDialect;
 import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.hibernate.search.MassIndexer;
 
 /**
  * Verifies that {@link MassIndexer#idFetchSize(int)} is applied by checking for errors thrown by

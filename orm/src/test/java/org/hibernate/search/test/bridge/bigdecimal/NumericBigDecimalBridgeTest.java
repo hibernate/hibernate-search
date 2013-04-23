@@ -83,7 +83,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestCase {
 				.createQuery();
 
 
-		List<Item> resultList = ( List<Item> ) fullTextSession.createFullTextQuery( rootQuery, Item.class ).list();
+		List<Item> resultList = (List<Item>) fullTextSession.createFullTextQuery( rootQuery, Item.class ).list();
 		assertNotNull( resultList );
 		assertTrue( resultList.size() == 1 );
 
@@ -128,7 +128,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestCase {
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 			if ( value != null ) {
-				BigDecimal decimalValue = ( BigDecimal ) value;
+				BigDecimal decimalValue = (BigDecimal) value;
 				long indexedValue = decimalValue.multiply( storeFactor ).longValue();
 				luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
 			}

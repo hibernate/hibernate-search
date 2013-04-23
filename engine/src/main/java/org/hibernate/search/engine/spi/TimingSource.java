@@ -20,10 +20,6 @@
  */
 package org.hibernate.search.engine.spi;
 
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.TimeLimitingCollector;
-import org.apache.lucene.util.Counter;
-
 /**
  * Lucene delegates responsibility for efficient time tracking to an external service;
  * this is needed for example by the {@link org.apache.lucene.search.TimeLimitingCollector#TimeLimitingCollector(Collector, Counter, long)}

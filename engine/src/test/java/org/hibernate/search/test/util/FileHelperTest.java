@@ -49,16 +49,6 @@ public class FileHelperTest {
 
 	private static File root;
 
-	@BeforeClass
-	public static void prepareRootDirectory() {
-		String buildDir = System.getProperty( "build.dir" );
-		if ( buildDir == null ) {
-			buildDir = ".";
-		}
-		root = new File( buildDir, "filehelper" );
-		log.infof( "Using %s as test directory.", root.getAbsolutePath() );
-	}
-
 	/**
 	 * Source directory
 	 */
@@ -69,6 +59,15 @@ public class FileHelperTest {
 	 */
 	private String destDir = "filehelperdest";
 
+	@BeforeClass
+	public static void prepareRootDirectory() {
+		String buildDir = System.getProperty( "build.dir" );
+		if ( buildDir == null ) {
+			buildDir = ".";
+		}
+		root = new File( buildDir, "filehelper" );
+		log.infof( "Using %s as test directory.", root.getAbsolutePath() );
+	}
 
 	private File createFile(File dir, String name) throws IOException {
 		File file = new File( dir, name );

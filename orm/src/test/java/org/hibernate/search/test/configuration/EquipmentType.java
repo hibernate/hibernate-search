@@ -48,7 +48,7 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 		// from the name field of the ClassBridge Annotation. This is not
 		// a requirement. It just works that way in this instance. The
 		// actual name could be supplied by hard coding it below.
-		Departments deps = ( Departments ) value;
+		Departments deps = (Departments) value;
 		String fieldValue = deps.getManufacturer();
 
 		if ( fieldValue != null ) {

@@ -70,7 +70,7 @@ public class FreshReadersProvidedTest {
 		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
 		Assert.assertNotNull( searchFactory.getAllIndexesManager().getIndexManager( "guests" ) );
 
-		{// Store guest "Thorin Oakenshield" in the index
+		{ // Store guest "Thorin Oakenshield" in the index
 			Guest lastDwarf = new Guest();
 			lastDwarf.id = 13l;
 			lastDwarf.name = "Thorin Oakenshield";
@@ -107,7 +107,7 @@ public class FreshReadersProvidedTest {
 		Assert.assertEquals( 1, filteredQueryEntityInfos.size() );
 		Assert.assertEquals( 13L, filteredQueryEntityInfos.get( 0 ).getId() );
 
-		{// Store guest "Balin"
+		{ // Store guest "Balin"
 			Guest balin = new Guest();
 			balin.id = 7l;
 			balin.name = "Balin";

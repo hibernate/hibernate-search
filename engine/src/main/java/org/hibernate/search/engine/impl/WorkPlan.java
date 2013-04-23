@@ -31,7 +31,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
@@ -70,16 +69,16 @@ public class WorkPlan {
 
 	private final InstanceInitializer instanceInitializer;
 
-	public WorkPlan(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
-		this.instanceInitializer = searchFactoryImplementor.getInstanceInitializer();
-	}
-
 	/**
 	 * most work is split in two, some other might cancel one or more existing works,
 	 * we don't track the number accurately as that's not needed.
 	 */
 	private int approximateWorkQueueSize = 0;
+
+	public WorkPlan(SearchFactoryImplementor searchFactoryImplementor) {
+		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.instanceInitializer = searchFactoryImplementor.getInstanceInitializer();
+	}
 
 	/**
 	 * Adds a work to be performed as part of the final plan.
@@ -314,7 +313,7 @@ public class WorkPlan {
 					if ( entityWork == null ) {
 						EntityIndexingInterceptor<? super T> entityInterceptor = getEntityInterceptor();
 						IndexingOverride operation;
-						if (entityInterceptor!=null) {
+						if ( entityInterceptor != null ) {
 							operation = entityInterceptor.onUpdate( value );
 						}
 						else {
@@ -358,8 +357,8 @@ public class WorkPlan {
 			EntityIndexBinder indexBindingForEntity = searchFactoryImplementor.getIndexBindingForEntity(
 					entityClass
 			);
-			return indexBindingForEntity!=null ?
-					(EntityIndexingInterceptor<? super T> ) indexBindingForEntity.getEntityIndexingInterceptor() :
+			return indexBindingForEntity != null ?
+					(EntityIndexingInterceptor<? super T>) indexBindingForEntity.getEntityIndexingInterceptor() :
 					null;
 		}
 	}

@@ -44,7 +44,7 @@ public class UpdateActivity extends AbstractActivity {
 		FullTextQuery q = getQuery( "John", s, Detective.class );
 		List list = q.setMaxResults( 1 ).list();
 		for ( Object o : list ) {
-			Detective detective = ( Detective ) o;
+			Detective detective = (Detective) o;
 			detective.setPhysicalDescription( "old" );
 		}
 	}

@@ -52,7 +52,9 @@ public class TimeoutManagerImpl implements TimeoutManager {
 
 	/** we start counting from this method call (if needed) */
 	public void start() {
-		if ( timeout == null ) return;
+		if ( timeout == null ) {
+			return;
+		}
 		this.start = System.nanoTime();
 		this.partialResults = false;
 	}
@@ -94,7 +96,9 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	}
 
 	public boolean isTimedOut() {
-		if ( timeout == null ) return false;
+		if ( timeout == null ) {
+			return false;
+		}
 		if ( timedOut ) {
 			return true;
 		}
@@ -102,7 +106,9 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	}
 
 	private boolean isTimedOut(long currentTime) {
-		if ( timeout == null ) return false;
+		if ( timeout == null ) {
+			return false;
+		}
 		if ( timedOut ) {
 			return true;
 		}

@@ -29,9 +29,6 @@ package org.hibernate.search;
  */
 public final class Environment {
 
-	private Environment() {
-	}
-
 	/**
 	 * Enable listeners auto registration in Hibernate Annotations and EntityManager. Default to true.
 	 */
@@ -219,4 +216,8 @@ public final class Environment {
 	 * </ul>
 	 */
 	public static final String INDEX_MANAGER_IMPL_NAME = "indexmanager";
+
+	private Environment() {
+	}
+
 }

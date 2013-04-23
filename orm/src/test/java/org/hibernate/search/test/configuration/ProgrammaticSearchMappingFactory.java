@@ -133,7 +133,7 @@ public class ProgrammaticSearchMappingFactory {
 							.param( "D", "D-Link" )
 							.param( "K", "Kingston" )
 							.param( "3", "3Com" )
-					  .indexed()
+					.indexed()
 					.property( "deptsId", ElementType.FIELD )
 						.documentId().name( "id" )
 					.property( "branchHead", ElementType.FIELD )

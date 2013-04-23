@@ -50,7 +50,7 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 		this.jmsConnectionFactoryName = properties.getProperty( JMS_CONNECTION_FACTORY );
 		try {
 			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
-			return ( QueueConnectionFactory ) initialContext.lookup( jmsConnectionFactoryName );
+			return (QueueConnectionFactory) initialContext.lookup( jmsConnectionFactoryName );
 		}
 		catch ( NamingException e ) {
 			throw log.jmsLookupException( getJmsQueueName(), jmsConnectionFactoryName, getIndexName(), e );
@@ -61,7 +61,7 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 	protected Queue initializeJMSQueue(QueueConnectionFactory factory, Properties properties) {
 		try {
 			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
-			return ( Queue ) initialContext.lookup( getJmsQueueName() );
+			return (Queue) initialContext.lookup( getJmsQueueName() );
 		}
 		catch ( NamingException e ) {
 			throw log.jmsLookupException( getJmsQueueName(), jmsConnectionFactoryName, getIndexName(), e );

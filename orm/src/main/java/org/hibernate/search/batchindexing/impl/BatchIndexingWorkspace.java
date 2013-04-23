@@ -81,17 +81,17 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final int idFetchSize;
 
 	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor,
-								  SessionFactory sessionFactory,
-								  Class<?> entityType,
-								  int objectLoadingThreads,
-								  int collectionLoadingThreads,
-								  CacheMode cacheMode,
-								  int objectLoadingBatchSize,
-								  CountDownLatch endAllSignal,
-								  MassIndexerProgressMonitor monitor,
-								  BatchBackend backend,
-								  long objectsLimit,
-								  int idFetchSize) {
+								SessionFactory sessionFactory,
+								Class<?> entityType,
+								int objectLoadingThreads,
+								int collectionLoadingThreads,
+								CacheMode cacheMode,
+								int objectLoadingBatchSize,
+								CountDownLatch endAllSignal,
+								MassIndexerProgressMonitor monitor,
+								BatchBackend backend,
+								long objectsLimit,
+								int idFetchSize) {
 
 		this.indexedType = entityType;
 		this.idFetchSize = idFetchSize;

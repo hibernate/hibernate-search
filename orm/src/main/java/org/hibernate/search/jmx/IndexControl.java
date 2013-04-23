@@ -145,7 +145,7 @@ public class IndexControl implements IndexControlMBean {
 			else {
 				initialContext = new InitialContext( jndiProperties );
 			}
-			return ( SessionFactory ) initialContext.lookup( sessionFactoryJndiName );
+			return (SessionFactory) initialContext.lookup( sessionFactoryJndiName );
 		}
 		catch ( Exception e ) {
 			throw new UnsupportedOperationException(

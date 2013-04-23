@@ -54,7 +54,7 @@ public class Work<T> {
 	}
 
 	private Work(T entity, Class<T> entityClass, Serializable id,
-				 WorkType type, boolean identifierWasRolledBack) {
+				WorkType type, boolean identifierWasRolledBack) {
 		this.entity = entity;
 		this.entityClass = entityClass;
 		this.id = id;

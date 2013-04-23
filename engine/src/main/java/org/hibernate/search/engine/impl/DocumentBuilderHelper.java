@@ -126,12 +126,12 @@ public final class DocumentBuilderHelper {
 	}
 
 	public static void populateResult(String fieldName,
-									  FieldBridge fieldBridge,
-									  Store store,
-									  Object[] result,
-									  Document document,
-									  ConversionContext conversionContext,
-									  int matchingPosition) {
+									FieldBridge fieldBridge,
+									Store store,
+									Object[] result,
+									Document document,
+									ConversionContext conversionContext,
+									int matchingPosition) {
 		//TODO make use of an isTwoWay() method
 		if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 			result[matchingPosition] = conversionContext

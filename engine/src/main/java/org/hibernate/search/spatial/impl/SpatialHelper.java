@@ -49,7 +49,7 @@ public abstract class SpatialHelper {
 	 * @return the cell index on the axis
 	 */
 	public static int getCellIndex(double coordinate, double range, int quadTreeLevel) {
-		return ( int ) Math.floor( Math.pow( 2, quadTreeLevel ) * coordinate / range );
+		return (int) Math.floor( Math.pow( 2, quadTreeLevel ) * coordinate / range );
 	}
 
 	/**
@@ -204,7 +204,7 @@ public abstract class SpatialHelper {
 
 		double iterations = GeometricConstants.EARTH_EQUATOR_CIRCUMFERENCE_KM / ( 2.0d * searchRange );
 
-		return ( int ) Math.max(  0, Math.ceil( Math.log( iterations ) / LOG2 ) );
+		return (int) Math.max( 0, Math.ceil( Math.log( iterations ) / LOG2 ) );
 	}
 
 	/**

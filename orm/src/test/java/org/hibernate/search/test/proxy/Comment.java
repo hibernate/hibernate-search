@@ -67,15 +67,16 @@ public class Comment implements IComment {
 	@ManyToOne(targetEntity = Profile.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "profileid")
 	@ContainedIn
-    public IProfile getProfile() {
+	public IProfile getProfile() {
 		if (parent == null && getRootComment() != null) {
 			return getRootComment().getProfile();
 		}
-	    return parent;
-    }
-    public void setProfile(IProfile p) {
-    	this.parent = p;
-    }
+		return parent;
+	}
+
+	public void setProfile(IProfile p) {
+		this.parent = p;
+	}
 
 	@Column(name = "content")
 	@Field(name = "content")

@@ -239,7 +239,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		if ( obj == null || !( obj instanceof FSSlaveDirectoryProvider ) ) {
 			return false;
 		}
-		FSSlaveDirectoryProvider other = ( FSSlaveDirectoryProvider ) obj;
+		FSSlaveDirectoryProvider other = (FSSlaveDirectoryProvider) obj;
 		//need to break memory barriers on both instances:
 		@SuppressWarnings("unused")
 		int readCurrentState = this.current; //unneeded value, but ensure visibility of indexName

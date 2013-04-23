@@ -51,12 +51,12 @@ public class FacetRange<T> {
 	private String stringMax;
 
 	public FacetRange(Class<?> rangeType,
-					  T min,
-					  T max,
-					  boolean includeMin,
-					  boolean includeMax,
-					  String fieldName,
-					  DocumentBuilderIndexedEntity<?> documentBuilder) {
+					T min,
+					T max,
+					boolean includeMin,
+					boolean includeMax,
+					String fieldName,
+					DocumentBuilderIndexedEntity<?> documentBuilder) {
 		if ( max == null && min == null ) {
 			throw new IllegalArgumentException( "At least one end of the range has to be specified" );
 		}

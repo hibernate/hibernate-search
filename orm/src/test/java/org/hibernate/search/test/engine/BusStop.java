@@ -118,7 +118,7 @@ public class BusStop {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		BusStop other = ( BusStop ) obj;
+		BusStop other = (BusStop) obj;
 		if ( roadName == null ) {
 			if ( other.roadName != null ) {
 				return false;

@@ -32,7 +32,6 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;

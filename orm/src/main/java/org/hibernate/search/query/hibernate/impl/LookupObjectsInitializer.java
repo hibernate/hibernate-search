@@ -49,16 +49,17 @@ public class LookupObjectsInitializer implements ObjectsInitializer {
 	}
 
 	public void initializeObjects(EntityInfo[] entityInfos,
-										 Criteria criteria, Class<?> entityType,
-										 SearchFactoryImplementor searchFactoryImplementor,
-										 TimeoutManager timeoutManager,
-										 Session session) {
+										Criteria criteria, Class<?> entityType,
+										SearchFactoryImplementor searchFactoryImplementor,
+										TimeoutManager timeoutManager,
+										Session session) {
 		boolean traceEnabled = log.isTraceEnabled();
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
-			if ( traceEnabled )
+			if ( traceEnabled ) {
 				log.tracef( "No object to initialize", maxResults );
+			}
 			return;
 		}
 

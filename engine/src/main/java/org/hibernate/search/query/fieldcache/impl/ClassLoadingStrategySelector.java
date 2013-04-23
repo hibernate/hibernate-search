@@ -75,7 +75,7 @@ public class ClassLoadingStrategySelector {
 			return getTwoWayStringBridge( encoding.unwrap() );
 		}
 		else if ( fieldBridge instanceof TwoWayString2FieldBridgeAdaptor ) {
-			TwoWayString2FieldBridgeAdaptor adaptor = (TwoWayString2FieldBridgeAdaptor ) fieldBridge;
+			TwoWayString2FieldBridgeAdaptor adaptor = (TwoWayString2FieldBridgeAdaptor) fieldBridge;
 			return adaptor.unwrap();
 		}
 		else {

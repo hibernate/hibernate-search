@@ -39,24 +39,24 @@ import java.util.Set;
  */
 public class WordDictionary {
 
+	private static final Random r = new Random( 12L );
+
 	private final String[] positionalWords;
 	private final int maxSize;
 	private final double gaussFactor;
-
-	private static final Random r = new Random( 12L );
 
 	public WordDictionary(Set<String> words) {
 		this.positionalWords = words.toArray( new String[0] );
 		//sort by String length. Languages use shorter terms more often.
 		Arrays.sort( positionalWords, new StringLengthComparator() );
 		maxSize = positionalWords.length;
-		gaussFactor = ((double)maxSize +1 ) / 4d ;
+		gaussFactor = ( (double) maxSize + 1 ) / 4d;
 	}
 
 	private static class StringLengthComparator implements Comparator<String>, Serializable {
 
 		public int compare(String o1, String o2) {
-			return o1.length()-o2.length();
+			return o1.length() - o2.length();
 		}
 
 	}

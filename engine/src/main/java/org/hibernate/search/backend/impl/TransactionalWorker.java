@@ -109,7 +109,7 @@ public class TransactionalWorker implements Worker {
 		if (indexBindingForEntity == null) {
 			return work;
 		}
-		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) indexBindingForEntity.getEntityIndexingInterceptor();
+		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) indexBindingForEntity.getEntityIndexingInterceptor();
 		if (interceptor == null) {
 			return work;
 		}
@@ -145,7 +145,7 @@ public class TransactionalWorker implements Worker {
 				log.forceSkipIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			case UPDATE:
-				 result = new Work<T>( work.getEntity(), work.getId(), WorkType.UPDATE );
+				result = new Work<T>( work.getEntity(), work.getId(), WorkType.UPDATE );
 				log.forceUpdateOnIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			case REMOVE:

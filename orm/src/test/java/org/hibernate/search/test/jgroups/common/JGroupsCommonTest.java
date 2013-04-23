@@ -104,7 +104,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 		slaveSession = getSlaveSession();
 		tx = slaveSession.beginTransaction();
-		ts = ( TShirt ) slaveSession.get( TShirt.class, ts.getId() );
+		ts = (TShirt) slaveSession.get( TShirt.class, ts.getId() );
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 

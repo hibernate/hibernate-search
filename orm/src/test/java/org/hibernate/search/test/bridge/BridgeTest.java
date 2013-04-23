@@ -57,7 +57,7 @@ import org.hibernate.search.test.TestConstants;
 /**
  * @author Emmanuel Bernard
  */
-public class l extends SearchTestCase {
+public class BridgeTest extends SearchTestCase {
 	public void testDefaultAndNullBridges() throws Exception {
 		Cloud cloud = new Cloud();
 		cloud.setMyDate( null );
@@ -112,7 +112,7 @@ public class l extends SearchTestCase {
 		assertEquals(
 				"Clazz projection works",
 				Cloud.class.getName(),
-				( ( Class ) ( ( Object[] ) result.get( 0 ) )[0] ).getName()
+				( (Class) ( (Object[]) result.get( 0 ) )[0] ).getName()
 		);
 
 		BooleanQuery bQuery = new BooleanQuery();
@@ -135,7 +135,7 @@ public class l extends SearchTestCase {
 		query = parser.parse( "char2:P" );
 		result = session.createFullTextQuery( query ).setProjection( "char2" ).list();
 		assertEquals( "Wrong results number, CharacterBridge is not working", 1, result.size() );
-		assertEquals( "Wrong result, CharacterBridge is not working", 'P', ( ( Object[] ) result.get( 0 ) )[0] );
+		assertEquals( "Wrong result, CharacterBridge is not working", 'P', ( (Object[]) result.get( 0 ) )[0] );
 
 		s.delete( s.get( Cloud.class, cloud.getId() ) );
 		tx.commit();
@@ -223,7 +223,7 @@ public class l extends SearchTestCase {
 	}
 
 
-    public void testCalendarBridge() throws Exception {
+	public void testCalendarBridge() throws Exception {
 		Cloud cloud = new Cloud();
 		Calendar c = GregorianCalendar.getInstance();
 		c.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests

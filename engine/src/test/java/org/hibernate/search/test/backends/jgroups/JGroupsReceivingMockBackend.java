@@ -85,7 +85,7 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 
 	public int releaseBlockedThreads() {
 		int count = (int) threadTrap.getCount();
-		for ( int i=0; i<count; i++) {
+		for ( int i = 0; i < count; i++ ) {
 			threadTrap.countDown();
 		}
 		return count;

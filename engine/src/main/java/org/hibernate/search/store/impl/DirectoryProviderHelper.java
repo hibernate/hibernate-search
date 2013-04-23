@@ -93,7 +93,7 @@ public final class DirectoryProviderHelper {
 			log.trace(
 					"Guess source directory from " + ROOT_INDEX_PROP_NAME + " " +
 							( root != null ? root : "<null>" ) +
-							 " and " +
+							" and " +
 							RELATIVE_INDEX_PROP_NAME + " " +
 							( relative != null ? relative : "<null>" )
 					);

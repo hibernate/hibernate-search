@@ -78,15 +78,14 @@ public class ClassBridgeAndProjectionTest extends SearchTestCase {
 		List results = query.list();
 		assertNotNull( results );
 		assertTrue( results.size() == 1 );
-		assertTrue( ( ( Teacher ) results.get( 0 ) ).getStudents().size() == 2 );
 
 		// now test with projection
 		query.setProjection( "amount_of_students" );
 		results = query.list();
 		assertNotNull( results );
 		assertTrue( results.size() == 1 );
-		Object[] firstResult = ( Object[] ) results.get( 0 );
-		Integer amountStudents = ( Integer ) firstResult[0];
+		Object[] firstResult = (Object[]) results.get( 0 );
+		Integer amountStudents = (Integer) firstResult[0];
 		assertEquals( Integer.valueOf( 2 ), amountStudents );
 		tx.commit();
 		s.close();

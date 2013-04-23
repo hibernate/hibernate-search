@@ -27,8 +27,6 @@ import java.util.Properties;
 
 import org.apache.lucene.index.IndexWriter;
 
-import org.hibernate.search.SearchException;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 

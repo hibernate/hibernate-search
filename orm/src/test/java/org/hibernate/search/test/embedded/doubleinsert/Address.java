@@ -47,7 +47,6 @@ import org.hibernate.search.annotations.Store;
 public class Address implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "A_ADDRESS_ID")
@@ -95,8 +94,7 @@ public class Address implements Serializable {
 	@IndexedEmbedded
 	private Contact contact;
 
-	public Address(String address1, String address2, String town,
-				   String county, String country, String postcode, boolean active, Contact contact) {
+	public Address(String address1, String address2, String town, String county, String country, String postcode, boolean active, Contact contact) {
 		super();
 		this.address1 = address1;
 		this.address2 = address2;

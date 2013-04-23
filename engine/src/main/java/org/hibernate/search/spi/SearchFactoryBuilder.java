@@ -308,7 +308,7 @@ public class SearchFactoryBuilder {
 
 	@SuppressWarnings( "unchecked" )
 	private <T> MutableEntityIndexBinding<T> buildTypeSafeMutableEntityBinder(Class<T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
-		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) entityMapping.getEntityIndexingInterceptor();
+		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) entityMapping.getEntityIndexingInterceptor();
 		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
 				entityMapping.getSelectionStrategy(),
 				entitySimilarity,
@@ -413,7 +413,7 @@ public class SearchFactoryBuilder {
 			Class mappedClass = classMappings.get( mappedXClass );
 			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
 			//interceptor might use non indexed state
-		    if ( mappedEntity.getEntityIndexingInterceptor() != null ) {
+			if ( mappedEntity.getEntityIndexingInterceptor() != null ) {
 				optimizationBlackListedTypes.add( mappedXClass );
 			}
 			// Create all DocumentBuilderIndexedEntity

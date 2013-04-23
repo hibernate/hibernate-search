@@ -61,7 +61,7 @@ public class ProgrammaticEmbeddedItTest extends SearchTestCase {
 				new TermQuery( new Term( "id.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
-		emmanuel = ( PlainPerson ) results.get( 0 );
+		emmanuel = (PlainPerson) results.get( 0 );
 		emmanuel.setFavoriteColor( "Red" );
 		tx.commit();
 		s.clear();
@@ -71,7 +71,7 @@ public class ProgrammaticEmbeddedItTest extends SearchTestCase {
 				new TermQuery( new Term( "id.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
-		emmanuel = ( PlainPerson ) results.get( 0 );
+		emmanuel = (PlainPerson) results.get( 0 );
 		assertEquals( "Red", emmanuel.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();

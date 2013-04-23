@@ -49,17 +49,17 @@ public class ProjectionLoader implements Loader {
 	private ObjectLoaderBuilder loaderBuilder;
 
 	public void init(Session session,
-					 SearchFactoryImplementor searchFactoryImplementor,
-					 ObjectsInitializer objectsInitializer,
-					 TimeoutManager timeoutManager) {
+					SearchFactoryImplementor searchFactoryImplementor,
+					ObjectsInitializer objectsInitializer,
+					TimeoutManager timeoutManager) {
 	}
 
 	public void init(Session session,
-					 SearchFactoryImplementor searchFactoryImplementor,
-					 ResultTransformer transformer,
-					 ObjectLoaderBuilder loaderBuilder,
-					 String[] aliases,
-					 TimeoutManager timeoutManager) {
+					SearchFactoryImplementor searchFactoryImplementor,
+					ResultTransformer transformer,
+					ObjectLoaderBuilder loaderBuilder,
+					String[] aliases,
+					TimeoutManager timeoutManager) {
 		init( session, searchFactoryImplementor, null, timeoutManager ); // TODO why do we call this method?
 		this.transformer = transformer;
 		this.aliases = aliases;

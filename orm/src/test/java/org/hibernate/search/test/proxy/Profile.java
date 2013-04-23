@@ -56,11 +56,12 @@ public class Profile implements IProfile {
 
 	@OneToMany(targetEntity = Comment.class, mappedBy = "profile")
 	@IndexedEmbedded(targetElement = Comment.class)
-    public Set<IComment> getComments() {
-	    return comments;
-    }
-    public void setComments(Set<IComment> c) {
-    	this.comments = c;
-    }
+	public Set<IComment> getComments() {
+		return comments;
+	}
+
+	public void setComments(Set<IComment> c) {
+		this.comments = c;
+	}
 
 }

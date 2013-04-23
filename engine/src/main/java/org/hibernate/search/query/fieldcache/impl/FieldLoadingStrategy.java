@@ -40,7 +40,7 @@ public interface FieldLoadingStrategy {
 	 * @param reader the {@code IndexReader} for which to load the new cache values
 	 * @throws java.io.IOException in case an error occurs reading the cache values from the index
 	 */
-	public void loadNewCacheValues(IndexReader reader) throws IOException;
+	void loadNewCacheValues(IndexReader reader) throws IOException;
 
 	/**
 	 * The collector wants to pick a specific element from the cache.
@@ -49,5 +49,5 @@ public interface FieldLoadingStrategy {
 	 * @param relativeDocId the doc id relative to the current reader
 	 * @return the cached field value for the document with the relative id {@code relativeDocId}.
 	 */
-	public Object collect(int relativeDocId);
+	Object collect(int relativeDocId);
 }

@@ -100,13 +100,13 @@ public class WorkerTestCase extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				ee = ( Employee ) s.get( Employee.class, ee.getId() );
+				ee = (Employee) s.get( Employee.class, ee.getId() );
 				ee.setName( "Emmanuel2" );
 				tx.commit();
 				s.close();
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				er = ( Employer ) s.get( Employer.class, er.getId() );
+				er = (Employer) s.get( Employer.class, er.getId() );
 				er.setName( "RH2" );
 				tx.commit();
 				s.close();
@@ -135,13 +135,13 @@ public class WorkerTestCase extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				er = ( Employer ) s.get( Employer.class, er.getId() );
+				er = (Employer) s.get( Employer.class, er.getId() );
 				s.delete( er );
 				tx.commit();
 				s.close();
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				ee = ( Employee ) s.get( Employee.class, ee.getId() );
+				ee = (Employee) s.get( Employee.class, ee.getId() );
 				s.delete( ee );
 				tx.commit();
 				s.close();
@@ -192,18 +192,18 @@ public class WorkerTestCase extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				er = ( Employer ) s.get( Employer.class, er.getId() );
+				er = (Employer) s.get( Employer.class, er.getId() );
 				er.setName( "RH2" );
-				ee = ( Employee ) s.get( Employee.class, ee.getId() );
+				ee = (Employee) s.get( Employee.class, ee.getId() );
 				ee.setName( "Emmanuel2" );
 				tx.commit();
 				s.close();
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				er = ( Employer ) s.get( Employer.class, er.getId() );
+				er = (Employer) s.get( Employer.class, er.getId() );
 				s.delete( er );
-				ee = ( Employee ) s.get( Employee.class, ee.getId() );
+				ee = (Employee) s.get( Employee.class, ee.getId() );
 				s.delete( ee );
 				tx.commit();
 				s.close();

@@ -69,7 +69,7 @@ public class SentenceInventor {
 	 */
 	public String randomString(int length) {
 		char[] chars = new char[length];
-		for ( int i=0; i<length; i++ ) {
+		for ( int i = 0; i < length; i++ ) {
 			chars[i] = randomCharacter();
 		}
 		return new String( chars );
@@ -84,10 +84,12 @@ public class SentenceInventor {
 	public String randomString() {
 		double d = r.nextGaussian() * 6.3d;
 		int l = (int) d + 6;
-		if ( l > 0 )
+		if ( l > 0 ) {
 			return randomString( l );
-		else
+		}
+		else {
 			return randomString();
+		}
 	}
 
 	/**
@@ -99,15 +101,18 @@ public class SentenceInventor {
 	public String randomTerm() {
 		int i = r.nextInt( 200 );
 		String term = randomString();
-		if ( i > 10 )
+		if ( i > 10 ) {
 			//completely lowercase 189/200 cases
 			return term.toLowerCase();
-		else if ( i < 2 )
+		}
+		else if ( i < 2 ) {
 			//completely uppercase in 2/200 cases
 			return term;
-		else
+		}
+		else {
 			//first letter uppercase in 9/200 cases
 			return term.substring( 0, 1 ) + term.substring( 1 ).toLowerCase();
+		}
 	}
 
 	private WordDictionary randomDictionary(int size) {
@@ -125,7 +130,7 @@ public class SentenceInventor {
 	public String nextSentence() {
 		int sentenceLength = r.nextInt( 3 ) + r.nextInt( 10 ) + 1;
 		String[] sentence = new String[sentenceLength];
-		for ( int i=0; i<sentenceLength; i++ ) {
+		for ( int i = 0; i < sentenceLength; i++ ) {
 			sentence[i] = dictionary.randomWord();
 		}
 		if ( sentenceLength == 1 ) {
@@ -133,7 +138,7 @@ public class SentenceInventor {
 		}
 		else {
 			StringBuilder sb = new StringBuilder( sentence[0]);
-			for ( int i=1; i<sentenceLength; i++) {
+			for ( int i = 1; i < sentenceLength; i++ ) {
 				sb.append( " " );
 				sb.append( sentence[i] );
 			}
@@ -154,7 +159,7 @@ public class SentenceInventor {
 		StringBuilder sb = new StringBuilder()
 			.append( firstsentence.substring( 0,1 ).toUpperCase() )
 			.append( firstsentence.substring( 1 ) );
-		for ( int i=1; i<periodLengthSentences; i++ ) {
+		for ( int i = 1; i < periodLengthSentences; i++ ) {
 			int separatorCharIndex = r.nextInt( sentenceSeparators.length );
 			sb
 				.append( sentenceSeparators[separatorCharIndex] )
@@ -168,7 +173,7 @@ public class SentenceInventor {
 	//run it to get an idea of what this class is going to produce
 	public static void main(String[] args) {
 		SentenceInventor wi = new SentenceInventor( 7L, 10000 );
-		for (int i=0; i<30; i++) {
+		for ( int i = 0; i < 30; i++ ) {
 			System.out.print( wi.nextPeriod() );
 		}
 	}

@@ -47,7 +47,7 @@ public class OptimizeTest extends SearchTestCase {
 		int loop = 2000;
 		for ( int i = 0; i < loop; i++ ) {
 			Email email = new Email();
-			email.setId( ( long ) i + 1 );
+			email.setId( (long) i + 1 );
 			email.setTitle( "JBoss World Berlin" );
 			email.setBody( "Meet the guys who wrote the software" );
 			s.persist( email );

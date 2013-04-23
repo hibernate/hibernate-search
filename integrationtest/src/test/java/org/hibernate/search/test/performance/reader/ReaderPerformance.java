@@ -74,7 +74,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
 		IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
-		ThreadPoolExecutor executor = ( ThreadPoolExecutor ) Executors.newFixedThreadPool( WORKER_THREADS );
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		for ( int batch = 0; batch <= 5000000; batch++ ) {
 			executor.execute( filler );
 		}
@@ -122,7 +122,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	}
 
 	private final void timeMs() throws InterruptedException {
-		ThreadPoolExecutor executor = ( ThreadPoolExecutor ) Executors.newFixedThreadPool( WORKER_THREADS );
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		CountDownLatch startSignal = new CountDownLatch( 1 );
 		InsertActivity insertionTask = new InsertActivity( getSessions(), startSignal );
 		SearchActivity searchTask = new SearchActivity( getSessions(), startSignal );

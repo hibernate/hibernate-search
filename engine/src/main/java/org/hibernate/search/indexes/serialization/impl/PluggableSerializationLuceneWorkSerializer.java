@@ -113,16 +113,16 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 	private void processId(LuceneWork work, Serializer serializer) {
 		Serializable id = work.getId();
 		if ( id instanceof Integer ) {
-			serializer.addIdAsInteger( ( Integer ) id );
+			serializer.addIdAsInteger( (Integer) id );
 		}
 		else if ( id instanceof Long ) {
-			serializer.addIdAsLong( ( Long ) id );
+			serializer.addIdAsLong( (Long) id );
 		}
 		else if ( id instanceof Float ) {
-			serializer.addIdAsFloat( ( Float ) id );
+			serializer.addIdAsFloat( (Float) id );
 		}
 		else if ( id instanceof Double ) {
-			serializer.addIdAsDouble( ( Double ) id );
+			serializer.addIdAsDouble( (Double) id );
 		}
 		else if ( id instanceof String ) {
 			serializer.addIdAsString( id.toString() );

@@ -100,16 +100,16 @@ public class QueryHits {
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 
 	public QueryHits(IndexSearcherWithPayload searcher,
-					 org.apache.lucene.search.Query preparedQuery,
-					 Filter filter,
-					 Sort sort,
-					 TimeoutManagerImpl timeoutManager,
-					 Map<String, FacetingRequestImpl> facetRequests,
-					 boolean enableFieldCacheOnTypes,
-					 FieldCacheCollectorFactory idFieldCollector,
-					 TimeoutExceptionFactory timeoutExceptionFactory,
-					 Point spatialSearchCenter,
-					 String spatialFieldName)
+					org.apache.lucene.search.Query preparedQuery,
+					Filter filter,
+					Sort sort,
+					TimeoutManagerImpl timeoutManager,
+					Map<String, FacetingRequestImpl> facetRequests,
+					boolean enableFieldCacheOnTypes,
+					FieldCacheCollectorFactory idFieldCollector,
+					TimeoutExceptionFactory timeoutExceptionFactory,
+					Point spatialSearchCenter,
+					String spatialFieldName)
 			throws IOException {
 		this(
 				searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager, facetRequests,
@@ -118,17 +118,17 @@ public class QueryHits {
 	}
 
 	public QueryHits(IndexSearcherWithPayload searcher,
-					 org.apache.lucene.search.Query preparedQuery,
-					 Filter filter,
-					 Sort sort,
-					 Integer n,
-					 TimeoutManagerImpl timeoutManager,
-					 Map<String, FacetingRequestImpl> facetRequests,
-					 boolean enableFieldCacheOnTypes,
-					 FieldCacheCollectorFactory idFieldCollector,
-					 TimeoutExceptionFactory timeoutExceptionFactory,
-					 Point spatialSearchCenter,
-					 String spatialFieldName)
+					org.apache.lucene.search.Query preparedQuery,
+					Filter filter,
+					Sort sort,
+					Integer n,
+					TimeoutManagerImpl timeoutManager,
+					Map<String, FacetingRequestImpl> facetRequests,
+					boolean enableFieldCacheOnTypes,
+					FieldCacheCollectorFactory idFieldCollector,
+					TimeoutExceptionFactory timeoutExceptionFactory,
+					Point spatialSearchCenter,
+					String spatialFieldName)
 			throws IOException {
 		this.timeoutManager = timeoutManager;
 		this.preparedQuery = preparedQuery;

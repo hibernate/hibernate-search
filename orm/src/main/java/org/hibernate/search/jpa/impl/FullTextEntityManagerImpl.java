@@ -68,18 +68,18 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 				);
 			}
 			else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
-				ftSession = Search.getFullTextSession( ( Session ) delegate );
+				ftSession = Search.getFullTextSession( (Session) delegate );
 			}
 			else if ( EntityManager.class.isAssignableFrom( delegate.getClass() ) ) {
 				//Some app servers wrap the EM twice
-				delegate = ( ( EntityManager ) delegate ).getDelegate();
+				delegate = ( (EntityManager) delegate ).getDelegate();
 				if ( delegate == null ) {
 					throw new SearchException(
 							"Trying to use Hibernate Search without an Hibernate EntityManager (no delegate)"
 					);
 				}
 				else if ( Session.class.isAssignableFrom( delegate.getClass() ) ) {
-					ftSession = Search.getFullTextSession( ( Session ) delegate );
+					ftSession = Search.getFullTextSession( (Session) delegate );
 				}
 				else {
 					throw new SearchException(
@@ -252,7 +252,7 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	public <T> T unwrap(Class<T> type) {
 		if ( type.equals( FullTextSession.class ) ) {
 			@SuppressWarnings("unchecked")
-			final T ftSession = ( T ) Search.getFullTextSession( em.unwrap( Session.class ) );
+			final T ftSession = (T) Search.getFullTextSession( em.unwrap( Session.class ) );
 			return ftSession;
 		}
 		else {

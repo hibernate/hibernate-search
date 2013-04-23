@@ -88,7 +88,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * @param parameterMetadata Additional query metadata.
 	 */
 	public FullTextQueryImpl(org.apache.lucene.search.Query query, Class<?>[] classes, SessionImplementor session,
-							 ParameterMetadata parameterMetadata) {
+							ParameterMetadata parameterMetadata) {
 		//TODO handle flushMode
 		super( query.toString(), null, session, parameterMetadata );
 		//TODO get a factory on searchFactoryImplementor
@@ -357,9 +357,9 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	private static final Loader noLoader = new Loader() {
 		public void init(Session session,
-						 SearchFactoryImplementor searchFactoryImplementor,
-						 ObjectsInitializer objectsInitializer,
-						 TimeoutManager timeoutManager) {
+						SearchFactoryImplementor searchFactoryImplementor,
+						ObjectsInitializer objectsInitializer,
+						TimeoutManager timeoutManager) {
 		}
 
 		public Object load(EntityInfo entityInfo) {

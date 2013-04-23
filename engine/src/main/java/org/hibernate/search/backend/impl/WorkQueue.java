@@ -52,10 +52,6 @@ public class WorkQueue {
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
 
-	public boolean isSealedAndUnchanged() {
-		return sealedAndUnchanged;
-	}
-
 	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.plan = new WorkPlan( searchFactoryImplementor );
@@ -64,6 +60,10 @@ public class WorkQueue {
 	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor, WorkPlan plan) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.plan = plan;
+	}
+
+	public boolean isSealedAndUnchanged() {
+		return sealedAndUnchanged;
 	}
 
 	public void add(Work work) {

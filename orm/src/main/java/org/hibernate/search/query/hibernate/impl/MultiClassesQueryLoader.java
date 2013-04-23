@@ -51,9 +51,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	private ObjectsInitializer objectsInitializer;
 
 	public void init(Session session,
-					 SearchFactoryImplementor searchFactoryImplementor,
-					 ObjectsInitializer objectsInitializer,
-					 TimeoutManager timeoutManager) {
+					SearchFactoryImplementor searchFactoryImplementor,
+					ObjectsInitializer objectsInitializer,
+					TimeoutManager timeoutManager) {
 		super.init( session, searchFactoryImplementor );
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;

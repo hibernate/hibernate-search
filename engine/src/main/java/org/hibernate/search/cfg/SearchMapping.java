@@ -74,7 +74,7 @@ public class SearchMapping {
 	 */
 
 	static Map<String, Object> addElementToAnnotationArray(Map<String, Object> containingAnnotation,
-													  String attributeName) {
+													String attributeName) {
 		@SuppressWarnings("unchecked") List<Map<String, Object>> array = (List<Map<String, Object>>) containingAnnotation.get( attributeName );
 		if ( array == null) {
 			array = new ArrayList<Map<String, Object>>();

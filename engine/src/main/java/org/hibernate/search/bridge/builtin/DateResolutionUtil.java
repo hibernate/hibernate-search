@@ -29,8 +29,8 @@ import org.hibernate.annotations.common.AssertionFailure;
 
 public class DateResolutionUtil {
 
-	private DateResolutionUtil() {}
-
+	private DateResolutionUtil() {
+	}
 
 	public static Resolution getLuceneResolution(org.hibernate.search.annotations.Resolution hibResolution) {
 		Resolution resolution = null;

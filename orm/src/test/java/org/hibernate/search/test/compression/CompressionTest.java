@@ -150,7 +150,7 @@ public class CompressionTest extends SearchTestCase {
 			);
 			List list = fullTextQuery.setProjection( "title", "abstract", "text" ).list();
 			Assert.assertEquals( 1, list.size() );
-			Object[] results = ( Object[] ) list.get( 0 );
+			Object[] results = (Object[]) list.get( 0 );
 			Assert.assertEquals( "Hibernate in Action, third edition", results[0] );
 			Assert.assertEquals( "JPA2 with Hibernate", results[1] );
 			Assert.assertEquals( "This is a placeholder for the new text that you should write", results[2] );

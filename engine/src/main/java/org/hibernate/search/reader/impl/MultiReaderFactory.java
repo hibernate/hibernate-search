@@ -60,7 +60,7 @@ public class MultiReaderFactory {
 		IndexReader[] readers;
 		ReaderProvider[] managers;
 		if ( multiReader instanceof CacheableMultiReader ) {
-			CacheableMultiReader castMultiReader = ( CacheableMultiReader ) multiReader;
+			CacheableMultiReader castMultiReader = (CacheableMultiReader) multiReader;
 			readers = ReaderProviderHelper.getSubReadersFromMultiReader( castMultiReader );
 			managers = castMultiReader.managers;
 		}

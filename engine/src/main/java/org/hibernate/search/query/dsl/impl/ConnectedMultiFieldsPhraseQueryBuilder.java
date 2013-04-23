@@ -56,7 +56,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 	private final List<FieldContext> fieldContexts;
 
 	public ConnectedMultiFieldsPhraseQueryBuilder(PhraseQueryContext phraseContext, QueryCustomizer queryCustomizer,
-												  List<FieldContext> fieldContexts, QueryBuildingContext queryContext) {
+												List<FieldContext> fieldContexts, QueryBuildingContext queryContext) {
 		this.phraseContext = phraseContext;
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;

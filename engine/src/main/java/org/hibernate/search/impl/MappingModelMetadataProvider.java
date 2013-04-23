@@ -409,14 +409,14 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
 			List<NumericField> numericFieldAnnotations = new ArrayList<NumericField>( numericFields.size() );
-			for(Map<String, Object> numericField : numericFields) {
+			for ( Map<String, Object> numericField : numericFields ) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( NumericField.class );
 				for ( Map.Entry<String, Object> entry : numericField.entrySet() ) {
 					fieldAnnotation.setValue( entry.getKey(), entry.getValue() );
 				}
 				numericFieldAnnotations.add( (NumericField) createAnnotation( fieldAnnotation ) );
 			}
-			for(Map<String, Object> field : fields) {
+			for ( Map<String, Object> field : fields ) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
 				for ( Map.Entry<String, Object> entry : field.entrySet() ) {
 					if ( entry.getKey().equals( "analyzer" ) ) {
@@ -452,10 +452,10 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				fieldAnnotations.add( (org.hibernate.search.annotations.Field) createAnnotation( fieldAnnotation ) );
 			}
 
-			if( spatial != null && spatial.size() > 0 ) {
+			if ( spatial != null && spatial.size() > 0 ) {
 				AnnotationDescriptor spatialAnnotation = new AnnotationDescriptor( Spatial.class );
 				for ( Map.Entry<String, Object> entry : spatial.entrySet() ) {
-					 if ( entry.getKey().equals( "boost" ) ) {
+					if ( entry.getKey().equals( "boost" ) ) {
 						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
 						@SuppressWarnings("unchecked")
 						Map<String, Object> boost = (Map<String, Object>) entry.getValue();

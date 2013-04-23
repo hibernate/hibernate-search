@@ -44,14 +44,14 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 	}
 
 	public String objectToString(Object object) {
-		PersonPK id = ( PersonPK ) object;
+		PersonPK id = (PersonPK) object;
 		StringBuilder sb = new StringBuilder();
 		sb.append( id.getFirstName() ).append( " " ).append( id.getLastName() );
 		return sb.toString();
 	}
 
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		PersonPK id = ( PersonPK ) value;
+		PersonPK id = (PersonPK) value;
 
 		//store each property in a unique field
 		luceneOptions.addFieldToDocument( name + ".firstName", id.getFirstName(), document );

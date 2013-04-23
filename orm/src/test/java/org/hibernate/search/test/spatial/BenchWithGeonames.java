@@ -325,25 +325,25 @@ public class BenchWithGeonames {
 			System.out
 					.println(
 							"Mean time with Quad Tree : " + Double.toString(
-									( double ) quadTreeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+									(double) quadTreeTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
 							) + " ms. Average number of docs  fetched : " + Double.toString( quadTreeDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with Quad Tree + Distance filter : " + Double.toString(
-									( double ) spatialTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+									(double) spatialTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
 							) + " ms. Average number of docs  fetched : " + Double.toString( spatialDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with DoubleRange : " + Double.toString(
-									( double ) doubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+									(double) doubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
 							) + " ms. Average number of docs  fetched : " + Double.toString( doubleRangeDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with DoubleRange + Distance filter : " + Double.toString(
-									( double ) distanceDoubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+									(double) distanceDoubleRangeTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
 							) + " ms. Average number of docs  fetched : " + Double.toString( distanceDoubleRangeDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 

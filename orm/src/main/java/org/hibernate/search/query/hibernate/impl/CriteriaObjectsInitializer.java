@@ -54,13 +54,15 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 	}
 
 	public void initializeObjects(EntityInfo[] entityInfos,
-										 Criteria criteria, Class<?> entityType,
-										 SearchFactoryImplementor searchFactoryImplementor,
-										 TimeoutManager timeoutManager,
-										 Session session) {
+										Criteria criteria, Class<?> entityType,
+										SearchFactoryImplementor searchFactoryImplementor,
+										TimeoutManager timeoutManager,
+										Session session) {
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
-		if ( log.isTraceEnabled() ) log.tracef( "Load %d objects using criteria queries", maxResults );
+		if ( log.isTraceEnabled() ) {
+			log.tracef( "Load %d objects using criteria queries", maxResults );
+		}
 
 		if ( maxResults == 0 ) {
 			return;

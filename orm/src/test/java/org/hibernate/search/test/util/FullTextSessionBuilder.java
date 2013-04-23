@@ -102,15 +102,15 @@ public class FullTextSessionBuilder {
 	 * @return the same builder (this).
 	 */
 	public FullTextSessionBuilder useRAMDirectoryProvider(boolean use) {
-		 if ( use ) {
-			 cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
-			 usingFileSystem = false;
-		 }
-		 else {
-			 cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-			 cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.getAbsolutePath() );
-			 usingFileSystem = true;
-		 }
+		if ( use ) {
+			cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
+			usingFileSystem = false;
+		}
+		else {
+			cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+			cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.getAbsolutePath() );
+			usingFileSystem = true;
+		}
 		return this;
 	}
 

@@ -28,7 +28,6 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -108,13 +107,13 @@ public class IndexMetadataCompleteConfiguredTest {
 		String title;
 	}
 
-	@Indexed(index="index1")
+	@Indexed(index = "index1")
 	public static final class Dvd {
 		@DocumentId long id;
 		@Field String title;
 	}
 
-	@Indexed(index="index2")
+	@Indexed(index = "index2")
 	public static final class Book {
 		@DocumentId long id;
 		@Field String title;

@@ -66,12 +66,12 @@ public class FieldMetadata {
 	private final Analyzer analyzer;
 
 	public FieldMetadata(String prefix,
-						 XProperty member,
-						 org.hibernate.search.annotations.Field fieldAnn,
-						 NumericField numericFieldAnn,
-						 Spatial spatialAnn,
-						 ConfigContext context,
-						 ReflectionManager reflectionManager) {
+						XProperty member,
+						org.hibernate.search.annotations.Field fieldAnn,
+						NumericField numericFieldAnn,
+						Spatial spatialAnn,
+						ConfigContext context,
+						ReflectionManager reflectionManager) {
 		ReflectionHelper.setAccessible( member );
 		fieldGetter = member;
 		String indexNullAs;

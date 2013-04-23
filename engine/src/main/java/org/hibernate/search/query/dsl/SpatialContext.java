@@ -20,8 +20,6 @@
  */
 package org.hibernate.search.query.dsl;
 
-import org.hibernate.search.annotations.Spatial;
-
 /**
  * @experimental This API might change in minor versions
  *

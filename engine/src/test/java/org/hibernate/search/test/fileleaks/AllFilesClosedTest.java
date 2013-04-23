@@ -61,7 +61,9 @@ public class AllFilesClosedTest {
 			doSomeOperations();
 			assertDirectoryOpen( directoryOne );
 			assertDirectoryOpen( directoryTwo );
-			if (nrtNotEnabled()) assertAllFilesClosed( directoryTwo );
+			if ( nrtNotEnabled() ) {
+				assertAllFilesClosed( directoryTwo );
+			}
 			// directoryOne is using resource pooling
 		}
 		finally {
@@ -179,13 +181,13 @@ public class AllFilesClosedTest {
 
 	/** Two mapped entities on two differently configured indexes **/
 
-	@Indexed(index="index1")
+	@Indexed(index = "index1")
 	public static final class Dvd {
 		@DocumentId long id;
 		@Field String title;
 	}
 
-	@Indexed(index="index2")
+	@Indexed(index = "index2")
 	public static final class Book {
 		@DocumentId long id;
 		@Field String title;

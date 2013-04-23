@@ -40,7 +40,7 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
 public abstract class ContextHelper {
 
 	public static SearchFactoryImplementor getSearchFactory(Session session) {
-		return getSearchFactoryBySessionImplementor( ( SessionImplementor ) session );
+		return getSearchFactoryBySessionImplementor( (SessionImplementor) session );
 	}
 
 	public static SearchFactoryImplementor getSearchFactoryBySessionImplementor(SessionImplementor session) {

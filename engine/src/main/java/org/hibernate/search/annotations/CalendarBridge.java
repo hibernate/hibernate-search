@@ -39,5 +39,7 @@ import java.lang.annotation.Target;
 @Target( {ElementType.FIELD, ElementType.METHOD} )
 @Documented
 public @interface CalendarBridge {
-    Resolution resolution();
+
+	Resolution resolution();
+
 }

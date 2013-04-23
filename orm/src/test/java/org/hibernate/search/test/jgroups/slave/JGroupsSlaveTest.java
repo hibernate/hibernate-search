@@ -92,7 +92,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		JGroupsReceiver.reset();
 		s = openSession();
 		tx = s.beginTransaction();
-		ts = ( TShirt ) s.get( TShirt.class, ts.getId() );
+		ts = (TShirt) s.get( TShirt.class, ts.getId() );
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 

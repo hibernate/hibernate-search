@@ -49,11 +49,10 @@ public class QueryLoader extends AbstractLoader {
 	private ObjectsInitializer objectsInitializer;
 	private boolean sizeSafe = true;
 
-
 	public void init(Session session,
-					 SearchFactoryImplementor searchFactoryImplementor,
-					 ObjectsInitializer objectsInitializer,
-					 TimeoutManager timeoutManager) {
+					SearchFactoryImplementor searchFactoryImplementor,
+					ObjectsInitializer objectsInitializer,
+					TimeoutManager timeoutManager) {
 		super.init( session, searchFactoryImplementor );
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;

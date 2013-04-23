@@ -48,7 +48,9 @@ class Helper {
 	 * return the analyzed value for a given field. If several terms are created, an exception is raised.
 	 */
 	static String getAnalyzedTerm(String fieldName, String value, String name, Analyzer queryAnalyzer, FieldContext fieldContext) {
-		if ( fieldContext.isIgnoreAnalyzer() ) return value;
+		if ( fieldContext.isIgnoreAnalyzer() ) {
+			return value;
+		}
 
 		try {
 			final List<String> termsFromText = getAllTermsFromText(

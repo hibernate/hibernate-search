@@ -108,9 +108,9 @@ public class OptimizerPerfTest extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				w = ( Worker ) s.get( Worker.class, w.getId() );
+				w = (Worker) s.get( Worker.class, w.getId() );
 				w.setName( "Gavin" );
-				c = ( Construction ) s.get( Construction.class, c.getId() );
+				c = (Construction) s.get( Construction.class, c.getId() );
 				c.setName( "W Hotel" );
 				tx.commit();
 				s.close();
@@ -142,9 +142,9 @@ public class OptimizerPerfTest extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				w = ( Worker ) s.get( Worker.class, w.getId() );
+				w = (Worker) s.get( Worker.class, w.getId() );
 				s.delete( w );
-				c = ( Construction ) s.get( Construction.class, c.getId() );
+				c = (Construction) s.get( Construction.class, c.getId() );
 				s.delete( c );
 				tx.commit();
 				s.close();
@@ -176,18 +176,18 @@ public class OptimizerPerfTest extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				w = ( Worker ) s.get( Worker.class, w.getId() );
+				w = (Worker) s.get( Worker.class, w.getId() );
 				w.setName( "Remi" );
-				c = ( Construction ) s.get( Construction.class, c.getId() );
+				c = (Construction) s.get( Construction.class, c.getId() );
 				c.setName( "Palais des festivals" );
 				tx.commit();
 				s.close();
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				w = ( Worker ) s.get( Worker.class, w.getId() );
+				w = (Worker) s.get( Worker.class, w.getId() );
 				s.delete( w );
-				c = ( Construction ) s.get( Construction.class, c.getId() );
+				c = (Construction) s.get( Construction.class, c.getId() );
 				s.delete( c );
 				tx.commit();
 				s.close();

@@ -26,7 +26,6 @@ package org.hibernate.search;
 import java.io.Serializable;
 
 import org.hibernate.Session;
-import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 
 /**
  * Extends the Hibernate {@link Session} with fulltext search and indexing capabilities.
