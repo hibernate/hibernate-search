@@ -72,7 +72,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		//     root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.size() == 0 ) {
 			//support all classes
-			for( Map.Entry<Class<?>, EntityIndexBinder> entry : searchFactoryImplementor.getIndexBindingForEntity().entrySet() ) {
+			for ( Map.Entry<Class<?>, EntityIndexBinder> entry : searchFactoryImplementor.getIndexBindingForEntity().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().getDocumentBuilder().isRoot() ) {
 					safeEntityTypes.add( entry.getKey() );

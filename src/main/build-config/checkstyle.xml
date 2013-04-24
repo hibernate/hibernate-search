@@ -62,7 +62,7 @@
         <module name="OneStatementPerLine" />
         <module name="EmptyStatement" />
         <module name="DefaultComesLast" />
-        <!-- <module name="WhitespaceAround" /> -->
+        <module name="WhitespaceAround" />
         <module name="TypecastParenPad" />
         <!-- <module name="DeclarationOrder" /> -->
         <module name="RedundantModifier"/>

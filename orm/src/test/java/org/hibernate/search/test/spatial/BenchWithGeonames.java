@@ -169,7 +169,7 @@ public class BenchWithGeonames {
 			long startTime, endTime, duration;
 			FullTextQuery hibQuery;
 			List quadTreeResults, rangeResults;
-			final QueryBuilder queryBuilder= fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+			final QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 			org.apache.lucene.search.Query query;
 			final Integer iterations = 2000;
 			final Integer warmUp = 50;
@@ -248,7 +248,7 @@ public class BenchWithGeonames {
 				if ( i > warmUp ) {
 					distanceDoubleRangeTotalDuration += duration;
 				}
-				rangeResults= hibQuery.list();
+				rangeResults = hibQuery.list();
 				session.clear();
 
 				luceneQuery = SpatialQueryBuilderFromPoint.buildQuadTreeQuery( center, radius, "location" );
@@ -283,7 +283,7 @@ public class BenchWithGeonames {
 				if ( i > warmUp ) {
 					spatialTotalDuration += duration;
 				}
-				quadTreeResults= hibQuery.list();
+				quadTreeResults = hibQuery.list();
 				session.clear();
 
 				if ( rangeResults.size() != quadTreeResults.size() ) {
@@ -304,11 +304,11 @@ public class BenchWithGeonames {
 					System.out.println( "Pure distance results : " + hibQuery.getResultSize());
 
 					List<Integer> rangeIds = new ArrayList<Integer>();
-					for( int index= 0; index< rangeResults.size(); index++ ) {
+					for ( int index = 0; index < rangeResults.size(); index++ ) {
 						rangeIds.add( (Integer) ( (Object[]) rangeResults.get( index ) )[0] );
 					}
 					List<Integer> quadTreeIds = new ArrayList<Integer>();
-					for( int index= 0; index< quadTreeResults.size(); index++ ) {
+					for ( int index = 0; index < quadTreeResults.size(); index++ ) {
 						quadTreeIds.add( (Integer) ( (Object[]) quadTreeResults.get( index ) )[0] );
 					}
 

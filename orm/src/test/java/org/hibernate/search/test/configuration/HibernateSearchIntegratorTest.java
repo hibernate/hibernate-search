@@ -221,9 +221,11 @@ public class HibernateSearchIntegratorTest {
 		}
 	}
 
-	private static class AnotherListenerA extends AnotherListener{}
-	private static class AnotherListenerB extends AnotherListener{}
-	private static class AnotherListenerC extends AnotherListener{}
+	private static class AnotherListenerA extends AnotherListener { }
+
+	private static class AnotherListenerB extends AnotherListener { }
+
+	private static class AnotherListenerC extends AnotherListener { }
 
 	private static class SimpleSessionFactoryServiceRegistry implements SessionFactoryServiceRegistry {
 

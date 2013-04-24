@@ -40,7 +40,8 @@ public class ConcurrentData {
 	private Long id;
 	private String data;
 
-	public ConcurrentData(){}
+	public ConcurrentData() {
+	}
 
 	public ConcurrentData(String data) {
 		this.data = data;

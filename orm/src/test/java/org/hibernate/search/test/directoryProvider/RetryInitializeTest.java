@@ -71,7 +71,7 @@ public class RetryInitializeTest {
 		slave = createSlaveNode( false );
 	}
 
-	@Test(expected=SearchException.class)
+	@Test(expected = SearchException.class)
 	public void testInitiallyFailing() {
 		slave = createSlaveNode( false );
 	}

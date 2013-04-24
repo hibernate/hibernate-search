@@ -29,7 +29,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 @Entity
-@Indexed( index="Products" )
+@Indexed(index = "Products")
 public class Product {
 
 	private Long id;

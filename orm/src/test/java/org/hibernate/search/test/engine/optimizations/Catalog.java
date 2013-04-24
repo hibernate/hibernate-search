@@ -42,7 +42,7 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy = false)
-@Table(name="catalog")
+@Table(name = "catalog")
 public class Catalog {
 
 	@Id()
@@ -51,10 +51,10 @@ public class Catalog {
 	@Column(length = 255)
 	private String name;
 
-	@OneToMany(mappedBy="catalog", cascade={ CascadeType.REMOVE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
+	@OneToMany(mappedBy = "catalog", cascade = { CascadeType.REMOVE, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	private Set<CatalogItem> catalogItems = new HashSet<CatalogItem>();
 
-	@ManyToMany(fetch=FetchType.LAZY, mappedBy="catalogs", cascade={CascadeType.PERSIST})
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "catalogs", cascade = { CascadeType.PERSIST })
 	private List<Consumer> consumers = new ArrayList<Consumer>();
 
 	public Catalog() {

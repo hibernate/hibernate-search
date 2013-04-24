@@ -283,8 +283,9 @@ public abstract class AbstractDocumentBuilder<T> {
 			DepthValidator depth = updateDepth( unproxiedInstance, member, currentDepth );
 			depth.increaseDepth();
 
-			if (depth.isMaxDepthReached())
+			if ( depth.isMaxDepthReached() ) {
 				return;
+			}
 
 			Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
 
@@ -698,8 +699,9 @@ public abstract class AbstractDocumentBuilder<T> {
 		Annotation[] annotations = member.getAnnotations();
 		for ( Annotation annotation : annotations ) {
 			String mappedBy = mappedBy( annotation );
-			if ( StringHelper.isNotEmpty( mappedBy ) )
+			if ( StringHelper.isNotEmpty( mappedBy ) ) {
 				return mappedBy;
+			}
 		}
 		return EMPTY;
 	}
@@ -739,15 +741,15 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 
 	private boolean isCorrespondingIndexedEmbedded(String mappedBy, XProperty property) {
-		if ( !property.isAnnotationPresent( IndexedEmbedded.class ) )
+		if ( !property.isAnnotationPresent( IndexedEmbedded.class ) ) {
 			return false;
-
-		if ( mappedBy.isEmpty() )
+		}
+		if ( mappedBy.isEmpty() ) {
 			return true;
-
-		if ( mappedBy.equals( property.getName() ) )
+		}
+		if ( mappedBy.equals( property.getName() ) ) {
 			return true;
-
+		}
 		return false;
 	}
 
@@ -903,16 +905,16 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private String removeLeadingPrefixFromPath(String path, String prefix) {
-		if ( path.startsWith( prefix ) )
+		if ( path.startsWith( prefix ) ) {
 			return path.substring( prefix.length() );
-
+		}
 		return path;
 	}
 
 	private int depth(IndexedEmbedded embeddedAnn) {
-		if ( isDepthNotSet( embeddedAnn ) && embeddedAnn.includePaths().length > 0 )
+		if ( isDepthNotSet( embeddedAnn ) && embeddedAnn.includePaths().length > 0 ) {
 			return 0;
-
+		}
 		return embeddedAnn.depth();
 	}
 
@@ -921,9 +923,9 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	private PathsContext updatePaths(String localPrefix, PathsContext pathsContext, IndexedEmbedded embeddedAnn) {
-		if ( pathsContext != null )
+		if ( pathsContext != null ) {
 			return pathsContext;
-
+		}
 		PathsContext newPathsContext = new PathsContext( embeddedAnn );
 		for ( String path : embeddedAnn.includePaths() ) {
 			newPathsContext.addPath( localPrefix + path );
@@ -936,10 +938,12 @@ public abstract class AbstractDocumentBuilder<T> {
 			boolean defaultPrefix = isDefaultPrefix( embeddedAnn );
 			for ( String path : pathsContext.pathsEncounteredState.keySet() ) {
 				String app = path;
-				if ( defaultPrefix )
+				if ( defaultPrefix ) {
 					app += ".";
-				if ( app.startsWith( localPrefix ) )
+				}
+				if ( app.startsWith( localPrefix ) ) {
 					return true;
+				}
 			}
 		}
 		return false;

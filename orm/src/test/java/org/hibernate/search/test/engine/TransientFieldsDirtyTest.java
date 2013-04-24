@@ -104,7 +104,7 @@ public class TransientFieldsDirtyTest extends SearchTestCase {
 
 	@Indexed
 	@Entity
-	@Table(name="FORMULAADD")
+	@Table(name = "FORMULAADD")
 	public static class FormulaAdd {
 
 		long id;

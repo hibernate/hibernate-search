@@ -37,11 +37,12 @@ import org.hibernate.search.annotations.Indexed;
 //Hibernate
 @Entity
 @Table(name = "doughnut")
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="doughnut")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region = "doughnut")
 // Hibernate Search
-@Indexed(index="Doughnut")
+@Indexed(index = "Doughnut")
 @Analyzer(impl = StandardAnalyzer.class)
 public class Doughnut {
+
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long doughnutId;
@@ -49,7 +50,7 @@ public class Doughnut {
 	@ManyToOne
 	private Box box;
 
-	@Column(length = 255,nullable=false)
+	@Column(length = 255, nullable = false)
 	private String kind;
 
 	/**

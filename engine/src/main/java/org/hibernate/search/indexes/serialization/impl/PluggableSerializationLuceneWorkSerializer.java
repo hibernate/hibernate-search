@@ -157,8 +157,8 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 	private void buildDocument(Document document, Serializer serializer) {
 		List<Fieldable> docFields = document.getFields();
 		serializer.fields( docFields );
-		for(Fieldable fieldable : docFields) {
-			if (fieldable instanceof NumericField) {
+		for ( Fieldable fieldable : docFields ) {
+			if ( fieldable instanceof NumericField ) {
 				NumericField safeField = (NumericField) fieldable;
 				LuceneNumericFieldContext context = new LuceneNumericFieldContext( (NumericField) fieldable );
 				switch ( safeField.getDataType() ) {

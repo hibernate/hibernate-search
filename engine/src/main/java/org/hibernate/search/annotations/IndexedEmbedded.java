@@ -65,7 +65,7 @@ public @interface IndexedEmbedded {
 	 *
 	 * <p>Defined paths are implicitly prefixed with the {@link IndexedEmbedded#prefix()}.
 	 */
-	String[] includePaths() default {};
+	String[] includePaths() default { };
 
 	/**
 	 * <p>Stop indexing embedded elements when depth is reached

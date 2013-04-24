@@ -275,9 +275,9 @@ public class AvroSerializer implements Serializer {
 		GenericRecord field = createNormalField( "TokenStreamField", context );
 		List<List<AttributeImpl>> stream = context.getTokenStream().getStream();
 		List<List<Object>> value = new ArrayList<List<Object>>( stream.size() );
-		for( List<AttributeImpl> attrs : stream ) {
+		for ( List<AttributeImpl> attrs : stream ) {
 			List<Object> elements = new ArrayList<Object>( attrs.size() );
-			for(AttributeImpl attr : attrs) {
+			for ( AttributeImpl attr : attrs ) {
 				elements.add( buildAttributeImpl( attr ) );
 			}
 			value.add( elements );

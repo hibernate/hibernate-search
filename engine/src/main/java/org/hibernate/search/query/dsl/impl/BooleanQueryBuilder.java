@@ -51,7 +51,7 @@ class BooleanQueryBuilder implements MustJunction {
 	}
 
 	public BooleanJunction not() {
-		final int lastIndex = clauses.size() -1;
+		final int lastIndex = clauses.size() - 1;
 		final BooleanClause last = clauses.get( lastIndex );
 		if ( ! last.getOccur().equals( BooleanClause.Occur.MUST ) ) {
 			throw new AssertionFailure( "Cannot negate class: " + last.getOccur() );

@@ -158,7 +158,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 
 	@Entity
 	@Indexed
-	@Table(name="CLASSBRIDGED")
+	@Table(name = "CLASSBRIDGED")
 	@ClassBridge(impl = ExceptionThrowingBridge.class, name = "test")
 	public static class ClassBridged {
 		@Id
@@ -168,7 +168,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 
 	@Entity
 	@Indexed
-	@Table(name="SIMPLEENTITY")
+	@Table(name = "SIMPLEENTITY")
 	public static class SimpleEntity {
 		@Id
 		@GeneratedValue
@@ -192,7 +192,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 	}
 
 	@Entity
-	@Table(name="EMBEDDEDENTITY")
+	@Table(name = "EMBEDDEDENTITY")
 	public static class EmbeddedEntity {
 		@Id
 		@GeneratedValue
@@ -216,7 +216,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 	}
 
 	@Entity
-	@Table(name="EMBEDDEDTWICEENTITY")
+	@Table(name = "EMBEDDEDTWICEENTITY")
 	public static class EmbeddedEmbeddedEntity {
 		@Id
 		@GeneratedValue

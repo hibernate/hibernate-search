@@ -59,9 +59,9 @@ public class NullEncodingFieldBridge implements FieldBridge, StringBridge {
 	 */
 	@Override
 	public String objectToString(Object object) {
-		if ( object == null )
+		if ( object == null ) {
 			return nullMarker;
-
+		}
 		return bridge.objectToString( object );
 	}
 

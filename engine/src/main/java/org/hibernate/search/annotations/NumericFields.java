@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * @author Gustavo Fernandes
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.METHOD, ElementType.FIELD} )
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface NumericFields {
 

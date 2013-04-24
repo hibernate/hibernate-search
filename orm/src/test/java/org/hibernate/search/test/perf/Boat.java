@@ -42,12 +42,12 @@ public class Boat {
 	@GeneratedValue
 	@DocumentId
 	public Integer id;
-	@Field(store= Store.YES)
+	@Field(store = Store.YES)
 	public String name;
 	@Field
 	public String description;
 
-	public Boat() {}
+	public Boat() { }
 
 	public Boat(String name, String description) {
 		this.name = name;

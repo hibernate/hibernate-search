@@ -98,7 +98,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		catch (Throwable e) {
 			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
-		finally{
+		finally {
 			destination.producerStopping();
 		}
 		log.trace( "finished" );

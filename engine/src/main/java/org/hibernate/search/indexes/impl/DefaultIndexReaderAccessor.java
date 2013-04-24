@@ -56,7 +56,7 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 
 	@Override
 	public IndexReader open(Class<?>... entities) {
-		if(entities.length == 0) {
+		if ( entities.length == 0 ) {
 			throw log.needAtLeastOneIndexedEntityType();
 		}
 

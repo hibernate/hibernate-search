@@ -38,7 +38,7 @@ class Helper {
 	 * This must be done prior to starting the transaction
 	 */
 	public static Transaction getTransactionAndMarkForJoin(StatelessSession session)
-			throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException{
+			throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		Transaction transaction = session.getTransaction();
 		doMarkforJoined( transaction );
 		return transaction;

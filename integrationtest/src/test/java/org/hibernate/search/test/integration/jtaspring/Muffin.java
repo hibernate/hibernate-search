@@ -34,7 +34,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 // Hibernate
 @Entity
 @Table(name = "muffin")
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="muffin")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region = "muffin")
 // Hibernate Search
 //@Indexed(index="Muffin")
 //@Analyzer(impl = StandardAnalyzer.class)
@@ -47,7 +47,7 @@ public class Muffin {
 	@ManyToOne
 	private Box box;
 
-	@Column(length = 255,nullable=false)
+	@Column(length = 255, nullable = false)
 	private String kind;
 
 	public Muffin() {

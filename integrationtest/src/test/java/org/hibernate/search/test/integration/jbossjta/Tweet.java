@@ -35,7 +35,8 @@ import org.hibernate.search.annotations.Indexed;
 @Entity
 @Indexed
 public class Tweet {
-	public Tweet() {};
+
+	public Tweet() { }
 
 	public Tweet(String tweet) {
 		this.text = tweet;
@@ -43,12 +44,12 @@ public class Tweet {
 
 	@Id
 	@GeneratedValue(generator = "uuid")
-	@GenericGenerator( name = "uuid", strategy = "uuid")
+	@GenericGenerator(name = "uuid", strategy = "uuid")
 	public String getId() { return id; }
 	public void setId(String id) { this.id = id; }
 	private String id;
 
-	@Column(name="tweet_text")
+	@Column(name = "tweet_text")
 	@Field
 	public String getText() { return text; };
 	public void setText(String text) { this.text = text; }

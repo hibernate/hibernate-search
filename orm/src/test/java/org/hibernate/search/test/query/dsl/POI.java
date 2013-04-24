@@ -77,7 +77,7 @@ public class POI {
 		this.name = name;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.type= type;
+		this.type = type;
 	}
 
 	public POI() {

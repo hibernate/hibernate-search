@@ -99,7 +99,7 @@ public class IndexManagerFactoryCustomizationTest {
 		String title;
 	}
 
-	@Indexed(index="dvds")
+	@Indexed(index = "dvds")
 	public static final class Dvd {
 		@DocumentId long id;
 		@Field String title;

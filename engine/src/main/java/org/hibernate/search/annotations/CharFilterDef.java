@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
  * @author Gustavo Fernandes
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface CharFilterDef {
 

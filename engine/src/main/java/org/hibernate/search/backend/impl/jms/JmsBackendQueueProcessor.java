@@ -128,8 +128,9 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 
 	public void close() {
 		try {
-			if ( connection != null )
+			if ( connection != null ) {
 				connection.close();
+			}
 		}
 		catch ( JMSException e ) {
 			log.unableToCloseJmsConnection( jmsQueueName, e );

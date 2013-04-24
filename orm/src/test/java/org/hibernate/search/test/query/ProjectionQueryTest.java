@@ -101,7 +101,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNotNull( projection );
 		final Husband husband = (Husband) projection[0];
 
-		assertTrue( Hibernate.isInitialized( husband.gletSpouse() ) );
+		assertTrue( Hibernate.isInitialized( husband.getSpouse() ) );
 
 		//cleanup
 		for ( Object element : s.createQuery( "from " + Husband.class.getName() ).list() ) {

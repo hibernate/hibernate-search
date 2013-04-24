@@ -225,9 +225,9 @@ public class ScrollableResultsTest {
 			assertEquals( "Rossi", objs[3] );
 			assertTrue( objs[4] instanceof Employee );
 			sess.contains( objs[4] );
-			assertTrue( objs[2]==objs[4] ); //projected twice the same entity
+			assertTrue( objs[2] == objs[4] ); // projected twice the same entity
 			// detach some objects:
-			if ( position%3 == 0 ) {
+			if ( position % 3 == 0 ) {
 				sess.evict( objs[2] );
 			}
 		}
@@ -241,7 +241,7 @@ public class ScrollableResultsTest {
 			sess.contains( objs[2] );
 			assertTrue( objs[4] instanceof Employee );
 			sess.contains( objs[4] );
-			assertTrue( objs[2]==objs[4] );
+			assertTrue( objs[2] == objs[4] );
 		}
 		assertEquals( -1, position );
 		scrollableResults.close();

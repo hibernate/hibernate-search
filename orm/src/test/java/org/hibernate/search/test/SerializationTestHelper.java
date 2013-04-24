@@ -92,8 +92,8 @@ public class SerializationTestHelper {
 				System.out.println( v );
 			}
 
-			public String toString(){
-				return ""+v;
+			public String toString() {
+				return "" + v;
 			}
 
 			@Override

@@ -35,8 +35,8 @@ import java.lang.annotation.Target;
  *
  * @author Amin Mohammed-Coleman
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( {ElementType.FIELD, ElementType.METHOD} )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface CalendarBridge {
 

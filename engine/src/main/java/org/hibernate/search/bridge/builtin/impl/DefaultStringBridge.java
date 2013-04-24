@@ -35,9 +35,9 @@ public class DefaultStringBridge implements StringBridge {
 
 	@Override
 	public String objectToString(Object object) {
-		if ( object == null )
+		if ( object == null ) {
 			return null;
-
+		}
 		return object.toString();
 	}
 

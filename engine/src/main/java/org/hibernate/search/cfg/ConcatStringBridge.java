@@ -31,13 +31,15 @@ import org.hibernate.search.bridge.StringBridge;
 /**
  * @author Emmanuel Bernard
  */
-public class ConcatStringBridge implements StringBridge, ParameterizedBridge{
+public class ConcatStringBridge implements StringBridge, ParameterizedBridge {
 	public static final String SIZE = "size";
 	private int size;
 
 	public String objectToString(Object object) {
-		if (object == null) return "";
-		if ( ! (object instanceof String) ) {
+		if ( object == null ) {
+			return "";
+		}
+		if ( !( object instanceof String ) ) {
 			throw new RuntimeException( "not a string" );
 		}
 		String string = object.toString();

@@ -67,7 +67,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 	private static final Log log = LoggerFactory.make();
 
-	public void testMapping() throws Exception{
+	public void testMapping() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "3340 Peachtree Rd NE" );
 		address.setStreet2( "JBoss" );
@@ -124,7 +124,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 	}
 
-	public void testAnalyzerDef() throws Exception{
+	public void testAnalyzerDef() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "3340 Peachtree Rd NE" );
 		address.setStreet2( "JBoss" );
@@ -149,7 +149,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
-	public void testBridgeMapping() throws Exception{
+	public void testBridgeMapping() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "Peachtree Rd NE" );
 		address.setStreet2( "JBoss" );
@@ -177,7 +177,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
-	public void testBoost() throws Exception{
+	public void testBoost() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -205,16 +205,16 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		assertTrue( "first result should be strictly higher", (Float) results.get( 0 )[1] > (Float) results.get( 1 )[1]*1.9f );
+		assertTrue( "first result should be strictly higher", (Float) results.get( 0 )[1] > (Float) results.get( 1 )[1] * 1.9f );
 		assertEquals( "Wrong result ordered", address.getStreet1(), ( (Address) results.get( 0 )[0] ).getStreet1() );
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
 
-	public void testAnalyzerDiscriminator() throws Exception{
+	public void testAnalyzerDiscriminator() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -243,14 +243,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertEquals( 0, nbrOfMatchingResults( "title", "aufeinanderschlug", s ) );
 		assertEquals( 1, nbrOfMatchingResults( "title", "acknowledgment", s ) );
 
-		for( Object result : s.createQuery( "from " + BlogEntry.class.getName() ).list() ) {
+		for ( Object result : s.createQuery( "from " + BlogEntry.class.getName() ).list() ) {
 			s.delete( result );
 		}
 		tx.commit();
 		s.close();
 	}
 
-	public void testDateBridgeMapping() throws Exception{
+	public void testDateBridgeMapping() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -292,14 +292,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
 
-	public void testCalendarBridgeMapping() throws Exception{
+	public void testCalendarBridgeMapping() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -333,14 +333,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
 
-	public void testProvidedIdMapping() throws Exception{
+	public void testProvidedIdMapping() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		SearchFactoryImplementor sf = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 
@@ -386,7 +386,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertEquals( 3, hits.totalHits );
 	}
 
-	public void testFullTextFilterDefAtMappingLevel() throws Exception{
+	public void testFullTextFilterDefAtMappingLevel() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -423,14 +423,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
 
-	public void testIndexEmbedded() throws Exception{
+	public void testIndexEmbedded() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -457,14 +457,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
 
-	public void testContainedIn() throws Exception{
+	public void testContainedIn() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -514,7 +514,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();

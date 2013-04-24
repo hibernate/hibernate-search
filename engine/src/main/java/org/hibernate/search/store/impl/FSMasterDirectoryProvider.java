@@ -147,8 +147,12 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		// this code is actually broken since the value change after initialize call
 		// but from a practical POV this is fine since we only call this method
 		// after initialize call
-		if ( obj == this ) return true;
-		if ( obj == null || !( obj instanceof FSMasterDirectoryProvider ) ) return false;
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj == null || !( obj instanceof FSMasterDirectoryProvider ) ) {
+			return false;
+		}
 		FSMasterDirectoryProvider other = (FSMasterDirectoryProvider)obj;
 		//break both memory barriers by reading volatile variables:
 		@SuppressWarnings("unused")
@@ -239,7 +243,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				try {
 					new File( destination, CURRENT_DIR_NAME[index]  ).createNewFile();
 				}
-				catch( IOException e ) {
+				catch ( IOException e ) {
 					log.unableToCreateCurrentMarker( indexName, e );
 				}
 				log.tracef( "Copy for %s took %d ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );

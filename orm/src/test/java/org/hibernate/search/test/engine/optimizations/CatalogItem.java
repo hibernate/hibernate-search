@@ -40,17 +40,17 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy = false)
-@Table(name="catalog_item")
+@Table(name = "catalog_item")
 public class CatalogItem {
 
 	public CatalogItem() {
 	}
 
 	@Id()
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long catalogItemId;
 
-	@ManyToOne(fetch=FetchType.LAZY, targetEntity=Item.class)
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = Item.class)
 	@JoinColumn(name = "itemId")
 	@LazyToOne(LazyToOneOption.PROXY)
 	@NaturalId

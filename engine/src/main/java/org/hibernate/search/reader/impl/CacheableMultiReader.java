@@ -51,13 +51,21 @@ public class CacheableMultiReader extends MultiReader {
 	@Override
 	public boolean equals(Object obj) {
 		// Equality only checks for subReaders as an equal sub-IndexReader is certainly coming from the same ReaderProvider.
-		if ( this == obj ) return true;
-		if ( !( obj instanceof CacheableMultiReader ) ) return false;
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !( obj instanceof CacheableMultiReader ) ) {
+			return false;
+		}
 		CacheableMultiReader that = (CacheableMultiReader) obj;
 		int length = this.subReaders.length;
-		if ( length != that.subReaders.length ) return false;
+		if ( length != that.subReaders.length ) {
+			return false;
+		}
 		for (int index = 0; index < length; index++) {
-			if ( !this.subReaders[index].equals( that.subReaders[index] ) ) return false;
+			if ( !this.subReaders[index].equals( that.subReaders[index] ) ) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -65,7 +73,7 @@ public class CacheableMultiReader extends MultiReader {
 	@Override
 	public int hashCode() {
 		int result = 0;
-		for (Object reader : this.subReaders) {
+		for ( Object reader : this.subReaders ) {
 			result = 31 * result + reader.hashCode();
 		}
 		return result;

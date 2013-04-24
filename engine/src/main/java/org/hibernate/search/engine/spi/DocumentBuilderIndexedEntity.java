@@ -654,9 +654,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	private Object unproxy(Object instance, InstanceInitializer objectInitializer) {
-		if ( instance == null )
+		if ( instance == null ) {
 			return null;
-
+		}
 		return objectInitializer.unproxy( instance );
 	}
 

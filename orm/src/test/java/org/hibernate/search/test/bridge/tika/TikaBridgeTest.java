@@ -178,7 +178,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		tx.commit();
 	}
 
-	@TestForIssue(jiraKey="HSEARCH-1256")
+	@TestForIssue(jiraKey = "HSEARCH-1256")
 	private void searchSongDslErrorMessage(Session session) throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		Transaction tx = session.beginTransaction();

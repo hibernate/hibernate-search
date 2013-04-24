@@ -69,7 +69,7 @@ public class IndexManagerHolder {
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 
-	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
+	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
 	//I currently think it's easier to not hide sharding implementations in a custom
 	//IndexManager to make it easier to explicitly a)detect duplicates b)start-stop
@@ -335,7 +335,7 @@ public class IndexManagerHolder {
 	 * @return the IndexManager, or null if it doesn't exist
 	 */
 	public IndexManager getIndexManager(String targetIndexName) {
-		if(targetIndexName == null) {
+		if ( targetIndexName == null ) {
 			throw log.nullIsInvalidIndexName();
 		}
 		return indexManagersRegistry.get( targetIndexName );

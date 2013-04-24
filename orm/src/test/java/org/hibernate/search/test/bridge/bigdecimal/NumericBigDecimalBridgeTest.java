@@ -98,7 +98,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestCase {
 
 	@Entity
 	@Indexed
-	@Table(name="ITEM")
+	@Table(name = "ITEM")
 	public static class Item {
 		@Id
 		@GeneratedValue

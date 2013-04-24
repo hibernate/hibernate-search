@@ -32,7 +32,7 @@ import org.hibernate.search.annotations.Spatials;
 
 @Spatials({
 	@Spatial,
-	@Spatial(name="work",  spatialMode = SpatialMode.GRID)
+	@Spatial(name = "work", spatialMode = SpatialMode.GRID)
 		})
 @Entity
 @Indexed
@@ -47,10 +47,10 @@ public class UserEx {
 	@Longitude
 	Double homeLongitude;
 
-	@Latitude(of="work")
+	@Latitude(of = "work")
 	Double workLatitude;
 
-	@Longitude(of="work")
+	@Longitude(of = "work")
 	Double workLongitude;
 
 	public UserEx(Integer id, Double homeLatitude, Double homeLongitude, Double workLatitude, Double workLongitude) {

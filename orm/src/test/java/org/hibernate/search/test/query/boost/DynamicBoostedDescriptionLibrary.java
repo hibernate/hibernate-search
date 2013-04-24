@@ -44,7 +44,7 @@ import org.hibernate.search.annotations.DynamicBoost;
 @Entity
 @Indexed
 @DynamicBoost(impl = CustomBoostStrategy.class)
-@Table(name="DynBoostLibrary")
+@Table(name = "DynBoostLibrary")
 public class DynamicBoostedDescriptionLibrary {
 
 	private int id;

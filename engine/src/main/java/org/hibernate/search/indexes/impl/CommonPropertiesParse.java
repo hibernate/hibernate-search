@@ -78,7 +78,7 @@ public class CommonPropertiesParse {
 	public static int extractMaxQueueSize(String indexName, Properties indexProps) {
 		String maxQueueSize = indexProps.getProperty( Environment.MAX_QUEUE_LENGTH );
 		if ( maxQueueSize != null ) {
-			int parsedInt= ConfigurationParseHelper
+			int parsedInt = ConfigurationParseHelper
 					.parseInt(
 							maxQueueSize, Executors.QUEUE_MAX_LENGTH,
 							"Illegal value for property " + Environment.MAX_QUEUE_LENGTH + " on index " + indexName

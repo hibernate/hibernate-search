@@ -86,7 +86,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @param propsFallBack
 	 */
 	public MaskedProperty(Properties propsToMask, String mask, Properties propsFallBack) {
-		if ( propsToMask==null || mask==null ) {
+		if ( propsToMask == null || mask == null ) {
 			throw new java.lang.IllegalArgumentException();
 		}
 		this.masked = propsToMask;
@@ -167,7 +167,9 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	private synchronized void initPropertyNames() {
-		if ( propertyNames != null) return;
+		if ( propertyNames != null) {
+			return;
+		}
 		Set<Object> maskedProperties = new TreeSet<Object>();
 		//we use keys to be safe and avoid CCE for non String key entries
 		Enumeration<?> maskedNames = masked.propertyNames();

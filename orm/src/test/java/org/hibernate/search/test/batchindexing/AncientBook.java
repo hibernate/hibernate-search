@@ -47,7 +47,7 @@ public class AncientBook extends Book {
 		this.catalogueGroupName = catalogueGroupName;
 	}
 
-	@ElementCollection( fetch=FetchType.EAGER )
+	@ElementCollection(fetch = FetchType.EAGER)
 	public Set<String> getAlternativeTitles() {
 		return alternativeTitles;
 	}

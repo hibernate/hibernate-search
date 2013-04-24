@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( {ElementType.TYPE} )
+@Target({ ElementType.TYPE })
 @Documented
 public @interface CacheFromIndex {
 

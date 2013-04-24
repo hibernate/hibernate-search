@@ -30,8 +30,8 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath*:beans.xml"})
-@TransactionConfiguration(transactionManager="transactionManager",defaultRollback=false)
+@ContextConfiguration(locations = { "classpath*:beans.xml" })
+@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
 @Transactional
 public class JtaAndSpringTest {
 

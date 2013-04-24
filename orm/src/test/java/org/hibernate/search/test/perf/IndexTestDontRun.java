@@ -90,7 +90,7 @@ public class IndexTestDontRun extends SearchTestCase {
 		threadPool.shutdown();//required to enable awaitTermination functionality
 		startSignal.countDown();//start all created threads
 		boolean terminationOk = threadPool.awaitTermination( 60, TimeUnit.SECONDS );
-		if ( terminationOk==false ) {
+		if ( terminationOk == false ) {
 			System.out.println( "No enough time to complete the tests!" );
 			return 0;
 		}

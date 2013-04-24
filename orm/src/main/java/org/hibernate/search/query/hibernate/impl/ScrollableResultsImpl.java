@@ -431,8 +431,8 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		 */
 		private Object[] getManagedResult(int x) {
 			EntityInfo entityInfo = getEntityInfo( x );
-			Object[] objects = entity==null ? null : entity.get();
-			if ( objects!=null && areAllEntitiesManaged( objects, entityInfo ) ) {
+			Object[] objects = entity == null ? null : entity.get();
+			if ( objects != null && areAllEntitiesManaged( objects, entityInfo ) ) {
 				return objects;
 			}
 			else {
@@ -450,8 +450,8 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		 * @return
 		 */
 		private EntityInfo getEntityInfo(int x) {
-			EntityInfo entityInfo = einfo==null ? null : einfo.get();
-			if ( entityInfo==null ) {
+			EntityInfo entityInfo = einfo == null ? null : einfo.get();
+			if ( entityInfo == null ) {
 				try {
 					entityInfo = documentExtractor.extract( x );
 				}

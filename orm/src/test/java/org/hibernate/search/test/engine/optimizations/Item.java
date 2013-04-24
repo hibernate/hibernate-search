@@ -41,14 +41,14 @@ import org.hibernate.annotations.Proxy;
  */
 @Entity
 @Proxy(lazy = false)
-@Table(name="item")
+@Table(name = "item")
 public class Item {
 
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long itemId;
 
-	@OneToMany(mappedBy="item", cascade={ CascadeType.REMOVE, CascadeType.REFRESH }, fetch=FetchType.LAZY)
+	@OneToMany(mappedBy = "item", cascade = { CascadeType.REMOVE, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	private Set<CatalogItem> catalogItems = new HashSet<CatalogItem>();
 
 	@Column(length = 255)

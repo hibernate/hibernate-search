@@ -77,13 +77,15 @@ public abstract class ConfigurationParseHelper {
 		if ( contextClassLoader != null ) {
 			url = contextClassLoader.getResource( path );
 		}
-		if ( url != null )
+		if ( url != null ) {
 			return url;
+		}
 
 		// Next, try to locate this resource through this class's classloader
 		url = ConfigurationParseHelper.class.getClassLoader().getResource( path );
-		if ( url != null )
+		if ( url != null ) {
 			return url;
+		}
 
 		// Next, try to locate this resource through the system classloader
 		url = ClassLoader.getSystemClassLoader().getResource( path );

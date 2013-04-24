@@ -53,7 +53,9 @@ public class IdHashShardingStrategy implements IndexShardingStrategy {
 	}
 
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		if ( idInString == null ) return providers;
+		if ( idInString == null ) {
+			return providers;
+		}
 		return new IndexManager[] { providers[hashKey( idInString )] };
 	}
 

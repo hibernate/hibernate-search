@@ -40,20 +40,20 @@ public class PointTest {
 		Point point2 = Point.fromDegrees( 0, -185 );
 		Assert.assertEquals( 175, point2.getLongitude(), 0 );
 
-		Point point3= Point.fromDegrees( 110, 0 );
+		Point point3 = Point.fromDegrees( 110, 0 );
 		Assert.assertEquals( 70, point3.getLatitude(), 0 );
 
-		Point point4= Point.fromDegrees( -110, 0 );
+		Point point4 = Point.fromDegrees( -110, 0 );
 		Assert.assertEquals( -70, point4.getLatitude(), 0 );
 
-		Point point5= Point.fromDegrees( 185, 0 );
+		Point point5 = Point.fromDegrees( 185, 0 );
 		Assert.assertEquals( -5, point5.getLatitude(), 0 );
 
-		Point point6= Point.fromDegrees( 90, 180);
+		Point point6 = Point.fromDegrees( 90, 180);
 		Assert.assertEquals( 90, point6.getLatitude(), 0 );
 		Assert.assertEquals( 180, point6.getLongitude(), 0 );
 
-		Point point7= Point.fromDegrees( -90, -180);
+		Point point7 = Point.fromDegrees( -90, -180);
 		Assert.assertEquals( -90, point7.getLatitude(), 0 );
 		Assert.assertEquals( 180, point7.getLongitude(), 0 );
 	}

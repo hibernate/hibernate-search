@@ -86,7 +86,9 @@ public class WorkQueue {
 	}
 
 	public List<LuceneWork> getSealedQueue() {
-		if ( sealedQueue == null ) throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
+		if ( sealedQueue == null ) {
+			throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
+		}
 		this.sealedAndUnchanged = false;
 		return sealedQueue;
 	}
@@ -113,8 +115,9 @@ public class WorkQueue {
 		}
 		plan.clear();
 		this.sealedAndUnchanged = false;
-		if ( sealedQueue != null )
+		if ( sealedQueue != null ) {
 			sealedQueue.clear();
+		}
 	}
 
 	/**

@@ -38,7 +38,7 @@ public abstract class SpatialHelper {
 	/**
 	 * Private constructor locking down utility class
 	 */
-	private SpatialHelper() {};
+	private SpatialHelper() { };
 
 	/**
 	 * Generate a Cell Index on one axis
@@ -107,7 +107,7 @@ public abstract class SpatialHelper {
 				quadTreeLevel
 		);
 
-		double[] projectedLowerRight= projectToIndexSpace( Point.fromDegrees( lowerLeft.getLatitude(), upperRight.getLongitude() ) );
+		double[] projectedLowerRight = projectToIndexSpace( Point.fromDegrees( lowerLeft.getLatitude(), upperRight.getLongitude() ) );
 		int lowerRightXIndex = getCellIndex(
 				projectedLowerRight[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,

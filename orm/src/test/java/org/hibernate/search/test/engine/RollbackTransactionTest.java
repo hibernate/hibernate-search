@@ -60,7 +60,7 @@ public class RollbackTransactionTest extends SearchTestCase {
 	private void createBusLines(int number, boolean rollback) {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		for (int i=0; i<number; i++ ) {
+		for ( int i = 0; i < number; i++ ) {
 			BusLine line = new BusLine();
 			line.setBusLineName( "line " + i );
 			fullTextSession.persist( line );

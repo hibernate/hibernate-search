@@ -71,7 +71,9 @@ public class JmsBackendQueueTask implements Runnable {
 				filteredQueue.remove( work );
 			}
 		}
-		if ( filteredQueue.size() == 0) return;
+		if ( filteredQueue.size() == 0 ) {
+			return;
+		}
 		LuceneWorkSerializer serializer = indexManager.getSerializer();
 		byte[] data = serializer.toSerializedModel( filteredQueue );
 		QueueSender sender;

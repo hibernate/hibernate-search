@@ -92,7 +92,7 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: two entities"
@@ -112,7 +112,7 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertTrue( "Valid configuration could not be built", configurationIsLegal );
@@ -131,7 +131,7 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: child entity"

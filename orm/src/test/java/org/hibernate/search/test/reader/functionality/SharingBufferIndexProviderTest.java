@@ -73,7 +73,7 @@ public class SharingBufferIndexProviderTest {
 			}
 		}
 		assertEquals( SEARCHES_NUM, countDoneSearches.get() );
-		assertEquals( SEARCHES_NUM/10, countDoneIndexmods.get() );
+		assertEquals( SEARCHES_NUM / 10, countDoneIndexmods.get() );
 	}
 
 	private Runnable makeTask(int i) {

@@ -33,8 +33,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 
 @Entity
-@Indexed(index="Email")
-@FullTextFilterDef(name="shard", impl= ShardSensitiveOnlyFilter.class)
+@Indexed(index = "Email")
+@FullTextFilterDef(name = "shard", impl = ShardSensitiveOnlyFilter.class)
 public class Email {
 
 	@Id

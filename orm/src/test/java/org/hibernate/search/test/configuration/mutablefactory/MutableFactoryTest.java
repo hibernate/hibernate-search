@@ -219,7 +219,7 @@ public class MutableFactoryTest {
 
 		poolExecutor.awaitTermination( 1, TimeUnit.MINUTES );
 
-		for (int i = 0 ; i < nbrOfThread*nbrOfClassesPerThread ; i++) {
+		for ( int i = 0; i < nbrOfThread * nbrOfClassesPerThread; i++ ) {
 			Query luceneQuery = parser.parse( "Emmanuel" + i);
 			final Class<?> classByNumber = getClassAByNumber( i );
 			IndexReader indexReader = sf.getIndexReaderAccessor().open( classByNumber );
@@ -272,7 +272,7 @@ public class MutableFactoryTest {
 
 			try {
 				for (int index = 0 ; index < 10 ; index++) {
-					final int i = factorOfClassesPerThread*nbrOfClassesPerThread + index;
+					final int i = factorOfClassesPerThread * nbrOfClassesPerThread + index;
 					final Class<?> aClass = MutableFactoryTest.getClassAByNumber( i );
 					factory.addClasses( aClass );
 					Object entity = aClass.getConstructor( Integer.class, String.class ).newInstance( i, "Emmanuel" + i );

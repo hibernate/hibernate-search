@@ -69,10 +69,10 @@ public class CollectionInitializeTest extends SearchTestCase {
 		final Transaction transaction = fullTextSession.beginTransaction();
 		LegacyCar[] cars = new LegacyCar[3];
 		for (int i = 1 ; i < 4 ; i++) {
-			cars[i-1] = new LegacyCar();
-			cars[i-1].setId( "" + i );
-			cars[i-1].setModel( "model" + i );
-			fullTextSession.persist( cars[i-1] );
+			cars[i - 1] = new LegacyCar();
+			cars[i - 1].setId( "" + i );
+			cars[i - 1].setModel( "model" + i );
+			fullTextSession.persist( cars[i - 1] );
 		}
 		LegacyCarPlant plant = new LegacyCarPlant();
 		plant.setCar( cars[0] );

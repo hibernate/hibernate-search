@@ -159,8 +159,8 @@ public class JMSSlaveTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jms" );
-		cfg.setProperty( "hibernate.search.default." +JmsBackendQueueProcessor.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
-		cfg.setProperty( "hibernate.search.default." +JmsBackendQueueProcessor.JMS_QUEUE, QUEUE_NAME );
+		cfg.setProperty( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
+		cfg.setProperty( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_QUEUE, QUEUE_NAME );
 
 		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of jndi properties to create the InitialContext
 		// for the queue processor

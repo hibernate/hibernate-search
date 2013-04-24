@@ -75,8 +75,8 @@ public class IndexedEntity {
 	private List<CollectionItem> itemsWithFieldsAnnotation = new ArrayList<CollectionItem>();
 
 	@ElementCollection
-	@Column(name="keyword")
-	@CollectionTable(name="indexedentity_keyword", joinColumns = { @JoinColumn( name = "indexedentity" ) })
+	@Column(name = "keyword")
+	@CollectionTable(name = "indexedentity_keyword", joinColumns = { @JoinColumn(name = "indexedentity") })
 	@Field(bridge = @FieldBridge(impl = CollectionOfStringsFieldBridge.class), analyze = Analyze.NO, store = Store.YES)
 	private Set<String> keywords = new HashSet<String>();
 

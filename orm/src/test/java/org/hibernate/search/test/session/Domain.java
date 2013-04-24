@@ -42,7 +42,7 @@ public class Domain {
 	@Field
 	private String name;
 
-	public Domain(){ }
+	public Domain() { }
 
 	public Domain(Integer id, String name) {
 		this.id = id;

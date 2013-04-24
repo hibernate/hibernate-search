@@ -98,7 +98,7 @@ public class LiveRunningTest {
 			int resultSize = fullTextQuery.getResultSize();
 			assertEquals( storedEmailsCount, resultSize );
 		}
-		finally{
+		finally {
 			session.close();
 		}
 	}

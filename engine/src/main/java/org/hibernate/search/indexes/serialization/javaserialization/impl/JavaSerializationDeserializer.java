@@ -65,7 +65,7 @@ public class JavaSerializationDeserializer implements Deserializer {
 				);
 			}
 		}
-		byte[] newData = new byte[data.length-2];
+		byte[] newData = new byte[data.length - 2];
 		System.arraycopy( data, 2, newData, 0, newData.length );
 		Message message = SerializationHelper.toInstance( newData, Message.class );
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();

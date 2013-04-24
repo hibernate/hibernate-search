@@ -76,7 +76,7 @@ public class TransactionSynchronizationTest extends SearchTestCase {
 
 	@Entity
 	@Indexed
-	@Table(name="Test007")
+	@Table(name = "Test007")
 	public static class Test {
 		@Id @GeneratedValue
 		public Integer getId() { return id; }

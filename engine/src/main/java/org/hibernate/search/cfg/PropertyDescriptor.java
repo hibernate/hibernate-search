@@ -36,8 +36,8 @@ public class PropertyDescriptor {
 
 	private Collection<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
 	private Collection<Map<String, Object>> numericFields = new ArrayList<Map<String, Object>>();
-	private Map<String, Object> dateBridge= new HashMap<String, Object>();
-	private Map<String, Object> calendarBridge= new HashMap<String, Object>();
+	private Map<String, Object> dateBridge = new HashMap<String, Object>();
+	private Map<String, Object> calendarBridge = new HashMap<String, Object>();
 	private Map<String,Object> indexEmbedded;
 	private Map<String,Object> containedIn;
 

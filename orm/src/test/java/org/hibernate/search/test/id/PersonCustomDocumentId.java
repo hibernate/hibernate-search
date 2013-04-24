@@ -51,7 +51,7 @@ public class PersonCustomDocumentId {
 		this.personNames = personNames;
 	}
 
-	@DocumentId(name="id")
+	@DocumentId(name = "id")
 	public String getSecurityNumber() {
 		return securityNumber;
 	}

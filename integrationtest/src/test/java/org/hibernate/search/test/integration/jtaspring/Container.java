@@ -38,15 +38,14 @@ import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Indexed;
 
 @Entity
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
-@Table(name="container")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Table(name = "container")
 @DiscriminatorColumn(name = "containerType", discriminatorType = DiscriminatorType.STRING)
-
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region="container")
-
-@Indexed(index="container")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region = "container")
+@Indexed(index = "container")
 @Analyzer(impl = StandardAnalyzer.class)
 public class Container extends AbstractEntity {
+
 	@Id()
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long containerId;

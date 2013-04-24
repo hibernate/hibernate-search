@@ -74,7 +74,7 @@ import org.hibernate.testing.SkipForDialect;
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
-@SkipForDialect(comment="looks like a database deadlock", value=org.hibernate.dialect.SybaseASE15Dialect.class, jiraKey="HSEARCH-1107")
+@SkipForDialect(comment = "looks like a database deadlock", value = org.hibernate.dialect.SybaseASE15Dialect.class, jiraKey = "HSEARCH-1107")
 public class WorkDoneOnEntitiesTest extends SearchTestCase {
 
 	private Session session = null;

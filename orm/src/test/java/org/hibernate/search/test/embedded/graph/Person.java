@@ -87,7 +87,7 @@ public class Person implements Serializable {
 		this.birthEvent = birthEvent;
 	}
 
-	@Field(store=Store.YES)
+	@Field(store = Store.YES)
 	public String getName() {
 		return name;
 	}

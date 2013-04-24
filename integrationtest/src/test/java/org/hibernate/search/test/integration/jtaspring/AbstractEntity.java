@@ -30,8 +30,8 @@ import org.hibernate.annotations.NaturalId;
 @MappedSuperclass
 public abstract class AbstractEntity {
 
-	@NaturalId(mutable=true)
-	@Column(length=36)
+	@NaturalId(mutable = true)
+	@Column(length = 36)
 	private String magicKey_;
 
 	/**

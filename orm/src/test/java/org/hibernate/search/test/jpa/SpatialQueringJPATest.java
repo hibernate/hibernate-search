@@ -163,7 +163,7 @@ public class SpatialQueringJPATest extends JPATestCase {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 
 		em.getTransaction().begin();
-		int cnt =0;
+		int cnt = 0;
 		for ( double[] c : new double[][] {
 				{41.04389845, -74.06328534},
 				{40.64383333, -73.75050000},

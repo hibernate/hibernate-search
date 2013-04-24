@@ -45,7 +45,7 @@ public class PropertySpatialMapping {
 	public PropertySpatialMapping(PropertyDescriptor property, EntityDescriptor entity, SearchMapping mapping) {
 		this.mapping = mapping;
 		this.entity = entity;
-		this.property= property;
+		this.property = property;
 		this.property.setSpatial( spatial );
 	}
 

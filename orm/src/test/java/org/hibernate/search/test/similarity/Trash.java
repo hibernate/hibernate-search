@@ -36,7 +36,7 @@ import org.hibernate.search.annotations.Similarity;
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed(index="garbageIndex")
+@Indexed(index = "garbageIndex")
 @Similarity(impl = DummySimilarity.class)
 public class Trash {
 	@Id

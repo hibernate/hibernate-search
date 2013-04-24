@@ -62,7 +62,7 @@ public class Location {
 	@ManyToOne(fetch = FetchType.LAZY, targetEntity = LocationGroup.class)
 	@JoinColumn(name = "location_group_id")
 	@LazyToOne(LazyToOneOption.PROXY)
-	@IndexedEmbedded(depth=1)
+	@IndexedEmbedded(depth = 1)
 	private LocationGroup locationGroup;
 
 	public Location() {

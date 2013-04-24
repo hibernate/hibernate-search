@@ -96,12 +96,11 @@ public final class Point implements Coordinates {
 			// shift 90, normalize full circle turn and 'symmetry' on the lat axis with abs
 			double _latitude = Math.abs( ( latitude + ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 ) ) % ( GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE ) );
 			// Push 2nd and 3rd quadran in 1st and 4th by 'symmetry'
-			if( _latitude > GeometricConstants.LATITUDE_DEGREE_RANGE ) {
-				_latitude= GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE- _latitude;
+			if ( _latitude > GeometricConstants.LATITUDE_DEGREE_RANGE ) {
+				_latitude = GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE - _latitude;
 			}
 			// unshift
-			_latitude= _latitude - ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 );
-
+			_latitude = _latitude - ( GeometricConstants.LATITUDE_DEGREE_RANGE / 2 );
 			return _latitude;
 		}
 		else {
@@ -176,12 +175,11 @@ public final class Point implements Coordinates {
 	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Distance haversine formula</a>
 	 */
 	public double getDistanceTo(final double latitude,final double longitude) {
-		double destinationLatitudeRadians= normalizeLatitude( latitude ) * GeometricConstants.TO_RADIANS_RATIO;
-		double destinationLongitudeRadians= normalizeLongitude( longitude ) * GeometricConstants.TO_RADIANS_RATIO;
-		final double dLat= (destinationLatitudeRadians - getLatitudeRad())/2.0d;
-		final double dLon= (destinationLongitudeRadians - getLongitudeRad())/2.0d;
-		final double a= Math.pow( Math.sin( dLat ), 2) +
-				Math.pow( Math.sin( dLon ), 2) * Math.cos( getLatitudeRad()) * Math.cos( destinationLatitudeRadians );
+		double destinationLatitudeRadians = normalizeLatitude( latitude ) * GeometricConstants.TO_RADIANS_RATIO;
+		double destinationLongitudeRadians = normalizeLongitude( longitude ) * GeometricConstants.TO_RADIANS_RATIO;
+		final double dLat = ( destinationLatitudeRadians - getLatitudeRad() ) / 2.0d;
+		final double dLon = ( destinationLongitudeRadians - getLongitudeRad() ) / 2.0d;
+		final double a = Math.pow( Math.sin( dLat ), 2 ) + Math.pow( Math.sin( dLon ), 2) * Math.cos( getLatitudeRad()) * Math.cos( destinationLatitudeRadians );
 		final double c = 2.0d * Math.atan2( Math.sqrt( a ), Math.sqrt( 1.0d - a ) );
 		return c * GeometricConstants.EARTH_MEAN_RADIUS_KM;
 	}
