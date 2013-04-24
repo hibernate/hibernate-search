@@ -17,7 +17,7 @@
  * v.2.1 along with this distribution; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
-*/
+ */
 package org.hibernate.search.test.integration.jbossas7;
 
 import static org.junit.Assert.assertEquals;
