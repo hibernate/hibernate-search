@@ -111,7 +111,8 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 					!rangeContext.isExcludeTo(),
 					!rangeContext.isExcludeFrom()
 			);
-		} else {
+		}
+		else {
 			final String fromString  = fieldContext.isIgnoreFieldBridge() ?
 					fromObject == null ? null : fromObject.toString() :
 					documentBuilder.objectToString( fieldName, fromObject, conversionContext );

@@ -65,9 +65,10 @@ public final class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 		Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by id using an IndexWriter.", managedType, id );
 		try {
-			if( idIsNumeric ) {
+			if ( idIsNumeric ) {
 				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
-			} else {
+			}
+			else {
 				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 				writer.deleteDocuments( idTerm );
 			}

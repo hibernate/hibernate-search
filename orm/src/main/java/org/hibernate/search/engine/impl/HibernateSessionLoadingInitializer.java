@@ -51,7 +51,8 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 			Object initialized = lazyInitializer.getImplementation( hibernateSession );
 			if ( initialized != null ) {
 				return initialized;
-			} else {
+			}
+			else {
 				// This is the case in which the proxy was created by a different session.
 				// unproxyAndReassociate is the ultimate bomb,
 				// able to deal with a Session change:

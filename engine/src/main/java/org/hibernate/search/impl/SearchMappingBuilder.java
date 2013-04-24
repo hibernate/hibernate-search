@@ -113,21 +113,23 @@ public class SearchMappingBuilder {
 
 	private static Class<?> getProgrammaticMappingClass(Object programmaticConfig) {
 		Class<?> clazz = null;
-		if (programmaticConfig instanceof String) {
+		if ( programmaticConfig instanceof String ) {
 			final String className = (String) programmaticConfig;
 			try {
 				clazz = ClassLoaderHelper.classForName( className, SearchMappingBuilder.class.getClassLoader() );
-			} catch (ClassNotFoundException e) {
-				throw new SearchException("Unable to find " + Environment.MODEL_MAPPING + "=" + className, e);
 			}
-		} else if (programmaticConfig instanceof Class){
+			catch (ClassNotFoundException e) {
+				throw new SearchException( "Unable to find " + Environment.MODEL_MAPPING + "=" + className, e );
+			}
+		}
+		else if ( programmaticConfig instanceof Class ) {
 			clazz = (Class<?>) programmaticConfig;
 		}
 		else {
-			throw new SearchException(Environment.MODEL_MAPPING + " is of an unknown type: " + programmaticConfig.getClass() );
+			throw new SearchException( Environment.MODEL_MAPPING + " is of an unknown type: " + programmaticConfig.getClass() );
 		}
-		if (clazz == null) {
-			throw new SearchException("No programmatic factory defined");
+		if ( clazz == null ) {
+			throw new SearchException( "No programmatic factory defined" );
 		}
 		return clazz;
 	}

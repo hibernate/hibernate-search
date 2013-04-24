@@ -101,7 +101,8 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 			configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
 			configuration.buildSessionFactory();
 			fail();
-		} catch (HibernateException e) {
+		}
+		catch (HibernateException e) {
 			//thrown exceptions means the test is ok when caused by a SearchException
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof SearchException );

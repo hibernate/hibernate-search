@@ -104,10 +104,12 @@ public class CollectionUpdateEventTest {
 						.as( "catalogItems should not be initialized" )
 						.isFalse();
 				}
-			} finally {
+			}
+			finally {
 				fullTextSession.close();
 			}
-		} finally {
+		}
+		finally {
 			fulltextSessionBuilder.close();
 		}
 	}

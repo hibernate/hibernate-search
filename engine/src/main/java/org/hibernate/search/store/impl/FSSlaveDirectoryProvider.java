@@ -284,7 +284,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			if ( currentMarkerIsInSource() ) {
 				initialized = true;
 				log.foundCurrentMarker();
-			} else {
+			}
+			else {
 				log.noCurrentMarkerInSourceDirectory();
 			}
 		}
@@ -417,7 +418,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		if ( directory != null ) {
 			try {
 				directory.close();
-			} catch ( Exception e ) {
+			}
+			catch ( Exception e ) {
 				log.unableToCloseLuceneDirectory( directory, e );
 			}
 		}

@@ -80,7 +80,8 @@ public class SearcherThread implements Runnable {
 	public void run() {
 		try {
 			startSignal.await();
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			log.error( "tests canceled", e );
 			Thread.currentThread().interrupt();
 			return;
@@ -124,7 +125,8 @@ public class SearcherThread implements Runnable {
 	private Document getDocument(IndexSearcher searcher, int docId ) {
 		try {
 			return searcher.doc( docId );
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe) {
 			throw new SearchException( "Unable to retrieve document", ioe );
 		}
 	}

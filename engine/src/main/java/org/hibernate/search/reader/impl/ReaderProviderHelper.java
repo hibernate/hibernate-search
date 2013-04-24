@@ -60,7 +60,8 @@ public abstract class ReaderProviderHelper {
 	public static IndexReader[] getSubReadersFromMultiReader(MultiReader parentReader) {
 		try {
 			return (IndexReader[]) subReadersField.get( parentReader );
-		} catch (IllegalAccessException e) {
+		}
+		catch (IllegalAccessException e) {
 			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not accessible", e );
 		}
 	}

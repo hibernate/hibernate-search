@@ -382,22 +382,30 @@ public class MaskedProperty extends Properties implements Serializable {
 
 	@Override
 	public synchronized boolean equals(Object obj) {
-		if ( this == obj )
+		if ( this == obj ) {
 			return true;
-		if ( obj == null )
+		}
+		if ( obj == null ) {
 			return false;
-		if ( getClass() != obj.getClass() )
+		}
+		if ( getClass() != obj.getClass() ) {
 			return false;
+		}
 		final MaskedProperty other = (MaskedProperty) obj;
 		if ( fallBack == null ) {
-			if ( other.fallBack != null )
+			if ( other.fallBack != null ) {
 				return false;
-		} else if ( ! fallBack.equals( other.fallBack ) )
+			}
+		}
+		else if ( ! fallBack.equals( other.fallBack ) ) {
 			return false;
-		if ( ! masked.equals( other.masked ) )
+		}
+		if ( ! masked.equals( other.masked ) ) {
 			return false;
-		if ( ! radix.equals( other.radix ) )
+		}
+		if ( ! radix.equals( other.radix ) ) {
 			return false;
+		}
 		return true;
 	}
 

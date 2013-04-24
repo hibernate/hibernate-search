@@ -51,7 +51,8 @@ public class ConfigurationParseHelperTest {
 		boolean exceptionLaunched = false;
 		try {
 			ConfigurationParseHelper.getIntValue( props, "value2", 8 );
-		} catch (SearchException e) {
+		}
+		catch (SearchException e) {
 			exceptionLaunched = true;
 		}
 		assertTrue( exceptionLaunched );
@@ -66,14 +67,16 @@ public class ConfigurationParseHelperTest {
 		boolean exceptionLaunched = false;
 		try {
 			ConfigurationParseHelper.parseBoolean( "5", "error" );
-		} catch (SearchException e) {
+		}
+		catch (SearchException e) {
 			exceptionLaunched = true;
 		}
 		assertTrue( exceptionLaunched );
 		exceptionLaunched = false;
 		try {
 			ConfigurationParseHelper.parseBoolean( null, "error" );
-		} catch (SearchException e) {
+		}
+		catch (SearchException e) {
 			exceptionLaunched = true;
 		}
 		assertTrue( exceptionLaunched );

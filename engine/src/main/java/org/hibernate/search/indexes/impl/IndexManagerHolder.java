@@ -225,7 +225,8 @@ public class IndexManagerHolder {
 		try {
 			manager.initialize( indexName, indexProps, context );
 			return manager;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw log.unableToInitializeIndexManager( indexName, e );
 		}
 	}

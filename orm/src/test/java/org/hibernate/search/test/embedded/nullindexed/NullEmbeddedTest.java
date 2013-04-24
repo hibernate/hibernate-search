@@ -68,7 +68,8 @@ public class NullEmbeddedTest extends SearchTestCase {
 		try {
 			findNullsFor( s, "partner", "indexAsNull not set" );
 			fail( "Embedded null field should not exists for field without indexAsNull property" );
-		} catch (SearchException e) {
+		}
+		catch (SearchException e) {
 			// Succeded: indexAsNull not specified so the field is not created
 		}
 

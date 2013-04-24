@@ -111,7 +111,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 
 				if (termsAtSamePosition == null) {
 					termsAtSamePosition = new ArrayList<Term>();
-					termsPerPosition.put( position, termsAtSamePosition  );
+					termsPerPosition.put( position, termsAtSamePosition );
 				}
 
 				String termString = new String( termAttribute.buffer(), 0, termAttribute.length() );
@@ -144,7 +144,8 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		final int size = termsPerPosition.size();
 		if ( size == 0 ) {
 			perFieldQuery = new BooleanQuery( );
-		} else if ( size <= 1 ) {
+		}
+		else if ( size <= 1 ) {
 			final List<Term> terms = termsPerPosition.values().iterator().next();
 			if ( terms.size() == 1 ) {
 				perFieldQuery = new TermQuery( terms.get( 0 ) );
@@ -158,7 +159,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			}
 		}
 		else {
-			if (isMultiPhrase) {
+			if ( isMultiPhrase ) {
 				MultiPhraseQuery query = new MultiPhraseQuery();
 				query.setSlop( phraseContext.getSlop() );
 				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {

@@ -107,7 +107,8 @@ public abstract class ConfigurationParseHelper {
 		else {
 			try {
 				return Integer.parseInt( value.trim() );
-			} catch (NumberFormatException nfe) {
+			}
+			catch (NumberFormatException nfe) {
 				throw new SearchException( errorMsgOnParseFailure, nfe );
 			}
 		}
@@ -128,7 +129,8 @@ public abstract class ConfigurationParseHelper {
 		else {
 			try {
 				return Long.parseLong( value.trim() );
-			} catch (NumberFormatException nfe) {
+			}
+			catch (NumberFormatException nfe) {
 				throw new SearchException( errorMsgOnParseFailure, nfe );
 			}
 		}

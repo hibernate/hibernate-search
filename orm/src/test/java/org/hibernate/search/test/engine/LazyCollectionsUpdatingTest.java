@@ -125,10 +125,12 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 			addBusStop( bus, "via M.Buonarroti" );
 			session.persist( bus );
 			tx.commit();
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			if ( tx != null )
 				tx.rollback();
-		} finally {
+		}
+		finally {
 			session.close();
 		}
 	}
