@@ -90,11 +90,11 @@ public @interface ClassBridge {
 	/**
 	 * @return Custom implementation of class bridge
 	 */
-	public Class<?> impl();
+	Class<?> impl();
 
 	/**
 	 * @return Array of {@code Parameter} instances passed to the class specified by {@link #impl} to initialize the class
 	 *         bridge
 	 */
-	public Parameter[] params() default { };
+	Parameter[] params() default { };
 }

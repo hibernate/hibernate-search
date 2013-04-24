@@ -148,6 +148,6 @@ public interface MassIndexer {
 	 * @param idFetchSize
 	 * @return <tt>this</tt> for method chaining
 	 */
-	public MassIndexer idFetchSize(int idFetchSize);
+	MassIndexer idFetchSize(int idFetchSize);
 
 }

@@ -45,6 +45,6 @@ public interface StreamingOperationSelectionDelegate {
 	 * @param forceAsync if true, the invocation will not block to wait for it being applied.
 	 *  When false this will depend on the backend configuration.
 	 */
-	public void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync);
+	void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync);
 
 }

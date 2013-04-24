@@ -202,14 +202,14 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 
 		@Override
-		public final long addAndGet(final long delta) {
+		public long addAndGet(final long delta) {
 			//parameter delta is ignored as we don't use the clock ticking strategy from Lucene's threads
 			//as I don't want to deal with statically referenced threads.
 			return timingSource.getMonotonicTimeEstimate();
 		}
 
 		@Override
-		public final long get() {
+		public long get() {
 			return timingSource.getMonotonicTimeEstimate();
 		}
 

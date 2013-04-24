@@ -26,5 +26,7 @@ import org.hibernate.StatelessSession;
  * @author Emmanuel Bernard
  */
 public interface StatelessSessionAwareRunnable {
-	public void run(StatelessSession session);
+
+	void run(StatelessSession session);
+
 }

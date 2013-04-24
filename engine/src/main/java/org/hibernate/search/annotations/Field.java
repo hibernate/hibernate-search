@@ -44,15 +44,16 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface Field {
+
 	/**
 	 * Default value for {@link #indexNullAs} parameter. Indicates that {@code null} values should not be indexed.
 	 */
-	public static final String DO_NOT_INDEX_NULL = "__DO_NOT_INDEX_NULL__";
+	String DO_NOT_INDEX_NULL = "__DO_NOT_INDEX_NULL__";
 
 	/**
 	 * Value for {@link #indexNullAs} parameter indicating that {@code null} values should not indexed using the
 	 */
-	public static final String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
+	String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
 
 	/**
 	 * @return Returns the field name. Defaults to the JavaBean property name.

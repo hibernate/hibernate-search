@@ -25,12 +25,12 @@ package org.hibernate.search.test.batchindexing;
 
 public interface TitleAble {
 
-	public String getTitle();
+	String getTitle();
 
-	public void setTitle(String title);
+	void setTitle(String title);
 
-	public void setFirstPublishedIn(Nation firstPublishedIn);
+	void setFirstPublishedIn(Nation firstPublishedIn);
 
-	public Nation getFirstPublishedIn();
+	Nation getFirstPublishedIn();
 
 }

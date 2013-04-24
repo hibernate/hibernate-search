@@ -42,12 +42,12 @@ public @interface IndexedEmbedded {
 	/**
 	 * Default value for {@link #indexNullAs} parameter. Indicates that {@code null} values should not be indexed.
 	 */
-	public static final String DO_NOT_INDEX_NULL = "__DO_NOT_INDEX_NULL__";
+	String DO_NOT_INDEX_NULL = "__DO_NOT_INDEX_NULL__";
 
 	/**
 	 * Value for {@link #indexNullAs} parameter indicating that {@code null} values should not indexed using the
 	 */
-	public static final String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
+	String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
 
 	/**
 	 * Field name prefix

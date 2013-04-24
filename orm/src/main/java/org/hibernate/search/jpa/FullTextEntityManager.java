@@ -76,7 +76,7 @@ public interface FullTextEntityManager extends EntityManager {
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
-	public <T> void purge(Class<T> entityType, Serializable id);
+	<T> void purge(Class<T> entityType, Serializable id);
 
 	/**
 	 * Remove all entities from of particular class and all its subclasses from the index.
@@ -85,12 +85,12 @@ public interface FullTextEntityManager extends EntityManager {
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
-	public <T> void purgeAll(Class<T> entityType);
+	<T> void purgeAll(Class<T> entityType);
 
 	/**
 	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
 	 */
-	public void flushToIndexes();
+	void flushToIndexes();
 
 	/**
 	 * Creates a MassIndexer to rebuild the indexes of some
@@ -99,6 +99,6 @@ public interface FullTextEntityManager extends EntityManager {
 	 * @param types optionally restrict the operation to selected types
 	 * @return a new MassIndexer
 	 */
-	public MassIndexer createIndexer(Class<?>... types);
+	MassIndexer createIndexer(Class<?>... types);
 
 }

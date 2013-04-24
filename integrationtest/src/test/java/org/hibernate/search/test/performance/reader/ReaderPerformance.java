@@ -121,7 +121,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		}
 	}
 
-	private final void timeMs() throws InterruptedException {
+	private void timeMs() throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		CountDownLatch startSignal = new CountDownLatch( 1 );
 		InsertActivity insertionTask = new InsertActivity( getSessions(), startSignal );

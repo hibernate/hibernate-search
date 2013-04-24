@@ -30,7 +30,7 @@ package org.hibernate.search.jmx;
  */
 public interface IndexingProgressMonitorMBean {
 
-	public static final String INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=IndexingProgressMBean";
+	String INDEXING_PROGRESS_MONITOR_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=IndexingProgressMBean";
 
 	/**
 	 * @return the number of entities loaded so far
@@ -47,5 +47,4 @@ public interface IndexingProgressMonitorMBean {
 	 */
 	long getNumberOfEntitiesToIndex();
 }
-
 

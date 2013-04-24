@@ -48,13 +48,14 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface TikaBridge {
+
 	/**
 	 * @return Class used for optional Tika metadata pre- and post-processing
 	 */
-	public Class<?> metadataProcessor() default void.class;
+	Class<?> metadataProcessor() default void.class;
 
 	/**
 	 * @return Class used for optionally providing a Tika parsing context
 	 */
-	public Class<?> parseContextProvider() default void.class;
+	Class<?> parseContextProvider() default void.class;
 }

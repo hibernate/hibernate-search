@@ -36,7 +36,7 @@ public interface TikaMetadataProcessor {
 	 * @return Tika metadata used for data processing. Additional metadata can be set here.
 	 * @see <a href="http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html">Tika API</a>
 	 */
-	public Metadata prepareMetadata();
+	Metadata prepareMetadata();
 
 	/**
 	 * This method called by the {@link org.hibernate.search.bridge.builtin.TikaBridge} after processing the data.
@@ -49,5 +49,5 @@ public interface TikaMetadataProcessor {
 	 * the Lucene document.
 	 * @param metadata the metadata discovered by the Tika parsing process
 	 */
-	public void set(String name, Object value, Document document, LuceneOptions luceneOptions, Metadata metadata);
+	void set(String name, Object value, Document document, LuceneOptions luceneOptions, Metadata metadata);
 }

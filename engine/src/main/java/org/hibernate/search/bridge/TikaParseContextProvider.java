@@ -40,5 +40,6 @@ public interface TikaParseContextProvider {
 	 * @return A {@code ParseContext} instance used by the Tika bridge to parse the data
 	 * @see <a href="http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html">Tika API</a>
 	 */
-	public ParseContext getParseContext(String name, Object value);
+	ParseContext getParseContext(String name, Object value);
+
 }

@@ -48,5 +48,5 @@ public @interface NumericField {
 	/**
 	 * Default precision step, mimicking  Lucene's default precision step value.
 	 */
-	static final int PRECISION_STEP_DEFAULT = 4;
+	int PRECISION_STEP_DEFAULT = 4;
 }

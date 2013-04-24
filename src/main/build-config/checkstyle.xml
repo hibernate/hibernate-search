@@ -65,7 +65,7 @@
         <!-- <module name="WhitespaceAround" /> -->
         <module name="TypecastParenPad" />
         <!-- <module name="DeclarationOrder" /> -->
-        <!-- <module name="RedundantModifier"/> -->
+        <module name="RedundantModifier"/>
 
         <module name="MethodParamPad">
             <property name="option" value="nospace" />

@@ -31,7 +31,8 @@ import org.hibernate.search.stat.Statistics;
  * @author Hardy Ferentschik
  */
 public interface StatisticsInfoMBean extends Statistics {
-	public static final String STATISTICS_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=StatisticsInfoMBean";
-}
 
+	String STATISTICS_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=StatisticsInfoMBean";
+
+}
 

@@ -63,7 +63,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 *
 	 * @return The statistics implementor.
 	 */
-	public StatisticsImplementor getStatisticsImplementor();
+	StatisticsImplementor getStatisticsImplementor();
 
 	/**
 	 * @return true if we are allowed to inspect entity state to

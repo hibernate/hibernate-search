@@ -33,6 +33,7 @@ import java.util.Set;
  * @author Hardy Ferentschik
  */
 public interface Statistics {
+
 	/**
 	 * Reset all statistics.
 	 */
@@ -88,12 +89,12 @@ public interface Statistics {
 	/**
 	 * Are statistics logged
 	 */
-	public boolean isStatisticsEnabled();
+	boolean isStatisticsEnabled();
 
 	/**
 	 * Enable statistics logs (this is a dynamic parameter)
 	 */
-	public void setStatisticsEnabled(boolean b);
+	void setStatisticsEnabled(boolean b);
 
 	/**
 	 * Returns the Hibernate Search version.
@@ -126,5 +127,4 @@ public interface Statistics {
 	 */
 	Map<String, Integer> indexedEntitiesCount();
 }
-
 

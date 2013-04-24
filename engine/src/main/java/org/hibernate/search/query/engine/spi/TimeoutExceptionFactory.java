@@ -30,6 +30,6 @@ import org.apache.lucene.search.Query;
  */
 public interface TimeoutExceptionFactory {
 
-	public RuntimeException createTimeoutException(String message, Query query);
+	RuntimeException createTimeoutException(String message, Query query);
 
 }

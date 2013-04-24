@@ -31,7 +31,7 @@ package org.hibernate.search.jmx;
  */
 public interface IndexControlMBean {
 
-	public static final String INDEX_CTRL_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=IndexControlMBean";
+	String INDEX_CTRL_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=IndexControlMBean";
 
 	/**
 	 * Sets the batch size for the mass indexer.

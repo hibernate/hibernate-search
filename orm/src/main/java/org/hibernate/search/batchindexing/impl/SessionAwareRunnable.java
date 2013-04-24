@@ -26,5 +26,7 @@ import org.hibernate.Session;
  * @author Emmanuel Bernard
  */
 public interface SessionAwareRunnable {
-	public void run(Session session);
+
+	void run(Session session);
+
 }

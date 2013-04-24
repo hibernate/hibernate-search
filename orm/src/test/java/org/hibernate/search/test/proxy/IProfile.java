@@ -31,11 +31,11 @@ import java.util.Set;
  */
 public interface IProfile {
 
-	public Integer getId();
+	Integer getId();
 
-	public void setId(Integer id);
+	void setId(Integer id);
 
-	public Set<IComment> getComments();
+	Set<IComment> getComments();
 
-	public void setComments(Set<IComment> c);
+	void setComments(Set<IComment> c);
 }
