@@ -805,8 +805,7 @@
                     <executions>
                         <execution>
                             <id>check-style</id>
-                            <phase>compile</phase>
-                            <!-- <phase>verify</phase> -->
+                            <phase>verify</phase>
                             <goals>
                                 <goal>checkstyle</goal>
                             </goals>
