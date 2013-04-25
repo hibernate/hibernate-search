@@ -41,15 +41,15 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {
-	
+
 	public static final TransactionalSelectionVisitor INSTANCE = new TransactionalSelectionVisitor();
-	
+
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
 	private final FlushSelectionDelegate flushDelegate = new FlushSelectionDelegate();
-	
+
 	private TransactionalSelectionVisitor() {
 		// use INSTANCE as this delegator is stateless
 	}
@@ -57,7 +57,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 	public ContextAwareSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
-	
+
 	public ContextAwareSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
@@ -93,7 +93,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		}
 
 	}
-	
+
 	private static class DeleteSelectionDelegate implements ContextAwareSelectionDelegate {
 
 		@Override

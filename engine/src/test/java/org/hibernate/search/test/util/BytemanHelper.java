@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -60,7 +60,7 @@ public class BytemanHelper extends Helper {
 
 	public void assertBooleanValue(boolean actual, boolean expected) {
 		if ( actual != expected ) {
-			fail("Unexpected boolean value");
+			fail( "Unexpected boolean value" );
 		}
 	}
 

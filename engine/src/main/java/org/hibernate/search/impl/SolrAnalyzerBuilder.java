@@ -108,7 +108,7 @@ final class SolrAnalyzerBuilder {
 			else {
 				localResourceLoader = defaultResourceLoader;
 			}
-			( ( ResourceLoaderAware ) processor ).inform( localResourceLoader );
+			( (ResourceLoaderAware) processor ).inform( localResourceLoader );
 		}
 	}
 

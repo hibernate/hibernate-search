@@ -47,9 +47,9 @@ public class TokenFilterDefMapping {
 	 * {@code &#064;TokenFilterDef(, ... params={&#064;Parameter(name="name", value="value"), ...} }
 	 */
 	public TokenFilterDefMapping param(String name, String value) {
-		Map<String, Object> param = SearchMapping.addElementToAnnotationArray(filter, "params");
-		param.put("name", name);
-		param.put("value", value);
+		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( filter, "params" );
+		param.put( "name", name );
+		param.put( "value", value );
 		return this;
 	}
 
@@ -57,7 +57,7 @@ public class TokenFilterDefMapping {
 	 * {@code &#064;TokenFilterDef(factory=factory)}
 	 */
 	public TokenFilterDefMapping filter(Class<? extends TokenFilterFactory> factory) {
-		return new TokenFilterDefMapping(factory, analyzerDef, mapping );
+		return new TokenFilterDefMapping( factory, analyzerDef, mapping );
 	}
 
 	public EntityMapping entity(Class<?> entityType) {
@@ -65,11 +65,11 @@ public class TokenFilterDefMapping {
 	}
 
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
-		return new AnalyzerDefMapping(name, tokenizerFactory, mapping);
+		return new AnalyzerDefMapping( name, tokenizerFactory, mapping );
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
-		return new FullTextFilterDefMapping(mapping, name, impl );
+		return new FullTextFilterDefMapping( mapping, name, impl );
 	}
 
 }

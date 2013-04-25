@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -30,6 +30,6 @@ import org.apache.lucene.document.Document;
 public class FloatNumericFieldBridge extends NumericFieldBridge {
 
 	public Object get(String name, Document document) {
-		return Float.valueOf(document.getFieldable(name).stringValue());
+		return Float.valueOf( document.getFieldable( name ).stringValue() );
 	}
 }

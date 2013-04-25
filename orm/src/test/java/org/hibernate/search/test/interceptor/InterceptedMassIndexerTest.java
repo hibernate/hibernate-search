@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -47,7 +47,7 @@ public class InterceptedMassIndexerTest extends SearchTestCase {
 
 	/**
 	 * Rebuild the index using a MassIndexer
-	 * 
+	 *
 	 * @throws InterruptedException
 	 */
 	private void rebuildIndexes() throws InterruptedException {
@@ -64,7 +64,7 @@ public class InterceptedMassIndexerTest extends SearchTestCase {
 
 	/**
 	 * Verify how many blogs we have in the index
-	 * 
+	 *
 	 * @param expectedBooks
 	 */
 	private void assertIndexedBooks(int expectedBooks) {

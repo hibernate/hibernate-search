@@ -23,6 +23,10 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
@@ -35,7 +39,6 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Sanne Grinovero

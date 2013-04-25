@@ -92,7 +92,7 @@ public class JNDIHelper {
 		Properties result = new Properties();
 		for ( Object property : properties.keySet() ) {
 			if ( property instanceof String ) {
-				String s = ( String ) property;
+				String s = (String) property;
 				if ( s.indexOf( prefix ) > -1 && !specialProps.contains( s ) ) {
 					result.setProperty( s.substring( prefix.length() ), properties.getProperty( s ) );
 				}

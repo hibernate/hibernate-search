@@ -37,17 +37,17 @@ import org.hibernate.search.util.logging.impl.Log;
  * @since 3.2
  */
 public class LogErrorHandler implements ErrorHandler {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	public void handle(ErrorContext context) {
-		
+
 		final List<LuceneWork> failingOperations = context.getFailingOperations();
 		final LuceneWork primaryFailure = context.getOperationAtFault();
 		final Throwable exceptionThatOccurred = context.getThrowable();
-		
+
 		final StringBuilder errorMsg = new StringBuilder();
-		
+
 		if ( exceptionThatOccurred != null ) {
 			errorMsg.append( "Exception occurred " )
 				.append( exceptionThatOccurred )
@@ -57,14 +57,14 @@ public class LogErrorHandler implements ErrorHandler {
 			errorMsg.append( "Primary Failure:\n" );
 			appendFailureMessage( errorMsg, primaryFailure );
 		}
-		
+
 		if ( ! failingOperations.isEmpty() ) {
 			errorMsg.append( "Subsequent failures:\n" );
 			for ( LuceneWork workThatFailed : failingOperations ) {
 				appendFailureMessage( errorMsg, workThatFailed );
 			}
 		}
-		
+
 		handleException( errorMsg.toString(), exceptionThatOccurred );
 	}
 

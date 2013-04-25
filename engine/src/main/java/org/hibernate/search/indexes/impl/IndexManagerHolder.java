@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -21,7 +21,6 @@
 package org.hibernate.search.indexes.impl;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,7 +69,7 @@ public class IndexManagerHolder {
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 
-	private final Map<String, IndexManager> indexManagersRegistry= new ConcurrentHashMap<String, IndexManager>();
+	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
 	//I currently think it's easier to not hide sharding implementations in a custom
 	//IndexManager to make it easier to explicitly a)detect duplicates b)start-stop
@@ -190,10 +189,10 @@ public class IndexManagerHolder {
 
 	@SuppressWarnings( "unchecked" )
 	private <T,U> MutableEntityIndexBinding<T> buildTypesafeMutableEntityBinder(Class<T> type, IndexManager[] providers,
-																			  IndexShardingStrategy shardingStrategy,
-																			  Similarity similarityInstance,
-																			  EntityIndexingInterceptor<U> interceptor) {
-		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T> ) interceptor;
+																		IndexShardingStrategy shardingStrategy,
+																		Similarity similarityInstance,
+																		EntityIndexingInterceptor<U> interceptor) {
+		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T>) interceptor;
 		return new MutableEntityIndexBinding<T>( shardingStrategy, similarityInstance, providers, safeInterceptor );
 	}
 
@@ -226,7 +225,8 @@ public class IndexManagerHolder {
 		try {
 			manager.initialize( indexName, indexProps, context );
 			return manager;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw log.unableToInitializeIndexManager( indexName, e );
 		}
 	}
@@ -335,7 +335,7 @@ public class IndexManagerHolder {
 	 * @return the IndexManager, or null if it doesn't exist
 	 */
 	public IndexManager getIndexManager(String targetIndexName) {
-		if(targetIndexName == null) {
+		if ( targetIndexName == null ) {
 			throw log.nullIsInvalidIndexName();
 		}
 		return indexManagersRegistry.get( targetIndexName );

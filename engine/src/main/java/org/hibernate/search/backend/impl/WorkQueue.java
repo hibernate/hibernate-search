@@ -52,18 +52,18 @@ public class WorkQueue {
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
 
-	public boolean isSealedAndUnchanged() {
-		return sealedAndUnchanged;
-	}
-
 	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.plan = new WorkPlan( searchFactoryImplementor );
 	}
-	
+
 	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor, WorkPlan plan) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.plan = plan;
+	}
+
+	public boolean isSealedAndUnchanged() {
+		return sealedAndUnchanged;
 	}
 
 	public void add(Work work) {
@@ -86,7 +86,9 @@ public class WorkQueue {
 	}
 
 	public List<LuceneWork> getSealedQueue() {
-		if ( sealedQueue == null ) throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
+		if ( sealedQueue == null ) {
+			throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
+		}
 		this.sealedAndUnchanged = false;
 		return sealedQueue;
 	}
@@ -113,8 +115,9 @@ public class WorkQueue {
 		}
 		plan.clear();
 		this.sealedAndUnchanged = false;
-		if ( sealedQueue != null )
+		if ( sealedQueue != null ) {
 			sealedQueue.clear();
+		}
 	}
 
 	/**
@@ -138,5 +141,5 @@ public class WorkQueue {
 			setSealedQueue( luceneWorkPlan );
 		}
 	}
-	
+
 }

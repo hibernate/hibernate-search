@@ -32,10 +32,10 @@ import javax.persistence.ManyToOne;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
-@Indexed(index="DVDS")
+@Indexed(index = "DVDS")
 @Entity
 public class Dvd implements TitleAble {
-	
+
 	private long unusuallyNamedIdentifier;
 	private String title;
 	private Nation firstPublishedIn;
@@ -54,18 +54,18 @@ public class Dvd implements TitleAble {
 	public String getTitle() {
 		return title;
 	}
-	
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
-	@ManyToOne(optional=false, fetch=FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	public Nation getFirstPublishedIn() {
 		return firstPublishedIn;
 	}
-	
+
 	public void setFirstPublishedIn(Nation firstPublishedIn) {
 		this.firstPublishedIn = firstPublishedIn;
 	}
-	
+
 }

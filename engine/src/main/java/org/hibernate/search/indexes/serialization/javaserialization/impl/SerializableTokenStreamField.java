@@ -28,6 +28,7 @@ import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableTokenStreamField extends SerializableField {
+
 	private SerializableTokenStream value;
 	private SerializableTermVector termVector;
 

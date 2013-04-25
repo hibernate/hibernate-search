@@ -48,9 +48,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  * @author Sanne Grinovero
  */
 public final class LuceneBackendResources {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	private final LuceneWorkVisitor visitor;
 	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
@@ -61,7 +61,7 @@ public final class LuceneBackendResources {
 
 	private final ReadLock readLock;
 	private final WriteLock writeLock;
-	
+
 	LuceneBackendResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, Properties props, AbstractWorkspaceImpl workspace) {
 		this.indexName = indexManager.getIndexName();
 		this.errorHandler = context.getErrorHandler();

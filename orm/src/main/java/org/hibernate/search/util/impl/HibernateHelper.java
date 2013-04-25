@@ -59,7 +59,7 @@ public final class HibernateHelper {
 
 	public static Object unproxy(Object value) {
 		if ( value instanceof HibernateProxy ) {
-			value = ( ( HibernateProxy ) value ).getHibernateLazyInitializer().getImplementation();
+			value = ( (HibernateProxy) value ).getHibernateLazyInitializer().getImplementation();
 		}
 		return value;
 	}

@@ -56,7 +56,7 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Hardy Ferentschik
  */
 public class StatisticsImpl implements Statistics, StatisticsImplementor {
-	
+
 	private AtomicLong searchQueryCount = new AtomicLong();
 	private AtomicLong searchExecutionTotalTime = new AtomicLong();
 	private AtomicLong searchExecutionMaxTime = new AtomicLong();
@@ -127,9 +127,9 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		try {
 			boolean isLongestQuery = false;
 			for ( long old = searchExecutionMaxTime.get();
-				  ( time > old ) && ( isLongestQuery = searchExecutionMaxTime.compareAndSet( old, time ) );
-				  old = searchExecutionMaxTime.get() ) {
-				;
+					( time > old ) && ( isLongestQuery = searchExecutionMaxTime.compareAndSet( old, time ) );
+					old = searchExecutionMaxTime.get() ) {
+				// no-op
 			}
 			if ( isLongestQuery ) {
 				queryExecutionMaxTimeQueryString = searchString;
@@ -172,9 +172,9 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		readLock.lock();
 		try {
 			for ( long old = objectLoadMaxTime.get();
-				  ( time > old ) && ( objectLoadMaxTime.compareAndSet( old, time ) );
-				  old = objectLoadMaxTime.get() ) {
-				;
+				( time > old ) && ( objectLoadMaxTime.compareAndSet( old, time ) );
+				old = objectLoadMaxTime.get() ) {
+				//no-op
 			}
 			objectLoadedCount.addAndGet( numberOfObjectsLoaded );
 			objectLoadTotalTime.addAndGet( time );

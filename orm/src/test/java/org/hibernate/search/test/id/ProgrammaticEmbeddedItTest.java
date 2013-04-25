@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -36,7 +36,7 @@ import org.hibernate.search.test.SearchTestCase;
 
 /**
  * Copied from EmbeddedIdTest, but using programmatic mapping instead.
- * 
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
@@ -61,7 +61,7 @@ public class ProgrammaticEmbeddedItTest extends SearchTestCase {
 				new TermQuery( new Term( "id.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
-		emmanuel = ( PlainPerson ) results.get( 0 );
+		emmanuel = (PlainPerson) results.get( 0 );
 		emmanuel.setFavoriteColor( "Red" );
 		tx.commit();
 		s.clear();
@@ -71,7 +71,7 @@ public class ProgrammaticEmbeddedItTest extends SearchTestCase {
 				new TermQuery( new Term( "id.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
-		emmanuel = ( PlainPerson ) results.get( 0 );
+		emmanuel = (PlainPerson) results.get( 0 );
 		assertEquals( "Red", emmanuel.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();

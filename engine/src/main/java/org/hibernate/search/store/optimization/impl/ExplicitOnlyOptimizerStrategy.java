@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -40,7 +39,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * This OptimizerStrategy will only optimize the index when forced to,
  * using an explicit invocation to {@link SearchFactory#optimize()} or
  * {@link SearchFactory#optimize(Class)}
- * 
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
@@ -56,7 +55,7 @@ public class ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 		boolean acquired = optimizerIsBusy.compareAndSet( false, true );
 		if ( acquired ) {
 			try {
-				writer.forceMerge(1, true);
+				writer.forceMerge( 1, true );
 			}
 			catch (IOException e) {
 				throw new SearchException( "Unable to optimize directoryProvider: " + indexName, e );

@@ -67,7 +67,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 
 		EmailAddress emailAddress = new EmailAddress();
 		emailAddress.setAddress( "foo@foobar.com" );
-		emailAddress.setDefaultAddress(true);
+		emailAddress.setDefaultAddress( true );
 
 		person.addEmailAddress( emailAddress );
 
@@ -88,7 +88,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 		// Now try to delete
 		tx = s.beginTransaction();
 		int id = person.getId();
-		person = ( SpecialPerson ) s.get( SpecialPerson.class, id );
+		person = (SpecialPerson) s.get( SpecialPerson.class, id );
 		s.delete( person );
 		tx.commit();
 
@@ -119,7 +119,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 	 */
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
-		SearchFactoryImplementor searchFactory = ( SearchFactoryImplementor ) fullTextSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 
 		// create test entity
 		SpecialPerson person = new SpecialPerson();
@@ -127,29 +127,29 @@ public class WorkDuplicationTest extends SearchTestCase {
 
 		EmailAddress emailAddress = new EmailAddress();
 		emailAddress.setAddress( "foo@foobar.com" );
-		emailAddress.setDefaultAddress(true);
+		emailAddress.setDefaultAddress( true );
 
 		person.addEmailAddress( emailAddress );
 
 		WorkQueue plannerEngine = new WorkQueue( searchFactory );
-		
+
 		plannerEngine.add( new Work<SpecialPerson>( person, 1, WorkType.ADD ) );
-		
+
 		plannerEngine.prepareWorkPlan();
 		List<LuceneWork> sealedQueue = plannerEngine.getSealedQueue();
 
-		assertEquals("There should only be one job in the queue", 1, sealedQueue.size());
-		assertTrue("Wrong job type", sealedQueue.get(0) instanceof AddLuceneWork );
+		assertEquals( "There should only be one job in the queue", 1, sealedQueue.size() );
+		assertTrue( "Wrong job type", sealedQueue.get( 0 ) instanceof AddLuceneWork );
 
 		plannerEngine.add( new Work<SpecialPerson>( person, 1, WorkType.DELETE ) );
 		plannerEngine.prepareWorkPlan();
 		sealedQueue = plannerEngine.getSealedQueue();
 
-		assertEquals("Jobs should have countered each other", 0, sealedQueue.size());
+		assertEquals( "Jobs should have countered each other", 0, sealedQueue.size() );
 
 		fullTextSession.close();
-	}	
-	
+	}
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
 	}

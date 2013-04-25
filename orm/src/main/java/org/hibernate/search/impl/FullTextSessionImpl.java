@@ -66,7 +66,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.engine.transaction.spi.TransactionCoordinator;
 import org.hibernate.event.spi.EventSource;
-import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.persister.entity.EntityPersister;

@@ -88,7 +88,7 @@ public class ShardsTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		a = ( Animal ) s.get( Animal.class, 1 );
+		a = (Animal) s.get( Animal.class, 1 );
 		a.setName( "Mouse" );
 		Furniture fur = new Furniture();
 		fur.setColor( "dark blue" );
@@ -161,7 +161,7 @@ public class ShardsTest extends SearchTestCase {
 		}
 
 		tx = s.beginTransaction();
-		a = ( Animal ) s.get( Animal.class, 1 );
+		a = (Animal) s.get( Animal.class, 1 );
 		a.setName( "Mouse" );
 		tx.commit();
 

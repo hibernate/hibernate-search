@@ -40,7 +40,8 @@ public class EmbeddedEntity {
 		impl = PaddedIntegerBridge.class,
 		params = { @Parameter(name = "padding", value = "4") }
 	)
-	@Column(name="num")
+
+	@Column(name = "num")
 	private Integer number;
 
 	public String getEmbeddedField() {

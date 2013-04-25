@@ -84,17 +84,17 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 					serializer.addPurgeAll( work.getEntityClass().getName() );
 				}
 				else if (work instanceof DeleteLuceneWork) {
-					processId(work, serializer);
+					processId( work, serializer );
 					serializer.addDelete( work.getEntityClass().getName() );
 				}
 				else if (work instanceof AddLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
-					processId(work, serializer);
+					processId( work, serializer );
 					serializer.addAdd( work.getEntityClass().getName(),  work.getFieldToAnalyzerMap() );
 				}
 				else if (work instanceof UpdateLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
-					processId(work, serializer);
+					processId( work, serializer );
 					serializer.addUpdate( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
 				}
 			}
@@ -113,16 +113,16 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 	private void processId(LuceneWork work, Serializer serializer) {
 		Serializable id = work.getId();
 		if ( id instanceof Integer ) {
-			serializer.addIdAsInteger( ( Integer ) id );
+			serializer.addIdAsInteger( (Integer) id );
 		}
 		else if ( id instanceof Long ) {
-			serializer.addIdAsLong( ( Long ) id );
+			serializer.addIdAsLong( (Long) id );
 		}
 		else if ( id instanceof Float ) {
-			serializer.addIdAsFloat( ( Float ) id );
+			serializer.addIdAsFloat( (Float) id );
 		}
 		else if ( id instanceof Double ) {
-			serializer.addIdAsDouble( ( Double ) id );
+			serializer.addIdAsDouble( (Double) id );
 		}
 		else if ( id instanceof String ) {
 			serializer.addIdAsString( id.toString() );
@@ -157,8 +157,8 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 	private void buildDocument(Document document, Serializer serializer) {
 		List<Fieldable> docFields = document.getFields();
 		serializer.fields( docFields );
-		for(Fieldable fieldable : docFields) {
-			if (fieldable instanceof NumericField) {
+		for ( Fieldable fieldable : docFields ) {
+			if ( fieldable instanceof NumericField ) {
 				NumericField safeField = (NumericField) fieldable;
 				LuceneNumericFieldContext context = new LuceneNumericFieldContext( (NumericField) fieldable );
 				switch ( safeField.getDataType() ) {

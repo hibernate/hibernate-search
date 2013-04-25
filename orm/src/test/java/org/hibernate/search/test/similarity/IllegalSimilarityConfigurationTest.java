@@ -23,9 +23,11 @@
  */
 package org.hibernate.search.test.similarity;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Verifies that SearchFactory properly checks for illegal combinations
@@ -33,7 +35,7 @@ import static org.junit.Assert.*;
  * Similarity implementation.
  * Also when opening a multireader on multiple indexes, all of these should
  * use the same Similarity implementation.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class IllegalSimilarityConfigurationTest {
@@ -44,18 +46,19 @@ public class IllegalSimilarityConfigurationTest {
 		FullTextSessionBuilder builder = null;
 		try {
 			builder = new FullTextSessionBuilder()
-					.addAnnotatedClass(Can.class)
-					.addAnnotatedClass(Trash.class).build();
-		} catch (Exception e) {
+					.addAnnotatedClass( Can.class )
+					.addAnnotatedClass( Trash.class ).build();
+		}
+		catch (Exception e) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertTrue( "A valid configuration could not be started.", configurationIsLegal );
 	}
-	
+
 	@Test
 	public void testInconsistentSimilarityInClassHierarchy() {
 		boolean configurationIsLegal = true;
@@ -64,17 +67,18 @@ public class IllegalSimilarityConfigurationTest {
 			builder = new FullTextSessionBuilder()
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( LittleTrash.class ).build();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: same similarity"
 				+ " must be used across class hierarchy", configurationIsLegal );
 	}
-	
+
 	@Test
 	public void testInconsistentSimilarityInClassSharingAnIndex() {
 		boolean configurationIsLegal = true;
@@ -83,17 +87,18 @@ public class IllegalSimilarityConfigurationTest {
 			builder = new FullTextSessionBuilder()
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( Sink.class ).build();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: two entities"
 				+ "sharing the same index are using a different similarity", configurationIsLegal );
 	}
-	
+
 	@Test
 	public void testImplicitSimilarityInheritanceIsValid() {
 		boolean configurationIsLegal = true;
@@ -102,16 +107,17 @@ public class IllegalSimilarityConfigurationTest {
 			builder = new FullTextSessionBuilder()
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( ProperTrashExtension.class ).build();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertTrue( "Valid configuration could not be built", configurationIsLegal );
 	}
-	
+
 	@Test
 	public void testInvalidToOverrideParentsSimilarity() {
 		boolean configurationIsLegal = true;
@@ -120,11 +126,12 @@ public class IllegalSimilarityConfigurationTest {
 			builder = new FullTextSessionBuilder()
 					.addAnnotatedClass( Can.class )
 					.addAnnotatedClass( SmallerCan.class ).build();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if (builder!=null)
+			if ( builder != null )
 				builder.close();
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: child entity"

@@ -59,11 +59,11 @@ public class SearchMapping {
 	public AnalyzerDefMapping analyzerDef(String name, Class<? extends TokenizerFactory> tokenizerFactory) {
 		return new AnalyzerDefMapping(name, tokenizerFactory, this);
 	}
-	
+
 	public EntityMapping entity(Class<?> entityType) {
 		return new EntityMapping(entityType, this);
 	}
-	
+
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
 		return new FullTextFilterDefMapping(this, name, impl );
 	}
@@ -74,7 +74,7 @@ public class SearchMapping {
 	 */
 
 	static Map<String, Object> addElementToAnnotationArray(Map<String, Object> containingAnnotation,
-													  String attributeName) {
+													String attributeName) {
 		@SuppressWarnings("unchecked") List<Map<String, Object>> array = (List<Map<String, Object>>) containingAnnotation.get( attributeName );
 		if ( array == null) {
 			array = new ArrayList<Map<String, Object>>();
@@ -92,14 +92,14 @@ public class SearchMapping {
 	EntityDescriptor getEntity(Class<?> entityType) {
 		EntityDescriptor entity = entities.get( entityType );
 		if (entity == null) {
-			entity = new EntityDescriptor(entityType);
+			entity = new EntityDescriptor( entityType );
 			entities.put( entityType, entity );
 		}
 		return entity;
 	}
 
 	void addFulltextFilterDef(Map<String, Object> fullTextFilterDef) {
-		fullTextFilterDefs.add(fullTextFilterDef);
+		fullTextFilterDefs.add( fullTextFilterDef );
 	}
-	
+
 }

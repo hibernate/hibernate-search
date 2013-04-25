@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -40,7 +40,7 @@ import org.junit.Test;
 /**
  * Tests to verify configuration options regarding custom OptimizerStrategy
  * implementations.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class OptimizerStrategyLoadTest {
@@ -65,7 +65,7 @@ public class OptimizerStrategyLoadTest {
 		verifyOptimizerImplementationIs( IncrementalOptimizerStrategy.class, cfg );
 	}
 
-	@Test(expected=SearchException.class)
+	@Test(expected = SearchException.class)
 	public void testIllegalImplementation() {
 		ManualConfiguration cfg = new ManualConfiguration();
 		cfg.addProperty( "hibernate.search.default.optimizer.implementation", "5" );
@@ -111,7 +111,7 @@ public class OptimizerStrategyLoadTest {
 	}
 
 	public static final class CustomOptimizer extends IncrementalOptimizerStrategy {
-		
+
 	}
 
 }

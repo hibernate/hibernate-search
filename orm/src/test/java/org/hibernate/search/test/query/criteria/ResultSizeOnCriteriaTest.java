@@ -50,25 +50,25 @@ public class ResultSizeOnCriteriaTest extends SearchTestCase {
 		// Search
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
-		FullTextSession fullTextSession = Search.getFullTextSession(session);
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
 
 		//Write query
-		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(Tractor.class).get();
-		Query query = qb.keyword().wildcard().onField("owner").matching("p*").createQuery();
+		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Tractor.class ).get();
+		Query query = qb.keyword().wildcard().onField( "owner" ).matching( "p*" ).createQuery();
 
 
 		//set criteria
-		Criteria criteria = session.createCriteria(Tractor.class);
-		criteria.add( Restrictions.eq("hasColor", Boolean.FALSE) );
+		Criteria criteria = session.createCriteria( Tractor.class );
+		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
 
-		FullTextQuery hibQuery = fullTextSession.createFullTextQuery(query, Tractor.class).setCriteriaQuery(criteria);
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Tractor.class ).setCriteriaQuery( criteria );
 		List<Tractor> result = hibQuery.list();
 		//Result size is ok
-		assertEquals(1, result.size());
+		assertEquals( 1, result.size() );
 
-		for (Tractor tractor : result) {
+		for ( Tractor tractor : result ) {
 			assertThat( tractor.isHasColor() ).isFalse();
-			assertThat( tractor.getOwner() ).startsWith("P");
+			assertThat( tractor.getOwner() ).startsWith( "P" );
 		}
 
 		//Compare with resultSize
@@ -84,7 +84,7 @@ public class ResultSizeOnCriteriaTest extends SearchTestCase {
 		tx.commit();
 
 		tx = session.beginTransaction();
-		for(Object element : session.createQuery( "select t from Tractor t" ).list() ) {
+		for ( Object element : session.createQuery( "select t from Tractor t" ).list() ) {
 			session.delete( element );
 		}
 		tx.commit();
@@ -98,20 +98,20 @@ public class ResultSizeOnCriteriaTest extends SearchTestCase {
 		Transaction tx = s.beginTransaction();
 
 		Tractor tractor = new Tractor();
-		tractor.setKurztext("tractor");
-		tractor.setOwner("Paul");
+		tractor.setKurztext( "tractor" );
+		tractor.setOwner( "Paul" );
 		tractor.removeColor();
-		s.persist(tractor);
+		s.persist( tractor );
 
 		Tractor tractor2 = new Tractor();
-		tractor2.setKurztext("tractor");
-		tractor2.setOwner("Pierre");
-		s.persist(tractor2);
+		tractor2.setKurztext( "tractor" );
+		tractor2.setOwner( "Pierre" );
+		s.persist( tractor2 );
 
 		Tractor tractor3 = new Tractor();
-		tractor3.setKurztext("tractor");
-		tractor3.setOwner("Jacques");
-		s.persist(tractor3);
+		tractor3.setKurztext( "tractor" );
+		tractor3.setOwner( "Jacques" );
+		s.persist( tractor3 );
 
 		tx.commit();
 		s.close();

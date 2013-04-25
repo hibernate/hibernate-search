@@ -30,20 +30,20 @@ public interface RangeFacet<T> extends Facet {
 	/**
 	 * @return the lower boundary of this range
 	 */
-	public T getMin();
+	T getMin();
 
 	/**
 	 * @return the upper boundary of this range
 	 */
-	public T getMax();
+	T getMax();
 
 	/**
 	 * @return {@code true} if the lower boundary is included in the range, {@code false} otherwise
 	 */
-	public boolean isIncludeMin();
+	boolean isIncludeMin();
 
 	/**
 	 * @return {@code true} if the upper boundary is included in the range, {@code false} otherwise
 	 */
-	public boolean isIncludeMax();
+	boolean isIncludeMax();
 }

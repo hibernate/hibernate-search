@@ -64,7 +64,7 @@ class ConnectedPhraseContext implements PhraseContext {
 	}
 
 	public PhraseContext filteredBy(Filter filter) {
-		queryCustomizer.filteredBy(filter);
+		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 }

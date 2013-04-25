@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -38,7 +38,7 @@ class Helper {
 	 * This must be done prior to starting the transaction
 	 */
 	public static Transaction getTransactionAndMarkForJoin(StatelessSession session)
-			throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException{
+			throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		Transaction transaction = session.getTransaction();
 		doMarkforJoined( transaction );
 		return transaction;

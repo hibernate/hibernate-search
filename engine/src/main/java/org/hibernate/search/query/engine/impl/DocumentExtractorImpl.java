@@ -81,15 +81,15 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private final ConversionContext exceptionWrap = new ContextualExceptionBridgeHelper();
 
 	public DocumentExtractorImpl(QueryHits queryHits,
-								 SearchFactoryImplementor searchFactoryImplementor,
-								 String[] projection,
-								 Set<String> idFieldNames,
-								 boolean allowFieldSelection,
-								 IndexSearcherWithPayload searcher,
-								 Object query,
-								 int firstIndex,
-								 int maxIndex,
-								 Set<Class<?>> classesAndSubclasses) {
+								SearchFactoryImplementor searchFactoryImplementor,
+								String[] projection,
+								Set<String> idFieldNames,
+								boolean allowFieldSelection,
+								IndexSearcherWithPayload searcher,
+								Object query,
+								int firstIndex,
+								int maxIndex,
+								Set<Class<?>> classesAndSubclasses) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		if ( projection != null ) {
 			this.projection = projection.clone();
@@ -301,7 +301,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			return queryHits.doc( index );
 		}
 	}
-	
+
 	/**
 	 * In rare cases the Lucene FieldCache might fail to return a value, at this point we already extracted
 	 * the Document so we need to repeat the process to extract the missing field only.

@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -50,7 +50,7 @@ import org.junit.Assert;
  * Strongly inspired to RamDirectoryTest, verifies the searchability of unflushed
  * modifications on an NRT IndexManager.
  * Implicitly verifies that the NRTIndexManager is setup as configured.
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class BasicNRTFunctionalityTest extends SearchTestCase {
@@ -100,12 +100,12 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 	}
 
 	public void testMultipleEntitiesPerIndex() throws Exception {
-		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( ( SessionFactoryImplementor ) getSessions() );
+		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( (SessionFactoryImplementor) getSessions() );
 		IndexManager documentsIndexManager = searchFactoryBySFI.getAllIndexesManager().getIndexManager( "Documents" );
 		Assert.assertNotNull( documentsIndexManager );
 		Assert.assertTrue( documentsIndexManager.getClass().equals( org.hibernate.search.indexes.impl.NRTIndexManager.class ) );
 		NRTIndexManager indexManager = (NRTIndexManager) documentsIndexManager;
-		
+
 		Session s = getSessions().openSession();
 		s.getTransaction().begin();
 		Document document =

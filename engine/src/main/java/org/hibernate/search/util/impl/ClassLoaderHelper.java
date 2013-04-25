@@ -105,7 +105,7 @@ public class ClassLoaderHelper {
 	 */
 	@Deprecated
 	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad,
-										 Class<?> caller, String componentDescription) {
+										Class<?> caller, String componentDescription) {
 		return instanceFromName( targetSuperType, classNameToLoad, caller.getClassLoader(), componentDescription );
 	}
 

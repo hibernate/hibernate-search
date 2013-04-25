@@ -27,11 +27,13 @@ package org.hibernate.search.test.embedded;
  * @author Emmanuel Bernard
  */
 public interface Person {
-	public String getName();
 
-	public void setName(String name);
+	String getName();
 
-	public Address getAddress();
+	void setName(String name);
 
-	public void setAddress(Address address);
+	Address getAddress();
+
+	void setAddress(Address address);
+
 }

@@ -66,7 +66,7 @@ public class DoubleInsertEmbeddedTest extends SearchTestCase {
 		s.getTransaction().commit();
 		s.close();
 	}
-	
+
 	public PersonalContact createTestData() {
 		Address address = new Address();
 		address.setAddress1( "TEST1" );
@@ -105,7 +105,7 @@ public class DoubleInsertEmbeddedTest extends SearchTestCase {
 		s.close();
 		return contact;
 	}
-	
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Phone.class,

@@ -40,5 +40,7 @@ import org.hibernate.search.analyzer.Discriminator;
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface AnalyzerDiscriminator {
-	public Class<? extends Discriminator> impl();
+
+	Class<? extends Discriminator> impl();
+
 }

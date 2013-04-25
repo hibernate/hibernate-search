@@ -48,8 +48,8 @@ public class Restaurant {
 	public Restaurant(Integer id, String name, String address,double latitude, double longitude) {
 		this.id = id;
 		this.name = name;
-		this.position= new Position();
-		this.position.address= address;
+		this.position = new Position();
+		this.position.address = address;
 		this.position.latitude = latitude;
 		this.position.longitude = longitude;
 	}

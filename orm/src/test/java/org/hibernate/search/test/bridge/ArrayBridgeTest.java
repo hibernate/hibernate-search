@@ -219,7 +219,7 @@ public class ArrayBridgeTest extends SearchTestCase {
 					.getName() );
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<ArrayBridgeTestEntity> findEmbeddedNullResults(String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
@@ -229,7 +229,7 @@ public class ArrayBridgeTest extends SearchTestCase {
 				.matching( value ).createQuery();
 		return fullTextSession.createFullTextQuery( query, ArrayBridgeTestEntity.class ).list();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<ArrayBridgeTestEntity> findResults(String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()

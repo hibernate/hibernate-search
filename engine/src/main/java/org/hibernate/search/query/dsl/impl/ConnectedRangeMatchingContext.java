@@ -43,8 +43,8 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 	private int firstOfContext = 0;
 
 	public ConnectedRangeMatchingContext(String fieldName,
-										 QueryCustomizer queryCustomizer,
-										 QueryBuildingContext queryContext) {
+										QueryCustomizer queryCustomizer,
+										QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.rangeContext = new RangeQueryContext();
@@ -71,7 +71,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		}
 
 		public RangeTerminationExcludable to(T to) {
-			mother.rangeContext.setTo(to);
+			mother.rangeContext.setTo( to );
 			return new ConnectedMultiFieldsRangeQueryBuilder(
 					mother.rangeContext,
 					mother.queryCustomizer,

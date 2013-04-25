@@ -104,7 +104,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 
 		slaveSession = getSlaveSession();
 		tx = slaveSession.beginTransaction();
-		ts = ( TShirt ) slaveSession.get( TShirt.class, ts.getId() );
+		ts = (TShirt) slaveSession.get( TShirt.class, ts.getId() );
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 
@@ -166,7 +166,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
 		applyJGroupsChannelConfiguration( cfg );
 	}
-	
+
 	/**
 	 * Used to isolate the JGroups channel name from other potentially running tests
 	 * @param cfg the configuration to isolate

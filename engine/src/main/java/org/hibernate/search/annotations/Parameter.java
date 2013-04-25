@@ -32,7 +32,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author Emmanuel Bernard
  */
-@Target({})
+@Target({ })
 @Retention(RUNTIME)
 public @interface Parameter {
 	String name();

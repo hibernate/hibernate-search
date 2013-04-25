@@ -46,21 +46,23 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 
 	private static final Log log = LoggerFactory.make();
 	private static final int MAX_IN_CLAUSE = 500;
-	
+
 	public static final CriteriaObjectsInitializer INSTANCE = new CriteriaObjectsInitializer();
-	
+
 	private CriteriaObjectsInitializer() {
 		// use INSTANCE instead of constructor
 	}
 
 	public void initializeObjects(EntityInfo[] entityInfos,
-										 Criteria criteria, Class<?> entityType,
-										 SearchFactoryImplementor searchFactoryImplementor,
-										 TimeoutManager timeoutManager,
-										 Session session) {
+										Criteria criteria, Class<?> entityType,
+										SearchFactoryImplementor searchFactoryImplementor,
+										TimeoutManager timeoutManager,
+										Session session) {
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
-		if ( log.isTraceEnabled() ) log.tracef( "Load %d objects using criteria queries", maxResults );
+		if ( log.isTraceEnabled() ) {
+			log.tracef( "Load %d objects using criteria queries", maxResults );
+		}
 
 		if ( maxResults == 0 ) {
 			return;
@@ -99,7 +101,7 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 			Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
 			if ( timeLeftInSecond != null ) {
 				if (timeLeftInSecond == 0) {
-					timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting(null);
+					timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting( null );
 				}
 				criteria.setTimeout( timeLeftInSecond.intValue() );
 			}

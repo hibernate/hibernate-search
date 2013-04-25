@@ -35,28 +35,28 @@ public interface Facet {
 	/**
 	 * @return the faceting name this {@code Facet}	belongs to. See {@link org.hibernate.search.query.facet.FacetingRequest#getFacetingName()}.
 	 */
-	public String getFacetingName();
+	String getFacetingName();
 
 	/**
 	 * @return the {@code Document} field name this facet was created for
 	 */
-	public String getFieldName();
+	String getFieldName();
 
 	/**
 	 * @return the value of this facet. In case of a discrete facet it is the actual {@code Document} field value. In case of
 	 *         a range query the value is a string representation of the range
 	 */
-	public String getValue();
+	String getValue();
 
 	/**
 	 * @return the faceting count
 	 */
-	public int getCount();
+	int getCount();
 
 	/**
 	 * @return a Lucene {@link Query} which can be applied just targeted all documents matching the value of this facet
 	 */
-	public Query getFacetQuery();
+	Query getFacetQuery();
 }
 
 

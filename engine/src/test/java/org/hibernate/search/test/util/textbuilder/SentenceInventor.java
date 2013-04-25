@@ -37,16 +37,16 @@ import java.util.TreeSet;
  * with Lucene.
  * Sentences produced depend from the constructor arguments,
  * making the output predictable for testing purposes.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class SentenceInventor {
-	
+
 	private final Random r;
 	private final WordDictionary dictionary;
 	//array contains repeated object for probability distribution (more chance for a ",")
 	private final char[] sentenceSeparators = new char[] { ',', ',', ',' , ';', ':', ':' };
-	
+
 	/**
 	 * @param randomSeed the seed to use for random generator
 	 * @param dictionarySize the number of terms to insert in the dictionary used to build sentences
@@ -55,26 +55,26 @@ public class SentenceInventor {
 		r = new Random( randomSeed );
 		dictionary = randomDictionary( dictionarySize );
 	}
-	
+
 	/**
 	 * @return a random character from the ASCII table (text chars only)
 	 */
 	public char randomCharacter() {
 		return (char) (r.nextInt( 26 ) + 65);
 	}
-	
+
 	/**
 	 * @param length the desired length
 	 * @return a randomly generated String
 	 */
 	public String randomString(int length) {
 		char[] chars = new char[length];
-		for ( int i=0; i<length; i++ ) {
+		for ( int i = 0; i < length; i++ ) {
 			chars[i] = randomCharacter();
 		}
 		return new String( chars );
 	}
-	
+
 	/**
 	 * Produces a randomly generated String, using
 	 * only western alphabet characters and selecting
@@ -84,12 +84,14 @@ public class SentenceInventor {
 	public String randomString() {
 		double d = r.nextGaussian() * 6.3d;
 		int l = (int) d + 6;
-		if ( l > 0 )
+		if ( l > 0 ) {
 			return randomString( l );
-		else
+		}
+		else {
 			return randomString();
+		}
 	}
-	
+
 	/**
 	 * Produces a random String, which might be lowercase,
 	 * completely uppercase, or uppercasing the first char
@@ -99,17 +101,20 @@ public class SentenceInventor {
 	public String randomTerm() {
 		int i = r.nextInt( 200 );
 		String term = randomString();
-		if ( i > 10 )
+		if ( i > 10 ) {
 			//completely lowercase 189/200 cases
 			return term.toLowerCase();
-		else if ( i < 2 )
+		}
+		else if ( i < 2 ) {
 			//completely uppercase in 2/200 cases
 			return term;
-		else
+		}
+		else {
 			//first letter uppercase in 9/200 cases
 			return term.substring( 0, 1 ) + term.substring( 1 ).toLowerCase();
+		}
 	}
-	
+
 	private WordDictionary randomDictionary(int size) {
 		Set<String> tree = new TreeSet<String>();
 		while ( tree.size() != size ) {
@@ -117,7 +122,7 @@ public class SentenceInventor {
 		}
 		return new WordDictionary( tree );
 	}
-	
+
 	/**
 	 * Builds a sentence concatenating terms from the generated dictionary and spaces
 	 * @return a sentence
@@ -125,7 +130,7 @@ public class SentenceInventor {
 	public String nextSentence() {
 		int sentenceLength = r.nextInt( 3 ) + r.nextInt( 10 ) + 1;
 		String[] sentence = new String[sentenceLength];
-		for ( int i=0; i<sentenceLength; i++ ) {
+		for ( int i = 0; i < sentenceLength; i++ ) {
 			sentence[i] = dictionary.randomWord();
 		}
 		if ( sentenceLength == 1 ) {
@@ -133,14 +138,14 @@ public class SentenceInventor {
 		}
 		else {
 			StringBuilder sb = new StringBuilder( sentence[0]);
-			for ( int i=1; i<sentenceLength; i++) {
+			for ( int i = 1; i < sentenceLength; i++ ) {
 				sb.append( " " );
 				sb.append( sentence[i] );
 			}
 			return sb.toString();
 		}
 	}
-	
+
 	/**
 	 * Combines a random (gaussian) number of sentences in a period,
 	 * using some punctuation symbols and
@@ -154,7 +159,7 @@ public class SentenceInventor {
 		StringBuilder sb = new StringBuilder()
 			.append( firstsentence.substring( 0,1 ).toUpperCase() )
 			.append( firstsentence.substring( 1 ) );
-		for ( int i=1; i<periodLengthSentences; i++ ) {
+		for ( int i = 1; i < periodLengthSentences; i++ ) {
 			int separatorCharIndex = r.nextInt( sentenceSeparators.length );
 			sb
 				.append( sentenceSeparators[separatorCharIndex] )
@@ -164,11 +169,11 @@ public class SentenceInventor {
 		sb.append( ".\n" );
 		return sb.toString();
 	}
-	
+
 	//run it to get an idea of what this class is going to produce
 	public static void main(String[] args) {
 		SentenceInventor wi = new SentenceInventor( 7L, 10000 );
-		for (int i=0; i<30; i++) {
+		for ( int i = 0; i < 30; i++ ) {
 			System.out.print( wi.nextPeriod() );
 		}
 	}

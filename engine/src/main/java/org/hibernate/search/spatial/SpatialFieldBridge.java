@@ -52,7 +52,8 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 			try {
 				Coordinates coordinates = (Coordinates) value;
 				return coordinates.getLatitude();
-			} catch ( ClassCastException e ) {
+			}
+			catch ( ClassCastException e ) {
 				throw LOG.cannotExtractCoordinateFromObject( value.getClass().getName() );
 			}
 		}
@@ -63,7 +64,8 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 		try {
 			Field latitude = clazz.getField( coordinateField );
 			return (Double) latitude.get( value );
-		} catch ( NoSuchFieldException e ) {
+		}
+		catch ( NoSuchFieldException e ) {
 			try {
 				PropertyDescriptor propertyDescriptor =  new PropertyDescriptor(
 						coordinateField,
@@ -77,14 +79,18 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 				else {
 					throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
 				}
-			} catch ( IllegalAccessException ex ) {
-				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
-			} catch ( InvocationTargetException ex ) {
-				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
-			} catch ( IntrospectionException ex ) {
+			}
+			catch ( IllegalAccessException ex ) {
 				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
 			}
-		} catch ( IllegalAccessException e ) {
+			catch ( InvocationTargetException ex ) {
+				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
+			}
+			catch ( IntrospectionException ex ) {
+				throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
+			}
+		}
+		catch ( IllegalAccessException e ) {
 			throw LOG.cannotReadFieldForClass( coordinateField, clazz.getName() );
 		}
 	}
@@ -97,7 +103,8 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 			try {
 				Coordinates coordinates = (Coordinates) value;
 				return coordinates.getLongitude();
-			} catch ( ClassCastException e ) {
+			}
+			catch ( ClassCastException e ) {
 				throw LOG.cannotExtractCoordinateFromObject( value.getClass().getName() );
 			}
 		}

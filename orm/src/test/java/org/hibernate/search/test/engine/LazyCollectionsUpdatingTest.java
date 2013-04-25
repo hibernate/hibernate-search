@@ -43,14 +43,14 @@ import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.
  * TestCase for HSEARCH-178 (Search hitting HHH-2763)
  * Verifies that it's possible to index lazy loaded collections from
  * indexed entities even when no transactions are used.
- * 
+ *
  * Additionally, it uses projection and verifies an optimal FieldSelector
  * is being applied (HSEARCH-690).
  *
  * @author Sanne Grinovero
  */
 public class LazyCollectionsUpdatingTest extends SearchTestCase {
-	
+
 	public void testUpdatingInTransaction() {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -73,7 +73,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		}
 		assertFindsByRoadName( "new" );
 	}
-	
+
 	public void testUpdatingOutOfTransaction() {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -93,7 +93,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		}
 		assertFindsByRoadName( "new" );
 	}
-	
+
 	public void assertFindsByRoadName(String analyzedRoadname) {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		resetFieldSelector();
@@ -104,7 +104,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		assertEquals( 1, query.list().size() );
 		List results = query.list();
 		assertFieldSelectorEnabled( "busLineName" );
-		String resultName = (String) ((Object[])results.get(0))[0];
+		String resultName = (String) ( (Object[]) results.get( 0 ) )[0];
 		assertEquals( "Linea 64", resultName );
 		tx.commit();
 		fullTextSession.close();
@@ -125,14 +125,16 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 			addBusStop( bus, "via M.Buonarroti" );
 			session.persist( bus );
 			tx.commit();
-		} catch (Throwable t) {
+		}
+		catch (Throwable t) {
 			if ( tx != null )
 				tx.rollback();
-		} finally {
+		}
+		finally {
 			session.close();
 		}
 	}
-	
+
 	static void addBusStop(BusLine bus, String roadName) {
 		BusStop stop = new BusStop();
 		stop.setRoadName( roadName );

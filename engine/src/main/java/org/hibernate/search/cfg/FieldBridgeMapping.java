@@ -44,10 +44,10 @@ public class FieldBridgeMapping {
 	private final Map<String, Object> bridge = new HashMap<String, Object>();
 
 	public FieldBridgeMapping(Class<?> impl, Map<String, Object> field,
-							  FieldMapping fieldMapping,
-							  PropertyDescriptor property,
-							  EntityDescriptor entity,
-							  SearchMapping mapping) {
+							FieldMapping fieldMapping,
+							PropertyDescriptor property,
+							EntityDescriptor entity,
+							SearchMapping mapping) {
 		this.mapping = mapping;
 		this.entity = entity;
 		this.property = property;
@@ -57,9 +57,9 @@ public class FieldBridgeMapping {
 	}
 
 	public FieldBridgeMapping param(String name, String value) {
-		Map<String, Object> param = SearchMapping.addElementToAnnotationArray(bridge, "params");
-		param.put("name", name);
-		param.put("value", value);
+		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( bridge, "params" );
+		param.put( "name", name );
+		param.put( "value", value );
 		return this;
 	}
 

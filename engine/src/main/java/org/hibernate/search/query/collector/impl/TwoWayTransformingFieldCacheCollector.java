@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -33,9 +33,9 @@ import org.hibernate.search.util.logging.impl.Log;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class TwoWayTransformingFieldCacheCollector extends FieldCacheCollector {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	private final TwoWayStringBridge stringBridge;
 	private final FieldCacheCollector privateDelegate;
 

@@ -57,7 +57,7 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 public class JGroupsSlaveTest extends SearchTestCase {
 
 	private Channel channel;
-	
+
 	/** makes sure that different tests don't join **/
 	private final String CHANNEL_NAME = UUID.randomUUID().toString();
 
@@ -92,7 +92,7 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		JGroupsReceiver.reset();
 		s = openSession();
 		tx = s.beginTransaction();
-		ts = ( TShirt ) s.get( TShirt.class, ts.getId() );
+		ts = (TShirt) s.get( TShirt.class, ts.getId() );
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 

@@ -107,7 +107,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		Document document = getSingleIndexedDocument( fullTextSession, QueryType.USE_DSL_QUERY );
 
 		String indexedNullString = document.get( "value" );
-		
+
 		String expectedString = "_custom_token_";
 		assertEquals( "The null value should be indexed as " + expectedString, expectedString, indexedNullString );
 

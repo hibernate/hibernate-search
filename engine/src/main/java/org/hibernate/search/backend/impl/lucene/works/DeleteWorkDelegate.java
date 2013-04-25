@@ -57,7 +57,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 class DeleteWorkDelegate implements LuceneWorkDelegate {
 
-	private static final Log log = LoggerFactory.make();	
+	private static final Log log = LoggerFactory.make();
 	protected final Workspace workspace;
 
 	DeleteWorkDelegate(Workspace workspace) {
@@ -75,7 +75,8 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		Query idQueryTerm;
 		if ( isIdNumeric( builder ) ) {
 			idQueryTerm = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
-		} else {
+		}
+		else {
 			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 			idQueryTerm = new TermQuery( idTerm );
 		}

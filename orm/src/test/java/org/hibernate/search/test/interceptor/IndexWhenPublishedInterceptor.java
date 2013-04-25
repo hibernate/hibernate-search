@@ -52,6 +52,6 @@ public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor<
 
 	@Override
 	public IndexingOverride onCollectionUpdate(Blog entity) {
-		return onUpdate(entity);
+		return onUpdate( entity );
 	}
 }

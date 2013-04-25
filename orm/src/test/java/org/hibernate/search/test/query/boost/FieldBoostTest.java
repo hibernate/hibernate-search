@@ -71,7 +71,7 @@ public class  FieldBoostTest extends SearchTestCase {
 
 		assertTrue(
 				"incorrect document returned",
-				( ( BoostedGetDescriptionLibrary ) results.get( 0 ) ).getDescription().startsWith( "Martians" )
+				( (BoostedGetDescriptionLibrary) results.get( 0 ) ).getDescription().startsWith( "Martians" )
 		);
 
 		//cleanup
@@ -106,7 +106,7 @@ public class  FieldBoostTest extends SearchTestCase {
 
 		assertTrue(
 				"incorrect document boost",
-				( ( BoostedFieldDescriptionLibrary ) results.get( 0 ) ).getDescription().startsWith( "Martians" )
+				( (BoostedFieldDescriptionLibrary) results.get( 0 ) ).getDescription().startsWith( "Martians" )
 		);
 
 		log.debug( hibQuery.explain( 0 ).toString() );
@@ -147,7 +147,7 @@ public class  FieldBoostTest extends SearchTestCase {
 
 		assertTrue(
 				"incorrect document returned",
-				( ( BoostedDescriptionLibrary ) results.get( 0 ) ).getDescription().startsWith( "Martians" )
+				( (BoostedDescriptionLibrary) results.get( 0 ) ).getDescription().startsWith( "Martians" )
 		);
 
 		//cleanup

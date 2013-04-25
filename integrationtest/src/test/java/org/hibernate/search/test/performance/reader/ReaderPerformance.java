@@ -1,25 +1,25 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- *  Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
- *  indicated by the @author tags or express copyright attribution
- *  statements applied by the authors.  All third-party contributions are
- *  distributed under license by Red Hat, Inc.
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
  *
- *  This copyrighted material is made available to anyone wishing to use, modify,
- *  copy, or redistribute it subject to the terms and conditions of the GNU
- *  Lesser General Public License, as published by the Free Software Foundation.
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- *  for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this distribution; if not, write to:
- *  Free Software Foundation, Inc.
- *  51 Franklin Street, Fifth Floor
- *  Boston, MA  02110-1301  USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
  */
 package org.hibernate.search.test.performance.reader;
 
@@ -74,7 +74,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
 		IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
-		ThreadPoolExecutor executor = ( ThreadPoolExecutor ) Executors.newFixedThreadPool( WORKER_THREADS );
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		for ( int batch = 0; batch <= 5000000; batch++ ) {
 			executor.execute( filler );
 		}
@@ -121,8 +121,8 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		}
 	}
 
-	private final void timeMs() throws InterruptedException {
-		ThreadPoolExecutor executor = ( ThreadPoolExecutor ) Executors.newFixedThreadPool( WORKER_THREADS );
+	private void timeMs() throws InterruptedException {
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		CountDownLatch startSignal = new CountDownLatch( 1 );
 		InsertActivity insertionTask = new InsertActivity( getSessions(), startSignal );
 		SearchActivity searchTask = new SearchActivity( getSessions(), startSignal );

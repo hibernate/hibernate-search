@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -35,27 +35,27 @@ import org.hibernate.annotations.Proxy;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
- * 
+ *
  * @author Tom Waterhouse
  */
 @Entity
 @Proxy(lazy = false)
-@Table(name="catalog_item")
+@Table(name = "catalog_item")
 public class CatalogItem {
 
 	public CatalogItem() {
 	}
 
 	@Id()
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long catalogItemId;
 
-	@ManyToOne(fetch=FetchType.LAZY, targetEntity=Item.class)
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = Item.class)
 	@JoinColumn(name = "itemId")
 	@LazyToOne(LazyToOneOption.PROXY)
 	@NaturalId
 	private Item item;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "catalogId")
 	@NaturalId

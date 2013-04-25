@@ -38,7 +38,6 @@ import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
@@ -93,13 +92,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author John Griffin
  */
 public final class BridgeFactory {
-	private static final Log LOG = LoggerFactory.make();
-
-	private static Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
-	private static Map<String, NumericFieldBridge> numericBridges = new HashMap<String, NumericFieldBridge>();
-
-	private BridgeFactory() {
-	}
 
 	public static final TwoWayFieldBridge CHARACTER = new TwoWayString2FieldBridgeAdaptor( new CharacterBridge() );
 	public static final TwoWayFieldBridge DOUBLE = new TwoWayString2FieldBridgeAdaptor( new DoubleBridge() );
@@ -204,6 +196,11 @@ public final class BridgeFactory {
 	public static final String TIKA_BRIDGE_METADATA_PROCESSOR_SETTER = "setMetadataProcessorClass";
 	public static final String TIKA_BRIDGE_PARSE_CONTEXT_SETTER = "setParseContextProviderClass";
 
+	private static final Log LOG = LoggerFactory.make();
+
+	private static Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
+	private static Map<String, NumericFieldBridge> numericBridges = new HashMap<String, NumericFieldBridge>();
+
 	static {
 		builtInBridges.put( Character.class.getName(), CHARACTER );
 		builtInBridges.put( char.class.getName(), CHARACTER );
@@ -238,6 +235,9 @@ public final class BridgeFactory {
 		numericBridges.put( double.class.getName(), DOUBLE_NUMERIC );
 		numericBridges.put( Float.class.getName(), FLOAT_NUMERIC );
 		numericBridges.put( float.class.getName(), FLOAT_NUMERIC );
+	}
+
+	private BridgeFactory() {
 	}
 
 	/**
@@ -357,7 +357,8 @@ public final class BridgeFactory {
 			else {
 				if ( latitudeField != null && longitudeField != null ) {
 					bridge = new SpatialFieldBridgeByRange( latitudeField, longitudeField );
-				} else {
+				}
+				else {
 					bridge = new SpatialFieldBridgeByRange();
 				}
 			}
@@ -613,7 +614,7 @@ public final class BridgeFactory {
 
 	private static void populateReturnType(Class<?> appliedOnType, Class<?> bridgeType, Object bridgeInstance) {
 		if ( AppliedOnTypeAwareBridge.class.isAssignableFrom( bridgeType ) ) {
-			( ( AppliedOnTypeAwareBridge ) bridgeInstance ).setAppliedOnType( appliedOnType );
+			( (AppliedOnTypeAwareBridge) bridgeInstance ).setAppliedOnType( appliedOnType );
 		}
 	}
 
@@ -795,8 +796,8 @@ public final class BridgeFactory {
 	 * @throws SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge.
 	 */
 	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge,
-													  XClass appliedOnType,
-													  ReflectionManager reflectionManager) {
+													XClass appliedOnType,
+													ReflectionManager reflectionManager) {
 		FieldBridge fb = extractType( fieldBridge, appliedOnType, reflectionManager );
 		if ( fb instanceof TwoWayFieldBridge ) {
 			return (TwoWayFieldBridge) fb;
@@ -816,8 +817,8 @@ public final class BridgeFactory {
 	 * @return FieldBridge
 	 */
 	public static FieldBridge extractType(org.hibernate.search.annotations.FieldBridge fieldBridgeAnnotation,
-										  XClass appliedOnType,
-										  ReflectionManager reflectionManager) {
+										XClass appliedOnType,
+										ReflectionManager reflectionManager) {
 		FieldBridge bridge = null;
 
 		if ( fieldBridgeAnnotation != null ) {

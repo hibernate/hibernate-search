@@ -58,17 +58,17 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 //TODO rename copy?
 public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory> {
-	
+
 	private static final String CURRENT1 = "current1";
 	private static final String CURRENT2 = "current2";
 	// defined to have CURRENT_DIR_NAME[1] == "current"+"1":
 	private static final String[] CURRENT_DIR_NAME = { null, CURRENT1, CURRENT2 };
-	
+
 	private static final Log log = LoggerFactory.make();
 	private final Timer timer = new Timer( true ); //daemon thread, the copy algorithm is robust
-	
+
 	private volatile int current;
-	
+
 	//variables having visibility granted by a read of "current"
 	private FSDirectory directory;
 	private String indexName;
@@ -147,8 +147,12 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		// this code is actually broken since the value change after initialize call
 		// but from a practical POV this is fine since we only call this method
 		// after initialize call
-		if ( obj == this ) return true;
-		if ( obj == null || !( obj instanceof FSMasterDirectoryProvider ) ) return false;
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj == null || !( obj instanceof FSMasterDirectoryProvider ) ) {
+			return false;
+		}
 		FSMasterDirectoryProvider other = (FSMasterDirectoryProvider)obj;
 		//break both memory barriers by reading volatile variables:
 		@SuppressWarnings("unused")
@@ -199,7 +203,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				log.skippingDirectorySynchronization( indexName );
 			}
 		}
-		
+
 		public void stop() {
 			executor.shutdownNow();
 		}
@@ -222,7 +226,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				long start = System.nanoTime();//keep time after lock is acquired for correct measure
 				int oldIndex = current;
 				int index = oldIndex == 1 ? 2 : 1;
-				File destinationFile = new File( destination, Integer.valueOf(index).toString() );
+				File destinationFile = new File( destination, Integer.valueOf( index ).toString() );
 				try {
 					log.tracef( "Copying %s into %s", source, destinationFile );
 					FileHelper.synchronize( source, destinationFile, true, copyChunkSize );
@@ -239,7 +243,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				try {
 					new File( destination, CURRENT_DIR_NAME[index]  ).createNewFile();
 				}
-				catch( IOException e ) {
+				catch ( IOException e ) {
 					log.unableToCreateCurrentMarker( indexName, e );
 				}
 				log.tracef( "Copy for %s took %d ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );

@@ -95,8 +95,8 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Analyzer analyzer = s.getSearchFactory().getAnalyzer( SubClass.class );
 
-		Token[] tokens = AnalyzerUtils.tokensFromAnalysis(analyzer, "name", "Proca\u00EFne");
-		assertTokensEqual( tokens, new String[]{"Procaine"});
+		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", "Proca\u00EFne" );
+		assertTokensEqual( tokens, new String[] { "Procaine" } );
 
 		s.close();
 	}

@@ -30,7 +30,7 @@ import org.apache.lucene.search.Similarity;
  * @author Emmanuel Bernard
  */
 public class DummySimilarity2 extends Similarity {
-	
+
 	private float CONST = .5f;
 
 	@Override

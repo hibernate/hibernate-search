@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -80,7 +80,7 @@ public class JGroupsConfigurationTest {
 	 * Attempts to start a SearchFactory, and make sure we close it if it happens to start
 	 * correctly.
 	 * @param cfg a configuration to try booting
-	 * @throws Throwable 
+	 * @throws Throwable
 	 */
 	private static void bootConfiguration(ManualConfiguration cfg) throws Throwable {
 		cfg.addClass( Dvd.class );
@@ -95,8 +95,9 @@ public class JGroupsConfigurationTest {
 			throw se.getCause();
 		}
 		finally {
-			if ( buildSearchFactory != null )
+			if ( buildSearchFactory != null ) {
 				buildSearchFactory.close();
+			}
 		}
 	}
 

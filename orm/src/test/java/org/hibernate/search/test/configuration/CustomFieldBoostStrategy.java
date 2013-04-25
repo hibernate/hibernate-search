@@ -34,7 +34,7 @@ import org.hibernate.search.engine.BoostStrategy;
 public class CustomFieldBoostStrategy implements BoostStrategy {
 
 	public float defineBoost(Object value) {
-		String name = ( String ) value;
+		String name = (String) value;
 		if ( "foobar".equals( name ) ) {
 			return 3.0f;
 		}

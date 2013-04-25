@@ -34,11 +34,11 @@ import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * This implementation use idInString as the hashKey.
- * 
+ *
  * @author Emmanuel Bernard
  */
 public class IdHashShardingStrategy implements IndexShardingStrategy {
-	
+
 	private IndexManager[] providers;
 	public void initialize(Properties properties, IndexManager[] providers) {
 		this.providers = providers;
@@ -49,11 +49,13 @@ public class IdHashShardingStrategy implements IndexShardingStrategy {
 	}
 
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-		return providers[ hashKey(idInString) ];
+		return providers[hashKey( idInString )];
 	}
 
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		if ( idInString == null ) return providers;
+		if ( idInString == null ) {
+			return providers;
+		}
 		return new IndexManager[] { providers[hashKey( idInString )] };
 	}
 

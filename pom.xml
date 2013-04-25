@@ -798,11 +798,14 @@
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <violationSeverity>error</violationSeverity>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <!-- generated code -->
+                        <excludes>**/Generated.java,**/TypeHelper*.java</excludes>
                     </configuration>
                     <executions>
                         <execution>
                             <id>check-style</id>
-                            <phase>compile</phase>
+                            <phase>verify</phase>
                             <goals>
                                 <goal>checkstyle</goal>
                             </goals>

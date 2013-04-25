@@ -56,7 +56,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 	private final List<FieldContext> fieldContexts;
 
 	public ConnectedMultiFieldsPhraseQueryBuilder(PhraseQueryContext phraseContext, QueryCustomizer queryCustomizer,
-												  List<FieldContext> fieldContexts, QueryBuildingContext queryContext) {
+												List<FieldContext> fieldContexts, QueryBuildingContext queryContext) {
 		this.phraseContext = phraseContext;
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
@@ -105,13 +105,13 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 				}
 
 				if ( positionIncrement > 0 ) {
-					position+=positionIncrement;
-					termsAtSamePosition = termsPerPosition.get(position);
+					position += positionIncrement;
+					termsAtSamePosition = termsPerPosition.get( position );
 				}
 
 				if (termsAtSamePosition == null) {
 					termsAtSamePosition = new ArrayList<Term>();
-					termsPerPosition.put( position, termsAtSamePosition  );
+					termsPerPosition.put( position, termsAtSamePosition );
 				}
 
 				String termString = new String( termAttribute.buffer(), 0, termAttribute.length() );
@@ -144,7 +144,8 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		final int size = termsPerPosition.size();
 		if ( size == 0 ) {
 			perFieldQuery = new BooleanQuery( );
-		} else if ( size <= 1 ) {
+		}
+		else if ( size <= 1 ) {
 			final List<Term> terms = termsPerPosition.values().iterator().next();
 			if ( terms.size() == 1 ) {
 				perFieldQuery = new TermQuery( terms.get( 0 ) );
@@ -158,7 +159,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			}
 		}
 		else {
-			if (isMultiPhrase) {
+			if ( isMultiPhrase ) {
 				MultiPhraseQuery query = new MultiPhraseQuery();
 				query.setSlop( phraseContext.getSlop() );
 				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
@@ -172,7 +173,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 				query.setSlop(  phraseContext.getSlop() );
 				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
 					final List<Term> value = entry.getValue();
-					query.add( value.get(0), entry.getKey() );
+					query.add( value.get( 0 ), entry.getKey() );
 				}
 				perFieldQuery = query;
 			}

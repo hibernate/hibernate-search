@@ -55,7 +55,7 @@ public class EntityManagerTest extends JPATestCase {
 		em.getTransaction().commit();
 
 		em.clear();
-		
+
 		em.getTransaction().begin();
 		em.remove( em.find( Bretzel.class, bretzel.getId() ) );
 		em.getTransaction().commit();

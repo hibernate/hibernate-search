@@ -42,10 +42,10 @@ public class State {
 	@DocumentId
 	@GeneratedValue
 	private Integer id;
-	
+
 	@Field
 	private String name;
-	
+
 	@ContainedIn
 	@OneToOne(mappedBy = "state", cascade = CascadeType.ALL)
 	private StateCandidate candidate;

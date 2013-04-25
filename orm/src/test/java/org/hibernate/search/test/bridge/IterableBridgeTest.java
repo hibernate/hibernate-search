@@ -226,7 +226,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned from a collection of Date", withoutNull.getName(), results.get( 0 )
 				.getName() );
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<IterableBridgeTestEntity> findEmbeddedNullResults( String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
@@ -236,7 +236,7 @@ public class IterableBridgeTest extends SearchTestCase {
 				.matching( value ).createQuery();
 		return fullTextSession.createFullTextQuery( query, IterableBridgeTestEntity.class ).list();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<IterableBridgeTestEntity> findResults( String fieldName, Object value) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()

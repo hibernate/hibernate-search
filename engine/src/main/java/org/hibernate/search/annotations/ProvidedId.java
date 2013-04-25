@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ProvidedId {
 
-	public static final String defaultFieldName = "providedId";
+	String defaultFieldName = "providedId";
 
 	String name() default defaultFieldName;
 

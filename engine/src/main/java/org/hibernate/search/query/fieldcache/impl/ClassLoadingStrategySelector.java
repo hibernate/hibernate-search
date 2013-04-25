@@ -1,4 +1,4 @@
-/* 
+/*
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -75,7 +75,7 @@ public class ClassLoadingStrategySelector {
 			return getTwoWayStringBridge( encoding.unwrap() );
 		}
 		else if ( fieldBridge instanceof TwoWayString2FieldBridgeAdaptor ) {
-			TwoWayString2FieldBridgeAdaptor adaptor = (TwoWayString2FieldBridgeAdaptor ) fieldBridge;
+			TwoWayString2FieldBridgeAdaptor adaptor = (TwoWayString2FieldBridgeAdaptor) fieldBridge;
 			return adaptor.unwrap();
 		}
 		else {

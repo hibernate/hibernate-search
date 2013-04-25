@@ -48,17 +48,17 @@ import org.hibernate.service.jta.platform.spi.JtaPlatform;
 
 /**
  * Implementation of the transactional context on top of an EventSource (Session)
- * 
+ *
  * @author Navin Surtani  - navin@surtani.org
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
 public class EventSourceTransactionContext implements TransactionContext, Serializable {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	private final EventSource eventSource;
-	
+
 	//this transient is required to break recursive serialization
 	private transient FullTextIndexEventListener flushListener;
 
@@ -68,7 +68,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	//will behave as "out of transaction" in the whole session lifespan.
 	private boolean realTxInProgress = false;
 	private boolean realTxInProgressInitialized = false;
-	
+
 	public EventSourceTransactionContext(EventSource eventSource) {
 		this.eventSource = eventSource;
 		this.flushListener = getIndexWorkFlushEventListener();
@@ -131,12 +131,12 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 
 	private boolean isLocalTransaction() {
 		//TODO make it better but I don't know how we can optimize it.
-		final TransactionManager transactionManager = getService(JtaPlatform.class).retrieveTransactionManager();
+		final TransactionManager transactionManager = getService( JtaPlatform.class ).retrieveTransactionManager();
 		return transactionManager == null;
 	}
 
 	private <T extends Service> T getService(Class<T> serviceClass) {
-		return eventSource.getFactory().getServiceRegistry().getService(serviceClass);
+		return eventSource.getFactory().getServiceRegistry().getService( serviceClass );
 	}
 
 	private FullTextIndexEventListener getIndexWorkFlushEventListener() {
@@ -144,8 +144,8 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			//for the "transient" case: might have been nullified.
 			return flushListener;
 		}
-		final Iterable<FlushEventListener> listeners = getService(EventListenerRegistry.class)
-				.getEventListenerGroup(EventType.FLUSH).listeners();
+		final Iterable<FlushEventListener> listeners = getService( EventListenerRegistry.class )
+				.getEventListenerGroup( EventType.FLUSH ).listeners();
 		for ( FlushEventListener listener : listeners ) {
 			if ( FullTextIndexEventListener.class.isAssignableFrom( listener.getClass() ) ) {
 				return (FullTextIndexEventListener) listener;
@@ -162,7 +162,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 		// either it is a real transaction, or if we are capable to manage this in the IndexWorkFlushEventListener
 		return getIndexWorkFlushEventListener() != null || isRealTransactionInProgress();
 	}
-	
+
 	private boolean isRealTransactionInProgress() {
 		if ( ! realTxInProgressInitialized ) {
 			realTxInProgress = eventSource.isTransactionInProgress();
@@ -220,5 +220,5 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			//do not delegate
 		}
 	}
-	
+
 }

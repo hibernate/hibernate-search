@@ -43,11 +43,11 @@ import junit.framework.Assert;
  * JGroups' Auto Node Selector Test
  * <p/>
  * Test if the selector choose a valid member
- * 
+ *
  * @author Pedro Ruivo
  * @since 4.3
  */
-@TestForIssue(jiraKey="HSEARCH-1261")
+@TestForIssue(jiraKey = "HSEARCH-1261")
 public class AutoNodeSelectorTest {
 
 	private static final String NEGATIVE_HASH_CODE_INDEX_NAME = "test.Book";
@@ -88,7 +88,7 @@ public class AutoNodeSelectorTest {
 		 * 2) when the view has 2 members;
 		 * 3) when the view has 3 member
 		 * 4) when the view has > 3 members;
-		 * 
+		 *
 		 * some view size can trigger the bug and other don't. test with a wide range
 		 */
 

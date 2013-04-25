@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -99,7 +99,7 @@ public class IndexManagerFactoryCustomizationTest {
 		String title;
 	}
 
-	@Indexed(index="dvds")
+	@Indexed(index = "dvds")
 	public static final class Dvd {
 		@DocumentId long id;
 		@Field String title;

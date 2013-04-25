@@ -24,21 +24,23 @@
 package org.hibernate.search.test.util.textbuilder;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests WordDictionary and WordInventor,
  * these are test utilities not part of the Search distribution;
  * the test exists to spot if the text they produce is unchanged, so
  * that other tests can rely on working test utilities.
- * 
+ *
  * @see WordDictionary
  * @see SentenceInventor
- * 
+ *
  * @author Sanne Grinovero
  */
 public class TextProductionTest {
-	
+
 	@Test
 	public void testSomeWordsGetBuilt() {
 		SentenceInventor wi = new SentenceInventor( 7L, 200 );

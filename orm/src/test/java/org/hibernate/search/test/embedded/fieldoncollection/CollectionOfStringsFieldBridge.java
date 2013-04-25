@@ -31,7 +31,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 
 public class CollectionOfStringsFieldBridge implements FieldBridge, StringBridge {
-	
+
 	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {
@@ -42,7 +42,7 @@ public class CollectionOfStringsFieldBridge implements FieldBridge, StringBridge
 		}
 		return object.toString();
 	}
-	
+
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value == null ) {

@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -31,7 +31,6 @@ import org.hibernate.testing.RequiresDialect;
 import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.hibernate.search.MassIndexer;
 
 /**
  * Verifies that {@link MassIndexer#idFetchSize(int)} is applied by checking for errors thrown by

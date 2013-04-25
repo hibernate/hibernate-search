@@ -127,23 +127,23 @@ public class TikaBridge implements FieldBridge {
 		InputStream in;
 		if ( object instanceof Blob ) {
 			try {
-				in = ( ( Blob ) object ).getBinaryStream();
+				in = ( (Blob) object ).getBinaryStream();
 			}
 			catch ( SQLException e ) {
 				throw log.unableToGetInputStreamFromBlob( e );
 			}
 		}
 		else if ( object instanceof byte[] ) {
-			byte[] data = ( byte[] ) object;
+			byte[] data = (byte[]) object;
 			in = new ByteArrayInputStream( data );
 		}
 		else if ( object instanceof String ) {
-			String path = ( String ) object;
+			String path = (String) object;
 			File file = new File( path );
 			in = openInputStream( file );
 		}
 		else if ( object instanceof URI ) {
-			URI uri = ( URI ) object;
+			URI uri = (URI) object;
 			File file = new File( uri );
 			in = openInputStream( file );
 		}

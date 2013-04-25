@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class MultiReaderFactory {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	public static IndexReader openReader(IndexManager... indexManagers) {
@@ -60,7 +60,7 @@ public class MultiReaderFactory {
 		IndexReader[] readers;
 		ReaderProvider[] managers;
 		if ( multiReader instanceof CacheableMultiReader ) {
-			CacheableMultiReader castMultiReader = ( CacheableMultiReader ) multiReader;
+			CacheableMultiReader castMultiReader = (CacheableMultiReader) multiReader;
 			readers = ReaderProviderHelper.getSubReadersFromMultiReader( castMultiReader );
 			managers = castMultiReader.managers;
 		}

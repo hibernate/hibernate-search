@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( {ElementType.TYPE, ElementType.METHOD, ElementType.FIELD} )
+@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface Boost {
 	float value();

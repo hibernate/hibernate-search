@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -76,7 +76,7 @@ public class NumericFieldUtils {
 	 * @return the created Query
 	 */
 	public static Query createExactMatchQuery(String fieldName, Object value) {
-		return createNumericRangeQuery(fieldName, value, value, true, true);
+		return createNumericRangeQuery( fieldName, value, value, true, true );
 	}
 
 	public static void setNumericValue(Object value, NumericField numericField) {

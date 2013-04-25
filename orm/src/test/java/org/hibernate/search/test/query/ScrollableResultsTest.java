@@ -23,6 +23,10 @@
  */
 package org.hibernate.search.test.query;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -32,22 +36,18 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Test for org.hibernate.search.query.ScrollableResultsImpl
- * 
+ *
  * @see org.hibernate.search.query.hibernate.impl.ScrollableResultsImpl
  * @author Sanne Grinovero
  */
 public class ScrollableResultsTest {
-	
+
 	private FullTextSessionBuilder builder;
 	private FullTextSession sess;
 
@@ -70,7 +70,7 @@ public class ScrollableResultsTest {
 		}
 		tx.commit();
 	}
-	
+
 	@After
 	public void tearDown() {
 		builder.close();
@@ -109,7 +109,7 @@ public class ScrollableResultsTest {
 		scrollableResults.close();
 		tx.commit();
 	}
-	
+
 	/**
 	 * Verify inverse-order scrolling.
 	 * TODO to verify correct FetchSize behavior I've been debugging
@@ -141,7 +141,7 @@ public class ScrollableResultsTest {
 		scrollableResults.close();
 		tx.commit();
 	}
-	
+
 	/**
 	 * Test that all entities returned by a ScrollableResults
 	 * are always attached to Session
@@ -186,7 +186,7 @@ public class ScrollableResultsTest {
 		assertEquals( 323, position );
 		tx.commit();
 	}
-	
+
 	/**
 	 * Verify scrolling works correctly when combined with Projection
 	 * and that the projected entities are managed, even in case
@@ -225,9 +225,9 @@ public class ScrollableResultsTest {
 			assertEquals( "Rossi", objs[3] );
 			assertTrue( objs[4] instanceof Employee );
 			sess.contains( objs[4] );
-			assertTrue( objs[2]==objs[4] ); //projected twice the same entity
+			assertTrue( objs[2] == objs[4] ); // projected twice the same entity
 			// detach some objects:
-			if ( position%3 == 0 ) {
+			if ( position % 3 == 0 ) {
 				sess.evict( objs[2] );
 			}
 		}
@@ -241,7 +241,7 @@ public class ScrollableResultsTest {
 			sess.contains( objs[2] );
 			assertTrue( objs[4] instanceof Employee );
 			sess.contains( objs[4] );
-			assertTrue( objs[2]==objs[4] ); 
+			assertTrue( objs[2] == objs[4] );
 		}
 		assertEquals( -1, position );
 		scrollableResults.close();

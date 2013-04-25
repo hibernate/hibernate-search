@@ -104,7 +104,7 @@ public class Cloud {
 	public void setUri(URI uri) {
 		this.uri = uri;
 	}
-	
+
 	@Field(analyze = Analyze.NO, store = Store.YES)
 	public UUID getUuid() {
 		return uuid;

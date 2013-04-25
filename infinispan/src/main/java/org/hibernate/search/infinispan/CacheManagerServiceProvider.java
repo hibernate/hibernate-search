@@ -51,7 +51,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
  */
 public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCacheManager> {
 
-	private static final Log log = LoggerFactory.make(Log.class);
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	/**
 	 * If no configuration is defined an no JNDI lookup name is provided, than a new Infinispan CacheManager
@@ -118,7 +118,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 		}
 		catch ( NamingException ne ) {
 			String msg = "Unable to retrieve CacheManager from JNDI [" + jndiNamespace + "]";
-			log.unableToRetrieveCacheManagerFromJndi(jndiNamespace, ne);
+			log.unableToRetrieveCacheManagerFromJndi( jndiNamespace, ne );
 			throw new SearchException( msg );
 		}
 		finally {
@@ -127,7 +127,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 					ctx.close();
 				}
 				catch ( NamingException ne ) {
-					log.unableToReleaseInitialContext(ne);
+					log.unableToReleaseInitialContext( ne );
 				}
 			}
 		}

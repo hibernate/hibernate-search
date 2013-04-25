@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * @author Gustavo Fernandes
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.METHOD, ElementType.FIELD} )
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface NumericFields {
 

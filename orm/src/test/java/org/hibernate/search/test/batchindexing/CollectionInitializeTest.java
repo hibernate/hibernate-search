@@ -48,7 +48,7 @@ public class CollectionInitializeTest extends SearchTestCase {
 			Assert.assertEquals( 1, resultSize );
 		}
 		finally {
-			clearData(fullTextSession);
+			clearData( fullTextSession );
 			fullTextSession.close();
 		}
 	}
@@ -60,7 +60,7 @@ public class CollectionInitializeTest extends SearchTestCase {
 		id.setPlantId( "2" );
 		fullTextSession.delete( fullTextSession.get( LegacyCarPlant.class, id ) );
 		for (int i = 1 ; i < 4 ; i++) {
-			fullTextSession.delete( fullTextSession.get(LegacyCar.class, "" + i ) );
+			fullTextSession.delete( fullTextSession.get( LegacyCar.class, "" + i ) );
 		}
 		transaction.commit();
 	}
@@ -69,10 +69,10 @@ public class CollectionInitializeTest extends SearchTestCase {
 		final Transaction transaction = fullTextSession.beginTransaction();
 		LegacyCar[] cars = new LegacyCar[3];
 		for (int i = 1 ; i < 4 ; i++) {
-			cars[i-1] = new LegacyCar();
-			cars[i-1].setId( "" + i );
-			cars[i-1].setModel( "model" + i );
-			fullTextSession.persist( cars[i-1] );
+			cars[i - 1] = new LegacyCar();
+			cars[i - 1].setId( "" + i );
+			cars[i - 1].setModel( "model" + i );
+			fullTextSession.persist( cars[i - 1] );
 		}
 		LegacyCarPlant plant = new LegacyCarPlant();
 		plant.setCar( cars[0] );

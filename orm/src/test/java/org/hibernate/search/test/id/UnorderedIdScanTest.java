@@ -73,7 +73,7 @@ public class UnorderedIdScanTest {
 	private static void tryCreatingDocumentBuilder(XClass mappedXClass, ReflectionManager reflectionManager) {
 		ManualConfiguration cfg = new ManualConfiguration();
 		ConfigContext context = new ConfigContext( cfg );
-		DocumentBuilderIndexedEntity docBuilder = new DocumentBuilderIndexedEntity(mappedXClass, context, null, reflectionManager,
+		DocumentBuilderIndexedEntity docBuilder = new DocumentBuilderIndexedEntity( mappedXClass, context, null, reflectionManager,
 				new HashSet(), SimpleInitializer.INSTANCE );
 	}
 
@@ -96,9 +96,9 @@ public class UnorderedIdScanTest {
 
 		@Override
 		public boolean equals(XClass class1, Class class2) {
-			if (class1 instanceof DeclaredMethodsReverter) {
+			if ( class1 instanceof DeclaredMethodsReverter ) {
 				DeclaredMethodsReverter wrapper = (DeclaredMethodsReverter) class1;
-				return super.equals(wrapper.delegate, class2 );
+				return super.equals( wrapper.delegate, class2 );
 			}
 			else {
 				return super.equals( class1, class2 );

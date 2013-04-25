@@ -33,7 +33,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Sanne Grinovero
  */
 public interface ContextAwareSelectionDelegate {
-	
+
 	/**
 	 * The LuceneWork must be applied to different indexes.
 	 *
@@ -41,6 +41,6 @@ public interface ContextAwareSelectionDelegate {
 	 * @param shardingStrategy the Sharding strategy is usually needed to identify affected Directories.
 	 * @param context the transactional context where the pending changes are stored
 	 */
-	public void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, WorkQueuePerIndexSplitter context);
+	void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, WorkQueuePerIndexSplitter context);
 
 }

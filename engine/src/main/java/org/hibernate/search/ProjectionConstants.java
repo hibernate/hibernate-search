@@ -32,22 +32,22 @@ public interface ProjectionConstants {
 	/**
 	 * Represents the Hibernate entity returned in a search.
 	 */
-	public String THIS = "__HSearch_This";
+	String THIS = "__HSearch_This";
 
 	/**
 	 * The Lucene document returned by a search.
 	 */
-	public String DOCUMENT = "__HSearch_Document";
+	String DOCUMENT = "__HSearch_Document";
 
 	/**
 	 * The legacy document's score from a search.
 	 */
-	public String SCORE = "__HSearch_Score";
+	String SCORE = "__HSearch_Score";
 
 	/**
 	 * Object id property
 	 */
-	public String ID = "__HSearch_id";
+	String ID = "__HSearch_id";
 
 	/**
 	 * Lucene Document id.
@@ -56,8 +56,8 @@ public interface ProjectionConstants {
 	 *
 	 * @experimental If you use this constant/feature, please speak up in the forum
 	 */
-	public String DOCUMENT_ID = "__HSearch_DocumentId";
-	
+	String DOCUMENT_ID = "__HSearch_DocumentId";
+
 	/**
 	 * Lucene {@link org.apache.lucene.search.Explanation} object describing the score computation for
 	 * the matching object/document
@@ -66,16 +66,16 @@ public interface ProjectionConstants {
 	 * To retrieve explanation of a single result, consider retrieving {@link #DOCUMENT_ID}
 	 * and using fullTextQuery.explain(int)
 	 */
-	public String EXPLANATION = "__HSearch_Explanation";
+	String EXPLANATION = "__HSearch_Explanation";
 
 	/**
 	 * Represents the Hibernate entity class returned in a search. In contrast to the other constants this constant
 	 * represents an actual field value of the underlying Lucene document and hence can directly be used in queries.
 	 */
-	public String OBJECT_CLASS = "_hibernate_class";
+	String OBJECT_CLASS = "_hibernate_class";
 
 	/**
 	 * Represents the distance between an entity and the center of the search radius in case of a spatial query
 	 */
-	public String SPATIAL_DISTANCE = "_HSearch_SpatialDistance";
+	String SPATIAL_DISTANCE = "_HSearch_SpatialDistance";
 }

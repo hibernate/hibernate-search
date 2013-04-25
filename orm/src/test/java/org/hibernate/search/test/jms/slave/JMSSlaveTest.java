@@ -94,7 +94,7 @@ public class JMSSlaveTest extends SearchTestCase {
 		SearchQueueChecker.reset();
 		s = openSession();
 		tx = s.beginTransaction();
-		ts = ( TShirt ) s.get( TShirt.class, ts.getId() );
+		ts = (TShirt) s.get( TShirt.class, ts.getId() );
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 
@@ -141,13 +141,13 @@ public class JMSSlaveTest extends SearchTestCase {
 
 	private Queue getMessageQueue() throws Exception {
 		Context ctx = getJndiInitialContext();
-		return ( Queue ) ctx.lookup( QUEUE_NAME );
+		return (Queue) ctx.lookup( QUEUE_NAME );
 	}
 
 	private QueueSession getQueueSession() throws Exception {
 		if ( queueSession == null ) {
 			Context ctx = getJndiInitialContext();
-			QueueConnectionFactory factory = ( QueueConnectionFactory ) ctx.lookup( CONNECTION_FACTORY_NAME );
+			QueueConnectionFactory factory = (QueueConnectionFactory) ctx.lookup( CONNECTION_FACTORY_NAME );
 			QueueConnection conn = factory.createQueueConnection();
 			conn.start();
 			queueSession = conn.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
@@ -159,8 +159,8 @@ public class JMSSlaveTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jms" );
-		cfg.setProperty( "hibernate.search.default." +JmsBackendQueueProcessor.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
-		cfg.setProperty( "hibernate.search.default." +JmsBackendQueueProcessor.JMS_QUEUE, QUEUE_NAME );
+		cfg.setProperty( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
+		cfg.setProperty( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_QUEUE, QUEUE_NAME );
 
 		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of jndi properties to create the InitialContext
 		// for the queue processor

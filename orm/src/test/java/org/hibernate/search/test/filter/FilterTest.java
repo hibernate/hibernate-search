@@ -67,7 +67,7 @@ public class FilterTest extends SearchTestCase {
 		ftQuery.enableFullTextFilter( "security" ).setParameter( "login", "andre" );
 		ftQuery.disableFullTextFilter( "security" );
 		ftQuery.disableFullTextFilter( "bestDriver" );
-		assertEquals( "Should not filter anymore", 3, ftQuery.getResultSize() );;
+		assertEquals( "Should not filter anymore", 3, ftQuery.getResultSize() );
 	}
 
 	public void testCache() {
@@ -80,7 +80,7 @@ public class FilterTest extends SearchTestCase {
 		assertEquals( "Should filter out all", 0, ftQuery.getResultSize() );
 
 		// HSEARCH-174 - we call System.gc() to force a garbage collection.
-		// Prior to the fix for HSEARCH-174 this would cause the filter to be 
+		// Prior to the fix for HSEARCH-174 this would cause the filter to be
 		// garbage collected since Lucene used weak references.
 		System.gc();
 

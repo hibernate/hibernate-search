@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -33,7 +33,7 @@ public abstract class NumericFieldBridge implements TwoWayFieldBridge {
 
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if (value != null) {
-			luceneOptions.addNumericFieldToDocument(name, value, document);
+			luceneOptions.addNumericFieldToDocument( name, value, document );
 		}
 	}
 

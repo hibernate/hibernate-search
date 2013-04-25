@@ -45,7 +45,7 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
  * @author Emmanuel Bernard
  */
 public interface SearchFactoryIntegrator extends SearchFactory {
-	
+
 	EntityIndexBinder getIndexBindingForEntity(Class<?> entityType);
 
 	/**

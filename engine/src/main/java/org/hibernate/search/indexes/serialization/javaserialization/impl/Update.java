@@ -28,6 +28,7 @@ import java.util.Map;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class Update implements Operation {
+
 	private String entityClassName;
 	private Serializable id;
 	private Map<String,String> fieldToAnalyzerMap = new HashMap<String, String>();

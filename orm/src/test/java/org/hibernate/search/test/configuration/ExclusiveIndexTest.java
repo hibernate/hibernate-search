@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -36,11 +36,11 @@ import org.junit.Test;
 
 /**
  * Verifies the property exclusive_index_use is properly applied to the backend
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class ExclusiveIndexTest {
-	
+
 	@Test
 	public void verifyIndexExclusivity() {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
@@ -52,7 +52,7 @@ public class ExclusiveIndexTest {
 			.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
 			.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
 			.openFullTextSession();
-		SearchFactoryImplementor searchFactory = ( SearchFactoryImplementor ) ftSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
 		ftSession.close();
 		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
 		//explicitly enabled:

@@ -30,19 +30,19 @@ import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 
-@Spatial(name="home",  spatialMode = SpatialMode.GRID)
+@Spatial(name = "home", spatialMode = SpatialMode.GRID)
 @Entity
 @Indexed
-@Table(name="people")//User is a reserved name in most databases
+@Table(name = "people")// User is a reserved name in most databases
 public class User {
 
 	@Id
 	Integer id;
 
-	@Latitude(of="home")
+	@Latitude(of = "home")
 	Double homeLatitude;
 
-	@Longitude(of="home")
+	@Longitude(of = "home")
 	Double homeLongitude;
 
 	public User(Integer id, Double homeLatitude, Double homeLongitude) {

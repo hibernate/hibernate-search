@@ -36,8 +36,8 @@ import java.lang.annotation.Target;
  *
  * @author Emmanuel Bernard
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( {ElementType.METHOD, ElementType.FIELD} )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 public @interface DocumentId {
 	String name() default "";

@@ -90,7 +90,7 @@ public class FilterOptimizationHelper {
 		}
 		//we need to copy the first BitSet because BitSet is modified by .logicalOp
 		BitSet result = (BitSet) docIdBitSets.get( 0 ).getBitSet().clone();
-		for ( int i=1; i<listSize; i++ ) {
+		for ( int i = 1; i < listSize; i++ ) {
 			BitSet bitSet = docIdBitSets.get( i ).getBitSet();
 			result.and( bitSet );
 		}
@@ -112,7 +112,7 @@ public class FilterOptimizationHelper {
 		}
 		//we need to copy the first OpenBitSet because BitSet is modified by .logicalOp
 		OpenBitSet result = (OpenBitSet) openBitSets.get( 0 ).clone();
-		for ( int i=1; i<listSize; i++ ) {
+		for ( int i = 1; i < listSize; i++ ) {
 			OpenBitSet openSet = openBitSets.get( i );
 			result.intersect( openSet );
 		}

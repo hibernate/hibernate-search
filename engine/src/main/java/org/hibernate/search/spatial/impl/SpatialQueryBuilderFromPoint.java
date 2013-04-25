@@ -114,7 +114,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
 	public static Query buildQuadTreeQuery(Point center, double radius, String fieldName) {
-		return new FilteredQuery( new MatchAllDocsQuery(  ), buildQuadTreeFilter(center, radius, fieldName) );
+		return new FilteredQuery( new MatchAllDocsQuery(), buildQuadTreeFilter( center, radius, fieldName ) );
 	}
 
 	/**
@@ -174,18 +174,18 @@ public abstract class SpatialQueryBuilderFromPoint {
 		String latitudeFieldName = fieldName + "_HSSI_Latitude";
 		String longitudeFieldName = fieldName + "_HSSI_Longitude";
 
-		Query latQuery= NumericRangeQuery.newDoubleRange(
+		Query latQuery = NumericRangeQuery.newDoubleRange(
 				latitudeFieldName, boundingBox.getLowerLeft().getLatitude(),
 				boundingBox.getUpperRight().getLatitude(), true, true
 		);
 
-		Query longQuery= null;
+		Query longQuery = null;
 		if ( boundingBox.getLowerLeft().getLongitude() <= boundingBox.getUpperRight().getLongitude() ) {
 			longQuery = NumericRangeQuery.newDoubleRange( longitudeFieldName, boundingBox.getLowerLeft().getLongitude(),
 					boundingBox.getUpperRight().getLongitude(), true, true );
 		}
 		else {
-			longQuery= new BooleanQuery();
+			longQuery = new BooleanQuery();
 			( (BooleanQuery) longQuery).add( NumericRangeQuery.newDoubleRange( longitudeFieldName, boundingBox.getLowerLeft().getLongitude(),
 					180.0, true, true ), BooleanClause.Occur.SHOULD );
 			( (BooleanQuery) longQuery).add( NumericRangeQuery.newDoubleRange( longitudeFieldName, -180.0,

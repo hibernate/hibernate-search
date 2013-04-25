@@ -38,11 +38,11 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 @Indexed
 @Entity
 public class Book implements TitleAble {
-	
+
 	private long id;
-	
+
 	private String title;
-	
+
 	private Nation firstPublishedIn;
 
 	@Id @GeneratedValue
@@ -63,13 +63,13 @@ public class Book implements TitleAble {
 		this.title = title;
 	}
 
-	@ManyToOne(fetch=FetchType.LAZY,optional=false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Fetch(FetchMode.SELECT)
-	@IndexedEmbedded(depth=3)
+	@IndexedEmbedded(depth = 3)
 	public Nation getFirstPublishedIn() {
 		return firstPublishedIn;
 	}
-	
+
 	public void setFirstPublishedIn(Nation firstPublishedIn) {
 		this.firstPublishedIn = firstPublishedIn;
 	}

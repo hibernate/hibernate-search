@@ -51,8 +51,8 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	private final QueryBuildingContext queryContext;
 
 	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext rangeContext,
-												 QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts,
-												 QueryBuildingContext queryContext) {
+												QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts,
+												QueryBuildingContext queryContext) {
 		this.rangeContext = rangeContext;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldContexts = fieldContexts;
@@ -97,13 +97,13 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 
-		FieldBridge fieldBridge = documentBuilder.getBridge(fieldContext.getField());
+		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
 
 
 		final Object fromObject = rangeContext.getFrom();
 		final Object toObject = rangeContext.getTo();
 
-		if (fieldBridge!=null && NumericFieldBridge.class.isAssignableFrom(fieldBridge.getClass())) {
+		if ( fieldBridge != null && NumericFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 			perFieldQuery = NumericFieldUtils.createNumericRangeQuery(
 					fieldName,
 					fromObject,
@@ -111,7 +111,8 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 					!rangeContext.isExcludeTo(),
 					!rangeContext.isExcludeFrom()
 			);
-		} else {
+		}
+		else {
 			final String fromString  = fieldContext.isIgnoreFieldBridge() ?
 					fromObject == null ? null : fromObject.toString() :
 					documentBuilder.objectToString( fieldName, fromObject, conversionContext );

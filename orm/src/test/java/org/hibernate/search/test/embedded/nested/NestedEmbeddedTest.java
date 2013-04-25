@@ -72,7 +72,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		s.clear();
 		tx = s.beginTransaction();
 
-		product = ( Product ) s.get( Product.class, product.getId() );
+		product = (Product) s.get( Product.class, product.getId() );
 		product.getAttributes().get( 0 ).getValues().get( 0 ).setValue( "bar" );
 		tx.commit();
 
@@ -128,13 +128,13 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		s.clear();
 		tx = s.beginTransaction();
 
-		john = ( Person ) s.get( Person.class, john.getId() );
+		john = (Person) s.get( Person.class, john.getId() );
 		john.getPlacesVisited().get( 0 ).getAddress().setCity( "Paris" );
 		tx.commit();
 
 		s.clear();
 
-		john = ( Person ) s.get( Person.class, john.getId() );
+		john = (Person) s.get( Person.class, john.getId() );
 
 		session = Search.getFullTextSession( s );
 		tx = s.beginTransaction();

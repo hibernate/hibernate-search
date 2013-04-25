@@ -63,10 +63,10 @@ public class PurgeTest extends SearchTestCase {
 		Query query = parser.parse( "brand:Seiko" );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
 		List results = hibQuery.list();
-		assertEquals("incorrect test record", 1, results.size());
-		assertEquals("incorrect test record", 1, ((Clock)results.get( 0 )).getId().intValue());
+		assertEquals( "incorrect test record", 1, results.size() );
+		assertEquals( "incorrect test record", 1, ( (Clock) results.get( 0 ) ).getId().intValue() );
 
-		s.purge( Clock.class, ((Clock)results.get( 0 )).getId());
+		s.purge( Clock.class, ( (Clock) results.get( 0 ) ).getId() );
 
 		tx.commit();
 
@@ -75,10 +75,11 @@ public class PurgeTest extends SearchTestCase {
 		query = parser.parse( "brand:Festina or brand:Seiko" );
 		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
 		results = hibQuery.list();
-		assertEquals("incorrect test record count", 1, results.size());
-		assertEquals("incorrect test record", 2, ((Clock)results.get( 0 )).getId().intValue());
+		assertEquals( "incorrect test record count", 1, results.size() );
+		assertEquals( "incorrect test record", 2, ( (Clock) results.get( 0 ) ).getId().intValue() );
 
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() )
+			s.delete( element );
 		tx.commit();
 		s.close();
 	}
@@ -111,12 +112,12 @@ public class PurgeTest extends SearchTestCase {
 		Query query = parser.parse( "brand:Festina or brand:Seiko or brand:Longine or brand:Rolex" );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
 		List results = hibQuery.list();
-		assertEquals("class not completely purged", 0, results.size());
+		assertEquals( "class not completely purged", 0, results.size() );
 
 		query = parser.parse( "summary:Festina or summary:gloire" );
 		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
 		results = hibQuery.list();
-		assertEquals("incorrect class purged", 2, results.size());
+		assertEquals( "incorrect class purged", 2, results.size() );
 
 		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
 		tx.commit();

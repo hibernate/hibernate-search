@@ -32,7 +32,7 @@ public interface WithinContext {
 	/** Latitude in degree */
 	LongitudeContext ofLatitude(double latitude);
 
-	public static interface LongitudeContext {
+	interface LongitudeContext {
 		/** Longitude in degree */
 		SpatialTermination andLongitude(double longitude);
 	}

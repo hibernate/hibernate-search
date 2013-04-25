@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -48,5 +48,5 @@ public @interface NumericField {
 	/**
 	 * Default precision step, mimicking  Lucene's default precision step value.
 	 */
-	static final int PRECISION_STEP_DEFAULT = 4;
+	int PRECISION_STEP_DEFAULT = 4;
 }

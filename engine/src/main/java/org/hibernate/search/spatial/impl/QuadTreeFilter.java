@@ -84,7 +84,7 @@ public final class QuadTreeFilter extends Filter {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "QuadTreeFilter" );
-		sb.append( "{quadTreeCellsIds=" ).append(quadTreeCellsIds);
+		sb.append( "{quadTreeCellsIds=" ).append( quadTreeCellsIds );
 		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();

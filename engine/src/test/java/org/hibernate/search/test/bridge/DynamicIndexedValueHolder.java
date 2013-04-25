@@ -37,13 +37,13 @@ import org.hibernate.search.annotations.Store;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
  */
-@Indexed(index="all")
+@Indexed(index = "all")
 public class DynamicIndexedValueHolder {
 
 	@DocumentId
 	public final String id;
 
-	@Field(norms = Norms.NO, store = Store.YES, analyze = Analyze.YES, name="value")
+	@Field(norms = Norms.NO, store = Store.YES, analyze = Analyze.YES, name = "value")
 	@FieldBridge(impl = MultiFieldMapBridge.class)
 	private Map<String, String> values = new HashMap<String, String>();
 

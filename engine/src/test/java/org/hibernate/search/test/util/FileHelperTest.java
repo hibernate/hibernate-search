@@ -23,6 +23,11 @@
  */
 package org.hibernate.search.test.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,30 +35,19 @@ import java.io.IOException;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public class FileHelperTest {
-	private static final Log log = LoggerFactory.make(Log.class);
+
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private static File root;
-
-	@BeforeClass
-	public static void prepareRootDirectory() {
-		String buildDir = System.getProperty( "build.dir" );
-		if ( buildDir == null ) {
-			buildDir = ".";
-		}
-		root = new File( buildDir, "filehelper" );
-		log.infof( "Using %s as test directory.", root.getAbsolutePath() );
-	}
 
 	/**
 	 * Source directory
@@ -65,6 +59,15 @@ public class FileHelperTest {
 	 */
 	private String destDir = "filehelperdest";
 
+	@BeforeClass
+	public static void prepareRootDirectory() {
+		String buildDir = System.getProperty( "build.dir" );
+		if ( buildDir == null ) {
+			buildDir = ".";
+		}
+		root = new File( buildDir, "filehelper" );
+		log.infof( "Using %s as test directory.", root.getAbsolutePath() );
+	}
 
 	private File createFile(File dir, String name) throws IOException {
 		File file = new File( dir, name );
@@ -127,7 +130,7 @@ public class FileHelperTest {
 
 		FileHelper.synchronize( src, dest, true );
 
-		assertTrue("Directories should be in sync", FileHelper.areInSync( src, dest ));
+		assertTrue( "Directories should be in sync", FileHelper.areInSync( src, dest ) );
 		assertEquals( srcTestFile.lastModified(), destTestFile.lastModified() );
 		assertEquals( srcTestFile.length(), destTestFile.length() );
 		assertTrue( destTestFile1.exists() );
@@ -138,6 +141,6 @@ public class FileHelperTest {
 		srcTestFile.delete();
 		FileHelper.synchronize( src, dest, true );
 		assertTrue( !destTestFile.exists() );
-		assertTrue("Directories should be in sync", FileHelper.areInSync( src, dest ));
+		assertTrue( "Directories should be in sync", FileHelper.areInSync( src, dest ) );
 	}
 }

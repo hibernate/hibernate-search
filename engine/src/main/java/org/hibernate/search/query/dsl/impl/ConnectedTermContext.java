@@ -42,15 +42,15 @@ class ConnectedTermContext implements TermContext {
 	public ConnectedTermContext(QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = new QueryCustomizer();
-		this.termContext = new TermQueryContext( TermQueryContext.Approximation.EXACT);
+		this.termContext = new TermQueryContext( TermQueryContext.Approximation.EXACT );
 	}
 
 	public TermMatchingContext onField(String field) {
-		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext);
+		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext );
 	}
 
 	public TermMatchingContext onFields(String... fields) {
-		return new ConnectedTermMatchingContext( termContext, fields, queryCustomizer, queryContext);
+		return new ConnectedTermMatchingContext( termContext, fields, queryCustomizer, queryContext );
 	}
 
 	public FuzzyContext fuzzy() {
@@ -58,7 +58,7 @@ class ConnectedTermContext implements TermContext {
 	}
 
 	public WildcardContext wildcard() {
-		return new ConnectedWildcardContext(queryCustomizer, queryContext);
+		return new ConnectedWildcardContext( queryCustomizer, queryContext );
 	}
 
 	public ConnectedTermContext boostedTo(float boost) {
@@ -72,7 +72,7 @@ class ConnectedTermContext implements TermContext {
 	}
 
 	public ConnectedTermContext filteredBy(Filter filter) {
-		queryCustomizer.filteredBy(filter);
+		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 }

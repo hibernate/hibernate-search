@@ -38,7 +38,7 @@ public abstract class SpatialHelper {
 	/**
 	 * Private constructor locking down utility class
 	 */
-	private SpatialHelper() {};
+	private SpatialHelper() { };
 
 	/**
 	 * Generate a Cell Index on one axis
@@ -49,7 +49,7 @@ public abstract class SpatialHelper {
 	 * @return the cell index on the axis
 	 */
 	public static int getCellIndex(double coordinate, double range, int quadTreeLevel) {
-		return ( int ) Math.floor( Math.pow( 2, quadTreeLevel ) * coordinate / range );
+		return (int) Math.floor( Math.pow( 2, quadTreeLevel ) * coordinate / range );
 	}
 
 	/**
@@ -71,7 +71,7 @@ public abstract class SpatialHelper {
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
 				quadTreeLevel
 		);
-		return formatQuadTreeCellId(longitudeCellIndex, latitudeCellIndex);
+		return formatQuadTreeCellId( longitudeCellIndex, latitudeCellIndex );
 	}
 
 	/**
@@ -107,7 +107,7 @@ public abstract class SpatialHelper {
 				quadTreeLevel
 		);
 
-		double[] projectedLowerRight= projectToIndexSpace( Point.fromDegrees( lowerLeft.getLatitude(), upperRight.getLongitude() ) );
+		double[] projectedLowerRight = projectToIndexSpace( Point.fromDegrees( lowerLeft.getLatitude(), upperRight.getLongitude() ) );
 		int lowerRightXIndex = getCellIndex(
 				projectedLowerRight[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
@@ -131,19 +131,16 @@ public abstract class SpatialHelper {
 				quadTreeLevel
 		);
 
-		int startX, endX;
-		startX= Math.min(Math.min(Math.min(lowerLeftXIndex,upperLeftXIndex),upperRightXIndex),lowerRightXIndex);
-		endX= Math.max(Math.max(Math.max(lowerLeftXIndex,upperLeftXIndex),upperRightXIndex),lowerRightXIndex);
+		final int startX = Math.min( Math.min( Math.min( lowerLeftXIndex, upperLeftXIndex ), upperRightXIndex ), lowerRightXIndex );
+		final int endX = Math.max( Math.max( Math.max( lowerLeftXIndex, upperLeftXIndex ), upperRightXIndex ), lowerRightXIndex );
 
-		int startY, endY;
-		startY= Math.min(Math.min(Math.min(lowerLeftYIndex,upperLeftYIndex),upperRightYIndex),lowerRightYIndex);
-		endY= Math.max(Math.max(Math.max(lowerLeftYIndex,upperLeftYIndex),upperRightYIndex),lowerRightYIndex);
+		final int startY = Math.min( Math.min( Math.min( lowerLeftYIndex, upperLeftYIndex ), upperRightYIndex ), lowerRightYIndex );
+		final int endY = Math.max( Math.max( Math.max( lowerLeftYIndex, upperLeftYIndex ), upperRightYIndex ), lowerRightYIndex );
 
-		List<String> quadTreeCellsIds = new ArrayList<String>((endX+1-startX)*(endY+1-startY));
-		int xIndex, yIndex;
-		for ( xIndex = startX; xIndex <= endX; xIndex++ ) {
-			for ( yIndex = startY; yIndex <= endY; yIndex++ ) {
-				quadTreeCellsIds.add(formatQuadTreeCellId(xIndex, yIndex));
+		List<String> quadTreeCellsIds = new ArrayList<String>( ( endX + 1 - startX ) * ( endY + 1 - startY ) );
+		for ( int xIndex = startX; xIndex <= endX; xIndex++ ) {
+			for ( int yIndex = startY; yIndex <= endY; yIndex++ ) {
+				quadTreeCellsIds.add( formatQuadTreeCellId( xIndex, yIndex ) );
 			}
 		}
 
@@ -198,7 +195,7 @@ public abstract class SpatialHelper {
 	 * that are big enough to contain the search area but the smallest possible. By returning this level we ensure
 	 * 4 Quad Tree Cell maximum will be needed to cover the search area (2 max on each axis because of search area
 	 * crossing fixed bonds of the quad tree cells)
-	 * 
+	 *
 	 * @param searchRange
 	 *            search range to be covered by the quad tree cells
 	 * @return Return the best Quad Tree level for a given search radius.
@@ -207,13 +204,13 @@ public abstract class SpatialHelper {
 
 		double iterations = GeometricConstants.EARTH_EQUATOR_CIRCUMFERENCE_KM / ( 2.0d * searchRange );
 
-		return ( int ) Math.max(  0, Math.ceil( Math.log( iterations ) / LOG2 ) );
+		return (int) Math.max( 0, Math.ceil( Math.log( iterations ) / LOG2 ) );
 	}
 
 	/**
 	 * Project a degree latitude/longitude point into a sinusoidal projection planar space for quad tree cell ids
 	 * computation
-	 * 
+	 *
 	 * @param point
 	 *            point to be projected
 	 * @return array of projected coordinates

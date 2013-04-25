@@ -31,7 +31,7 @@ import org.apache.lucene.search.Similarity;
  */
 @SuppressWarnings("serial")
 public class DummySimilarity extends Similarity {
-	
+
 	private float CONST = 1.0f;
 
 	@Override

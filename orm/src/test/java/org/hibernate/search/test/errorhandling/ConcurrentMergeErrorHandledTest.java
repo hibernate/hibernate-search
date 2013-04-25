@@ -48,12 +48,12 @@ import org.junit.runner.RunWith;
  * which means the commit on the index from our part.
  * The tricky issue is that the merger works in a separate thread and some
  * inner private classes are involved.
- * 
+ *
  * The Byteman rules are defined in a resources file ConcurrentMergeErrorTest.bytemanrules
- * 
+ *
  * The goal of the test is to make sure we can catch and report the errors
  * thrown by the merger via whatever is configured as Environment.ERROR_HANDLER.
- * 
+ *
  * @see Environment#ERROR_HANDLER
  * @author Sanne Grinovero
  */

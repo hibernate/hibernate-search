@@ -37,11 +37,11 @@ import org.hibernate.annotations.IndexColumn;
 
 @Entity
 public class ProductCatalog {
-	
+
 	@Id @GeneratedValue
 	private Integer id;
 	private String name;
-	
+
 	@OneToMany(fetch = FetchType.LAZY)
 	@IndexColumn(name = "list_position")
 	@Cascade(org.hibernate.annotations.CascadeType.ALL)
@@ -69,6 +69,6 @@ public class ProductCatalog {
 	}
 
 	public void addItem(Item item) {
-		this.items.add(item);
+		this.items.add( item );
 	}
 }

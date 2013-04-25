@@ -30,7 +30,8 @@ import org.hibernate.annotations.common.AssertionFailure;
  * @author Emmanuel Bernard
  */
 public class FilterCacheModeTypeHelper {
-	private FilterCacheModeTypeHelper() {}
+
+	private FilterCacheModeTypeHelper() { }
 
 	public static boolean cacheInstance(FilterCacheModeType type) {
 		switch ( type ) {

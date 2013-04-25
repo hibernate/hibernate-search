@@ -71,21 +71,21 @@ public class CopyTokenStream extends TokenStream implements Serializable {
 		}
 
 		// Since the TokenFilter can be reset, the tokens need to be preserved as immutable.
-		setState(index);
+		setState( index );
 		index++;
 		return true;
 	}
 
 	private void setState(int localIndex) {
-		for ( AttributeImpl attr : cache.get(localIndex) ) {
+		for ( AttributeImpl attr : cache.get( localIndex ) ) {
 			addAttributeImpl( attr );
 		}
 	}
 
 	@Override
 	public final void end() throws IOException {
-		if (cache.size() > 0) {
-			setState(cache.size()-1);
+		if ( cache.size() > 0 ) {
+			setState( cache.size() - 1 );
 		}
 	}
 

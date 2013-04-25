@@ -92,17 +92,17 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 		Entity2ForUnindexed ent2_0   = new Entity2ForUnindexed();
 		Entity2ForUnindexed ent2_1   = new Entity2ForUnindexed();
 
-		ent2_0.setEntity1(ent1_0);
-		ent1_0.getEntities2().add(ent2_0);
+		ent2_0.setEntity1( ent1_0 );
+		ent1_0.getEntities2().add( ent2_0 );
 
-		ent2_1.setEntity1(ent1_1);
-		ent1_1.getEntities2().add(ent2_1);
+		ent2_1.setEntity1( ent1_1 );
+		ent1_1.getEntities2().add( ent2_1 );
 
-		//persist outside the tx
-		fts.persist(ent1_0);
-		fts.persist(ent1_1);
-		fts.persist(ent2_0);
-		fts.persist(ent2_1);
+		// persist outside the tx
+		fts.persist( ent1_0 );
+		fts.persist( ent1_1 );
+		fts.persist( ent2_0 );
+		fts.persist( ent2_1 );
 
 		Transaction tx = fts.beginTransaction();
 		tx.commit(); //flush
@@ -110,23 +110,25 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 		fts.clear();
 
 		Entity1ForUnindexed other = new Entity1ForUnindexed();
-        fts.persist(other);
+		fts.persist( other );
 
 		fts.getTransaction().begin();
-        fts.getTransaction().commit();
-        fts.clear();
+		fts.getTransaction().commit();
+		fts.clear();
 
 		//FIXME that's not guaranteed to happen before flush
-        long otherId = other.getUid();
+		long otherId = other.getUid();
 
-		assertEquals( 1, fts.createFullTextQuery( new TermQuery( new Term("entity1.uid", new Long( ent1_0.getUid() ).toString() ) ), Entity2ForUnindexed.class ).getResultSize() );
-		Entity1ForUnindexed toDelete = (Entity1ForUnindexed) fts.get(Entity1ForUnindexed.class, otherId);
+		assertEquals( 1, fts
+				.createFullTextQuery( new TermQuery( new Term( "entity1.uid", new Long( ent1_0.getUid() ).toString() ) ), Entity2ForUnindexed.class )
+				.getResultSize() );
+		Entity1ForUnindexed toDelete = (Entity1ForUnindexed) fts.get( Entity1ForUnindexed.class, otherId );
 
-		fts.delete(toDelete);
+		fts.delete( toDelete );
 
 		fts.getTransaction().begin();
-        fts.getTransaction().commit();
-        fts.clear();
+		fts.getTransaction().commit();
+		fts.clear();
 
 		assertEquals( 0, fts.createFullTextQuery( new TermQuery( new Term("entity1.uid", String.valueOf( otherId ) ) ), Entity2ForUnindexed.class ).getResultSize() );
 

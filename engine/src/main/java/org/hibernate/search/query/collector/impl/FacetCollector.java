@@ -214,7 +214,7 @@ public class FacetCollector extends Collector {
 		}
 	}
 
-	static public class FacetEntryComparator implements Comparator<Entry<String, Integer>>, Serializable {
+	public static class FacetEntryComparator implements Comparator<Entry<String, Integer>>, Serializable {
 		private final FacetSortOrder sortOder;
 
 		public FacetEntryComparator(FacetSortOrder sortOrder) {
@@ -234,14 +234,14 @@ public class FacetCollector extends Collector {
 		}
 	}
 
-	static public class RangeDefinitionOrderFacetComparator implements Comparator<Facet>, Serializable {
+	public static class RangeDefinitionOrderFacetComparator implements Comparator<Facet>, Serializable {
 
 		public int compare(Facet facet1, Facet facet2) {
 			return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
 		}
 	}
 
-	static public abstract class FacetCounter {
+	public abstract static class FacetCounter {
 		private Map<String, Integer> counts = newHashMap();
 
 		Map<String, Integer> getCounts() {

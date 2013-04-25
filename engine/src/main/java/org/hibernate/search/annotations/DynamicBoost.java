@@ -46,5 +46,6 @@ public @interface DynamicBoost {
 	 *         value as function of the annotated object.
 	 * @see org.hibernate.search.engine.BoostStrategy
 	 */
-	public abstract Class<? extends BoostStrategy> impl();
+	Class<? extends BoostStrategy> impl();
+
 }

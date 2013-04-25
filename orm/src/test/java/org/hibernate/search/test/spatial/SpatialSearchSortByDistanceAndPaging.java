@@ -57,7 +57,7 @@ import org.hibernate.testing.TestForIssue;
  *
  * @author PB
  */
-@TestForIssue(jiraKey="HSEARCH-1267")
+@TestForIssue(jiraKey = "HSEARCH-1267")
 public class SpatialSearchSortByDistanceAndPaging extends SearchTestCase {
 
 	private static final int EXPECTED_RESULTS_COUNT = 37;

@@ -27,5 +27,3 @@
  * <a href="http://en.wikipedia.org/wiki/Faceted_search">Faceted Search</a>.
  */
 package org.hibernate.search.query.facet;
-
-

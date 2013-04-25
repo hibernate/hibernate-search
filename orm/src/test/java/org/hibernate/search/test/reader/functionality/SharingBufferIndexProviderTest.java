@@ -39,7 +39,7 @@ import org.junit.Test;
 
 /**
  * Emulates a stress condition on the SharingBufferReaderProvider, to make sure index lifecycle is properly managed.
- * 
+ *
  * @author Sanne Grinovero
  */
 public class SharingBufferIndexProviderTest {
@@ -52,10 +52,10 @@ public class SharingBufferIndexProviderTest {
 	private final AtomicInteger countDoneSearches = new AtomicInteger();
 	private final AtomicInteger countDoneIndexmods = new AtomicInteger();
 	private static final int SEARCHES_NUM = 10000;
-	
+
 	@Test
 	public void testStressingMock() throws InterruptedException {
-		readerProvider.initialize(null, null);
+		readerProvider.initialize( null, null );
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( 50 ); //much chaos
 		for ( int i = 0; i < SEARCHES_NUM; i++ ) {
 			executor.execute( makeTask( i ) );
@@ -73,7 +73,7 @@ public class SharingBufferIndexProviderTest {
 			}
 		}
 		assertEquals( SEARCHES_NUM, countDoneSearches.get() );
-		assertEquals( SEARCHES_NUM/10, countDoneIndexmods.get() );
+		assertEquals( SEARCHES_NUM / 10, countDoneIndexmods.get() );
 	}
 
 	private Runnable makeTask(int i) {
@@ -92,7 +92,8 @@ public class SharingBufferIndexProviderTest {
 		public void run() {
 			try {
 				startSignal.await();
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				//manage termination:
 				return;
@@ -103,7 +104,7 @@ public class SharingBufferIndexProviderTest {
 			countDoneSearches.incrementAndGet();
 		}
 	}
-	
+
 	private class ChangeTask extends SearchTask {
 		public void run() {
 			super.run();
@@ -112,7 +113,7 @@ public class SharingBufferIndexProviderTest {
 			countDoneIndexmods.incrementAndGet();
 		}
 	}
-	
+
 	private class DirectorySwitchTask extends ChangeTask {
 		public void run() {
 			super.run();

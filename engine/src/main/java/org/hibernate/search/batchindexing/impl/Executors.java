@@ -40,12 +40,12 @@ import org.hibernate.search.util.logging.impl.Log;
  * @author Sanne Grinovero
  */
 public class Executors {
-	
-	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
+
 	public static final int QUEUE_MAX_LENGTH = 1000;
-	
+	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	/**
 	 * Creates a new fixed size ThreadPoolExecutor.
 	 * It's using a blockingqueue of maximum 1000 elements and the rejection
@@ -73,63 +73,62 @@ public class Executors {
 		return new ThreadPoolExecutor(
 				threads,
 				threads,
-	            0L, TimeUnit.MILLISECONDS,
-	            new LinkedBlockingQueue<Runnable>( queueSize ),
-	            new SearchThreadFactory( groupname ),
-	            new BlockPolicy() );
+				0L,
+				TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>( queueSize ),
+				new SearchThreadFactory( groupname ),
+				new BlockPolicy()
+				);
 	}
-	
+
 	/**
-     * The thread factory, used to customize thread names
-     */
-    private static class SearchThreadFactory implements ThreadFactory {
-    	
-        final ThreadGroup group;
-        final AtomicInteger threadNumber = new AtomicInteger( 1 );
-        final String namePrefix;
+	 * The thread factory, used to customize thread names
+	 */
+	private static class SearchThreadFactory implements ThreadFactory {
 
-        SearchThreadFactory(String groupname) {
-            SecurityManager s = System.getSecurityManager();
-            group = ( s != null ) ? s.getThreadGroup() :
-                                 Thread.currentThread().getThreadGroup();
-            namePrefix = THREAD_GROUP_PREFIX + groupname + "-";
-        }
+		final ThreadGroup group;
+		final AtomicInteger threadNumber = new AtomicInteger( 1 );
+		final String namePrefix;
 
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread( group, r, 
-                                  namePrefix + threadNumber.getAndIncrement(),
-                                  0 );
-            return t;
-        }
-        
-    }
-    
-    /**
-     * A handler for rejected tasks that will have the caller block until
-     * space is available.
-     */
-    public static class BlockPolicy implements RejectedExecutionHandler {
+		SearchThreadFactory(String groupname) {
+			SecurityManager s = System.getSecurityManager();
+			group = ( s != null ) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+			namePrefix = THREAD_GROUP_PREFIX + groupname + "-";
+		}
 
-    	/**
-         * Creates a <tt>BlockPolicy</tt>.
-         */
-        public BlockPolicy() { }
+		public Thread newThread(Runnable r) {
+			Thread t = new Thread( group, r, namePrefix + threadNumber.getAndIncrement(), 0 );
+			return t;
+		}
 
-        /**
-         * Puts the Runnable to the blocking queue, effectively blocking
-         * the delegating thread until space is available.
-         * @param r the runnable task requested to be executed
-         * @param e the executor attempting to execute this task
-         */
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-        	try {
+	}
+
+	/**
+	 * A handler for rejected tasks that will have the caller block until space is available.
+	 */
+	public static class BlockPolicy implements RejectedExecutionHandler {
+
+		/**
+		 * Creates a <tt>BlockPolicy</tt>.
+		 */
+		public BlockPolicy() {
+		}
+
+		/**
+		 * Puts the Runnable to the blocking queue, effectively blocking the delegating thread until space is available.
+		 *
+		 * @param r the runnable task requested to be executed
+		 * @param e the executor attempting to execute this task
+		 */
+		public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+			try {
 				e.getQueue().put( r );
 			}
 			catch (InterruptedException e1) {
 				log.interruptedWorkError( r );
 				Thread.currentThread().interrupt();
 			}
-        }
-    }
-	
+		}
+	}
+
 }

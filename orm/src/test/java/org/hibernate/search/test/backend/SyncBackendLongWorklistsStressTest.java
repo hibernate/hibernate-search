@@ -54,7 +54,7 @@ public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
 
 		Transaction tx = s.beginTransaction();
 		// count of entities in database needs to be checked before SF is closed (HSQLDB will forget the entities)
-		Number count = ( Number ) s.createCriteria( Clock.class )
+		Number count = (Number) s.createCriteria( Clock.class )
 				.setProjection( Projections.rowCount() )
 				.uniqueResult();
 		Assert.assertEquals( NUM_SAVED_ENTITIES, count.intValue() );

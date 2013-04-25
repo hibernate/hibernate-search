@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -85,7 +85,7 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 
 	public int releaseBlockedThreads() {
 		int count = (int) threadTrap.getCount();
-		for ( int i=0; i<count; i++) {
+		for ( int i = 0; i < count; i++ ) {
 			threadTrap.countDown();
 		}
 		return count;

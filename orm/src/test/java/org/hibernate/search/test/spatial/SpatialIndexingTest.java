@@ -63,8 +63,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( POI.class ).get();
@@ -107,11 +107,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testDistanceProjection() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
-		POI poi2= new POI(  2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
-		POI poi3= new POI(  3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
-		POI poi4= new POI(  4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
-		POI poi5= new POI(  5, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
-		POI poi6= new POI(  6, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
+		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
+		POI poi3 = new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
+		POI poi4 = new POI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
+		POI poi5 = new POI( 5, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
+		POI poi6 = new POI( 6, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
@@ -127,8 +127,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		tx.commit();
 
 		tx = fullTextSession.beginTransaction();
-		double centerLatitude= 24.0d;
-		double centerLongitude= 32.0d;
+		double centerLatitude = 24.0d;
+		double centerLongitude = 32.0d;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( POI.class ).get();
@@ -140,12 +140,12 @@ public class SpatialIndexingTest extends SearchTestCase {
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.list();
-		Object[] firstResult = (Object[]) results.get(0);
-		Object[] secondResult = (Object[]) results.get(1);
-		Object[] thirdResult = (Object[]) results.get(2);
-		Object[] fourthResult = (Object[]) results.get(3);
-		Object[] fifthResult = (Object[]) results.get(4);
-		Object[] sixthResult = (Object[]) results.get(5);
+		Object[] firstResult = (Object[]) results.get( 0 );
+		Object[] secondResult = (Object[]) results.get( 1 );
+		Object[] thirdResult = (Object[]) results.get( 2 );
+		Object[] fourthResult = (Object[]) results.get( 3 );
+		Object[] fifthResult = (Object[]) results.get( 4 );
+		Object[] sixthResult = (Object[]) results.get( 5 );
 		Assert.assertEquals( ((Double)firstResult[1]), 0.0, 0.0001 );
 		Assert.assertEquals( ((Double)secondResult[1]), 10.1582, 0.0001 );
 		Assert.assertEquals( ((Double)thirdResult[1]), 11.1195, 0.0001 );
@@ -154,7 +154,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( ((Double)sixthResult[1]), 24.446, 0.001 );
 
 		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for (Object entity : pois) {
+		for ( Object entity : pois ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -183,8 +183,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		tx.commit();
 
 		tx = fullTextSession.beginTransaction();
-		double centerLatitude= 24.0d;
-		double centerLongitude= 32.0d;
+		double centerLatitude = 24.0d;
+		double centerLongitude = 32.0d;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( POI.class ).get();
@@ -229,8 +229,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		tx.commit();
 
 		tx = fullTextSession.beginTransaction();
-		double centerLatitude= 24.0d;
-		double centerLongitude= 32.0d;
+		double centerLatitude = 24.0d;
+		double centerLongitude = 32.0d;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( NonGeoPOI.class ).get();
@@ -265,8 +265,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Event.class ).get();
@@ -303,8 +303,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( User.class ).get();
@@ -341,8 +341,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( UserRange.class ).get();
@@ -418,8 +418,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( RangeEvent.class ).get();
 
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
 				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
@@ -455,8 +455,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Hotel.class ).get();
@@ -497,8 +497,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( RangeHotel.class ).get();
@@ -518,8 +518,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
 
-		double endOfTheWorldLatitude= 0.0d;
-		double endOfTheWorldLongitude= 180.0d;
+		double endOfTheWorldLatitude = 0.0d;
+		double endOfTheWorldLongitude = 180.0d;
 
 		org.apache.lucene.search.Query luceneQuery3 = builder.spatial().onCoordinates( "location" )
 				.within( 112, Unit.KM ).ofLatitude( endOfTheWorldLatitude ).andLongitude( endOfTheWorldLongitude ).createQuery();
@@ -556,8 +556,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Restaurant.class ).get();
 
-		double centerLatitude= 24;
-		double centerLongitude= 31.5;
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
 
 		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "position.location" )
 				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();

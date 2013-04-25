@@ -23,12 +23,14 @@
  */
 package org.hibernate.search.test.engine;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Tests that the FullTextIndexEventListener is Serializable
@@ -42,8 +44,8 @@ public class EventListenerSerializationTest {
 		FullTextIndexEventListener eventListener = new FullTextIndexEventListener( FullTextIndexEventListener.Installation.SINGLE_INSTANCE );
 		eventListener.addSynchronization( null, null );
 		Object secondListener = SerializationTestHelper
-				.duplicateBySerialization(eventListener);
-		assertNotNull(secondListener);
-		assertFalse(secondListener == eventListener);
+				.duplicateBySerialization( eventListener );
+		assertNotNull( secondListener );
+		assertFalse( secondListener == eventListener );
 	}
 }

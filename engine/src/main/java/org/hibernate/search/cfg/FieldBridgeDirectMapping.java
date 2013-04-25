@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -45,8 +45,8 @@ public class FieldBridgeDirectMapping extends PropertyMapping {
 
 	public FieldBridgeDirectMapping param(String name, String value) {
 		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( fieldBridgeAnn, "params" );
-		param.put("name", name);
-		param.put("value", value);
+		param.put( "name", name );
+		param.put( "value", value );
 		return this;
 	}
 

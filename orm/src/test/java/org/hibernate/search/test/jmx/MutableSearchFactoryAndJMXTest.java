@@ -37,7 +37,7 @@ import org.junit.Test;
  * @author Hardy Ferentschik
  */
 public class MutableSearchFactoryAndJMXTest {
-	
+
 	@Test
 	public void testRebuildFactory() {
 		File targetDir = TestConstants.getTargetDir();

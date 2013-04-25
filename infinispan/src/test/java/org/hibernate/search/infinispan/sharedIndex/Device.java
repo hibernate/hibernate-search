@@ -45,15 +45,15 @@ public abstract class Device {
 	@GeneratedValue
 	public Long id;
 
-	@Field(analyze=Analyze.NO)
+	@Field(analyze = Analyze.NO)
 	@Column(name = "mfg")
 	public String manufacturer = "";
 
-	@Field(analyze=Analyze.NO)
+	@Field(analyze = Analyze.NO)
 	@Column(name = "model")
 	public String model = "";
 
-	@Field(analyze=Analyze.NO)
+	@Field(analyze = Analyze.NO)
 	@Column(name = "serial_number")
 	public String serialNumber;
 
@@ -76,7 +76,7 @@ public abstract class Device {
 		if ( !( obj instanceof Device ) )
 			return false;
 		Device other = (Device) obj;
-		
+
 		if ( manufacturer == null ) {
 			if ( other.manufacturer != null )
 				return false;

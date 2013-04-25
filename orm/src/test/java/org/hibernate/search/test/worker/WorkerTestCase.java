@@ -49,7 +49,7 @@ import org.hibernate.search.test.TestConstants;
  * @author Sanne Grinovero
  */
 public class WorkerTestCase extends SearchTestCase {
-	
+
 	public void testConcurrency() throws Exception {
 		final AtomicBoolean allFine = new AtomicBoolean( true );
 		int nThreads = 15;
@@ -100,13 +100,13 @@ public class WorkerTestCase extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				ee = ( Employee ) s.get( Employee.class, ee.getId() );
+				ee = (Employee) s.get( Employee.class, ee.getId() );
 				ee.setName( "Emmanuel2" );
 				tx.commit();
 				s.close();
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				er = ( Employer ) s.get( Employer.class, er.getId() );
+				er = (Employer) s.get( Employer.class, er.getId() );
 				er.setName( "RH2" );
 				tx.commit();
 				s.close();
@@ -135,13 +135,13 @@ public class WorkerTestCase extends SearchTestCase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				er = ( Employer ) s.get( Employer.class, er.getId() );
+				er = (Employer) s.get( Employer.class, er.getId() );
 				s.delete( er );
 				tx.commit();
 				s.close();
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				ee = ( Employee ) s.get( Employee.class, ee.getId() );
+				ee = (Employee) s.get( Employee.class, ee.getId() );
 				s.delete( ee );
 				tx.commit();
 				s.close();
@@ -189,21 +189,21 @@ public class WorkerTestCase extends SearchTestCase {
 				s.persist( ee );
 				tx.commit();
 				s.close();
-	
+
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				er = ( Employer ) s.get( Employer.class, er.getId() );
+				er = (Employer) s.get( Employer.class, er.getId() );
 				er.setName( "RH2" );
-				ee = ( Employee ) s.get( Employee.class, ee.getId() );
+				ee = (Employee) s.get( Employee.class, ee.getId() );
 				ee.setName( "Emmanuel2" );
 				tx.commit();
 				s.close();
-	
+
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				er = ( Employer ) s.get( Employer.class, er.getId() );
+				er = (Employer) s.get( Employer.class, er.getId() );
 				s.delete( er );
-				ee = ( Employee ) s.get( Employee.class, ee.getId() );
+				ee = (Employee) s.get( Employee.class, ee.getId() );
 				s.delete( ee );
 				tx.commit();
 				s.close();
@@ -232,7 +232,7 @@ public class WorkerTestCase extends SearchTestCase {
 				Employer.class
 		};
 	}
-	
+
 	protected boolean isWorkerSync() {
 		return true;
 	}

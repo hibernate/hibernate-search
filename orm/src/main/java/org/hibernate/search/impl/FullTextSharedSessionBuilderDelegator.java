@@ -108,7 +108,7 @@ public class FullTextSharedSessionBuilderDelegator implements FullTextSharedSess
 
 	@Override
 	public FullTextSharedSessionBuilder autoJoinTransactions(boolean autoJoinTransactions) {
-		builder.autoJoinTransactions(autoJoinTransactions);
+		builder.autoJoinTransactions( autoJoinTransactions );
 		return this;
 	}
 

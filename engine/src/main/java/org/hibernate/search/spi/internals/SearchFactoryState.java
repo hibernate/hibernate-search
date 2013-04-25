@@ -44,7 +44,7 @@ import java.util.Properties;
 
 /**
  * Represents the sharable state of a search factory
- * 
+ *
  * @author Emmanuel Bernard
  */
 public interface SearchFactoryState {

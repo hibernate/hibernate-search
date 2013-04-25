@@ -35,11 +35,12 @@ import java.lang.annotation.Target;
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( {ElementType.FIELD, ElementType.METHOD} )
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface FieldBridge {
-	//default to embed @FieldBridge in @Field
-	public Class<?> impl() default void.class;
 
-	public Parameter[] params() default {};
+	//default to embed @FieldBridge in @Field
+	Class<?> impl() default void.class;
+
+	Parameter[] params() default { };
 }

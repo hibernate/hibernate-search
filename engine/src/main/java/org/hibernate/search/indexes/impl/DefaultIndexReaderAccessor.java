@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -56,7 +56,7 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 
 	@Override
 	public IndexReader open(Class<?>... entities) {
-		if(entities.length == 0) {
+		if ( entities.length == 0 ) {
 			throw log.needAtLeastOneIndexedEntityType();
 		}
 

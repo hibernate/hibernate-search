@@ -31,13 +31,13 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class Item {
-	
+
 	@Id @GeneratedValue
 	private Integer id;
 	private String description;
 	private Double price;
-	
-	
+
+
 	@ManyToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
 	private ProductCatalog productCatalog;
 

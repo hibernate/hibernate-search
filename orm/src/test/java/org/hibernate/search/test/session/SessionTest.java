@@ -57,7 +57,7 @@ public class SessionTest extends SearchTestCase {
 	public void testSessionWrapper() throws Exception {
 		Session s = openSession();
 		DelegationWrapper wrapper = new DelegationWrapper( s );
-		Session wrapped = ( Session ) Proxy.newProxyInstance(
+		Session wrapped = (Session) Proxy.newProxyInstance(
 				org.hibernate.Session.class.getClassLoader(),
 				SESS_PROXY_INTERFACES,
 				wrapper

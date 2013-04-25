@@ -45,22 +45,21 @@ import org.hibernate.search.annotations.DocumentId;
 @Entity
 @Indexed
 public class Product {
-	
+
 	@Id @GeneratedValue @DocumentId
 	private Integer id;
-	
+
 	@Field
 	private String name;
-	
+
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense
 	@IndexedEmbedded
 	private Set<Author> authors = new HashSet<Author>();
 
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense
-	@MapKeyColumn(name="CUST_NAME",nullable=false)
+	@MapKeyColumn(name = "CUST_NAME", nullable = false)
 	@IndexedEmbedded
 	private Map<String, Order> orders = new HashMap<String, Order>();
-
 
 	public Integer getId() {
 		return id;

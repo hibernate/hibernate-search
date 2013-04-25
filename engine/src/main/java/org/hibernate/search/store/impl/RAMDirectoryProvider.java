@@ -85,8 +85,12 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 		// this code is actually broken since the value change after initialize call
 		// but from a practical POV this is fine since we only call this method
 		// after initialize call
-		if ( obj == this ) return true;
-		if ( obj == null || !( obj instanceof RAMDirectoryProvider ) ) return false;
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj == null || !( obj instanceof RAMDirectoryProvider ) ) {
+			return false;
+		}
 		return indexName.equals( ( (RAMDirectoryProvider) obj ).indexName );
 	}
 

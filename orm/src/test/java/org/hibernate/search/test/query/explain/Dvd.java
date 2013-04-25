@@ -37,9 +37,10 @@ import org.hibernate.search.annotations.Field;
 @Entity
 @Indexed
 public class Dvd {
+
 	@Id @GeneratedValue @DocumentId private Integer id;
-	private @Field String title;
-	private @Field String description;
+	@Field private String title;
+	@Field private String description;
 
 	protected Dvd() {
 	}

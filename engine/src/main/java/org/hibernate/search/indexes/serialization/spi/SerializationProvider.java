@@ -42,7 +42,7 @@ package org.hibernate.search.indexes.serialization.spi;
  * If message's major version is < current version, the
  * implementation is strongly encouraged to parse and process them.
  * It is mandatory if only message's minor version is < current version.
- * 
+ *
  * Implementors are encouraged to implement a descriptive <code>toString()</code>
  * method for logging purposes.
  *

@@ -41,5 +41,5 @@ public @interface ClassBridges {
 	 * which is to be applied to the class containing
 	 * this annotation.
 	 */
-	ClassBridge[] value() default {};
+	ClassBridge[] value() default { };
 }

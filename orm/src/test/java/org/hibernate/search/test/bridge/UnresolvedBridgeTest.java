@@ -23,17 +23,18 @@
  */
 package org.hibernate.search.test.bridge;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.SearchException;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Emmanuel Bernard
  */
 public class UnresolvedBridgeTest {
-	
+
 	@Test
 	public void testSerializableType() throws Exception {
 		Configuration cfg = new Configuration();
@@ -46,7 +47,7 @@ public class UnresolvedBridgeTest {
 			cfg.buildSessionFactory();
 			fail( "Undefined bridge went through" );
 		}
-		catch( Exception e ) {
+		catch ( Exception e ) {
 			Throwable ee = e;
 			boolean hasSearchException = false;
 			for (;;) {

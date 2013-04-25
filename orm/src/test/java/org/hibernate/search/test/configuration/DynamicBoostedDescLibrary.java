@@ -47,7 +47,7 @@ public class DynamicBoostedDescLibrary {
 		dynScore = 1.0f;
 	}
 
-	
+
 	public int getLibraryId() {
 		return libraryId;
 	}

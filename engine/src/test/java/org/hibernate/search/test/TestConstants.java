@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -39,12 +39,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class TestConstants {
 
-	private static final Log log = LoggerFactory.make();
-
 	public static final Analyzer standardAnalyzer = new StandardAnalyzer( TestConstants.getTargetLuceneVersion() );
 	public static final Analyzer stopAnalyzer = new StopAnalyzer( TestConstants.getTargetLuceneVersion() );
 	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer( TestConstants.getTargetLuceneVersion() );
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
+
+	private static final Log log = LoggerFactory.make();
 
 	private static File targetDir;
 	private static final String indexDirPath;
@@ -53,7 +53,7 @@ public class TestConstants {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 		// get a URL reference to something we now is part of the classpath (our own classes)
 		String currentTestName = new RuntimeException().getStackTrace()[1].getClassName();
-		int hopsToRoot = currentTestName.split("\\.").length;
+		int hopsToRoot = currentTestName.split( "\\." ).length;
 		URL myUrl = contextClassLoader.getResource( currentTestName.replace( '.', '/' ) + ".class" );
 		File myPath = new File( myUrl.getFile() );
 		// navigate back to '/target'

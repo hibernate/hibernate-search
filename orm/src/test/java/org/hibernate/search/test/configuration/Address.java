@@ -46,7 +46,7 @@ public class Address {
 	private Date dateCreated;
 	private Calendar lastUpdated;
 	private String owner;
-	
+
 	public Long getAddressId() {
 		return addressId;
 	}
@@ -74,7 +74,7 @@ public class Address {
 	public void setStreet2(String street2) {
 		this.street2 = street2;
 	}
-	
+
 	public Calendar getLastUpdated() {
 		return lastUpdated;
 	}
@@ -94,9 +94,9 @@ public class Address {
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-	
+
 	public String getOwner() {
 		return this.owner;
 	}
-	
+
 }

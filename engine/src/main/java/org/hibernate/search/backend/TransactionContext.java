@@ -34,17 +34,17 @@ public interface TransactionContext {
 	/**
 	 * @return A boolean indicating whether a transaction is in progress or not.
 	 */
-	public boolean isTransactionInProgress();
+	boolean isTransactionInProgress();
 
 	/**
 	 * @return a transaction object.
 	 */
-	public Object getTransactionIdentifier();
+	Object getTransactionIdentifier();
 
 	/**
 	 * Register the given synchronization.
 	 *
 	 * @param synchronization synchronization to register
 	 */
-	public void registerSynchronization(Synchronization synchronization);
+	void registerSynchronization(Synchronization synchronization);
 }

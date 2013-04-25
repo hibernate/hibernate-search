@@ -58,7 +58,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 	public void testAnalyzerDef() throws Exception {
 		// create the test instance
 		Team team = new Team();
-		team.setDescription( "This is a D\u00E0scription" );  // \u00E0 == � - ISOLatin1AccentFilterFactory should strip of diacritic 
+		team.setDescription( "This is a D\u00E0scription" );  // \u00E0 == � - ISOLatin1AccentFilterFactory should strip of diacritic
 		team.setLocation( "Atlanta" );
 		team.setName( "ATL team" );
 

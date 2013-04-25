@@ -111,7 +111,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 	}
 
 	@Entity
-	@Table(name="JUSTFOO")
+	@Table(name = "JUSTFOO")
 	@Indexed
 	@ClassBridge(impl = FooBridge.class)
 	@AnalyzerDiscriminator(impl = FooBridge.class)
@@ -157,7 +157,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 	}
 
 	@Entity
-	@Table(name="JUSTBAR")
+	@Table(name = "JUSTBAR")
 	@Indexed
 	@ClassBridge(name = "classField", impl = BarBridge.class, analyzer = @Analyzer(impl = AnalyzerForTests1.class))
 	public static class Bar {

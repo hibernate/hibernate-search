@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -27,7 +27,8 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 
 public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
-	private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
+
+	private static final BigDecimal storeFactor = BigDecimal.valueOf( 100 );
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {

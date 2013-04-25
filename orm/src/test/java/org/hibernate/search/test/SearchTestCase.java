@@ -118,7 +118,7 @@ public abstract class SearchTestCase extends TestCase {
 			}
 			session.close();
 			session = null;
-			log.debug("Closing open session. Make sure to close sessions explicitly in your tests!");
+			log.debug( "Closing open session. Make sure to close sessions explicitly in your tests!" );
 		}
 		else {
 			session = null;
@@ -170,7 +170,7 @@ public abstract class SearchTestCase extends TestCase {
 	}
 
 	protected Directory getDirectory(Class<?> clazz) {
-		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( ( SessionFactoryImplementor ) sessions );
+		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( (SessionFactoryImplementor) sessions );
 		IndexManager[] indexManagers = searchFactoryBySFI.getIndexBindingForEntity( clazz ).getIndexManagers();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 		return indexManager.getDirectoryProvider().getDirectory();
@@ -213,7 +213,7 @@ public abstract class SearchTestCase extends TestCase {
 		if ( searchFactory == null ) {
 			Session session = openSession();
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			searchFactory = ( SearchFactoryImplementor ) fullTextSession.getSearchFactory();
+			searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 			fullTextSession.close();
 		}
 		return searchFactory;
@@ -380,7 +380,7 @@ public abstract class SearchTestCase extends TestCase {
 		}
 		catch ( Throwable t ) {
 			if ( t instanceof InvocationTargetException ) {
-				t = ( ( InvocationTargetException ) t ).getTargetException();
+				t = ( (InvocationTargetException) t ).getTargetException();
 			}
 			if ( t instanceof IllegalAccessException ) {
 				t.fillInStackTrace();

@@ -239,7 +239,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		if ( obj == null || !( obj instanceof FSSlaveDirectoryProvider ) ) {
 			return false;
 		}
-		FSSlaveDirectoryProvider other = ( FSSlaveDirectoryProvider ) obj;
+		FSSlaveDirectoryProvider other = (FSSlaveDirectoryProvider) obj;
 		//need to break memory barriers on both instances:
 		@SuppressWarnings("unused")
 		int readCurrentState = this.current; //unneeded value, but ensure visibility of indexName
@@ -259,7 +259,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	}
 
 	class InitTask extends TimerTask {
-	
+
 		@Override
 		public void run() {
 			try {
@@ -275,7 +275,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			}
 		}
 	}
-	
+
 	/**
 	 * @return true if both initialize and start succeeded
 	 */
@@ -284,7 +284,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			if ( currentMarkerIsInSource() ) {
 				initialized = true;
 				log.foundCurrentMarker();
-			} else {
+			}
+			else {
 				log.noCurrentMarkerInSourceDirectory();
 			}
 		}
@@ -316,7 +317,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				}
 			}
 		}
-		
+
 		public void stop() {
 			executor.shutdownNow();
 		}
@@ -412,19 +413,20 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		closeDirectory( directory1 );
 		closeDirectory( directory2 );
 	}
-	
+
 	private void closeDirectory(Directory directory) {
 		if ( directory != null ) {
 			try {
 				directory.close();
-			} catch ( Exception e ) {
+			}
+			catch ( Exception e ) {
 				log.unableToCloseLuceneDirectory( directory, e );
 			}
 		}
 	}
-	
+
 	protected void scheduleTask(TimerTask task, long period) {
 		timer.schedule( task, period, period );
 	}
-	
+
 }

@@ -65,13 +65,9 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 		FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
 		if ( fieldBridge instanceof SpatialFieldBridgeByQuadTree) {
 			return SpatialQueryBuilderFromPoint.buildSpatialQueryByQuadTree(
-                    Point.fromDegrees(
-                            spatialContext.getCoordinates().getLatitude(),
-                            spatialContext.getCoordinates().getLongitude()
-                    ),
-                    spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
-                    coordinatesField
-            );
+					Point.fromDegrees( spatialContext.getCoordinates().getLatitude(), spatialContext.getCoordinates().getLongitude() ),
+					spatialContext.getRadiusDistance(), // always in KM so far, no need to convert
+					coordinatesField );
 		}
 		else if ( fieldBridge instanceof SpatialFieldBridgeByRange ) {
 			return SpatialQueryBuilderFromPoint.buildSpatialQueryByRange(

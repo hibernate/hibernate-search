@@ -110,7 +110,8 @@ public class BatchCoordinator implements Runnable {
 			finally {
 				monitor.indexingCompleted();
 			}
-		} catch (RuntimeException re) {
+		}
+		catch (RuntimeException re) {
 			// each batch processing stage is already supposed to properly handle any kind
 			// of exception, still since this is possibly an async operation we need a safety
 			// for the unexpected exceptions

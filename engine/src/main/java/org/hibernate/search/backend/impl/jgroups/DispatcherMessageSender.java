@@ -39,7 +39,7 @@ import org.jgroups.util.RspList;
  * We use the MessageDispatcher instead of the JChannel to be able to use blocking
  * operations (optionally) without having to rely on the RSVP protocol
  * being configured on the stack.
- * 
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
  */

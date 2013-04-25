@@ -49,15 +49,16 @@ public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBri
 
 	public String objectToString(Object object) {
 		String rawInteger = object.toString();
-		if (rawInteger.length() > padding) throw new IllegalArgumentException( "Try to pad on a number too big" );
-		StringBuilder paddedInteger = new StringBuilder( );
-		for ( int padIndex = rawInteger.length() ; padIndex < padding ; padIndex++ ) {
-			paddedInteger.append('0');
+		if ( rawInteger.length() > padding ) throw new IllegalArgumentException( "Try to pad on a number too big" );
+		StringBuilder paddedInteger = new StringBuilder();
+		for ( int padIndex = rawInteger.length(); padIndex < padding; padIndex++ ) {
+			paddedInteger.append( '0' );
 		}
 		return paddedInteger.append( rawInteger ).toString();
 	}
 
 	public Object stringToObject(String stringValue) {
-		return new Integer(stringValue);
+		return new Integer( stringValue );
 	}
+
 }

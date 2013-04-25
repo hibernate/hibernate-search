@@ -49,7 +49,7 @@ public class RangeEvent {
 	String name;
 
 	@Field(store = Store.YES, index = Index.YES)
-	@Column(name="realdate")
+	@Column(name = "realdate")
 	Date date;
 
 	@Field(store = Store.YES, index = Index.YES)
@@ -79,7 +79,7 @@ public class RangeEvent {
 		this.name = name;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.date= date;
+		this.date = date;
 	}
 
 	public RangeEvent() {

@@ -23,6 +23,11 @@
  */
 package org.hibernate.search.test.filter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,11 +42,8 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.SortedVIntList;
-
 import org.hibernate.search.filter.impl.AndDocIdSet;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Functionality testcase for org.hibernate.search.filter.AndDocIdSet.
@@ -157,7 +159,7 @@ public class AndDocIdSetsTest {
 	}
 
 	private static void compareAndingPerformance(final int listSize,
-												 final int minBitsSize, final int maxBitsSize) throws IOException {
+												final int minBitsSize, final int maxBitsSize) throws IOException {
 		List<BitSet> filtersData = makeRandomBitSetList( 13L, listSize, minBitsSize, maxBitsSize );
 		DocIdSet andedByBitsResult = null;
 		DocIdSet andedByIterationResult = null;
@@ -219,7 +221,7 @@ public class AndDocIdSetsTest {
 	}
 
 	private static List<BitSet> makeRandomBitSetList(final long randomSeed, final int listSize,
-													 final int minBitsSize, final int maxBitsSize) {
+													final int minBitsSize, final int maxBitsSize) {
 		Random r = new Random( randomSeed ); //have a fixed Seed for repeatable tests
 		List<BitSet> resultList = new ArrayList<BitSet>( listSize );
 		for ( int i = 0; i < listSize; i++ ) {

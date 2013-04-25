@@ -111,8 +111,8 @@ public class DynamicBoostingTest extends SearchTestCase {
 				score = 0.0f;
 			}
 			else {
-				queryResult = ( Object[] ) resultList.get( 0 );
-				score = ( Float ) queryResult[0];
+				queryResult = (Object[]) resultList.get( 0 );
+				score = (Float) queryResult[0];
 				String explanation = queryResult[1].toString();
 				log.debugf( "score: %f explanation: %s", score, explanation );
 			}

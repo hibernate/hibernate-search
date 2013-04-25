@@ -95,7 +95,7 @@ public final class AnnotationProcessingHelper {
 		if ( fieldAnn != null ) {
 			float boost;
 			if ( fieldAnn instanceof org.hibernate.search.annotations.Field ) {
-				boost = ( ( org.hibernate.search.annotations.Field ) fieldAnn ).boost().value();
+				boost = ( (org.hibernate.search.annotations.Field) fieldAnn ).boost().value();
 			}
 			else if ( fieldAnn instanceof Spatial ) {
 				boost = ( (Spatial) fieldAnn ).boost().value();

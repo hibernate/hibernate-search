@@ -43,51 +43,51 @@ public class ClassBridgeMapping {
 	public ClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity, Class<?> impl) {
 		this.mapping = mapping;
 		this.entity = entity;
-		this.classBridge = new HashMap<String,Object>();
-		entity.addClassBridgeDef(classBridge);
-		if (impl != null) {
-			this.classBridge.put("impl", impl);
+		this.classBridge = new HashMap<String, Object>();
+		entity.addClassBridgeDef( classBridge );
+		if ( impl != null ) {
+			this.classBridge.put( "impl", impl );
 		}
-		
+
 	}
-	
+
 	public ClassBridgeMapping name(String name) {
-		this.classBridge.put("name", name);
+		this.classBridge.put( "name", name );
 		return this;
 	}
-	
+
 	public ClassBridgeMapping store(Store store) {
-		this.classBridge.put("store", store);
+		this.classBridge.put( "store", store );
 		return this;
 	}
-	
+
 	public ClassBridgeMapping index(Index index) {
-		this.classBridge.put("index", index);
+		this.classBridge.put( "index", index );
 		return this;
 	}
-	
+
 	public ClassBridgeMapping analyze(Analyze analyze) {
-		this.classBridge.put("analyze", analyze);
+		this.classBridge.put( "analyze", analyze );
 		return this;
 	}
 
 	public ClassBridgeMapping norms(Norms norms) {
-		this.classBridge.put("norms", norms);
+		this.classBridge.put( "norms", norms );
 		return this;
 	}
 
 	public ClassBridgeMapping termVector(TermVector termVector) {
-		this.classBridge.put("termVector", termVector);
+		this.classBridge.put( "termVector", termVector );
 		return this;
 	}
-	
+
 	public ClassBridgeMapping boost(float boost) {
 		final Map<String, Object> boostAnn = new HashMap<String, Object>();
 		boostAnn.put( "value", boost );
 		classBridge.put( "boost", boostAnn );
 		return this;
 	}
-	
+
 	public ClassBridgeMapping analyzer(Class<?> analyzerClass) {
 		final Map<String, Object> analyzer = new HashMap<String, Object>();
 		analyzer.put( "impl", analyzerClass );
@@ -101,12 +101,11 @@ public class ClassBridgeMapping {
 		classBridge.put( "analyzer", analyzer );
 		return this;
 	}
-	
-	
+
 	public ClassBridgeMapping param(String name, String value) {
-		Map<String, Object> param = SearchMapping.addElementToAnnotationArray(classBridge, "params");
-		param.put("name", name);
-		param.put("value", value);
+		Map<String, Object> param = SearchMapping.addElementToAnnotationArray( classBridge, "params" );
+		param.put( "name", name );
+		param.put( "value", value );
 		return this;
 	}
 
@@ -117,7 +116,7 @@ public class ClassBridgeMapping {
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
 		return new FullTextFilterDefMapping( mapping, name, impl );
 	}
-	
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping( name, type, entity, mapping );
 	}
@@ -137,5 +136,5 @@ public class ClassBridgeMapping {
 	public IndexedMapping indexed() {
 		return new IndexedMapping( mapping, entity );
 	}
-	
+
 }

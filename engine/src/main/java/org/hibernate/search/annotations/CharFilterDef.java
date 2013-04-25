@@ -37,16 +37,17 @@ import java.lang.annotation.Target;
  * @author Gustavo Fernandes
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface CharFilterDef {
+
 	/**
 	 * @return the <code>TokenFilterFactory</code> class which shall be instantiated.
 	 */
-	public abstract Class<? extends CharFilterFactory> factory();
+	Class<? extends CharFilterFactory> factory();
 
 	/**
 	 * @return Optional parameters passed to the <code>CharFilterFactory</code>.
 	 */
-	public abstract Parameter[] params() default { };
+	Parameter[] params() default { };
 }

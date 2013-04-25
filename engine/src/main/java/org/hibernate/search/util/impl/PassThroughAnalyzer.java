@@ -45,7 +45,7 @@ public final class PassThroughAnalyzer extends Analyzer {
 
 	/**
 	 * Create a new PassThroughAnalyzer.
-	 * 
+	 *
 	 * @param luceneVersion
 	 */
 	public PassThroughAnalyzer(Version luceneVersion) {

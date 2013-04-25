@@ -23,18 +23,21 @@
  */
 package org.hibernate.search.test.configuration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Properties;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 /**
  * @author Sanne Grinovero
  */
 public class ConfigurationParseHelperTest {
-	
+
 	@Test
 	public void testIntegerParsers() {
 		assertEquals( 0, ConfigurationParseHelper.parseInt( "   0 ", "not important") );
@@ -48,12 +51,13 @@ public class ConfigurationParseHelperTest {
 		boolean exceptionLaunched = false;
 		try {
 			ConfigurationParseHelper.getIntValue( props, "value2", 8 );
-		} catch (SearchException e) {
+		}
+		catch (SearchException e) {
 			exceptionLaunched = true;
 		}
 		assertTrue( exceptionLaunched );
 	}
-	
+
 	@Test
 	public void testBooleanParsers() {
 		assertTrue( ConfigurationParseHelper.parseBoolean( "true", null ) );
@@ -63,14 +67,16 @@ public class ConfigurationParseHelperTest {
 		boolean exceptionLaunched = false;
 		try {
 			ConfigurationParseHelper.parseBoolean( "5", "error" );
-		} catch (SearchException e) {
+		}
+		catch (SearchException e) {
 			exceptionLaunched = true;
 		}
 		assertTrue( exceptionLaunched );
 		exceptionLaunched = false;
 		try {
 			ConfigurationParseHelper.parseBoolean( null, "error" );
-		} catch (SearchException e) {
+		}
+		catch (SearchException e) {
 			exceptionLaunched = true;
 		}
 		assertTrue( exceptionLaunched );

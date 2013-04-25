@@ -39,7 +39,7 @@ import java.text.ParseException;
 public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 
 	public static final String RESOLUTION_PARAMETER = "resolution";
-	
+
 	private DateTools.Resolution resolution;
 	public static final TwoWayStringBridge CALENDAR_YEAR = new CalendarBridge( Resolution.YEAR );
 	public static final TwoWayStringBridge CALENDAR_MONTH = new CalendarBridge( Resolution.MONTH );
@@ -62,26 +62,27 @@ public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
 	}
 
-    public Object stringToObject(String stringValue) {
+	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
-            return null;
-        }
-        try {
-            Date date = DateTools.stringToDate( stringValue );
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime( date );
-            return calendar;
-        } catch (ParseException e) {
-            throw new SearchException( "Unable to parse into calendar: " + stringValue, e );
-        }
+			return null;
+		}
+		try {
+			Date date = DateTools.stringToDate( stringValue );
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime( date );
+			return calendar;
+		}
+		catch ( ParseException e ) {
+			throw new SearchException( "Unable to parse into calendar: " + stringValue, e );
+		}
 	}
 
 	public String objectToString(Object object) {
-        if (object == null) {
-            return null;
-        }
-        Calendar calendar = (Calendar)object;
-        return DateTools.dateToString(calendar.getTime(),resolution);
-    }
+		if ( object == null ) {
+			return null;
+		}
+		Calendar calendar = (Calendar) object;
+		return DateTools.dateToString( calendar.getTime(), resolution );
+	}
 
 }

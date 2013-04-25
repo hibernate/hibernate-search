@@ -25,7 +25,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 
 /**
  * It manages an {@link java.util.Map} object annotated with {@link org.hibernate.search.annotations.NumericField}
- * 
+ *
  * @author Davide D'Alto
  */
 public class BuiltinNumericMapBridge extends BuiltinMapBridge {
@@ -48,8 +48,9 @@ public class BuiltinNumericMapBridge extends BuiltinMapBridge {
 			}
 
 			private void manageNull(String name, Document document, LuceneOptions luceneOptions) {
-				if ( luceneOptions.indexNullAs() != null )
+				if ( luceneOptions.indexNullAs() != null ) {
 					luceneOptions.addFieldToDocument( name, luceneOptions.indexNullAs(), document );
+				}
 			}
 
 		} );

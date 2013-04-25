@@ -73,7 +73,7 @@ public class DslEmbeddedSearchTest extends SearchTestCase {
 
 		assertEquals( "DSL didn't find the embedded string field", 1, results.size() );
 		assertEquals( "embedded", results.get( 0 ).getEmbeddedEntity().getEmbeddedField() );
-		
+
 	}
 
 	public void testSearchNumberWithFieldBridge() throws Exception {

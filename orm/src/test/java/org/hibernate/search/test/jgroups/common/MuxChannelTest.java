@@ -38,7 +38,7 @@ import org.junit.Test;
 
 /**
  * Test injected mux supported channel.
- * 
+ *
  * @author Ales Justin
  */
 public abstract class MuxChannelTest extends JGroupsCommonTest {

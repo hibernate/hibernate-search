@@ -75,58 +75,61 @@ public class SearchMappingBuilder {
 			mapping = (SearchMapping) programmaticConfig;
 			return mapping;
 		}
-		Class<?> clazz = getProgrammaticMappingClass(programmaticConfig);
+		Class<?> clazz = getProgrammaticMappingClass( programmaticConfig );
 		Method[] methods = clazz.getDeclaredMethods();
 		int count = 0;
-		for (Method method : methods) {
-			if (method.isAnnotationPresent(Factory.class)) {
+		for ( Method method : methods ) {
+			if ( method.isAnnotationPresent( Factory.class ) ) {
 				count++;
 				ReflectionHelper.setAccessible( method );
-				mapping = getNewInstanceOfSearchMapping(clazz, method);
+				mapping = getNewInstanceOfSearchMapping( clazz, method );
 			}
 		}
-		validateMappingFactoryDefinition(count, clazz);
+		validateMappingFactoryDefinition( count, clazz );
 		return mapping;
 	}
 
 	private static SearchMapping getNewInstanceOfSearchMapping(Class<?> clazz, Method method) {
 		SearchMapping mapping = null;
 		try {
-			LOG.debugf("invoking factory method [ %s.%s ] to get search mapping instance", clazz.getName(), method.getName());
+			LOG.debugf( "invoking factory method [ %s.%s ] to get search mapping instance", clazz.getName(), method.getName() );
 			Object instance = clazz.newInstance();
-			mapping = (SearchMapping) method.invoke(instance);
-		} catch (Exception e) {
-			throw new SearchException("Unable to call the factory method: " + clazz.getName() + "." + method.getName(), e);
+			mapping = (SearchMapping) method.invoke( instance );
+		}
+		catch (Exception e) {
+			throw new SearchException( "Unable to call the factory method: " + clazz.getName() + "." + method.getName(), e );
 		}
 		return mapping;
 	}
 
 	private static void validateMappingFactoryDefinition(int count, Class<?> factory) {
-		if (count == 0) {
-			throw new SearchException("No @Factory method defined for building programmatic api on " + factory);
+		if ( count == 0 ) {
+			throw new SearchException( "No @Factory method defined for building programmatic api on " + factory );
 		}
-		if (count > 1) {
-			throw new SearchException("Multiple @Factory methods defined. Only one factory method required. " + factory);
+		if ( count > 1 ) {
+			throw new SearchException( "Multiple @Factory methods defined. Only one factory method required. " + factory );
 		}
 	}
 
 	private static Class<?> getProgrammaticMappingClass(Object programmaticConfig) {
 		Class<?> clazz = null;
-		if (programmaticConfig instanceof String) {
-			final String className = ( String ) programmaticConfig;
+		if ( programmaticConfig instanceof String ) {
+			final String className = (String) programmaticConfig;
 			try {
 				clazz = ClassLoaderHelper.classForName( className, SearchMappingBuilder.class.getClassLoader() );
-			} catch (ClassNotFoundException e) {
-				throw new SearchException("Unable to find " + Environment.MODEL_MAPPING + "=" + className, e);
 			}
-		} else if (programmaticConfig instanceof Class){
+			catch (ClassNotFoundException e) {
+				throw new SearchException( "Unable to find " + Environment.MODEL_MAPPING + "=" + className, e );
+			}
+		}
+		else if ( programmaticConfig instanceof Class ) {
 			clazz = (Class<?>) programmaticConfig;
 		}
 		else {
-			throw new SearchException(Environment.MODEL_MAPPING + " is of an unknown type: " + programmaticConfig.getClass() );
+			throw new SearchException( Environment.MODEL_MAPPING + " is of an unknown type: " + programmaticConfig.getClass() );
 		}
-		if (clazz == null) {
-			throw new SearchException("No programmatic factory defined");
+		if ( clazz == null ) {
+			throw new SearchException( "No programmatic factory defined" );
 		}
 		return clazz;
 	}

@@ -36,14 +36,14 @@ import org.hibernate.search.store.Workspace;
  * @author Sanne Grinovero
  */
 public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
-	
+
 	private final AddWorkDelegate addDelegate;
 	private final DeleteWorkDelegate deleteDelegate;
 	private final UpdateWorkDelegate updateDelegate;
 	private final OptimizeWorkDelegate optimizeDelegate;
 	private final PurgeAllWorkDelegate purgeAllDelegate;
 	private final FlushWorkDelegate flushDelegate;
-	
+
 	public LuceneWorkVisitor(Workspace workspace) {
 		this.addDelegate = new AddWorkDelegate( workspace );
 		if ( workspace.areSingleTermDeletesSafe() ) {

@@ -300,7 +300,7 @@ public class InheritanceTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "Wrong number of results", 1, result.size() );
 		assertTrue( "Wrong result type", result.get( 0 ) instanceof Mammal );
-		Mammal mammal = ( Mammal ) result.get( 0 );
+		Mammal mammal = (Mammal) result.get( 0 );
 		assertEquals( "Wrong animal name", "Elephant", mammal.getName() );
 	}
 

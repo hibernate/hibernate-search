@@ -88,7 +88,9 @@ public class FilterDef {
 
 	public void invoke(String parameterName, Object filter, Object parameterValue) {
 		Method method = setters.get( parameterName );
-		if ( method == null ) throw new SearchException( "No setter " + parameterName + " found in " + this.impl );
+		if ( method == null ) {
+			throw new SearchException( "No setter " + parameterName + " found in " + this.impl );
+		}
 		try {
 			method.invoke( filter, parameterValue );
 		}

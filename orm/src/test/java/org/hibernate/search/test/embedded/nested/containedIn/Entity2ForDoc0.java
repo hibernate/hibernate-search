@@ -42,7 +42,7 @@ public class Entity2ForDoc0 {
 
 	@Id
 	@GeneratedValue //(generator = "ids_generator2", strategy = GenerationType.SEQUENCE)
-	@Column(name="universalid")//"uid" is a keywork in Oracle
+	@Column(name = "universalid")//"uid" is a keywork in Oracle
 	private long uid;
 
 	@Version
@@ -63,7 +63,7 @@ public class Entity2ForDoc0 {
 		this.name = name;
 	}
 
-	
+
 	public long getUid() {
 		return uid;
 	}

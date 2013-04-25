@@ -56,7 +56,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class MaskedProperty extends Properties implements Serializable {
-	
+
 	private static final long serialVersionUID = -593307257383085113L;
 	private static final Log log = LoggerFactory.make();
 
@@ -64,7 +64,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	private final Properties fallBack;
 	private final String radix;
 	private transient Set<Object> propertyNames;
-	
+
 	/**
 	 * Provides a view to the provided Properties hiding
 	 * all keys not starting with some [mask.].
@@ -75,7 +75,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	public MaskedProperty(Properties propsToMask, String mask) {
 		this( propsToMask, mask, null );
 	}
-	
+
 	/**
 	 * Provides a view to the provided Properties hiding
 	 * all keys not starting with some [mask.].
@@ -86,14 +86,14 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * @param propsFallBack
 	 */
 	public MaskedProperty(Properties propsToMask, String mask, Properties propsFallBack) {
-		if ( propsToMask==null || mask==null ) {
+		if ( propsToMask == null || mask == null ) {
 			throw new java.lang.IllegalArgumentException();
 		}
 		this.masked = propsToMask;
 		this.radix = mask + ".";
 		this.fallBack = propsFallBack;
 	}
-	
+
 	@Override
 	public String getProperty(String key) {
 		String compositeKey = radix + key;
@@ -167,7 +167,9 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	private synchronized void initPropertyNames() {
-		if ( propertyNames != null) return;
+		if ( propertyNames != null) {
+			return;
+		}
 		Set<Object> maskedProperties = new TreeSet<Object>();
 		//we use keys to be safe and avoid CCE for non String key entries
 		Enumeration<?> maskedNames = masked.propertyNames();
@@ -176,7 +178,7 @@ public class MaskedProperty extends Properties implements Serializable {
 			if ( String.class.isInstance( key ) ) {
 				String maskedProperty = (String) key;
 				if ( maskedProperty.startsWith( radix ) ) {
-					maskedProperties.add(maskedProperty.substring( radix.length(), maskedProperty.length() ) );
+					maskedProperties.add( maskedProperty.substring( radix.length(), maskedProperty.length() ) );
 				}
 			}
 		}
@@ -191,7 +193,7 @@ public class MaskedProperty extends Properties implements Serializable {
 		}
 		propertyNames = Collections.unmodifiableSet( maskedProperties );
 	}
-	
+
 	/**
 	 * @throws UnsupportedOperationException
 	 */
@@ -382,23 +384,31 @@ public class MaskedProperty extends Properties implements Serializable {
 
 	@Override
 	public synchronized boolean equals(Object obj) {
-		if ( this == obj )
+		if ( this == obj ) {
 			return true;
-		if ( obj == null )
+		}
+		if ( obj == null ) {
 			return false;
-		if ( getClass() != obj.getClass() )
+		}
+		if ( getClass() != obj.getClass() ) {
 			return false;
+		}
 		final MaskedProperty other = (MaskedProperty) obj;
 		if ( fallBack == null ) {
-			if ( other.fallBack != null )
+			if ( other.fallBack != null ) {
 				return false;
-		} else if ( ! fallBack.equals( other.fallBack ) )
+			}
+		}
+		else if ( ! fallBack.equals( other.fallBack ) ) {
 			return false;
-		if ( ! masked.equals( other.masked ) )
+		}
+		if ( ! masked.equals( other.masked ) ) {
 			return false;
-		if ( ! radix.equals( other.radix ) )
+		}
+		if ( ! radix.equals( other.radix ) ) {
 			return false;
+		}
 		return true;
 	}
-	
+
 }

@@ -62,7 +62,7 @@ public class SimilarityTest extends SearchTestCase {
 	}
 
 	public void testClassAndGlobalSimilarity() throws Exception {
-	    Session s = openSession(  );
+		Session s = openSession(  );
 		Transaction tx = s.beginTransaction();
 		Trash trash = new Trash();
 		trash.setName( "Green trash" );
@@ -99,7 +99,7 @@ public class SimilarityTest extends SearchTestCase {
 		s.close();
 
 	}
-	
+
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Trash.class,

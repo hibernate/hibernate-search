@@ -37,6 +37,7 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Emmanuel Bernard
  */
 public class EmbeddedIdTest extends SearchTestCase {
+
 	public void testFieldBridge() throws Exception {
 		PersonPK emmanuelPk = new PersonPK();
 		emmanuelPk.setFirstName( "Emmanuel" );
@@ -56,7 +57,7 @@ public class EmbeddedIdTest extends SearchTestCase {
 				new TermQuery( new Term( "id.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
-		emmanuel = ( Person ) results.get( 0 );
+		emmanuel = (Person) results.get( 0 );
 		emmanuel.setFavoriteColor( "Red" );
 		tx.commit();
 		s.clear();
@@ -66,7 +67,7 @@ public class EmbeddedIdTest extends SearchTestCase {
 				new TermQuery( new Term( "id.lastName", "Bernard" ) )
 		).list();
 		assertEquals( 1, results.size() );
-		emmanuel = ( Person ) results.get( 0 );
+		emmanuel = (Person) results.get( 0 );
 		assertEquals( "Red", emmanuel.getFavoriteColor() );
 		s.delete( results.get( 0 ) );
 		tx.commit();
@@ -102,7 +103,7 @@ public class EmbeddedIdTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		// we need a query which has at least the size of two. 
+		// we need a query which has at least the size of two.
 		List results = Search.getFullTextSession( s ).createFullTextQuery(
 				new TermQuery( new Term( "favoriteColor", "blue" ) )
 		).list();

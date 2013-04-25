@@ -69,7 +69,7 @@ public class ParentOfBirthEvent {
 	}
 
 	@ContainedIn
-	@ManyToOne(cascade=CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	public Event getEvent() {
 		return event;
 	}

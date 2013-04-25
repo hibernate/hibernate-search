@@ -64,7 +64,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final String idNameOfIndexedType;
 
 	// status control
-	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index 
+	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index
 	private final CountDownLatch endAllSignal; //released when we release all locks and IndexWriter
 
 	// progress monitor
@@ -81,17 +81,17 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final int idFetchSize;
 
 	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor,
-								  SessionFactory sessionFactory,
-								  Class<?> entityType,
-								  int objectLoadingThreads,
-								  int collectionLoadingThreads,
-								  CacheMode cacheMode,
-								  int objectLoadingBatchSize,
-								  CountDownLatch endAllSignal,
-								  MassIndexerProgressMonitor monitor,
-								  BatchBackend backend,
-								  long objectsLimit,
-								  int idFetchSize) {
+								SessionFactory sessionFactory,
+								Class<?> entityType,
+								int objectLoadingThreads,
+								int collectionLoadingThreads,
+								CacheMode cacheMode,
+								int objectLoadingBatchSize,
+								CountDownLatch endAllSignal,
+								MassIndexerProgressMonitor monitor,
+								BatchBackend backend,
+								long objectsLimit,
+								int idFetchSize) {
 
 		this.indexedType = entityType;
 		this.idFetchSize = idFetchSize;

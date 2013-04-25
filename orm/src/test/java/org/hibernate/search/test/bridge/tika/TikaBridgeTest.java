@@ -113,9 +113,9 @@ public class TikaBridgeTest extends SearchTestCase {
 		catch ( HibernateException e ) {
 			// hmm, a lot of exception wrapping going on
 			assertTrue( e.getCause() instanceof BridgeException );
-			BridgeException bridgeException = ( BridgeException ) e.getCause();
+			BridgeException bridgeException = (BridgeException) e.getCause();
 			assertTrue( e.getCause() instanceof SearchException );
-			SearchException searchException = ( SearchException ) bridgeException.getCause();
+			SearchException searchException = (SearchException) bridgeException.getCause();
 			assertTrue( "Wrong root cause", searchException.getMessage().startsWith( "HSEARCH000151" ) );
 		}
 		finally {
@@ -178,7 +178,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		tx.commit();
 	}
 
-	@TestForIssue(jiraKey="HSEARCH-1256")
+	@TestForIssue(jiraKey = "HSEARCH-1256")
 	private void searchSongDslErrorMessage(Session session) throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		Transaction tx = session.beginTransaction();
@@ -188,7 +188,8 @@ public class TikaBridgeTest extends SearchTestCase {
 		boolean exceptionCaught = false;
 		try {
 			queryBuilder.keyword().onField( "mp3FileName" ).ignoreFieldBridge().matching( "Emmanuel" ).createQuery();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			exceptionCaught = true;
 			Assert.assertTrue( e instanceof SearchException );
 			Assert.assertTrue( e.getMessage().contains( "The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" ) );

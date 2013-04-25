@@ -39,26 +39,27 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class LookupObjectsInitializer implements ObjectsInitializer {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	public static final LookupObjectsInitializer INSTANCE = new LookupObjectsInitializer();
-	
+
 	private LookupObjectsInitializer() {
 		// use INSTANCE instead of constructor
 	}
 
 	public void initializeObjects(EntityInfo[] entityInfos,
-										 Criteria criteria, Class<?> entityType,
-										 SearchFactoryImplementor searchFactoryImplementor,
-										 TimeoutManager timeoutManager,
-										 Session session) {
+										Criteria criteria, Class<?> entityType,
+										SearchFactoryImplementor searchFactoryImplementor,
+										TimeoutManager timeoutManager,
+										Session session) {
 		boolean traceEnabled = log.isTraceEnabled();
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
-			if ( traceEnabled )
-				log.tracef("No object to initialize", maxResults);
+			if ( traceEnabled ) {
+				log.tracef( "No object to initialize", maxResults );
+			}
 			return;
 		}
 

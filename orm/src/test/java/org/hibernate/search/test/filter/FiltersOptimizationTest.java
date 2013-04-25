@@ -23,6 +23,12 @@
  */
 package org.hibernate.search.test.filter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -33,9 +39,7 @@ import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.OpenBitSet;
 import org.hibernate.search.filter.impl.FilterOptimizationHelper;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * Used to test org.hibernate.search.filter.FiltersOptimizationHelper
@@ -43,7 +47,7 @@ import static org.junit.Assert.*;
  * @author Sanne Grinovero
  */
 public class FiltersOptimizationTest {
-	
+
 	/**
 	 * in some cases optimizations are not possible,
 	 * test that mergeByBitAnds returns the same instance
@@ -59,7 +63,7 @@ public class FiltersOptimizationTest {
 		List<DocIdSet> merge = FilterOptimizationHelper.mergeByBitAnds( dataIn );
 		assertSame( dataIn, merge );
 	}
-	
+
 	/**
 	 * In case two filters are of OpenBitSet implementation,
 	 * they should be AND-ed by using bit operations
@@ -75,12 +79,12 @@ public class FiltersOptimizationTest {
 		dataIn.add( unmergedSet );
 		List<DocIdSet> merge = FilterOptimizationHelper.mergeByBitAnds( dataIn );
 		assertNotSame( dataIn, merge );
-		
+
 		assertEquals( 2, merge.size() );
 		assertSame( unmergedSet, merge.get( 0 ) );
 		assertTrue( isIdSetSequenceSameTo( merge.get( 1 ), 1,2,5,8,11 ) );
 	}
-	
+
 	/**
 	 * In case two filters are of OpenBitSet implementation,
 	 * they should be AND-ed by using bit operations
@@ -96,12 +100,12 @@ public class FiltersOptimizationTest {
 		dataIn.add( unmergedSet );
 		List<DocIdSet> merge = FilterOptimizationHelper.mergeByBitAnds( dataIn );
 		assertNotSame( dataIn, merge );
-		
+
 		assertEquals( 2, merge.size() );
 		assertSame( unmergedSet, merge.get( 0 ) );
 		assertTrue( isIdSetSequenceSameTo( merge.get( 1 ), 1,2,5,8,11 ) );
 	}
-	
+
 	/**
 	 * Used to this test the testcase's helper method isIdSetSequenceSameTo
 	 * @throws IOException
@@ -118,7 +122,7 @@ public class FiltersOptimizationTest {
 				makeOpenBitSetTestSet( 1,2,3,5,8,11 ),
 				1,2,3,5,8 ) );
 	}
-	
+
 	/**
 	 * Verifies if the docIdSet is representing a specific
 	 * sequence of docIds.
@@ -166,7 +170,7 @@ public class FiltersOptimizationTest {
 		}
 		return set;
 	}
-	
+
 	/**
 	 * test helper, makes a prefilled DocIdBitSet
 	 * using the java.lang.BitSet
@@ -195,12 +199,12 @@ public class FiltersOptimizationTest {
 		DocIdSetHiddenType(DocIdSet wrapped) {
 			this.bitSet = wrapped;
 		}
-		
+
 		@Override
 		public DocIdSetIterator iterator() throws IOException {
 			return bitSet.iterator();
 		}
-		
+
 	}
 
 }

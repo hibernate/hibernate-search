@@ -26,7 +26,6 @@ package org.hibernate.search;
 import java.io.Serializable;
 
 import org.hibernate.Session;
-import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 
 /**
  * Extends the Hibernate {@link Session} with fulltext search and indexing capabilities.
@@ -34,7 +33,7 @@ import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
  * @author Emmanuel Bernard
  */
 public interface FullTextSession extends Session {
-	
+
 	/**
 	 * Create a fulltext query on top of a native Lucene query returning the matching objects
 	 * of type <code>entities</code> and their respective subclasses.
@@ -53,7 +52,7 @@ public interface FullTextSession extends Session {
 	 * Force the (re)indexing of a given <b>managed</b> object.
 	 * Indexation is batched per transaction: if a transaction is active, the operation
 	 * will not affect the index at least until commit.
-	 * 
+	 *
 	 * Any {@link EntityIndexingInterceptor} registered on the entity will be ignored:
 	 * this method forces an index operation.
 	 *
@@ -81,7 +80,7 @@ public interface FullTextSession extends Session {
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
-	public <T> void purge(Class<T> entityType, Serializable id);
+	<T> void purge(Class<T> entityType, Serializable id);
 
 	/**
 	 * Remove all entities from of particular class and all its subclasses from the index.
@@ -92,12 +91,12 @@ public interface FullTextSession extends Session {
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
-	public <T> void purgeAll(Class<T> entityType);
+	<T> void purgeAll(Class<T> entityType);
 
 	/**
 	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
 	 */
-	public void flushToIndexes();
+	void flushToIndexes();
 
 	/**
 	 * Creates a MassIndexer to rebuild the indexes of some
@@ -110,12 +109,12 @@ public interface FullTextSession extends Session {
 	 * @param types optionally restrict the operation to selected types
 	 * @return a new MassIndexer
 	 */
-	public MassIndexer createIndexer(Class<?>... types);
+	MassIndexer createIndexer(Class<?>... types);
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FullTextSharedSessionBuilder sessionWithOptions();
+	FullTextSharedSessionBuilder sessionWithOptions();
 
 }

@@ -20,7 +20,6 @@
  * Free Software Foundation, Inc.
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
- * 
  */
 package org.hibernate.search.infinispan.sharedIndex;
 
@@ -49,10 +48,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 /**
  * Test to verify HSEARCH-926
- * 
+ *
  * @author Zach Kurey
  */
 public class SharedIndexTest {
@@ -107,12 +105,12 @@ public class SharedIndexTest {
 	public void tearDown() throws Exception {
 		node.close();
 	}
-	
+
 	@BeforeClass
 	public static void prepareConnectionPool() {
 		ClusterSharedConnectionProvider.realStart();
 	}
-	
+
 	@AfterClass
 	public static void shutdownConnectionPool() {
 		ClusterSharedConnectionProvider.realStop();
@@ -120,7 +118,7 @@ public class SharedIndexTest {
 
 	/**
 	 * Counts the number of nodes in the cluster on this node
-	 * 
+	 *
 	 * @param node
 	 *            the FullTextSessionBuilder representing the current node
 	 * @return

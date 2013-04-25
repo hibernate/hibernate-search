@@ -58,7 +58,7 @@ import java.lang.annotation.Documented;
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( {ElementType.FIELD, ElementType.METHOD} )
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface ContainedIn {
 }

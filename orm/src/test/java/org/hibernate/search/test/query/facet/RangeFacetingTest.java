@@ -21,7 +21,6 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
 package org.hibernate.search.test.query.facet;
 
 import java.text.DateFormat;
@@ -220,7 +219,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		assertEquals( "[1.01, 1.5]", facets.get( 1 ).getValue() );
 		assertEquals( "[1.51, 3.0]", facets.get( 2 ).getValue() );
 	}
-	
+
 	public void testRangeQueryRangeDefOrderHigherMaxCount() {
 		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
 				.name( priceRange )
@@ -232,7 +231,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 4.00 ).to( 5.00 )
 				.includeZeroCounts( false )
 				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
-				.maxFacetCount(5)
+				.maxFacetCount( 5 )
 				.createFacetingRequest();
 
 		FullTextQuery query = createMatchAllQuery( Fruit.class );

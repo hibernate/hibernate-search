@@ -45,11 +45,12 @@ import org.hibernate.search.annotations.TokenizerDef;
  */
 @Entity
 @Indexed
-@AnalyzerDef( name="ngram",
+@AnalyzerDef(name = "ngram",
 		tokenizer = @TokenizerDef( factory = StandardTokenizerFactory.class),
 		filters = @TokenFilterDef( factory = NGramFilterFactory.class,
-			params={@Parameter( name = "minGramSize", value="3"),
-					@Parameter( name = "maxGramSize", value="3")})
+		params = {
+		@Parameter(name = "minGramSize", value = "3"),
+		@Parameter(name = "maxGramSize", value = "3") })
 		)
 public class RemoteEntity {
 	@Id @DocumentId @GeneratedValue

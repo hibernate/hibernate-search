@@ -53,8 +53,9 @@ public class BuiltinNumericArrayBridge extends BuiltinArrayBridge {
 			}
 
 			private void manageNull(String name, Document document, LuceneOptions luceneOptions) {
-				if ( luceneOptions.indexNullAs() != null )
+				if ( luceneOptions.indexNullAs() != null ) {
 					luceneOptions.addFieldToDocument( name, luceneOptions.indexNullAs(), document );
+				}
 			}
 
 		} );

@@ -64,10 +64,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class ProgrammaticMappingTest extends SearchTestCase {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
-	public void testMapping() throws Exception{
+
+	public void testMapping() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "3340 Peachtree Rd NE" );
 		address.setStreet2( "JBoss" );
@@ -83,7 +83,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "" + address.getAddressId() );
-		System.out.println(luceneQuery.toString(  ));
+		System.out.println( luceneQuery.toString() );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( "documentId does not work properly", 1, query.getResultSize() );
 
@@ -104,7 +104,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 	public void testNumeric() throws Exception {
 		Item item = new Item();
-		item.setPrice(34.54d);
+		item.setPrice( 34.54d );
 
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -114,17 +114,17 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		tx = s.beginTransaction();
 
-		NumericRangeQuery<Double> q = NumericRangeQuery.newDoubleRange("price", 34.5d, 34.6d, true, true);
-		FullTextQuery query = s.createFullTextQuery(q, Item.class);
-		assertEquals("Numeric field via programmatic config",1,query.getResultSize());
+		NumericRangeQuery<Double> q = NumericRangeQuery.newDoubleRange( "price", 34.5d, 34.6d, true, true );
+		FullTextQuery query = s.createFullTextQuery( q, Item.class );
+		assertEquals( "Numeric field via programmatic config", 1, query.getResultSize() );
 
-		s.delete(query.list().get(0));
+		s.delete( query.list().get( 0 ) );
 		tx.commit();
 		s.close();
 
 	}
 
-	public void testAnalyzerDef() throws Exception{
+	public void testAnalyzerDef() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "3340 Peachtree Rd NE" );
 		address.setStreet2( "JBoss" );
@@ -144,12 +144,12 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		final FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( "Analyzer inoperant", 1, query.getResultSize() );
 
-		s.delete( query.list().get( 0 ));
+		s.delete( query.list().get( 0 ) );
 		tx.commit();
 		s.close();
 	}
 
-	public void testBridgeMapping() throws Exception{
+	public void testBridgeMapping() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "Peachtree Rd NE" );
 		address.setStreet2( "JBoss" );
@@ -177,7 +177,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
-	public void testBoost() throws Exception{
+	public void testBoost() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -205,16 +205,16 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		assertTrue( "first result should be strictly higher", (Float) results.get( 0 )[1] > (Float) results.get( 1 )[1]*1.9f );
+		assertTrue( "first result should be strictly higher", (Float) results.get( 0 )[1] > (Float) results.get( 1 )[1] * 1.9f );
 		assertEquals( "Wrong result ordered", address.getStreet1(), ( (Address) results.get( 0 )[0] ).getStreet1() );
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
-	
-	public void testAnalyzerDiscriminator() throws Exception{
+
+	public void testAnalyzerDiscriminator() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -223,7 +223,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		deEntry.setDescription( "aufeinanderschl\u00FCgen" );
 		deEntry.setLanguage( "de" );
 		s.persist( deEntry );
-		
+
 		BlogEntry enEntry = new BlogEntry();
 		enEntry.setTitle( "acknowledgment" );
 		enEntry.setDescription( "acknowledgment" );
@@ -243,14 +243,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertEquals( 0, nbrOfMatchingResults( "title", "aufeinanderschlug", s ) );
 		assertEquals( 1, nbrOfMatchingResults( "title", "acknowledgment", s ) );
 
-		for( Object result : s.createQuery( "from " + BlogEntry.class.getName() ).list() ) {
+		for ( Object result : s.createQuery( "from " + BlogEntry.class.getName() ).list() ) {
 			s.delete( result );
 		}
 		tx.commit();
 		s.close();
 	}
-	
-	public void testDateBridgeMapping() throws Exception{
+
+	public void testDateBridgeMapping() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -262,22 +262,22 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		c.set( 2009, Calendar.NOVEMBER, 15);
 
 		Date date = new Date( c.getTimeInMillis() );
-		address.setDateCreated(date);
+		address.setDateCreated( date );
 		s.persist( address );
 
 		address = new Address();
 		address.setStreet1( "Peachtnot Rd NE" );
 		address.setStreet2( "Peachtree Rd NE" );
-		address.setDateCreated(date);
+		address.setDateCreated( date );
 		s.persist( address );
-		
+
 		BlogEntry enEntry = new BlogEntry();
 		enEntry.setTitle( "acknowledgment" );
 		enEntry.setDescription( "acknowledgment" );
 		enEntry.setLanguage( "en" );
-		enEntry.setDateCreated(date);
+		enEntry.setDateCreated( date );
 		s.persist( enEntry );
-		
+
 		tx.commit();
 
 		s.clear();
@@ -292,14 +292,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
-	
-	public void testCalendarBridgeMapping() throws Exception{
+
+	public void testCalendarBridgeMapping() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
@@ -310,15 +310,15 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		c.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
 		c.set( 2009, Calendar.NOVEMBER, 15);
 
-		address.setLastUpdated(c);
+		address.setLastUpdated( c );
 		s.persist( address );
 
 		address = new Address();
 		address.setStreet1( "Peachtnot Rd NE" );
 		address.setStreet2( "Peachtree Rd NE" );
-		address.setLastUpdated(c);
+		address.setLastUpdated( c );
 		s.persist( address );
-		
+
 		tx.commit();
 
 		s.clear();
@@ -333,17 +333,17 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
-	
-	public void testProvidedIdMapping() throws Exception{
+
+	public void testProvidedIdMapping() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		SearchFactoryImplementor sf = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
-		
+
 		ProvidedIdEntry person1 = new ProvidedIdEntry();
 		person1.setName( "Big Goat" );
 		person1.setBlurb( "Eats grass" );
@@ -366,14 +366,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		sf.getWorker().performWork( work2, tc );
 
 		tc.end();
-		
+
 		Transaction transaction = fullTextSession.beginTransaction();
 
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "providedidentry.name", TestConstants.standardAnalyzer );
 		Query luceneQuery = parser.parse( "Goat" );
 
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Hsearch Query extension
-		//needs it. So we use plain Lucene 
+		//needs it. So we use plain Lucene
 
 		IndexReader indexReader = fullTextSession.getSearchFactory().getIndexReaderAccessor().open( ProvidedIdEntry.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
@@ -385,29 +385,29 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		assertEquals( 3, hits.totalHits );
 	}
-	
-	public void testFullTextFilterDefAtMappingLevel() throws Exception{
+
+	public void testFullTextFilterDefAtMappingLevel() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
 		Address address = new Address();
 		address.setStreet1( "Peachtree Rd NE" );
 		address.setStreet2( "Peachtnot Rd NE" );
-		address.setOwner("test");
+		address.setOwner( "test" );
 		Calendar c = GregorianCalendar.getInstance();
 		c.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
 		c.set( 2009, Calendar.NOVEMBER, 15);
 
-		address.setLastUpdated(c);
+		address.setLastUpdated( c );
 		s.persist( address );
 
 		address = new Address();
 		address.setStreet1( "Peachtnot Rd NE" );
 		address.setStreet2( "Peachtree Rd NE" );
-		address.setLastUpdated(c);
-		address.setOwner("test2");
+		address.setLastUpdated( c );
+		address.setOwner( "test2" );
 		s.persist( address );
-		
+
 		tx.commit();
 
 		s.clear();
@@ -417,32 +417,32 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1:Peachtnot" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
-		query.enableFullTextFilter("security").setParameter("ownerName", "test");
+		query.enableFullTextFilter( "security" ).setParameter( "ownerName", "test" );
 		assertEquals( "expecting 1 results", 1, query.getResultSize() );
 
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
-	
-	public void testIndexEmbedded() throws Exception{
+
+	public void testIndexEmbedded() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
 		ProductCatalog productCatalog = new ProductCatalog();
-		productCatalog.setName("Cars");
+		productCatalog.setName( "Cars" );
 		Item item = new Item();
-		item.setDescription("Ferrari");
-		item.setProductCatalog(productCatalog);
-		productCatalog.addItem(item);
-		
-		s.persist(item);
-		s.persist(productCatalog);
+		item.setDescription( "Ferrari" );
+		item.setProductCatalog( productCatalog );
+		productCatalog.addItem( item );
+
+		s.persist( item );
+		s.persist( productCatalog );
 		tx.commit();
 
 		s.clear();
@@ -457,26 +457,26 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
-	
-	public void testContainedIn() throws Exception{
+
+	public void testContainedIn() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
 		ProductCatalog productCatalog = new ProductCatalog();
-		productCatalog.setName("Cars");
+		productCatalog.setName( "Cars" );
 		Item item = new Item();
-		item.setDescription("test");
-		item.setProductCatalog(productCatalog);
-		productCatalog.addItem(item);
-		
-		s.persist(item);
-		s.persist(productCatalog);
+		item.setDescription( "test" );
+		item.setProductCatalog( productCatalog );
+		productCatalog.addItem( item );
+
+		s.persist( item );
+		s.persist( productCatalog );
 		tx.commit();
 
 		s.clear();
@@ -488,16 +488,15 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 1 results", 1, query.getResultSize() );
 		tx.commit();
-		
+
 		tx = s.beginTransaction();
-		
-		Item loaded = (Item) s.get(Item.class, item.getId());
-		loaded.setDescription("Ferrari");
-		
-		s.update(loaded);
+
+		Item loaded = (Item) s.get( Item.class, item.getId() );
+		loaded.setDescription( "Ferrari" );
+
+		s.update( loaded );
 		tx.commit();
-		
-		
+
 		tx = s.beginTransaction();
 
 		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
@@ -510,18 +509,18 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 1 results", 1, query.getResultSize() );
 		tx.commit();
-		
+
 		tx = s.beginTransaction();
 		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = query.list();
 
-		for( Object[] result : results ) {
+		for ( Object[] result : results ) {
 			s.delete( result[0] );
 		}
 		tx.commit();
 		s.close();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void testClassBridgeMapping() throws Exception {
 		org.hibernate.Session s = openSession();
@@ -549,7 +548,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "incorrect number of results returned", 2, result.size() );
 		for (Departments d : result) {
-			assertEquals("incorrect manufacturer", "C", d.getManufacturer());
+			assertEquals( "incorrect manufacturer", "C", d.getManufacturer() );
 		}
 
 		// No data cross-ups.
@@ -566,7 +565,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertTrue( "incorrect entity returned, wrong branch head", result.size() == 1 );
-		assertEquals("incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead());
+		assertEquals( "incorrect entity returned", "Kent Lewin", ( result.get( 0 ) ).getBranchHead() );
 
 		// Check other ClassBridge annotation.
 		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "branchnetwork", new SimpleAnalyzer( TestConstants.getTargetLuceneVersion() ) );
@@ -583,7 +582,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 	}
-	
+
 	public void testDynamicBoosts() throws Exception {
 
 		Session session = openSession();
@@ -676,8 +675,8 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 		session.close();
 
-		 s = openSession();
-		 tx = s.beginTransaction();
+		s = openSession();
+		tx = s.beginTransaction();
 		ClassLevelTestPoI classLevelTestPoI = new ClassLevelTestPoI( "test", 24.0, 32.0d );
 		s.persist( classLevelTestPoI );
 		s.flush();
@@ -757,7 +756,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		session.close();
 	}
-	
+
 	private float getScore(Query query) {
 		Session session = openSession();
 		Object[] queryResult;
@@ -774,8 +773,8 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				score = 0.0f;
 			}
 			else {
-				queryResult = ( Object[] ) resultList.get( 0 );
-				score = ( Float ) queryResult[0];
+				queryResult = (Object[]) resultList.get( 0 );
+				score = (Float) queryResult[0];
 				String explanation = queryResult[1].toString();
 				log.debugf( "score: %f explanation: %s", score, explanation );
 			}
@@ -785,7 +784,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		}
 		return score;
 	}
-	
+
 	private int nbrOfMatchingResults(String field, String token, FullTextSession s) throws ParseException {
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), field, TestConstants.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( token );
@@ -793,7 +792,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		return query.getResultSize();
 	}
 
-	
+
 	private Departments getDepts1() {
 		Departments depts = new Departments();
 
@@ -840,7 +839,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		depts.setManufacturer( "C" );
 		return depts;
 	}
-	
+
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
@@ -861,5 +860,5 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				ClassLevelTestPoI.class,
 				LatLongAnnTestPoi.class
 		};
-	}	
+	}
 }

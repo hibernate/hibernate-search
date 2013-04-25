@@ -34,7 +34,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 
 /**
  * @author zkurey
- * 
+ *
  *         The "a." prefix shouldn't be specified since its implicit that "a." is
  *         part of the path
  */

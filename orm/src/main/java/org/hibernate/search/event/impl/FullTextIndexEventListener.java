@@ -110,7 +110,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	// final because it's initialization should be published to other threads.
 	// ! update the readObject() method in case of name changes !
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
-	private transient final Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>(
+	private final transient Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>(
 			0
 	);
 
@@ -185,7 +185,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			final Object entity = event.getEntity();
 			if ( getDocumentBuilder( entity ) != null ) {
 				// FIXME The engine currently needs to know about details such as identifierRollbackEnabled
-				// but we should not move the responsibility to figure out the proper id to the engine  
+				// but we should not move the responsibility to figure out the proper id to the engine
 				boolean identifierRollbackEnabled = event.getSession()
 						.getFactory()
 						.getSettings()

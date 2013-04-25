@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -43,7 +43,7 @@ import org.junit.Test;
 
 /**
  * Test for HSEARCH-1090: IndexReader leaks file handles on close
- * 
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 public class AllFilesClosedTest {
@@ -61,7 +61,9 @@ public class AllFilesClosedTest {
 			doSomeOperations();
 			assertDirectoryOpen( directoryOne );
 			assertDirectoryOpen( directoryTwo );
-			if (nrtNotEnabled()) assertAllFilesClosed( directoryTwo );
+			if ( nrtNotEnabled() ) {
+				assertAllFilesClosed( directoryTwo );
+			}
 			// directoryOne is using resource pooling
 		}
 		finally {
@@ -179,13 +181,13 @@ public class AllFilesClosedTest {
 
 	/** Two mapped entities on two differently configured indexes **/
 
-	@Indexed(index="index1")
+	@Indexed(index = "index1")
 	public static final class Dvd {
 		@DocumentId long id;
 		@Field String title;
 	}
 
-	@Indexed(index="index2")
+	@Indexed(index = "index2")
 	public static final class Book {
 		@DocumentId long id;
 		@Field String title;

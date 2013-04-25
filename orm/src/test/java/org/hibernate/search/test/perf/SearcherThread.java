@@ -50,7 +50,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  */
 public class SearcherThread implements Runnable {
-	private static final Log log = LoggerFactory.make(Log.class);
+
+	private static final Log log = LoggerFactory.make( Log.class );
+
 	private final int threadId;
 	private final String queryString;
 	private final SessionFactory sf;
@@ -61,7 +63,7 @@ public class SearcherThread implements Runnable {
 
 	/**
 	 * Initialize with thread-id, queryString, indexSearcher
-	 * @param startSignal 
+	 * @param startSignal
 	 */
 	public SearcherThread(int threadId, String queryString, SessionFactory sf, IndexSearcher indexSearcher, boolean isLucene, CountDownLatch startSignal) {
 		this.isLucene = isLucene;
@@ -78,7 +80,8 @@ public class SearcherThread implements Runnable {
 	public void run() {
 		try {
 			startSignal.await();
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			log.error( "tests canceled", e );
 			Thread.currentThread().interrupt();
 			return;
@@ -122,7 +125,8 @@ public class SearcherThread implements Runnable {
 	private Document getDocument(IndexSearcher searcher, int docId ) {
 		try {
 			return searcher.doc( docId );
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe) {
 			throw new SearchException( "Unable to retrieve document", ioe );
 		}
 	}
@@ -170,5 +174,5 @@ public class SearcherThread implements Runnable {
 	public synchronized void setTime(long time) {
 		this.time = time;
 	}
-	
+
 }

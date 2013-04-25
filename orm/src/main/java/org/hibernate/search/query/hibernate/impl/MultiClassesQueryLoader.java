@@ -51,9 +51,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	private ObjectsInitializer objectsInitializer;
 
 	public void init(Session session,
-					 SearchFactoryImplementor searchFactoryImplementor,
-					 ObjectsInitializer objectsInitializer,
-					 TimeoutManager timeoutManager) {
+					SearchFactoryImplementor searchFactoryImplementor,
+					ObjectsInitializer objectsInitializer,
+					TimeoutManager timeoutManager) {
 		super.init( session, searchFactoryImplementor );
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;
@@ -72,7 +72,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		//     root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.size() == 0 ) {
 			//support all classes
-			for( Map.Entry<Class<?>, EntityIndexBinder> entry : searchFactoryImplementor.getIndexBindingForEntity().entrySet() ) {
+			for ( Map.Entry<Class<?>, EntityIndexBinder> entry : searchFactoryImplementor.getIndexBindingForEntity().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().getDocumentBuilder().isRoot() ) {
 					safeEntityTypes.add( entry.getKey() );
@@ -80,7 +80,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			}
 		}
 		else {
-			safeEntityTypes.addAll(entityTypes);
+			safeEntityTypes.addAll( entityTypes );
 		}
 		entityMatadata = new ArrayList<RootEntityMetadata>( safeEntityTypes.size() );
 		for (Class clazz :  safeEntityTypes) {

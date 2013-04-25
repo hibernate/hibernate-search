@@ -29,7 +29,7 @@ public class SerializableIntField extends SerializableNumericField {
 	private int value;
 
 	public SerializableIntField(int value, LuceneNumericFieldContext context) {
-		super(context);
+		super( context );
 		this.value = value;
 	}
 

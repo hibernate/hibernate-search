@@ -36,14 +36,14 @@ import org.hibernate.search.annotations.Similarity;
  * @author Sanne Grinovero
  */
 @Entity
-@Indexed(index="garbageIndex")
+@Indexed(index = "garbageIndex")
 @Similarity(impl = DummySimilarity2.class)
 public class Sink {
 	@Id
 	@DocumentId
 	@GeneratedValue
 	private Integer id;
-	
+
 	@Field
 	private String name;
 

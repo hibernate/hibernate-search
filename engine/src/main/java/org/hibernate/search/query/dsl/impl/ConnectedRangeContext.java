@@ -56,7 +56,7 @@ class ConnectedRangeContext implements RangeContext {
 	}
 
 	public RangeContext filteredBy(Filter filter) {
-		queryCustomizer.filteredBy(filter);
+		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 }

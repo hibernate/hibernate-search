@@ -68,7 +68,7 @@ public class DirectoryProviderFactory {
 		String maybeShortCut = className.toLowerCase();
 
 		DirectoryProvider<?> provider;
-		//try and use the built-in shortcuts before loading the provider as a fully qualified class name 
+		//try and use the built-in shortcuts before loading the provider as a fully qualified class name
 		if ( defaultProviderClasses.containsKey( maybeShortCut ) ) {
 			String fullClassName = defaultProviderClasses.get( maybeShortCut );
 			provider = ClassLoaderHelper.instanceFromName( DirectoryProvider.class,

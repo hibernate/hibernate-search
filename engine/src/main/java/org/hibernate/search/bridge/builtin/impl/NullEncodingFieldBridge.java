@@ -54,14 +54,14 @@ public class NullEncodingFieldBridge implements FieldBridge, StringBridge {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.hibernate.search.bridge.StringBridge#objectToString(java.lang.Object)
 	 */
 	@Override
 	public String objectToString(Object object) {
-		if ( object == null )
+		if ( object == null ) {
 			return nullMarker;
-
+		}
 		return bridge.objectToString( object );
 	}
 

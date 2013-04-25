@@ -23,13 +23,13 @@
  */
 package org.hibernate.search.test.shards;
 
+import static org.junit.Assert.assertTrue;
+
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.test.util.RamIndexManager;
-
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author Sanne Grinovero

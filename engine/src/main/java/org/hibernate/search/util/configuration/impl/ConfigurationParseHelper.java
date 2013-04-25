@@ -53,10 +53,10 @@ public abstract class ConfigurationParseHelper {
 	 */
 	public static URL locateConfig(final String path) {
 		try {
-			return new URL(path);
+			return new URL( path );
 		}
-		catch(MalformedURLException e) {
-			return findAsResource(path);
+		catch ( MalformedURLException e ) {
+			return findAsResource( path );
 		}
 	}
 
@@ -74,24 +74,26 @@ public abstract class ConfigurationParseHelper {
 		// First, try to locate this resource through the current
 		// context classloader.
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-		if (contextClassLoader!=null) {
-			url = contextClassLoader.getResource(path);
+		if ( contextClassLoader != null ) {
+			url = contextClassLoader.getResource( path );
 		}
-		if (url != null)
+		if ( url != null ) {
 			return url;
+		}
 
 		// Next, try to locate this resource through this class's classloader
-		url = ConfigurationParseHelper.class.getClassLoader().getResource(path);
-		if (url != null)
+		url = ConfigurationParseHelper.class.getClassLoader().getResource( path );
+		if ( url != null ) {
 			return url;
+		}
 
 		// Next, try to locate this resource through the system classloader
-		url = ClassLoader.getSystemClassLoader().getResource(path);
+		url = ClassLoader.getSystemClassLoader().getResource( path );
 
 		// Anywhere else we should look?
 		return url;
 	}
-	
+
 	/**
 	 * Parses a String to get an int value.
 	 *
@@ -107,12 +109,13 @@ public abstract class ConfigurationParseHelper {
 		else {
 			try {
 				return Integer.parseInt( value.trim() );
-			} catch (NumberFormatException nfe) {
+			}
+			catch (NumberFormatException nfe) {
 				throw new SearchException( errorMsgOnParseFailure, nfe );
 			}
 		}
 	}
-	
+
 	/**
 	 * Parses a String to get an long value.
 	 *
@@ -128,12 +131,13 @@ public abstract class ConfigurationParseHelper {
 		else {
 			try {
 				return Long.parseLong( value.trim() );
-			} catch (NumberFormatException nfe) {
+			}
+			catch (NumberFormatException nfe) {
 				throw new SearchException( errorMsgOnParseFailure, nfe );
 			}
 		}
 	}
-	
+
 	/**
 	 * In case value is null or an empty string the defValue is returned
 	 * @param value
@@ -167,7 +171,7 @@ public abstract class ConfigurationParseHelper {
 			return parseLong( value, errorMsgOnParseFailure );
 		}
 	}
-	
+
 	/**
 	 * Looks for a numeric value in the Properties, returning
 	 * defValue if not found or if an empty string is found.
