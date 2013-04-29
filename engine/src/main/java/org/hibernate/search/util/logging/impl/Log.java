@@ -707,9 +707,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 177, value = "Cannot define an entity with 0 shard on '%1$s'")
 	SearchException entityWithNoShard(Class<?> type);
 
-	@Message(id = 171, value = "Cannot set a sharding strategy when using dynamic sharding on '%1$s'")
+	@Message(id = 178, value = "Cannot set a sharding strategy when using dynamic sharding on '%1$s'")
 	SearchException illegalStragegyWhenUsingDynamicSharding(Class<?> type);
 
-	@Message(id = 172, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext. Actual class is %1$s")
+	@Message(id = 179, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext. Actual class is %1$s")
 	SearchException assertionFailureCannotCastToWorkerBuilderContext(Class<?> type);
 }
