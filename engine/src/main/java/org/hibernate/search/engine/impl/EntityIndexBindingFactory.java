@@ -46,16 +46,16 @@ public class EntityIndexBindingFactory {
 
 	@SuppressWarnings( "unchecked" )
 	public static <T,U> MutableEntityIndexBinding<T> buildEntityIndexBinder(Class<T> type, IndexManager[] providers,
-																			  IndexShardingStrategy shardingStrategy,
-																			  ShardIdentifierProvider shardIdentifierProvider,
-																			  Similarity similarityInstance,
-																			  EntityIndexingInterceptor<U> interceptor,
-																			  boolean isDynamicSharding,
-																			  Properties properties,
-																			  String rootDirectoryProviderName,
-																			  WorkerBuildContext context,
-																			  IndexManagerHolder indexManagerHolder,
-																			  IndexManagerFactory indexManagerFactory) {
+																			IndexShardingStrategy shardingStrategy,
+																			ShardIdentifierProvider shardIdentifierProvider,
+																			Similarity similarityInstance,
+																			EntityIndexingInterceptor<U> interceptor,
+																			boolean isDynamicSharding,
+																			Properties properties,
+																			String rootDirectoryProviderName,
+																			WorkerBuildContext context,
+																			IndexManagerHolder indexManagerHolder,
+																			IndexManagerFactory indexManagerFactory) {
 		if ( !isDynamicSharding && providers.length == 0 ) {
 			throw log.entityWithNoShard( type );
 		}
@@ -71,12 +71,12 @@ public class EntityIndexBindingFactory {
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> MutableEntityIndexBinding<T> copyEntityIndexBindingReplacingSimilarity( Class <T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
-		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T> ) entityMapping.getEntityIndexingInterceptor();
+	public static <T> MutableEntityIndexBinding<T> copyEntityIndexBindingReplacingSimilarity(Class<T> clazz, EntityIndexBinder entityMapping, Similarity entitySimilarity) {
+		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) entityMapping.getEntityIndexingInterceptor();
 		boolean isDynamicSharding = entityMapping instanceof DynamicShardingEntityIndexBinding;
 		MutableEntityIndexBinding<T> newMapping;
 		if (isDynamicSharding) {
-			newMapping = ( (DynamicShardingEntityIndexBinding<T>) entityMapping ).cloneWithSimilarity(entitySimilarity);
+			newMapping = ( (DynamicShardingEntityIndexBinding<T>) entityMapping ).cloneWithSimilarity( entitySimilarity );
 
 		}
 		else {

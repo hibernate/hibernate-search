@@ -65,8 +65,8 @@ public class DynamicShardingTest extends SearchTestCase {
 
 	public void testSharding() throws Exception {
 		Session s = openSession();
-		EntityIndexBinder binder = getSearchFactoryImpl().getIndexBindingForEntity().get(Animal.class);
-		assertThat(binder.getIndexManagers()).hasSize( 0 );
+		EntityIndexBinder binder = getSearchFactoryImpl().getIndexBindingForEntity().get( Animal.class );
+		assertThat( binder.getIndexManagers() ).hasSize( 0 );
 		Transaction tx = s.beginTransaction();
 		Animal a = new Animal();
 		a.setId( 1 );
@@ -76,7 +76,7 @@ public class DynamicShardingTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 
-		assertThat(binder.getIndexManagers()).hasSize( 1 );
+		assertThat( binder.getIndexManagers() ).hasSize( 1 );
 
 		tx = s.beginTransaction();
 		a = new Animal();
@@ -87,7 +87,7 @@ public class DynamicShardingTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 
-		assertThat(binder.getIndexManagers()).hasSize( 2 );
+		assertThat( binder.getIndexManagers() ).hasSize( 2 );
 
 		tx = s.beginTransaction();
 		a = new Animal();
@@ -98,7 +98,7 @@ public class DynamicShardingTest extends SearchTestCase {
 		tx.commit();
 		s.clear();
 
-		assertThat(binder.getIndexManagers()).hasSize( 2 );
+		assertThat( binder.getIndexManagers() ).hasSize( 2 );
 
 		FSDirectory animalMammalDirectory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.Mammal" ) );
 		try {

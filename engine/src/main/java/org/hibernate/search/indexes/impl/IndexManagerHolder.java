@@ -246,7 +246,7 @@ public class IndexManagerHolder {
 		WorkerBuildContext context;
 		//known implementations of SearchFactory passed are MutableSearchFactory and ImmutableSearchFactory
 		if ( WorkerBuildContext.class.isAssignableFrom( searchFactory.getClass() ) ) {
-			context = ( WorkerBuildContext ) searchFactory;
+			context = (WorkerBuildContext) searchFactory;
 		}
 		else {
 			throw log.assertionFailureCannotCastToWorkerBuilderContext( searchFactory.getClass() );
@@ -263,7 +263,7 @@ public class IndexManagerHolder {
 	}
 
 	public static boolean isDynamicSharding(String shardsCountValue) {
-		return DYNAMIC_SHARDING.equals(shardsCountValue);
+		return DYNAMIC_SHARDING.equals( shardsCountValue );
 	}
 
 	public static boolean isDynamicSharding(Properties properties) {
