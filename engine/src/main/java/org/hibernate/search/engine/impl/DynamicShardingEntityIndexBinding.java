@@ -25,14 +25,12 @@ import org.apache.lucene.search.Similarity;
 import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
-import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 
@@ -40,8 +38,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -178,7 +174,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 			for (String shard : shards) {
 				managers.add( indexManagerHolder.getOrCreateLateIndexManager( getProviderName( shard ), DynamicShardingEntityIndexBinding.this ) );
 			}
-			return managers.toArray(new IndexManager[shards.length]);
+			return managers.toArray( new IndexManager[shards.length] );
 		}
 
 		@Override
@@ -187,7 +183,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 			return getIndexManagersFromShards( shards );
 		}
 
-		private final String getProviderName(String shard) {
+		private String getProviderName(String shard) {
 			return rootDirectoryProviderName + "." + shard;
 		}
 	}

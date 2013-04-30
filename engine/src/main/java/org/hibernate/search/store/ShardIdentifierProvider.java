@@ -22,7 +22,6 @@ package org.hibernate.search.store;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.indexes.spi.IndexManager;
 
 import java.io.Serializable;
 import java.util.Properties;
@@ -37,26 +36,26 @@ public interface ShardIdentifierProvider {
 	/**
 	 * Initialize the provider.
 	 */
-	public void initialize(Properties properties);
+	void initialize(Properties properties);
 
 	/**
 	 * Returns the shard identifier upon addition.
 	 */
-	public String getShardIdentifier(Class<?> entity, Serializable id, String idInString, Document document);
+	String getShardIdentifier(Class<?> entity, Serializable id, String idInString, Document document);
 
 	/**
 	 * Returns the set of shard identifiers upon deletion.
 	 */
-	public String[] getShardIdentifiers(Class<?> entity, Serializable id, String idInString);
+	String[] getShardIdentifiers(Class<?> entity, Serializable id, String idInString);
 
 	/**
 	 * Returns the set of shard identifiers for a query.
 	 */
-	public String[] getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters);
+	String[] getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters);
 
 	/**
 	 * Returns the list of all known shard identifiers.
 	 * The list can vary between calls.
 	 */
-	public String[] getAllShardIdentifiers();
+	String[] getAllShardIdentifiers();
 }
