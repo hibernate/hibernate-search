@@ -143,4 +143,3 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 	}
 
 }
-

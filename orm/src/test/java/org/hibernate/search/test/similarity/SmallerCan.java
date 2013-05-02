@@ -36,4 +36,3 @@ public class SmallerCan extends Can {
 	//illegal type: can't override a parent defined Similarity
 
 }
-

@@ -100,4 +100,3 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		return new Class[] { };
 	}
 }
-

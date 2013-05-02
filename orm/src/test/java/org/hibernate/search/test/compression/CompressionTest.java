@@ -209,4 +209,3 @@ public class CompressionTest extends SearchTestCase {
 		s.close();
 	}
 }
-

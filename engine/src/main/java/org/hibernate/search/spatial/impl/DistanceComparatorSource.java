@@ -39,4 +39,3 @@ public class DistanceComparatorSource extends FieldComparatorSource {
 		return new DistanceComparator( center, numHits, fieldname );
 	}
 }
-

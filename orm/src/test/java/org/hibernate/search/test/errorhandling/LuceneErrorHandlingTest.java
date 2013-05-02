@@ -192,4 +192,3 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	}
 
 }
-

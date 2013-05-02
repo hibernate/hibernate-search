@@ -42,4 +42,3 @@ public @interface Longitude {
 	 */
 	String of() default "";
 }
-

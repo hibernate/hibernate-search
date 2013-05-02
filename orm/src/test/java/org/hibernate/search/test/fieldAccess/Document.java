@@ -94,4 +94,3 @@ public class Document {
 		this.text = text;
 	}
 }
-

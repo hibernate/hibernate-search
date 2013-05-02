@@ -32,4 +32,3 @@ public class ProperTrashExtension extends Trash {
 	//only needing a different type for testing purposes
 
 }
-

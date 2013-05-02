@@ -42,4 +42,3 @@ public @interface Latitude {
 	 */
 	String of() default "";
 }
-

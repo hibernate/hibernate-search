@@ -46,4 +46,3 @@ public class BooleanBridge implements TwoWayStringBridge {
 				object.toString();
 	}
 }
-

@@ -55,4 +55,3 @@ public class EnumBridge implements TwoWayStringBridge, AppliedOnTypeAwareBridge 
 		this.clazz = enumReturnType;
 	}
 }
-

@@ -69,4 +69,3 @@ public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 		return  "<b>" + originalValue + "</b>";
 	}
 }
-

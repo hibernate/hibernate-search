@@ -90,4 +90,3 @@ public class Student {
 		this.teacher = teacher;
 	}
 }
-

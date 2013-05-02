@@ -127,4 +127,3 @@ public interface Statistics {
 	 */
 	Map<String, Integer> indexedEntitiesCount();
 }
-

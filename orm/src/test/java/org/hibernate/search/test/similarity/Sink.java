@@ -63,4 +63,3 @@ public class Sink {
 		this.name = name;
 	}
 }
-
