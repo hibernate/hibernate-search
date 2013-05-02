@@ -84,4 +84,3 @@ public class TShirt {
 		this.length = length;
 	}
 }
-

@@ -46,5 +46,5 @@ public interface IndexingProgressMonitorMBean {
 	 * @return the total number of entities which need indexing
 	 */
 	long getNumberOfEntitiesToIndex();
-}
 
+}

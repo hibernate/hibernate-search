@@ -50,4 +50,3 @@ public enum TermVector {
 	 */
 	WITH_POSITION_OFFSETS
 }
-

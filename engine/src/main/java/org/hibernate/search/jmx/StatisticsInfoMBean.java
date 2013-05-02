@@ -35,4 +35,3 @@ public interface StatisticsInfoMBean extends Statistics {
 	String STATISTICS_MBEAN_OBJECT_NAME = "org.hibernate.search.jmx:type=StatisticsInfoMBean";
 
 }
-

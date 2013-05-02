@@ -90,4 +90,3 @@ public class LargeDocument {
 		this.text = text;
 	}
 }
-

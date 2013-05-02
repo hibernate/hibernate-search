@@ -43,4 +43,3 @@ public class LoggerFactory {
 		return Logger.getMessageLogger( logClass, directCaller.getClassName() );
 	}
 }
-

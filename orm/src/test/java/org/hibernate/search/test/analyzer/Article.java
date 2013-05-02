@@ -115,4 +115,3 @@ public class Article {
 		this.references = references;
 	}
 }
-

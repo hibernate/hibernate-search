@@ -146,4 +146,3 @@ public class Month {
 	private Date estimatedCreation;
 
 }
-

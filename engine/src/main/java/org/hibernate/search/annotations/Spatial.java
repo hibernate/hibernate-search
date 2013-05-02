@@ -109,4 +109,3 @@ public @interface Spatial {
 	 */
 	int bottomQuadTreeLevel() default SpatialFieldBridgeByQuadTree.DEFAULT_BOTTOM_QUAD_TREE_LEVEL;
 }
-

@@ -94,4 +94,3 @@ public class AvoidDuplicatesTest extends SearchTestCase {
 	}
 
 }
-
