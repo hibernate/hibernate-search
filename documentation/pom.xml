@@ -61,55 +61,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <sourcepath>
-                        ${basedir}/../hibernate-search-engine/src/main/java;
-                        ${basedir}/../hibernate-search-orm/src/main/java;
-                        ${basedir}/../hibernate-search-infinispan/src/main/java
-                    </sourcepath>
-                    <tags>
-                        <tag>
-                            <name>experimental</name>
-                            <placement>a</placement>
-                            <head>Experimental</head>
-                        </tag>
-                    </tags>
-                    <docfilessubdirs>true</docfilessubdirs>
-                    <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-                    <links>
-                        <link>http://download.oracle.com/javase/6/docs/api/</link>
-                        <link>http://docs.jboss.org/hibernate/stable/core/javadocs/</link>
-                        <link>http://lucene.apache.org/java/3_5_0/api/all</link>
-                    </links>
-                    <packagesheader>Hibernate Search Packages</packagesheader>
-                    <doctitle>Hibernate Search ${project.version}</doctitle>
-                    <windowtitle>Hibernate Search ${project.version}</windowtitle>
-                    <groups>
-                        <group>
-                            <title>Hibernate Search Engine and ORM Packages</title>
-                            <packages>org.hibernate.search*</packages>
-                        </group>
-                        <group>
-                            <title>Hibernate Search Infinispan</title>
-                            <packages>org.hibernate.search.infinispan</packages>
-                        </group>
-                    </groups>
-                    <bottom>
-                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>javadoc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.jboss.maven.plugins</groupId>
                 <artifactId>maven-jdocbook-plugin</artifactId>
                 <configuration>

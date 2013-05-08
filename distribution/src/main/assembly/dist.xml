@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  ~ indicated by the @author tags or express copyright attribution
+  ~ statements applied by the authors.  All third-party contributions are
+  ~ distributed under license by Red Hat, Inc.
+  ~
+  ~ This copyrighted material is made available to anyone wishing to use, modify,
+  ~ copy, or redistribute it subject to the terms and conditions of the GNU
+  ~ Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~ for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this distribution; if not, write to:
+  ~ Free Software Foundation, Inc.
+  ~ 51 Franklin Street, Fifth Floor
+  ~ Boston, MA  02110-1301  USA
+  -->
+
+<!--
+  When updating this file, make sure we don't include duplicate jars in different subdirectories.
+  Generate the distribution preview to see how it looks like:
+   mvn clean package assembly:assembly -DskipTests=true
+  To inspect which jars are being distributed and look for duplicates this might be handy:
+   tar -ztvf target/*-dist.tar.gz  | grep .jar | sed -e "s/.*\/dist//" -e "s/\(\/lib\/[^\/]*\)\/\(.*\)/\2 \t\t\t\1/" | sort
+ -->
+<assembly>
+    <id>dist</id>
+    <formats>
+        <format>tar.gz</format>
+        <format>zip</format>
+        <format>dir</format>
+    </formats>
+
+    <!-- Configure the module artifacts which make it into the distribution bundle -->
+    <!-- first the actual project artifacts -->
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>dist</outputDirectory>
+            <includes>
+                <include>org.hibernate:hibernate-search-engine</include>
+                <include>org.hibernate:hibernate-search-orm</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/required</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <!-- hibernate-search-engine -->
+                <include>org.apache.lucene:lucene-core</include>
+                <include>org.hibernate.common:hibernate-commons-annotations</include>
+                <include>org.jboss.logging:jboss-logging</include>
+                <include>org.apache.avro:avro</include>
+
+                <!-- hibernate-search-orm -->
+                <include>org.hibernate:hibernate-core</include>
+                <include>dom4j:dom4j</include>
+                <include>javassist:javassist</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/optional</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <!-- hibernate-search-engine-->
+                <include>org.hibernate:hibernate-search-analyzers</include>
+                <include>org.apache.lucene:lucene-analyzers</include>
+
+                <!-- hibernate-search-orm-->
+                <include>org.hibernate:hibernate-entitymanager</include>
+            </includes>
+            <excludes>
+                <exclude>dom4j:*</exclude>
+                <exclude>javassist:javassist</exclude>
+                <exclude>org.jboss.spec.javax.transaction:*</exclude>
+            </excludes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/clustering</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-infinispan</include>
+                <include>org.infinispan:infinispan-lucene-directory</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>/dist/lib/provided</outputDirectory>
+            <scope>provided</scope>
+            <includes>
+                <include>javax.transaction:jta</include>
+                <include>javax.jms:jms</include>
+                <include>javax.annotation:jsr250-api</include>
+                <include>org.hibernate.javax.persistence:*</include>
+            </includes>
+        </dependencySet>
+
+    </dependencySets>
+
+    <files>
+        <file>
+            <source>../README.md</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>../lgpl.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>../changelog.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>../copyright.txt</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+    </files>
+
+    <fileSets>
+        <!-- Include all sources -->
+        <fileSet>
+            <directory>..</directory>
+            <outputDirectory>project</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+                <exclude>.git</exclude>
+                <exclude>*.log</exclude>
+                <exclude>*.sh</exclude>
+                <exclude>**/.gitignore</exclude>
+                <exclude>**/.settings/**</exclude>
+                <exclude>**/.project</exclude>
+                <exclude>**/.classpath</exclude>
+                <exclude>**/.externalToolBuilders/**</exclude>
+                <exclude>**/target/**</exclude>
+                <exclude>**/.idea/**</exclude>
+                <exclude>**/*.iml</exclude>
+                <exclude>atlassian-ide-plugin.xml</exclude>
+                <exclude>.sonar-ide.properties</exclude>
+            </excludes>
+        </fileSet>
+
+        <!-- Include documentation -->
+        <fileSet>
+            <directory>target/site/apidocs</directory>
+            <outputDirectory>docs/api</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../documentation/target/docbook/publish</directory>
+            <outputDirectory>docs/reference</outputDirectory>
+        </fileSet>
+    </fileSets>
+
+</assembly>
