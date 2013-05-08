@@ -86,12 +86,11 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 		tx.commit();
 		session.close();
 
+		// assert that everything got saved and indexed correctly
 		final Long truckLVN746XDId = truckLVN746XD.getId();
 		final Long truckMLN666DJId = truckMLN666DJ.getId();
-		// assert that everything got saved correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		// everything gets indexed correctly
 		assertEquals( truckMLN666DJId, findTruckIdFromIndex( session, "armchair" ) );
 		assertEquals( truckLVN746XDId, findTruckIdFromIndex( session, "table" ) );
 		tx.commit();
@@ -108,9 +107,9 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 		tx.commit();
 		session.close();
 
+		// let's assert that indexes got updated correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		// let's assert that indexes got updated correctly
 		assertNull( findTruckIdFromIndex( session, "table" ) );
 		tx.commit();
 		session.close();
@@ -122,7 +121,6 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 		session.delete( driverDoe );
 		tx.commit();
 		session.close();
-
 	}
 
 	private Long findTruckIdFromIndex(FullTextSession session, String itemDescription) {
