@@ -67,15 +67,21 @@ public class SharedIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 	@Override
 	public IndexWriter getIndexWriter() {
 		synchronized ( lock ) {
-			openWriterUsers++;
-			return super.getIndexWriter();
+			IndexWriter indexWriter = super.getIndexWriter();
+			if ( indexWriter != null ) {
+				openWriterUsers++;
+			}
+			return indexWriter;
 		}
 	}
 
 	public IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
 		synchronized ( lock ) {
-			openWriterUsers++;
-			return super.getIndexWriter( errorContextBuilder );
+			IndexWriter indexWriter = super.getIndexWriter( errorContextBuilder );
+			if ( indexWriter != null ) {
+				openWriterUsers++;
+			}
+			return indexWriter;
 		}
 	}
 
