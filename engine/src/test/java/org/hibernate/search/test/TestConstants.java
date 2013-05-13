@@ -29,6 +29,7 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
+
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -53,12 +54,12 @@ public class TestConstants {
 		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 		// get a URL reference to something we now is part of the classpath (our own classes)
 		String currentTestName = new RuntimeException().getStackTrace()[1].getClassName();
-		int hopsToRoot = currentTestName.split( "\\." ).length;
+		int hopsToCompileDirectory = currentTestName.split( "\\." ).length;
+		int hopsToTargetDirectory = hopsToCompileDirectory + 1;
 		URL myUrl = contextClassLoader.getResource( currentTestName.replace( '.', '/' ) + ".class" );
-		File myPath = new File( myUrl.getFile() );
+		targetDir = new File( myUrl.getFile() );
 		// navigate back to '/target'
-		targetDir = myPath;
-		for ( int i = 0; i < hopsToRoot + 3; i++ ) { // target/classes == +2, +1 to root module
+		for ( int i = 0; i < hopsToTargetDirectory; i++ ) {
 			targetDir = targetDir.getParentFile();
 		}
 
@@ -88,5 +89,4 @@ public class TestConstants {
 	public static String getIndexDirectory() {
 		return indexDirPath;
 	}
-
 }
