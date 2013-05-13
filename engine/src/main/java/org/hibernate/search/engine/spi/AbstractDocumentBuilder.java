@@ -1012,10 +1012,28 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 		else {
 
-			List<XProperty> propertyList = clazz.getDeclaredProperties( XClass.ACCESS_FIELD );
-
 			String latitudeField = null;
 			String longitudeField = null;
+
+			List<XProperty> fieldList = clazz.getDeclaredProperties( XClass.ACCESS_FIELD );
+
+			for ( XProperty property : fieldList ) {
+				if ( property.isAnnotationPresent( Latitude.class ) && ( property.getAnnotation( Latitude.class ) ).of().equals( ann.name() ) ) {
+					if ( latitudeField != null ) {
+						throw log.ambiguousLatitudeDefinition( this.beanXClassName, latitudeField, property.getName() );
+					}
+					latitudeField = property.getName();
+				}
+				if ( property.isAnnotationPresent( Longitude.class ) && ( property.getAnnotation( Longitude.class )).of().equals( ann.name() ) ) {
+					if ( longitudeField != null ) {
+						throw log.ambiguousLongitudeDefinition( this.beanXClassName, longitudeField, property.getName() );
+					}
+					longitudeField = property.getName();
+				}
+			}
+
+			List<XProperty> propertyList = clazz.getDeclaredProperties( XClass.ACCESS_PROPERTY );
+
 			for ( XProperty property : propertyList ) {
 				if ( property.isAnnotationPresent( Latitude.class ) && ( property.getAnnotation( Latitude.class ) ).of().equals( ann.name() ) ) {
 					if ( latitudeField != null ) {
