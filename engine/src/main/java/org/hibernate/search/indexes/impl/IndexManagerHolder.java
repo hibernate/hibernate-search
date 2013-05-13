@@ -97,7 +97,7 @@ public class IndexManagerHolder {
 		Properties[] indexProps = getDirectoryProperties( cfg, directoryProviderName );
 
 		//set up the IndexManagers
-		final boolean isDynamicSharding = isDynamicSharding( indexProps[0] );
+		final boolean isDynamicSharding = isShardingDynamic( indexProps[0] );
 
 		//define the Similarity implementation:
 		// warning: it can also be set by an annotation at class level
@@ -262,12 +262,12 @@ public class IndexManagerHolder {
 		return indexManager;
 	}
 
-	public static boolean isDynamicSharding(String shardsCountValue) {
+	private static boolean isShardingDynamic(String shardsCountValue) {
 		return DYNAMIC_SHARDING.equals( shardsCountValue );
 	}
 
-	public static boolean isDynamicSharding(Properties properties) {
-		return isDynamicSharding( properties.getProperty( NBR_OF_SHARDS ) );
+	public static boolean isShardingDynamic(Properties properties) {
+		return isShardingDynamic( properties.getProperty( NBR_OF_SHARDS ) );
 	}
 
 	private Class<? extends EntityIndexingInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
@@ -373,7 +373,7 @@ public class IndexManagerHolder {
 		Properties globalProperties = new MaskedProperty( rootCfg, "default" );
 		Properties directoryLocalProperties = new MaskedProperty( rootCfg, directoryProviderName, globalProperties );
 		final String shardsCountValue = directoryLocalProperties.getProperty( NBR_OF_SHARDS );
-		if ( shardsCountValue == null || isDynamicSharding( shardsCountValue ) ) {
+		if ( shardsCountValue == null || isShardingDynamic( shardsCountValue ) ) {
 			// no shard or dynamic shards: finished.
 			return new Properties[] { directoryLocalProperties };
 		}
