@@ -46,6 +46,7 @@ import org.hibernate.ejb.HibernatePersistence;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTSStandaloneTransactionManagerLookup;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;
@@ -58,7 +59,7 @@ import org.hibernate.search.util.impl.FileHelper;
 public class JBossTSTest {
 
 	private static EntityManagerFactory factory;
-	public static File tempDirectory = new File( "./test-tmp" );
+	public static File tempDirectory = new File( TestConstants.getTargetDir() + "/h2" );
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -66,7 +67,7 @@ public class JBossTSTest {
 		tempDirectory.mkdir();
 
 		//DataSource configuration
-		final String url = "jdbc:h2:file:./test-tmp/h2db";
+		final String url = "jdbc:h2:file:" + tempDirectory.getAbsolutePath() + "/h2db";
 		final String user = "sa";
 		final String password = "";
 
@@ -102,12 +103,12 @@ public class JBossTSTest {
 				.addProperty( "hibernate.dialect", H2Dialect.class.getName() )
 				.addProperty( Environment.HBM2DDL_AUTO, "create-drop" )
 				.addProperty( Environment.SHOW_SQL, "true" )
-				//I don't pool connections by JTA transaction. Leave the work to Hibernate Core
+						//I don't pool connections by JTA transaction. Leave the work to Hibernate Core
 				.addProperty( Environment.RELEASE_CONNECTIONS, ConnectionReleaseMode.AFTER_TRANSACTION.toString() )
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.create();
 		final HibernatePersistence hp = new HibernatePersistence();
-		factory = hp.createContainerEntityManagerFactory( unitInfo, new HashMap( ) );
+		factory = hp.createContainerEntityManagerFactory( unitInfo, new HashMap() );
 
 	}
 
@@ -140,7 +141,7 @@ public class JBossTSTest {
 		ftem.createFullTextQuery( query, Tweet.class ).getResultList();
 		final List resultList = em.createQuery( "from " + Tweet.class.getName() ).getResultList();
 		Assert.assertEquals( 1, resultList.size() );
-		for (Object o : resultList) {
+		for ( Object o : resultList ) {
 			em.remove( o );
 		}
 		tm.commit();
