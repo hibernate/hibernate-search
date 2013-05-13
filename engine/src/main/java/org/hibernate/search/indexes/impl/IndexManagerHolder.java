@@ -157,7 +157,7 @@ public class IndexManagerHolder {
 					shardingStrategyName, DirectoryProviderFactory.class, "IndexShardingStrategy"
 			);
 		}
-		if (shardingStrategy != null) {
+		if ( shardingStrategy != null ) {
 			shardingStrategy.initialize(
 				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers
 			);
@@ -177,12 +177,12 @@ public class IndexManagerHolder {
 
 		Indexed indexedAnnotation = entity.getAnnotation( Indexed.class );
 		EntityIndexingInterceptor<?> interceptor = null;
-		if (indexedAnnotation != null) {
+		if ( indexedAnnotation != null ) {
 			Class<? extends EntityIndexingInterceptor> interceptorClass = getInterceptorClassFromHierarchy(
 					entity,
 					indexedAnnotation
 			);
-			if (interceptorClass == DefaultEntityInterceptor.class) {
+			if ( interceptorClass == DefaultEntityInterceptor.class ) {
 				interceptor = null;
 			}
 			else {
@@ -218,7 +218,7 @@ public class IndexManagerHolder {
 		if ( indexManager == null ) {
 			indexManager = createIndexManager( providerName, indexProp, context, indexManagerFactory );
 			indexManagersRegistry.put( providerName, indexManager );
-			if (similarityInstance != null) {
+			if ( similarityInstance != null ) {
 				setSimilarity( similarityInstance, indexManager );
 			}
 		}
@@ -276,7 +276,7 @@ public class IndexManagerHolder {
 		while ( result == DefaultEntityInterceptor.class ) {
 			superEntity = superEntity.getSuperclass();
 			//Object.class
-			if (superEntity == null) {
+			if ( superEntity == null ) {
 				return result;
 			}
 			Indexed indexAnnForSuperclass = superEntity.getAnnotation( Indexed.class );
