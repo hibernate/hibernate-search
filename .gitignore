@@ -4,15 +4,8 @@
 #Checkstyle
 .checkstyle
 
-# Gradle work directory
-.gradle
-buildSrc/.gradle
-
-# Build output directies
+# Build output directories
 target
-build
-bin
-test-output
 
 # IntelliJ specific files/directories
 /out
