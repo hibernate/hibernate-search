@@ -25,6 +25,10 @@ package org.hibernate.search.test.integration.jms;
 
 import java.io.File;
 
+import org.hibernate.search.test.integration.jms.controller.RegistrationController;
+import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
+import org.hibernate.search.test.integration.jms.model.RegisteredMember;
+import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
@@ -35,14 +39,6 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
-
-import org.hibernate.search.Version;
-import org.hibernate.search.test.integration.jms.controller.RegistrationController;
-import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
-import org.hibernate.search.test.integration.jms.model.RegisteredMember;
-import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 /**
  * Create deployments for JMS Master/Slave configuration integration tests.
@@ -52,8 +48,6 @@ import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
  * @author Sanne Grinovero
  */
 public class DeploymentJmsMasterSlave {
-
-	private static File[] libraryFiles;
 
 	public static Archive<?> createMaster(String deploymentName, int refreshPeriod, File tmpDir) throws Exception {
 		return baseArchive( deploymentName, masterPersistenceXml( deploymentName, refreshPeriod, tmpDir ) )
@@ -69,10 +63,9 @@ public class DeploymentJmsMasterSlave {
 	private static WebArchive baseArchive(String name, PersistenceDescriptor unitDef) throws Exception {
 		WebArchive webArchive = ShrinkWrap
 				.create( WebArchive.class, name + ".war" )
-				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class )
+				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, SearchNewEntityJmsMasterSlave.class )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
-		addLibraries( webArchive );
 		return webArchive;
 	}
 
@@ -147,23 +140,6 @@ public class DeploymentJmsMasterSlave {
 							.name( "hibernate.search.default.worker.execution" )
 							.value( "sync" )
 							.up();
-	}
-
-	private static void addLibraries(WebArchive archive) {
-		if ( libraryFiles == null ) { //cache this as Maven resolution is painfully slow
-			MavenDependencyResolver resolver = DependencyResolvers
-					.use( MavenDependencyResolver.class );
-			String currentVersion = Version.getVersionString();
-			libraryFiles = resolver
-					.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
-					.exclusion( "org.hibernate:hibernate-entitymanager" )
-					.exclusion( "org.hibernate:hibernate-core" )
-					.exclusion( "org.hibernate:hibernate-search-analyzers" )
-					.exclusion( "org.jboss.logging:jboss-logging" )
-					.exclusion( "org.slf4j:slf4j-api" )
-					.resolveAsFiles();
-		}
-		archive.addAsLibraries( libraryFiles );
 	}
 
 	private static Asset hornetqJmsXml() {

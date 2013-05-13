@@ -25,6 +25,7 @@ package org.hibernate.search.test.integration.jms.controller;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
+import javax.jms.MessageListener;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -35,7 +36,7 @@ import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
 		@ActivationConfigProperty(propertyName = "destination", propertyValue = RegistrationConfiguration.DESTINATION_QUEUE) })
-public class RegistrationMdb extends AbstractJMSHibernateSearchController {
+public class RegistrationMdb extends AbstractJMSHibernateSearchController implements MessageListener {
 
 	@PersistenceContext
 	private EntityManager em;
