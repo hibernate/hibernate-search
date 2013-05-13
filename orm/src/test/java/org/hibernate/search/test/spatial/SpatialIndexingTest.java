@@ -581,6 +581,44 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	public void testSpatialLatLongOnGetters() throws Exception {
+		GetterUser user = new GetterUser( 1, 24.0d, 32.0d );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+		fullTextSession.save( user );
+		tx.commit();
+
+		tx = fullTextSession.beginTransaction();
+		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
+		double centerLatitude = 24;
+		double centerLongitude = 31.5;
+
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( GetterUser.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "home" )
+				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, GetterUser.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( 0, results.size() );
+
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "home" )
+				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, GetterUser.class );
+		List results2 = hibQuery2.list();
+		Assert.assertEquals( 1, results2.size() );
+
+		List<?> events = fullTextSession.createQuery( "from " + GetterUser.class.getName() ).list();
+		for (Object entity : events) {
+			fullTextSession.delete( entity );
+		}
+		tx.commit();
+		fullTextSession.close();
+	}
+
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
@@ -593,7 +631,8 @@ public class SpatialIndexingTest extends SearchTestCase {
 				RangeHotel.class,
 				RangeEvent.class,
 				Restaurant.class,
-				NonGeoPOI.class
+				NonGeoPOI.class,
+				GetterUser.class
 		};
 	}
 }
