@@ -157,7 +157,7 @@ public class IndexManagerHolder {
 					shardingStrategyName, DirectoryProviderFactory.class, "IndexShardingStrategy"
 			);
 		}
-		if (shardingStrategy != null) {
+		if ( shardingStrategy != null ) {
 			shardingStrategy.initialize(
 				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers
 			);
@@ -218,7 +218,7 @@ public class IndexManagerHolder {
 		if ( indexManager == null ) {
 			indexManager = createIndexManager( providerName, indexProp, context, indexManagerFactory );
 			indexManagersRegistry.put( providerName, indexManager );
-			if (similarityInstance != null) {
+			if ( similarityInstance != null ) {
 				setSimilarity( similarityInstance, indexManager );
 			}
 		}
