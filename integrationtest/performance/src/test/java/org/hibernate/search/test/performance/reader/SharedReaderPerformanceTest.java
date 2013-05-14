@@ -26,11 +26,9 @@ package org.hibernate.search.test.performance.reader;
 /**
  * @author Sanne Grinovero
  */
-public class SharedReaderPerfTest extends ReaderPerformance {
-
+public class SharedReaderPerformanceTest extends ReaderPerformance {
 	@Override
 	protected String getReaderStrategyName() {
 		return "shared";
 	}
-
 }

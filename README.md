@@ -43,11 +43,26 @@ Download the distribution bundle from [SourceForge](http://sourceforge.net/proje
     > cd hibernate-search
     > mvn clean install -s settings-example.xml
 
-If you want to also build the documentation, use
+#### Build options (profiles)
+
+Per default the documentation is not built. To include it in the full build, run:
 
     > mvn clean install -Pdocs -s settings-example.xml
+
+To build the distribution bundle run:
+
+    > mvn clean install -Pdist -s settings-example.xml
+
+Last but not least, if you want to run the performance test under _integration/performance_:
+
+    > mvn clean install -Pperf -s settings-example.xml
+
+You can also build the above mentioned modules directly by changing into these directories and executing maven in the
+module directory.
+
+### Contributing
     
-If you want to contribute, read [Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
+If you want to contribute, you find all you need to know in [Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
 
 ## Contact
 

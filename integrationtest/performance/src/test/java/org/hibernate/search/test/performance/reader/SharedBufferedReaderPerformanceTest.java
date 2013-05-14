@@ -23,16 +23,16 @@
  */
 package org.hibernate.search.test.performance.reader;
 
+import org.hibernate.cfg.Configuration;
+import org.hibernate.search.Environment;
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 
 /**
- * @author Sanne Grinovero
+ * @author Emmanuel Bernard
  */
-public class BufferSharingReaderPerfTest extends ReaderPerformance {
-
-	@Override
-	protected String getReaderStrategyName() {
-		return SharingBufferReaderProvider.class.getName();
+public class SharedBufferedReaderPerformanceTest extends ReaderPerformanceTestCase {
+	protected void configure(Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getCanonicalName() );
 	}
-
 }

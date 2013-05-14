@@ -21,14 +21,16 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.performance.optimizer;
+package org.hibernate.search.test.performance.reader;
 
 /**
- * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-public class IncrementalOptimizerStrategyPerfTest extends OptimizerPerfTest {
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.optimizer.transaction_limit.max", "10" );
+public class NotSharedReaderPerformanceTest extends ReaderPerformance {
+
+	@Override
+	protected String getReaderStrategyName() {
+		return "not-shared";
 	}
+
 }
