@@ -25,12 +25,14 @@ import java.io.IOException;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
 
+import org.hibernate.search.spatial.Coordinates;
+
 public class DistanceComparatorSource extends FieldComparatorSource {
 
 	private final Point center;
 
-	public DistanceComparatorSource(Point center) {
-		this.center = center;
+	public DistanceComparatorSource(Coordinates center) {
+		this.center = Point.fromDegrees( center.getLatitude(), center.getLongitude() );
 	}
 
 	@Override

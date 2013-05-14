@@ -65,6 +65,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.logging.impl.Log;
@@ -135,8 +136,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	}
 
 	@Override
-	public HSQuery setSpatialParameters(Point center, String fieldName) {
-		spatialSearchCenter = center;
+	public HSQuery setSpatialParameters(Coordinates center, String fieldName) {
+		spatialSearchCenter = Point.fromDegrees( center.getLatitude(), center.getLongitude() );
 		spatialFieldName = fieldName;
 		return this;
 	}
