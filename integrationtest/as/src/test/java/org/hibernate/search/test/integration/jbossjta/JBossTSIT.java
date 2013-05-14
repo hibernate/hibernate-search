@@ -56,7 +56,7 @@ import org.hibernate.search.util.impl.FileHelper;
  * @author Emmanuel Bernard
  */
 
-public class JBossTSTest {
+public class JBossTSIT {
 
 	private static EntityManagerFactory factory;
 	public static File tempDirectory = new File( TestConstants.getTargetDir() + "/h2" );

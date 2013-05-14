@@ -21,18 +21,14 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.performance.reader;
-
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
-import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
+package org.hibernate.search.test.performance.optimizer;
 
 /**
  * @author Emmanuel Bernard
  */
-public class SharedBufferedReaderPerfTest extends ReaderPerfTestCase {
-	protected void configure(Configuration cfg) {
+public class IncrementalOptimizerStrategyPerformanceTest extends OptimizerPerformanceTest {
+	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getCanonicalName() );
+		cfg.setProperty( "hibernate.search.default.optimizer.transaction_limit.max", "10" );
 	}
 }

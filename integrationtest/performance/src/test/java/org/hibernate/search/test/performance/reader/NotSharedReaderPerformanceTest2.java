@@ -23,14 +23,15 @@
  */
 package org.hibernate.search.test.performance.reader;
 
+import org.hibernate.cfg.Configuration;
+import org.hibernate.search.Environment;
+
 /**
- * @author Sanne Grinovero
+ * @author Emmanuel Bernard
  */
-public class NotSharedReaderPerfTest extends ReaderPerformance {
-
-	@Override
-	protected String getReaderStrategyName() {
-		return "not-shared";
+public class NotSharedReaderPerformanceTest2 extends ReaderPerformanceTestCase {
+	protected void configure(Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( Environment.READER_STRATEGY, "not-shared" );
 	}
-
 }

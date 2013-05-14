@@ -32,6 +32,9 @@ import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -46,11 +49,12 @@ import org.hibernate.search.util.impl.FileHelper;
 /**
  * @author Emmanuel Bernard
  */
-public class OptimizerPerfTest extends SearchTestCase {
+public class OptimizerPerformanceTest extends SearchTestCase {
+	@Before
 	public void setUp() throws Exception {
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
-		sub.mkdir();
+		sub.mkdirs();
 		File[] files = sub.listFiles();
 		for ( File file : files ) {
 			if ( file.isDirectory() ) {
@@ -60,6 +64,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 		super.setUp();
 	}
 
+	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
@@ -67,6 +72,7 @@ public class OptimizerPerfTest extends SearchTestCase {
 		setCfg( null ); //we need a fresh session factory each time for index set up
 	}
 
+	@Test
 	public void testConcurrency() throws Exception {
 		int nThreads = 15;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );

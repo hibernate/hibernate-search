@@ -43,7 +43,8 @@
         <module>analyzers</module>
         <module>testing</module>
         <module>infinispan</module>
-        <module>integrationtest</module>
+        <module>integrationtest/as</module>
+        <module>integrationtest/spring</module>
         <module>modules</module>
     </modules>
 
@@ -878,6 +879,13 @@
             <id>dist</id>
             <modules>
                 <module>distribution</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>perf</id>
+            <modules>
+                <module>integrationtest/performance</module>
             </modules>
         </profile>
 

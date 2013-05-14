@@ -23,19 +23,9 @@
  */
 package org.hibernate.search.test.integration.jbossas7;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
-
 import javax.inject.Inject;
 
-import org.hibernate.search.Version;
-import org.hibernate.search.test.integration.jbossas7.controller.MemberRegistration;
-import org.hibernate.search.test.integration.jbossas7.model.Member;
-import org.hibernate.search.test.integration.jbossas7.util.Resources;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -51,6 +41,16 @@ import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.hibernate.search.Version;
+import org.hibernate.search.test.integration.jbossas7.controller.MemberRegistration;
+import org.hibernate.search.test.integration.jbossas7.model.Member;
+import org.hibernate.search.test.integration.jbossas7.util.Resources;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Example of an integration test using JBoss AS 7 and Arquillian.
@@ -126,7 +126,7 @@ public class MemberRegistrationIT {
 	}
 
 	@Test
-	public void testUnexistingMember() throws Exception {
+	public void testNonExistingMember() throws Exception {
 		List<Member> search = memberRegistration.search( "TotallyInventedName" );
 
 		assertNotNull( "Search should never return null", search );

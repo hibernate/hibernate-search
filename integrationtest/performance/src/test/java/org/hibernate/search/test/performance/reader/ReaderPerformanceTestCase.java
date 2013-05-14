@@ -52,7 +52,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Emmanuel Bernard
  */
-public abstract class ReaderPerfTestCase extends SearchTestCase {
+public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 
 	private static final Log log = LoggerFactory.make();
 

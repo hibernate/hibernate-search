@@ -55,16 +55,29 @@ public abstract class ReaderPerformance extends SearchTestCase {
 
 	private static final int WORKER_THREADS = 20;
 
-	private static final int WARMUP_CYCLES = 6;
+	private static final int WARM_UP_CYCLES = 6;
 
 	public void setUp() throws Exception {
 		File baseIndexDir = getBaseIndexDir();
-		baseIndexDir.mkdir();
+		baseIndexDir.mkdirs();
 		File[] files = baseIndexDir.listFiles();
 		for ( File file : files ) {
 			FileHelper.delete( file );
 		}
 		super.setUp();
+	}
+
+	public void tearDown() throws Exception {
+		super.tearDown();
+		FileHelper.delete( getBaseIndexDir() );
+	}
+
+	public final void testPerformance()
+			throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
+		buildBigIndex();
+		for ( int i = 0; i < WARM_UP_CYCLES; i++ ) {
+			timeMs();
+		}
 	}
 
 	private void buildBigIndex()
@@ -94,11 +107,6 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		};
 	}
 
-	public void tearDown() throws Exception {
-		super.tearDown();
-		FileHelper.delete( getBaseIndexDir() );
-	}
-
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
@@ -112,14 +120,6 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	}
 
 	protected abstract String getReaderStrategyName();
-
-	public final void testPerformance()
-			throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
-		buildBigIndex();
-		for ( int i = 0; i < WARMUP_CYCLES; i++ ) {
-			timeMs();
-		}
-	}
 
 	private void timeMs() throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
@@ -152,5 +152,4 @@ public abstract class ReaderPerformance extends SearchTestCase {
 						( TOTAL_WORK_BATCHES * UPDATES_PER_BATCH ) + " updates)"
 		);
 	}
-
 }
