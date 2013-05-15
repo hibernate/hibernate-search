@@ -18,9 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.spatial.impl;
+package org.hibernate.search.spatial;
 
 import org.apache.lucene.search.SortField;
+
+import org.hibernate.search.spatial.impl.DistanceComparatorSource;
+import org.hibernate.search.spatial.impl.Point;
 
 /**
  * Lucene SortField for sorting documents which have been indexed with Hibernate Search spatial
@@ -32,7 +35,7 @@ import org.apache.lucene.search.SortField;
  */
 public class DistanceSortField extends SortField {
 
-	public DistanceSortField(Point center, String fieldName) {
+	public DistanceSortField(Coordinates center, String fieldName) {
 		super( fieldName, new DistanceComparatorSource( center ) );
 	}
 

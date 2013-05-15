@@ -20,6 +20,8 @@
  */
 package org.hibernate.search.spatial.impl;
 
+import org.hibernate.search.spatial.Coordinates;
+
 /**
  * Bounding box for search area on Earth
  *
@@ -39,12 +41,13 @@ public final class Rectangle {
 	/**
 	 * Compute appropriate bounding box on Earth with pole and prime meridian crossing checks
 	 *
-	 * @param center of the search area
+	 * @param centerCoordinates of the search area
 	 * @param radius of the search area
 	 * @return a bounding box for the area
 	 * @see <a href="http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates">Bouding box on Earth calculation</a>
 	 */
-	public static Rectangle fromBoundingCircle(Point center, double radius) {
+	public static Rectangle fromBoundingCircle(Coordinates centerCoordinates, double radius) {
+		Point center = Point.fromCoordinates( centerCoordinates );
 		// http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
 		double minimumLatitude, maximumLatitude;
 		double minimumLongitude, maximumLongitude;

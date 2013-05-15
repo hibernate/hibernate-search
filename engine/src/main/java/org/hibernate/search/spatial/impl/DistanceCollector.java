@@ -27,6 +27,7 @@ import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.util.collections.IntToDoubleMap;
+import org.hibernate.search.spatial.Coordinates;
 
 public class DistanceCollector extends Collector {
 
@@ -41,10 +42,10 @@ public class DistanceCollector extends Collector {
 	private IntToDoubleMap latitudeValues;
 	private IntToDoubleMap longitudeValues;
 
-	public DistanceCollector(Collector delegate, Point center, int hitsCount, String fieldname) {
+	public DistanceCollector(Collector delegate, Coordinates centerCoordinates, int hitsCount, String fieldname) {
 		this.delegate = delegate;
 		this.acceptsDocsOutOfOrder = delegate.acceptsDocsOutOfOrder();
-		this.center = center;
+		this.center = Point.fromCoordinates( centerCoordinates );
 		this.distances = new IntToDoubleMap( hitsCount );
 		this.latitudeValues = new IntToDoubleMap( hitsCount );
 		this.longitudeValues = new IntToDoubleMap( hitsCount );

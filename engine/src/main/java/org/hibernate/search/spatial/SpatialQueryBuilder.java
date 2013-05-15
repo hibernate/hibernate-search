@@ -22,7 +22,7 @@ package org.hibernate.search.spatial;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
+import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromCoordinates;
 
 /**
  * The SpatialQueryBuilder hold builder methods for Quad Tree, Distance and Spatial (Quad Tree+Distance) filters
@@ -48,7 +48,7 @@ public abstract class SpatialQueryBuilder {
 	 * @see	Coordinates
 	 */
 	public static Query buildSpatialQueryByQuadTree(double latitude, double longitude, double radius, String fieldName) {
-		return SpatialQueryBuilderFromPoint
+		return SpatialQueryBuilderFromCoordinates
 				.buildSpatialQueryByQuadTree(
 						Point.fromDegrees( latitude, longitude ),
 						radius,
@@ -71,7 +71,7 @@ public abstract class SpatialQueryBuilder {
 	 * @see	Coordinates
 	 */
 	public static Query buildSpatialQueryByRange(double latitude, double longitude, double radius, String fieldName) {
-		return SpatialQueryBuilderFromPoint.buildSpatialQueryByRange(
+		return SpatialQueryBuilderFromCoordinates.buildSpatialQueryByRange(
 				Point.fromDegrees( latitude, longitude ),
 				radius,
 				fieldName

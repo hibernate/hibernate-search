@@ -29,6 +29,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredDocIdSet;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
+import org.hibernate.search.spatial.Coordinates;
 
 /**
  * Lucene Filter for filtering documents which have been indexed with Hibernate Search spatial Field bridge
@@ -53,19 +54,19 @@ public final class DistanceFilter extends Filter {
 	 *
 	 * @param previousFilter previous Filter in the chain. As Distance is costly by retrieving the lat and long field
 	 * it is better to use it last
-	 * @param center center of the search perimeter
+	 * @param centerCoordinates center of the search perimeter
 	 * @param radius radius of the search perimeter
 	 * @param coordinatesField name of the field implementing Coordinates
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public DistanceFilter(Filter previousFilter, Point center, double radius, String coordinatesField) {
+	public DistanceFilter(Filter previousFilter, Coordinates centerCoordinates, double radius, String coordinatesField) {
 		if ( previousFilter != null ) {
 			this.previousFilter = previousFilter;
 		}
 		else {
 			this.previousFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
 		}
-		this.center = center;
+		this.center = Point.fromCoordinates( centerCoordinates );
 		this.radius = radius;
 		this.coordinatesField = coordinatesField;
 	}
@@ -75,20 +76,20 @@ public final class DistanceFilter extends Filter {
 	 *
 	 * @param previousFilter previous Filter in the chain. As Distance is costly by retrieving the lat and long field
 	 * it is better to use it last
-	 * @param center center of the search perimeter
+	 * @param centerCoordinates center of the search perimeter
 	 * @param radius radius of the search perimeter
 	 * @param latitudeField name of the field hosting latitude
 	 * @param longitudeField name of the field hosting longitude
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public DistanceFilter(Filter previousFilter, Point center, double radius, String latitudeField, String longitudeField) {
+	public DistanceFilter(Filter previousFilter, Coordinates centerCoordinates, double radius, String latitudeField, String longitudeField) {
 		if ( previousFilter != null ) {
 			this.previousFilter = previousFilter;
 		}
 		else {
 			this.previousFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
 		}
-		this.center = center;
+		this.center = Point.fromCoordinates( centerCoordinates );
 		this.radius = radius;
 		this.coordinatesField = null;
 		this.latitudeField = latitudeField;

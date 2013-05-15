@@ -29,6 +29,7 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
 
 import java.util.List;
@@ -39,7 +40,7 @@ import java.util.List;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public abstract class SpatialQueryBuilderFromPoint {
+public abstract class SpatialQueryBuilderFromCoordinates {
 
 	/**
 	 * Returns a Lucene filter which rely on Hibernate Search Spatial
@@ -53,7 +54,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see org.hibernate.search.spatial.Coordinates
 	 * @see org.apache.lucene.search.Filter
 	 */
-	public static Filter buildQuadTreeFilter(Point center, double radius, String fieldName) {
+	public static Filter buildQuadTreeFilter(Coordinates center, double radius, String fieldName) {
 		int bestQuadTreeLevel = SpatialHelper.findBestQuadTreeLevelForSearchRange( 2.0d * radius );
 		if ( bestQuadTreeLevel > SpatialFieldBridgeByQuadTree.DEFAULT_BOTTOM_QUAD_TREE_LEVEL ) {
 			bestQuadTreeLevel = SpatialFieldBridgeByQuadTree.DEFAULT_BOTTOM_QUAD_TREE_LEVEL;
@@ -77,7 +78,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see DistanceFilter
 	 * @see Filter
 	 */
-	public static Filter buildDistanceFilter(Filter previousFilter, Point center, double radius, String coordinatesField) {
+	public static Filter buildDistanceFilter(Filter previousFilter, Coordinates center, double radius, String coordinatesField) {
 		return new DistanceFilter( previousFilter, center, radius, coordinatesField );
 	}
 
@@ -97,7 +98,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see DistanceFilter
 	 * @see Filter
 	 */
-	public static Filter buildDistanceFilter(Filter previousFilter, Point center, double radius, String latitudeField, String longitudeField) {
+	public static Filter buildDistanceFilter(Filter previousFilter, Coordinates center, double radius, String latitudeField, String longitudeField) {
 		return new DistanceFilter( previousFilter, center, radius, latitudeField, longitudeField );
 	}
 
@@ -113,7 +114,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see org.apache.lucene.search.Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildQuadTreeQuery(Point center, double radius, String fieldName) {
+	public static Query buildQuadTreeQuery(Coordinates center, double radius, String fieldName) {
 		return new FilteredQuery( new MatchAllDocsQuery(), buildQuadTreeFilter( center, radius, fieldName ) );
 	}
 
@@ -128,7 +129,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildDistanceQuery(Point center, double radius, String fieldName) {
+	public static Query buildDistanceQuery(Coordinates center, double radius, String fieldName) {
 		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
 		return new FilteredQuery( new MatchAllDocsQuery(  ), buildDistanceFilter( allFilter, center, radius, fieldName ) );
 	}
@@ -145,7 +146,7 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildSpatialQueryByQuadTree(Point center, double radius, String fieldName) {
+	public static Query buildSpatialQueryByQuadTree(Coordinates center, double radius, String fieldName) {
 		return new FilteredQuery( new MatchAllDocsQuery(  ),
 				buildDistanceFilter(
 						buildQuadTreeFilter( center, radius, fieldName ),
@@ -160,15 +161,15 @@ public abstract class SpatialQueryBuilderFromPoint {
 	 * Returns a Lucene Query which rely on double numeric range query
 	 * on Latitude / Longitude
 	 *
-	 * @param center center of the search discus
+	 * @param centerCoordinates center of the search discus
 	 * @param radius distance max to center in km
 	 * @param fieldName name of the Lucene Field implementing Coordinates
 	 * @return Lucene Query to be used in a search
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildSpatialQueryByRange(Point center, double radius, String fieldName) {
-
+	public static Query buildSpatialQueryByRange(Coordinates centerCoordinates, double radius, String fieldName) {
+		Point center = Point.fromCoordinates( centerCoordinates );
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
 		String latitudeFieldName = fieldName + "_HSSI_Latitude";

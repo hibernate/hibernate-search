@@ -54,8 +54,8 @@ import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.DistanceCollector;
-import org.hibernate.search.spatial.impl.Point;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
@@ -83,7 +83,7 @@ public class QueryHits {
 
 	private final boolean enableFieldCacheOnClassName;
 
-	private Point spatialSearchCenter = null;
+	private Coordinates spatialSearchCenter = null;
 	private String spatialFieldName = null;
 
 	/**
@@ -108,7 +108,7 @@ public class QueryHits {
 					boolean enableFieldCacheOnTypes,
 					FieldCacheCollectorFactory idFieldCollector,
 					TimeoutExceptionFactory timeoutExceptionFactory,
-					Point spatialSearchCenter,
+					Coordinates spatialSearchCenter,
 					String spatialFieldName)
 			throws IOException {
 		this(
@@ -127,7 +127,7 @@ public class QueryHits {
 					boolean enableFieldCacheOnTypes,
 					FieldCacheCollectorFactory idFieldCollector,
 					TimeoutExceptionFactory timeoutExceptionFactory,
-					Point spatialSearchCenter,
+					Coordinates spatialSearchCenter,
 					String spatialFieldName)
 			throws IOException {
 		this.timeoutManager = timeoutManager;

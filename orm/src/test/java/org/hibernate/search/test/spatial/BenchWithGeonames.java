@@ -37,7 +37,7 @@ import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.Rectangle;
-import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
+import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromCoordinates;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -228,7 +228,7 @@ public class BenchWithGeonames {
 						)
 						.createQuery();
 				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery(
-						SpatialQueryBuilderFromPoint.buildDistanceFilter(
+						SpatialQueryBuilderFromCoordinates.buildDistanceFilter(
 								new QueryWrapperFilter( query ),
 								center,
 								radius,
@@ -251,7 +251,7 @@ public class BenchWithGeonames {
 				rangeResults = hibQuery.list();
 				session.clear();
 
-				luceneQuery = SpatialQueryBuilderFromPoint.buildQuadTreeQuery( center, radius, "location" );
+				luceneQuery = SpatialQueryBuilderFromCoordinates.buildQuadTreeQuery( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
@@ -268,7 +268,7 @@ public class BenchWithGeonames {
 				}
 				session.clear();
 
-				luceneQuery = SpatialQueryBuilderFromPoint.buildSpatialQueryByQuadTree( center, radius, "location" );
+				luceneQuery = SpatialQueryBuilderFromCoordinates.buildSpatialQueryByQuadTree( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
@@ -287,7 +287,7 @@ public class BenchWithGeonames {
 				session.clear();
 
 				if ( rangeResults.size() != quadTreeResults.size() ) {
-					luceneQuery = SpatialQueryBuilderFromPoint.buildDistanceQuery( center, radius, "location" );
+					luceneQuery = SpatialQueryBuilderFromCoordinates.buildDistanceQuery( center, radius, "location" );
 					hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 					hibQuery.setProjection( "id", "name" );
 
@@ -385,7 +385,7 @@ public class BenchWithGeonames {
 			Point center = Point.fromDegrees( 46, 4 );
 			double radius = 50.0d;
 
-			luceneQuery = SpatialQueryBuilderFromPoint.buildSpatialQueryByQuadTree( center, radius, "location" );
+			luceneQuery = SpatialQueryBuilderFromCoordinates.buildSpatialQueryByQuadTree( center, radius, "location" );
 			hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 			hibQuery.setProjection( "id", "name", "type" );
 

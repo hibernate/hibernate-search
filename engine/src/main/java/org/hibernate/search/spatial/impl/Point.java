@@ -43,6 +43,19 @@ public final class Point implements Coordinates {
 	}
 
 	/**
+	 * @param center the coordinates for the Point to be created
+	 * @return a Point from given Coordinates. Same instance when given a Point.
+	 */
+	public static Point fromCoordinates(Coordinates center) {
+		if ( center instanceof Point ) {
+			return (Point) center;
+		}
+		else {
+			return Point.fromDegrees( center.getLatitude(), center.getLongitude() );
+		}
+	}
+
+	/**
 	 * @param latitude in degrees
 	 * @param longitude in degrees
 	 * @return a point with coordinates given in degrees

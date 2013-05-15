@@ -72,7 +72,7 @@ import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
-import org.hibernate.search.spatial.impl.Point;
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -137,7 +137,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 	}
 
 	@Override
-	public FullTextQuery setSpatialParameters(Point center, String fieldName) {
+	public FullTextQuery setSpatialParameters(Coordinates center, String fieldName) {
 		query.setSpatialParameters( center, fieldName );
 		return this;
 	}
