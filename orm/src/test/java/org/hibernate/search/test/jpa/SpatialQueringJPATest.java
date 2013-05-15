@@ -32,7 +32,6 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.impl.DistanceSortField;
-import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.test.spatial.POI;
 import org.junit.Assert;
 
@@ -136,7 +135,7 @@ public class SpatialQueringJPATest extends JPATestCase {
 		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ) );
 		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
-		hibQuery.setSpatialParameters( Point.fromDegrees( centerLatitude, centerLongitude ), "location" );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.getResultList();
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
@@ -200,7 +199,7 @@ public class SpatialQueringJPATest extends JPATestCase {
 		hibQuery.setSort( distanceSort );
 		hibQuery.setMaxResults( 1000 );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
-		hibQuery.setSpatialParameters( Point.fromDegrees( centerLatitude, centerLongitude ), "location" );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List<Object[]> results = hibQuery.getResultList();
 
 		for ( Object[] result : results ) {
@@ -255,7 +254,7 @@ public class SpatialQueringJPATest extends JPATestCase {
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		// Set max results to 3 when 6 documents are stored:
 		hibQuery.setMaxResults( 3 );
-		hibQuery.setSpatialParameters( Point.fromDegrees( centerLatitude, centerLongitude ), "location" );
+		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.getResultList();
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );

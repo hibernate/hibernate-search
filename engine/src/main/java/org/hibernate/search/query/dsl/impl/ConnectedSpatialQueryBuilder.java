@@ -27,8 +27,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.SpatialTermination;
 import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
-import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromPoint;
+import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromCoordinates;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -64,17 +63,14 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 		String coordinatesField = spatialContext.getCoordinatesField();
 		FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
 		if ( fieldBridge instanceof SpatialFieldBridgeByQuadTree) {
-			return SpatialQueryBuilderFromPoint.buildSpatialQueryByQuadTree(
-					Point.fromDegrees( spatialContext.getCoordinates().getLatitude(), spatialContext.getCoordinates().getLongitude() ),
+			return SpatialQueryBuilderFromCoordinates.buildSpatialQueryByQuadTree(
+					spatialContext.getCoordinates(),
 					spatialContext.getRadiusDistance(), // always in KM so far, no need to convert
 					coordinatesField );
 		}
 		else if ( fieldBridge instanceof SpatialFieldBridgeByRange ) {
-			return SpatialQueryBuilderFromPoint.buildSpatialQueryByRange(
-					Point.fromDegrees(
-							spatialContext.getCoordinates().getLatitude(),
-							spatialContext.getCoordinates().getLongitude()
-					),
+			return SpatialQueryBuilderFromCoordinates.buildSpatialQueryByRange(
+					spatialContext.getCoordinates(),
 					spatialContext.getRadiusDistance(), //always in KM so far, no need to convert
 					coordinatesField
 			);

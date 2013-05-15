@@ -691,7 +691,7 @@ List results = hibQuery.list();</programlisting>
 
         <para>There are some geo related hacks (search radius too large,
         search radius crossing the poles) that are handled in bounding box
-        computations done by Rectangle.fromBoundingCircle(Point center, double
+        computations done by Rectangle.fromBoundingCircle(Coordinates center, double
         radius) (see
         http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates for
         reference on those subjects).</para>
@@ -726,7 +726,7 @@ List results = hibQuery.list();</programlisting>
         lookup query of Step 3 to exclude false candidates from the result
         list.</para>
 
-        <para>See SpatialQueryBuilderFromPoint.buildSpatialQuery(Point center,
+        <para>See SpatialQueryBuilderFromCoordinates.buildSpatialQuery(Coordinates center,
         double radius, String fieldName)</para>
       </section>
     </section>

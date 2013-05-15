@@ -57,6 +57,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.engine.spi.FacetManager;
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -245,14 +246,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public FullTextQuery setSpatialParameters( Point center, String fieldName ) {
+	public FullTextQuery setSpatialParameters(Coordinates center, String fieldName) {
 		hSearchQuery.setSpatialParameters( center, fieldName );
 		return this;
 	}
 
 	@Override
 	public FullTextQuery setSpatialParameters(double latitude, double longitude, String fieldName) {
-		setSpatialParameters(  Point.fromDegrees( latitude, longitude ), fieldName );
+		setSpatialParameters( Point.fromDegrees( latitude, longitude ), fieldName );
 		return this;
 	}
 

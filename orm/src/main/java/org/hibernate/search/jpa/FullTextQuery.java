@@ -36,7 +36,7 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
-import org.hibernate.search.spatial.impl.Point;
+import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.transform.ResultTransformer;
 
 /**
@@ -121,7 +121,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @return {@code this} for method chaining
 	 */
-	FullTextQuery setSpatialParameters(Point center, String fieldName);
+	FullTextQuery setSpatialParameters(Coordinates center, String fieldName);
 
 	/**
 	 * Enable a given filter by its name. Returns a FullTextFilter object that allows filter parameter injection

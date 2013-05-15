@@ -23,6 +23,8 @@ package org.hibernate.search.spatial.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.spatial.Coordinates;
+
 /**
  * Spatial fields, ids generator and geometric calculation methods for use in SpatialFieldBridge
  *
@@ -155,7 +157,7 @@ public abstract class SpatialHelper {
 	 * @param quadTreeLevel Quad Tree level of the wanted cell ids
 	 * @return List of the ids of the cells covering the bounding box of the given search discus
 	 */
-	public static List<String> getQuadTreeCellsIds(Point center, double radius, int quadTreeLevel) {
+	public static List<String> getQuadTreeCellsIds(Coordinates center, double radius, int quadTreeLevel) {
 
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
