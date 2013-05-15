@@ -31,7 +31,7 @@ import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.spatial.impl.DistanceSortField;
+import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.spatial.POI;
 import org.junit.Assert;
 

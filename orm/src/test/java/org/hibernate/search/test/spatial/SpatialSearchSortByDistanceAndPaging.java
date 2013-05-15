@@ -48,7 +48,7 @@ import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.spatial.impl.DistanceSortField;
+import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.testing.TestForIssue;
 

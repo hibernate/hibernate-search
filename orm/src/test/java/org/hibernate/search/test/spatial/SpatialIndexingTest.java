@@ -33,7 +33,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.spatial.impl.DistanceSortField;
+import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
