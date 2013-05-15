@@ -32,7 +32,7 @@ public class DistanceComparatorSource extends FieldComparatorSource {
 	private final Point center;
 
 	public DistanceComparatorSource(Coordinates center) {
-		this.center = Point.fromDegrees( center.getLatitude(), center.getLongitude() );
+		this.center = Point.fromCoordinates( center );
 	}
 
 	@Override
