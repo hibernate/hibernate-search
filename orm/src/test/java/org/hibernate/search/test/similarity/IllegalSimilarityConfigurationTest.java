@@ -23,11 +23,12 @@
  */
 package org.hibernate.search.test.similarity;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verifies that SearchFactory properly checks for illegal combinations
@@ -45,16 +46,17 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Can.class )
 					.addAnnotatedClass( Trash.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
 		assertTrue( "A valid configuration could not be started.", configurationIsLegal );
 	}
@@ -64,19 +66,22 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( LittleTrash.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
-		assertFalse( "Invalid Similarity declared, should have thrown an exception: same similarity"
-				+ " must be used across class hierarchy", configurationIsLegal );
+		assertFalse(
+				"Invalid Similarity declared, should have thrown an exception: same similarity"
+						+ " must be used across class hierarchy", configurationIsLegal
+		);
 	}
 
 	@Test
@@ -84,19 +89,22 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( Sink.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
-		assertFalse( "Invalid Similarity declared, should have thrown an exception: two entities"
-				+ "sharing the same index are using a different similarity", configurationIsLegal );
+		assertFalse(
+				"Invalid Similarity declared, should have thrown an exception: two entities"
+						+ "sharing the same index are using a different similarity", configurationIsLegal
+		);
 	}
 
 	@Test
@@ -104,16 +112,17 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( ProperTrashExtension.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
 		assertTrue( "Valid configuration could not be built", configurationIsLegal );
 	}
@@ -123,19 +132,22 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Can.class )
 					.addAnnotatedClass( SmallerCan.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
-		assertFalse( "Invalid Similarity declared, should have thrown an exception: child entity"
-				+ " is overriding parent's Similarity", configurationIsLegal );
+		assertFalse(
+				"Invalid Similarity declared, should have thrown an exception: child entity"
+						+ " is overriding parent's Similarity", configurationIsLegal
+		);
 	}
 
 }

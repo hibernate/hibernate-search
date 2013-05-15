@@ -142,13 +142,16 @@ public class IndexControlMBeanTest extends SearchTestCase {
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		File targetDir = TestConstants.getTargetDir();
+		File targetDir = TestConstants.getTargetDir( IndexControlMBeanTest.class );
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 
 		cfg.setProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" );
 		cfg.setProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" );
-		cfg.setProperty( "hibernate.jndi.org.osjava.sj.factory", "org.hibernate.search.test.jmx.IndexControlMBeanTest$CustomContextFactory" );
+		cfg.setProperty(
+				"hibernate.jndi.org.osjava.sj.factory",
+				"org.hibernate.search.test.jmx.IndexControlMBeanTest$CustomContextFactory"
+		);
 		cfg.setProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() );
 		cfg.setProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" );
 

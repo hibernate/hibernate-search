@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import junit.framework.AssertionFailedError;
+import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.remoting.transport.Address;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -30,8 +32,6 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.remoting.transport.Address;
 
 /**
  * Helpers to setup several instances of Hibernate Search using
@@ -49,24 +49,27 @@ public class ClusterTestHelper {
 	 * fragmented index.
 	 * The backing CacheManager will be started, but didn't necessarily
 	 * join the existing nodes.
+	 *
 	 * @return a started FullTextSessionBuilder
 	 */
-	public static FullTextSessionBuilder createClusterNode(Set<Class<?>> entityTypes, boolean exclusiveWrite) {
-		FullTextSessionBuilder node = new FullTextSessionBuilder()
-			.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
-			// fragment on every 7 bytes: don't use this on a real case!
-			// only done to make sure we generate lots of small fragments.
-			.setProperty( "hibernate.search.default.indexwriter.chunk_size", "13" )
-			// this schema is shared across nodes, so don't drop it on shutdown:
-			.setProperty( Environment.HBM2DDL_AUTO, "create" )
-			// if we should allow aggressive index locking:
-			.setProperty( "hibernate.search.default." + org.hibernate.search.Environment.EXCLUSIVE_INDEX_USE,
-					String.valueOf( exclusiveWrite ) )
-			// share the same in-memory database connection pool
-			.setProperty(
-					Environment.CONNECTION_PROVIDER,
-					org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
-					);
+	public static FullTextSessionBuilder createClusterNode(Class<?> testClass, Set<Class<?>> entityTypes, boolean exclusiveWrite) {
+		FullTextSessionBuilder node = new FullTextSessionBuilder( testClass )
+				.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
+						// fragment on every 7 bytes: don't use this on a real case!
+						// only done to make sure we generate lots of small fragments.
+				.setProperty( "hibernate.search.default.indexwriter.chunk_size", "13" )
+						// this schema is shared across nodes, so don't drop it on shutdown:
+				.setProperty( Environment.HBM2DDL_AUTO, "create" )
+						// if we should allow aggressive index locking:
+				.setProperty(
+						"hibernate.search.default." + org.hibernate.search.Environment.EXCLUSIVE_INDEX_USE,
+						String.valueOf( exclusiveWrite )
+				)
+						// share the same in-memory database connection pool
+				.setProperty(
+						Environment.CONNECTION_PROVIDER,
+						org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
+				);
 		for ( Class<?> entityType : entityTypes ) {
 			node.addAnnotatedClass( entityType );
 		}
@@ -95,7 +98,9 @@ public class ClusterTestHelper {
 
 	/**
 	 * Counts the number of nodes in the cluster on this node
+	 *
 	 * @param node the FullTextSessionBuilder representing the current node
+	 *
 	 * @return the number of nodes as seen by the current node
 	 */
 	public static int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {

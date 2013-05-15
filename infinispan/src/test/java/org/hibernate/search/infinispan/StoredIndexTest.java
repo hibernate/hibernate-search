@@ -23,17 +23,17 @@ package org.hibernate.search.infinispan;
 import java.util.List;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * Verifies we're able to start from an existing index in Infinispan,
@@ -115,21 +115,25 @@ public class StoredIndexTest {
 	/**
 	 * Creates a new SessionFactory using a shared H2 connection pool, and running
 	 * an Infinispan Directory storing the index in memory and write-through filesystem.
+	 *
 	 * @param createSchema set to false to not drop an existing schema
 	 */
 	private void startNode(boolean createSchema) {
-		node = new FullTextSessionBuilder()
-			.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
-			.setProperty( CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME, "filesystem-loading-infinispan.xml" )
-			// avoid killing the schema when you still have to run the second node:
-			.setProperty( Environment.HBM2DDL_AUTO, createSchema ? "create" : "validate" )
-			// share the same in-memory database connection pool
-			.setProperty(
-					Environment.CONNECTION_PROVIDER,
-					org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
-			)
-			.addAnnotatedClass( SimpleEmail.class )
-			.build();
+		node = new FullTextSessionBuilder( StoredIndexTest.class )
+				.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
+				.setProperty(
+						CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME,
+						"filesystem-loading-infinispan.xml"
+				)
+						// avoid killing the schema when you still have to run the second node:
+				.setProperty( Environment.HBM2DDL_AUTO, createSchema ? "create" : "validate" )
+						// share the same in-memory database connection pool
+				.setProperty(
+						Environment.CONNECTION_PROVIDER,
+						org.hibernate.search.infinispan.ClusterSharedConnectionProvider.class.getName()
+				)
+				.addAnnotatedClass( SimpleEmail.class )
+				.build();
 	}
 
 	/**

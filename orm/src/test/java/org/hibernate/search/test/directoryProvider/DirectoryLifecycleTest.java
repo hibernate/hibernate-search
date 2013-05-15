@@ -19,14 +19,15 @@
 
 package org.hibernate.search.test.directoryProvider;
 
-import static org.fest.assertions.Assertions.assertThat;
+import org.junit.Test;
 
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -43,12 +44,13 @@ public class DirectoryLifecycleTest {
 	}
 
 	private void testOnce() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder()
-		.setProperty(
-			"hibernate.search.default.directory_provider",
-			org.hibernate.search.test.directoryProvider.CloseCheckingDirectoryProvider.class.getName() )
-		.addAnnotatedClass( SnowStorm.class )
-		.build();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( DirectoryLifecycleTest.class )
+				.setProperty(
+						"hibernate.search.default.directory_provider",
+						org.hibernate.search.test.directoryProvider.CloseCheckingDirectoryProvider.class.getName()
+				)
+				.addAnnotatedClass( SnowStorm.class )
+				.build();
 		CloseCheckingDirectoryProvider directoryProvider;
 		try {
 			SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) builder.getSearchFactory();
@@ -56,7 +58,7 @@ public class DirectoryLifecycleTest {
 			IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 			assertThat( indexManagers.length ).isEqualTo( 1 );
 			assertThat( indexManagers[0] ).isInstanceOf( DirectoryBasedIndexManager.class );
-			DirectoryBasedIndexManager dbBasedManager = (DirectoryBasedIndexManager)indexManagers[0];
+			DirectoryBasedIndexManager dbBasedManager = (DirectoryBasedIndexManager) indexManagers[0];
 			assertThat( dbBasedManager.getDirectoryProvider() ).isInstanceOf( CloseCheckingDirectoryProvider.class );
 			directoryProvider = (CloseCheckingDirectoryProvider) dbBasedManager.getDirectoryProvider();
 			assertThat( directoryProvider.isInitialized() ).isTrue();

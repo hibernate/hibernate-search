@@ -59,7 +59,7 @@ import org.hibernate.search.util.impl.FileHelper;
 public class JBossTSIT {
 
 	private static EntityManagerFactory factory;
-	public static File tempDirectory = new File( TestConstants.getTargetDir() + "/h2" );
+	public static File tempDirectory = new File( TestConstants.getTargetDir( JBossTSIT.class ) + "/h2" );
 
 	@BeforeClass
 	public static void setUp() throws Exception {

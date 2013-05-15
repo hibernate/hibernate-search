@@ -25,13 +25,13 @@ package org.hibernate.search.test.jmx;
 
 import java.io.File;
 
+import org.junit.Test;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.test.util.ManualConfiguration;
-
-import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -40,7 +40,7 @@ public class MutableSearchFactoryAndJMXTest {
 
 	@Test
 	public void testRebuildFactory() {
-		File targetDir = TestConstants.getTargetDir();
+		File targetDir = TestConstants.getTargetDir( MutableSearchFactoryAndJMXTest.class );
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 

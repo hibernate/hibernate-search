@@ -23,22 +23,23 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
 import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
+import org.junit.Test;
+
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author Sanne Grinovero
@@ -48,13 +49,15 @@ public class CustomLockProviderTest {
 	@Test
 	public void testUseOfCustomLockingFactory() {
 		assertNull( CustomLockFactoryProvider.optionValue );
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CustomLockProviderTest.class );
 		builder
-			.addAnnotatedClass( SnowStorm.class )
-			.setProperty( "hibernate.search.default.locking_option", "somethingHere" )
-			.setProperty( "hibernate.search.default.locking_strategy",
-					"org.hibernate.search.test.directoryProvider.CustomLockFactoryProvider" )
-			.build();
+				.addAnnotatedClass( SnowStorm.class )
+				.setProperty( "hibernate.search.default.locking_option", "somethingHere" )
+				.setProperty(
+						"hibernate.search.default.locking_strategy",
+						"org.hibernate.search.test.directoryProvider.CustomLockFactoryProvider"
+				)
+				.build();
 		builder.close();
 		assertEquals( "somethingHere", CustomLockFactoryProvider.optionValue );
 		CustomLockFactoryProvider.optionValue = null;
@@ -62,18 +65,21 @@ public class CustomLockProviderTest {
 
 	@Test
 	public void testFailOnInexistentLockingFactory() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CustomLockProviderTest.class );
 		try {
 			builder
-				.addAnnotatedClass( SnowStorm.class )
-				.setProperty( "hibernate.search.default.locking_option", "somethingHere" )
-				.setProperty( "hibernate.search.default.locking_strategy", "org.hibernate.NotExistingFactory")
-				.build();
+					.addAnnotatedClass( SnowStorm.class )
+					.setProperty( "hibernate.search.default.locking_option", "somethingHere" )
+					.setProperty( "hibernate.search.default.locking_strategy", "org.hibernate.NotExistingFactory" )
+					.build();
 			builder.close();
 			fail();
 		}
-		catch (SearchException e) {
-			assertEquals( "Unable to find locking_strategy implementation class: org.hibernate.NotExistingFactory", e.getCause().getMessage() );
+		catch ( SearchException e ) {
+			assertEquals(
+					"Unable to find locking_strategy implementation class: org.hibernate.NotExistingFactory",
+					e.getCause().getMessage()
+			);
 		}
 	}
 
@@ -97,7 +103,7 @@ public class CustomLockProviderTest {
 	}
 
 	private void testUseOfSelectedLockingFactory(String optionName, Class expectedType, boolean useRamDirectory) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CustomLockProviderTest.class );
 		FullTextSessionBuilder fullTextSessionBuilder = builder.addAnnotatedClass( SnowStorm.class );
 		if ( optionName != null ) {
 			fullTextSessionBuilder.setProperty( "hibernate.search.default.locking_strategy", optionName );

@@ -23,23 +23,24 @@
  */
 package org.hibernate.search.infinispan;
 
-import static junit.framework.Assert.assertEquals;
-import static org.hibernate.search.infinispan.ClusterTestHelper.clusterSize;
-import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
-import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
-
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import static junit.framework.Assert.assertEquals;
+import static org.hibernate.search.infinispan.ClusterTestHelper.clusterSize;
+import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
+import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
 
 /**
  * In this test we initially start a master node which will stay alive
@@ -48,7 +49,7 @@ import org.junit.Test;
  * After that we add and remove additional new nodes, still making more
  * index changes checking that each node is always able
  * to see changes as soon as committed by the main node; this
- * results in a very stressfull test as the cluster topology is changed
+ * results in a very stressful test as the cluster topology is changed
  * at each step (though it doesn't rehash as it's replicating).
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -59,7 +60,7 @@ public class LiveRunningTest {
 	private static final int MAX_SLAVES = 5;
 	private static HashSet<Class<?>> entityTypes;
 
-	private final FullTextSessionBuilder master = createClusterNode( entityTypes, true );
+	private final FullTextSessionBuilder master = createClusterNode( LiveRunningTest.class, entityTypes, true );
 	private final List<FullTextSessionBuilder> slaves = new LinkedList<FullTextSessionBuilder>();
 
 	private boolean growCluster = true;
@@ -91,7 +92,7 @@ public class LiveRunningTest {
 	}
 
 	private void assertView(FullTextSessionBuilder node) {
-		assertEquals( slaves.size() + 1 , clusterSize( node, SimpleEmail.class ) );
+		assertEquals( slaves.size() + 1, clusterSize( node, SimpleEmail.class ) );
 		FullTextSession session = node.openFullTextSession();
 		try {
 			FullTextQuery fullTextQuery = session.createFullTextQuery( new MatchAllDocsQuery() );
@@ -109,7 +110,7 @@ public class LiveRunningTest {
 				growCluster = false;
 			}
 			else {
-				slaves.add( createClusterNode( entityTypes, false ) );
+				slaves.add( createClusterNode( LiveRunningTest.class, entityTypes, false ) );
 			}
 		}
 		else {

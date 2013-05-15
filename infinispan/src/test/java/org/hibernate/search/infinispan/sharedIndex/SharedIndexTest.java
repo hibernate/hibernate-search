@@ -23,14 +23,18 @@
  */
 package org.hibernate.search.infinispan.sharedIndex;
 
-import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
-import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashSet;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
+import org.infinispan.manager.EmbeddedCacheManager;
+import org.infinispan.remoting.transport.Address;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -40,13 +44,10 @@ import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.infinispan.manager.EmbeddedCacheManager;
-import org.infinispan.remoting.transport.Address;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
+import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test to verify HSEARCH-926
@@ -59,7 +60,7 @@ public class SharedIndexTest {
 
 	@Test
 	public void testSingleResultFromDeviceIndex() {
-		assertEquals( 1, clusterSize( node, Toaster.class ) );
+		assertEquals( 1, clusterSize( node ) );
 		// index an entity:
 		{
 			FullTextSession fullTextSession = node.openFullTextSession();
@@ -97,7 +98,7 @@ public class SharedIndexTest {
 		entityTypes.add( Device.class );
 		entityTypes.add( Robot.class );
 		entityTypes.add( Toaster.class );
-		node = createClusterNode( entityTypes, true );
+		node = createClusterNode( SharedIndexTest.class, entityTypes, true );
 		waitMembersCount( node, Toaster.class, 1 );
 	}
 
@@ -119,11 +120,11 @@ public class SharedIndexTest {
 	/**
 	 * Counts the number of nodes in the cluster on this node
 	 *
-	 * @param node
-	 *            the FullTextSessionBuilder representing the current node
-	 * @return
+	 * @param node the FullTextSessionBuilder representing the current node
+	 *
+	 * @return the number of nodes in the cluster
 	 */
-	protected int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
+	protected int clusterSize(FullTextSessionBuilder node) {
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
 		EntityIndexBinder indexBinding = searchFactory.getIndexBindingForEntity( Toaster.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];

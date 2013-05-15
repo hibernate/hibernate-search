@@ -24,6 +24,8 @@ import java.util.List;
 
 import junit.framework.Assert;
 import org.apache.lucene.search.Query;
+import org.junit.Test;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
@@ -40,8 +42,6 @@ import org.hibernate.search.test.configuration.ProductCatalog;
 import org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
-import org.junit.Test;
-
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -57,7 +57,7 @@ public class ClasstypeFieldCacheExtractionTest {
 	@Test
 	public void testWithFieldCacheOnTypOnMixedIds() {
 		// multiple id fieldnames, multiple classes but cached
-		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS };
+		Mapping.enableFieldCache = new FieldCacheType[] { FieldCacheType.CLASS };
 		wrapper( true, "id", "addressId" );
 	}
 
@@ -65,7 +65,7 @@ public class ClasstypeFieldCacheExtractionTest {
 	public void testWithFieldCacheOnTypeAndIdOnMixedIds() {
 		// works the same as CLASS because one of the entities uses a different fieldname
 		// which forces us to disable ID caching
-		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS, FieldCacheType.ID };
+		Mapping.enableFieldCache = new FieldCacheType[] { FieldCacheType.CLASS, FieldCacheType.ID };
 		wrapper( true, "id", "addressId" );
 	}
 
@@ -79,29 +79,32 @@ public class ClasstypeFieldCacheExtractionTest {
 	@Test
 	public void testWithFieldCacheOnType() {
 		// single type: doesn't need classtype cache
-		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS };
+		Mapping.enableFieldCache = new FieldCacheType[] { FieldCacheType.CLASS };
 		wrapper( false, "id" );
 	}
 
 	@Test
 	public void testWithFieldCacheOnTypeAndId() {
 		// nothing needs to be extracted, full cache
-		Mapping.enableFieldCache = new FieldCacheType[]{ FieldCacheType.CLASS, FieldCacheType.ID };
+		Mapping.enableFieldCache = new FieldCacheType[] { FieldCacheType.CLASS, FieldCacheType.ID };
 		wrapper( false );
 	}
 
 	public void wrapper(boolean usingMixedIds, String... expectedLoadedFields) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( ClasstypeFieldCacheExtractionTest.class );
 		if ( usingMixedIds ) {
 			builder
-				.addAnnotatedClass( Address.class )
-				.addAnnotatedClass( Country.class );
+					.addAnnotatedClass( Address.class )
+					.addAnnotatedClass( Country.class );
 		}
 		builder.addAnnotatedClass( Item.class )
-			.addAnnotatedClass( ProductCatalog.class )
-			.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() )
-			.setProperty( Environment.MODEL_MAPPING, Mapping.class.getName() )
-			.build();
+				.addAnnotatedClass( ProductCatalog.class )
+				.setProperty(
+						"hibernate.search.default." + Environment.READER_STRATEGY,
+						org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName()
+				)
+				.setProperty( Environment.MODEL_MAPPING, Mapping.class.getName() )
+				.build();
 		try {
 			storeDemoData( builder );
 			performtest( builder, expectedLoadedFields );
@@ -148,17 +151,17 @@ public class ClasstypeFieldCacheExtractionTest {
 			SearchMapping mapping = new SearchMapping();
 			mapping
 					.entity( Address.class )
-						.indexed()
-						.cacheFromIndex( enableFieldCache )
-						.indexName( "single-index" )
+					.indexed()
+					.cacheFromIndex( enableFieldCache )
+					.indexName( "single-index" )
 					.entity( Country.class )
-						.indexed()
-						.cacheFromIndex( enableFieldCache )
-						.indexName( "single-index" )
-						.property( "name", ElementType.FIELD )
+					.indexed()
+					.cacheFromIndex( enableFieldCache )
+					.indexName( "single-index" )
+					.property( "name", ElementType.FIELD )
 					.entity( Item.class )
-						.indexed()
-						.cacheFromIndex( enableFieldCache );
+					.indexed()
+					.cacheFromIndex( enableFieldCache );
 			return mapping;
 		}
 

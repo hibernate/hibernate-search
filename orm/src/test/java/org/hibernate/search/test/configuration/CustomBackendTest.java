@@ -23,16 +23,17 @@
  */
 package org.hibernate.search.test.configuration;
 
+import org.junit.Test;
+
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
+import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -49,15 +50,17 @@ public class CustomBackendTest {
 	}
 
 	private void verifyBackendUsage(String name, Class<? extends BackendQueueProcessor> backendType) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CustomBackendTest.class );
 		FullTextSession ftSession = builder
-			.setProperty( "hibernate.search.default.worker.backend", name )
-			.addAnnotatedClass( BlogEntry.class )
-			.openFullTextSession();
+				.setProperty( "hibernate.search.default.worker.backend", name )
+				.addAnnotatedClass( BlogEntry.class )
+				.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
 		ftSession.close();
 		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( "org.hibernate.search.test.configuration.BlogEntry" );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager(
+				"org.hibernate.search.test.configuration.BlogEntry"
+		);
 		BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
 		assertEquals( backendType, backendQueueProcessor.getClass() );
 		builder.close();

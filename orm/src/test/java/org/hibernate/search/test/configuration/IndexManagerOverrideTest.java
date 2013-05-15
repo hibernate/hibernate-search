@@ -20,13 +20,14 @@
  */
 package org.hibernate.search.test.configuration;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * Verifies the configured IndexManager implementation is used for each index
@@ -37,31 +38,39 @@ public class IndexManagerOverrideTest {
 
 	@Test
 	public void verifyIndexExclusivity() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( IndexManagerOverrideTest.class );
 		FullTextSession ftSession = builder
-			.setProperty( "hibernate.search.Book.indexmanager", "near-real-time" )
-			.setProperty( "hibernate.search.org.hibernate.search.test.perf.Boat.indexmanager",
-					"org.hibernate.search.test.util.RamIndexManager" )
-			.addAnnotatedClass( BlogEntry.class )
-			.addAnnotatedClass( org.hibernate.search.test.perf.Boat.class )
-			.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
-			.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
-			.openFullTextSession();
+				.setProperty( "hibernate.search.Book.indexmanager", "near-real-time" )
+				.setProperty(
+						"hibernate.search.org.hibernate.search.test.perf.Boat.indexmanager",
+						"org.hibernate.search.test.util.RamIndexManager"
+				)
+				.addAnnotatedClass( BlogEntry.class )
+				.addAnnotatedClass( org.hibernate.search.test.perf.Boat.class )
+				.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
+				.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
+				.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
 		ftSession.close();
 		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
 
 		//checks for the default implementation
-		checkIndexManagerType( allIndexesManager, "org.hibernate.search.test.configuration.BlogEntry",
-				org.hibernate.search.indexes.impl.DirectoryBasedIndexManager.class );
+		checkIndexManagerType(
+				allIndexesManager, "org.hibernate.search.test.configuration.BlogEntry",
+				org.hibernate.search.indexes.impl.DirectoryBasedIndexManager.class
+		);
 
 		//Uses "NRT" taken from shortcut names
-		checkIndexManagerType( allIndexesManager, "Book",
-				org.hibernate.search.indexes.impl.NRTIndexManager.class );
+		checkIndexManagerType(
+				allIndexesManager, "Book",
+				org.hibernate.search.indexes.impl.NRTIndexManager.class
+		);
 
 		//Uses a fully qualified name to load an implementation
-		checkIndexManagerType( allIndexesManager, "org.hibernate.search.test.perf.Boat",
-				org.hibernate.search.test.util.RamIndexManager.class );
+		checkIndexManagerType(
+				allIndexesManager, "org.hibernate.search.test.perf.Boat",
+				org.hibernate.search.test.util.RamIndexManager.class
+		);
 
 		builder.close();
 	}
