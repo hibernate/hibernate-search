@@ -43,7 +43,7 @@ public class ExclusiveIndexTest {
 
 	@Test
 	public void verifyIndexExclusivity() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( ExclusiveIndexTest.class );
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.org.hibernate.search.test.configuration.BlogEntry.exclusive_index_use", "true" )
 			.setProperty( "hibernate.search.Book.exclusive_index_use", "false" )

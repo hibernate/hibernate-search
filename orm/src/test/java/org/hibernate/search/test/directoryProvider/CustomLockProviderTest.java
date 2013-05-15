@@ -48,7 +48,7 @@ public class CustomLockProviderTest {
 	@Test
 	public void testUseOfCustomLockingFactory() {
 		assertNull( CustomLockFactoryProvider.optionValue );
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CustomLockProviderTest.class );
 		builder
 			.addAnnotatedClass( SnowStorm.class )
 			.setProperty( "hibernate.search.default.locking_option", "somethingHere" )
@@ -62,7 +62,7 @@ public class CustomLockProviderTest {
 
 	@Test
 	public void testFailOnInexistentLockingFactory() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CustomLockProviderTest.class );
 		try {
 			builder
 				.addAnnotatedClass( SnowStorm.class )
@@ -97,7 +97,7 @@ public class CustomLockProviderTest {
 	}
 
 	private void testUseOfSelectedLockingFactory(String optionName, Class expectedType, boolean useRamDirectory) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CustomLockProviderTest.class );
 		FullTextSessionBuilder fullTextSessionBuilder = builder.addAnnotatedClass( SnowStorm.class );
 		if ( optionName != null ) {
 			fullTextSessionBuilder.setProperty( "hibernate.search.default.locking_strategy", optionName );

@@ -37,7 +37,7 @@ public class IndexManagerOverrideTest {
 
 	@Test
 	public void verifyIndexExclusivity() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( IndexManagerOverrideTest.class );
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.Book.indexmanager", "near-real-time" )
 			.setProperty( "hibernate.search.org.hibernate.search.test.perf.Boat.indexmanager",

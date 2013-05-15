@@ -77,7 +77,7 @@ public class IndexingGeneratedCorpusTest {
 
 	@Before
 	public void setUp() throws Exception {
-		builder = new FullTextSessionBuilder();
+		builder = new FullTextSessionBuilder( IndexingGeneratedCorpusTest.class );
 		builder
 				.addAnnotatedClass( Book.class )
 				.addAnnotatedClass( Dvd.class )

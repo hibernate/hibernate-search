@@ -45,7 +45,7 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Can.class )
 					.addAnnotatedClass( Trash.class ).build();
 		}
@@ -64,7 +64,7 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( LittleTrash.class ).build();
 		}
@@ -84,7 +84,7 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( Sink.class ).build();
 		}
@@ -104,7 +104,7 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( ProperTrashExtension.class ).build();
 		}
@@ -123,7 +123,7 @@ public class IllegalSimilarityConfigurationTest {
 		boolean configurationIsLegal = true;
 		FullTextSessionBuilder builder = null;
 		try {
-			builder = new FullTextSessionBuilder()
+			builder = new FullTextSessionBuilder( IllegalSimilarityConfigurationTest.class )
 					.addAnnotatedClass( Can.class )
 					.addAnnotatedClass( SmallerCan.class ).build();
 		}

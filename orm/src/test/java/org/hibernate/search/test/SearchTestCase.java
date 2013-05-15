@@ -228,7 +228,7 @@ public abstract class SearchTestCase extends TestCase {
 		// the constructor File(File, String) is broken too, see :
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5066567
 		// So make sure to use File(String, String) in this case as TestConstants works with absolute paths!
-		File indexPath = new File( TestConstants.getIndexDirectory(), shortTestName );
+		File indexPath = new File( TestConstants.getIndexDirectory( SearchTestCase.class ), shortTestName );
 		return indexPath;
 	}
 

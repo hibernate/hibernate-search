@@ -49,7 +49,7 @@ public class CustomBackendTest {
 	}
 
 	private void verifyBackendUsage(String name, Class<? extends BackendQueueProcessor> backendType) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CustomBackendTest.class );
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.default.worker.backend", name )
 			.addAnnotatedClass( BlogEntry.class )

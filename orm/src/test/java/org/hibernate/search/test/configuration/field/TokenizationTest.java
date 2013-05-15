@@ -65,7 +65,7 @@ public class TokenizationTest {
 
 		config.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		config.setProperty( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory() );
+		config.setProperty( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( TokenizationTest.class ) );
 
 		config.buildSessionFactory();
 

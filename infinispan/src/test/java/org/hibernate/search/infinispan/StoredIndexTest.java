@@ -118,7 +118,7 @@ public class StoredIndexTest {
 	 * @param createSchema set to false to not drop an existing schema
 	 */
 	private void startNode(boolean createSchema) {
-		node = new FullTextSessionBuilder()
+		node = new FullTextSessionBuilder( StoredIndexTest.class )
 			.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
 			.setProperty( CacheManagerServiceProvider.INFINISPAN_CONFIGURATION_RESOURCENAME, "filesystem-loading-infinispan.xml" )
 			// avoid killing the schema when you still have to run the second node:

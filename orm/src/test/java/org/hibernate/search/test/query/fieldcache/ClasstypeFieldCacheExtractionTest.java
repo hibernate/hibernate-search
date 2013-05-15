@@ -91,7 +91,7 @@ public class ClasstypeFieldCacheExtractionTest {
 	}
 
 	public void wrapper(boolean usingMixedIds, String... expectedLoadedFields) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( ClasstypeFieldCacheExtractionTest.class );
 		if ( usingMixedIds ) {
 			builder
 				.addAnnotatedClass( Address.class )

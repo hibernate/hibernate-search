@@ -31,7 +31,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.analysis.StopAnalyzer;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -64,42 +63,32 @@ public class FullTextSessionBuilder {
 
 	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 
-	public static final File indexRootDirectory;
-
+	private final File indexRootDirectory;
 	private final Properties cfg = new Properties();
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private SessionFactory sessionFactory;
 	private boolean usingFileSystem = false;
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
 
-	static {
-		indexRootDirectory = new File( TestConstants.getIndexDirectory() );
+	public FullTextSessionBuilder(Class<?> testClass) {
+		indexRootDirectory = new File( TestConstants.getIndexDirectory( testClass ) );
 		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
-	}
 
-	public FullTextSessionBuilder() {
 		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
 
-		//cache:
+		// cache:
 		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
-		cfg.setProperty(
-				Environment.CACHE_REGION_FACTORY,
-				CachingRegionFactory.class.getCanonicalName()
-		);
+		cfg.setProperty( Environment.CACHE_REGION_FACTORY, CachingRegionFactory.class.getCanonicalName() );
 		cfg.setProperty( Environment.USE_QUERY_CACHE, "true" );
 
-		//search specific:
-		cfg.setProperty(
-				org.hibernate.search.Environment.ANALYZER_CLASS,
-				StopAnalyzer.class.getName()
-		);
+		// search specific:
+		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		useRAMDirectoryProvider( true );
 	}
 
 	/**
 	 * @param use if true, use indexes in RAM otherwise use FSDirectoryProvider
-	 *
 	 * @return the same builder (this).
 	 */
 	public FullTextSessionBuilder useRAMDirectoryProvider(boolean use) {
@@ -117,10 +106,8 @@ public class FullTextSessionBuilder {
 
 	/**
 	 * Override before building any parameter, or add new ones.
-	 *
 	 * @param key Property name.
 	 * @param value Property value.
-	 *
 	 * @return the same builder (this).
 	 */
 	public FullTextSessionBuilder setProperty(String key, String value) {
@@ -130,9 +117,7 @@ public class FullTextSessionBuilder {
 
 	/**
 	 * Adds classes to the SessionFactory being built.
-	 *
 	 * @param annotatedClass The annotated class to add to the configuration.
-	 *
 	 * @return the same builder (this)
 	 */
 	public FullTextSessionBuilder addAnnotatedClass(Class annotatedClass) {
@@ -184,9 +169,7 @@ public class FullTextSessionBuilder {
 		registryBuilder.applySettings( hibConfiguration.getProperties() );
 
 		final ServiceRegistry serviceRegistry = registryBuilder.buildServiceRegistry();
-		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory(
-				serviceRegistry
-		);
+		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory( serviceRegistry );
 		ServiceRegistryImplementor serviceRegistryImplementor = sessionFactoryImpl.getServiceRegistry();
 		EventListenerRegistry registry = serviceRegistryImplementor.getService( EventListenerRegistry.class );
 
@@ -213,7 +196,6 @@ public class FullTextSessionBuilder {
 
 	/**
 	 * Defines a programmatic configuration to be used by Search
-	 *
 	 * @return the enabled SearchMapping. change it to define the mapping programmatically.
 	 */
 	public SearchMapping fluentMapping() {
@@ -225,7 +207,7 @@ public class FullTextSessionBuilder {
 		return mapping;
 	}
 
-	public static void cleanupFilesystem() {
+	public void cleanupFilesystem() {
 		FileHelper.delete( indexRootDirectory );
 	}
 

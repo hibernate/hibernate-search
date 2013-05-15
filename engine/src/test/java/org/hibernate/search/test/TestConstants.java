@@ -29,7 +29,6 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
-
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -47,26 +46,6 @@ public class TestConstants {
 
 	private static final Log log = LoggerFactory.make();
 
-	private static File targetDir;
-	private static final String indexDirPath;
-
-	static {
-		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-		// get a URL reference to something we now is part of the classpath (our own classes)
-		String currentTestName = new RuntimeException().getStackTrace()[1].getClassName();
-		int hopsToCompileDirectory = currentTestName.split( "\\." ).length;
-		int hopsToTargetDirectory = hopsToCompileDirectory + 1;
-		URL myUrl = contextClassLoader.getResource( currentTestName.replace( '.', '/' ) + ".class" );
-		targetDir = new File( myUrl.getFile() );
-		// navigate back to '/target'
-		for ( int i = 0; i < hopsToTargetDirectory; i++ ) {
-			targetDir = targetDir.getParentFile();
-		}
-
-		indexDirPath = targetDir.getAbsolutePath() + File.separator + "indextemp";
-		log.debugf( "Using %s as index directory.", indexDirPath );
-	}
-
 	public static Version getTargetLuceneVersion() {
 		return Version.LUCENE_CURRENT;
 	}
@@ -74,19 +53,36 @@ public class TestConstants {
 	/**
 	 * Returns the target directory of the build.
 	 *
+	 * @param testClass the test class for which the target directory is requested.
 	 * @return the target directory of the build
 	 */
-	public static File getTargetDir() {
+	public static File getTargetDir(Class<?> testClass) {
+		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		// get a URL reference to something we now is part of the classpath (our own classes)
+		String currentTestClass = testClass.getName();
+		int hopsToCompileDirectory = currentTestClass.split( "\\." ).length;
+		int hopsToTargetDirectory = hopsToCompileDirectory + 1;
+		URL classURL = contextClassLoader.getResource( currentTestClass.replace( '.', '/' ) + ".class" );
+		// navigate back to '/target'
+		File targetDir = new File( classURL.getFile() );
+		// navigate back to '/target'
+		for ( int i = 0; i < hopsToTargetDirectory; i++ ) {
+			targetDir = targetDir.getParentFile();
+		}
 		return targetDir;
 	}
 
 	/**
-	 * Return the root directory to store test indexes in. Tests should never use or delete this directly
-	 * but rather nest sub directories in it to avoid interferences across tests.
+	 * Return the root directory to store test indexes in. Tests should never use or delete this directly but rather
+	 * nest sub directories in it to avoid interferences across tests.
 	 *
+	 * @param testClass the test class for which the index directory is requested.
 	 * @return Return the root directory to store test indexes
 	 */
-	public static String getIndexDirectory() {
+	public static String getIndexDirectory(Class<?> testClass) {
+		File targetDir = getTargetDir( testClass );
+		String indexDirPath = targetDir.getAbsolutePath() + File.separator + "indextemp";
+		log.debugf( "Using %s as index directory.", indexDirPath );
 		return indexDirPath;
 	}
 }

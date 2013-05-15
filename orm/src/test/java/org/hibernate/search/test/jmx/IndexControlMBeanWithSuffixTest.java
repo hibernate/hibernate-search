@@ -77,7 +77,7 @@ public class IndexControlMBeanWithSuffixTest extends SearchTestCase {
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		File targetDir = TestConstants.getTargetDir();
+		File targetDir = TestConstants.getTargetDir( IndexControlMBeanWithSuffixTest.class );
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 

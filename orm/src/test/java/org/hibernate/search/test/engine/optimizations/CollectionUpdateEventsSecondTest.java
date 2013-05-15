@@ -118,7 +118,7 @@ public class CollectionUpdateEventsSecondTest {
 
 	private FullTextSessionBuilder createSearchFactory() {
 		loadCountListener = new LoadCountingListener();
-		FullTextSessionBuilder builder = new FullTextSessionBuilder()
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CollectionUpdateEventsSecondTest.class )
 				.setProperty( "hibernate.search.default.worker.backend",
 						LeakingLuceneBackend.class.getName() )
 				.addAnnotatedClass( LocationGroup.class )
