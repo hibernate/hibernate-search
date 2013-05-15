@@ -28,14 +28,13 @@ import junit.framework.Assert;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.StopFilterFactory;
+import org.junit.Test;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-
-import org.junit.Test;
 
 /**
  * Verifies a proper message is thrown when a resource is not found
@@ -47,7 +46,7 @@ public class ResourceNotFoundMessageTest {
 	@Test
 	public void testIllegalAnalyzerDefinition() {
 		try {
-			new FullTextSessionBuilder()
+			new FullTextSessionBuilder( ResourceNotFoundMessageTest.class )
 					.addAnnotatedClass( User.class )
 					.setProperty( Environment.MODEL_MAPPING, ResourceNotFoundMessageTest.class.getName() )
 					.build();

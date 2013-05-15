@@ -19,26 +19,27 @@
 
 package org.hibernate.search.test.directoryProvider;
 
-import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterCopy;
-import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterMain;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterCopy;
+import static org.hibernate.search.test.directoryProvider.FSSlaveAndMasterDPTest.masterMain;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Verifies basic behavior of FSSlaveDirectoryProvider around
@@ -60,8 +61,12 @@ public class RetryInitializeTest {
 
 	@After
 	public void tearDown() throws Exception {
-		if ( slave != null ) slave.close();
-		if ( master != null ) master.close();
+		if ( slave != null ) {
+			slave.close();
+		}
+		if ( master != null ) {
+			master.close();
+		}
 		FSSlaveAndMasterDPTest.cleanupDirectories( root );
 	}
 
@@ -107,20 +112,23 @@ public class RetryInitializeTest {
 	}
 
 	private FullTextSessionBuilder createMasterNode() {
-		return new FullTextSessionBuilder()
-			.addAnnotatedClass( SnowStorm.class )
-			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
-			.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + masterMain )
-			.setProperty( "hibernate.search.default.directory_provider", "filesystem-master" )
-			.build();
+		return new FullTextSessionBuilder( RetryInitializeTest.class )
+				.addAnnotatedClass( SnowStorm.class )
+				.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
+				.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + masterMain )
+				.setProperty( "hibernate.search.default.directory_provider", "filesystem-master" )
+				.build();
 	}
 
 	private FullTextSessionBuilder createSlaveNode(boolean enableRetryInitializePeriod) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder()
-			.addAnnotatedClass( SnowStorm.class )
-			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
-			.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/slave" )
-			.setProperty( "hibernate.search.default.directory_provider", FSSlaveDirectoryProviderTestingExtension.class.getName() );
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( RetryInitializeTest.class )
+				.addAnnotatedClass( SnowStorm.class )
+				.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
+				.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/slave" )
+				.setProperty(
+						"hibernate.search.default.directory_provider",
+						FSSlaveDirectoryProviderTestingExtension.class.getName()
+				);
 		if ( enableRetryInitializePeriod ) {
 			builder.setProperty( "hibernate.search.default.retry_initialize_period", "12" );
 		}

@@ -23,24 +23,25 @@
  */
 package org.hibernate.search.infinispan;
 
-import static junit.framework.Assert.assertEquals;
-import static org.hibernate.search.infinispan.ClusterTestHelper.clusterSize;
-import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
-import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
-
 import java.util.HashSet;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import org.hibernate.Transaction;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.test.util.FullTextSessionBuilder;
+
+import static junit.framework.Assert.assertEquals;
+import static org.hibernate.search.infinispan.ClusterTestHelper.clusterSize;
+import static org.hibernate.search.infinispan.ClusterTestHelper.createClusterNode;
+import static org.hibernate.search.infinispan.ClusterTestHelper.waitMembersCount;
 
 /**
  * We start two different Hibernate Search instances, both using
@@ -64,7 +65,7 @@ public class TwoNodesTest {
 
 	@Test
 	public void testSomething() {
-		assertEquals( 2, clusterSize( nodea, SimpleEmail.class  ) );
+		assertEquals( 2, clusterSize( nodea, SimpleEmail.class ) );
 		// index an entity:
 		{
 			FullTextSession fullTextSession = nodea.openFullTextSession();
@@ -79,7 +80,7 @@ public class TwoNodesTest {
 		// verify nodeb is able to find it:
 		verifyNodeSeesUpdatedIndex( nodeb );
 		// now start a new node, it will join the cluster and receive the current index state:
-		FullTextSessionBuilder nodeC = createClusterNode( entityTypes, true );
+		FullTextSessionBuilder nodeC = createClusterNode( TwoNodesTest.class, entityTypes, true );
 		assertEquals( 3, clusterSize( nodea, SimpleEmail.class ) );
 		try {
 			// verify the new node is able to perform the same searches:
@@ -88,7 +89,7 @@ public class TwoNodesTest {
 		finally {
 			nodeC.close();
 		}
-		assertEquals( 2, clusterSize( nodea, SimpleEmail.class  ) );
+		assertEquals( 2, clusterSize( nodea, SimpleEmail.class ) );
 		verifyNodeSeesUpdatedIndex( nodea );
 		verifyNodeSeesUpdatedIndex( nodeb );
 	}
@@ -120,8 +121,8 @@ public class TwoNodesTest {
 	public void setUp() throws Exception {
 		entityTypes = new HashSet<Class<?>>();
 		entityTypes.add( SimpleEmail.class );
-		nodea = createClusterNode( entityTypes, true );
-		nodeb = createClusterNode( entityTypes, true );
+		nodea = createClusterNode( TwoNodesTest.class, entityTypes, true );
+		nodeb = createClusterNode( TwoNodesTest.class, entityTypes, true );
 		waitMembersCount( nodea, SimpleEmail.class, 2 );
 	}
 

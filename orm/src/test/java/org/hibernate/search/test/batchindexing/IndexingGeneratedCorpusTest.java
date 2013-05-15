@@ -23,9 +23,6 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -55,7 +52,9 @@ import org.hibernate.search.test.util.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests the fullTextSession.createIndexer() API for basic functionality.
@@ -67,8 +66,8 @@ public class IndexingGeneratedCorpusTest {
 	private static final Log log = LoggerFactory.make();
 
 	private final int BOOK_NUM = 140;
-	private final int ANCIENTBOOK_NUM = 120;
-	private final int SECRETBOOK_NUM = 20;
+	private final int ANCIENT_BOOK_NUM = 120;
+	private final int SECRET_BOOK_NUM = 20;
 	private final int DVD_NUM = 200;
 
 	private SentenceInventor sentenceInventor = new SentenceInventor( 7L, 4000 );
@@ -77,7 +76,7 @@ public class IndexingGeneratedCorpusTest {
 
 	@Before
 	public void setUp() throws Exception {
-		builder = new FullTextSessionBuilder();
+		builder = new FullTextSessionBuilder( IndexingGeneratedCorpusTest.class );
 		builder
 				.addAnnotatedClass( Book.class )
 				.addAnnotatedClass( Dvd.class )
@@ -90,8 +89,8 @@ public class IndexingGeneratedCorpusTest {
 				.build();
 		createMany( Book.class, BOOK_NUM );
 		createMany( Dvd.class, DVD_NUM );
-		createMany( AncientBook.class, ANCIENTBOOK_NUM );
-		createMany( SecretBook.class, SECRETBOOK_NUM );
+		createMany( AncientBook.class, ANCIENT_BOOK_NUM );
+		createMany( SecretBook.class, SECRET_BOOK_NUM );
 		storeAllBooksInNation();
 	}
 
@@ -200,7 +199,9 @@ public class IndexingGeneratedCorpusTest {
 
 	private void verifyIndexIsLocked(boolean isLocked, Class type) throws IOException {
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) builder.getSearchFactory();
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getIndexBindingForEntity( type ).getIndexManagers()[0];
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getIndexBindingForEntity(
+				type
+		).getIndexManagers()[0];
 		Directory directory = indexManager.getDirectoryProvider().getDirectory();
 		LockFactory lockFactory = directory.getLockFactory();
 		Lock writeLock = lockFactory.makeLock( "write.lock" );
@@ -214,27 +215,27 @@ public class IndexingGeneratedCorpusTest {
 				countByFT( Dvd.class )
 		);
 		assertEquals(
-				ANCIENTBOOK_NUM + BOOK_NUM,
+				ANCIENT_BOOK_NUM + BOOK_NUM,
 				countByFT( Book.class )
 		);
 		assertEquals(
-				ANCIENTBOOK_NUM + BOOK_NUM + SECRETBOOK_NUM,
+				ANCIENT_BOOK_NUM + BOOK_NUM + SECRET_BOOK_NUM,
 				countByDatabaseCriteria( Book.class )
 		);
 		assertEquals(
-				SECRETBOOK_NUM,
+				SECRET_BOOK_NUM,
 				countByDatabaseCriteria( SecretBook.class )
 		);
 		assertEquals(
-				ANCIENTBOOK_NUM,
+				ANCIENT_BOOK_NUM,
 				countByFT( AncientBook.class )
 		);
 		assertEquals(
-				DVD_NUM + ANCIENTBOOK_NUM + BOOK_NUM,
+				DVD_NUM + ANCIENT_BOOK_NUM + BOOK_NUM,
 				countByFT( AncientBook.class, Book.class, Dvd.class )
 		);
 		assertEquals(
-				DVD_NUM + ANCIENTBOOK_NUM,
+				DVD_NUM + ANCIENT_BOOK_NUM,
 				countByFT( AncientBook.class, Dvd.class )
 		);
 	}

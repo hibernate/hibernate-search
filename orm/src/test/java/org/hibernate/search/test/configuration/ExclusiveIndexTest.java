@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.test.configuration;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
@@ -32,7 +32,8 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verifies the property exclusive_index_use is properly applied to the backend
@@ -43,15 +44,18 @@ public class ExclusiveIndexTest {
 
 	@Test
 	public void verifyIndexExclusivity() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder();
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( ExclusiveIndexTest.class );
 		FullTextSession ftSession = builder
-			.setProperty( "hibernate.search.org.hibernate.search.test.configuration.BlogEntry.exclusive_index_use", "true" )
-			.setProperty( "hibernate.search.Book.exclusive_index_use", "false" )
-			.addAnnotatedClass( BlogEntry.class )
-			.addAnnotatedClass( org.hibernate.search.test.perf.Boat.class )
-			.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
-			.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
-			.openFullTextSession();
+				.setProperty(
+						"hibernate.search.org.hibernate.search.test.configuration.BlogEntry.exclusive_index_use",
+						"true"
+				)
+				.setProperty( "hibernate.search.Book.exclusive_index_use", "false" )
+				.addAnnotatedClass( BlogEntry.class )
+				.addAnnotatedClass( org.hibernate.search.test.perf.Boat.class )
+				.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
+				.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
+				.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
 		ftSession.close();
 		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
@@ -65,7 +69,9 @@ public class ExclusiveIndexTest {
 	}
 
 	private void assertExclusiveIsEnabled(IndexManagerHolder allIndexesManager, String indexName, boolean expectExclusive) {
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( indexName );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager(
+				indexName
+		);
 		BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
 		assertEquals( LuceneBackendQueueProcessor.class, backendQueueProcessor.getClass() );
 		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) backendQueueProcessor;

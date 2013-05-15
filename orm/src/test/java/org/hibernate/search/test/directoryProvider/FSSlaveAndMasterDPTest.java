@@ -30,9 +30,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.queryParser.QueryParser;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -174,7 +174,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 
 	static File prepareDirectories(String testId) {
 
-		String superRootPath = TestConstants.getIndexDirectory();
+		String superRootPath = TestConstants.getIndexDirectory( FSSlaveAndMasterDPTest.class );
 		File root = new File( superRootPath, testId );
 
 		if ( root.exists() ) {
@@ -218,7 +218,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		cleanupDirectories( root );
 	}
 
-	static void cleanupDirectories( File root ) {
+	static void cleanupDirectories(File root) {
 		log.debugf( "Deleting test directory %s ", root.getAbsolutePath() );
 		FileHelper.delete( root );
 	}

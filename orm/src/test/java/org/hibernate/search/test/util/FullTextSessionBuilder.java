@@ -64,20 +64,18 @@ public class FullTextSessionBuilder {
 
 	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 
-	public static final File indexRootDirectory;
-
+	private final File indexRootDirectory;
 	private final Properties cfg = new Properties();
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private SessionFactory sessionFactory;
 	private boolean usingFileSystem = false;
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
 
-	static {
-		indexRootDirectory = new File( TestConstants.getIndexDirectory() );
-		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
-	}
 
-	public FullTextSessionBuilder() {
+	public FullTextSessionBuilder(Class<?> testClass) {
+		indexRootDirectory = new File( TestConstants.getIndexDirectory( testClass ) );
+		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
+
 		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
 
@@ -225,7 +223,7 @@ public class FullTextSessionBuilder {
 		return mapping;
 	}
 
-	public static void cleanupFilesystem() {
+	public void cleanupFilesystem() {
 		FileHelper.delete( indexRootDirectory );
 	}
 

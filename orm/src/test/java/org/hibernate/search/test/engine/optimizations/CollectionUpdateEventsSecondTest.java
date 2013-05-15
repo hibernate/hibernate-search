@@ -23,9 +23,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+import org.junit.Test;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.event.spi.LoadEvent;
@@ -33,10 +34,8 @@ import org.hibernate.event.spi.LoadEventListener;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.test.util.LeakingLuceneBackend;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-
-import org.junit.Test;
+import org.hibernate.search.test.util.LeakingLuceneBackend;
 
 /**
  * Related to HSEARCH-782: make sure we don't unnecessarily index entities or load unrelated entities
@@ -118,9 +117,11 @@ public class CollectionUpdateEventsSecondTest {
 
 	private FullTextSessionBuilder createSearchFactory() {
 		loadCountListener = new LoadCountingListener();
-		FullTextSessionBuilder builder = new FullTextSessionBuilder()
-				.setProperty( "hibernate.search.default.worker.backend",
-						LeakingLuceneBackend.class.getName() )
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CollectionUpdateEventsSecondTest.class )
+				.setProperty(
+						"hibernate.search.default.worker.backend",
+						LeakingLuceneBackend.class.getName()
+				)
 				.addAnnotatedClass( LocationGroup.class )
 				.addAnnotatedClass( Location.class )
 				.addLoadEventListener( loadCountListener );
@@ -204,6 +205,7 @@ public class CollectionUpdateEventsSecondTest {
 	 */
 	public static class LoadCountingListener implements LoadEventListener {
 		final AtomicInteger locationLoadEvents = new AtomicInteger();
+
 		@Override
 		public void onLoad(LoadEvent event, LoadType loadType) throws HibernateException {
 			if ( Location.class.getName().equals( event.getEntityClassName() ) ) {
