@@ -40,7 +40,7 @@ public class MutableSearchFactoryAndJMXTest {
 
 	@Test
 	public void testRebuildFactory() {
-		File targetDir = TestConstants.getTargetDir();
+		File targetDir = TestConstants.getTargetDir( MutableSearchFactoryAndJMXTest.class );
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 

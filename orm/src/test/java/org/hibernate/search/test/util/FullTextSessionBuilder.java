@@ -64,18 +64,12 @@ public class FullTextSessionBuilder {
 
 	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 
-	public static final File indexRootDirectory;
-
+	private File indexRootDirectory;
 	private final Properties cfg = new Properties();
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
 	private SessionFactory sessionFactory;
 	private boolean usingFileSystem = false;
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
-
-	static {
-		indexRootDirectory = new File( TestConstants.getIndexDirectory() );
-		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
-	}
 
 	public FullTextSessionBuilder() {
 		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
@@ -94,24 +88,24 @@ public class FullTextSessionBuilder {
 				org.hibernate.search.Environment.ANALYZER_CLASS,
 				StopAnalyzer.class.getName()
 		);
-		useRAMDirectoryProvider( true );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		usingFileSystem = false;
 	}
 
 	/**
-	 * @param use if true, use indexes in RAM otherwise use FSDirectoryProvider
+	 * Store indexes permanently in FSDirectory. Helper to automatically cleanup
+	 * the filesystem when the builder is closed; alternatively you could just use
+	 * properties directly and clean the filesystem explicitly.
 	 *
+	 * @param testClass needed to locate an appropriate temporary directory
 	 * @return the same builder (this).
 	 */
-	public FullTextSessionBuilder useRAMDirectoryProvider(boolean use) {
-		if ( use ) {
-			cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
-			usingFileSystem = false;
-		}
-		else {
-			cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-			cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.getAbsolutePath() );
-			usingFileSystem = true;
-		}
+	public FullTextSessionBuilder useFileSystemDirectoryProvider(Class<?> testClass) {
+		indexRootDirectory = new File( TestConstants.getIndexDirectory( testClass ) );
+		log.debugf( "Using %s as index directory.", indexRootDirectory.getAbsolutePath() );
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+		cfg.setProperty( "hibernate.search.default.indexBase", indexRootDirectory.getAbsolutePath() );
+		usingFileSystem = true;
 		return this;
 	}
 
@@ -225,7 +219,7 @@ public class FullTextSessionBuilder {
 		return mapping;
 	}
 
-	public static void cleanupFilesystem() {
+	public void cleanupFilesystem() {
 		FileHelper.delete( indexRootDirectory );
 	}
 

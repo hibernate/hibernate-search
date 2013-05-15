@@ -102,7 +102,9 @@ public class CustomLockProviderTest {
 		if ( optionName != null ) {
 			fullTextSessionBuilder.setProperty( "hibernate.search.default.locking_strategy", optionName );
 		}
-		fullTextSessionBuilder.useRAMDirectoryProvider( useRamDirectory );
+		if ( ! useRamDirectory ) {
+			fullTextSessionBuilder.useFileSystemDirectoryProvider( CustomLockProviderTest.class );
+		}
 		FullTextSessionBuilder ftsb = fullTextSessionBuilder.build();
 		try {
 			SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftsb.getSearchFactory();
