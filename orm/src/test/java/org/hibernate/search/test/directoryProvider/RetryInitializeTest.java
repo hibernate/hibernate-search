@@ -107,7 +107,7 @@ public class RetryInitializeTest {
 	}
 
 	private FullTextSessionBuilder createMasterNode() {
-		return new FullTextSessionBuilder()
+		return new FullTextSessionBuilder( RetryInitializeTest.class )
 			.addAnnotatedClass( SnowStorm.class )
 			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
 			.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + masterMain )
@@ -116,7 +116,7 @@ public class RetryInitializeTest {
 	}
 
 	private FullTextSessionBuilder createSlaveNode(boolean enableRetryInitializePeriod) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder()
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( RetryInitializeTest.class )
 			.addAnnotatedClass( SnowStorm.class )
 			.setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy )
 			.setProperty( "hibernate.search.default.indexBase", root.getAbsolutePath() + "/slave" )

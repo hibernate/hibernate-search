@@ -39,7 +39,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testInvalidDeepSimplePath() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -56,7 +56,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testInvalidDeepSimplePathWithLeadingPrefix() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -75,7 +75,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testInvalidPrefix() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -92,7 +92,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testShallowInvalidPath() throws Exception {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -109,7 +109,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testNonLeafPathInvalid() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -126,7 +126,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testEmbeddedPathValidation() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -148,7 +148,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testNonLeafEmbeddedPath() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -170,7 +170,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testNonIndexedPath() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -189,7 +189,7 @@ public class TestInvalidPaths {
 
 	@Test
 	public void testRenamedFieldInPath() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( FieldRenamedContainerEntity.class );
 		cfg.addAnnotatedClass( FieldRenamedEmbeddedEntity.class );
 		try {
@@ -209,7 +209,7 @@ public class TestInvalidPaths {
 	 */
 	@Test
 	public void testDepthMatchesPathMarkedAsEncountered() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );
@@ -224,7 +224,7 @@ public class TestInvalidPaths {
 	 */
 	@Test
 	public void testDepthExceedsPathMarkedAsEncountered() {
-		FullTextSessionBuilder cfg = new FullTextSessionBuilder();
+		FullTextSessionBuilder cfg = new FullTextSessionBuilder( TestInvalidPaths.class );
 		cfg.addAnnotatedClass( A.class );
 		cfg.addAnnotatedClass( B.class );
 		cfg.addAnnotatedClass( C.class );

@@ -50,7 +50,7 @@ public class SearchIndexerTest {
 	 */
 	@Test
 	public void testEntityHierarchy() {
-		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+		FullTextSessionBuilder ftsb = new FullTextSessionBuilder( SearchIndexerTest.class )
 				.addAnnotatedClass( ModernBook.class )
 				.addAnnotatedClass( AncientBook.class )
 				.addAnnotatedClass( Dvd.class )
@@ -117,7 +117,7 @@ public class SearchIndexerTest {
 	@Test
 	public void testIdentifierNaming() throws InterruptedException {
 		//disable automatic indexing, to test manual index creation.
-		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+		FullTextSessionBuilder ftsb = new FullTextSessionBuilder( SearchIndexerTest.class )
 				.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
 				.addAnnotatedClass( Dvd.class )
 				.addAnnotatedClass( Nation.class )
@@ -176,7 +176,7 @@ public class SearchIndexerTest {
 	@Test
 	public void testExtendedIdentifierNaming() throws InterruptedException {
 		//disable automatic indexing, to test manual index creation.
-		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
+		FullTextSessionBuilder ftsb = new FullTextSessionBuilder( SearchIndexerTest.class )
 				.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
 				.addAnnotatedClass( ExtendedIssueEntity.class )
 				.addAnnotatedClass( IssueEntity.class )

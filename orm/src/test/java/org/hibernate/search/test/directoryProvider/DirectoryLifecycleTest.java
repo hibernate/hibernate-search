@@ -43,7 +43,7 @@ public class DirectoryLifecycleTest {
 	}
 
 	private void testOnce() {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder()
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( DirectoryLifecycleTest.class )
 		.setProperty(
 			"hibernate.search.default.directory_provider",
 			org.hibernate.search.test.directoryProvider.CloseCheckingDirectoryProvider.class.getName() )

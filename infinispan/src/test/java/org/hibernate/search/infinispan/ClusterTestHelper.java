@@ -52,7 +52,7 @@ public class ClusterTestHelper {
 	 * @return a started FullTextSessionBuilder
 	 */
 	public static FullTextSessionBuilder createClusterNode(Set<Class<?>> entityTypes, boolean exclusiveWrite) {
-		FullTextSessionBuilder node = new FullTextSessionBuilder()
+		FullTextSessionBuilder node = new FullTextSessionBuilder( ClusterTestHelper.class )
 			.setProperty( "hibernate.search.default.directory_provider", "infinispan" )
 			// fragment on every 7 bytes: don't use this on a real case!
 			// only done to make sure we generate lots of small fragments.

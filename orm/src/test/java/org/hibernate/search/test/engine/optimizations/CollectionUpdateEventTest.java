@@ -115,7 +115,7 @@ public class CollectionUpdateEventTest {
 	}
 
 	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder()
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( CollectionUpdateEventTest.class )
 			.addAnnotatedClass( Catalog.class )
 			.addAnnotatedClass( CatalogItem.class )
 			.addAnnotatedClass( Consumer.class )

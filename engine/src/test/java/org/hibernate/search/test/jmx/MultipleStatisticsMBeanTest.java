@@ -58,7 +58,7 @@ public class MultipleStatisticsMBeanTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		File targetDir = TestConstants.getTargetDir();
+		File targetDir = TestConstants.getTargetDir( MultipleStatisticsMBeanTest.class );
 		simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();

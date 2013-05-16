@@ -78,7 +78,7 @@ public class UpdateOperationsTest {
 	}
 
 	private static FullTextSessionBuilder createSearchFactory(boolean enableFeature) {
-		FullTextSessionBuilder builder = new FullTextSessionBuilder()
+		FullTextSessionBuilder builder = new FullTextSessionBuilder( UpdateOperationsTest.class )
 				.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() )
 				.setProperty( "hibernate.search.default.optimizer.implementation", LeakingOptimizer.class.getCanonicalName() )
 				.addAnnotatedClass( Document.class );

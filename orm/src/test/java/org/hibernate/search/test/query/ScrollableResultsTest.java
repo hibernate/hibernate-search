@@ -53,7 +53,7 @@ public class ScrollableResultsTest {
 
 	@Before
 	public void setUp() {
-		builder = new FullTextSessionBuilder();
+		builder = new FullTextSessionBuilder( ScrollableResultsTest.class );
 		builder
 			.addAnnotatedClass( AlternateBook.class )
 			.addAnnotatedClass( Employee.class )

@@ -47,7 +47,7 @@ public class ResourceNotFoundMessageTest {
 	@Test
 	public void testIllegalAnalyzerDefinition() {
 		try {
-			new FullTextSessionBuilder()
+			new FullTextSessionBuilder( ResourceNotFoundMessageTest.class )
 					.addAnnotatedClass( User.class )
 					.setProperty( Environment.MODEL_MAPPING, ResourceNotFoundMessageTest.class.getName() )
 					.build();
