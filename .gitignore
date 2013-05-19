@@ -6,6 +6,7 @@
 
 # Build output directories
 target
+bin
 
 # IntelliJ specific files/directories
 /out
