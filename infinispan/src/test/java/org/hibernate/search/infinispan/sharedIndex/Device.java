@@ -69,32 +69,47 @@ public abstract class Device {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( this == obj )
+		if ( this == obj ) {
 			return true;
-		if ( obj == null )
+		}
+		if ( obj == null ) {
 			return false;
-		if ( !( obj instanceof Device ) )
+		}
+		if ( !( obj instanceof Device ) ) {
 			return false;
+		}
 		Device other = (Device) obj;
 
 		if ( manufacturer == null ) {
-			if ( other.manufacturer != null )
+			if ( other.manufacturer != null ) {
 				return false;
+			}
 		}
-		else if ( !manufacturer.equals( other.manufacturer ) )
-			return false;
+		else {
+			if ( !manufacturer.equals( other.manufacturer ) ) {
+				return false;
+			}
+		}
 		if ( model == null ) {
-			if ( other.model != null )
+			if ( other.model != null ) {
 				return false;
+			}
 		}
-		else if ( !model.equals( other.model ) )
-			return false;
+		else {
+			if ( !model.equals( other.model ) ) {
+				return false;
+			}
+		}
 		if ( serialNumber == null ) {
-			if ( other.serialNumber != null )
+			if ( other.serialNumber != null ) {
 				return false;
+			}
 		}
-		else if ( !serialNumber.equals( other.serialNumber ) )
-			return false;
+		else {
+			if ( !serialNumber.equals( other.serialNumber ) ) {
+				return false;
+			}
+		}
 		return true;
 	}
 }

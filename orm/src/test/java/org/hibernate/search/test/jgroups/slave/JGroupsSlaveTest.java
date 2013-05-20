@@ -87,7 +87,9 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				break; //enough time wasted
 			}
 		}
-		if ( failed ) Assert.fail( "Message not received after waiting for long!" );
+		if ( failed ) {
+			Assert.fail( "Message not received after waiting for long!" );
+		}
 
 		JGroupsReceiver.reset();
 		s = openSession();
@@ -104,7 +106,9 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				break; //enough time wasted
 			}
 		}
-		if ( failed ) Assert.fail( "Message not received after waiting for long!" );
+		if ( failed ) {
+			Assert.fail( "Message not received after waiting for long!" );
+		}
 
 		JGroupsReceiver.reset();
 		s = openSession();
@@ -120,7 +124,9 @@ public class JGroupsSlaveTest extends SearchTestCase {
 				break; //enough time wasted
 			}
 		}
-		if ( failed ) Assert.fail( "Message not received after waiting for long!" );
+		if ( failed ) {
+			Assert.fail( "Message not received after waiting for long!" );
+		}
 
 		s.close();
 	}

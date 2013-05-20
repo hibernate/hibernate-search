@@ -78,8 +78,9 @@ public class PurgeTest extends SearchTestCase {
 		assertEquals( "incorrect test record count", 1, results.size() );
 		assertEquals( "incorrect test record", 2, ( (Clock) results.get( 0 ) ).getId().intValue() );
 
-		for ( Object element : s.createQuery( "from java.lang.Object" ).list() )
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
 			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
@@ -119,7 +120,9 @@ public class PurgeTest extends SearchTestCase {
 		results = hibQuery.list();
 		assertEquals( "incorrect class purged", 2, results.size() );
 
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) s.delete( element );
+		for (Object element : s.createQuery( "from java.lang.Object" ).list()) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}
