@@ -22,6 +22,8 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -46,17 +48,20 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * The Workspace implementation to be used to take advantage of NRT Lucene features.
  * {@code IndexReader} instances are obtained directly from the {@code IndexWriter}, which is not forced
  * to flush all pending changes to the Directory structure.
+ * <p/>
  *
  * In current version Lucene still requires to flush delete operations, or the IndexReaders
  * retrieved via NRT will include deleted Document instances in queries; flushing delete operations
- * happens to be quite expensive to this Workspace implementation attempts to detect when such
+ * happens to be quite expensive so this Workspace implementation attempts to detect when such
  * a flush operation is needed.
+ * <p/>
  *
  * Applying write operations flags "indexReader requirements" with needs for either normal flush
  * or flushed including deletes, but doesn't actually update IndexReader instances: these
  * instances are updated only if and when a fresh IndexReader is requested via {@link #openIndexReader()};
  * this method will check if it can return the last opened IndexReader or if this is stale and
  * it needs to open a fresh copy using NRT from the current IndexWriter.
+ * <p/>
  *
  * Generation counters are used to track need-at-least version versus last-updated-at version:
  * shared state is avoided between index writers and reader threads to avoid high complexity.
@@ -64,9 +69,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * the index to be dirty without triggering an actual IndexReader refresh, so the version counters
  * can have gaps: method {@link #refreshReaders()} will always jump to latest seen version, as it will
  * refresh the index to satisfy both kinds of flush requirements (writes and deletes).
+ * <p/>
  *
  * We keep a reference IndexReader in the {@link #currentReader} atomic reference as a fast path
  * for multiple read events when the index is not dirty.
+ * <p/>
  *
  * This class implements both Workspace and ReaderProvider.
  *
@@ -93,25 +100,26 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	 * When true a flush operation should make sure all write operations are flushed,
 	 * otherwise a simpler flush strategy can be picked.
 	 */
-	private volatile boolean needFlushWrites = true;
+	private final AtomicBoolean needFlushWrites = new AtomicBoolean( true );
 
 	/**
 	 * Often when flushing deletes don't need to be applied. Some operation might have requested otherwise:
 	 */
-	private volatile boolean needFlushDeletes = false;
+	private final AtomicBoolean needFlushDeletes = new AtomicBoolean( false );
 
 	/**
 	 * Internal counter used to mark different generations of IndexReaders. Monotonic incremental.
-	 * Guarded by synchronization.
+	 * Not expecting an overflow in this planet's lifetime.
 	 */
-	private long readerGeneration = 0;
+	private final AtomicLong readerGeneration = new AtomicLong( 0 );
 
 	/**
 	 * When refreshing an IndexReader to achieve a fresh snapshot to a generation, we need to check this
 	 * value to see if deletions need to be flushed. We try hard to not flush deletions as that is a
 	 * very expensive operation.
+	 * NOTE: concurrently accessed. Guarded by readerGenRequiringFlushWrites: read the other first, write it last.
 	 */
-	private volatile long readerGenRequiringFlushDeletes = 0;
+	private long readerGenRequiringFlushDeletes = 0;
 
 	/**
 	 * As with {@link #readerGenRequiringFlushDeletes}, if this value is above the value of {@link #currentReaderGen}
@@ -142,15 +150,19 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	 * Translates fields as needFlushWrites and needFlushDeletes in a set of requirements as checked
 	 * by reader threads. This is commonly invoked by a single thread (so no contention on this method
 	 * is expected) but it needs to expose a consistent view of the written fields to {@link #refreshReaders()}.
+	 * This is normally not invoked in parallel by multiple threads as the backend design allows a single working thread
+	 * per index, but it could be invoked concurrently when streaming work is being applied (when a MassIndexer is
+	 * running). Note that multiple threads invoking this in parallel might result in skipping some sequence numbers
+	 * but that's not a problem.
 	 */
-	private synchronized void setupNewReadersRequirements() {
-		if ( needFlushDeletes || needFlushWrites ) {
-			final long nextGenId = ++readerGeneration;
-			if ( needFlushDeletes ) {
-				this.needFlushDeletes = false;
-				this.readerGenRequiringFlushDeletes = nextGenId;
+	private void setupNewReadersRequirements() {
+		if ( needFlushDeletes.get() || needFlushWrites.get() ) {
+			final long nextGenId = readerGeneration.incrementAndGet();
+			if ( needFlushDeletes.get() ) {
+				this.needFlushDeletes.lazySet( false ); //flushed by volatile write at end of method
+				this.readerGenRequiringFlushDeletes = nextGenId; //flushed by volatile write at end of method
 			}
-			this.needFlushWrites = false;
+			this.needFlushWrites.lazySet( false ); //flushed by volatile write at end of method
 			this.readerGenRequiringFlushWrites = nextGenId;
 		}
 	}
@@ -166,6 +178,9 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 		if ( indexReaderIsFresh() ) {
 			return currentReader.get();
 		}
+		//order of the following two reads DOES matter:
+		final long readerGenRequiringFlushWrites = this.readerGenRequiringFlushWrites;
+		final long readerGenRequiringFlushDeletes = this.readerGenRequiringFlushDeletes;
 		final boolean flushDeletes = currentReaderGen < readerGenRequiringFlushDeletes;
 		final long openingGen = Math.max( readerGenRequiringFlushDeletes, readerGenRequiringFlushWrites );
 
@@ -184,7 +199,9 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	}
 
 	private boolean indexReaderIsFresh() {
-		return currentReaderGen >= readerGenRequiringFlushDeletes && currentReaderGen >= readerGenRequiringFlushWrites;
+		final long currentReaderGen = this.currentReaderGen;
+		//Note it reads the volatile first. These two longs are always updated in pairs.
+		return currentReaderGen >= readerGenRequiringFlushWrites && currentReaderGen >= readerGenRequiringFlushDeletes;
 	}
 
 	@Override
@@ -322,17 +339,18 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 		FLUSH_DELETIONS {
 			@Override
 			void apply(final NRTWorkspaceImpl workspace) {
-				if ( !workspace.needFlushDeletes ) {
-					workspace.needFlushDeletes = true;
-				}
+				//LazySet is good enough as we only want to provide reads consistent with the state
+				//the application is expecting. I.E. if no other flush is happening down the road
+				//(which will eventually flush this write too) we're fine for other cores to "see"
+				//IndexReader instances slightly stale.
+				workspace.needFlushDeletes.lazySet( true );
 			}
 		},
 		FLUSH_WRITES {
 			@Override
 			void apply(final NRTWorkspaceImpl workspace) {
-				if ( !workspace.needFlushWrites ) {
-					workspace.needFlushWrites = true;
-				}
+				//See FLUSH_DELETIONS for why #lazySet is good enough.
+				workspace.needFlushWrites.lazySet( true );
 			}
 		},
 		FLUSH_WRITES_AND_DELETES {
