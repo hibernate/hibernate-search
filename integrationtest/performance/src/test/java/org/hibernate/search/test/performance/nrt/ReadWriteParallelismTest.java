@@ -65,8 +65,8 @@ public class ReadWriteParallelismTest {
 	 * The values below (as committed in source code) are not right for measurement!
 	 * We keep them reasonably low for a reasonably quick feedback from test builds.
 	 */
-	private static final int WARMUP_SECONDS = 20;
-	private static final int FULLRUN_SECONDS = 240;
+	private static final int WARM_UP_SECONDS = 20;
+	private static final int FULL_RUN_SECONDS = 240;
 
 	private static final AtomicBoolean failures = new AtomicBoolean( false );
 	private static final AtomicBoolean running = new AtomicBoolean( true );
@@ -85,18 +85,18 @@ public class ReadWriteParallelismTest {
 		}
 		threadPool.shutdown();
 		//Time to warmup only:
-		threadPool.awaitTermination( WARMUP_SECONDS, TimeUnit.SECONDS );
+		threadPool.awaitTermination(WARM_UP_SECONDS, TimeUnit.SECONDS );
 		System.out.println( "Warmup complete. Start measuring now..");
 		//Start measuring:
 		cyclesCompleted.set( 0 );
 		long startMeasurementTime = System.nanoTime();
-		threadPool.awaitTermination( FULLRUN_SECONDS, TimeUnit.SECONDS );
+		threadPool.awaitTermination(FULL_RUN_SECONDS, TimeUnit.SECONDS );
 		int doneCycles = cyclesCompleted.get();
 		long endMeasurementTime = System.nanoTime();
 		Assert.assertFalse( "Some failure happened in Task execution", failures.get() );
 		long totalTime = endMeasurementTime - startMeasurementTime;
-		long millisecondsElapsetTime = TimeUnit.MILLISECONDS.convert( totalTime, TimeUnit.NANOSECONDS );
-		System.out.println( "Completed " + doneCycles + " in " + millisecondsElapsetTime + " milliseconds" );
+		long millisecondsElapsedTime = TimeUnit.MILLISECONDS.convert( totalTime, TimeUnit.NANOSECONDS );
+		System.out.println( "Completed " + doneCycles + " in " + millisecondsElapsedTime + " milliseconds" );
 		running.set( false );
 	}
 
