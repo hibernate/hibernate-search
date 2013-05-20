@@ -85,12 +85,12 @@ public class ReadWriteParallelismTest {
 		}
 		threadPool.shutdown();
 		//Time to warmup only:
-		threadPool.awaitTermination(WARM_UP_SECONDS, TimeUnit.SECONDS );
+		threadPool.awaitTermination( WARM_UP_SECONDS, TimeUnit.SECONDS );
 		System.out.println( "Warmup complete. Start measuring now..");
 		//Start measuring:
 		cyclesCompleted.set( 0 );
 		long startMeasurementTime = System.nanoTime();
-		threadPool.awaitTermination(FULL_RUN_SECONDS, TimeUnit.SECONDS );
+		threadPool.awaitTermination( FULL_RUN_SECONDS, TimeUnit.SECONDS );
 		int doneCycles = cyclesCompleted.get();
 		long endMeasurementTime = System.nanoTime();
 		Assert.assertFalse( "Some failure happened in Task execution", failures.get() );
@@ -167,7 +167,7 @@ public class ReadWriteParallelismTest {
 	private static class Book {
 		@DocumentId
 		Integer id;
-		@Field(analyze=Analyze.NO, norms=Norms.NO)
+		@Field(analyze = Analyze.NO, norms = Norms.NO)
 		String title;
 	}
 
