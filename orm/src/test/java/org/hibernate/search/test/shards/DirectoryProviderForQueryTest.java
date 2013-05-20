@@ -81,7 +81,9 @@ public class DirectoryProviderForQueryTest extends SearchTestCase {
 		fullTextQuery.enableFullTextFilter( "shard" ).setParameter( "index", 0 );
 		assertEquals( "Query with filter should bring back results from only one shard.", 1, fullTextQuery.list().size() );
 
-		for (Object o : results) s.delete( o );
+		for ( Object o : results ) {
+			s.delete( o );
+		}
 		tx.commit();
 		s.close();
 	}

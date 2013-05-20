@@ -124,8 +124,9 @@ public class ScrollableResultsImpl implements ScrollableResults {
 				entityInfosToLoad.add( lo.getEntityInfo( x ) );
 				resultsContext[arrayIdx] = lo;
 				sizeToLoad++;
-				if ( sizeToLoad >= fetchSize )
+				if ( sizeToLoad >= fetchSize ) {
 					break;
+				}
 			}
 		}
 		//preload efficiently by batches:
@@ -230,7 +231,9 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		// (or 0 I can't remember) but we can't
 		// do that since we have to make up for
 		// an Object[]. J.G
-		if ( current < first || current > max ) return null;
+		if ( current < first || current > max ) {
+			return null;
+		}
 		LoadedObject cacheEntry = ensureCurrentLoaded();
 		return cacheEntry.getManagedResult( current );
 	}
@@ -404,7 +407,9 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	}
 
 	public int getRowNumber() {
-		if ( max < first ) return -1;
+		if ( max < first ) {
+			return -1;
+		}
 		return current - first;
 	}
 
@@ -437,7 +442,9 @@ public class ScrollableResultsImpl implements ScrollableResults {
 			}
 			else {
 				Object loaded = loader.load( entityInfo );
-				if ( ! loaded.getClass().isArray() ) loaded = new Object[] { loaded };
+				if ( ! loaded.getClass().isArray() ) {
+					loaded = new Object[] { loaded };
+				}
 				objects = (Object[]) loaded;
 				this.entity = new SoftReference<Object[]>( objects );
 				return objects;
@@ -473,8 +480,9 @@ public class ScrollableResultsImpl implements ScrollableResults {
 			for ( int idx : entityInfo.getIndexesOfThis() ) {
 				Object o = objects[idx];
 				//TODO improve: is it useful to check for proxies and have them reassociated to persistence context?
-				if ( ! hibSession.contains( o ) )
+				if ( ! hibSession.contains( o ) ) {
 					return false;
+				}
 			}
 			return true;
 		}

@@ -94,7 +94,9 @@ public class JGroupsMasterTest extends SearchTestCase {
 				break; //enough time wasted
 			}
 		}
-		if ( failed ) Assert.fail( "Message not received after waiting for long!" );
+		if ( failed ) {
+			Assert.fail( "Message not received after waiting for long!" );
+		}
 	}
 
 	private int countByQuery(String luceneQueryString) throws ParseException {

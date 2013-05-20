@@ -95,7 +95,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	}
 
 	public List executeLoad(EntityInfo... entityInfos) {
-		if ( entityInfos.length == 0 ) return Collections.EMPTY_LIST;
+		if ( entityInfos.length == 0 ) {
+			return Collections.EMPTY_LIST;
+		}
 		if ( entityInfos.length == 1 ) {
 			final Object entity = load( entityInfos[0] );
 			if ( entity == null ) {
@@ -125,7 +127,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 					break; //we stop looping for the right bucket
 				}
 			}
-			if (!found) throw new AssertionFailure( "Could not find root entity for " + clazz );
+			if (!found) {
+				throw new AssertionFailure( "Could not find root entity for " + clazz );
+			}
 		}
 
 		//initialize objects by bucket
@@ -155,7 +159,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor) {
 			this.rootEntity = rootEntity;
 			EntityIndexBinder provider = searchFactoryImplementor.getIndexBindingForEntity( rootEntity );
-			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
+			if ( provider == null) {
+				throw new AssertionFailure("Provider not found for class: " + rootEntity);
+			}
 			this.mappedSubclasses = provider.getDocumentBuilder().getMappedSubclasses();
 			this.criteria = null; //default
 		}

@@ -50,7 +50,9 @@ public class IteratorImpl implements Iterator<Object> {
 
 	//side effect is to set up next
 	public boolean hasNext() {
-		if ( nextObjectIndex == index ) return next != null;
+		if ( nextObjectIndex == index ) {
+			return next != null;
+		}
 		next = null;
 		nextObjectIndex = -1;
 		do {
@@ -73,7 +75,9 @@ public class IteratorImpl implements Iterator<Object> {
 
 	public Object next() {
 		//hasNext() has side effect
-		if ( !hasNext() ) throw new NoSuchElementException( "Out of boundaries" );
+		if (!hasNext()) {
+			throw new NoSuchElementException( "Out of boundaries" );
+		}
 		index++;
 		return next;
 	}

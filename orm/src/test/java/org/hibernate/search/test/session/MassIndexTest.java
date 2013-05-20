@@ -79,7 +79,9 @@ public class MassIndexTest extends SearchTestCase {
 		while ( results.next() ) {
 			index++;
 			s.index( results.get( 0 ) );
-			if ( index % 5 == 0 ) s.clear();
+			if ( index % 5 == 0 ) {
+				s.clear();
+			}
 		}
 		tx.commit(); // if you get a LazyInitializationException, that's because we clear() the session in the loop.. it only works with a batch size of 5 (the point of the test)
 		s.clear();
@@ -148,13 +150,15 @@ public class MassIndexTest extends SearchTestCase {
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
 		assertEquals( 0, result.size() );
 		result = s.createCriteria( Email.class ).list();
-		for (int i = 0; i < loop / 2; i++)
+		for (int i = 0; i < loop / 2; i++) {
 			s.index( result.get( i ) );
+		}
 		tx.commit(); //do the process
 		s.index( result.get( loop / 2 ) ); //do the process out of tx
 		tx = s.beginTransaction();
-		for (int i = loop / 2 + 1; i < loop; i++)
+		for (int i = loop / 2 + 1; i < loop; i++) {
 			s.index( result.get( i ) );
+		}
 		tx.commit(); //do the process
 		s.close();
 

@@ -58,25 +58,35 @@ public class UselessShardingStrategy implements IndexShardingStrategy {
 		Enumeration<?> propertyNames = properties.propertyNames();
 		int counter;
 		counter = checkEnumeration( propertyNames );
-		if (counter != 2) throw new IllegalStateException( "propertyNames() fails" );
+		if (counter != 2) {
+			throw new IllegalStateException( "propertyNames() fails" );
+		}
 		counter = checkEnumeration( properties.keys() );
-		if (counter != 2) throw new IllegalStateException( "keys() fails" );
+		if (counter != 2) {
+			throw new IllegalStateException( "keys() fails" );
+		}
 		counter = 0;
 		for (Object key :  properties.keySet() ) {
-			if ( ! String.class.isInstance( key ) ) continue;
+			if ( ! String.class.isInstance( key ) ) {
+				continue;
+			}
 			if ( String.class.cast( key ).startsWith( "test." ) ) {
 				System.out.println( key );
 				counter++;
 			}
 		}
-		if (counter != 2) throw new IllegalStateException( "keySet() fails" );
+		if (counter != 2) {
+			throw new IllegalStateException( "keySet() fails" );
+		}
 	}
 
 	private int checkEnumeration(Enumeration<?> propertyNames) {
 		int counter = 0;
 		while ( propertyNames.hasMoreElements() ) {
 			Object key = propertyNames.nextElement();
-			if ( ! String.class.isInstance( key ) ) continue;
+			if ( ! String.class.isInstance( key ) ) {
+				continue;
+			}
 			String propertyName = (String) key;
 			if ( propertyName.startsWith( "test." ) ) {
 				counter++;

@@ -95,7 +95,9 @@ public class IndexTestDontRun extends SearchTestCase {
 			return 0;
 		}
 		long totalTime = 0;
-		for (SearcherThread t : threadsList) totalTime += t.getTime();
+		for (SearcherThread t : threadsList) {
+			totalTime += t.getTime();
+		}
 		return totalTime;
 	}
 

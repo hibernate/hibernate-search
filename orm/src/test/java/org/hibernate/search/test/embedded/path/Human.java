@@ -138,33 +138,49 @@ public class Human {
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( this == obj )
+		if ( this == obj ) {
 			return true;
-		if ( obj == null )
+		}
+		if ( obj == null ) {
 			return false;
-		if ( getClass() != obj.getClass() )
+		}
+		if ( getClass() != obj.getClass() ) {
 			return false;
+		}
 		Human other = (Human) obj;
 		if ( child == null ) {
-			if ( other.child != null )
+			if ( other.child != null ) {
 				return false;
+			}
 		}
-		else if ( !child.equals( other.child ) )
+		else {
+			if ( !child.equals( other.child ) ) {
+				return false;
+			}
+		}
+		if ( id != other.id ) {
 			return false;
-		if ( id != other.id )
-			return false;
+		}
 		if ( name == null ) {
-			if ( other.name != null )
+			if ( other.name != null ) {
 				return false;
+			}
 		}
-		else if ( !name.equals( other.name ) )
-			return false;
+		else {
+			if ( !name.equals( other.name ) ) {
+				return false;
+			}
+		}
 		if ( surname == null ) {
-			if ( other.surname != null )
+			if ( other.surname != null ) {
 				return false;
+			}
 		}
-		else if ( !surname.equals( other.surname ) )
-			return false;
+		else {
+			if ( !surname.equals( other.surname ) ) {
+				return false;
+			}
+		}
 		return true;
 	}
 

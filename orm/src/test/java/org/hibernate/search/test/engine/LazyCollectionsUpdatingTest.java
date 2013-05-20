@@ -127,8 +127,9 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 			tx.commit();
 		}
 		catch (Throwable t) {
-			if ( tx != null )
+			if ( tx != null ) {
 				tx.rollback();
+			}
 		}
 		finally {
 			session.close();

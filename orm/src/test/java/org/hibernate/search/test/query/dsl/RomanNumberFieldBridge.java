@@ -33,18 +33,24 @@ public class RomanNumberFieldBridge implements StringBridge {
 			return null;
 		}
 		int v = ( (Number) object ).intValue();
-		if ( v == 0 )
+		if ( v == 0 ) {
 			return null;
-		if ( v == 1 )
+		}
+		if ( v == 1 ) {
 			return "I";
-		if ( v == 2 )
+		}
+		if ( v == 2 ) {
 			return "II";
-		if ( v == 3 )
+		}
+		if ( v == 3 ) {
 			return "III";
-		if ( v == 4 )
+		}
+		if ( v == 4 ) {
 			return "IV";
-		if ( v == 5 )
+		}
+		if ( v == 5 ) {
 			return "IV";
+		}
 		// ... I bet someone has written a smarter converter
 		return null;
 	}
