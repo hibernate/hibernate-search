@@ -212,8 +212,15 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 				writeLock.unlock();
 			}
 		}
-		indexReader.incRef();
-		return indexReader;
+		if ( indexReader.tryIncRef() ) {
+			return indexReader;
+		}
+		else {
+			//In this case we have a race: the chosen IndexReader was closed before we could increment its reference, so we need
+			//to try again. Basically an optimistic lock as the race condition is very unlikely.
+			//Changes should be tested at least with ReadWriteParallelismTest (in the performance tests module).
+			return openIndexReader();
+		}
 	}
 
 	@Override
