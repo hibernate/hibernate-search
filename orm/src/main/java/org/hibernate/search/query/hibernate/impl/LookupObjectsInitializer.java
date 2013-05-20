@@ -67,7 +67,8 @@ public class LookupObjectsInitializer implements ObjectsInitializer {
 		for ( EntityInfo entityInfo : entityInfos ) {
 			ObjectLoaderHelper.load( entityInfo, session );
 		}
-		if ( traceEnabled )
+		if ( traceEnabled ) {
 			log.tracef( "Initialized %d objects by lookup method.", maxResults );
+		}
 	}
 }

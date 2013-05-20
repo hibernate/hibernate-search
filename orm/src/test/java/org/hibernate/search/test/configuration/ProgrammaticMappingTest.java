@@ -578,7 +578,9 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertEquals( "incorrect number of results returned", 1, result.size() );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) s.delete( element );
+		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}

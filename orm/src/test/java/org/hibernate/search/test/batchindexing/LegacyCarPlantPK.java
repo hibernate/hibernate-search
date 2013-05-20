@@ -53,15 +53,19 @@ public class LegacyCarPlantPK implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if ( this == o )
+		if ( this == o ) {
 			return true;
-		if ( o == null || getClass() != o.getClass() )
+		}
+		if ( o == null || getClass() != o.getClass() ) {
 			return false;
+		}
 		LegacyCarPlantPK that = (LegacyCarPlantPK) o;
-		if ( carId != null ? !carId.equals( that.carId ) : that.carId != null )
+		if ( carId != null ? !carId.equals( that.carId ) : that.carId != null ) {
 			return false;
-		if ( plantId != null ? !plantId.equals( that.plantId ) : that.plantId != null )
+		}
+		if ( plantId != null ? !plantId.equals( that.plantId ) : that.plantId != null ) {
 			return false;
+		}
 
 		return true;
 	}

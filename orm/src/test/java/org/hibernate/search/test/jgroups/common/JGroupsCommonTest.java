@@ -100,7 +100,9 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 			}
 		}
 
-		if ( failed ) Assert.fail( "Lots of time waited and still the two documents are not indexed yet!" );
+		if ( failed ) {
+			Assert.fail( "Lots of time waited and still the two documents are not indexed yet!" );
+		}
 
 		slaveSession = getSlaveSession();
 		tx = slaveSession.beginTransaction();
@@ -124,7 +126,9 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 			}
 		}
 
-		if ( failed ) Assert.fail( "Waited for long and still Peter Pan didn't fly in!" );
+		if ( failed ) {
+			Assert.fail( "Waited for long and still Peter Pan didn't fly in!" );
+		}
 
 		slaveSession = getSlaveSession();
 		tx = slaveSession.beginTransaction();
@@ -148,7 +152,9 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 			}
 		}
 
-		if ( failed ) Assert.fail( "Waited for long and elements where still not deleted!" );
+		if ( failed ) {
+			Assert.fail( "Waited for long and elements where still not deleted!" );
+		}
 	}
 
 	@Override

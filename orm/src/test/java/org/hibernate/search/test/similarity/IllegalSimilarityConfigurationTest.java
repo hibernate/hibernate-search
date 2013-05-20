@@ -53,8 +53,9 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
 		assertTrue( "A valid configuration could not be started.", configurationIsLegal );
 	}
@@ -72,8 +73,9 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: same similarity"
 				+ " must be used across class hierarchy", configurationIsLegal );
@@ -92,8 +94,9 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: two entities"
 				+ "sharing the same index are using a different similarity", configurationIsLegal );
@@ -112,8 +115,9 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
 		assertTrue( "Valid configuration could not be built", configurationIsLegal );
 	}
@@ -131,8 +135,9 @@ public class IllegalSimilarityConfigurationTest {
 			configurationIsLegal = false;
 		}
 		finally {
-			if ( builder != null )
+			if ( builder != null ) {
 				builder.close();
+			}
 		}
 		assertFalse( "Invalid Similarity declared, should have thrown an exception: child entity"
 				+ " is overriding parent's Similarity", configurationIsLegal );
