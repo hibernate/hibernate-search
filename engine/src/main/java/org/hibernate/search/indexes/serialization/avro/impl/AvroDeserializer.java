@@ -162,7 +162,7 @@ public class AvroDeserializer implements Deserializer {
 
 	private Map<String, String> getAnalyzers(GenericRecord operation) {
 		Map<?,?> analyzersWithUtf8  = (Map<?,?>) operation.get( "fieldToAnalyzerMap" );
-		if (analyzersWithUtf8 == null) {
+		if ( analyzersWithUtf8 == null ) {
 			return null;
 		}
 		Map<String,String> analyzers = new HashMap<String, String>( analyzersWithUtf8.size() );
@@ -319,7 +319,7 @@ public class AvroDeserializer implements Deserializer {
 				log.unknownAttributeSerializedRepresentation( name );
 			}
 		}
-		if ( element instanceof ByteBuffer) {
+		if ( element instanceof ByteBuffer ) {
 			hydrator.addSerializedAttribute( asByteArray( (ByteBuffer) element ) );
 		}
 		else {

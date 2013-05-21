@@ -65,7 +65,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		List<Location> locations = fullTextQuery.list();
 		FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled();
 		Assert.assertEquals( NUM_LOCATIONS, locations.size() );
-		for (Location location : locations) {
+		for ( Location location : locations ) {
 			int id = location.getId();
 			Assert.assertEquals( String.valueOf( id ) + "42", location.getDescription() );
 		}
@@ -78,7 +78,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		Transaction transaction = fullTextSession.beginTransaction();
 		Country italy = new Country( "Italy", 39d );
-		for (int i = 0; i < NUM_LOCATIONS; i++) {
+		for ( int i = 0; i < NUM_LOCATIONS; i++ ) {
 			session.persist( new Location( i, Long.valueOf( i ), 7 * i, Double.valueOf( 9 * i ), Integer
 					.valueOf( 100 - i ), String.valueOf( i ) + "42", null, italy, BigDecimal.ONE ) );
 		}

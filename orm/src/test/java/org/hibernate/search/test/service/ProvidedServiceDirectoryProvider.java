@@ -49,7 +49,7 @@ public class ProvidedServiceDirectoryProvider extends RAMDirectoryProvider {
 
 	@Override
 	public void start(DirectoryBasedIndexManager indexManager) {
-		if (foo == null) {
+		if ( foo == null ) {
 			throw new RuntimeException( "service should be started" );
 		}
 		if ( ! foo.isProvided() ) {

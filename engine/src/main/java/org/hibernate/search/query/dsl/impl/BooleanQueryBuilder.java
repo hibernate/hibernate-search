@@ -87,7 +87,7 @@ class BooleanQueryBuilder implements MustJunction {
 
 	public Query createQuery() {
 		final int nbrOfClauses = clauses.size();
-		if ( nbrOfClauses == 0) {
+		if ( nbrOfClauses == 0 ) {
 			throw new AssertionFailure( "Cannot create an empty boolean query" );
 		}
 		else if ( nbrOfClauses == 1 ) {

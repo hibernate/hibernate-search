@@ -62,16 +62,16 @@ public class SearchMappingBuilder {
 
 		//try SearchConfiguration object first and then properties
 		Object modelMappingProperty = cfg.getProgrammaticMapping();
-		if ( modelMappingProperty == null) {
+		if ( modelMappingProperty == null ) {
 			modelMappingProperty = cfg.getProperties().get( Environment.MODEL_MAPPING );
 		}
 
-		if ( modelMappingProperty == null) {
+		if ( modelMappingProperty == null ) {
 			return null;
 		}
 		SearchMapping mapping = null;
 		Object programmaticConfig = modelMappingProperty;
-		if (programmaticConfig instanceof SearchMapping) {
+		if ( programmaticConfig instanceof SearchMapping ) {
 			mapping = (SearchMapping) programmaticConfig;
 			return mapping;
 		}
@@ -96,7 +96,7 @@ public class SearchMappingBuilder {
 			Object instance = clazz.newInstance();
 			mapping = (SearchMapping) method.invoke( instance );
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			throw new SearchException( "Unable to call the factory method: " + clazz.getName() + "." + method.getName(), e );
 		}
 		return mapping;
@@ -118,7 +118,7 @@ public class SearchMappingBuilder {
 			try {
 				clazz = ClassLoaderHelper.classForName( className, SearchMappingBuilder.class.getClassLoader() );
 			}
-			catch (ClassNotFoundException e) {
+			catch ( ClassNotFoundException e ) {
 				throw new SearchException( "Unable to find " + Environment.MODEL_MAPPING + "=" + className, e );
 			}
 		}

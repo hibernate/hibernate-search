@@ -99,7 +99,7 @@ public class SyncJGroupsBackendTest {
 			storeDvd( 1, "Hibernate Search in Action" );
 			System.out.println( "[POSTSEND] Timestamp: " + System.nanoTime() );
 		}
-		catch (SearchException se) {
+		catch ( SearchException se ) {
 			//Expected: we're inducing the RPC into timeout by blocking receiver processing
 			Throwable cause = se.getCause();
 			Assert.assertTrue( "Cause was not a TimeoutException but a " + cause, cause instanceof TimeoutException );
@@ -126,7 +126,7 @@ public class SyncJGroupsBackendTest {
 		try {
 			storeDvd( 2, "Byteman in Action" ); //not actually needing Byteman here
 		}
-		catch (SearchException se) {
+		catch ( SearchException se ) {
 			//Expected: we're inducing the RPC into NPE
 			Throwable cause = se.getCause().getCause();
 			Assert.assertTrue( "Cause was not a NullPointerException but a " + cause, cause instanceof NullPointerException );

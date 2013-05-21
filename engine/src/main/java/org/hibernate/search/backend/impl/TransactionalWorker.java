@@ -75,7 +75,7 @@ public class TransactionalWorker implements Worker {
 			throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityType );
 		}
 		work = interceptWork( indexBindingForEntity, work );
-		if (work == null) {
+		if ( work == null ) {
 			//nothing to do
 			return;
 		}
@@ -106,11 +106,11 @@ public class TransactionalWorker implements Worker {
 	}
 
 	private <T> Work<T> interceptWork(EntityIndexBinding indexBindingForEntity, Work<T> work) {
-		if (indexBindingForEntity == null) {
+		if ( indexBindingForEntity == null ) {
 			return work;
 		}
 		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) indexBindingForEntity.getEntityIndexingInterceptor();
-		if (interceptor == null) {
+		if ( interceptor == null ) {
 			return work;
 		}
 		IndexingOverride operation;

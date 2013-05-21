@@ -86,7 +86,7 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		if ( log.isTraceEnabled() ) {
 			log.tracef( "Initialized %d objects out of %d in the persistence context", maxResults - remainingSize, maxResults );
 		}
-		if (remainingSize > 0) {
+		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(
 					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
 					criteria,

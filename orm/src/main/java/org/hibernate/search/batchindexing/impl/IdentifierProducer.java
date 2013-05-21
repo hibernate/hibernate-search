@@ -95,7 +95,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		try {
 			inTransactionWrapper( upperSession );
 		}
-		catch (Throwable e) {
+		catch ( Throwable e ) {
 			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
 		finally {
@@ -106,7 +106,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 
 	private void inTransactionWrapper(StatelessSession upperSession) throws Exception {
 		StatelessSession session = upperSession;
-		if (upperSession == null) {
+		if ( upperSession == null ) {
 			session = sessionFactory.openStatelessSession();
 		}
 		try {
@@ -115,12 +115,12 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			loadAllIdentifiers( session );
 			transaction.commit();
 		}
-		catch (InterruptedException e) {
+		catch ( InterruptedException e ) {
 			// just quit
 			Thread.currentThread().interrupt();
 		}
 		finally {
-			if (upperSession == null) {
+			if ( upperSession == null ) {
 				session.close();
 			}
 		}

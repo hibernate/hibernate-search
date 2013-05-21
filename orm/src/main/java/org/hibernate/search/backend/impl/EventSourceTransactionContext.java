@@ -140,7 +140,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	}
 
 	private FullTextIndexEventListener getIndexWorkFlushEventListener() {
-		if ( this.flushListener != null) {
+		if ( this.flushListener != null ) {
 			//for the "transient" case: might have been nullified.
 			return flushListener;
 		}

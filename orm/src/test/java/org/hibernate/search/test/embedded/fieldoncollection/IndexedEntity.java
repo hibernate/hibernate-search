@@ -146,7 +146,7 @@ public class IndexedEntity {
 	public void setKeywords(Set<String> keywords) {
 		this.keywords.clear();
 
-		for (String keyword : keywords) {
+		for ( String keyword : keywords ) {
 			this.addKeyword( keyword );
 		}
 	}

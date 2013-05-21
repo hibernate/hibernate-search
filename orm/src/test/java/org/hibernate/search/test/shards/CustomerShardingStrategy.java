@@ -75,7 +75,7 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] filters) {
 		FullTextFilter filter = getCustomerFilter( filters, "customer" );
-		if (filter == null) {
+		if ( filter == null ) {
 			return getIndexManagersForAllShards();
 		}
 		else {
@@ -84,7 +84,7 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 	}
 
 	private FullTextFilter getCustomerFilter(FullTextFilterImplementor[] filters, String name) {
-		for (FullTextFilterImplementor filter: filters) {
+		for ( FullTextFilterImplementor filter: filters ) {
 			if ( filter.getName().equals( name ) ) {
 				return filter;
 			}

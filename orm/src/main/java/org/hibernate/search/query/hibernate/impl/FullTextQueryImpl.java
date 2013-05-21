@@ -257,7 +257,6 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
-
 	public FullTextQuery setFirstResult(int firstResult) {
 		hSearchQuery.firstResult( firstResult );
 		return this;

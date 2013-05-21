@@ -65,7 +65,7 @@ public class JmsBackendQueueTask implements Runnable {
 
 	public void run() {
 		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>(queue);
-		for (LuceneWork work : queue) {
+		for ( LuceneWork work : queue ) {
 			if ( work instanceof OptimizeLuceneWork ) {
 				//we don't want optimization to be propagated
 				filteredQueue.remove( work );
@@ -92,7 +92,7 @@ public class JmsBackendQueueTask implements Runnable {
 
 			session.close();
 		}
-		catch (JMSException e) {
+		catch ( JMSException e ) {
 			throw log.unableToSendJMSWork( indexName, processor.getJmsQueueName(), e );
 		}
 	}

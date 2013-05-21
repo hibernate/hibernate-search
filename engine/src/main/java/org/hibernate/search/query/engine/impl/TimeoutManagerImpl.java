@@ -68,7 +68,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	}
 
 	private Long getTimeoutLeft(long factor) {
-		if (timeout == null) {
+		if ( timeout == null ) {
 			return null;
 		}
 		else {
@@ -142,7 +142,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 
 	public void forceTimedOut() {
 		this.timedOut = Boolean.TRUE;
-		if ( type == Type.LIMIT) {
+		if ( type == Type.LIMIT ) {
 			//we stop where we are return what we have
 			this.partialResults = true;
 		}
@@ -163,12 +163,12 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	}
 
 	public void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e) {
-		if ( type == Type.LIMIT) {
+		if ( type == Type.LIMIT ) {
 			//we stop where we are return what we have
 			this.partialResults = true;
 		}
 		else {
-			if ( e == null) {
+			if ( e == null ) {
 				e = timeoutExceptionFactory.createTimeoutException(
 						"Timeout period exceeded",
 						luceneQuery );

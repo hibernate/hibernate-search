@@ -96,7 +96,7 @@ public class ProjectionLoader implements Loader {
 	public List load(EntityInfo... entityInfos) {
 		//no need to timeouManage here, the underlying loader is the real time consumer
 		List results = new ArrayList( entityInfos.length );
-		if (entityInfos.length == 0) {
+		if ( entityInfos.length == 0 ) {
 			return results;
 		}
 

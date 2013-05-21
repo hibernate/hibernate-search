@@ -36,7 +36,7 @@ public class ClusterSharedConnectionProvider implements ConnectionProvider {
 	}
 
 	public static void realStop() {
-		if ( pool != null) {
+		if ( pool != null ) {
 			pool.dispose();
 			pool = null;
 		}

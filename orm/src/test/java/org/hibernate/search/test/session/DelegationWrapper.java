@@ -44,7 +44,7 @@ public class DelegationWrapper implements InvocationHandler, Serializable {
 		try {
 			return method.invoke( realSession, args );
 		}
-		catch (InvocationTargetException e) {
+		catch ( InvocationTargetException e ) {
 			if ( e.getTargetException() instanceof RuntimeException ) {
 				throw (RuntimeException) e.getTargetException();
 			}

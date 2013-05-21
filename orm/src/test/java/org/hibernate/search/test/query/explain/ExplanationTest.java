@@ -61,7 +61,7 @@ public class ExplanationTest extends SearchTestCase {
 				.setProjection( FullTextQuery.DOCUMENT_ID, FullTextQuery.EXPLANATION, FullTextQuery.THIS );
 		@SuppressWarnings("unchecked") List<Object[]> results = ftQuery.list();
 		assertEquals( 2, results.size() );
-		for (Object[] result : results) {
+		for ( Object[] result : results ) {
 			assertEquals( ftQuery.explain( (Integer) result[0] ).toString(), result[1].toString() );
 			s.delete( result[2] );
 		}

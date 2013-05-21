@@ -49,7 +49,7 @@ public class IllegalSimilarityConfigurationTest {
 					.addAnnotatedClass( Can.class )
 					.addAnnotatedClass( Trash.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
@@ -69,7 +69,7 @@ public class IllegalSimilarityConfigurationTest {
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( LittleTrash.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
@@ -90,7 +90,7 @@ public class IllegalSimilarityConfigurationTest {
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( Sink.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
@@ -111,7 +111,7 @@ public class IllegalSimilarityConfigurationTest {
 					.addAnnotatedClass( Trash.class )
 					.addAnnotatedClass( ProperTrashExtension.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {
@@ -131,7 +131,7 @@ public class IllegalSimilarityConfigurationTest {
 					.addAnnotatedClass( Can.class )
 					.addAnnotatedClass( SmallerCan.class ).build();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			configurationIsLegal = false;
 		}
 		finally {

@@ -56,7 +56,7 @@ public class Generator {
 				.append( "\t" ).append( "\t" ).append( "private String name;" ).append( "\n" )
 				.append( "\t}\n\n" );
 		String innerString = inner.toString();
-		for (int i = 0 ; i < 100 ; i++) {
+		for ( int i = 0 ; i < 100 ; i++ ) {
 			generated.append( innerString.replace( "Ax", "A" + i ) );
 		}
 
