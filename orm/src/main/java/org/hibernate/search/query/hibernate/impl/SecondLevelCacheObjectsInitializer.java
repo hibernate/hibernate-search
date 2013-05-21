@@ -72,7 +72,7 @@ public class SecondLevelCacheObjectsInitializer implements ObjectsInitializer {
 						//load the object from the second level cache
 						session.get( entityInfo.getClazz(), entityInfo.getId() );
 					}
-					catch (ObjectNotFoundException onfe) {
+					catch ( ObjectNotFoundException onfe ) {
 						// Unlikely but needed: an index might be out of sync, and the cache might be as well
 						remainingEntityInfos.add( entityInfo );
 					}

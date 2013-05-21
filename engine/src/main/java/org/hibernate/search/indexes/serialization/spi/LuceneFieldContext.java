@@ -103,7 +103,7 @@ public class LuceneFieldContext {
 
 	public byte[] getReaderValue() {
 		Reader reader = field.readerValue();
-		if (reader instanceof Serializable) {
+		if ( reader instanceof Serializable ) {
 			return SerializationHelper.toByteArray( (Serializable) reader );
 		}
 		else {

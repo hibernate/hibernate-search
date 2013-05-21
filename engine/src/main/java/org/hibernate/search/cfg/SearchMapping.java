@@ -76,7 +76,7 @@ public class SearchMapping {
 	static Map<String, Object> addElementToAnnotationArray(Map<String, Object> containingAnnotation,
 													String attributeName) {
 		@SuppressWarnings("unchecked") List<Map<String, Object>> array = (List<Map<String, Object>>) containingAnnotation.get( attributeName );
-		if ( array == null) {
+		if ( array == null ) {
 			array = new ArrayList<Map<String, Object>>();
 			containingAnnotation.put( attributeName, array );
 		}
@@ -91,7 +91,7 @@ public class SearchMapping {
 
 	EntityDescriptor getEntity(Class<?> entityType) {
 		EntityDescriptor entityDescriptor = entities.get( entityType );
-		if (entityDescriptor == null) {
+		if ( entityDescriptor == null ) {
 			entityDescriptor = new EntityDescriptor( );
 			entities.put( entityType, entityDescriptor );
 		}

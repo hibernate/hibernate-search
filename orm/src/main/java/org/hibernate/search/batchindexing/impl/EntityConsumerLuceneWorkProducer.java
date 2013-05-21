@@ -104,7 +104,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 			indexAllQueue( session );
 			transaction.commit();
 		}
-		catch (Throwable e) {
+		catch ( Throwable e ) {
 			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
 		finally {
@@ -138,7 +138,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 				}
 			}
 		}
-		catch (InterruptedException e) {
+		catch ( InterruptedException e ) {
 			// just quit
 			Thread.currentThread().interrupt();
 		}

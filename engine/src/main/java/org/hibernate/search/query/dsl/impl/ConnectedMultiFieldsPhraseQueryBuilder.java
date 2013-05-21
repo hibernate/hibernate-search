@@ -109,7 +109,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 					termsAtSamePosition = termsPerPosition.get( position );
 				}
 
-				if (termsAtSamePosition == null) {
+				if ( termsAtSamePosition == null ) {
 					termsAtSamePosition = new ArrayList<Term>();
 					termsPerPosition.put( position, termsAtSamePosition );
 				}

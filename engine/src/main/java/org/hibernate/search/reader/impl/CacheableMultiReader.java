@@ -62,7 +62,7 @@ public class CacheableMultiReader extends MultiReader {
 		if ( length != that.subReaders.length ) {
 			return false;
 		}
-		for (int index = 0; index < length; index++) {
+		for ( int index = 0; index < length; index++ ) {
 			if ( !this.subReaders[index].equals( that.subReaders[index] ) ) {
 				return false;
 			}

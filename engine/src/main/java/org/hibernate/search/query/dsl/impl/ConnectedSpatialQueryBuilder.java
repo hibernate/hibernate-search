@@ -62,7 +62,7 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 		// FIXME in the future we will likely react to some state stored in SpatialFieldBridge (for the indexing strategy)
 		String coordinatesField = spatialContext.getCoordinatesField();
 		FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
-		if ( fieldBridge instanceof SpatialFieldBridgeByQuadTree) {
+		if ( fieldBridge instanceof SpatialFieldBridgeByQuadTree ) {
 			return SpatialQueryBuilderFromCoordinates.buildSpatialQueryByQuadTree(
 					spatialContext.getCoordinates(),
 					spatialContext.getRadiusDistance(), // always in KM so far, no need to convert

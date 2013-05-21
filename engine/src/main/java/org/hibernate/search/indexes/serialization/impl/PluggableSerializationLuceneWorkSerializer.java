@@ -76,8 +76,8 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 			Serializer serializer = provider.getSerializer();
 			serializer.luceneWorks( works );
 
-			for (LuceneWork work : works) {
-				if (work instanceof OptimizeLuceneWork) {
+			for ( LuceneWork work : works ) {
+				if ( work instanceof OptimizeLuceneWork ) {
 					serializer.addOptimizeAll();
 				}
 				else if (work instanceof PurgeAllLuceneWork) {

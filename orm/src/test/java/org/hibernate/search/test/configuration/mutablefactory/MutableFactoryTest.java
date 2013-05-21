@@ -193,12 +193,12 @@ public class MutableFactoryTest {
 		List<DoAddClasses> runnables = new ArrayList<DoAddClasses>(10);
 		final int nbrOfThread = 10;
 		final int nbrOfClassesPerThread = 10;
-		for (int i = 0 ; i < nbrOfThread; i++) {
+		for ( int i = 0; i < nbrOfThread; i++ ) {
 			runnables.add( new DoAddClasses( sf, i, nbrOfClassesPerThread ) );
 		}
 		final ThreadPoolExecutor poolExecutor = Executors.newFixedThreadPool( nbrOfThread, "SFI classes addition" );
 		poolExecutor.prestartAllCoreThreads();
-		for (Runnable runnable : runnables) {
+		for ( Runnable runnable : runnables ) {
 			poolExecutor.execute( runnable );
 		}
 		poolExecutor.shutdown();
@@ -207,12 +207,12 @@ public class MutableFactoryTest {
 		do {
 			Thread.sleep( 100 );
 			inProgress = false;
-			for ( DoAddClasses runnable : runnables) {
+			for ( DoAddClasses runnable : runnables ) {
 				inProgress = inProgress || runnable.isFailure() == null;
 			}
 		} while (inProgress);
 
-		for ( DoAddClasses runnable : runnables) {
+		for ( DoAddClasses runnable : runnables ) {
 			assertNotNull( "Threads not run # " + runnable.getWorkNumber(), runnable.isFailure() );
 			assertFalse( "thread failed #" + runnable.getWorkNumber() + " Failure: " + runnable.getFailureInfo(), runnable.isFailure() );
 		}
@@ -271,7 +271,7 @@ public class MutableFactoryTest {
 		public void run() {
 
 			try {
-				for (int index = 0 ; index < 10 ; index++) {
+				for ( int index = 0 ; index < 10 ; index++ ) {
 					final int i = factorOfClassesPerThread * nbrOfClassesPerThread + index;
 					final Class<?> aClass = MutableFactoryTest.getClassAByNumber( i );
 					factory.addClasses( aClass );

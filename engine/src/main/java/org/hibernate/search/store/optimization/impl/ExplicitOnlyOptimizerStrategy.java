@@ -57,7 +57,7 @@ public class ExplicitOnlyOptimizerStrategy implements OptimizerStrategy {
 			try {
 				writer.forceMerge( 1, true );
 			}
-			catch (IOException e) {
+			catch ( IOException e ) {
 				throw new SearchException( "Unable to optimize directoryProvider: " + indexName, e );
 			}
 			finally {

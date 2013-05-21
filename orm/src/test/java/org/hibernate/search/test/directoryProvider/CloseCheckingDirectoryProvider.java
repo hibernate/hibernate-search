@@ -45,7 +45,7 @@ public class CloseCheckingDirectoryProvider extends RAMDirectoryProvider {
 		if ( initialized ) {
 			throw new SearchException( "Initialized twice" );
 		}
-		if ( started) {
+		if ( started ) {
 			throw new SearchException( "Initialized after start" );
 		}
 		if ( stopped ) {

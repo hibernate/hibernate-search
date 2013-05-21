@@ -98,7 +98,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	public String getProperty(String key) {
 		String compositeKey = radix + key;
 		String value = masked.getProperty( compositeKey );
-		if ( value != null) {
+		if ( value != null ) {
 			log.tracef( "found a match for key: [%s] value: %s", compositeKey, value );
 			return value;
 		}
@@ -167,7 +167,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	private synchronized void initPropertyNames() {
-		if ( propertyNames != null) {
+		if ( propertyNames != null ) {
 			return;
 		}
 		Set<Object> maskedProperties = new TreeSet<Object>();

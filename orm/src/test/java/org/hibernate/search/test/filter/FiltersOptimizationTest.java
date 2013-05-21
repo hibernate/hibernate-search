@@ -163,7 +163,7 @@ public class FiltersOptimizationTest {
 	 */
 	private OpenBitSet makeOpenBitSetTestSet(int... enabledBits) {
 		OpenBitSet set = new OpenBitSet();
-		for (int position : enabledBits ) {
+		for ( int position : enabledBits ) {
 			// a minimal check for input duplicates:
 			assertFalse( set.get( position ) );
 			set.set( position );
@@ -180,7 +180,7 @@ public class FiltersOptimizationTest {
 	 */
 	private DocIdBitSet makeBitSetTestSet(int... enabledBits) {
 		BitSet set = new BitSet();
-		for (int position : enabledBits ) {
+		for ( int position : enabledBits ) {
 			// a minimal check for input duplicates:
 			assertFalse( set.get( position ) );
 			set.set( position );

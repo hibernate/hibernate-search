@@ -64,11 +64,11 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 
 	public Query createQuery() {
 		Query finalQuery = wrappedQuery;
-		if (wrappedQuery == null) {
+		if ( wrappedQuery == null ) {
 			throw new AssertionFailure( "wrapped query not set" );
 		}
 		finalQuery.setBoost( boost * finalQuery.getBoost() );
-		if (filter != null) {
+		if ( filter != null ) {
 			finalQuery = new FilteredQuery(finalQuery, filter);
 		}
 		if ( constantScore ) {

@@ -54,7 +54,7 @@ public class ExcludeAllFilter extends Filter implements Serializable {
 
 	public static void verifyItsAReadOnlySegmentReader(IndexReader reader) {
 		String implementationName = reader.getClass().getName();
-		if (! "org.apache.lucene.index.ReadOnlySegmentReader".equals( implementationName ) ) {
+		if ( ! "org.apache.lucene.index.ReadOnlySegmentReader".equals( implementationName ) ) {
 			throw new SearchException( "test failed: we should receive subreaders" );
 		}
 	}

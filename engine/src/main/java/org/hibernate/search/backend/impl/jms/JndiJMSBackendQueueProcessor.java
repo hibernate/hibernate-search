@@ -80,7 +80,7 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 				return factory.createQueueConnection( login, password );
 			}
 		}
-		catch (JMSException e) {
+		catch ( JMSException e ) {
 			throw log.unableToOpenJMSConnection( getIndexName(), getJmsQueueName(), e );
 		}
 	}
