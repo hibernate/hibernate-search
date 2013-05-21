@@ -189,7 +189,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 		this.currentReaderGen = openingGen;
 		try {
 			if ( oldReader != null ) {
-				oldReader.close();
+				oldReader.decRef();
 			}
 		}
 		catch ( IOException e ) {
