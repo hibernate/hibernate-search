@@ -78,9 +78,6 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 
 	public void tearDown() throws Exception {
 		super.tearDown();
-		if ( getSessions() != null ) {
-			getSessions().close();
-		}
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
 		setCfg( null );  //we need a fresh session factory each time for index set up
