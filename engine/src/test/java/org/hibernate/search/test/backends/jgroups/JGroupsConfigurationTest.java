@@ -89,7 +89,7 @@ public class JGroupsConfigurationTest {
 		try {
 			buildSearchFactory = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 		}
-		catch (SearchException se) {
+		catch ( SearchException se ) {
 			//we know we're getting a generic failure, but we want to make assert on the details message of
 			// the cause:
 			throw se.getCause();

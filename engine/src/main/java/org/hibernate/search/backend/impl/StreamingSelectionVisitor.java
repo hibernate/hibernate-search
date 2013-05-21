@@ -103,7 +103,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 					work.getId(),
 					work.getIdInString()
 			);
-			for (IndexManager indexManager : indexManagers) {
+			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}
 		}
@@ -115,7 +115,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
-			for (IndexManager indexManager : indexManagers) {
+			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}
 		}
@@ -131,7 +131,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 					work.getId(),
 					work.getIdInString()
 			);
-			for (IndexManager indexManager : indexManagers) {
+			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}
 		}

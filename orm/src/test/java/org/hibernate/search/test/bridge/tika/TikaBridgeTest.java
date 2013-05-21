@@ -189,7 +189,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		try {
 			queryBuilder.keyword().onField( "mp3FileName" ).ignoreFieldBridge().matching( "Emmanuel" ).createQuery();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			exceptionCaught = true;
 			Assert.assertTrue( e instanceof SearchException );
 			Assert.assertTrue( e.getMessage().contains( "The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" ) );

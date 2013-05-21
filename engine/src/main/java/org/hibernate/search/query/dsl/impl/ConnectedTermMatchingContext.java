@@ -57,7 +57,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 		this.queryCustomizer = queryCustomizer;
 		this.termContext = termContext;
 		this.fieldContexts = new ArrayList<FieldContext>(fields.length);
-		for (String field : fields) {
+		for ( String field : fields ) {
 			this.fieldContexts.add( new FieldContext( field ) );
 		}
 	}

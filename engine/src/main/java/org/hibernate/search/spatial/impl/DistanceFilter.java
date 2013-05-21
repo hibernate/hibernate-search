@@ -152,7 +152,7 @@ public final class DistanceFilter extends Filter {
 		sb.append( "{previousFilter=" ).append( previousFilter );
 		sb.append( ", center=" ).append( center );
 		sb.append( ", radius=" ).append( radius );
-		if ( coordinatesField != null) {
+		if ( coordinatesField != null ) {
 			sb.append( ", coordinatesField='" ).append( coordinatesField ).append( '\'' );
 		}
 		else {

@@ -292,7 +292,7 @@ public class AvroSerializer implements Serializer {
 			GenericRecord record = new GenericData.Record( protocol.getType( "TokenTrackingAttribute" ) );
 			int[] positions = ( (AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) attr ).getPositions();
 			List<Integer> fullPositions = new ArrayList<Integer>( positions.length );
-			for (int position : positions) {
+			for ( int position : positions ) {
 				fullPositions.add( position );
 			}
 			record.put( "positions", fullPositions );

@@ -104,7 +104,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 					work.getId(),
 					work.getIdInString()
 			);
-			for (IndexManager indexManager : indexManagers) {
+			for ( IndexManager indexManager : indexManagers ) {
 				context.getIndexManagerQueue( indexManager ).add( work );
 			}
 		}
@@ -121,7 +121,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
 				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
-			for (IndexManager indexManager : indexManagers) {
+			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, null, false );
 			}
 		}
@@ -134,7 +134,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
 				WorkQueuePerIndexSplitter context) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
-			for (IndexManager indexManager : indexManagers) {
+			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, null, false );
 			}
 		}
@@ -151,7 +151,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 					work.getId(),
 					work.getIdInString()
 			);
-			for (IndexManager indexManager : indexManagers) {
+			for ( IndexManager indexManager : indexManagers ) {
 				context.getIndexManagerQueue( indexManager ).add( work );
 			}
 		}

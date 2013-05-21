@@ -41,7 +41,7 @@ public class InstanceTransactionContext implements TransactionContext {
 	private final List<Synchronization> synchronizations = new ArrayList<Synchronization>(5);
 
 	public void beginTransaction() {
-		if (transactionState != State.NO_TRANSACTION) {
+		if ( transactionState != State.NO_TRANSACTION ) {
 			throw new IllegalStateException( "Transaction context already started: " + transactionState);
 		}
 		transactionState = State.IN_TRANSACTION;
@@ -52,10 +52,10 @@ public class InstanceTransactionContext implements TransactionContext {
 			throw new IllegalStateException( "Transaction context not in active state: " + transactionState);
 		}
 		try {
-			for (Synchronization sync : synchronizations) {
+			for ( Synchronization sync : synchronizations ) {
 				sync.beforeCompletion();
 			}
-			for (Synchronization sync : synchronizations) {
+			for ( Synchronization sync : synchronizations ) {
 				sync.afterCompletion( Status.STATUS_COMMITTED );
 			}
 		}
@@ -70,10 +70,10 @@ public class InstanceTransactionContext implements TransactionContext {
 			throw new IllegalStateException( "Transaction context not in active state: " + transactionState);
 		}
 		try {
-			for (Synchronization sync : synchronizations) {
+			for ( Synchronization sync : synchronizations ) {
 				sync.beforeCompletion();
 			}
-			for (Synchronization sync : synchronizations) {
+			for ( Synchronization sync : synchronizations ) {
 				sync.afterCompletion( Status.STATUS_ROLLEDBACK );
 			}
 		}

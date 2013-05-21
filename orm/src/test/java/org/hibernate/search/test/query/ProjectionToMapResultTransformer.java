@@ -36,7 +36,7 @@ public class ProjectionToMapResultTransformer implements ResultTransformer {
 
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		Map result = new HashMap( tuple.length );
-		for (int i = 0; i < tuple.length; i++) {
+		for ( int i = 0; i < tuple.length; i++ ) {
 			String key = aliases[i];
 			if ( key != null ) {
 				result.put( key, tuple[i] );

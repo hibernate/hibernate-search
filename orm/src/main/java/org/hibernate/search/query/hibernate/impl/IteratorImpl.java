@@ -75,7 +75,7 @@ public class IteratorImpl implements Iterator<Object> {
 
 	public Object next() {
 		//hasNext() has side effect
-		if (!hasNext()) {
+		if ( !hasNext() ) {
 			throw new NoSuchElementException( "Out of boundaries" );
 		}
 		index++;

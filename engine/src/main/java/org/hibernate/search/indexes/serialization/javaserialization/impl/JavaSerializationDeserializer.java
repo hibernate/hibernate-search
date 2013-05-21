@@ -199,8 +199,8 @@ public class JavaSerializationDeserializer implements Deserializer {
 				else if ( field instanceof SerializableTokenStreamField ) {
 					SerializableTokenStreamField reallySafeField = (SerializableTokenStreamField) field;
 					List<List<AttributeImpl>> tokens = reallySafeField.getValue().getStream();
-					for (List<AttributeImpl> token : tokens) {
-						for (AttributeImpl attribute : token) {
+					for ( List<AttributeImpl> token : tokens ) {
+						for ( AttributeImpl attribute : token ) {
 							hydrator.addAttributeInstance( attribute );
 						}
 						hydrator.addToken();

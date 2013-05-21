@@ -82,7 +82,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 						(ReflectionManager) cfg.getClass().getMethod( "getReflectionManager" ).invoke( cfg );
 
 			}
-			catch (Exception e) {
+			catch ( Exception e ) {
 				reflectionManager = new JavaReflectionManager();
 			}
 		}
@@ -107,7 +107,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 		public boolean hasNext() {
 			//we need to read the next non null one. getMappedClass() can return null and should be ignored
-			if ( future != null) {
+			if ( future != null ) {
 				return true;
 			}
 			do {

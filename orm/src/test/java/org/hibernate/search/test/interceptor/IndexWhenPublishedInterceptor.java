@@ -31,7 +31,7 @@ import org.hibernate.search.indexes.interceptor.IndexingOverride;
 public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor<Blog> {
 	@Override
 	public IndexingOverride onAdd(Blog entity) {
-		if (entity.getStatus() == BlogStatus.PUBLISHED) {
+		if ( entity.getStatus() == BlogStatus.PUBLISHED ) {
 			return IndexingOverride.APPLY_DEFAULT;
 		}
 		return IndexingOverride.SKIP;
@@ -39,7 +39,7 @@ public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor<
 
 	@Override
 	public IndexingOverride onUpdate(Blog entity) {
-		if (entity.getStatus() == BlogStatus.PUBLISHED) {
+		if ( entity.getStatus() == BlogStatus.PUBLISHED ) {
 			return IndexingOverride.UPDATE;
 		}
 		return IndexingOverride.REMOVE;

@@ -74,7 +74,7 @@ public class SolrModuleMemberRegistrationIT {
 	}
 
 	private static Asset manifest() {
-		String manifest =  Descriptors.create( ManifestDescriptor.class )
+		String manifest = Descriptors.create( ManifestDescriptor.class )
 				.attribute( "Dependencies", "org.hibernate.search.orm services, org.apache.solr:3.6.2" )
 				.exportAsString();
 		return new StringAsset( manifest );

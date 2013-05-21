@@ -83,7 +83,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			safeEntityTypes.addAll( entityTypes );
 		}
 		entityMatadata = new ArrayList<RootEntityMetadata>( safeEntityTypes.size() );
-		for (Class clazz :  safeEntityTypes) {
+		for ( Class clazz :  safeEntityTypes ) {
 			entityMatadata.add( new RootEntityMetadata( clazz, searchFactoryImplementor ) );
 		}
 	}
@@ -112,10 +112,10 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		//split EntityInfo per root entity
 		Map<RootEntityMetadata, List<EntityInfo>> entityinfoBuckets =
 				new HashMap<RootEntityMetadata, List<EntityInfo>>( entityMatadata.size());
-		for (EntityInfo entityInfo : entityInfos) {
+		for ( EntityInfo entityInfo : entityInfos ) {
 			boolean found = false;
 			final Class<?> clazz = entityInfo.getClazz();
-			for (RootEntityMetadata rootEntityInfo : entityMatadata) {
+			for ( RootEntityMetadata rootEntityInfo : entityMatadata ) {
 				if ( rootEntityInfo.rootEntity == clazz || rootEntityInfo.mappedSubclasses.contains( clazz ) ) {
 					List<EntityInfo> bucket = entityinfoBuckets.get( rootEntityInfo );
 					if ( bucket == null ) {
@@ -127,7 +127,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 					break; //we stop looping for the right bucket
 				}
 			}
-			if (!found) {
+			if ( !found ) {
 				throw new AssertionFailure( "Could not find root entity for " + clazz );
 			}
 		}
@@ -159,7 +159,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor) {
 			this.rootEntity = rootEntity;
 			EntityIndexBinder provider = searchFactoryImplementor.getIndexBindingForEntity( rootEntity );
-			if ( provider == null) {
+			if ( provider == null ) {
 				throw new AssertionFailure("Provider not found for class: " + rootEntity);
 			}
 			this.mappedSubclasses = provider.getDocumentBuilder().getMappedSubclasses();

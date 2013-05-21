@@ -158,7 +158,7 @@ public final class DirectoryProviderHelper {
 				iw.close();
 			}
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			throw new SearchException( "Could not initialize index", e );
 		}
 		finally {

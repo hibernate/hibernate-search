@@ -124,7 +124,7 @@ public class Executors {
 			try {
 				e.getQueue().put( r );
 			}
-			catch (InterruptedException e1) {
+			catch ( InterruptedException e1 ) {
 				log.interruptedWorkError( r );
 				Thread.currentThread().interrupt();
 			}

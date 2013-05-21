@@ -98,7 +98,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 6, results4.size() );
 
 		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for (Object entity : pois) {
+		for ( Object entity : pois ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -200,7 +200,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results = hibQuery.list();
 
 		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for (Object entity : pois) {
+		for ( Object entity : pois ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -245,7 +245,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		List results = hibQuery.list();
 
 		List<?> pois = fullTextSession.createQuery( "from " + NonGeoPOI.class.getName() ).list();
-		for (Object entity : pois) {
+		for ( Object entity : pois ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -286,7 +286,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + Event.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -324,7 +324,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + User.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -362,7 +362,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + UserRange.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -397,7 +397,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + UserEx.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -438,7 +438,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + RangeEvent.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -476,7 +476,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + Hotel.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -536,7 +536,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 3, results4.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + RangeHotel.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -574,7 +574,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + Restaurant.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -612,7 +612,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + GetterUser.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();

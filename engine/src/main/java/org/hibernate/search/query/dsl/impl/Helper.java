@@ -56,7 +56,7 @@ class Helper {
 			final List<String> termsFromText = getAllTermsFromText(
 					fieldName, value.toString(), queryAnalyzer
 			);
-			if (termsFromText.size() > 1) {
+			if ( termsFromText.size() > 1 ) {
 				StringBuilder error = new StringBuilder( "The ")
 						.append( name )
 						.append( " parameter leads to several terms when analyzed: " );

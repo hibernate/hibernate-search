@@ -120,7 +120,7 @@ public class PurgeTest extends SearchTestCase {
 		results = hibQuery.list();
 		assertEquals( "incorrect class purged", 2, results.size() );
 
-		for (Object element : s.createQuery( "from java.lang.Object" ).list()) {
+		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
 			s.delete( element );
 		}
 		tx.commit();

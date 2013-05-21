@@ -115,7 +115,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		int windowStart = Math.max( first, current - fetchSize + 1 );
 		List<EntityInfo> entityInfosToLoad = new ArrayList<EntityInfo>( fetchSize );
 		int sizeToLoad = 0;
-		for (int x = windowStart; x < windowStop; x++) {
+		for ( int x = windowStart; x < windowStop; x++ ) {
 			int arrayIdx = x - first;
 			LoadedObject lo = resultsContext[arrayIdx];
 			if ( lo == null ) {
@@ -219,7 +219,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		try {
 			documentExtractor.close();
 		}
-		catch (SearchException e) {
+		catch ( SearchException e ) {
 			log.unableToCloseSearcherInScrollableResult( e );
 		}
 	}
@@ -462,7 +462,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 				try {
 					entityInfo = documentExtractor.extract( x );
 				}
-				catch (IOException e) {
+				catch ( IOException e ) {
 					throw new SearchException( "Unable to read Lucene topDocs[" + x + "]", e );
 				}
 				einfo = new SoftReference<EntityInfo>( entityInfo );

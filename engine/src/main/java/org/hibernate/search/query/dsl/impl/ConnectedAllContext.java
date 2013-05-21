@@ -55,7 +55,7 @@ public class ConnectedAllContext implements AllContext {
 		}
 		else {
 			BooleanQuery booleanQuery = new BooleanQuery( );
-			for (BooleanClause clause : clauses) {
+			for ( BooleanClause clause : clauses ) {
 				booleanQuery.add( clause );
 			}
 			query = booleanQuery;
@@ -64,7 +64,7 @@ public class ConnectedAllContext implements AllContext {
 	}
 
 	public AllContext except(Query... queriesMatchingExcludedDocuments) {
-		for (Query query : queriesMatchingExcludedDocuments) {
+		for ( Query query : queriesMatchingExcludedDocuments ) {
 			clauses.add( new BooleanClause( query, BooleanClause.Occur.MUST_NOT ) );
 		}
 		return this;

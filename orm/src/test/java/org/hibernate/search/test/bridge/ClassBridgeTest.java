@@ -176,7 +176,7 @@ public class ClassBridgeTest extends SearchTestCase {
 
 		assertTrue( "incorrect result count returned", projections.isLast() );
 		//cleanup
-		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) {
+		for ( Object element : s.createQuery( "from " + Departments.class.getName() ).list() ) {
 			s.delete( element );
 		}
 		tx.commit();
@@ -242,7 +242,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertEquals( "incorrect entity returned", "Kent Lewin", ( (Department) result.get( 0 ) ).getBranchHead() );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Department.class.getName() ).list()) {
+		for ( Object element : s.createQuery( "from " + Department.class.getName() ).list() ) {
 			s.delete( element );
 		}
 		tx.commit();
