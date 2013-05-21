@@ -35,12 +35,11 @@ import java.sql.SQLException;
 import junit.framework.TestCase;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.store.Directory;
-import org.junit.After;
-import org.junit.Before;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
@@ -61,6 +60,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.testing.FailureExpected;
 import org.hibernate.testing.SkipForDialect;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  * Base class for Hibernate Search unit tests.
@@ -228,7 +229,7 @@ public abstract class SearchTestCase extends TestCase {
 		// the constructor File(File, String) is broken too, see :
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5066567
 		// So make sure to use File(String, String) in this case as TestConstants works with absolute paths!
-		File indexPath = new File( TestConstants.getIndexDirectory( SearchTestCase.class ), shortTestName );
+		File indexPath = new File( TestConstants.getIndexDirectory( this.getClass() ), shortTestName );
 		return indexPath;
 	}
 
@@ -263,7 +264,7 @@ public abstract class SearchTestCase extends TestCase {
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
-			throw new RuntimeException(  e );
+			throw new RuntimeException( e );
 		}
 	}
 
@@ -424,7 +425,7 @@ public abstract class SearchTestCase extends TestCase {
 		}
 	}
 
-		public String fullTestName() {
+	public String fullTestName() {
 		return this.getClass().getName() + "#" + this.getName();
 	}
 
