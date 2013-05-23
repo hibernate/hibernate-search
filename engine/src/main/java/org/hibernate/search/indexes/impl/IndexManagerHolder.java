@@ -124,10 +124,13 @@ public class IndexManagerHolder {
 						directoryProviderName + "." + index :
 						directoryProviderName;
 				Properties indexProp = indexProps[index];
-				IndexManager indexManager = doGetAndEnlistIndexManagerOrNull( providerName, mappedClass );
+				IndexManager indexManager = indexManagersRegistry.get( providerName );
 				if ( indexManager == null ) {
 					indexManager = doGetOrCreateIndexManager( providerName, mappedClass, similarityInstance,
 							indexProp, cfg.getIndexManagerFactory(), context );
+				}
+				else {
+					indexManager.addContainedEntity( mappedClass );
 				}
 				providers[index] = indexManager;
 			}
@@ -210,8 +213,8 @@ public class IndexManagerHolder {
 	}
 
 	/**
-	 * Clients of this method should primarily use doGetAndEnlistIndexManagerOrNull and only proceed
-	 * if it returns null. This will decrease the contention on the lock.
+	 * Clients of this method should first optimistically check the indexManagersRegistry, which might already contain the needed IndexManager,
+	 * to avoid contention on this synchronized method during dynamic reconfiguration at runtime.
 	 */
 	private synchronized IndexManager doGetOrCreateIndexManager(String providerName, Class<?> mappedClass, Similarity similarityInstance, Properties indexProp, IndexManagerFactory indexManagerFactory, WorkerBuildContext context) {
 		IndexManager indexManager = indexManagersRegistry.get( providerName );
@@ -223,17 +226,6 @@ public class IndexManagerHolder {
 			}
 		}
 		indexManager.addContainedEntity( mappedClass );
-		return indexManager;
-	}
-
-	/**
-	 * If this method returns null, use doGetOrCreateIndexManager.
-	 */
-	private synchronized IndexManager doGetAndEnlistIndexManagerOrNull(String providerName, Class<?> mappedClass) {
-		IndexManager indexManager = indexManagersRegistry.get( providerName );
-		if ( indexManager != null ) {
-			indexManager.addContainedEntity( mappedClass );
-		}
 		return indexManager;
 	}
 
