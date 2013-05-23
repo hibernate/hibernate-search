@@ -238,8 +238,9 @@ public class IndexManagerHolder {
 	}
 
 	public IndexManager getOrCreateLateIndexManager(String providerName, DynamicShardingEntityIndexBinding entityIndexBinder) {
-		IndexManager indexManager = doGetAndEnlistIndexManagerOrNull( providerName, entityIndexBinder.getDocumentBuilder().getBeanClass() );
+		IndexManager indexManager = indexManagersRegistry.get( providerName );
 		if ( indexManager != null ) {
+			indexManager.addContainedEntity( entityIndexBinder.getDocumentBuilder().getBeanClass() );
 			return indexManager;
 		}
 		SearchFactoryImplementor searchFactory = entityIndexBinder.getSearchFactory();

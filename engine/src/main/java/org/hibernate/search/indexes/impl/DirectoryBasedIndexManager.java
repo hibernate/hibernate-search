@@ -156,8 +156,9 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void addContainedEntity(Class<?> entity) {
-		containedEntityTypes.add( entity );
-		triggerWorkspaceReconfiguration();
+		if ( containedEntityTypes.add( entity ) ) {
+			triggerWorkspaceReconfiguration();
+		}
 	}
 
 	@Override
