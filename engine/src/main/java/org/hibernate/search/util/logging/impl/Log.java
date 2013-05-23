@@ -699,4 +699,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 175, value = "Exception reported from remote JGroups node '%1$s' : '%2$s'")
 	SearchException jgroupsRemoteException(Address sender, Throwable exception, @Cause Throwable cause);
 
+	@Message(id = 176, value = "Document could not be parsed")
+	SearchException unableToParseDocument(@Cause Throwable cause);
+
 }

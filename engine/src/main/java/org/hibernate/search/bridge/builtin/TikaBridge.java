@@ -26,7 +26,7 @@ package org.hibernate.search.bridge.builtin;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
@@ -48,7 +48,6 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static com.google.common.base.Throwables.propagate;
 import static org.apache.tika.io.IOUtils.closeQuietly;
 
 /**
@@ -98,10 +97,8 @@ public class TikaBridge implements FieldBridge {
 		if ( value == null ) {
 			throw new IllegalArgumentException( "null cannot be passed to Tika bridge" );
 		}
-		InputStream in = null;
+		InputStream in = getInputStreamForData( value );
 		try {
-			in = getInputStreamForData( value );
-
 			Metadata metadata = metadataProcessor.prepareMetadata();
 			ParseContext parseContext = parseContextProvider.getParseContext( name, value );
 
@@ -116,14 +113,14 @@ public class TikaBridge implements FieldBridge {
 			metadataProcessor.set( name, value, document, luceneOptions, metadata );
 		}
 		catch ( Exception e ) {
-			throw propagate( e );
+			throw log.unableToParseDocument( e );
 		}
 		finally {
 			closeQuietly( in );
 		}
 	}
 
-	private InputStream getInputStreamForData(Object object) throws Exception {
+	private InputStream getInputStreamForData(Object object) {
 		InputStream in;
 		if ( object instanceof Blob ) {
 			try {
@@ -153,7 +150,7 @@ public class TikaBridge implements FieldBridge {
 		return in;
 	}
 
-	private FileInputStream openInputStream(File file) throws IOException {
+	private FileInputStream openInputStream(File file) {
 		if ( file.exists() ) {
 			if ( file.isDirectory() ) {
 				throw log.fileIsADirectory( file.toString() );
@@ -165,7 +162,12 @@ public class TikaBridge implements FieldBridge {
 		else {
 			throw log.fileDoesNotExist( file.toString() );
 		}
-		return new FileInputStream( file );
+		try {
+			return new FileInputStream( file );
+		}
+		catch ( FileNotFoundException e ) {
+			throw log.fileDoesNotExist( file.toString() );
+		}
 	}
 
 	private static class NoopTikaMetadataProcessor implements TikaMetadataProcessor {
