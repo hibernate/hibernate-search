@@ -52,7 +52,11 @@ public class MemberRegistration {
 	}
 
 	public void register() throws Exception {
-		em.persist( newMember );
+		register( newMember );
+	}
+
+	public void register(Member member) throws Exception {
+		em.persist( member );
 		initNewMember();
 	}
 
