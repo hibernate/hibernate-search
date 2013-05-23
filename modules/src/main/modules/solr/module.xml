@@ -27,13 +27,14 @@
         <resource-root path="solr-analysis-extras-${luceneVersion}.jar" />
         <resource-root path="solr-core-${luceneVersion}.jar" />
         <resource-root path="solr-solrj-${luceneVersion}.jar" />
-        <resource-root path="guava-${guavaVersion}.jar" />
         <resource-root path="commons-io-${commonsIoVersion}.jar" />
         <resource-root path="commons-codec-${commonsCodecVersion}.jar" />
         <resource-root path="commons-lang-${commonsLangVersion}.jar" />
     </resources>
     <dependencies>
-        <module name="org.apache.lucene" />
+        <module name="org.apache.lucene" slot="${luceneVersion}" />
+        <module name="org.slf4j" />
         <module name="org.jboss.logging" />
+        <module name="javax.api" />
     </dependencies>
 </module>
