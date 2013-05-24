@@ -115,7 +115,6 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.apache.solr:*</include>
-                <include>com.google.guava:guava</include>
             </includes>
             <excludes>
                 <exclude>org.apache.lucene:*</exclude>

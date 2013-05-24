@@ -160,7 +160,6 @@
         <!-- Used in the hibernate-search-modules project -->
         <paranamerVersion>2.3</paranamerVersion>
         <snappyVersion>1.0.4.1</snappyVersion>
-        <guavaVersion>r05</guavaVersion>
     </properties>
 
     <dependencyManagement>
@@ -477,6 +476,10 @@
                 <artifactId>solr-analysis-extras</artifactId>
                 <version>${luceneVersion}</version>
                 <exclusions>
+                    <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                    </exclusion>
                     <exclusion>
                         <groupId>org.apache.solr</groupId>
                         <artifactId>solr-noggit</artifactId>
