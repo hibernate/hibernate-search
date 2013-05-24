@@ -1,6 +1,37 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.3.0.Beta1 (24-05-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1314] - Allow @Latitude and @Longitude annotations on methods (getters) too
+    * [HSEARCH-1319] - AS7 kit does not include JMS dependency
+    * [HSEARCH-1320] - SharedIndexWorkspaceImpl holding index lock indefinitely
+    * [HSEARCH-1323] - A full build creates indextemp and simpleJndi test directory which don't get cleaned up
+    * [HSEARCH-1330] - Performance tests create a test directory outside the target directory
+    * [HSEARCH-1332] - The Solr JBoss Module should include the specific version of Lucene it requires
+
+** Improvement
+    * [HSEARCH-1311] - Create a dedicated distribution module
+    * [HSEARCH-1315] - Spatial API polishing
+    * [HSEARCH-1317] - NRT backend flush operation could work in parallel with Readers refresh
+    * [HSEARCH-1334] - Remove dependency to Guava
+    * [HSEARCH-1336] - Upgrade to Hibernate ORM 4.2.2.Final
+
+** Task
+    * [HSEARCH-735] - Create a test for HSEARCH-734
+    * [HSEARCH-1259] - Remove archetype module
+    * [HSEARCH-1292] - Add more rules to checkstyle
+    * [HSEARCH-1308] - Upgrade from JBoss Transactions 4.16.4 to Narayana 4.17.4
+    * [HSEARCH-1309] - Split integration tests in isolated sub modules
+    * [HSEARCH-1310] - Drop the hibernate-search prefix from the module directories
+    * [HSEARCH-1322] - Upgrade to Hibernate Commons Annotations 4.0.2.Final
+    * [HSEARCH-1325] - Control line endings with an appropriate .gitattributes file
+    * [HSEARCH-1329] - The two variants of ReaderPerformanceTestCase are failing
+    * [HSEARCH-1335] - The hibernate-search-modules project should be built before the integration test one
+
+
 Version 4.3.0.Alpha1 (19-04-2013)
 ------------------------
 
