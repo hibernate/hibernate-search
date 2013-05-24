@@ -69,16 +69,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- The only purpose of this dependency is to explain maven that
-        the module project must be built before the integration tests one -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-modules</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-
         <!-- JBoss TS -->
         <dependency>
             <groupId>org.jboss.jbossts.jta</groupId>
