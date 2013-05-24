@@ -121,10 +121,9 @@ public class TikaBridge implements FieldBridge {
 	}
 
 	private InputStream getInputStreamForData(Object object) {
-		InputStream in;
 		if ( object instanceof Blob ) {
 			try {
-				in = ( (Blob) object ).getBinaryStream();
+				return ( (Blob) object ).getBinaryStream();
 			}
 			catch ( SQLException e ) {
 				throw log.unableToGetInputStreamFromBlob( e );
@@ -132,22 +131,21 @@ public class TikaBridge implements FieldBridge {
 		}
 		else if ( object instanceof byte[] ) {
 			byte[] data = (byte[]) object;
-			in = new ByteArrayInputStream( data );
+			return new ByteArrayInputStream( data );
 		}
 		else if ( object instanceof String ) {
 			String path = (String) object;
 			File file = new File( path );
-			in = openInputStream( file );
+			return openInputStream( file );
 		}
 		else if ( object instanceof URI ) {
 			URI uri = (URI) object;
 			File file = new File( uri );
-			in = openInputStream( file );
+			return openInputStream( file );
 		}
 		else {
 			throw log.unsupportedTikaBridgeType();
 		}
-		return in;
 	}
 
 	private FileInputStream openInputStream(File file) {
