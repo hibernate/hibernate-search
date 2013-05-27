@@ -104,7 +104,7 @@ class Helper {
 		final Class<?> type = queryContext.getEntityType();
 		EntityIndexBinder indexBinding = factory.getIndexBindingForEntity( type );
 		if ( indexBinding == null ) {
-			throw new AssertionFailure( "Class in not indexed: " + type );
+			throw new AssertionFailure( "Class is not indexed: " + type );
 		}
 		return indexBinding.getDocumentBuilder();
 	}
