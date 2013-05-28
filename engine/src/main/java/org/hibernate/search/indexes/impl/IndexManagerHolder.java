@@ -51,12 +51,12 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Stores references to IndexManager instances, and starts/stops them.
- * Starting IndexManagers happens by creating new EntityIndexBinder instances, while creating the binders
- * if we hit the need for a new IndexManager, or several according to a sharding strategy, the new
- * IndexManagers are started incrementally.
- * Stopping IndexManager can not currently happen decrementally: to stop the IndexManagers all of them
- * are stopped.
+ * Stores references to {@code IndexManager} instances, and starts or stops them.
+ *
+ * Starting {@code IndexManager}s happens by creating new {@code EntityIndexBinder} instances. {@code IndexManager}s are
+ * started successively as they are needed (for example based on the sharding strategy).
+ *
+ * Stopping {@code IndexManager}s can currently only happen all at once.
  *
  * @author Emmanuel Bernard
  * @author Sylvain Vieujot

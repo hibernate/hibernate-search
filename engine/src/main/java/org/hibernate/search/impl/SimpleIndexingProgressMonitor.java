@@ -52,7 +52,7 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 	}
 
 	/**
-	 * Logs progress of indexing job every <code>logAfterNumberOfDocuments</code>
+	 * Logs progress of indexing job every {@code logAfterNumberOfDocuments}
 	 * documents written.
 	 *
 	 * @param logAfterNumberOfDocuments log each time the specified number of documents has been added

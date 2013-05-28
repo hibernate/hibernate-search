@@ -65,7 +65,7 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
 public class MutableSearchFactory implements SearchFactoryImplementorWithShareableState, SearchFactoryIntegrator {
 	//a reference to the same instance of this class is help by clients and various HSearch services
 	//when changing the SearchFactory internals, only the underlying delegate should be changed.
-	//the volatile ensure that the state is replicated upong underlying factory switch.
+	//the volatile ensure that the state is replicated upon underlying factory switch.
 	private volatile SearchFactoryImplementorWithShareableState delegate;
 
 	//lock to be acquired every time the underlying searchFactory is rebuilt
