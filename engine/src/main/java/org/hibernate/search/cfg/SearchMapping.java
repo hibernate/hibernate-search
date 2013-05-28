@@ -90,12 +90,12 @@ public class SearchMapping {
 	}
 
 	EntityDescriptor getEntity(Class<?> entityType) {
-		EntityDescriptor entity = entities.get( entityType );
-		if (entity == null) {
-			entity = new EntityDescriptor( entityType );
-			entities.put( entityType, entity );
+		EntityDescriptor entityDescriptor = entities.get( entityType );
+		if (entityDescriptor == null) {
+			entityDescriptor = new EntityDescriptor( );
+			entities.put( entityType, entityDescriptor );
 		}
-		return entity;
+		return entityDescriptor;
 	}
 
 	void addFulltextFilterDef(Map<String, Object> fullTextFilterDef) {

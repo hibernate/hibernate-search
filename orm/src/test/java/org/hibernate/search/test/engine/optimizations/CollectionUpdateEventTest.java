@@ -44,7 +44,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class CollectionUpdateEventTest {
 
 	/**
-	 * If the top level class has a classbridge or dynamicboost, then we can't safely
+	 * If the top level class has a class bridge or dynamic boost, then we can't safely
 	 * enable this optimization.
 	 */
 	@Test
@@ -70,7 +70,7 @@ public class CollectionUpdateEventTest {
 	}
 
 	/**
-	 * Test again with a no-enough-depth scenario, but having the classbridge
+	 * Test again with a no-enough-depth scenario, but having the class bridge
 	 * defined close to the collection (far from the root entity)
 	 */
 	@Test
@@ -78,8 +78,8 @@ public class CollectionUpdateEventTest {
 		testScenario( false, 1, true );
 	}
 
-	private void testScenario(boolean usingClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
-		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth, usingClassbridgeOnEmbedded );
+	private void testScenario(boolean usingClassBridge, int depth, boolean usingClassBridgeOnEmbedded) {
+		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth, usingClassBridgeOnEmbedded );
 		try {
 			initializeData( fulltextSessionBuilder );
 			FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
@@ -94,7 +94,7 @@ public class CollectionUpdateEventTest {
 					.as( "catalogItems should not be initialized" )
 					.isFalse();
 				updateCatalogsCollection( fullTextSession, catalog );
-				if ( ( usingClassBridge || usingClassbridgeOnEmbedded ) && depth > 1 ) {
+				if ( ( usingClassBridge || usingClassBridgeOnEmbedded ) && depth > 1 ) {
 					assertThat( catalogItems.wasInitialized() )
 						.as( "catalogItems should have been initialized" )
 						.isTrue();
@@ -147,10 +147,6 @@ public class CollectionUpdateEventTest {
 		return builder.build();
 	}
 
-	/**
-	 * Initialize the test data.
-	 * @param fulltextSessionBuilder
-	 */
 	private void initializeData(FullTextSessionBuilder fulltextSessionBuilder) {
 		FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
 			try {
