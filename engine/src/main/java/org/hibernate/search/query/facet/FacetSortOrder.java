@@ -47,6 +47,13 @@ public enum FacetSortOrder {
 
 	/**
 	 * The order in which ranges were defined. Only valid for range faceting
+	 * @deprecated use {@link #RANGE_DEFINITION_ORDER}
 	 */
-	RANGE_DEFINITION_ODER
+	@Deprecated
+	RANGE_DEFINITION_ODER,
+
+	/**
+	 * The order in which ranges were defined. Only valid for range faceting
+	 */
+	RANGE_DEFINITION_ORDER
 }

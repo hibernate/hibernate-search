@@ -133,7 +133,8 @@ public class FacetCollector extends Collector {
 		List<Facet> facetList;
 		// handle RANGE_DEFINITION_ODER differently from count based orders. we try to avoid the creation of
 		// Facet instances which we can only do for count based ordering
-		if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( request.getSort() ) ) {
+		if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( request.getSort() )
+				|| FacetSortOrder.RANGE_DEFINITION_ORDER.equals( request.getSort() ) ) {
 			facetList = createRangeFacetList( counter.getCounts().entrySet(), request, counter.getCounts().size() );
 			Collections.sort( facetList, new RangeDefinitionOrderFacetComparator( ) );
 			if ( facetRequest.getMaxNumberOfFacets() > 0 ) {
