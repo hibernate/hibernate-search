@@ -642,7 +642,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 158, value = "Class %1$s cannot have two @Spatial using default/same name")
 	SearchException cannotHaveTwoSpatialsWithDefaultOrSameName(String className);
 
-	@Message(id = 159, value = "Cannot find a Coordinates Interface nor Lat/Long annotations bound to %1$s @Spatial for class %2$s")
+	@Message(id = 159, value = "Cannot find a Coordinates interface nor @Latitude/@Longitude annotations bound to " +
+			"the @Spatial name '%1$s' for class %2$s. It might be a typo (or a lapse) in @Latitude.of / @Longitude.of " +
+			"attributes.")
 	SearchException cannotFindCoordinatesNorLatLongForSpatial(String spatialName, String className);
 
 	@Message(id = 160, value = "@Latitude definition for class '%1$s' is ambiguous: specified on both fields '%2$s' and '%3$s'")
