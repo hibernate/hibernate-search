@@ -43,7 +43,6 @@ public class ConnectedFacetRangeEndContext<T> extends ConnectedFacetParameterCon
 
 	public FacetRangeEndContext<T> excludeLimit() {
 		context.setIncludeRangeEnd( false );
-		context.makeRange();
 		return this;
 	}
 

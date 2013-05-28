@@ -156,6 +156,44 @@ public class RangeFacetingTest extends AbstractFacetTest {
 
 	}
 
+	public void testRangeWithExcludeLimitsAtEachLevel() {
+		final String facetingName = "cdPriceFaceting";
+		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( facetingName )
+				.onField( indexFieldName )
+				.range()
+				.below( 1000 ).excludeLimit()
+				.from( 1000 ).to( 1500 ).excludeLimit()
+				.from( 1500 ).to( 2000 ).excludeLimit()
+				.above( 2000 )
+				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ORDER )
+				.createFacetingRequest();
+		FullTextQuery query = createMatchAllQuery( Cd.class );
+		FacetManager facetManager = query.getFacetManager();
+		query.getFacetManager().enableFaceting( rangeRequest );
+
+		List<Facet> facets = query.getFacetManager().getFacets( facetingName );
+		assertFacetCounts( facets, new int[] { 2, 0, 6, 2 } );
+
+		rangeRequest = queryBuilder( Cd.class ).facet()
+				.name( facetingName )
+				.onField( indexFieldName )
+				.range()
+				.below( 1000 )
+				.from( 1000 ).excludeLimit().to( 1500 )
+				.from( 1500 ).excludeLimit().to( 2000 )
+				.above( 2000 ).excludeLimit()
+				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ORDER )
+				.createFacetingRequest();
+		query = createMatchAllQuery( Cd.class );
+		facetManager = query.getFacetManager();
+		query.getFacetManager().enableFaceting( rangeRequest );
+
+		facets = query.getFacetManager().getFacets( facetingName );
+		assertFacetCounts( facets, new int[] { 2, 3, 4, 1 } );
+
+	}
+
 	// HSEARCH-770
 	public void testRangeBelowWithFacetSelection() {
 		final String facetingName = "truckHorsePowerFaceting";
