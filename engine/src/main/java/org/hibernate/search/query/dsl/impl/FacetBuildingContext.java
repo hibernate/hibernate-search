@@ -158,9 +158,10 @@ class FacetBuildingContext<T> {
 			request = new RangeFacetRequest<T>( name, fieldName, rangeList, documentBuilder );
 		}
 		else {
-			if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( sort ) ) {
+			if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( sort )
+					|| FacetSortOrder.RANGE_DEFINITION_ORDER.equals( sort ) ) {
 				throw new SearchException(
-						"RANGE_DEFINITION_ODER is not a valid sort order for a discrete faceting request."
+						"RANGE_DEFINITION_ORDER is not a valid sort order for a discrete faceting request."
 				);
 			}
 			request = new DiscreteFacetRequest( name, fieldName );
