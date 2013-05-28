@@ -53,11 +53,6 @@ public class BytemanHelper extends Helper {
 		}
 	}
 
-	public void throwNPE(String message) {
-		//Needed because of Bug BYTEMAN-173: can't simply inject a NPE from the rule
-		throw new NullPointerException( message );
-	}
-
 	public void assertBooleanValue(boolean actual, boolean expected) {
 		if ( actual != expected ) {
 			fail( "Unexpected boolean value" );
