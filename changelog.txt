@@ -1,6 +1,13 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.3.0.CR1 (28-05-2013)
+------------------------
+
+** Improvement
+    * [HSEARCH-1337] - Make the message clearer and provide a hint when no matching @Latitude/@Longitude is found for a @Spatial index
+
+
 Version 4.3.0.Beta1 (24-05-2013)
 ------------------------
 
