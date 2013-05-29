@@ -23,9 +23,11 @@
  */
 package org.hibernate.search;
 
-import org.apache.lucene.analysis.Analyzer;
+import java.util.Set;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.indexes.IndexReaderAccessor;
+import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.stat.Statistics;
 
@@ -54,7 +56,9 @@ public interface SearchFactory {
 	 * Retrieve an analyzer instance by its definition name
 	 *
 	 * @param name the name of the analyzer
+	 *
 	 * @return analyzer with the specified name
+	 *
 	 * @throws org.hibernate.search.SearchException if the definition name is unknown
 	 */
 	Analyzer getAnalyzer(String name);
@@ -63,9 +67,11 @@ public interface SearchFactory {
 	 * Retrieves the scoped analyzer for a given class.
 	 *
 	 * @param clazz The class for which to retrieve the analyzer.
+	 *
 	 * @return The scoped analyzer for the specified class.
+	 *
 	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
-	 *                                  class is not an indexed entity.
+	 * class is not an indexed entity.
 	 */
 	Analyzer getAnalyzer(Class<?> clazz);
 
@@ -87,4 +93,23 @@ public interface SearchFactory {
 	 * @return the IndexReaderAccessor for this SearchFactory
 	 */
 	IndexReaderAccessor getIndexReaderAccessor();
+
+	/**
+	 * Returns a descriptor for the specified entity type describing its indexed state.
+	 *
+	 * @param entityType the entity for which to retrieve the descriptor
+	 *
+	 * @return a non {@code null} {@code IndexedEntityDescriptor}. This method can also be called for non indexed types.
+	 *         To determine whether the entity is actually indexed {@link org.hibernate.search.metadata.IndexedTypeDescriptor#isIndexed()} can be used.
+	 *
+	 * @throws IllegalArgumentException in case {@code entityType} is {@code null}
+	 */
+	IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType);
+
+	/**
+	 * Returns the set of currently indexed entities.
+	 *
+	 * @return the set of currently indexed entities. If no entities are indexed the empty set is returned.
+	 */
+	Set<Class<?>> getIndexedEntities();
 }

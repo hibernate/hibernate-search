@@ -44,6 +44,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
@@ -75,116 +76,143 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		this.delegate = delegate;
 	}
 
+	@Override
 	public Map<String, FilterDef> getFilterDefinitions() {
 		return delegate.getFilterDefinitions();
 	}
 
+	@Override
 	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
 		return delegate.getIndexBindingForEntity();
 	}
 
+	@Override
 	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
 		return delegate.getIndexBindingForEntity( entityType );
 	}
 
+	@Override
 	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {
 		return delegate.getDocumentBuilderContainedEntity( entityType );
 	}
 
+	@Override
 	public Worker getWorker() {
 		return delegate.getWorker();
 	}
 
+	@Override
 	public FilterCachingStrategy getFilterCachingStrategy() {
 		return delegate.getFilterCachingStrategy();
 	}
 
+	@Override
 	public Map<String, Analyzer> getAnalyzers() {
 		return delegate.getAnalyzers();
 	}
 
+	@Override
 	public int getCacheBitResultsSize() {
 		return delegate.getCacheBitResultsSize();
 	}
 
+	@Override
 	public Properties getConfigurationProperties() {
 		return delegate.getConfigurationProperties();
 	}
 
+	@Override
 	public FilterDef getFilterDefinition(String name) {
 		return delegate.getFilterDefinition( name );
 	}
 
+	@Override
 	public String getIndexingStrategy() {
 		return delegate.getIndexingStrategy();
 	}
 
+	@Override
 	public void close() {
 		delegate.close();
 	}
 
+	@Override
 	public HSQuery createHSQuery() {
 		return delegate.createHSQuery();
 	}
 
+	@Override
 	public int getFilterCacheBitResultsSize() {
 		return delegate.getFilterCacheBitResultsSize();
 	}
 
+	@Override
 	public Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes) {
 		return delegate.getIndexedTypesPolymorphic( classes );
 	}
 
+	@Override
 	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
 		return delegate.makeBatchBackend( progressMonitor );
 	}
 
+	@Override
 	public boolean isJMXEnabled() {
 		return delegate.isJMXEnabled();
 	}
 
+	@Override
 	public StatisticsImplementor getStatisticsImplementor() {
 		return delegate.getStatisticsImplementor();
 	}
 
+	@Override
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
 		return delegate.getIndexHierarchy();
 	}
 
+	@Override
 	public ServiceManager getServiceManager() {
 		return delegate.getServiceManager();
 	}
 
+	@Override
 	public void optimize() {
 		delegate.optimize();
 	}
 
+	@Override
 	public void optimize(Class entityType) {
 		delegate.optimize( entityType );
 	}
 
+	@Override
 	public Analyzer getAnalyzer(String name) {
 		return delegate.getAnalyzer( name );
 	}
 
+	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
 		return delegate.getAnalyzer( clazz );
 	}
 
+	@Override
 	public QueryContextBuilder buildQueryBuilder() {
 		return delegate.buildQueryBuilder();
 	}
 
+	@Override
 	public Statistics getStatistics() {
 		return delegate.getStatistics();
 	}
 
+	@Override
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
 		return delegate.getDocumentBuildersContainedEntities();
 	}
 
+	@Override
 	public void addClasses(Class<?>... classes) {
-		//todo optimize the list of
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder().currentFactory( this );
 		for ( Class<?> type : classes ) {
 			builder.addClass( type );
@@ -198,10 +226,12 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		}
 	}
 
+	@Override
 	public boolean isDirtyChecksEnabled() {
 		return delegate.isDirtyChecksEnabled();
 	}
 
+	@Override
 	public boolean isStopped() {
 		return delegate.isStopped();
 	}
@@ -229,6 +259,17 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public IndexReaderAccessor getIndexReaderAccessor() {
 		return delegate.getIndexReaderAccessor();
+	}
+
+	@Override
+	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType) {
+		return delegate.getIndexedTypeDescriptor( entityType );
+	}
+
+	@Override
+	public Set<Class<?>> getIndexedEntities() {
+		// TODO implement
+		return null;
 	}
 
 	@Override

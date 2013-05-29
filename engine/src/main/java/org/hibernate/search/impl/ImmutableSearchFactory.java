@@ -32,6 +32,7 @@ import org.apache.lucene.analysis.Analyzer;
 
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
+import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
@@ -158,14 +159,17 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		this.indexReaderAccessor = new DefaultIndexReaderAccessor( this );
 	}
 
+	@Override
 	public Map<String, FilterDef> getFilterDefinitions() {
 		return filterDefinitions;
 	}
 
+	@Override
 	public String getIndexingStrategy() {
 		return indexingStrategy;
 	}
 
+	@Override
 	public void close() {
 		if ( stopped.compareAndSet( false, true ) ) {  //make sure we only stop once
 			try {
@@ -197,31 +201,38 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		}
 	}
 
+	@Override
 	public HSQuery createHSQuery() {
 		return new HSQueryImpl( this );
 	}
 
+	@Override
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
 	}
 
+	@Override
 	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
 		return indexBindingForEntities;
 	}
 
+	@Override
 	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
 		return indexBindingForEntities.get( entityType );
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {
 		return (DocumentBuilderContainedEntity<T>) documentBuildersContainedEntities.get( entityType );
 	}
 
+	@Override
 	public void addClasses(Class<?>... classes) {
 		throw new AssertionFailure( "Cannot add classes to an " + ImmutableSearchFactory.class.getName() );
 	}
 
+	@Override
 	public Worker getWorker() {
 		return worker;
 	}
@@ -230,12 +241,14 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called" );
 	}
 
+	@Override
 	public void optimize() {
 		for ( IndexManager im : this.allIndexesManager.getIndexManagers() ) {
 			im.optimize();
 		}
 	}
 
+	@Override
 	public void optimize(Class entityType) {
 		EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( entityType );
 		for ( IndexManager im : entityIndexBinding.getIndexManagers() ) {
@@ -243,6 +256,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		}
 	}
 
+	@Override
 	public Analyzer getAnalyzer(String name) {
 		final Analyzer analyzer = analyzers.get( name );
 		if ( analyzer == null ) {
@@ -251,76 +265,94 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return analyzer;
 	}
 
+	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
 		EntityIndexBinder entityIndexBinding = getSafeIndexBindingForEntity( clazz );
 		DocumentBuilderIndexedEntity<?> builder = entityIndexBinding.getDocumentBuilder();
 		return builder.getAnalyzer();
 	}
 
+	@Override
 	public QueryContextBuilder buildQueryBuilder() {
 		return new ConnectedQueryContextBuilder( this );
 	}
 
+	@Override
 	public Statistics getStatistics() {
 		return statistics;
 	}
 
+	@Override
 	public StatisticsImplementor getStatisticsImplementor() {
 		return statistics;
 	}
 
+	@Override
 	public FilterCachingStrategy getFilterCachingStrategy() {
 		return filterCachingStrategy;
 	}
 
+	@Override
 	public Map<String, Analyzer> getAnalyzers() {
 		return analyzers;
 	}
 
+	@Override
 	public int getCacheBitResultsSize() {
 		return cacheBitResultsSize;
 	}
 
+	@Override
 	public Properties getConfigurationProperties() {
 		return configurationProperties;
 	}
 
+	@Override
 	public FilterDef getFilterDefinition(String name) {
 		return filterDefinitions.get( name );
 	}
 
+	@Override
 	public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
 		return serviceManager.requestService( provider, this );
 	}
 
+	@Override
 	public void releaseService(Class<? extends ServiceProvider<?>> provider) {
 		serviceManager.releaseService( provider );
 	}
 
+	@Override
 	public int getFilterCacheBitResultsSize() {
 		return cacheBitResultsSize;
 	}
 
+	@Override
 	public Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes) {
 		return indexHierarchy.getIndexedClasses( classes );
 	}
 
+	@Override
 	public BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor) {
 		return new DefaultBatchBackend( this, progressMonitor );
 	}
 
+	@Override
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
 		return indexHierarchy;
 	}
 
+	@Override
 	public ServiceManager getServiceManager() {
 		return serviceManager;
 	}
 
+	@Override
 	public SearchFactoryImplementor getUninitializedSearchFactory() {
 		return this;
 	}
 
+	@Override
 	public boolean isJMXEnabled() {
 		String enableJMX = getConfigurationProperties().getProperty( Environment.JMX_ENABLED );
 		return "true".equalsIgnoreCase( enableJMX );
@@ -342,10 +374,12 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return objectName;
 	}
 
+	@Override
 	public boolean isDirtyChecksEnabled() {
 		return enableDirtyChecks;
 	}
 
+	@Override
 	public boolean isStopped() {
 		return stopped.get();
 	}
@@ -384,6 +418,18 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public IndexReaderAccessor getIndexReaderAccessor() {
 		return indexReaderAccessor;
+	}
+
+	@Override
+	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType) {
+		// TODO implement
+		return null;
+	}
+
+	@Override
+	public Set<Class<?>> getIndexedEntities() {
+		// TODO implement
+		return null;
 	}
 
 	@Override
