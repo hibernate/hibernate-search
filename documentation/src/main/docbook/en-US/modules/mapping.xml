@@ -620,14 +620,14 @@ public class Owner {
           <para>Return places where name contains JBoss and where address city
           is Atlanta. In Lucene query this would be</para>
 
-          <programlisting>+name:jboss +address.city:atlanta  </programlisting>
+          <programlisting>+name:jboss +address.city:atlanta</programlisting>
         </listitem>
 
         <listitem>
           <para>Return places where name contains JBoss and where owner's name
           contain Joe. In Lucene query this would be</para>
 
-          <programlisting>+name:jboss +address.orderBy_name:joe  </programlisting>
+          <programlisting>+name:jboss +address.ownedBy_name:joe</programlisting>
         </listitem>
       </itemizedlist>
 
