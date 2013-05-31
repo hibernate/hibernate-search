@@ -45,7 +45,6 @@ import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
-import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
@@ -177,14 +176,14 @@ public class SpatialSearchSortByDistanceAndPaging extends SearchTestCase {
 
 		FullTextQuery hibQuery = fTxtSess.createFullTextQuery( luceneQuery, GeoEntity.class );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
-		hibQuery.setSpatialParameters( startLat, startLon, AbstractDocumentBuilder.COORDINATES_DEFAULT_FIELD );
+		hibQuery.setSpatialParameters( startLat, startLon, Spatial.COORDINATES_DEFAULT_FIELD );
 
 		if ( sortByDistance ) {
 			Sort distanceSort = new Sort(
 					new DistanceSortField(
 							startLat,
 							startLon,
-							AbstractDocumentBuilder.COORDINATES_DEFAULT_FIELD
+							Spatial.COORDINATES_DEFAULT_FIELD
 					)
 			);
 			hibQuery.setSort( distanceSort );
