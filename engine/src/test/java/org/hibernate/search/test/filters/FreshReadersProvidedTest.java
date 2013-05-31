@@ -68,7 +68,7 @@ public class FreshReadersProvidedTest {
 	@Test
 	public void filtersTest() {
 		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
-		Assert.assertNotNull( searchFactory.getAllIndexesManager().getIndexManager( "guests" ) );
+		Assert.assertNotNull( searchFactory.getIndexManagerHolder().getIndexManager( "guests" ) );
 
 		{ // Store guest "Thorin Oakenshield" in the index
 			Guest lastDwarf = new Guest();

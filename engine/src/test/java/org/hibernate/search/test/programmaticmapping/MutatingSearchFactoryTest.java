@@ -48,13 +48,13 @@ public class MutatingSearchFactoryTest {
 	public void mutationTest() {
 		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
 
-		Assert.assertNull( searchFactory.getAllIndexesManager().getIndexManager( "phoneNumbersIndex" ) );
+		Assert.assertNull( searchFactory.getIndexManagerHolder().getIndexManager( "phoneNumbersIndex" ) );
 		searchFactory.addClasses( TelephoneRecord.class );
-		Assert.assertNotNull( searchFactory.getAllIndexesManager().getIndexManager( "phoneNumbersIndex" ) );
+		Assert.assertNotNull( searchFactory.getIndexManagerHolder().getIndexManager( "phoneNumbersIndex" ) );
 
-		Assert.assertNull( searchFactory.getAllIndexesManager().getIndexManager( "addressBookIndex" ) );
+		Assert.assertNull( searchFactory.getIndexManagerHolder().getIndexManager( "addressBookIndex" ) );
 		searchFactory.addClasses( AddressBook.class );
-		Assert.assertNotNull( searchFactory.getAllIndexesManager().getIndexManager( "addressBookIndex" ) );
+		Assert.assertNotNull( searchFactory.getIndexManagerHolder().getIndexManager( "addressBookIndex" ) );
 	}
 
 	static SearchMapping buildMappingDefinition() {

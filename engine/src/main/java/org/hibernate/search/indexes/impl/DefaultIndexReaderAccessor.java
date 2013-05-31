@@ -86,7 +86,7 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 			throw log.needAtLeastOneIndexName();
 		}
 		String[] indexManagerNames = names.toArray( new String[size] );
-		IndexManagerHolder managerSource = searchFactory.getAllIndexesManager();
+		IndexManagerHolder managerSource = searchFactory.getIndexManagerHolder();
 		IndexManager[] managers = new IndexManager[size];
 		for ( int i = 0; i < size; i++ ) {
 			String indexName = indexManagerNames[i];

@@ -123,7 +123,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		final String indexManagerName = "org.hibernate.search.test.jms.master.TShirt";
-		IndexManager indexManager = getSearchFactoryImpl().getAllIndexesManager().getIndexManager( indexManagerName );
+		IndexManager indexManager = getSearchFactoryImpl().getIndexManagerHolder().getIndexManager( indexManagerName );
 		//send message to all listeners
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
 		data = MessageSerializationHelper.prependString( indexManagerName, data );

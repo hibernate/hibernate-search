@@ -49,7 +49,7 @@ public class IndexManagerOverrideTest {
 			.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
 		ftSession.close();
-		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
+		IndexManagerHolder allIndexesManager = searchFactory.getIndexManagerHolder();
 
 		//checks for the default implementation
 		checkIndexManagerType( allIndexesManager, "org.hibernate.search.test.configuration.BlogEntry",

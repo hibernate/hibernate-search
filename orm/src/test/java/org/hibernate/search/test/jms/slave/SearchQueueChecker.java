@@ -65,7 +65,7 @@ public class SearchQueueChecker implements MessageListener {
 		List<LuceneWork> queue;
 		try {
 			String indexName = objectMessage.getStringProperty( JmsBackendQueueTask.INDEX_NAME_JMS_PROPERTY );
-			IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
+			IndexManager indexManager = searchFactory.getIndexManagerHolder().getIndexManager( indexName );
 			queue = indexManager.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
 		}
 		catch ( JMSException e ) {

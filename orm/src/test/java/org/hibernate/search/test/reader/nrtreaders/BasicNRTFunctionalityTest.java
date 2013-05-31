@@ -101,7 +101,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 
 	public void testMultipleEntitiesPerIndex() throws Exception {
 		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( (SessionFactoryImplementor) getSessions() );
-		IndexManager documentsIndexManager = searchFactoryBySFI.getAllIndexesManager().getIndexManager( "Documents" );
+		IndexManager documentsIndexManager = searchFactoryBySFI.getIndexManagerHolder().getIndexManager( "Documents" );
 		Assert.assertNotNull( documentsIndexManager );
 		Assert.assertTrue( documentsIndexManager.getClass().equals( org.hibernate.search.indexes.impl.NRTIndexManager.class ) );
 		NRTIndexManager indexManager = (NRTIndexManager) documentsIndexManager;

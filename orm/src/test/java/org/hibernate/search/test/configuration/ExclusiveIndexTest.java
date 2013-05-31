@@ -54,7 +54,7 @@ public class ExclusiveIndexTest {
 			.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
 		ftSession.close();
-		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
+		IndexManagerHolder allIndexesManager = searchFactory.getIndexManagerHolder();
 		//explicitly enabled:
 		assertExclusiveIsEnabled( allIndexesManager, "org.hibernate.search.test.configuration.BlogEntry", true );
 		//explicitly disabled (this entity defined a short index name):

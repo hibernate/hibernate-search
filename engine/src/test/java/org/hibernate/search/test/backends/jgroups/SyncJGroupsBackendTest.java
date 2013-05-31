@@ -165,7 +165,7 @@ public class SyncJGroupsBackendTest {
 	}
 
 	private static BackendQueueProcessor  extractBackendQueue(TestingSearchFactoryHolder node, String indexName) {
-		IndexManager indexManager = node.getSearchFactory().getAllIndexesManager().getIndexManager( indexName );
+		IndexManager indexManager = node.getSearchFactory().getIndexManagerHolder().getIndexManager( indexName );
 		Assert.assertNotNull( indexManager );
 		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;
 		return dbi.getBackendQueueProcessor();

@@ -213,7 +213,12 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	@Override
 	public IndexManagerHolder getAllIndexesManager() {
-		return delegate.getAllIndexesManager();
+		return getIndexManagerHolder();
+	}
+
+	@Override
+	public IndexManagerHolder getIndexManagerHolder() {
+		return delegate.getIndexManagerHolder();
 	}
 
 	@Override

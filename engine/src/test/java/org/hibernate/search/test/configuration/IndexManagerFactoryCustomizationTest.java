@@ -89,7 +89,7 @@ public class IndexManagerFactoryCustomizationTest {
 	}
 
 	private Class<? extends IndexManager> extractDocumentIndexManagerClassName(SearchFactoryImplementor sf, String indexName) {
-		IndexManager indexManager = sf.getAllIndexesManager().getIndexManager( indexName );
+		IndexManager indexManager = sf.getIndexManagerHolder().getIndexManager( indexName );
 		Assert.assertNotNull( indexManager );
 		return indexManager.getClass();
 	}
