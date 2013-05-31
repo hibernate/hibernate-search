@@ -31,9 +31,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -41,6 +38,9 @@ import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.bridge.TikaParseContextProvider;
 import org.hibernate.search.bridge.builtin.TikaBridge;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.junit.Before;
+import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -73,7 +73,11 @@ public class TikaBridgeTest {
 	public void setUp() {
 		bridgeUnderTest = new TikaBridge();
 		testDocument = new Document();
-		options = new LuceneOptionsImpl( Store.YES, Field.Index.ANALYZED, Field.TermVector.NO, 0f );
+		DocumentFieldMetadata fieldMetadata =
+				new DocumentFieldMetadata.Builder( null, Store.YES, Field.Index.ANALYZED, Field.TermVector.NO )
+						.boost( 0F )
+						.build();
+		options = new LuceneOptionsImpl( fieldMetadata );
 
 		CustomTikaMetadataProcessor.invocationCount = 0;
 		CustomTikaParseContextProvider.invocationCount = 0;

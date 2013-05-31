@@ -74,6 +74,11 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Spatial {
 	/**
+	 * Prefix used to generate field names for a default {@link org.hibernate.search.annotations.Spatial} annotation
+	 */
+	String COORDINATES_DEFAULT_FIELD = "_hibernate_default_coordinates";
+
+	/**
 	 * The name of the field prefix where spatial index
 	 * information is stored in a Lucene document.
 	 *

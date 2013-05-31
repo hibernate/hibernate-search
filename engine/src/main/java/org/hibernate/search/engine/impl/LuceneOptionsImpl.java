@@ -29,12 +29,12 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.document.NumericField;
-
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 
 import static org.hibernate.search.annotations.NumericField.PRECISION_STEP_DEFAULT;
 
@@ -56,17 +56,17 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	private final int precisionStep;
 	private final String indexNullAs;
 
-	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, float boost) {
-		this( store, indexMode, termVector, boost, null, PRECISION_STEP_DEFAULT );
+	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata) {
+		this( fieldMetadata, fieldMetadata.getBoost(), null, PRECISION_STEP_DEFAULT );
 	}
 
-	public LuceneOptionsImpl(Store store, Index indexMode, TermVector termVector, float boost, String indexNullAs, int precisionStep) {
-		this.indexMode = indexMode;
-		this.termVector = termVector;
+	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float boost, String indexNullAs, int precisionStep) {
+		this.indexMode = fieldMetadata.getIndex();
+		this.termVector = fieldMetadata.getTermVector();
 		this.boost = boost;
-		this.storeType = store;
-		this.storeCompressed = store.equals( Store.COMPRESS );
-		this.storeUncompressed = store.equals( Store.YES );
+		this.storeType = fieldMetadata.getStore();
+		this.storeCompressed = this.storeType.equals( Store.COMPRESS );
+		this.storeUncompressed = this.storeType.equals( Store.YES );
 		this.indexNullAs = indexNullAs;
 		this.precisionStep = precisionStep;
 	}
@@ -142,13 +142,5 @@ public class LuceneOptionsImpl implements LuceneOptions {
 
 	public TermVector getTermVector() {
 		return this.termVector;
-	}
-
-	/**
-	 * Might be useful for a bridge implementation, but not currently part
-	 * of LuceneOptions API as we are considering to remove the getters.
-	 */
-	public Store getStoreStrategy() {
-		return storeType;
 	}
 }
