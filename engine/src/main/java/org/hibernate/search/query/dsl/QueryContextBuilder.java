@@ -43,5 +43,16 @@ package org.hibernate.search.query.dsl;
  */
 public interface QueryContextBuilder {
 	//TODO make a forEntities
+
+	/**
+	 * Creates an entity context which can be used to obtain a {@link QueryBuilder}.
+	 * </p>
+	 * Note that the passed entity type is used to verify field names, transparently apply analyzers and field bridges
+	 * etc. The query result list, however, is not automatically restricted to the given type. Instead a type filter
+	 * must be applied when creating the full text query in order to restrict the query result to certain entity types.
+	 *
+	 * @param entityType entity type used for meta data retrieval during query creation
+	 * @return an entity context
+	 */
 	EntityContext forEntity(Class<?> entityType);
 }

@@ -25,6 +25,12 @@
 package org.hibernate.search.query.dsl;
 
 /**
+ * Builds up Lucene queries for a given entity type following the fluent API pattern. The resulting {@link Query} can
+ * be obtained from the final {@link Termination} object of the invocation chain.
+ * </p>
+ * If required, the resulting {@code Query} instance can be modified or combined with other queries, be them created
+ * via this fluent API or using native Lucene APIs.
+ *
  * @author Emmanuel Bernard
  */
 public interface QueryBuilder {
