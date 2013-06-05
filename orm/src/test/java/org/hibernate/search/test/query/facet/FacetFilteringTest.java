@@ -106,6 +106,18 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		assertFacetCounts( facetManager.getFacets( colorFacetName ), new int[] { 4, 0, 0, 0, 0 } );
 		assertFacetCounts( facetManager.getFacets( ccsFacetName ), new int[] { 4, 0, 0, 0 } );
 
+		assertEquals(
+				"Facets should not take count in equality",
+				colorFacet,
+				facetManager.getFacets( colorFacetName ).get( 0 )
+		);
+		assertTrue(
+				"We should be able to find facets amongst the selected ones",
+				facetManager.getFacetGroup( colorFacetName ).getSelectedFacets().contains(
+						facetManager.getFacets( colorFacetName ).get( 0 )
+				)
+		);
+
 		facetManager.getFacetGroup( colorFacetName ).clearSelectedFacets();
 		facetManager.getFacetGroup( ccsFacetName ).clearSelectedFacets();
 		assertFacetCounts( facetManager.getFacets( colorFacetName ), new int[] { 12, 12, 12, 12, 2 } );

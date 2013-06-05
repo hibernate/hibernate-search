@@ -75,9 +75,6 @@ public abstract class AbstractFacet implements Facet {
 
 		AbstractFacet that = (AbstractFacet) o;
 
-		if ( count != that.count ) {
-			return false;
-		}
 		if ( facetingName != null ? !facetingName.equals( that.facetingName ) : that.facetingName != null ) {
 			return false;
 		}
@@ -96,7 +93,6 @@ public abstract class AbstractFacet implements Facet {
 		int result = facetingName != null ? facetingName.hashCode() : 0;
 		result = 31 * result + ( fieldName != null ? fieldName.hashCode() : 0 );
 		result = 31 * result + ( value != null ? value.hashCode() : 0 );
-		result = 31 * result + count;
 		return result;
 	}
 
