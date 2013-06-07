@@ -1,6 +1,18 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.3.0.Final (08-06-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1338] - excludeLimit with repeated from().to() fail on facet DSL
+    * [HSEARCH-1339] - Fix typo in FacetSortOrder.RANGE_DEFINITION_ODER (deprecation)
+    * [HSEARCH-1346] - Selected Facet object not equal to computed Facet object
+
+** Improvement
+    * [HSEARCH-1345] - Document type limitation of DSL generated Queries
+
+
 Version 4.3.0.CR1 (28-05-2013)
 ------------------------
 
@@ -12,6 +24,7 @@ Version 4.3.0.Beta1 (24-05-2013)
 ------------------------
 
 ** Bug
+    * [HSEARCH-1307] - NRT backend could hit AlreadyClosedException: this IndexReader is closed
     * [HSEARCH-1314] - Allow @Latitude and @Longitude annotations on methods (getters) too
     * [HSEARCH-1319] - AS7 kit does not include JMS dependency
     * [HSEARCH-1320] - SharedIndexWorkspaceImpl holding index lock indefinitely
