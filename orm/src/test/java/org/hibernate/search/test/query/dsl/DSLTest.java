@@ -37,7 +37,6 @@ import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.StopFilterFactory;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -45,6 +44,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -68,6 +68,7 @@ public class DSLTest extends SearchTestCase {
 	private Date february;
 	private Date march;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -75,6 +76,7 @@ public class DSLTest extends SearchTestCase {
 		indexTestData();
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		cleanUpTestData();
 		super.tearDown();
@@ -385,7 +387,7 @@ public class DSLTest extends SearchTestCase {
 
 		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
-		List results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		List<?> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
 
 		assertEquals( "test range numeric ", 1, results.size() );
 		assertEquals( "test range numeric ", "January", ( (Month) results.get( 0 ) ).getName() );
@@ -542,7 +544,7 @@ public class DSLTest extends SearchTestCase {
 
 		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
 
-		List results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		List<?> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
 
 		assertEquals( "test range numeric ", 1, results.size() );
 		assertEquals( "test range numeric ", "January", ( (Month) results.get( 0 ) ).getName() );
@@ -580,7 +582,7 @@ public class DSLTest extends SearchTestCase {
 				.matching( 2 )
 				.createQuery();
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Month.class );
-		List results = fullTextQuery.list();
+		List<?> results = fullTextQuery.list();
 		assertEquals( 1, results.size() );
 		Month february = (Month) results.get( 0 );
 		assertEquals( 2, february.getMonthValue() );
@@ -601,7 +603,7 @@ public class DSLTest extends SearchTestCase {
 						.ofCoordinates( coordinates )
 					.createQuery();
 
-		List results = fullTextSession.createFullTextQuery( query, POI.class ).list();
+		List<?> results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 
 		assertEquals( "test quad tree based spatial query", 1, results.size() );
 		assertEquals( "test quad tree based spatial query", "Bozo", ( (POI) results.get( 0 ) ).getName() );
@@ -618,6 +620,64 @@ public class DSLTest extends SearchTestCase {
 		assertEquals( "test quad tree based spatial  query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
 
 		transaction.commit();
+	}
+
+	@TestForIssue( jiraKey = "HSEARCH-703" )
+	public void testPolymorphicQueryForUnindexedSuperTypeReturnsIndexedSubType() {
+		Transaction transaction = fullTextSession.beginTransaction();
+
+		final QueryBuilder builder = fullTextSession
+				.getSearchFactory()
+				.buildQueryBuilder()
+				.forEntity( Object.class )
+				.get();
+
+		Query query = builder.all().createQuery();
+		List<?> results = fullTextSession.createFullTextQuery( query, Object.class ).list();
+
+		assertEquals( "expected all instances of all indexed types", 7, results.size() );
+
+		transaction.commit();
+	}
+
+	@TestForIssue( jiraKey = "HSEARCH-703" )
+	public void testPolymorphicQueryWithKeywordTermForUnindexedSuperTypeReturnsIndexedSubType() {
+		Transaction transaction = fullTextSession.beginTransaction();
+
+		final QueryBuilder builder = fullTextSession
+				.getSearchFactory()
+				.buildQueryBuilder()
+				.forEntity( Car.class )
+				.get();
+
+		Query query = builder.keyword().onField( "name" ).matching( "Morris" ).createQuery();
+		List<?> results = fullTextSession.createFullTextQuery( query ).list();
+
+		assertEquals( "expected one instance of indexed sub-type", 1, results.size() );
+		assertEquals( 180, ( (SportsCar) results.get( 0 ) ).getEnginePower() );
+
+		transaction.commit();
+	}
+
+	@TestForIssue( jiraKey = "HSEARCH-703" )
+	public void testObtainingBuilderForUnindexedTypeWithoutIndexedSubTypesCausesException() {
+		Transaction transaction = fullTextSession.beginTransaction();
+
+		try {
+			fullTextSession
+				.getSearchFactory()
+				.buildQueryBuilder()
+				.forEntity( Animal.class )
+				.get();
+
+			fail( "Obtaining a builder not allowed for unindexed type without any indexed sub-types." );
+		}
+		catch (SearchException e) {
+			// sucess
+		}
+		finally {
+			transaction.commit();
+		}
 	}
 
 	private void indexTestData() {
@@ -666,6 +726,12 @@ public class DSLTest extends SearchTestCase {
 		poi = new POI( 2, "Bozo", 24d, 32d, "Monument" );
 		fullTextSession.persist( poi );
 
+		Car car = new SportsCar( 1, "Leyland", 100 );
+		fullTextSession.persist( car );
+
+		car = new SportsCar( 2, "Morris", 180 );
+		fullTextSession.persist( car );
+
 		tx.commit();
 		fullTextSession.clear();
 	}
@@ -682,7 +748,7 @@ public class DSLTest extends SearchTestCase {
 		tx = fullTextSession.beginTransaction();
 		@SuppressWarnings("unchecked")
 		final List<Object> results = fullTextSession.createQuery( "from " + Object.class.getName() ).list();
-		assertEquals( 5, results.size() );
+		assertEquals( 7, results.size() );
 
 		for ( Object entity : results ) {
 			fullTextSession.delete( entity );
@@ -696,7 +762,10 @@ public class DSLTest extends SearchTestCase {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Month.class,
-				POI.class
+				POI.class,
+				Car.class,
+				SportsCar.class,
+				Animal.class
 		};
 	}
 
