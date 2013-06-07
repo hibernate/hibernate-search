@@ -40,6 +40,9 @@ public abstract class AbstractFacet implements Facet {
 	private final int count;
 
 	public AbstractFacet(String facetingName, String fieldName, String value, int count) {
+		if ( facetingName == null ) {
+			throw new IllegalArgumentException( "The facetingName name name cannot be null" );
+		}
 		this.facetingName = facetingName;
 		this.fieldName = fieldName;
 		this.count = count;
@@ -72,28 +75,15 @@ public abstract class AbstractFacet implements Facet {
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-
 		AbstractFacet that = (AbstractFacet) o;
-
-		if ( facetingName != null ? !facetingName.equals( that.facetingName ) : that.facetingName != null ) {
-			return false;
-		}
-		if ( fieldName != null ? !fieldName.equals( that.fieldName ) : that.fieldName != null ) {
-			return false;
-		}
-		if ( value != null ? !value.equals( that.value ) : that.value != null ) {
-			return false;
-		}
-
-		return true;
+		//facetingName can't be null: checked in the constructor
+		return facetingName.equals( that.facetingName );
 	}
 
 	@Override
 	public int hashCode() {
-		int result = facetingName != null ? facetingName.hashCode() : 0;
-		result = 31 * result + ( fieldName != null ? fieldName.hashCode() : 0 );
-		result = 31 * result + ( value != null ? value.hashCode() : 0 );
-		return result;
+		//facetingName can't be null: checked in the constructor
+		return facetingName.hashCode();
 	}
 
 	@Override
@@ -108,5 +98,3 @@ public abstract class AbstractFacet implements Facet {
 		return sb.toString();
 	}
 }
-
-
