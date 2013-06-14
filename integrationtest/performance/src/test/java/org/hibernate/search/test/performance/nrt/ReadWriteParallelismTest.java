@@ -47,7 +47,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.test.programmaticmapping.TestingSearchFactoryHolder;
+import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Rule;
@@ -73,7 +73,7 @@ public class ReadWriteParallelismTest {
 	private static final AtomicInteger cyclesCompleted = new AtomicInteger( 0 );
 
 	@Rule
-	public TestingSearchFactoryHolder sfHolder = new TestingSearchFactoryHolder( Book.class )
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class )
 		.withProperty( "hibernate.search.default.indexmanager", "near-real-time" );
 
 	@Test

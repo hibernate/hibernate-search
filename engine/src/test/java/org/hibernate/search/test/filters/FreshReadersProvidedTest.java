@@ -44,7 +44,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.test.programmaticmapping.TestingSearchFactoryHolder;
+import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Rule;
@@ -63,7 +63,7 @@ import org.junit.Test;
 public class FreshReadersProvidedTest {
 
 	@Rule
-	public TestingSearchFactoryHolder sfHolder = new TestingSearchFactoryHolder( Guest.class );
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Guest.class );
 
 	@Test
 	public void filtersTest() {

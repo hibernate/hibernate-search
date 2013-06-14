@@ -36,7 +36,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.programmaticmapping.TestingSearchFactoryHolder;
+import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.TestForIssue;
 import org.jgroups.TimeoutException;
@@ -61,7 +61,7 @@ public class SyncJGroupsBackendTest {
 	private static final String JGROUPS_CONFIGURATION = "jgroups-testing-udp.xml";
 
 	@Rule
-	public TestingSearchFactoryHolder slaveNode = new TestingSearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
+	public SearchFactoryHolder slaveNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", "jgroupsSlave" )
 		.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
 		.withProperty( "hibernate.search.dvds.jgroups.delegate_backend", "blackhole" )
@@ -73,7 +73,7 @@ public class SyncJGroupsBackendTest {
 		;
 
 	@Rule
-	public TestingSearchFactoryHolder masterNode = new TestingSearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
+	public SearchFactoryHolder masterNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", JGroupsReceivingMockBackend.class.getName() )
 		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
 		;
@@ -164,7 +164,7 @@ public class SyncJGroupsBackendTest {
 		return (JGroupsBackendQueueProcessor) backendQueueProcessor;
 	}
 
-	private static BackendQueueProcessor  extractBackendQueue(TestingSearchFactoryHolder node, String indexName) {
+	private static BackendQueueProcessor  extractBackendQueue(SearchFactoryHolder node, String indexName) {
 		IndexManager indexManager = node.getSearchFactory().getIndexManagerHolder().getIndexManager( indexName );
 		Assert.assertNotNull( indexManager );
 		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;

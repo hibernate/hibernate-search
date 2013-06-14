@@ -28,7 +28,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.errors.EmptyQueryException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.programmaticmapping.TestingSearchFactoryHolder;
+import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +43,7 @@ import org.junit.rules.ExpectedException;
 public class EmptyQueryExceptionTest {
 
 	@Rule
-	public TestingSearchFactoryHolder sfHolder = new TestingSearchFactoryHolder( Book.class );
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class );
 
 	@Rule
 	public ExpectedException exceptions = ExpectedException.none();
