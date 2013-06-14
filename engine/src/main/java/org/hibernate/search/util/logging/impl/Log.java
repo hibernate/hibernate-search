@@ -704,4 +704,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 176, value = "Document could not be parsed")
 	SearchException unableToParseDocument(@Cause Throwable cause);
 
+	@Message(id = 177, value = "Unable to find a valid document id for entity '%1$s'")
+	SearchException noDocumentIdFoundException( String entityName );
+
 }

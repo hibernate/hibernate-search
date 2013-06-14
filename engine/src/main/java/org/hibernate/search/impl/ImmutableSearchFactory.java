@@ -37,7 +37,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
@@ -237,10 +236,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return worker;
 	}
 
-	public void setBackendQueueProcessor(BackendQueueProcessor backendQueueProcessor) {
-		throw new AssertionFailure( "ImmutableSearchFactory is immutable: should never be called" );
-	}
-
 	@Override
 	public void optimize() {
 		for ( IndexManager im : this.allIndexesManager.getIndexManagers() ) {
@@ -428,8 +423,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@Override
 	public Set<Class<?>> getIndexedEntities() {
-		// TODO implement
-		return null;
+		return indexBindingForEntities.keySet();
 	}
 
 	@Override

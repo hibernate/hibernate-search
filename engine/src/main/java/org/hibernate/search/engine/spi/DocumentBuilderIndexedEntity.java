@@ -158,7 +158,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		if ( idPropertyMetadata == null ) {
-			throw new SearchException( "No document id in: " + clazz );
+			throw log.noDocumentIdFoundException( clazz.getName() );
 		}
 
 		idFieldName = idPropertyMetadata.getFieldMetadata().iterator().next().getName();
