@@ -57,8 +57,8 @@ import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
 /**
- * Factory delegating to a concrete implementation of another factory,
- * Useful to swap one factory for another.
+ * Factory delegating to a concrete implementation of another factory. Useful to swap one factory for another.
+ *
  * Swapping factory is thread safe.
  *
  * @author Emmanuel Bernard
@@ -268,8 +268,7 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	@Override
 	public Set<Class<?>> getIndexedEntities() {
-		// TODO implement
-		return null;
+		return delegate.getIndexedEntities();
 	}
 
 	@Override

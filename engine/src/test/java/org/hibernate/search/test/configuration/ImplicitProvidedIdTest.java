@@ -66,7 +66,7 @@ public class ImplicitProvidedIdTest {
 			.setProgrammaticMapping( mapping )
 			.addClass( Book.class );
 		exceptions.expect( SearchException.class );
-		exceptions.expectMessage( "No document id in: " + Book.class.getName() );
+		exceptions.expectMessage( "HSEARCH000177" );
 		storeBooksViaProvidedId( cfg, ProvidedId.defaultFieldName, false );
 	}
 
