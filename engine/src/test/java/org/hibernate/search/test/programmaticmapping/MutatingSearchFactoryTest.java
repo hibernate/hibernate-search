@@ -28,6 +28,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -42,7 +43,7 @@ import org.junit.Test;
 public class MutatingSearchFactoryTest {
 
 	@Rule
-	public TestingSearchFactoryHolder sfHolder = new TestingSearchFactoryHolder( buildMappingDefinition() );
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( buildMappingDefinition() );
 
 	@Test
 	public void mutationTest() {

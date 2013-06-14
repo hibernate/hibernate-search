@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.programmaticmapping;
+package org.hibernate.search.test.util;
 
 import java.util.Properties;
 
@@ -27,7 +27,6 @@ import junit.framework.Assert;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
 import org.junit.rules.ExternalResource;
 
 /**
@@ -36,18 +35,18 @@ import org.junit.rules.ExternalResource;
  * @author Sanne Grinovero
  * @since 4.1
  */
-public class TestingSearchFactoryHolder extends ExternalResource {
+public class SearchFactoryHolder extends ExternalResource {
 
 	private final SearchMapping buildMappingDefinition;
 	private final Class<?>[] entities;
 	private final Properties configuration;
 	private SearchFactoryImplementor sf;
 
-	public TestingSearchFactoryHolder(Class<?>... entities) {
+	public SearchFactoryHolder(Class<?>... entities) {
 		this( null, entities );
 	}
 
-	public TestingSearchFactoryHolder(SearchMapping buildMappingDefinition, Class<?>... entities) {
+	public SearchFactoryHolder(SearchMapping buildMappingDefinition, Class<?>... entities) {
 		this.buildMappingDefinition = buildMappingDefinition;
 		this.entities = entities;
 		this.configuration = new Properties();
@@ -77,7 +76,7 @@ public class TestingSearchFactoryHolder extends ExternalResource {
 		sf.close();
 	}
 
-	public TestingSearchFactoryHolder withProperty(String key, Object value) {
+	public SearchFactoryHolder withProperty(String key, Object value) {
 		Assert.assertNull( "SessionFactory already initialized", sf );
 		configuration.put( key, value );
 		return this;

@@ -33,7 +33,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.programmaticmapping.TestingSearchFactoryHolder;
+import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;
@@ -50,7 +50,7 @@ import org.junit.runner.RunWith;
 public class SharedReleasesLocksTest {
 
 	@Rule
-	public TestingSearchFactoryHolder sfHolder = new TestingSearchFactoryHolder( Book.class )
+	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Book.class )
 		.withProperty( "hibernate.search.default.exclusive_index_use", "false" );
 
 	@Test
