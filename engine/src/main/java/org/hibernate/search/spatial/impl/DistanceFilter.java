@@ -22,13 +22,15 @@ package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredDocIdSet;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
+import org.apache.lucene.util.Bits;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
@@ -102,12 +104,12 @@ public final class DistanceFilter extends Filter {
 	 * @param reader reader to the index
 	 */
 	@Override
-	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+		final AtomicReader atomicReader = context.reader();
+		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, getLatitudeField(), false );
+		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, getLongitudeField(), false );
 
-		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, getLatitudeField() );
-		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( reader, getLongitudeField() );
-
-		DocIdSet docs = previousFilter.getDocIdSet( reader );
+		DocIdSet docs = previousFilter.getDocIdSet( context, acceptDocs );
 
 		if ( ( docs == null ) || ( docs.iterator() == null ) ) {
 			return null;

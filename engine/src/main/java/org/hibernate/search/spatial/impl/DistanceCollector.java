@@ -22,7 +22,8 @@ package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.Scorer;
@@ -66,12 +67,13 @@ public class DistanceCollector extends Collector {
 	}
 
 	@Override
-	public void setNextReader(IndexReader reader, int docBase) throws IOException {
-		delegate.setNextReader( reader, docBase );
-		double[] unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( reader, latitudeField );
-		double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( reader, longitudeField );
+	public void setNextReader(AtomicReaderContext newContext) throws IOException {
+		delegate.setNextReader( newContext );
+		final AtomicReader atomicReader = newContext.reader();
+		final double[] unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
+		final double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
 
-		this.docBase = docBase;
+		this.docBase = newContext.docBase;
 		for ( int i = 0 ; i < unbasedLatitudeValues.length ; i ++ ) {
 			latitudeValues.put( this.docBase + i, unbasedLatitudeValues[i] );
 			longitudeValues.put( this.docBase + i, unbasedLongitudeValues[i] );
