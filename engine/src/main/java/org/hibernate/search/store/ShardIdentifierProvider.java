@@ -18,14 +18,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.engine.impl;
+package org.hibernate.search.store;
 
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.apache.lucene.document.Document;
+import org.hibernate.search.filter.FullTextFilterImplementor;
+
+import java.io.Serializable;
+import java.util.Properties;
 
 /**
+ * Provides shard identifiers when dynamic sharding is used.
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface MutableEntityIndexBinding<T> extends EntityIndexBinder {
-	void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder);
+public interface ShardIdentifierProvider {
+
+	/**
+	 * Initialize the provider.
+	 */
+	void initialize(Properties properties);
+
+	/**
+	 * Returns the shard identifier upon addition.
+	 */
+	String getShardIdentifier(Class<?> entity, Serializable id, String idInString, Document document);
+
+	/**
+	 * Returns the set of shard identifiers upon deletion.
+	 */
+	String[] getShardIdentifiers(Class<?> entity, Serializable id, String idInString);
+
+	/**
+	 * Returns the set of shard identifiers for a query.
+	 */
+	String[] getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters);
+
+	/**
+	 * Returns the list of all known shard identifiers.
+	 * The list can vary between calls.
+	 */
+	String[] getAllShardIdentifiers();
 }

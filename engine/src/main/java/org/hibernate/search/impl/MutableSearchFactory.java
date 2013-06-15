@@ -39,6 +39,7 @@ import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -50,6 +51,8 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.stat.Statistics;
@@ -62,7 +65,9 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  *
  * @author Emmanuel Bernard
  */
-public class MutableSearchFactory implements SearchFactoryImplementorWithShareableState, SearchFactoryIntegrator {
+public class MutableSearchFactory implements SearchFactoryImplementorWithShareableState, SearchFactoryIntegrator, WorkerBuildContext {
+	// Implements WorkerBuilderContext for the dynamic sharding approach which build IndexManager lazily
+
 	//a reference to the same instance of this class is help by clients and various HSearch services
 	//when changing the SearchFactory internals, only the underlying delegate should be changed.
 	//the volatile ensure that the state is replicated upong underlying factory switch.
@@ -115,8 +120,23 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 		return delegate.getFilterDefinition( name );
 	}
 
+	@Override
+	public SearchFactoryImplementor getUninitializedSearchFactory() {
+		return this;
+	}
+
 	public String getIndexingStrategy() {
 		return delegate.getIndexingStrategy();
+	}
+
+	@Override
+	public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
+		return delegate.getServiceManager().requestService( provider, this );
+	}
+
+	@Override
+	public void releaseService(Class<? extends ServiceProvider<?>> provider) {
+		delegate.getServiceManager().releaseService( provider );
 	}
 
 	public void close() {
