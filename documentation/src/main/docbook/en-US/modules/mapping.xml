@@ -2827,6 +2827,15 @@ public class Address {
  ......
 }</programlisting>
       </example>
+      <note>
+        <para>When using a programmatic mapping for a given type X, you
+        can only refer to fields defined on X. Fields or methods inherited
+        from a super type are not configurable. In case you need to configure
+        a super class property, you need to either override the property in X
+        or create a programmatic mapping for the super class. This mimics the
+        usage of annotations where you cannot annotate a field or method of a
+        super class either, unless it is redefined in the given type.</para>
+      </note>
     </section>
 
     <section>
