@@ -30,8 +30,8 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Lazily loaded Services might need a BuilContext to retrieve additional services;
- * in such a case we can wrap a reference to a {@link ServiceManager} and a
+ * Lazily loaded services might need a {@code BuildContext} to retrieve additional services.
+ * In such a case we can wrap a reference to a {@link ServiceManager} and a
  * {@link SearchFactoryImplementor} to create a limited BuildContext:
  * we're out of the boot phase at this point so not all operations are legal.
  *

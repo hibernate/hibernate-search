@@ -33,7 +33,7 @@ import org.junit.Test;
  * Verifies that SearchFactory properly checks for illegal combinations
  * of Similarity: different entities sharing the same index must use the same
  * Similarity implementation.
- * Also when opening a multireader on multiple indexes, all of these should
+ * Also when opening a {@code MultiReader} on multiple indexes, all of these should
  * use the same Similarity implementation.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.

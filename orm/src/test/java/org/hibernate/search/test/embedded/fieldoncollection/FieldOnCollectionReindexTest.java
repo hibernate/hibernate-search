@@ -36,7 +36,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.TestForIssue;
 
-public class FieldOnCollectionReindexationTest extends SearchTestCase {
+public class FieldOnCollectionReindexTest extends SearchTestCase {
 
 	@TestForIssue(jiraKey = "HSEARCH-1020")
 	public void testUpdatingCollectionWithFieldAnnotationReindexesEntity() {

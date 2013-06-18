@@ -58,7 +58,7 @@ public class JGroupsReceiver extends ReceiverAdapter {
 			byte[] rawBuffer = message.getRawBuffer();
 			String indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
 			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
-			IndexManager indexManager = searchFactory.getAllIndexesManager().getIndexManager( indexName );
+			IndexManager indexManager = searchFactory.getIndexManagerHolder().getIndexManager( indexName );
 			List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
 			queues++;
 			works += queue.size();

@@ -120,7 +120,7 @@ public class JMSMasterTest extends SearchTestCase {
 		message.setStringProperty(
 				JmsBackendQueueTask.INDEX_NAME_JMS_PROPERTY,
 				indexName );
-		IndexManager indexManager = getSearchFactoryImpl().getAllIndexesManager().getIndexManager( indexName );
+		IndexManager indexManager = getSearchFactoryImpl().getIndexManagerHolder().getIndexManager( indexName );
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
 		message.setObject( data );
 		QueueSender sender = getQueueSession().createSender( getMessageQueue() );

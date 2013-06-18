@@ -22,6 +22,7 @@ package org.hibernate.search.test.engine.optimizations;
 import java.lang.annotation.ElementType;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.collection.internal.PersistentBag;
 import org.hibernate.collection.internal.PersistentSet;
 import org.hibernate.search.FullTextSession;
@@ -30,7 +31,8 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
@@ -44,7 +46,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class CollectionUpdateEventTest {
 
 	/**
-	 * If the top level class has a classbridge or dynamicboost, then we can't safely
+	 * If the top level class has a class bridge or dynamic boost, then we can't safely
 	 * enable this optimization.
 	 */
 	@Test
@@ -70,7 +72,7 @@ public class CollectionUpdateEventTest {
 	}
 
 	/**
-	 * Test again with a no-enough-depth scenario, but having the classbridge
+	 * Test again with a no-enough-depth scenario, but having the class bridge
 	 * defined close to the collection (far from the root entity)
 	 */
 	@Test
@@ -78,8 +80,12 @@ public class CollectionUpdateEventTest {
 		testScenario( false, 1, true );
 	}
 
-	private void testScenario(boolean usingClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
-		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory( usingClassBridge, depth, usingClassbridgeOnEmbedded );
+	private void testScenario(boolean usingClassBridge, int depth, boolean usingClassBridgeOnEmbedded) {
+		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory(
+				usingClassBridge,
+				depth,
+				usingClassBridgeOnEmbedded
+		);
 		try {
 			initializeData( fulltextSessionBuilder );
 			FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
@@ -87,22 +93,17 @@ public class CollectionUpdateEventTest {
 				Catalog catalog = (Catalog) fullTextSession.get( Catalog.class, 1L );
 				PersistentSet catalogItems = (PersistentSet) catalog.getCatalogItems();
 				PersistentBag consumers = (PersistentBag) catalog.getConsumers();
-				assertThat( consumers.wasInitialized() )
-					.as( "consumers should not be initialized" )
-					.isFalse();
-				assertThat( consumers.wasInitialized() )
-					.as( "catalogItems should not be initialized" )
-					.isFalse();
+
+				assertFalse( "consumers should not be initialized", consumers.wasInitialized() );
+				assertFalse( "catalogItems should not be initialized", consumers.wasInitialized() );
+
 				updateCatalogsCollection( fullTextSession, catalog );
-				if ( ( usingClassBridge || usingClassbridgeOnEmbedded ) && depth > 1 ) {
-					assertThat( catalogItems.wasInitialized() )
-						.as( "catalogItems should have been initialized" )
-						.isTrue();
+
+				if ( ( usingClassBridge || usingClassBridgeOnEmbedded ) && depth > 1 ) {
+					assertTrue( "catalogItems should have been initialized", catalogItems.wasInitialized() );
 				}
 				else {
-					assertThat( catalogItems.wasInitialized() )
-						.as( "catalogItems should not be initialized" )
-						.isFalse();
+					assertFalse( "catalogItems should not be initialized", catalogItems.wasInitialized() );
 				}
 			}
 			finally {
@@ -114,46 +115,42 @@ public class CollectionUpdateEventTest {
 		}
 	}
 
-	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth, boolean usingClassbridgeOnEmbedded) {
+	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth, boolean usingClassBridgeOnEmbedded) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
-			.addAnnotatedClass( Catalog.class )
-			.addAnnotatedClass( CatalogItem.class )
-			.addAnnotatedClass( Consumer.class )
-			.addAnnotatedClass( Item.class );
+				.addAnnotatedClass( Catalog.class )
+				.addAnnotatedClass( CatalogItem.class )
+				.addAnnotatedClass( Consumer.class )
+				.addAnnotatedClass( Item.class );
 		SearchMapping fluentMapping = builder.fluentMapping();
 		EntityMapping catalogMapping = fluentMapping
-			.entity( Catalog.class );
-		if ( usingClassbridgeOnEmbedded ) {
+				.entity( Catalog.class );
+		if ( usingClassBridgeOnEmbedded ) {
 			catalogMapping.classBridge( ItemClassBridge.class );
 		}
 		catalogMapping
-			.property( "catalogItems", ElementType.FIELD ).containedIn()
-		.entity( CatalogItem.class )
-			.property( "item", ElementType.FIELD ).containedIn()
-			.property( "catalog", ElementType.FIELD ).indexEmbedded();
+				.property( "catalogItems", ElementType.FIELD ).containedIn()
+				.entity( CatalogItem.class )
+				.property( "item", ElementType.FIELD ).containedIn()
+				.property( "catalog", ElementType.FIELD ).indexEmbedded();
 		if ( defineClassBridge ) {
 			fluentMapping
-				.entity( Item.class )
+					.entity( Item.class )
 					.classBridge( ItemClassBridge.class )
 					.indexed()
 					.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
 		}
 		else {
 			fluentMapping
-				.entity( Item.class )
+					.entity( Item.class )
 					.indexed()
 					.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
 		}
 		return builder.build();
 	}
 
-	/**
-	 * Initialize the test data.
-	 * @param fulltextSessionBuilder
-	 */
 	private void initializeData(FullTextSessionBuilder fulltextSessionBuilder) {
 		FullTextSession fullTextSession = fulltextSessionBuilder.openFullTextSession();
-			try {
+		try {
 			final Transaction transaction = fullTextSession.beginTransaction();
 
 			Catalog catalog = new Catalog();

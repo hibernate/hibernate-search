@@ -98,7 +98,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
 		try {
 			indexName = objectMessage.getStringProperty( JmsBackendQueueTask.INDEX_NAME_JMS_PROPERTY );
-			indexManager = factory.getAllIndexesManager().getIndexManager( indexName );
+			indexManager = factory.getIndexManagerHolder().getIndexManager( indexName );
 			if ( indexManager == null ) {
 				log.messageReceivedForUndefinedIndex( indexName );
 				return;

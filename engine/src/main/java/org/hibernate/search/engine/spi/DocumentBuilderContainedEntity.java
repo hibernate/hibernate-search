@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.impl.ConfigContext;
@@ -55,20 +54,27 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
 	 * @param instanceInitializer a {@link org.hibernate.search.spi.InstanceInitializer} object.
 	 */
-	public DocumentBuilderContainedEntity(XClass xClass, ConfigContext context,
-			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {
+	public DocumentBuilderContainedEntity(XClass xClass,
+			ConfigContext context,
+			ReflectionManager reflectionManager,
+			Set<XClass> optimizationBlackList,
+			InstanceInitializer instanceInitializer) {
 		super( xClass, context, null, reflectionManager, optimizationBlackList, instanceInitializer );
+
 		//done after init:
-		if ( metadata.containedInGetters.size() == 0 ) {
+		if ( getTypeMetadata().getContainedInMetadata().isEmpty() ) {
 			this.entityState = EntityState.NON_INDEXABLE;
 		}
 	}
 
-	protected void documentBuilderSpecificChecks(XProperty member, PropertiesMetadata propertiesMetadata, boolean isRoot, String prefix, ConfigContext context, PathsContext pathsContext) {
-	}
-
 	@Override
-	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
+	public void addWorkToQueue(Class<T> entityClass,
+			T entity,
+			Serializable id,
+			boolean delete,
+			boolean add,
+			List<LuceneWork> queue,
+			ConversionContext contextualBridge) {
 		// nothing to do
 	}
 

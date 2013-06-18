@@ -31,14 +31,16 @@ import java.util.zip.DataFormatException;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Fieldable;
-
 import org.apache.lucene.document.NumericField;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
-import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
+import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -120,18 +122,18 @@ public final class DocumentBuilderHelper {
 			}
 		}
 
-		final AbstractDocumentBuilder.PropertiesMetadata metadata = builderIndexedEntity.getMetadata();
+		final TypeMetadata metadata = builderIndexedEntity.getMetadata();
 		processFieldsForProjection( metadata, fields, result, document, conversionContext );
 		return result;
 	}
 
 	public static void populateResult(String fieldName,
-									FieldBridge fieldBridge,
-									Store store,
-									Object[] result,
-									Document document,
-									ConversionContext conversionContext,
-									int matchingPosition) {
+			FieldBridge fieldBridge,
+			Store store,
+			Object[] result,
+			Document document,
+			ConversionContext conversionContext,
+			int matchingPosition) {
 		//TODO make use of an isTwoWay() method
 		if ( store != Store.NO && TwoWayFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
 			result[matchingPosition] = conversionContext
@@ -151,19 +153,19 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-	private static void processFieldsForProjection(AbstractDocumentBuilder.PropertiesMetadata metadata, String[] fields, Object[] result, Document document, ConversionContext contextualBridge) {
+	private static void processFieldsForProjection(TypeMetadata typeMetadata, String[] fields, Object[] result, Document document, ConversionContext contextualBridge) {
 		//process base fields
-		final int nbrFoEntityFields = metadata.fieldNames.size();
-		for ( int index = 0; index < nbrFoEntityFields; index++ ) {
-			final String fieldName = metadata.fieldNames.get( index );
+		for ( PropertyMetadata propertyMetadata : typeMetadata.getPropertyMetadata() ) {
+			DocumentFieldMetadata fieldMetadata = propertyMetadata.getFieldMetadata();
+			final String fieldName = fieldMetadata.getName();
 			int matchingPosition = getFieldPosition( fields, fieldName );
 			if ( matchingPosition != -1 ) {
 				contextualBridge.pushProperty( fieldName );
 				try {
 					populateResult(
 							fieldName,
-							metadata.fieldBridges.get( index ),
-							metadata.fieldStore.get( index ),
+							fieldMetadata.getFieldBridge(),
+							fieldMetadata.getStore(),
 							result,
 							document,
 							contextualBridge,
@@ -177,14 +179,13 @@ public final class DocumentBuilderHelper {
 		}
 
 		//process fields of embedded
-		final int nbrOfEmbeddedObjects = metadata.embeddedPropertiesMetadata.size();
-		for ( int index = 0; index < nbrOfEmbeddedObjects; index++ ) {
+		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			//there is nothing we can do for collections
-			if ( metadata.embeddedContainers.get( index ) == AbstractDocumentBuilder.PropertiesMetadata.Container.OBJECT ) {
-				contextualBridge.pushProperty( metadata.embeddedFieldNames.get( index ) );
+			if ( embeddedTypeMetadata.getEmbeddedContainer() == EmbeddedTypeMetadata.Container.OBJECT ) {
+				contextualBridge.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
 				try {
 					processFieldsForProjection(
-							metadata.embeddedPropertiesMetadata.get( index ), fields, result, document, contextualBridge
+							embeddedTypeMetadata, fields, result, document, contextualBridge
 					);
 				}
 				finally {
@@ -194,15 +195,13 @@ public final class DocumentBuilderHelper {
 		}
 
 		//process class bridges
-		final int nbrOfClassBridges = metadata.classBridges.size();
-		for ( int index = 0; index < nbrOfClassBridges; index++ ) {
-			final String fieldName = metadata.classNames.get( index );
-			int matchingPosition = getFieldPosition( fields, fieldName );
+		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
+			int matchingPosition = getFieldPosition( fields, fieldMetadata.getName() );
 			if ( matchingPosition != -1 ) {
 				populateResult(
-						fieldName,
-						metadata.classBridges.get( index ),
-						metadata.classStores.get( index ),
+						fieldMetadata.getName(),
+						fieldMetadata.getFieldBridge(),
+						fieldMetadata.getStore(),
 						result,
 						document,
 						contextualBridge,

@@ -32,7 +32,8 @@ import org.hibernate.search.store.Workspace;
 
 /**
  * Controls how and when the indexes are optimized.
- * Implementations need to be threadsafe.
+ *
+ * Note: Implementations need to be threadsafe.
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
@@ -42,12 +43,12 @@ public interface OptimizerStrategy {
 	/**
 	 * Invokes optimize on the IndexWriter; This is invoked when
 	 * an optimization has been explicitly requested by the user API
-	 * using {@link SearchFactory#optimize()} or {@link SearchFactory#optimize(Class)},
+	 * using {@link org.hibernate.search.SearchFactory#optimize()} or {@link org.hibernate.search.SearchFactory#optimize(Class)},
 	 * or at the start or end of a MassIndexer's work.
 	 *
 	 * @param writer the index writer
 	 * @return {@code true} if optimisation occurred, {@code false} otherwise
-	 * @throws SearchException in case of IO errors on the index
+	 * @throws org.hibernate.search.SearchException in case of IO errors on the index
 	 */
 	boolean performOptimization(IndexWriter writer);
 

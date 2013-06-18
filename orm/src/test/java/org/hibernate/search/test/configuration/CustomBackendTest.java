@@ -56,7 +56,7 @@ public class CustomBackendTest {
 			.openFullTextSession();
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
 		ftSession.close();
-		IndexManagerHolder allIndexesManager = searchFactory.getAllIndexesManager();
+		IndexManagerHolder allIndexesManager = searchFactory.getIndexManagerHolder();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( "org.hibernate.search.test.configuration.BlogEntry" );
 		BackendQueueProcessor backendQueueProcessor = indexManager.getBackendQueueProcessor();
 		assertEquals( backendType, backendQueueProcessor.getClass() );

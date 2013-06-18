@@ -357,6 +357,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@Override
 	public IndexManagerHolder getAllIndexesManager() {
+		return getIndexManagerHolder();
+	}
+
+	@Override
+	public IndexManagerHolder getIndexManagerHolder() {
 		return this.allIndexesManager;
 	}
 

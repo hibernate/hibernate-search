@@ -31,6 +31,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.hibernate.search.test.util.LeakingOptimizer;
 import org.junit.Test;
 
 /**
@@ -48,8 +49,8 @@ public class UpdateOperationsTest {
 		invokeTest( false, 3 );
 	}
 
-	private void invokeTest(boolean enableFeature, int expectedBackendOperations) {
-		FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory( enableFeature );
+	private void invokeTest(boolean indexMetadataIsComplete, int expectedBackendOperations) {
+		FullTextSessionBuilder fullTextSessionBuilder = createSearchFactory( indexMetadataIsComplete );
 		try {
 			LeakingOptimizer.reset();
 			LeakingLuceneBackend.reset();
@@ -77,12 +78,12 @@ public class UpdateOperationsTest {
 		}
 	}
 
-	private static FullTextSessionBuilder createSearchFactory(boolean enableFeature) {
+	private static FullTextSessionBuilder createSearchFactory(boolean indexMetadataIsComplete) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 				.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() )
 				.setProperty( "hibernate.search.default.optimizer.implementation", LeakingOptimizer.class.getCanonicalName() )
 				.addAnnotatedClass( Document.class );
-		if ( enableFeature == false ) {
+		if ( !indexMetadataIsComplete ) {
 			builder.setProperty( "hibernate.search.default.index_metadata_complete", "false" );
 		}
 		return builder.build();

@@ -44,7 +44,7 @@ public interface SearchFactory {
 	void optimize();
 
 	/**
-	 * Optimize the index holding <code>entityType</code>
+	 * Optimize the index holding {@code entityType}
 	 *
 	 * @param entityType the entity type (index) to optimize
 	 */
@@ -64,7 +64,7 @@ public interface SearchFactory {
 	 *
 	 * @param clazz The class for which to retrieve the analyzer.
 	 * @return The scoped analyzer for the specified class.
-	 * @throws java.lang.IllegalArgumentException in case <code>clazz == null</code> or the specified
+	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
 	 *                                  class is not an indexed entity.
 	 */
 	Analyzer getAnalyzer(Class<?> clazz);
@@ -87,5 +87,4 @@ public interface SearchFactory {
 	 * @return the IndexReaderAccessor for this SearchFactory
 	 */
 	IndexReaderAccessor getIndexReaderAccessor();
-
 }

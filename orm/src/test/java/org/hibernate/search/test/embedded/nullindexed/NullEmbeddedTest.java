@@ -39,7 +39,7 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class NullEmbeddedTest extends SearchTestCase {
 
-	public void testEmebeddedNullNotIndexedQuery() throws Exception {
+	public void testEmbeddedNullNotIndexedQuery() throws Exception {
 		Man withoutPuppies = new Man( "Davide" );
 		withoutPuppies.setPartner( null );
 

@@ -50,7 +50,7 @@ public class PropertiesExampleBridgeTest {
 	@Test
 	public void testPropertiesIndexing() {
 		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
-		Assert.assertNotNull( searchFactory.getAllIndexesManager().getIndexManager( "all" ) );
+		Assert.assertNotNull( searchFactory.getIndexManagerHolder().getIndexManager( "all" ) );
 
 		{
 			// Store some test data:

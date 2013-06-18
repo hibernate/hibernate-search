@@ -104,7 +104,7 @@ public class AllFilesClosedTest {
 	}
 
 	private FileMonitoringDirectory getDirectory(String indexName) {
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getAllIndexesManager().getIndexManager( indexName );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getIndexManagerHolder().getIndexManager( indexName );
 		FileMonitoringDirectoryProvider directoryProvider = (FileMonitoringDirectoryProvider) indexManager.getDirectoryProvider();
 		FileMonitoringDirectory directory = (FileMonitoringDirectory) directoryProvider.getDirectory();
 		return directory;

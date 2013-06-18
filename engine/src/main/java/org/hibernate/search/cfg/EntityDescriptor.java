@@ -49,9 +49,6 @@ public class EntityDescriptor {
 		return indexed;
 	}
 
-	public EntityDescriptor(Class<?> entityType) {
-	}
-
 	public void setIndexed(Map<String, Object> indexed) {
 		this.indexed = indexed;
 	}

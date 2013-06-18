@@ -35,7 +35,7 @@ import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
  * so for large resultsets you should use BigArrayFieldCacheCollectorImpl instead.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
- * @see org.hibernate.search.query.collector.BigArrayFieldCacheCollectorImpl
+ * @see org.hibernate.search.query.collector.impl.BigArrayFieldCacheCollectorImpl
  */
 final class MapFieldCacheCollectorImpl extends FieldCacheCollector {
 

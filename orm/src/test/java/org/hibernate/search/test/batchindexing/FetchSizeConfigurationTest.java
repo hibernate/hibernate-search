@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Verifies that {@link MassIndexer#idFetchSize(int)} is applied by checking for errors thrown by
+ * Verifies that {@link org.hibernate.search.MassIndexer#idFetchSize(int)} is applied by checking for errors thrown by
  * the JDBC Dialect. We use this approach especially as we want to make sure that using
  * {@link Integer#MIN_VALUE} is an acceptable option on MySQL as we suggest it on the documentation.
  *

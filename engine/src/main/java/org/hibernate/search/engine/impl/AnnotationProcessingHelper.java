@@ -145,7 +145,7 @@ public final class AnnotationProcessingHelper {
 		}
 	}
 
-	public static Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext context) {
+	public static Analyzer getAnalyzer(org.hibernate.search.annotations.Analyzer analyzerAnn, ConfigContext configContext) {
 		Class<?> analyzerClass = analyzerAnn == null ? void.class : analyzerAnn.impl();
 		if ( analyzerClass == void.class ) {
 			String definition = analyzerAnn == null ? "" : analyzerAnn.definition();
@@ -153,12 +153,12 @@ public final class AnnotationProcessingHelper {
 				return null;
 			}
 			else {
-				return context.buildLazyAnalyzer( definition );
+				return configContext.buildLazyAnalyzer( definition );
 			}
 		}
 		else {
 			try {
-				return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, context.getLuceneMatchVersion() );
+				return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, configContext.getLuceneMatchVersion() );
 			}
 			catch ( ClassCastException e ) {
 				throw new SearchException(

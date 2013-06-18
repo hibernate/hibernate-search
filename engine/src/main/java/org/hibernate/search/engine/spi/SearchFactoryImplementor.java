@@ -67,15 +67,26 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 
 	/**
 	 * @return true if we are allowed to inspect entity state to
-	 * potentially skip some indexing operations.
-	 * Can be disabled to get pre-3.4 behavior (always rebuild document)
+	 *         potentially skip some indexing operations.
+	 *         Can be disabled to get pre-3.4 behavior (always rebuild document)
 	 */
 	boolean isDirtyChecksEnabled();
 
+	/**
+	 * @return the {@code IndexManagerHolder} which gives access to all index managers known to this factory
+	 *
+	 * @deprecated As of Search 4.4, replaced by {@link #getIndexManagerHolder}
+	 */
+	@Deprecated
 	IndexManagerHolder getAllIndexesManager();
 
 	/**
-	 * @return returns an instance of {@code InstanceInitializer} for class/object initialization.
+	 * @return Returns the {@code IndexManagerHolder} which gives access to all index managers known to this factory
+	 */
+	IndexManagerHolder getIndexManagerHolder();
+
+	/**
+	 * @return an instance of {@code InstanceInitializer} for class/object initialization.
 	 */
 	InstanceInitializer getInstanceInitializer();
 

@@ -65,7 +65,7 @@ public class SharedReleasesLocksTest {
 		//The second write will be successful:
 		writeABook( 2l, "no contention" );
 		//Now verify the index lock was properly released, not having the backend counters fooled by the initial failure:
-		IndexManager indexManager = sfHolder.getSearchFactory().getAllIndexesManager().getIndexManager( "books" );
+		IndexManager indexManager = sfHolder.getSearchFactory().getIndexManagerHolder().getIndexManager( "books" );
 		DirectoryBasedIndexManager dbim = (DirectoryBasedIndexManager) indexManager;
 		Directory directory = dbim.getDirectoryProvider().getDirectory();
 		Assert.assertFalse( "Index lock leaked!", IndexWriter.isLocked( directory ) );
