@@ -112,6 +112,12 @@
             <property name="tokens" value="CTOR_CALL, METHOD_CALL, SUPER_CTOR_CALL" />
             <property name="option" value="space" />
         </module>
+
+        <module name="DoubleSpaces">
+            <property name="ignoreComments" value="true" />
+            <property name="ignoreStrings" value="true" />
+        </module>
+
     </module>
 
     <!-- We are not using NewLineAtEndOfFile because the new line chars change
