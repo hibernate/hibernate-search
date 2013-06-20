@@ -55,16 +55,16 @@ import org.hibernate.search.annotations.TokenizerDef;
 public class RemoteEntity {
 	@Id @DocumentId @GeneratedValue
 	public Integer getId() { return id; }
-	public void setId(Integer id) {  this.id = id; }
+	public void setId(Integer id) { this.id = id; }
 	private Integer id;
 
 	@Field(store = Store.YES, termVector = TermVector.WITH_POSITION_OFFSETS, boost = @Boost(23f) )
 	public String getName() { return name; }
-	public void setName(String name) {  this.name = name; }
+	public void setName(String name) { this.name = name; }
 	private String name;
 
 	@Field(analyzer = @Analyzer(definition = "ngram")) @NumericField(precisionStep = 2)
 	public Float getApproximation() { return approximation; }
-	public void setApproximation(Float approximation) {  this.approximation = approximation; }
+	public void setApproximation(Float approximation) { this.approximation = approximation; }
 	private Float approximation;
 }

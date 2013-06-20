@@ -86,7 +86,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 			for ( FieldContext fieldContext : fieldContexts ) {
 				aggregatedFieldsQuery.add( createQuery( fieldContext, conversionContext ), BooleanClause.Occur.SHOULD );
 			}
-			return  queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
+			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
 		}
 	}
 
@@ -113,14 +113,14 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 			);
 		}
 		else {
-			final String fromString  = fieldContext.isIgnoreFieldBridge() ?
+			final String fromString = fieldContext.isIgnoreFieldBridge() ?
 					fromObject == null ? null : fromObject.toString() :
 					documentBuilder.objectToString( fieldName, fromObject, conversionContext );
 			final String lowerTerm = fromString == null ?
 					null :
 					Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
 
-			final String toString  = fieldContext.isIgnoreFieldBridge() ?
+			final String toString = fieldContext.isIgnoreFieldBridge() ?
 					toObject == null ? null : toObject.toString() :
 					documentBuilder.objectToString( fieldName, toObject, conversionContext );
 			final String upperTerm = toString == null ?

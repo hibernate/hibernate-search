@@ -71,7 +71,7 @@ public class TransactionTest extends SearchTestCase {
 		s.doWork( new Work() {
 			@Override
 			public void execute(Connection connection) throws SQLException {
-				connection.setAutoCommit( true );  // www.hibernate.org/403.html
+				connection.setAutoCommit( true ); // www.hibernate.org/403.html
 			}
 		} );
 		s.persist(

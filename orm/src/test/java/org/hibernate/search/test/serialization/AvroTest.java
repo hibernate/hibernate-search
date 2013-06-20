@@ -119,7 +119,7 @@ public class AvroTest {
 			serializableSample[i] = (byte) i;
 		}
 
-		List<String> classReferences = new ArrayList<String>(  );
+		List<String> classReferences = new ArrayList<String>();
 		classReferences.add( AvroTest.class.getName() );
 
 		List<GenericRecord> fieldables = new ArrayList<GenericRecord>( 1 );
@@ -156,8 +156,8 @@ public class AvroTest {
 		fieldables.add( field );
 		field = createField( tokenStreamSchema );
 
-		List<List<Object>> tokens = new ArrayList<List<Object>>(  );
-		List<Object> attrs = new ArrayList<Object>(  );
+		List<List<Object>> tokens = new ArrayList<List<Object>>();
+		List<Object> attrs = new ArrayList<Object>();
 		tokens.add( attrs );
 		GenericData.Record attr = new GenericData.Record( tokenTrackingAttribute );
 		List<Integer> positions = new ArrayList<Integer>();

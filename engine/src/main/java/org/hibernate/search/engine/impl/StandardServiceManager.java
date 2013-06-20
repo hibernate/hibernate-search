@@ -140,7 +140,7 @@ public class StandardServiceManager implements ServiceManager {
 	}
 
 	public void stopServices() {
-		for ( ServiceProviderWrapper wrapper :  managedProviders.values() ) {
+		for ( ServiceProviderWrapper wrapper : managedProviders.values() ) {
 			wrapper.ensureStopped();
 		}
 	}

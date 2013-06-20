@@ -149,7 +149,7 @@ public final class DirectoryProviderHelper {
 	 */
 	public static void initializeIndexIfNeeded(Directory directory) {
 		//version doesn't really matter as we won't use the Analyzer
-		Version version =  Environment.DEFAULT_LUCENE_MATCH_VERSION;
+		Version version = Environment.DEFAULT_LUCENE_MATCH_VERSION;
 		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
 		try {
 			if ( ! IndexReader.indexExists( directory ) ) {

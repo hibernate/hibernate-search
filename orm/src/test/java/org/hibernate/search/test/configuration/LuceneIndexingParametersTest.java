@@ -71,8 +71,8 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Author.class, USE_COMPOUND_FILE, 0 );
 		assertValueIsSet( Author.class, RAM_BUFFER_SIZE, 1 );
 		assertValueIsSet( Author.class, MAX_MERGE_DOCS, 9 );
-		assertValueIsSet( Author.class, MAX_BUFFERED_DOCS,  1000 );
-		assertValueIsSet( Author.class, MERGE_FACTOR,  100 );
+		assertValueIsSet( Author.class, MAX_BUFFERED_DOCS, 1000 );
+		assertValueIsSet( Author.class, MERGE_FACTOR, 100 );
 	}
 
 	public void testSpecificTypeParametersOverride() {

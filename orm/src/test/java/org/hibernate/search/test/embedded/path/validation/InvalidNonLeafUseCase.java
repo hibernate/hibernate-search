@@ -45,8 +45,8 @@ public class InvalidNonLeafUseCase {
 
 	@ManyToOne
 	@IndexedEmbedded(includePaths = {
-			"b.c.indexed",   // valid
-			"b.c"        // invalid path, dne doesn't exist
+			"b.c.indexed", // valid
+			"b.c" // invalid path, dne doesn't exist
 	})
 	public A a;
 

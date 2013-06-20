@@ -82,7 +82,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		}
 		entityDeletionQuery.add( idQueryTerm, BooleanClause.Occur.MUST );
 
-		Term classNameQueryTerm =  new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
+		Term classNameQueryTerm = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
 		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.MUST );
 

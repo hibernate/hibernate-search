@@ -307,7 +307,7 @@ public class MutableFactoryTest {
 			}
 			catch ( Exception e ) {
 				this.failure = true;
-				e.printStackTrace(  );
+				e.printStackTrace();
 				failureInfo = "failure: Emmanuel" + factorOfClassesPerThread + " exception: " + e.toString();
 			}
 		}
