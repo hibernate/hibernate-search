@@ -85,7 +85,7 @@ public class EntityInfoImpl implements EntityInfo {
 		}
 	}
 
-	public EntityInfoImpl(Class clazz,  String idName,  Serializable id, Object[] projection) {
+	public EntityInfoImpl(Class clazz, String idName, Serializable id, Object[] projection) {
 		this.clazz = clazz;
 		this.idName = idName;
 		this.id = id;

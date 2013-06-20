@@ -296,7 +296,7 @@ public class AndDocIdSetsTest {
 	// HSEARCH-610
 	@Test
 	public void testWithOpenBitSet() {
-		DocIdSet idSet1 = new OpenBitSet( new long[] { 1121 }, 1 );  // bits 0, 5, 6, 10
+		DocIdSet idSet1 = new OpenBitSet( new long[] { 1121 }, 1 ); // bits 0, 5, 6, 10
 		DocIdSet idSet2 = new OpenBitSet( new long[] { 64 }, 1 ); // bit 6
 		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
 

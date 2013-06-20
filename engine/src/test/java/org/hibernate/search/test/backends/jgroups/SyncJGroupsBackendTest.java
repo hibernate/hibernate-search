@@ -149,7 +149,7 @@ public class SyncJGroupsBackendTest {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, "dvds" );
 		JGroupsBackendQueueProcessor jgroupsProcessor = (JGroupsBackendQueueProcessor) backendQueueProcessor;
 		long messageTimeout = jgroupsProcessor.getMessageTimeout();
-		Assert.assertEquals( "message timeout configuration property not applied",  200,  messageTimeout );
+		Assert.assertEquals( "message timeout configuration property not applied", 200, messageTimeout );
 	}
 
 	private JGroupsReceivingMockBackend extractMockBackend(String indexName) {
@@ -164,7 +164,7 @@ public class SyncJGroupsBackendTest {
 		return (JGroupsBackendQueueProcessor) backendQueueProcessor;
 	}
 
-	private static BackendQueueProcessor  extractBackendQueue(TestingSearchFactoryHolder node, String indexName) {
+	private static BackendQueueProcessor extractBackendQueue(TestingSearchFactoryHolder node, String indexName) {
 		IndexManager indexManager = node.getSearchFactory().getIndexManagerHolder().getIndexManager( indexName );
 		Assert.assertNotNull( indexManager );
 		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;

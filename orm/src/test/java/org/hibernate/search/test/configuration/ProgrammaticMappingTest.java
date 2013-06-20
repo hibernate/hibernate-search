@@ -139,7 +139,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx = s.beginTransaction();
 
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
-		org.apache.lucene.search.Query luceneQuery =  parser.parse( "street1_ngram:pea" );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1_ngram:pea" );
 
 		final FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( "Analyzer inoperant", 1, query.getResultSize() );

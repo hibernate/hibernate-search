@@ -48,6 +48,6 @@ public class ConcatStringBridge implements StringBridge, ParameterizedBridge {
 	}
 
 	public void setParameterValues(Map<String,String> parameters) {
-		size =  Integer.valueOf( parameters.get( SIZE ) );
+		size = Integer.valueOf( parameters.get( SIZE ) );
 	}
 }

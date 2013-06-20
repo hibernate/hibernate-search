@@ -41,7 +41,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author John Griffin
  */
-public class  FieldBoostTest extends SearchTestCase {
+public class FieldBoostTest extends SearchTestCase {
 
 	private static final Log log = LoggerFactory.make();
 

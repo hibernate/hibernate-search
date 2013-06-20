@@ -137,7 +137,7 @@ public class AvroDeserializer implements Deserializer {
 	}
 
 	private String asClass(GenericRecord operation, String attribute) {
-		Integer index =  (Integer) operation.get( attribute );
+		Integer index = (Integer) operation.get( attribute );
 		return classReferences.get( index ).toString();
 	}
 
@@ -161,7 +161,7 @@ public class AvroDeserializer implements Deserializer {
 	}
 
 	private Map<String, String> getAnalyzers(GenericRecord operation) {
-		Map<?,?> analyzersWithUtf8  = (Map<?,?>) operation.get( "fieldToAnalyzerMap" );
+		Map<?,?> analyzersWithUtf8 = (Map<?,?>) operation.get( "fieldToAnalyzerMap" );
 		if ( analyzersWithUtf8 == null ) {
 			return null;
 		}

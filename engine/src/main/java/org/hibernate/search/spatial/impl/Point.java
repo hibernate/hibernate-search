@@ -69,7 +69,7 @@ public final class Point implements Coordinates {
 	 * @return longitude normalized in ]-180;+180]
 	 */
 	public static double normalizeLongitude(double longitude) {
-		if ( longitude ==  ( -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) {
+		if ( longitude == ( -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) {
 			return GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ;
 		}
 		else {

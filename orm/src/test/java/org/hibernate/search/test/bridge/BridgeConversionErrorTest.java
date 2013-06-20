@@ -113,7 +113,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 
 	public void testEmbeddedEmbeddedBridgeError() throws Exception {
 		SimpleEntity entity = new SimpleEntity( null ); // null won't throw an exception
-		EmbeddedEntity embedded = new EmbeddedEntity( null );  // null won't throw an exception
+		EmbeddedEntity embedded = new EmbeddedEntity( null ); // null won't throw an exception
 		entity.setEmbedded( embedded );
 		embedded.setEmbeddedEmbedded( new EmbeddedEmbeddedEntity( "foo" ) );
 		org.hibernate.Session s = openSession();

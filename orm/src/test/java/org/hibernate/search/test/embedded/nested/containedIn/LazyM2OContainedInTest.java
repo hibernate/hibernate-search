@@ -89,8 +89,8 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 		Entity1ForUnindexed ent1_0 = new Entity1ForUnindexed();
 		Entity1ForUnindexed ent1_1 = new Entity1ForUnindexed();
 
-		Entity2ForUnindexed ent2_0   = new Entity2ForUnindexed();
-		Entity2ForUnindexed ent2_1   = new Entity2ForUnindexed();
+		Entity2ForUnindexed ent2_0 = new Entity2ForUnindexed();
+		Entity2ForUnindexed ent2_1 = new Entity2ForUnindexed();
 
 		ent2_0.setEntity1( ent1_0 );
 		ent1_0.getEntities2().add( ent2_0 );

@@ -67,7 +67,7 @@ public abstract class SpatialFieldBridge implements FieldBridge {
 		}
 		catch ( NoSuchFieldException e ) {
 			try {
-				PropertyDescriptor propertyDescriptor =  new PropertyDescriptor(
+				PropertyDescriptor propertyDescriptor = new PropertyDescriptor(
 						coordinateField,
 						clazz,
 						"get" + capitalize( coordinateField ),

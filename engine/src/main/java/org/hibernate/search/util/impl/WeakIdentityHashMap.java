@@ -219,7 +219,7 @@ public class WeakIdentityHashMap<K,V> /*extends AbstractMap*/ implements Map<K,V
 	 */
 	int hash(Object x) {
 		int h = System.identityHashCode( x );
-		return h - ( h << 7 );  // that is,, -127 * h
+		return h - ( h << 7 ); // that is,, -127 * h
 	}
 
 	/**
@@ -250,8 +250,9 @@ public class WeakIdentityHashMap<K,V> /*extends AbstractMap*/ implements Map<K,V
 					else {
 						prev.next = next;
 					}
-					e.next = null;  // Help GC
-					e.value = null; //  "   "
+					// Assign null helps GC
+					e.next = null;
+					e.value = null;
 					size--;
 					break;
 				}
@@ -438,8 +439,9 @@ public class WeakIdentityHashMap<K,V> /*extends AbstractMap*/ implements Map<K,V
 				Entry<K,V> next = e.next;
 				K key = e.get();
 				if ( key == null ) {
-					e.next = null;  // Help GC
-					e.value = null; //  "   "
+					// Assign null helps GC
+					e.next = null;
+					e.value = null;
 					size--;
 				}
 				else {

@@ -134,7 +134,7 @@ public class NullEmbeddedTest extends SearchTestCase {
 	public void testEmbeddedNullIndexing() throws Exception {
 		Man me = new Man( "Davide" );
 		Pet dog = new Pet( "dog" );
-		me.setPet( null  );
+		me.setPet( null );
 
 		Man someoneElse = new Man( "Omar" );
 

@@ -241,7 +241,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 					log.unableToRemovePreviousMarket( indexName );
 				}
 				try {
-					new File( destination, CURRENT_DIR_NAME[index]  ).createNewFile();
+					new File( destination, CURRENT_DIR_NAME[index] ).createNewFile();
 				}
 				catch ( IOException e ) {
 					log.unableToCreateCurrentMarker( indexName, e );

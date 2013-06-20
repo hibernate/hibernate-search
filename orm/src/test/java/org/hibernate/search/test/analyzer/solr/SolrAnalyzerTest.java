@@ -58,7 +58,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 	public void testAnalyzerDef() throws Exception {
 		// create the test instance
 		Team team = new Team();
-		team.setDescription( "This is a D\u00E0scription" );  // \u00E0 == � - ISOLatin1AccentFilterFactory should strip of diacritic
+		team.setDescription( "This is a D\u00E0scription" ); // \u00E0 == � - ISOLatin1AccentFilterFactory should strip of diacritic
 		team.setLocation( "Atlanta" );
 		team.setName( "ATL team" );
 
@@ -73,7 +73,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		tx = fts.beginTransaction();
 		TermQuery query = new TermQuery( new Term( "description", "D\u00E0scription" ) );
 		assertEquals(
-				"iso latin filter should work.  � should be a now", 0, fts.createFullTextQuery( query ).list().size()
+				"iso latin filter should work. � should be a now", 0, fts.createFullTextQuery( query ).list().size()
 		);
 
 		query = new TermQuery( new Term( "description", "is" ) );

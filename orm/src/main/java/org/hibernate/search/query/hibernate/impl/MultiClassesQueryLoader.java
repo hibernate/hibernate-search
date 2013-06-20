@@ -83,7 +83,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			safeEntityTypes.addAll( entityTypes );
 		}
 		entityMatadata = new ArrayList<RootEntityMetadata>( safeEntityTypes.size() );
-		for ( Class clazz :  safeEntityTypes ) {
+		for ( Class clazz : safeEntityTypes ) {
 			entityMatadata.add( new RootEntityMetadata( clazz, searchFactoryImplementor ) );
 		}
 	}
