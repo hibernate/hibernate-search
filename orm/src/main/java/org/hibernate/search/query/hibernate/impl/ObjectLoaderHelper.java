@@ -110,7 +110,7 @@ public class ObjectLoaderHelper {
 								+ entityInfo.getIdName()
 								+ "' as document id and '"
 								+ entityInfo.getId()
-								+ "'  as value was not unique"
+								+ "' as value was not unique"
 				);
 			}
 		}

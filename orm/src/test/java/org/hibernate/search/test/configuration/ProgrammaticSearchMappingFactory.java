@@ -167,10 +167,10 @@ public class ProgrammaticSearchMappingFactory {
 					.property( "name", ElementType.METHOD )
 						.field()
 				.entity( LatLongAnnTestPoi.class ).indexed()
-					.spatial().name(  "location" )
-					.property(  "latitude", ElementType.FIELD )
+					.spatial().name( "location" )
+					.property( "latitude", ElementType.FIELD )
 						.latitude().name( "location" )
-					.property(  "longitude", ElementType.FIELD )
+					.property( "longitude", ElementType.FIELD )
 						.longitude().name( "location" )
 		;
 

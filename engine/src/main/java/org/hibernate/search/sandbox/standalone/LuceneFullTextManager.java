@@ -76,7 +76,7 @@ public class LuceneFullTextManager implements FullTextManager {
 	}
 
 	public FullTextQuery createFullTextQuery(Query luceneQuery, Class<?>... entities) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return null;
 	}
 
 

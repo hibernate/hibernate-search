@@ -67,7 +67,7 @@ public class InfinispanModuleMemberRegistrationIT {
 	}
 
 	private static Asset manifest() {
-		String manifest =  Descriptors.create( ManifestDescriptor.class )
+		String manifest = Descriptors.create( ManifestDescriptor.class )
 				.attribute( "Dependencies", "org.hibernate.search.orm services" )
 				.exportAsString();
 		return new StringAsset( manifest );

@@ -64,7 +64,7 @@ public class TwoNodesTest {
 
 	@Test
 	public void testSomething() {
-		assertEquals( 2, clusterSize( nodea, SimpleEmail.class  ) );
+		assertEquals( 2, clusterSize( nodea, SimpleEmail.class ) );
 		// index an entity:
 		{
 			FullTextSession fullTextSession = nodea.openFullTextSession();
@@ -88,7 +88,7 @@ public class TwoNodesTest {
 		finally {
 			nodeC.close();
 		}
-		assertEquals( 2, clusterSize( nodea, SimpleEmail.class  ) );
+		assertEquals( 2, clusterSize( nodea, SimpleEmail.class ) );
 		verifyNodeSeesUpdatedIndex( nodea );
 		verifyNodeSeesUpdatedIndex( nodeb );
 	}

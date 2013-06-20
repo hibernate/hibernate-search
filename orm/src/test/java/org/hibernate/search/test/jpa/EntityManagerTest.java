@@ -50,7 +50,7 @@ public class EntityManagerTest extends JPATestCase {
 		query = new TermQuery( new Term("saltQty", "23.0") );
 		assertEquals( "getResultList", 1, em.createFullTextQuery( query ).getResultList().size() );
 		assertEquals( "getSingleResult and object retrieval", 23f,
-				( (Bretzel)  em.createFullTextQuery( query ).getSingleResult() ).getSaltQty() );
+				( (Bretzel) em.createFullTextQuery( query ).getSingleResult() ).getSaltQty() );
 		assertEquals( 1, em.createFullTextQuery( query ).getResultSize() );
 		em.getTransaction().commit();
 

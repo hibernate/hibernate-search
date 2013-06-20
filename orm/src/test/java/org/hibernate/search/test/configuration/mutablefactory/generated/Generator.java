@@ -69,7 +69,7 @@ public class Generator {
 		}
 		catch ( IOException e ) {
 			System.out.println( "Error while generating classes" );
-			e.printStackTrace(  );
+			e.printStackTrace();
 		}
 		System.out.println( "Generated in :" + f.getAbsolutePath() );
 	}

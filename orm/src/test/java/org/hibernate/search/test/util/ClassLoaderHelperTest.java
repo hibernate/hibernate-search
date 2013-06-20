@@ -119,7 +119,7 @@ public class ClassLoaderHelperTest {
 	@Test
 	public void testLoadingAnalyzerWithVersionConstructor() {
 		Analyzer analyzer = ClassLoaderHelper.analyzerInstanceFromClass(
-				StandardAnalyzer.class,  Environment.DEFAULT_LUCENE_MATCH_VERSION
+				StandardAnalyzer.class, Environment.DEFAULT_LUCENE_MATCH_VERSION
 		);
 		assertNotNull( "We should be able to instantiate an analyzer with a Lucene version parameter", analyzer );
 	}

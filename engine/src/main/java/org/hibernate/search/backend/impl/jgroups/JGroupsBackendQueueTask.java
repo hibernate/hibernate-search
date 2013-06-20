@@ -92,7 +92,7 @@ public class JGroupsBackendQueueTask {
 		data = MessageSerializationHelper.prependString( indexName, data );
 
 		try {
-			Message message =  masterNodeSelector.createMessage( data );
+			Message message = masterNodeSelector.createMessage( data );
 			factory.getMessageSender().send( message, blockForACK, messageTimeout );
 			if ( trace ) {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );

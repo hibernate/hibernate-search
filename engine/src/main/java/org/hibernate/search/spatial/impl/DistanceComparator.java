@@ -74,7 +74,7 @@ public final class DistanceComparator extends FieldComparator<Double> {
 		double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( reader, longitudeField );
 		this.docBase = docBase;
 		for ( int i = 0; i < unbasedLatitudeValues.length; i++ ) {
-			latitudeValues.put( this.docBase + i,  unbasedLatitudeValues[i] );
+			latitudeValues.put( this.docBase + i, unbasedLatitudeValues[i] );
 			longitudeValues.put( this.docBase + i, unbasedLongitudeValues[i] );
 		}
 	}

@@ -59,14 +59,14 @@ public class UselessShardingStrategy implements IndexShardingStrategy {
 		int counter;
 		counter = checkEnumeration( propertyNames );
 		if ( counter != 2 ) {
-			throw new IllegalStateException( "propertyNames() fails"            );
+			throw new IllegalStateException( "propertyNames() fails" );
 		}
 		counter = checkEnumeration( properties.keys() );
 		if ( counter != 2 ) {
 			throw new IllegalStateException( "keys() fails" );
 		}
 		counter = 0;
-		for ( Object key :  properties.keySet() ) {
+		for ( Object key : properties.keySet() ) {
 			if ( ! String.class.isInstance( key ) ) {
 				continue;
 			}

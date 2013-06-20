@@ -66,6 +66,6 @@ public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
 	public String objectToString(Object value) {
 		String originalValue = value.toString();
-		return  "<b>" + originalValue + "</b>";
+		return "<b>" + originalValue + "</b>";
 	}
 }

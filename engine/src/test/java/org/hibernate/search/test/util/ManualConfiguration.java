@@ -46,7 +46,7 @@ import org.hibernate.search.spi.ServiceProvider;
  */
 public class ManualConfiguration extends SearchConfigurationBase implements SearchConfiguration {
 
-	private final Map<String,Class<?>>  classes;
+	private final Map<String,Class<?>> classes;
 	private final Properties properties;
 	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
 	private final InstanceInitializer initializer;

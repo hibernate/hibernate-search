@@ -617,7 +617,7 @@ public class DSLTest extends SearchTestCase {
 		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 
 		assertEquals( "test quad tree based spatial query", 1, results.size() );
-		assertEquals( "test quad tree based spatial  query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
+		assertEquals( "test quad tree based spatial query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
 
 		transaction.commit();
 	}

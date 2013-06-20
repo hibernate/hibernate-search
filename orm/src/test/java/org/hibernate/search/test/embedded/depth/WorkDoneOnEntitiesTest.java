@@ -196,7 +196,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		ps[1] = new WorkingPerson( 1, "John of England" );
 		ps[2] = new WorkingPerson( 2, "Henry II of England" );
 		ps[3] = new WorkingPerson( 3, "Eleanor of Aquitaine" );
-		ps[4] = new WorkingPerson( 4, "Geoffrey V  of Anjou" );
+		ps[4] = new WorkingPerson( 4, "Geoffrey V of Anjou" );
 		ps[5] = new WorkingPerson( 5, "Empress Matilda" );
 		ps[6] = new WorkingPerson( 6, "William X of Aquitaine" );
 		ps[7] = new WorkingPerson( 7, "Aenor de Châtellerault" );
