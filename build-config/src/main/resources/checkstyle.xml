@@ -55,7 +55,7 @@
         <module name="PackageAnnotation" />
         <module name="CovariantEquals" />
         <module name="ModifiedControlVariable" />
-        <!-- <module name="NeedBraces" /> -->
+        <module name="NeedBraces" />
         <module name="OneStatementPerLine" />
         <module name="EmptyStatement" />
         <module name="DefaultComesLast" />
