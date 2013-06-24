@@ -446,7 +446,7 @@ public abstract class AbstractDocumentBuilder<T> {
 			);
 			return false; // can't know what a class bridge is going to look at -> reindex // TODO nice new feature to have?
 		}
-		BoostStrategy boostStrategy = typeMetadata.getClassBoostStrategy();
+		BoostStrategy boostStrategy = typeMetadata.getDynamicBoost();
 		if ( boostStrategy != null && !( boostStrategy instanceof DefaultBoostStrategy ) ) {
 			log.tracef(
 					"State inspection optimization disabled as DynamicBoost is enabled on entity %s",

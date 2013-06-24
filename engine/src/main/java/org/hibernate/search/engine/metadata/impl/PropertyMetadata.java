@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -47,27 +46,17 @@ public class PropertyMetadata {
 	private final Map<String, DocumentFieldMetadata> documentFieldMetadata;
 	private final Set<DocumentFieldMetadata> documentFieldMetadataSet;
 	private final BoostStrategy dynamicBoostStrategy;
-	private final Integer precisionStep;
-	private final String nullToken;
 
 	private PropertyMetadata(Builder builder) {
 		this.propertyAccessor = builder.propertyAccessor;
 		this.documentFieldMetadataSet = Collections.unmodifiableSet( builder.fieldMetadataSet );
 		this.documentFieldMetadata = createDocumentFieldMetadataMap( builder.fieldMetadataSet );
-		this.nullToken = builder.nullToken;
 
 		if ( builder.dynamicBoostStrategy != null ) {
 			this.dynamicBoostStrategy = builder.dynamicBoostStrategy;
 		}
 		else {
 			this.dynamicBoostStrategy = DefaultBoostStrategy.INSTANCE;
-		}
-
-		if ( builder.precisionStep == null ) {
-			this.precisionStep = NumericField.PRECISION_STEP_DEFAULT;
-		}
-		else {
-			this.precisionStep = builder.precisionStep;
 		}
 	}
 
@@ -85,14 +74,6 @@ public class PropertyMetadata {
 
 	public String getPropertyAccessorName() {
 		return propertyAccessor == null ? null : propertyAccessor.getName();
-	}
-
-	public Integer getPrecisionStep() {
-		return precisionStep;
-	}
-
-	public String getNullToken() {
-		return nullToken;
 	}
 
 	public Set<DocumentFieldMetadata> getFieldMetadata() {
@@ -114,8 +95,6 @@ public class PropertyMetadata {
 
 		// optional parameters
 		private BoostStrategy dynamicBoostStrategy;
-		private Integer precisionStep;
-		private String nullToken;
 
 		public Builder(XProperty propertyAccessor) {
 			if ( propertyAccessor != null ) {
@@ -127,16 +106,6 @@ public class PropertyMetadata {
 
 		public Builder dynamicBoostStrategy(BoostStrategy boostStrategy) {
 			this.dynamicBoostStrategy = boostStrategy;
-			return this;
-		}
-
-		public Builder precisionStep(Integer precisionStep) {
-			this.precisionStep = precisionStep;
-			return this;
-		}
-
-		public Builder indexNullAs(String nullToken) {
-			this.nullToken = nullToken;
 			return this;
 		}
 
@@ -160,8 +129,6 @@ public class PropertyMetadata {
 		sb.append( "propertyAccessor=" ).append( propertyAccessor );
 		sb.append( ", fieldMetadata=" ).append( documentFieldMetadataSet );
 		sb.append( ", dynamicBoostStrategy=" ).append( dynamicBoostStrategy );
-		sb.append( ", precisionStep=" ).append( precisionStep );
-		sb.append( ", nullToken='" ).append( nullToken ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
 	}

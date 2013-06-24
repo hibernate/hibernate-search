@@ -21,30 +21,57 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.metadata;
+package org.hibernate.search.metadata.impl;
 
+import java.util.Collections;
 import java.util.Set;
 
+import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.engine.impl.DefaultBoostStrategy;
+import org.hibernate.search.metadata.FieldDescriptor;
+import org.hibernate.search.metadata.IndexDescriptor;
+import org.hibernate.search.metadata.IndexedTypeDescriptor;
+
 /**
+ * Dummy descriptor for an unindexed type
+ *
  * @author Hardy Ferentschik
  */
-public interface IndexDescriptor {
-	/**
-	 * @return the name of the Lucene index (unless it is sharded in which case {@link #getShardNames()} should be used. In the case of
-	 *         a sharded this method will return an arbitrary valid index name from the set of shard index names.
-	 */
-	String getName();
+public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescriptor {
+	public static final IndexedTypeDescriptor INSTANCE = new IndexedTypeDescriptorForUnindexedType();
 
-	/**
-	 * @return {@code true} is this index is sharded, {@code false} otherwise
-	 */
-	boolean isSharded();
+	private IndexedTypeDescriptorForUnindexedType() {
+	}
 
-	/**
-	 * @return the set of index names for a sharded index. In case the index is not sharded the set will just contain the
-	 *         single index name. See {@link #getName()}.
-	 */
-	Set<String> getShardNames();
+	@Override
+	public boolean isIndexed() {
+		return false;
+	}
+
+	@Override
+	public float getStaticBoost() {
+		return 1;
+	}
+
+	@Override
+	public BoostStrategy getDynamicBoost() {
+		return DefaultBoostStrategy.INSTANCE;
+	}
+
+	@Override
+	public IndexDescriptor getIndexDescriptor() {
+		return null;
+	}
+
+	@Override
+	public Set<FieldDescriptor> getIndexedFields() {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public FieldDescriptor getIndexedField(String fieldName) {
+		return null;
+	}
 }
 
 

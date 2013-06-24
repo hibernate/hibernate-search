@@ -25,6 +25,8 @@ package org.hibernate.search.metadata;
 
 import java.util.Set;
 
+import org.hibernate.search.engine.BoostStrategy;
+
 /**
  * Top level descriptor of the metadata API. Giving access to the indexing information for a single entity.
  *
@@ -32,22 +34,29 @@ import java.util.Set;
  */
 public interface IndexedTypeDescriptor {
 	/**
-	 * @return {@code true} if the entity for this descriptor is indexed, {@code false} otherwise
+	 * @return {@code true} if the type for this descriptor is indexed, {@code false} otherwise
 	 */
 	boolean isIndexed();
 
 	/**
 	 * @return the class boost value, 1 being the default.
 	 */
-	float getClassBoost();
+	float getStaticBoost();
 
 	/**
-	 * @return an {@code IndexDescriptor} instance describing Lucene index information
+	 * @return Dynamic boost strategy. There will always be a boost strategy, but the default strategy will apply a
+	 *         boost of 1.0.
+	 */
+	BoostStrategy getDynamicBoost();
+
+	/**
+	 * @return an {@code IndexDescriptor} instance describing Lucene index information. {@code null} is returned for
+	 *         an unindexed type
 	 */
 	IndexDescriptor getIndexDescriptor();
 
 	/**
-	 * @return a set of {@code FieldDescriptor}s for the indexed fields of the entity.
+	 * @return a set of {@code FieldDescriptor}s for the indexed fields of the type.
 	 */
 	// TODO does this include the id field descriptor or should that be a separate descriptor?
 	// TODO should OBJECT_CLASS be considered?

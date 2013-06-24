@@ -21,8 +21,8 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.metadata;
+package org.hibernate.search.metadata.impl;
 
 /**
- * This package contains a read only metamodel for indexed entities.
+ * This package contains the implementation classes of the public metadata API
  */

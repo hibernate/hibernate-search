@@ -25,6 +25,7 @@ package org.hibernate.search.engine.metadata.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 
@@ -41,6 +42,10 @@ public class DocumentFieldMetadata {
 	private final FieldBridge fieldBridge;
 	private final Float boost;
 	private final Analyzer analyzer;
+	private final boolean isId;
+	private final String nullToken;
+	private final boolean isNumeric;
+	private final int precisionStep;
 
 	private DocumentFieldMetadata(Builder builder) {
 		this.fieldName = builder.fieldName;
@@ -50,10 +55,18 @@ public class DocumentFieldMetadata {
 		this.fieldBridge = builder.fieldBridge;
 		this.boost = builder.boost;
 		this.analyzer = builder.analyzer;
+		this.isId = builder.isId;
+		this.nullToken = builder.nullToken;
+		this.isNumeric = builder.isNumeric;
+		this.precisionStep = builder.precisionStep;
 	}
 
 	public String getName() {
 		return fieldName;
+	}
+
+	public boolean isId() {
+		return isId;
 	}
 
 	public Store getStore() {
@@ -80,9 +93,21 @@ public class DocumentFieldMetadata {
 		return analyzer;
 	}
 
+	public String indexNullAs() {
+		return nullToken;
+	}
+
+	public boolean isNumeric() {
+		return isNumeric;
+	}
+
+	public Integer getPrecisionStep() {
+		return precisionStep;
+	}
+
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder( "FieldMetadata{" );
+		final StringBuilder sb = new StringBuilder( "DocumentFieldMetadata{" );
 		sb.append( "fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( ", store=" ).append( store );
 		sb.append( ", index=" ).append( index );
@@ -90,6 +115,10 @@ public class DocumentFieldMetadata {
 		sb.append( ", fieldBridge=" ).append( fieldBridge );
 		sb.append( ", boost=" ).append( boost );
 		sb.append( ", analyzer=" ).append( analyzer );
+		sb.append( ", isId=" ).append( isId );
+		sb.append( ", nullToken='" ).append( nullToken ).append( '\'' );
+		sb.append( ", numeric=" ).append( isNumeric );
+		sb.append( ", precisionStep=" ).append( precisionStep );
 		sb.append( '}' );
 		return sb.toString();
 	}
@@ -105,11 +134,15 @@ public class DocumentFieldMetadata {
 		private FieldBridge fieldBridge;
 		private Float boost;
 		private Analyzer analyzer;
+		private boolean isId;
+		private String nullToken;
+		private boolean isNumeric;
+		private int precisionStep = NumericField.PRECISION_STEP_DEFAULT;
 
 		public Builder(String fieldName,
-			Store store,
-			Field.Index index,
-			Field.TermVector termVector) {
+				Store store,
+				Field.Index index,
+				Field.TermVector termVector) {
 
 			this.fieldName = fieldName;
 			this.store = store;
@@ -129,6 +162,26 @@ public class DocumentFieldMetadata {
 
 		public Builder analyzer(Analyzer analyzer) {
 			this.analyzer = analyzer;
+			return this;
+		}
+
+		public Builder id() {
+			this.isId = true;
+			return this;
+		}
+
+		public Builder indexNullAs(String nullToken) {
+			this.nullToken = nullToken;
+			return this;
+		}
+
+		public Builder numeric() {
+			this.isNumeric = true;
+			return this;
+		}
+
+		public Builder precisionStep(int precisionStep) {
+			this.precisionStep = precisionStep;
 			return this;
 		}
 

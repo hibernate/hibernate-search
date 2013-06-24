@@ -267,8 +267,8 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	}
 
 	@Override
-	public Set<Class<?>> getIndexedEntities() {
-		return delegate.getIndexedEntities();
+	public Set<Class<?>> getIndexedTypes() {
+		return delegate.getIndexedTypes();
 	}
 
 	@Override

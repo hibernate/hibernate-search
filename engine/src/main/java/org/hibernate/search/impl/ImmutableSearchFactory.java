@@ -26,13 +26,12 @@ package org.hibernate.search.impl;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
-
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.Environment;
-import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
@@ -58,6 +57,9 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.metadata.impl.IndexedTypeDescriptorForUnindexedType;
+import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.impl.HSQueryImpl;
@@ -91,6 +93,10 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	private final Map<Class<?>, EntityIndexBinder> indexBindingForEntities;
 	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
+	/**
+	 * Lazily populated map of type descriptors
+	 */
+	private final ConcurrentHashMap<Class<?>, IndexedTypeDescriptor> indexedTypeDescriptors;
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
@@ -142,20 +148,21 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.GENERATE_STATS, false
 		);
-		statistics.setStatisticsEnabled( statsEnabled );
+		this.statistics.setStatisticsEnabled( statsEnabled );
 
 		this.enableDirtyChecks = ConfigurationParseHelper.getBooleanValue(
 				configurationProperties, Environment.ENABLE_DIRTY_CHECK, true
 		);
 
 		if ( isJMXEnabled() ) {
-			statisticsMBeanName = registerMBeans();
+			this.statisticsMBeanName = registerMBeans();
 		}
 		else {
-			statisticsMBeanName = null;
+			this.statisticsMBeanName = null;
 		}
 
 		this.indexReaderAccessor = new DefaultIndexReaderAccessor( this );
+		this.indexedTypeDescriptors = new ConcurrentHashMap<Class<?>, IndexedTypeDescriptor>();
 	}
 
 	@Override
@@ -417,12 +424,30 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@Override
 	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType) {
-		// TODO implement
-		return null;
+		IndexedTypeDescriptor typeDescriptor;
+		if ( indexedTypeDescriptors.containsKey( entityType ) ) {
+			typeDescriptor = indexedTypeDescriptors.get( entityType );
+		}
+		else {
+			EntityIndexBinder indexBinder = indexBindingForEntities.get( entityType );
+			IndexedTypeDescriptor indexedTypeDescriptor;
+			if ( indexBinder == null ) {
+				indexedTypeDescriptor = IndexedTypeDescriptorForUnindexedType.INSTANCE;
+			}
+			else {
+				indexedTypeDescriptor = new IndexedTypeDescriptorImpl(
+						indexBinder.getDocumentBuilder().getMetadata(),
+						indexBinder.getIndexManagers()
+				);
+			}
+			indexedTypeDescriptors.put( entityType, indexedTypeDescriptor );
+			typeDescriptor = indexedTypeDescriptor;
+		}
+		return typeDescriptor;
 	}
 
 	@Override
-	public Set<Class<?>> getIndexedEntities() {
+	public Set<Class<?>> getIndexedTypes() {
 		return indexBindingForEntities.keySet();
 	}
 

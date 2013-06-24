@@ -173,6 +173,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 								Field.Index.NOT_ANALYZED_NO_NORMS,
 								termVector
 						)
+								.id()
 								.boost( AnnotationProcessingHelper.getBoost( member, null ) )
 								.fieldBridge( idBridge )
 								.build();
@@ -751,8 +752,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( fieldAnnotation != null ) {
 			if ( isFieldInPath( fieldAnnotation, member, pathsContext, prefix ) || !parseContext.isMaxLevelReached() ) {
 				PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
-						.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) )
-						.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) );
+						.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
 				bindFieldAnnotation(
 						prefix,
@@ -781,9 +781,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ConfigContext configContext,
 			ParseContext parseContext) {
 
-		String nullToken = determineNullToken( fieldAnnotation, configContext );
-		propertyMetadataBuilder.indexNullAs( nullToken );
-
 		XProperty member = propertyMetadataBuilder.getPropertyAccessor();
 
 		if ( isPropertyTransient( member, configContext ) ) {
@@ -807,25 +804,39 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				member,
 				reflectionManager
 		);
+
+		String nullToken = determineNullToken( fieldAnnotation, configContext );
 		if ( nullToken != null && fieldBridge instanceof TwoWayFieldBridge ) {
 			fieldBridge = new NullEncodingTwoWayFieldBridge( (TwoWayFieldBridge) fieldBridge, nullToken );
 		}
 		Analyzer analyzer = determineAnalyzer( fieldAnnotation, member, configContext );
 
-		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
+		// adjust the type analyzer
+		analyzer = typeMetadataBuilder.addToScopedAnalyzer(
+				fieldName,
+				analyzer,
+				index
+		);
+
+		DocumentFieldMetadata.Builder fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
+				fieldName,
+				store,
+				index,
+				termVector
+		)
 				.boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
 				.fieldBridge( fieldBridge )
 				.analyzer( analyzer )
-				.build();
+				.indexNullAs( nullToken );
 
+		if ( numericFieldAnnotation != null ) {
+			fieldMetadataBuilder.numeric()
+					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) );
+		}
+
+		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
-		// adjust the type analyzer
-		typeMetadataBuilder.addToScopedAnalyzer(
-				fieldMetadata.getName(),
-				fieldMetadata.getAnalyzer(),
-				fieldMetadata.getIndex()
-		);
 
 		// keep track of collection role names for ORM integration optimization based on collection update events
 		if ( member.isCollection() ) {
@@ -1000,15 +1011,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						pathsContext,
 						prefix
 				) || !parseContext.isMaxLevelReached() ) {
-
-					NumericField numericFieldAnnotation = getNumericExtension(
-							fieldAnnotation,
-							numericFieldsAnnotations
-					);
-
 					PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
-							.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) )
-							.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) );
+							.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
 					bindFieldAnnotation(
 							prefix,

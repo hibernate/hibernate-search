@@ -25,6 +25,7 @@ package org.hibernate.search.metadata;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
@@ -49,24 +50,29 @@ public interface FieldDescriptor {
 	boolean isId();
 
 	/**
-	 * @return an {@code Analyze} enum instance defining the type of analyzing applied to this field.
+	 * @return an {@code Index} enum instance defining whether this field is indexed
 	 */
-	Analyze getAnalyzeType();
+	Index getIndex();
 
 	/**
-	 * @return a {@code Store} enum instance defining whether the index value is stored in the index itself.
+	 * @return an {@code Analyze} enum instance defining the type of analyzing applied to this field
 	 */
-	Store getStoreType();
+	Analyze getAnalyze();
+
+	/**
+	 * @return a {@code Store} enum instance defining whether the index value is stored in the index itself
+	 */
+	Store getStore();
 
 	/**
 	 * @return a {@code TermVector} enum instance defining whether and how term vectors are stored for this field
 	 */
-	TermVector getTermVectorType();
+	TermVector getTermVector();
 
 	/**
 	 * @return a {@code Norms} enum instance defining whether and how norms are stored for this field
 	 */
-	Norms getNormType();
+	Norms getNorms();
 
 	/**
 	 * @return the boost value for this field. 1 being the default value.
@@ -74,9 +80,29 @@ public interface FieldDescriptor {
 	float getBoost();
 
 	/**
-	 * @return the string used to index {@code null} values. {@code null} in case null values are not indexed.
+	 * @return the string used to index {@code null} values. {@code null} in case null values are not indexed
 	 */
-	String nullIndexedAs();
+	String indexNullAs();
+
+	/**
+	 * @return {@code true} if {@code null} values are indexed, {@code false} otherwise
+	 *
+	 * @see #indexNullAs()
+	 */
+	boolean indexNull();
+
+	/**
+	 * @return the numeric precision step in case this field is indexed as a numeric value. If the field is not numeric
+	 *         {@code null} is returned.
+	 */
+	Integer precisionStep();
+
+	/**
+	 * @return {@code true} if this field is indexed as numeric field, {@code false} otherwise
+	 *
+	 * @see #precisionStep()
+	 */
+	boolean isNumeric();
 
 	/**
 	 * @return the field bridge instance used to convert the property value into a string based field value

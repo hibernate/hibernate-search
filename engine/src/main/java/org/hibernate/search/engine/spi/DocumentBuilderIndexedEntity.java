@@ -443,7 +443,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// process the indexed fields
 		XMember previousMember = null;
 		Object currentFieldValue = null;
-		for ( PropertyMetadata propertyMetadata : typeMetadata.getPropertyMetadata() ) {
+		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
 			XMember member = propertyMetadata.getPropertyAccessor();
 			if ( previousMember != member ) {
 				currentFieldValue = unproxy(
@@ -761,7 +761,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			allowFieldSelectionInProjection = false;
 			return;
 		}
-		for ( PropertyMetadata propertyMetadata : getMetadata().getPropertyMetadata() ) {
+		for ( PropertyMetadata propertyMetadata : getMetadata().getAllPropertyMetadata() ) {
 			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
 				FieldBridge bridge = documentFieldMetadata.getFieldBridge();
 				if ( !( bridge instanceof TwoWayStringBridge
