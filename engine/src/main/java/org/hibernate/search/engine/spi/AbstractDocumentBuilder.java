@@ -350,18 +350,18 @@ public abstract class AbstractDocumentBuilder<T> {
 			// so it looks like we can rely on reference equality comparisons, or at least that seems a safe way:
 			PropertyMetadata propertyMetadata = typeMetadata.getPropertyMetadataForProperty( dirtyPropertyName );
 			if ( propertyMetadata != null ) {
+				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+					// take care of indexed fields:
+					if ( fieldMetadata.getIndex().isIndexed() ) {
+						return true;
+					}
 
-				DocumentFieldMetadata fieldMetadata = propertyMetadata.getFieldMetadata();
-				// take care of indexed fields:
-				if ( fieldMetadata.getIndex().isIndexed() ) {
-					return true;
-				}
-
-				// take care of stored fields:
-				Store store = fieldMetadata.getStore();
-				if ( store.equals( Store.YES ) || store.equals( Store.COMPRESS ) ) {
-					// unless Store.NO, which doesn't affect the index
-					return true;
+					// take care of stored fields:
+					Store store = fieldMetadata.getStore();
+					if ( store.equals( Store.YES ) || store.equals( Store.COMPRESS ) ) {
+						// unless Store.NO, which doesn't affect the index
+						return true;
+					}
 				}
 			}
 

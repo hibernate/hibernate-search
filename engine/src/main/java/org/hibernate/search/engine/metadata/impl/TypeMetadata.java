@@ -84,9 +84,9 @@ public class TypeMetadata {
 	private final Set<PropertyMetadata> propertyMetadataSet;
 
 	/**
-	 * Metadata for a Java property (field or getter) keyed against the document field name
+	 * Metadata for a document field keyed against the field name
 	 */
-	private final Map<String, PropertyMetadata> documentFieldNameToPropertyMetadata;
+	private final Map<String, DocumentFieldMetadata> documentFieldNameFieldMetadata;
 
 	/**
 	 * Metadata for a Java property (field or getter) keyed  the property name
@@ -169,14 +169,8 @@ public class TypeMetadata {
 		this.jpaIdUsedAsDocumentId = determineWhetherDocumentIdPropertyIsTheSameAsJpaIdProperty( builder.jpaProperty );
 		this.classBridgeFields = Collections.unmodifiableSet( builder.classBridgeFields );
 		this.propertyMetadataSet = Collections.unmodifiableSet( builder.propertyMetadataList );
-		this.propertyGetterNameToPropertyMetadata = keyPropertyMetadata(
-				builder.propertyMetadataList,
-				KeyType.PROPERTY_NAME
-		);
-		this.documentFieldNameToPropertyMetadata = keyPropertyMetadata(
-				builder.propertyMetadataList,
-				KeyType.DOCUMENT_FIELD_NAME
-		);
+		this.propertyGetterNameToPropertyMetadata = keyPropertyMetadata( builder.propertyMetadataList );
+		this.documentFieldNameFieldMetadata = keyFieldMetadata( builder.propertyMetadataList );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
 	}
 
@@ -212,8 +206,8 @@ public class TypeMetadata {
 		return idPropertyMetadata;
 	}
 
-	public PropertyMetadata getPropertyMetadataForDocumentField(String fieldName) {
-		return documentFieldNameToPropertyMetadata.get( fieldName );
+	public DocumentFieldMetadata getDocumentFieldMetadataFor(String fieldName) {
+		return documentFieldNameFieldMetadata.get( fieldName );
 	}
 
 	public PropertyMetadata getPropertyMetadataForProperty(String propertyName) {
@@ -252,8 +246,9 @@ public class TypeMetadata {
 		return new LuceneOptionsImpl( fieldMetadata );
 	}
 
-	public LuceneOptions getFieldLuceneOptions(PropertyMetadata propertyMetadata, Object value) {
-		DocumentFieldMetadata fieldMetadata = propertyMetadata.getFieldMetadata();
+	public LuceneOptions getFieldLuceneOptions(PropertyMetadata propertyMetadata,
+			DocumentFieldMetadata fieldMetadata,
+			Object value) {
 		return new LuceneOptionsImpl(
 				fieldMetadata,
 				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value ),
@@ -277,7 +272,7 @@ public class TypeMetadata {
 		sb.append( ", discriminator=" ).append( discriminator );
 		sb.append( ", discriminatorGetter=" ).append( discriminatorGetter );
 		sb.append( ", classBoostStrategy=" ).append( classBoostStrategy );
-		sb.append( ", documentFieldNameToFieldMetadata=" ).append( documentFieldNameToPropertyMetadata );
+		sb.append( ", documentFieldNameToFieldMetadata=" ).append( documentFieldNameFieldMetadata );
 		sb.append( ", propertyGetterNameToFieldMetadata=" ).append( propertyGetterNameToPropertyMetadata );
 		sb.append( ", idPropertyMetadata=" ).append( idPropertyMetadata );
 		sb.append( ", classBridgeFields=" ).append( classBridgeFieldNameToDocumentFieldMetadata );
@@ -300,26 +295,30 @@ public class TypeMetadata {
 			return false;
 		}
 		else {
-			return jpaIdProperty.equals( idPropertyMetadata.getPropertyGetter() );
+			return jpaIdProperty.equals( idPropertyMetadata.getPropertyAccessor() );
 		}
 	}
 
-	private Map<String, PropertyMetadata> keyPropertyMetadata(Set<PropertyMetadata> propertyMetadataSet, KeyType keyType) {
-		String key;
+	private Map<String, PropertyMetadata> keyPropertyMetadata(Set<PropertyMetadata> propertyMetadataSet) {
 		Map<String, PropertyMetadata> tmpMap = new HashMap<String, PropertyMetadata>();
 		for ( PropertyMetadata propertyMetadata : propertyMetadataSet ) {
-			DocumentFieldMetadata fieldMetadata = propertyMetadata.getFieldMetadata();
-			if ( KeyType.DOCUMENT_FIELD_NAME.equals( keyType ) ) {
-				key = fieldMetadata.getName();
-			}
-			else {
-				key = propertyMetadata.getPropertyGetterName();
-			}
+			tmpMap.put( propertyMetadata.getPropertyAccessorName(), propertyMetadata );
+		}
+		return Collections.unmodifiableMap( tmpMap );
+	}
 
-			PropertyMetadata oldPropertyMetadata = tmpMap.put( key, propertyMetadata );
-			if ( oldPropertyMetadata != null ) {
-				if ( !fieldMetadata.getIndex().equals( oldPropertyMetadata.getFieldMetadata().getIndex() ) ) {
-					log.inconsistentFieldConfiguration( fieldMetadata.getName() );
+	private Map<String, DocumentFieldMetadata> keyFieldMetadata(Set<PropertyMetadata> propertyMetadataSet) {
+		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
+		for ( PropertyMetadata propertyMetadata : propertyMetadataSet ) {
+			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
+				DocumentFieldMetadata oldFieldMetadata = tmpMap.put(
+						documentFieldMetadata.getName(),
+						documentFieldMetadata
+				);
+				if ( oldFieldMetadata != null ) {
+					if ( !documentFieldMetadata.getIndex().equals( oldFieldMetadata.getIndex() ) ) {
+						log.inconsistentFieldConfiguration( documentFieldMetadata.getName() );
+					}
 				}
 			}
 		}
@@ -491,11 +490,6 @@ public class TypeMetadata {
 		public TypeMetadata build() {
 			return new TypeMetadata( this );
 		}
-	}
-
-	private enum KeyType {
-		PROPERTY_NAME,
-		DOCUMENT_FIELD_NAME
 	}
 }
 

@@ -129,6 +129,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	private final FieldCacheCollectorFactory idFieldCacheCollectorFactory;
 
 	/**
+	 * The document field name of the document id
+	 */
+	private final String idFieldName;
+
+	/**
 	 * The property metadata for the document id (not that in the case of a provided id the id getter can be {@code null}.
 	 */
 	private PropertyMetadata idPropertyMetadata;
@@ -156,6 +161,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			throw new SearchException( "No document id in: " + clazz );
 		}
 
+		idFieldName = idPropertyMetadata.getFieldMetadata().iterator().next().getName();
+
 		CacheFromIndex fieldCacheOptions = clazz.getAnnotation( CacheFromIndex.class );
 		if ( fieldCacheOptions == null ) {
 			this.fieldCacheUsage = Collections.unmodifiableSet( EnumSet.of( org.hibernate.search.annotations.FieldCacheType.CLASS ) );
@@ -181,7 +188,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			);
 		}
 		this.entityState = EntityState.INDEXED;
-		this.identifierName = idProvided ? null : idPropertyMetadata.getPropertyGetter().getName();
+		this.identifierName = idProvided ? null : idPropertyMetadata.getPropertyAccessor().getName();
 	}
 
 	private PropertyMetadata providedIdMetadata(XClass clazz, ConfigContext context, ReflectionManager reflectionManager) {
@@ -212,7 +219,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 							.fieldBridge( providedIdFieldBridge )
 							.boost( 1.0f )
 							.build();
-			propertyMetadata = new PropertyMetadata.Builder( null, fieldMetadata ).build();
+			propertyMetadata = new PropertyMetadata.Builder( null)
+					.addDocumentField( fieldMetadata )
+					.build();
 		}
 
 		return propertyMetadata;
@@ -234,7 +243,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public XMember getIdGetter() {
-		return idPropertyMetadata.getPropertyGetter();
+		return idPropertyMetadata.getPropertyAccessor();
 	}
 
 	public FieldCacheCollectorFactory getIdFieldCacheCollectionFactory() {
@@ -252,7 +261,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	public void addWorkToQueue(Class<T> entityClass, T entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
-		DocumentFieldMetadata idFieldMetadata = idPropertyMetadata.getFieldMetadata();
+		DocumentFieldMetadata idFieldMetadata = idPropertyMetadata.getFieldMetadata( idFieldName );
 		String idInString = objectToString( getIdBridge(), idFieldMetadata.getName(), id, contextualBridge );
 		if ( delete && !add ) {
 			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
@@ -373,13 +382,15 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		doc.add( classField );
 
 		// now add the entity id to the document
-		LuceneOptions luceneOptions = new LuceneOptionsImpl( idPropertyMetadata.getFieldMetadata() );
+		DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
+
+		LuceneOptions luceneOptions = new LuceneOptionsImpl( idFieldMetaData );
 		final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( getIdBridge() );
 		conversionContext.setClass( entityType );
-		conversionContext.pushProperty( idPropertyMetadata.getFieldMetadata().getName() );
+		conversionContext.pushProperty( idFieldMetaData.getName() );
 
 		try {
-			contextualizedBridge.set( idPropertyMetadata.getFieldMetadata().getName(), id, doc, luceneOptions );
+			contextualizedBridge.set( idFieldMetaData.getName(), id, doc, luceneOptions );
 		}
 		finally {
 			conversionContext.popProperty();
@@ -433,7 +444,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		XMember previousMember = null;
 		Object currentFieldValue = null;
 		for ( PropertyMetadata propertyMetadata : typeMetadata.getPropertyMetadata() ) {
-			XMember member = propertyMetadata.getPropertyGetter();
+			XMember member = propertyMetadata.getPropertyAccessor();
 			if ( previousMember != member ) {
 				currentFieldValue = unproxy(
 						ReflectionHelper.getMemberValue( unproxiedInstance, member ),
@@ -450,16 +461,21 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				}
 			}
 
-			DocumentFieldMetadata fieldMetadata = propertyMetadata.getFieldMetadata();
-			final FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
-			final String fieldName = fieldMetadata.getName();
-			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
-			conversionContext.pushProperty( propertyMetadata.getPropertyGetterName() );
 			try {
-				oneWayConversionContext.set(
-						fieldName, currentFieldValue, doc,
-						typeMetadata.getFieldLuceneOptions( propertyMetadata, currentFieldValue )
-				);
+				conversionContext.pushProperty( propertyMetadata.getPropertyAccessorName() );
+
+				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+					final FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
+					final String fieldName = fieldMetadata.getName();
+					final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
+
+					oneWayConversionContext.set(
+							fieldName,
+							currentFieldValue,
+							doc,
+							typeMetadata.getFieldLuceneOptions( propertyMetadata, fieldMetadata, currentFieldValue )
+					);
+				}
 			}
 			finally {
 				conversionContext.popProperty();
@@ -628,17 +644,17 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	@Deprecated //with no replacement: too expensive to create the conversionContext each time this was needed
 	public Term getTerm(Serializable id) {
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
-		DocumentFieldMetadata fieldMetadata = idPropertyMetadata.getFieldMetadata();
+		DocumentFieldMetadata fieldMetadata = idPropertyMetadata.getFieldMetadata( idFieldName );
 		String idFieldName = fieldMetadata.getName();
 		return new Term( idFieldName, objectToString( getIdBridge(), idFieldName, id, conversionContext ) );
 	}
 
 	public TwoWayFieldBridge getIdBridge() {
-		return (TwoWayFieldBridge) idPropertyMetadata.getFieldMetadata().getFieldBridge();
+		return (TwoWayFieldBridge) idPropertyMetadata.getFieldMetadata( idFieldName ).getFieldBridge();
 	}
 
 	public String getIdKeywordName() {
-		return idPropertyMetadata.getFieldMetadata().getName();
+		return idPropertyMetadata.getFieldMetadata( idFieldName ).getName();
 	}
 
 	/**
@@ -649,13 +665,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 */
 	@Override
 	public Serializable getId(Object entity) {
-		if ( entity == null || idPropertyMetadata.getPropertyGetterName() == null || idProvided ) {
+		if ( entity == null || idPropertyMetadata.getPropertyAccessorName() == null || idProvided ) {
 			throw new IllegalStateException( "Cannot guess id from entity" );
 		}
 		Object unproxiedEntity = getInstanceInitializer().unproxy( entity );
 		return (Serializable) ReflectionHelper.getMemberValue(
 				unproxiedEntity,
-				idPropertyMetadata.getPropertyGetter()
+				idPropertyMetadata.getPropertyAccessor()
 		);
 	}
 
@@ -663,10 +679,12 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		if ( fieldName == null ) {
 			throw new AssertionFailure( "Field name should not be null" );
 		}
-		if ( fieldName.equals( idPropertyMetadata.getFieldMetadata().getName() ) ) {
+
+		DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
+		if ( fieldName.equals( idFieldMetaData.getName() ) ) {
 			return objectToString(
 					getIdBridge(),
-					idPropertyMetadata.getFieldMetadata().getName(),
+					idFieldMetaData.getName(),
 					value,
 					conversionContext
 			);
@@ -702,9 +720,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	private FieldBridge getBridge(TypeMetadata typeMetadata, String fieldName) {
 		// process base fields
-		PropertyMetadata propertyMetadata = typeMetadata.getPropertyMetadataForDocumentField( fieldName );
-		if ( propertyMetadata != null && propertyMetadata.getFieldMetadata().getFieldBridge() != null ) {
-			return propertyMetadata.getFieldMetadata().getFieldBridge();
+		DocumentFieldMetadata documentFieldMetadata = typeMetadata.getDocumentFieldMetadataFor( fieldName );
+		if ( documentFieldMetadata != null && documentFieldMetadata.getFieldBridge() != null ) {
+			return documentFieldMetadata.getFieldBridge();
 		}
 
 		// process embedded fields
@@ -744,12 +762,14 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			return;
 		}
 		for ( PropertyMetadata propertyMetadata : getMetadata().getPropertyMetadata() ) {
-			FieldBridge bridge = propertyMetadata.getFieldMetadata().getFieldBridge();
-			if ( !( bridge instanceof TwoWayStringBridge
-					|| bridge instanceof TwoWayString2FieldBridgeAdaptor
-					|| bridge instanceof NumericFieldBridge ) ) {
-				allowFieldSelectionInProjection = false;
-				return;
+			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
+				FieldBridge bridge = documentFieldMetadata.getFieldBridge();
+				if ( !( bridge instanceof TwoWayStringBridge
+						|| bridge instanceof TwoWayString2FieldBridgeAdaptor
+						|| bridge instanceof NumericFieldBridge ) ) {
+					allowFieldSelectionInProjection = false;
+					return;
+				}
 			}
 		}
 		for ( DocumentFieldMetadata fieldMetadata : getMetadata().getClassBridgeMetadata() ) {
