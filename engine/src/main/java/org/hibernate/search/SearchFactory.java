@@ -107,9 +107,9 @@ public interface SearchFactory {
 	IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType);
 
 	/**
-	 * Returns the set of currently indexed entities.
+	 * Returns the set of currently indexed types.
 	 *
-	 * @return the set of currently indexed entities. If no entities are indexed the empty set is returned.
+	 * @return the set of currently indexed types. If no types are indexed the empty set is returned.
 	 */
-	Set<Class<?>> getIndexedEntities();
+	Set<Class<?>> getIndexedTypes();
 }

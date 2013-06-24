@@ -29,11 +29,15 @@ import java.util.Set;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.junit.Test;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static org.jgroups.util.Util.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -43,14 +47,12 @@ import static org.junit.Assert.fail;
 public class SearchFactoryTest {
 
 	@Test
-	public void testEntityWithNoDocumentIdThrowsException() {
-		ManualConfiguration cfg = new ManualConfiguration();
-		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.addClass( Entity.class );
+	public void testTypeWithNoDocumentIdThrowsException() {
+		ManualConfiguration cfg = getManualConfiguration();
 
 		SearchMapping mapping = new SearchMapping();
 		mapping
-				.entity( Entity.class ).indexed()
+				.entity( Foo.class ).indexed()
 		;
 		cfg.setProgrammaticMapping( mapping );
 
@@ -64,39 +66,89 @@ public class SearchFactoryTest {
 	}
 
 	@Test
-	public void testGetIndexedEntities() {
-		ManualConfiguration cfg = new ManualConfiguration();
-		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.addClass( Entity.class );
+	public void testGetIndexedTypesNoTypeIndexed() {
+		ManualConfiguration cfg = getManualConfiguration();
+
+		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		Set<Class<?>> indexedClasses = sf.getIndexedTypes();
+		assertEquals( "Wrong number of indexed entities", 0, indexedClasses.size() );
+	}
+
+	@Test
+	public void testGetIndexedTypeSingleIndexedType() {
+		ManualConfiguration cfg = getManualConfiguration();
 
 		SearchMapping mapping = new SearchMapping();
 		mapping
-				.entity( Entity.class ).indexed()
+				.entity( Foo.class ).indexed()
 				.property( "id", FIELD ).documentId()
 		;
 		cfg.setProgrammaticMapping( mapping );
 
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
-		Set<Class<?>> indexedClasses = sf.getIndexedEntities();
-		assertTrue( indexedClasses.size() == 1 );
-		assertTrue( indexedClasses.iterator().next().equals( Entity.class ) );
+		Set<Class<?>> indexedClasses = sf.getIndexedTypes();
+		assertEquals( "Wrong number of indexed entities", 1, indexedClasses.size() );
+		assertTrue( indexedClasses.iterator().next().equals( Foo.class ) );
 	}
 
 	@Test
-	public void tesNoIndexedEntities() {
-		ManualConfiguration cfg = new ManualConfiguration();
-		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.addClass( Entity.class );
+	public void testGetIndexedTypesMultipleTypes() {
+		ManualConfiguration cfg = getManualConfiguration();
 
 		SearchMapping mapping = new SearchMapping();
+		mapping
+				.entity( Foo.class ).indexed()
+				.property( "id", FIELD ).documentId()
+				.entity( Bar.class ).indexed()
+				.property( "id", FIELD ).documentId()
+		;
 		cfg.setProgrammaticMapping( mapping );
 
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
-		Set<Class<?>> indexedClasses = sf.getIndexedEntities();
-		assertTrue( indexedClasses.isEmpty() );
+		Set<Class<?>> indexedClasses = sf.getIndexedTypes();
+		assertEquals( "Wrong number of indexed entities", 2, indexedClasses.size() );
 	}
 
-	public static class Entity {
+	@Test
+	public void testGetTypeDescriptorForUnindexedType() {
+		ManualConfiguration cfg = getManualConfiguration();
+
+		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		IndexedTypeDescriptor indexedTypeDescriptor = sf.getIndexedTypeDescriptor( Foo.class);
+		assertNotNull( indexedTypeDescriptor );
+		assertFalse( indexedTypeDescriptor.isIndexed() );
+	}
+
+	@Test
+	public void testGetTypeDescriptorForIndexedType() {
+		ManualConfiguration cfg = getManualConfiguration();
+
+		SearchMapping mapping = new SearchMapping();
+		mapping
+				.entity( Foo.class ).indexed()
+				.property( "id", FIELD ).documentId()
+		;
+		cfg.setProgrammaticMapping( mapping );
+
+		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		IndexedTypeDescriptor indexedTypeDescriptor = sf.getIndexedTypeDescriptor( Foo.class);
+		assertNotNull( indexedTypeDescriptor );
+		assertTrue( indexedTypeDescriptor.isIndexed() );
+	}
+
+	private ManualConfiguration getManualConfiguration() {
+		ManualConfiguration cfg = new ManualConfiguration();
+		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
+		cfg.addClass( Foo.class );
+		cfg.addClass( Bar.class );
+		return cfg;
+	}
+
+	public static class Foo {
+		private long id;
+	}
+
+	public static class Bar {
 		private long id;
 	}
 }

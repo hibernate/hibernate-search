@@ -174,12 +174,28 @@ public class TypeMetadata {
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
 	}
 
-	public Set<PropertyMetadata> getPropertyMetadata() {
+	public Set<PropertyMetadata> getAllPropertyMetadata() {
 		return propertyMetadataSet;
+	}
+
+	public PropertyMetadata getPropertyMetadataForProperty(String propertyName) {
+		return propertyGetterNameToPropertyMetadata.get( propertyName );
+	}
+
+	public PropertyMetadata getIdPropertyMetadata() {
+		return idPropertyMetadata;
 	}
 
 	public Set<DocumentFieldMetadata> getClassBridgeMetadata() {
 		return classBridgeFields;
+	}
+
+	public DocumentFieldMetadata getDocumentFieldMetadataFor(String fieldName) {
+		return documentFieldNameFieldMetadata.get( fieldName );
+	}
+
+	public Set<String> getAllFieldNames() {
+		return documentFieldNameFieldMetadata.keySet();
 	}
 
 	public Set<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
@@ -202,18 +218,6 @@ public class TypeMetadata {
 		return !classBridgeFieldNameToDocumentFieldMetadata.isEmpty();
 	}
 
-	public PropertyMetadata getIdPropertyMetadata() {
-		return idPropertyMetadata;
-	}
-
-	public DocumentFieldMetadata getDocumentFieldMetadataFor(String fieldName) {
-		return documentFieldNameFieldMetadata.get( fieldName );
-	}
-
-	public PropertyMetadata getPropertyMetadataForProperty(String propertyName) {
-		return propertyGetterNameToPropertyMetadata.get( propertyName );
-	}
-
 	public DocumentFieldMetadata getFieldMetadataForClassBridgeField(String fieldName) {
 		return classBridgeFieldNameToDocumentFieldMetadata.get( fieldName );
 	}
@@ -224,10 +228,6 @@ public class TypeMetadata {
 
 	public XMember getDiscriminatorGetter() {
 		return discriminatorGetter;
-	}
-
-	public BoostStrategy getClassBoostStrategy() {
-		return classBoostStrategy;
 	}
 
 	public Similarity getSimilarity() {
@@ -252,9 +252,17 @@ public class TypeMetadata {
 		return new LuceneOptionsImpl(
 				fieldMetadata,
 				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value ),
-				propertyMetadata.getNullToken(),
-				propertyMetadata.getPrecisionStep()
+				fieldMetadata.indexNullAs(),
+				fieldMetadata.getPrecisionStep()
 		);
+	}
+
+	public BoostStrategy getDynamicBoost() {
+		return classBoostStrategy;
+	}
+
+	public float getStaticBoost() {
+		return boost;
 	}
 
 	public float getClassBoost(Object value) {
@@ -320,6 +328,16 @@ public class TypeMetadata {
 						log.inconsistentFieldConfiguration( documentFieldMetadata.getName() );
 					}
 				}
+			}
+		}
+
+		for ( DocumentFieldMetadata documentFieldMetadata : classBridgeFields ) {
+			tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
+		}
+
+		if ( idPropertyMetadata != null ) {
+			for ( DocumentFieldMetadata documentFieldMetadata : idPropertyMetadata.getFieldMetadata() ) {
+				tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
 			}
 		}
 		return Collections.unmodifiableMap( tmpMap );
@@ -443,7 +461,7 @@ public class TypeMetadata {
 			stateInspectionOptimizationsEnabled = false;
 		}
 
-		public void addToScopedAnalyzer(String fieldName, Analyzer analyzer, Field.Index index) {
+		public Analyzer addToScopedAnalyzer(String fieldName, Analyzer analyzer, Field.Index index) {
 			if ( analyzer == null ) {
 				analyzer = this.getAnalyzer();
 			}
@@ -457,6 +475,7 @@ public class TypeMetadata {
 				// no analyzer is used, add a fake one for queries
 				scopedAnalyzer.addScopedAnalyzer( fieldName, passThroughAnalyzer );
 			}
+			return analyzer;
 		}
 
 		public void blacklistForOptimization(XClass blackListClass) {

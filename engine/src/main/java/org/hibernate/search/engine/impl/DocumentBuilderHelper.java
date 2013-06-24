@@ -155,7 +155,7 @@ public final class DocumentBuilderHelper {
 
 	private static void processFieldsForProjection(TypeMetadata typeMetadata, String[] fields, Object[] result, Document document, ConversionContext contextualBridge) {
 		//process base fields
-		for ( PropertyMetadata propertyMetadata : typeMetadata.getPropertyMetadata() ) {
+		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
 			for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
 				final String fieldName = fieldMetadata.getName();
 				int matchingPosition = getFieldPosition( fields, fieldName );
