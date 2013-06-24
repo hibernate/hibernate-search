@@ -23,6 +23,12 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.engine.BoostStrategy;
@@ -30,20 +36,24 @@ import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.util.impl.ReflectionHelper;
 
 /**
- * Encapsulating the metadata for a single indexed property annotated with {@code Field}.
+ * Encapsulating the metadata for a single indexed property (field or getter).
+ *
+ * Each field or getter can have multiple document fields (via {@code @Fields}).
  *
  * @author Hardy Ferentschik
  */
 public class PropertyMetadata {
-	private final XProperty propertyGetter;
-	private final DocumentFieldMetadata fieldMetadata;
+	private final XProperty propertyAccessor;
+	private final Map<String, DocumentFieldMetadata> documentFieldMetadata;
+	private final Set<DocumentFieldMetadata> documentFieldMetadataSet;
 	private final BoostStrategy dynamicBoostStrategy;
 	private final Integer precisionStep;
 	private final String nullToken;
 
 	private PropertyMetadata(Builder builder) {
-		this.propertyGetter = builder.propertyGetter;
-		this.fieldMetadata = builder.fieldMetadata;
+		this.propertyAccessor = builder.propertyAccessor;
+		this.documentFieldMetadataSet = Collections.unmodifiableSet( builder.fieldMetadataSet );
+		this.documentFieldMetadata = createDocumentFieldMetadataMap( builder.fieldMetadataSet );
 		this.nullToken = builder.nullToken;
 
 		if ( builder.dynamicBoostStrategy != null ) {
@@ -61,12 +71,20 @@ public class PropertyMetadata {
 		}
 	}
 
-	public XProperty getPropertyGetter() {
-		return propertyGetter;
+	private Map<String, DocumentFieldMetadata> createDocumentFieldMetadataMap(Set<DocumentFieldMetadata> fieldMetadataSet) {
+		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
+		for ( DocumentFieldMetadata documentFieldMetadata : fieldMetadataSet ) {
+			tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
+		}
+		return Collections.unmodifiableMap( tmpMap );
 	}
 
-	public String getPropertyGetterName() {
-		return propertyGetter == null ? null : propertyGetter.getName();
+	public XProperty getPropertyAccessor() {
+		return propertyAccessor;
+	}
+
+	public String getPropertyAccessorName() {
+		return propertyAccessor == null ? null : propertyAccessor.getName();
 	}
 
 	public Integer getPrecisionStep() {
@@ -77,8 +95,12 @@ public class PropertyMetadata {
 		return nullToken;
 	}
 
-	public DocumentFieldMetadata getFieldMetadata() {
-		return fieldMetadata;
+	public Set<DocumentFieldMetadata> getFieldMetadata() {
+		return documentFieldMetadataSet;
+	}
+
+	public DocumentFieldMetadata getFieldMetadata(String fieldName) {
+		return documentFieldMetadata.get( fieldName );
 	}
 
 	public BoostStrategy getDynamicBoostStrategy() {
@@ -87,20 +109,20 @@ public class PropertyMetadata {
 
 	public static class Builder {
 		// required parameters
-		private final XProperty propertyGetter;
-		private final DocumentFieldMetadata fieldMetadata;
+		private final XProperty propertyAccessor;
+		private final Set<DocumentFieldMetadata> fieldMetadataSet;
 
 		// optional parameters
 		private BoostStrategy dynamicBoostStrategy;
 		private Integer precisionStep;
 		private String nullToken;
 
-		public Builder(XProperty propertyGetter, DocumentFieldMetadata fieldMetadata) {
-			if ( propertyGetter != null ) {
-				ReflectionHelper.setAccessible( propertyGetter );
+		public Builder(XProperty propertyAccessor) {
+			if ( propertyAccessor != null ) {
+				ReflectionHelper.setAccessible( propertyAccessor );
 			}
-			this.propertyGetter = propertyGetter;
-			this.fieldMetadata = fieldMetadata;
+			this.propertyAccessor = propertyAccessor;
+			this.fieldMetadataSet = new HashSet<DocumentFieldMetadata>();
 		}
 
 		public Builder dynamicBoostStrategy(BoostStrategy boostStrategy) {
@@ -118,6 +140,15 @@ public class PropertyMetadata {
 			return this;
 		}
 
+		public Builder addDocumentField(DocumentFieldMetadata documentFieldMetadata) {
+			this.fieldMetadataSet.add( documentFieldMetadata );
+			return this;
+		}
+
+		public XProperty getPropertyAccessor() {
+			return propertyAccessor;
+		}
+
 		public PropertyMetadata build() {
 			return new PropertyMetadata( this );
 		}
@@ -126,8 +157,8 @@ public class PropertyMetadata {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "PropertyMetadata{" );
-		sb.append( "propertyGetter=" ).append( propertyGetter );
-		sb.append( ", fieldMetadata=" ).append( fieldMetadata );
+		sb.append( "propertyAccessor=" ).append( propertyAccessor );
+		sb.append( ", fieldMetadata=" ).append( documentFieldMetadataSet );
 		sb.append( ", dynamicBoostStrategy=" ).append( dynamicBoostStrategy );
 		sb.append( ", precisionStep=" ).append( precisionStep );
 		sb.append( ", nullToken='" ).append( nullToken ).append( '\'' );

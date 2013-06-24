@@ -156,24 +156,25 @@ public final class DocumentBuilderHelper {
 	private static void processFieldsForProjection(TypeMetadata typeMetadata, String[] fields, Object[] result, Document document, ConversionContext contextualBridge) {
 		//process base fields
 		for ( PropertyMetadata propertyMetadata : typeMetadata.getPropertyMetadata() ) {
-			DocumentFieldMetadata fieldMetadata = propertyMetadata.getFieldMetadata();
-			final String fieldName = fieldMetadata.getName();
-			int matchingPosition = getFieldPosition( fields, fieldName );
-			if ( matchingPosition != -1 ) {
-				contextualBridge.pushProperty( fieldName );
-				try {
-					populateResult(
-							fieldName,
-							fieldMetadata.getFieldBridge(),
-							fieldMetadata.getStore(),
-							result,
-							document,
-							contextualBridge,
-							matchingPosition
-					);
-				}
-				finally {
-					contextualBridge.popProperty();
+			for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+				final String fieldName = fieldMetadata.getName();
+				int matchingPosition = getFieldPosition( fields, fieldName );
+				if ( matchingPosition != -1 ) {
+					contextualBridge.pushProperty( fieldName );
+					try {
+						populateResult(
+								fieldName,
+								fieldMetadata.getFieldBridge(),
+								fieldMetadata.getStore(),
+								result,
+								document,
+								contextualBridge,
+								matchingPosition
+						);
+					}
+					finally {
+						contextualBridge.popProperty();
+					}
 				}
 			}
 		}
