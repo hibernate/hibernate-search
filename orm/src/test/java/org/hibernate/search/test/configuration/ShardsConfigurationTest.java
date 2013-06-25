@@ -28,7 +28,7 @@ import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MERGE_FACTOR;
 import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.RAM_BUFFER_SIZE;
 
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
@@ -70,24 +70,24 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 	}
 
 	public void testCorrectNumberOfShardsDetected() {
-		EntityIndexBinder indexBindingForDocument = getSearchFactory().getIndexBindingForEntity( Document.class );
+		EntityIndexBinding indexBindingForDocument = getSearchFactory().getIndexBinding( Document.class );
 		IndexManager[] documentManagers = indexBindingForDocument.getIndexManagers();
 		assertNotNull( documentManagers);
 		assertEquals( 4, documentManagers.length );
-		EntityIndexBinder indexBindingForBooks = getSearchFactory().getIndexBindingForEntity( Book.class );
+		EntityIndexBinding indexBindingForBooks = getSearchFactory().getIndexBinding( Book.class );
 		IndexManager[] bookManagers = indexBindingForBooks.getIndexManagers();
 		assertNotNull( bookManagers );
 		assertEquals( 2, bookManagers.length );
 	}
 
 	public void testSelectionOfShardingStrategy() {
-		IndexShardingStrategy shardingStrategy = getSearchFactory().getIndexBindingForEntity( Document.class ).getSelectionStrategy();
+		IndexShardingStrategy shardingStrategy = getSearchFactory().getIndexBinding( Document.class ).getSelectionStrategy();
 		assertNotNull( shardingStrategy );
 		assertEquals( shardingStrategy.getClass(), UselessShardingStrategy.class );
 	}
 
 	public void testShardingSettingsInherited() {
-		IndexManager[] indexManagers = getSearchFactory().getIndexBindingForEntity().get( Document.class ).getIndexManagers();
+		IndexManager[] indexManagers = getSearchFactory().getIndexBindings().get( Document.class ).getIndexManagers();
 		assertTrue( getDirectoryProvider( indexManagers[0] ) instanceof RAMDirectoryProvider );
 		assertTrue( getDirectoryProvider( indexManagers[1] ) instanceof FSDirectoryProvider );
 		assertTrue( getDirectoryProvider( indexManagers[2] ) instanceof RAMDirectoryProvider );

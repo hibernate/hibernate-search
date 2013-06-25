@@ -63,7 +63,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
@@ -139,7 +139,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
 		if ( "event".equals( indexingStrategy ) ) {
-			used = searchFactoryImplementor.getIndexBindingForEntity().size() != 0;
+			used = searchFactoryImplementor.getIndexBindings().size() != 0;
 		}
 		else if ( "manual".equals( indexingStrategy ) ) {
 			used = false;
@@ -368,7 +368,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	 */
 	protected AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
 		Class<?> clazz = entity.getClass();
-		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( clazz );
+		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding( clazz );
 		if ( entityIndexBinding != null ) {
 			return entityIndexBinding.getDocumentBuilder();
 		}

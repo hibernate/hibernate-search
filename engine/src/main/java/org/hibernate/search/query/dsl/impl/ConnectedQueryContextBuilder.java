@@ -80,7 +80,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 		 * neither the given type nor any of its sub-types are indexed
 		 */
 		private Class<?> getIndexBoundType(Class<?> entityType, SearchFactoryImplementor factory) {
-			if ( factory.getIndexBindingForEntity( entityType ) != null ) {
+			if ( factory.getIndexBinding( entityType ) != null ) {
 				return entityType;
 			}
 

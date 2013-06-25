@@ -43,7 +43,7 @@ import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
@@ -66,7 +66,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 
 	private final ProducerConsumerQueue<List<?>> source;
 	private final SessionFactory sessionFactory;
-	private final Map<Class<?>, EntityIndexBinder> entityIndexBinders;
+	private final Map<Class<?>, EntityIndexBinding> entityIndexBinders;
 	private final MassIndexerProgressMonitor monitor;
 	private final CacheMode cacheMode;
 	private final CountDownLatch producerEndSignal;
@@ -87,7 +87,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		this.cacheMode = cacheMode;
 		this.backend = backend;
 		this.errorHandler = errorHandler;
-		this.entityIndexBinders = searchFactory.getIndexBindingForEntity();
+		this.entityIndexBinders = searchFactory.getIndexBindings();
 	}
 
 	public void run(Session upperSession) {
@@ -149,7 +149,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 			throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
-		EntityIndexBinder entityIndexBinding = entityIndexBinders.get( clazz );
+		EntityIndexBinding entityIndexBinding = entityIndexBinders.get( clazz );
 		if ( entityIndexBinding == null ) {
 			// it might be possible to receive not-indexes subclasses of the currently indexed type;
 			// being not-indexed, we skip them.

@@ -47,8 +47,8 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.ChainedFilter;
@@ -521,7 +521,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
-		Map<Class<?>, EntityIndexBinder> builders = searchFactoryImplementor.getIndexBindingForEntity();
+		Map<Class<?>, EntityIndexBinding> builders = searchFactoryImplementor.getIndexBindings();
 		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 
@@ -536,7 +536,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				);
 			}
 
-			for ( EntityIndexBinder indexBinder : builders.values() ) {
+			for ( EntityIndexBinding indexBinder : builders.values() ) {
 				DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
 				if ( builder.getIdKeywordName() != null ) {
@@ -553,7 +553,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities.size() );
 			involvedClasses.addAll( indexedTargetedEntities );
 			for ( Class<?> clazz : indexedTargetedEntities ) {
-				EntityIndexBinder indexBinder = builders.get( clazz );
+				EntityIndexBinding indexBinder = builders.get( clazz );
 				if ( indexBinder != null ) {
 					DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
 					involvedClasses.addAll( builder.getMappedSubclasses() );
@@ -561,7 +561,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 
 			for ( Class clazz : involvedClasses ) {
-				EntityIndexBinder indexBinder = builders.get( clazz );
+				EntityIndexBinding indexBinder = builders.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
 				if ( indexBinder == null ) {
 					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
@@ -601,8 +601,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 		}
 		else {
-			Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities = searchFactoryImplementor.getIndexBindingForEntity();
-			this.classesAndSubclasses = documentBuildersIndexedEntities.keySet();
+			this.classesAndSubclasses = searchFactoryImplementor.getIndexedTypes();
 		}
 
 		//set up the searcher
@@ -926,12 +925,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
 	 */
 	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
-		Map<Class<?>, EntityIndexBinder> builders = searchFactoryImplementor.getIndexBindingForEntity();
+		Map<Class<?>, EntityIndexBinding> builders = searchFactoryImplementor.getIndexBindings();
 		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
 		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
 		FieldCacheCollectorFactory anyImplementation = null;
 		for ( Class<?> clazz : classesAndSubclasses ) {
-			EntityIndexBinder docBuilder = builders.get( clazz );
+			EntityIndexBinding docBuilder = builders.get( clazz );
 			FieldCacheCollectorFactory fieldCacheCollectionFactory = docBuilder.getIdFieldCacheCollectionFactory();
 			if ( fieldCacheCollectionFactory == null ) {
 				// some implementation disable it, so we won't use it

@@ -30,7 +30,7 @@ import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
@@ -69,7 +69,7 @@ public class TransactionalWorker implements Worker {
 
 	public void performWork(Work<?> work, TransactionContext transactionContext) {
 		final Class<?> entityType = instanceInitializer.getClassFromWork( work );
-		EntityIndexBinder indexBindingForEntity = factory.getIndexBindingForEntity( entityType );
+		EntityIndexBinding indexBindingForEntity = factory.getIndexBinding( entityType );
 		if ( indexBindingForEntity == null
 				&& factory.getDocumentBuilderContainedEntity( entityType ) == null ) {
 			throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityType );
@@ -105,7 +105,7 @@ public class TransactionalWorker implements Worker {
 		}
 	}
 
-	private <T> Work<T> interceptWork(EntityIndexBinder indexBindingForEntity, Work<T> work) {
+	private <T> Work<T> interceptWork(EntityIndexBinding indexBindingForEntity, Work<T> work) {
 		if (indexBindingForEntity == null) {
 			return work;
 		}

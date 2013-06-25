@@ -30,7 +30,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 import java.io.Serializable;
@@ -54,7 +54,7 @@ public class LuceneFullTextManager implements FullTextManager {
 	}
 
 	public <T> T get(Class<T> entityType, Serializable id) {
-		final EntityIndexBinder entityIndexBinding = searchFactory.getIndexBindingForEntity( entityType );
+		final EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( entityType );
 		if ( entityIndexBinding == null ) {
 			String msg = "Entity to retrueve is not an @Indexed entity: " + entityType.getClass().getName();
 			throw new IllegalArgumentException( msg );
@@ -97,7 +97,7 @@ public class LuceneFullTextManager implements FullTextManager {
 		Class<?> clazz = getClass( entity );
 		//TODO cache that at the FTSession level
 		//not strictly necessary but a small optimization
-		final EntityIndexBinder entityIndexBinding = searchFactory.getIndexBindingForEntity( clazz );
+		final EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( clazz );
 		if ( entityIndexBinding == null ) {
 			String msg = "Entity to index is not an @Indexed entity: " + entity.getClass().getName();
 			throw new IllegalArgumentException( msg );

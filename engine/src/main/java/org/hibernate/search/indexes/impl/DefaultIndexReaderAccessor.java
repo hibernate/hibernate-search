@@ -25,7 +25,7 @@ import java.util.TreeSet;
 
 import org.apache.lucene.index.IndexReader;
 
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.impl.ImmutableSearchFactory;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -62,7 +62,7 @@ public class DefaultIndexReaderAccessor implements IndexReaderAccessor {
 
 		HashMap<String, IndexManager> indexManagers = new HashMap<String, IndexManager>();
 		for ( Class<?> type : entities ) {
-			EntityIndexBinder entityIndexBinding = searchFactory.getSafeIndexBindingForEntity( type );
+			EntityIndexBinding entityIndexBinding = searchFactory.getSafeIndexBindingForEntity( type );
 			IndexManager[] indexManagersForAllShards = entityIndexBinding.getSelectionStrategy()
 					.getIndexManagersForAllShards();
 			for ( IndexManager im : indexManagersForAllShards ) {

@@ -22,6 +22,7 @@ package org.hibernate.search.test.backend;
 
 import junit.framework.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.junit.Test;
 
 import org.hibernate.Session;
@@ -29,7 +30,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -108,7 +108,7 @@ public class OptimizationTriggerTest extends SearchTestCase {
 
 	private DirectoryBasedIndexManager getSingleIndexManager(Class<?> clazz) {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( clazz );
+		EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( clazz );
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		return (DirectoryBasedIndexManager) indexManagers[0];

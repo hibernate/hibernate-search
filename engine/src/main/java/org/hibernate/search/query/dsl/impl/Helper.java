@@ -37,7 +37,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 /**
@@ -54,7 +54,7 @@ class Helper {
 
 		try {
 			final List<String> termsFromText = getAllTermsFromText(
-					fieldName, value.toString(), queryAnalyzer
+					fieldName, value, queryAnalyzer
 			);
 			if (termsFromText.size() > 1) {
 				StringBuilder error = new StringBuilder( "The ")
@@ -102,7 +102,7 @@ class Helper {
 	static DocumentBuilderIndexedEntity<?> getDocumentBuilder(QueryBuildingContext queryContext) {
 		final SearchFactoryImplementor factory = queryContext.getFactory();
 		final Class<?> type = queryContext.getEntityType();
-		EntityIndexBinder indexBinding = factory.getIndexBindingForEntity( type );
+		EntityIndexBinding indexBinding = factory.getIndexBinding( type );
 		if ( indexBinding == null ) {
 			throw new AssertionFailure( "Class is not indexed: " + type );
 		}

@@ -42,7 +42,7 @@ import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -259,7 +259,7 @@ public final class DocumentBuilderHelper {
 	}
 
 	private static DocumentBuilderIndexedEntity<?> getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity(
+		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding(
 				clazz
 		);
 		if ( entityIndexBinding == null ) {

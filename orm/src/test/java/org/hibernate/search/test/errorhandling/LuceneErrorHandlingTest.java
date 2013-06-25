@@ -39,7 +39,7 @@ import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
@@ -58,11 +58,11 @@ import org.hibernate.search.test.SearchTestCase;
  */
 public class LuceneErrorHandlingTest extends SearchTestCase {
 
-	static final AtomicInteger workcounter = new AtomicInteger();
+	static final AtomicInteger WORK_COUNTER = new AtomicInteger();
 
 	public void testErrorHandling() {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		EntityIndexBinder mappingForEntity = searchFactory.getIndexBindingForEntity( Document.class );
+		EntityIndexBinding mappingForEntity = searchFactory.getIndexBinding( Document.class );
 		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
@@ -70,11 +70,11 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( new HarmlessWork( "firstWork" ) );
 		queue.add( new HarmlessWork( "secondWork" ) );
-		workcounter.set( 0 ); // reset work counter
+		WORK_COUNTER.set( 0 ); // reset work counter
 		indexManager.performOperations( queue, null );
-		Assert.assertEquals( 2, workcounter.get() );
+		Assert.assertEquals( 2, WORK_COUNTER.get() );
 
-		workcounter.set( 0 ); // reset work counter
+		WORK_COUNTER.set( 0 ); // reset work counter
 		final FailingWork firstFailure = new FailingWork( "firstFailure" );
 		queue.add( firstFailure );
 		final HarmlessWork thirdWork = new HarmlessWork( "thirdWork" );
@@ -82,7 +82,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		final HarmlessWork fourthWork = new HarmlessWork( "fourthWork" );
 		queue.add( fourthWork );
 		indexManager.performOperations( queue, null );
-		Assert.assertEquals( 4, workcounter.get() );
+		Assert.assertEquals( 4, WORK_COUNTER.get() );
 
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Throwable exception = mockErrorHandler.getLastException();
@@ -146,7 +146,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		}
 
 		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
-			workcounter.incrementAndGet();
+			WORK_COUNTER.incrementAndGet();
 		}
 
 	}
@@ -188,7 +188,6 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 			throw new SearchException( "failed work message" );
 		}
-
 	}
 
 }

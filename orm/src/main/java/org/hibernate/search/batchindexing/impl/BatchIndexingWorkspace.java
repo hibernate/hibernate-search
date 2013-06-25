@@ -95,7 +95,7 @@ public class BatchIndexingWorkspace implements Runnable {
 
 		this.indexedType = entityType;
 		this.idFetchSize = idFetchSize;
-		this.idNameOfIndexedType = searchFactoryImplementor.getIndexBindingForEntity( entityType )
+		this.idNameOfIndexedType = searchFactoryImplementor.getIndexBinding( entityType )
 				.getDocumentBuilder()
 				.getIdentifierName();
 		this.searchFactory = searchFactoryImplementor;

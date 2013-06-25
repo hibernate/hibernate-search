@@ -24,6 +24,7 @@
 
 package org.hibernate.search.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -36,6 +37,7 @@ import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -54,7 +56,7 @@ import org.hibernate.search.spi.internals.SearchFactoryState;
 public class MutableSearchFactoryState implements SearchFactoryState {
 
 	private Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
-	private Map<Class<?>, EntityIndexBinder> indexBindingsPerEntity;
+	private Map<Class<?>, EntityIndexBinding> indexBindingsPerEntity;
 	private String indexingStrategy;
 	private Worker worker;
 	private BackendQueueProcessor backendQueueProcessor;
@@ -78,7 +80,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
-		indexBindingsPerEntity = oldFactoryState.getIndexBindingForEntity();
+		indexBindingsPerEntity = oldFactoryState.getIndexBindings();
 		documentBuildersContainedEntities = oldFactoryState.getDocumentBuildersContainedEntities();
 		worker = oldFactoryState.getWorker();
 		filterDefinitions = oldFactoryState.getFilterDefinitions();
@@ -100,6 +102,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		indexManagerFactory = oldFactoryState.getIndexManagerFactory();
 	}
 
+	@Override
 	public ServiceManager getServiceManager() {
 		return serviceManager;
 	}
@@ -108,18 +111,31 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.serviceManager = serviceManager;
 	}
 
+	@Override
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
 	}
 
+	@Override
 	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
+		Map<Class<?>, EntityIndexBinder> tmpMap = new HashMap<Class<?>, EntityIndexBinder>();
+		for ( Map.Entry<Class<?>, EntityIndexBinding> entry : indexBindingsPerEntity.entrySet() ) {
+			tmpMap.put( entry.getKey(), new EntityIndexBindingWrapper( entry.getValue() ) );
+		}
+		return tmpMap;
+	}
+
+	@Override
+	public Map<Class<?>, EntityIndexBinding> getIndexBindings() {
 		return indexBindingsPerEntity;
 	}
 
+	@Override
 	public String getIndexingStrategy() {
 		return indexingStrategy;
 	}
 
+	@Override
 	public Worker getWorker() {
 		return worker;
 	}
@@ -128,26 +144,32 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return backendQueueProcessor;
 	}
 
+	@Override
 	public Map<String, FilterDef> getFilterDefinitions() {
 		return filterDefinitions;
 	}
 
+	@Override
 	public FilterCachingStrategy getFilterCachingStrategy() {
 		return filterCachingStrategy;
 	}
 
+	@Override
 	public Map<String, Analyzer> getAnalyzers() {
 		return analyzers;
 	}
 
+	@Override
 	public int getCacheBitResultsSize() {
 		return cacheBitResultsSize;
 	}
 
+	@Override
 	public Properties getConfigurationProperties() {
 		return configurationProperties;
 	}
 
+	@Override
 	public PolymorphicIndexHierarchy getIndexHierarchy() {
 		return indexHierarchy;
 	}
@@ -156,7 +178,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.documentBuildersContainedEntities = documentBuildersContainedEntities;
 	}
 
-	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexBinder> documentBuildersIndexedEntities) {
+	public void setDocumentBuildersIndexedEntities(Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities) {
 		this.indexBindingsPerEntity = documentBuildersIndexedEntities;
 	}
 
@@ -196,6 +218,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.indexHierarchy = indexHierarchy;
 	}
 
+	@Override
 	public boolean isTransactionManagerExpected() {
 		return transactionManagerExpected;
 	}

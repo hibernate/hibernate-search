@@ -41,7 +41,7 @@ import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DepthValidator;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
@@ -354,7 +354,7 @@ public class WorkPlan {
 		}
 
 		private EntityIndexingInterceptor<? super T> getEntityInterceptor() {
-			EntityIndexBinder indexBindingForEntity = searchFactoryImplementor.getIndexBindingForEntity(
+			EntityIndexBinding indexBindingForEntity = searchFactoryImplementor.getIndexBinding(
 					entityClass
 			);
 			return indexBindingForEntity != null ?
@@ -536,7 +536,7 @@ public class WorkPlan {
 	 * @return the DocumentBuilder for this type
 	 */
 	private static <T> AbstractDocumentBuilder<T> getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> entityClass) {
-		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityClass );
+		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding( entityClass );
 		if ( entityIndexBinding == null ) {
 			DocumentBuilderContainedEntity entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity(
 					entityClass

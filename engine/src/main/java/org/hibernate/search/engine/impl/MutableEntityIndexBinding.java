@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
@@ -33,7 +33,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class MutableEntityIndexBinding<T> implements EntityIndexBinder {
+public class MutableEntityIndexBinding<T> implements EntityIndexBinding {
 
 	private final IndexShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;

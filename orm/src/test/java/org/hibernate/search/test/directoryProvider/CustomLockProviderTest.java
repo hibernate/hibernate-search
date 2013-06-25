@@ -33,7 +33,7 @@ import org.apache.lucene.store.NativeFSLockFactory;
 import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
@@ -108,7 +108,7 @@ public class CustomLockProviderTest {
 		FullTextSessionBuilder ftsb = fullTextSessionBuilder.build();
 		try {
 			SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftsb.getSearchFactory();
-			EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( SnowStorm.class );
+			EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( SnowStorm.class );
 			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
 			DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();
 			Directory directory = directoryProvider.getDirectory();

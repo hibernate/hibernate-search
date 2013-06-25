@@ -33,7 +33,7 @@ import java.util.Set;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.annotations.common.AssertionFailure;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
@@ -72,7 +72,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		//     root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.size() == 0 ) {
 			//support all classes
-			for ( Map.Entry<Class<?>, EntityIndexBinder> entry : searchFactoryImplementor.getIndexBindingForEntity().entrySet() ) {
+			for ( Map.Entry<Class<?>, EntityIndexBinding> entry : searchFactoryImplementor.getIndexBindings().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().getDocumentBuilder().isRoot() ) {
 					safeEntityTypes.add( entry.getKey() );
@@ -154,7 +154,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 
 		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor) {
 			this.rootEntity = rootEntity;
-			EntityIndexBinder provider = searchFactoryImplementor.getIndexBindingForEntity( rootEntity );
+			EntityIndexBinding provider = searchFactoryImplementor.getIndexBinding( rootEntity );
 			if ( provider == null) throw new AssertionFailure("Provider not found for class: " + rootEntity);
 			this.mappedSubclasses = provider.getDocumentBuilder().getMappedSubclasses();
 			this.criteria = null; //default

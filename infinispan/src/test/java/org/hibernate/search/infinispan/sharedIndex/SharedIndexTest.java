@@ -33,7 +33,7 @@ import java.util.List;
 import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.ClusterSharedConnectionProvider;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
@@ -125,7 +125,7 @@ public class SharedIndexTest {
 	 */
 	protected int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
-		EntityIndexBinder indexBinding = searchFactory.getIndexBindingForEntity( Toaster.class );
+		EntityIndexBinding indexBinding = searchFactory.getIndexBinding( Toaster.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();
