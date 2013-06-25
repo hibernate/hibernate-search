@@ -26,7 +26,7 @@ import junit.framework.Assert;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
@@ -92,7 +92,7 @@ public class OptimizerStrategyLoadTest {
 		cfg.addClass( Document.class );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 		try {
-			EntityIndexBinder indexBindingForEntity = sf.getIndexBindingForEntity( Document.class );
+			EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( Document.class );
 			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
 			OptimizerStrategy optimizerStrategy = indexManager.getOptimizerStrategy();
 			Assert.assertTrue( type.isAssignableFrom( optimizerStrategy.getClass() ) );

@@ -28,7 +28,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
@@ -39,7 +39,7 @@ import static junit.framework.Assert.assertEquals;
 
 
 /**
- * Verifies the global setting from {@link SearchConfiguration#isIndexMetadataComplete()}
+ * Verifies the global setting from {@link org.hibernate.search.cfg.spi.SearchConfiguration#isIndexMetadataComplete()}
  * affect the backends as expected.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
@@ -95,11 +95,10 @@ public class IndexMetadataCompleteConfiguredTest {
 	}
 
 	private static AbstractWorkspaceImpl extractWorkspace(MutableSearchFactory sf, Class<?> type) {
-		EntityIndexBinder indexBindingForEntity = sf.getIndexBindingForEntity( type );
+		EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( type );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
 		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
-		AbstractWorkspaceImpl workspace = backend.getIndexResources().getWorkspace();
-		return workspace;
+		return backend.getIndexResources().getWorkspace();
 	}
 
 	public static final class Document {

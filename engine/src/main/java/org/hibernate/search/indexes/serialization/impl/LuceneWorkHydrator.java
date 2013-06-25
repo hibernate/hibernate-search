@@ -52,7 +52,7 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorksBuilder;
 import org.hibernate.search.indexes.serialization.spi.SerializableIndex;
@@ -404,7 +404,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	private String objectIdInString(Class<?> entityClass, Serializable id, ConversionContext conversionContext) {
-		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( entityClass );
+		EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( entityClass );
 		if ( indexBindingForEntity == null ) {
 			throw new SearchException( "Unable to find entity type metadata while deserializing: " + entityClass );
 		}

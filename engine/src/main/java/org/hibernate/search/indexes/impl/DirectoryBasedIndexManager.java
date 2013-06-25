@@ -37,7 +37,7 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.impl.EmptyBuildContext;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializerService;
@@ -176,8 +176,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	//Not exposed on the IndexManager interface
-	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
-		return boundSearchFactory.getIndexBindingForEntity( entityType );
+	public EntityIndexBinding getIndexBinding(Class<?> entityType) {
+		return boundSearchFactory.getIndexBinding( entityType );
 	}
 
 	//Not exposed on the IndexManager interface

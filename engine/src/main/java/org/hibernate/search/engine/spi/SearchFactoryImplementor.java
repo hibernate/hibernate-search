@@ -40,6 +40,18 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  */
 public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 
+	/**
+	 * Returns a map of all known entity index binding (indexed entities) keyed against the indexed type
+	 *
+	 * @return a map of all known entity index binding (indexed entities) keyed against the indexed type. The empty
+	 *         map is returned if there are no indexed types.
+	 */
+	Map<Class<?>, EntityIndexBinding> getIndexBindings();
+
+	/**
+	 * @deprecated since 4.4. Use {@link #getIndexBindings()}
+	 */
+	@Deprecated
 	Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity();
 
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);

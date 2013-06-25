@@ -20,13 +20,56 @@
  */
 package org.hibernate.search.engine.spi;
 
+import java.util.Set;
+
+import org.apache.lucene.search.Similarity;
+import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
+import org.hibernate.search.store.IndexShardingStrategy;
+
 /**
  * Specifies the relation and options from an indexed entity to its index(es).
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
- * @since 4.0
- * @deprecated Since 4.4. Use {@link EntityIndexBinding} instead
+ * @author Hardy Ferentschik
  */
-@Deprecated
-public interface EntityIndexBinder extends EntityIndexBinding {
+public interface EntityIndexBinding {
+
+	/**
+	 * @return the {@code Similarity} used to search and index this entity
+	 */
+	Similarity getSimilarity();
+
+	/**
+	 * @return the sharding strategy
+	 */
+	IndexShardingStrategy getSelectionStrategy();
+
+	/**
+	 * @return the document builder for this binding
+	 */
+	DocumentBuilderIndexedEntity<?> getDocumentBuilder();
+
+	/**
+	 * @return factory for the field caches
+	 */
+	FieldCacheCollectorFactory getIdFieldCacheCollectionFactory();
+
+	/**
+	 * Called once during bootstrapping
+	 *
+	 * @param indexedClasses set of indexed classes
+	 */
+	void postInitialize(Set<Class<?>> indexedClasses);
+
+	/**
+	 * @return the array of index managers
+	 */
+	IndexManager[] getIndexManagers();
+
+	/**
+	 * @return the interceptor for indexing operations. Can be {@code null}
+	 */
+	EntityIndexingInterceptor<?> getEntityIndexingInterceptor();
 }

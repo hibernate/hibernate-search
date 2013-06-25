@@ -25,7 +25,7 @@ import java.util.Set;
 import junit.framework.AssertionFailedError;
 
 import org.hibernate.cfg.Environment;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
@@ -100,7 +100,7 @@ public class ClusterTestHelper {
 	 */
 	public static int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
 		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
-		EntityIndexBinder indexBinding = searchFactory.getIndexBindingForEntity( entityType );
+		EntityIndexBinding indexBinding = searchFactory.getIndexBinding( entityType );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();

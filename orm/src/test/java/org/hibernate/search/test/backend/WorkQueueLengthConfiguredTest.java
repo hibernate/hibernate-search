@@ -20,7 +20,7 @@
 package org.hibernate.search.test.backend;
 
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -44,7 +44,7 @@ public class WorkQueueLengthConfiguredTest extends SearchTestCase {
 	@Test
 	public void testNothingTest() {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		EntityIndexBinder indexBindingForEntity = searchFactory.getIndexBindingForEntity( Clock.class );
+		EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( Clock.class );
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];

@@ -198,7 +198,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 
 	public Set<String> getIndexedClassNames() {
 		Set<String> indexedClasses = new HashSet<String>();
-		for ( Class clazz : searchFactoryImplementor.getIndexBindingForEntity().keySet() ) {
+		for ( Class clazz : searchFactoryImplementor.getIndexBindings().keySet() ) {
 			indexedClasses.add( clazz.getName() );
 		}
 		return indexedClasses;

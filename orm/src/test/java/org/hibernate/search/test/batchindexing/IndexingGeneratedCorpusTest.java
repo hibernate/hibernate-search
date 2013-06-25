@@ -200,7 +200,7 @@ public class IndexingGeneratedCorpusTest {
 
 	private void verifyIndexIsLocked(boolean isLocked, Class type) throws IOException {
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) builder.getSearchFactory();
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getIndexBindingForEntity( type ).getIndexManagers()[0];
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getIndexBinding( type ).getIndexManagers()[0];
 		Directory directory = indexManager.getDirectoryProvider().getDirectory();
 		LockFactory lockFactory = directory.getLockFactory();
 		Lock writeLock = lockFactory.makeLock( "write.lock" );

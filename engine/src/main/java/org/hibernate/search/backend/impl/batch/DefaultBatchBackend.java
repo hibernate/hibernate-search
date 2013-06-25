@@ -34,7 +34,7 @@ import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -67,7 +67,7 @@ public class DefaultBatchBackend implements BatchBackend {
 
 	private void sendWorkToShards(LuceneWork work, boolean forceAsync) {
 		final Class<?> entityType = work.getEntityClass();
-		EntityIndexBinder entityIndexBinding = searchFactoryImplementor.getIndexBindingForEntity( entityType );
+		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		if ( forceAsync ) {
 			work.getWorkDelegate( StreamingSelectionVisitor.INSTANCE )
@@ -100,7 +100,7 @@ public class DefaultBatchBackend implements BatchBackend {
 	private Collection<IndexManager> uniqueIndexManagerForTypes(Collection<Class<?>> entityTypes) {
 		HashMap<String,IndexManager> uniqueBackends = new HashMap<String, IndexManager>( entityTypes.size() );
 		for ( Class<?> type : entityTypes ) {
-			EntityIndexBinder indexBindingForEntity = searchFactoryImplementor.getIndexBindingForEntity( type );
+			EntityIndexBinding indexBindingForEntity = searchFactoryImplementor.getIndexBinding( type );
 			if ( indexBindingForEntity != null ) {
 				IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 				for ( IndexManager im : indexManagers ) {

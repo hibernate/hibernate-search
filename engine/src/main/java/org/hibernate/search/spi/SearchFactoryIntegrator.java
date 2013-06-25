@@ -26,6 +26,7 @@ package org.hibernate.search.spi;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
@@ -39,14 +40,28 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
  * its clients.
  *
  * It also allows modification of some of the search factory internals:
- *  - today allow addition of new indexed classes.
+ * - today allow addition of new indexed classes.
  *
- * @experimental
  * @author Emmanuel Bernard
+ * @experimental
  */
 public interface SearchFactoryIntegrator extends SearchFactory {
 
+	/**
+	 * @deprecated since 4.4. Use {@link #getIndexBinding(Class)}
+	 */
+	@Deprecated
 	EntityIndexBinder getIndexBindingForEntity(Class<?> entityType);
+
+	/**
+	 * Returns the entity to index binding for the given type.
+	 *
+	 * @param entityType the type for which to retrieve the binding
+	 *
+	 * @return the entity to index binding for the given type. {@code null} is returned for types which are unindexed or
+	 *         unknown.
+	 */
+	EntityIndexBinding getIndexBinding(Class<?> entityType);
 
 	/**
 	 * Add the following classes to the SearchFactory. If these classes are new to the SearchFactory this
@@ -64,9 +79,9 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	 * Return an Hibernate Search query object.
 	 * This object uses fluent APIs to define the query executed.
 	 * Offers a few execution approaches:
-	 *  - return the list of results eagerly
-	 *  - return the list of results lazily
-	 *  - get the number of results
+	 * - return the list of results eagerly
+	 * - return the list of results lazily
+	 * - get the number of results
 	 */
 	HSQuery createHSQuery();
 
@@ -78,6 +93,7 @@ public interface SearchFactoryIntegrator extends SearchFactory {
 	/**
 	 * Used to catch exceptions in all synchronous operations; but default they are logged, the user
 	 * can configure alternative error management means.
+	 *
 	 * @return the configured ErrorHandler, global to the SearchFactory
 	 */
 	ErrorHandler getErrorHandler();

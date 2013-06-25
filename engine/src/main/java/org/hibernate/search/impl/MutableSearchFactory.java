@@ -39,6 +39,7 @@ import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
@@ -82,6 +83,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	}
 
 	@Override
+	public Map<Class<?>, EntityIndexBinding> getIndexBindings() {
+		return delegate.getIndexBindings();
+	}
+
+	@Override
 	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
 		return delegate.getIndexBindingForEntity();
 	}
@@ -89,6 +95,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
 		return delegate.getIndexBindingForEntity( entityType );
+	}
+
+	@Override
+	public EntityIndexBinding getIndexBinding(Class<?> entityType) {
+		return delegate.getIndexBinding( entityType );
 	}
 
 	@Override
