@@ -57,7 +57,7 @@ public class IndexTestDontRun extends SearchTestCase {
 		long time = System.nanoTime();
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		for (int i = 0; i < 50000; i++) {
+		for ( int i = 0; i < 50000; i++ ) {
 			s.save( new Boat( "Maria el Seb", "a long" + i + " description of the land" + i ) );
 		}
 		tx.commit();
@@ -80,7 +80,7 @@ public class IndexTestDontRun extends SearchTestCase {
 		CountDownLatch startSignal = new CountDownLatch(1);
 		List<SearcherThread> threadsList = new ArrayList<SearcherThread>( TOTAL_SEARCHES );
 		IndexSearcher indexSearcher = getNewSearcher();
-		for (int i = 0; i < TOTAL_SEARCHES; i++) {
+		for ( int i = 0; i < TOTAL_SEARCHES; i++ ) {
 			// Create a thread and invoke it
 			//if ( i % 100 == 0) indexSearcher = getNewSearcher();
 			SearcherThread searcherThread = new SearcherThread( i, "name:maria OR description:long" + i, getSessions(), indexSearcher, plainLucene, startSignal );
@@ -95,7 +95,9 @@ public class IndexTestDontRun extends SearchTestCase {
 			return 0;
 		}
 		long totalTime = 0;
-		for (SearcherThread t : threadsList) totalTime += t.getTime();
+		for ( SearcherThread t : threadsList ) {
+			totalTime += t.getTime();
+		}
 		return totalTime;
 	}
 

@@ -73,7 +73,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			for ( FieldContext fieldContext : fieldContexts ) {
 				aggregatedFieldsQuery.add( createQuery( fieldContext ), BooleanClause.Occur.SHOULD );
 			}
-			return  queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
+			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();
 		}
 	}
 
@@ -109,7 +109,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 					termsAtSamePosition = termsPerPosition.get( position );
 				}
 
-				if (termsAtSamePosition == null) {
+				if ( termsAtSamePosition == null ) {
 					termsAtSamePosition = new ArrayList<Term>();
 					termsPerPosition.put( position, termsAtSamePosition );
 				}
@@ -170,7 +170,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 			}
 			else {
 				PhraseQuery query = new PhraseQuery();
-				query.setSlop(  phraseContext.getSlop() );
+				query.setSlop( phraseContext.getSlop() );
 				for ( Map.Entry<Integer,List<Term>> entry : termsPerPosition.entrySet() ) {
 					final List<Term> value = entry.getValue();
 					query.add( value.get( 0 ), entry.getKey() );

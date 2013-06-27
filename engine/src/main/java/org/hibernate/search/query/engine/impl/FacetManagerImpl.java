@@ -110,11 +110,11 @@ public class FacetManagerImpl implements FacetManager {
 		DocumentExtractor queryDocumentExtractor = query.queryDocumentExtractor();
 		queryDocumentExtractor.close();
 		//handle edge case of an empty index
-		if (facetResults == null) {
+		if ( facetResults == null ) {
 			return Collections.emptyList();
 		}
 		List<Facet> results = facetResults.get( facetingName );
-		if (results != null) {
+		if ( results != null ) {
 			return results;
 		}
 		else {

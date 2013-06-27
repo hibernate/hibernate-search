@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~  Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  ~  indicated by the @author tags or express copyright attribution
+  ~  statements applied by the authors.  All third-party contributions are
+  ~  distributed under license by Red Hat, Inc.
+  ~
+  ~  This copyrighted material is made available to anyone wishing to use, modify,
+  ~  copy, or redistribute it subject to the terms and conditions of the GNU
+  ~  Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~  for more details.
+  ~
+  ~  You should have received a copy of the GNU Lesser General Public License
+  ~  along with this distribution; if not, write to:
+  ~  Free Software Foundation, Inc.
+  ~  51 Franklin Street, Fifth Floor
+  ~  Boston, MA  02110-1301  USA
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-search-parent</artifactId>
+        <version>4.4.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>hibernate-search-build-config</artifactId>
+
+    <name>Hibernate Search build configuration</name>
+    <description>Configuration for the build of Hibernate Search</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+</project>

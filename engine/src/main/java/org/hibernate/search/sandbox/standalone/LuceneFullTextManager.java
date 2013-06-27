@@ -59,14 +59,14 @@ public class LuceneFullTextManager implements FullTextManager {
 			String msg = "Entity to retrueve is not an @Indexed entity: " + entityType.getClass().getName();
 			throw new IllegalArgumentException( msg );
 		}
-		if (id == null) {
+		if ( id == null ) {
 			throw new IllegalArgumentException( "Identifier cannot be null" );
 		}
 		DocumentBuilderIndexedEntity<?> docBuilder = entityIndexBinding.getDocumentBuilder();
 		Query luceneQuery = new TermQuery( docBuilder.getTerm( id ) );
 		FullTextQuery searchQuery = createFullTextQuery( luceneQuery, entityType );
 		List<?> results = searchQuery.list();
-		if (results.size() > 1) {
+		if ( results.size() > 1 ) {
 			//TODO find correct exception
 			throw new SearchException("Several entities with he same id found: " + entityType + "#" + id);
 		}
@@ -76,7 +76,7 @@ public class LuceneFullTextManager implements FullTextManager {
 	}
 
 	public FullTextQuery createFullTextQuery(Query luceneQuery, Class<?>... entities) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return null;
 	}
 
 

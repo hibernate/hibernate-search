@@ -120,7 +120,7 @@ final class LuceneBackendQueueTask implements Runnable {
 					task.get();
 					errorContextBuilder.workCompleted( queue.get( i ) );
 				}
-				catch (ExecutionException e) {
+				catch ( ExecutionException e ) {
 					if ( failedUpdates == null ) {
 						failedUpdates = new LinkedList<LuceneWork>();
 					}

@@ -50,8 +50,8 @@ public class UnresolvedBridgeTest {
 		catch ( Exception e ) {
 			Throwable ee = e;
 			boolean hasSearchException = false;
-			for (;;) {
-				if (ee == null) {
+			for ( ;; ) {
+				if ( ee == null ) {
 					break;
 				}
 				else if (ee instanceof SearchException) {

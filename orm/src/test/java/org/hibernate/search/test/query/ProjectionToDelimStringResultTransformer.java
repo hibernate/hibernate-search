@@ -34,7 +34,7 @@ public class ProjectionToDelimStringResultTransformer implements ResultTransform
 
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		String s = tuple[0].toString();
-		for (int i = 1; i < tuple.length; i++) {
+		for ( int i = 1; i < tuple.length; i++ ) {
 			s = s + ", " + tuple[i].toString();
 		}
 		return s;

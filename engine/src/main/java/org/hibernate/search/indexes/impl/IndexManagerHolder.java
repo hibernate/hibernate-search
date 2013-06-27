@@ -145,12 +145,12 @@ public class IndexManagerHolder {
 
 		Indexed indexedAnnotation = entity.getAnnotation( Indexed.class );
 		EntityIndexingInterceptor<?> interceptor = null;
-		if (indexedAnnotation != null) {
+		if ( indexedAnnotation != null ) {
 			Class<? extends EntityIndexingInterceptor> interceptorClass = getInterceptorClassFromHierarchy(
 					entity,
 					indexedAnnotation
 			);
-			if (interceptorClass == DefaultEntityInterceptor.class) {
+			if ( interceptorClass == DefaultEntityInterceptor.class ) {
 				interceptor = null;
 			}
 			else {
@@ -176,7 +176,7 @@ public class IndexManagerHolder {
 		while ( result == DefaultEntityInterceptor.class ) {
 			superEntity = superEntity.getSuperclass();
 			//Object.class
-			if (superEntity == null) {
+			if ( superEntity == null ) {
 				return result;
 			}
 			Indexed indexAnnForSuperclass = superEntity.getAnnotation( Indexed.class );
@@ -226,7 +226,7 @@ public class IndexManagerHolder {
 			manager.initialize( indexName, indexProps, context );
 			return manager;
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			throw log.unableToInitializeIndexManager( indexName, e );
 		}
 	}

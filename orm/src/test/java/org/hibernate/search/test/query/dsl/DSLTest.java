@@ -617,7 +617,7 @@ public class DSLTest extends SearchTestCase {
 		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 
 		assertEquals( "test quad tree based spatial query", 1, results.size() );
-		assertEquals( "test quad tree based spatial  query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
+		assertEquals( "test quad tree based spatial query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
 
 		transaction.commit();
 	}
@@ -672,8 +672,8 @@ public class DSLTest extends SearchTestCase {
 
 			fail( "Obtaining a builder not allowed for unindexed type without any indexed sub-types." );
 		}
-		catch (SearchException e) {
-			// sucess
+		catch ( SearchException e ) {
+			// success
 		}
 		finally {
 			transaction.commit();

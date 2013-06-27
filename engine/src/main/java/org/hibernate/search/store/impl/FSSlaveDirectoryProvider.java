@@ -114,7 +114,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		boolean currentMarkerInSource = false;
 		for ( int tried = 0 ; tried <= retry ; tried++ ) {
 			//we try right away the first time
-			if ( tried > 0) {
+			if ( tried > 0 ) {
 				try {
 					Thread.sleep( TimeUnit.SECONDS.toMillis( 5 ) );
 				}
@@ -268,7 +268,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 					cancel();
 				}
 			}
-			catch (RuntimeException re) {
+			catch ( RuntimeException re ) {
 				// we need this to make sure the error is logged somewhere,
 				// as we're executing it in the timer thread
 				log.failedSlaveDirectoryProviderInitialization( indexName, re );

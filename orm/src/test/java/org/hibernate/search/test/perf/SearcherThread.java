@@ -81,7 +81,7 @@ public class SearcherThread implements Runnable {
 		try {
 			startSignal.await();
 		}
-		catch (InterruptedException e) {
+		catch ( InterruptedException e ) {
 			log.error( "tests canceled", e );
 			Thread.currentThread().interrupt();
 			return;
@@ -101,7 +101,7 @@ public class SearcherThread implements Runnable {
 			// Search
 			TopDocs hits = indexsearcher.search( q, 1000 );
 			List<String> names = new ArrayList<String>(100);
-			for (int i = 0 ; i < 100 ; i++) {
+			for ( int i = 0; i < 100; i++ ) {
 				Document doc = getDocument( indexsearcher, hits.scoreDocs[i].doc );
 				names.add( doc.get( "name" ) );
 			}
@@ -110,14 +110,14 @@ public class SearcherThread implements Runnable {
 //			log.error( "Lucene [ Thread-id : " + threadId + " ] Total time taken for search is : " + totalTime + "ms with total no. of matching records : " + hits.length() );
 			setTime( totalTime );
 		}
-		catch (ParseException e) {
+		catch ( ParseException e ) {
 			System.out.println( "[ Thread-id : " + threadId + " ] Parse Exception for queryString : " + queryString );
 			e.printStackTrace();
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			System.out.println( "[ Thread-id : " + threadId + " ] IO Exception for queryString : " + queryString );
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			e.printStackTrace( );
 		}
 	}
@@ -126,7 +126,7 @@ public class SearcherThread implements Runnable {
 		try {
 			return searcher.doc( docId );
 		}
-		catch (IOException ioe) {
+		catch ( IOException ioe ) {
 			throw new SearchException( "Unable to retrieve document", ioe );
 		}
 	}
@@ -146,7 +146,7 @@ public class SearcherThread implements Runnable {
 		try {
 			Query q = getQuery();
 			// Search
-			FullTextSession ftSession = Search.getFullTextSession( sf.openSession(  ) );
+			FullTextSession ftSession = Search.getFullTextSession( sf.openSession() );
 			final FullTextQuery textQuery = ftSession.createFullTextQuery( q, Boat.class )
 					.setMaxResults( 100 ).setProjection( "name" );
 			long start = System.nanoTime();
@@ -157,13 +157,13 @@ public class SearcherThread implements Runnable {
 //			log.error( "HSearch [ Thread-id : " + threadId + " ] Total time taken for search is : " + totalTime + "ms with total no. of matching records : " + resultSize );
 			setTime( totalTime );
 		}
-		catch (ParseException e) {
+		catch ( ParseException e ) {
 			log.error( "[ Thread-id : " + threadId + " ] Parse Exception for queryString : " + queryString );
 			e.printStackTrace();
 		}
-		catch (Throwable e) {
+		catch ( Throwable e ) {
 			log.error( "[ Thread-id : " + threadId + " ] Exception for queryString : " + queryString );
-			e.printStackTrace(  );
+			e.printStackTrace();
 		}
 	}
 

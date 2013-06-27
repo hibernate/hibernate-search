@@ -253,7 +253,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		throw e;
 	}
 
-	@SuppressWarnings( { "ThrowableInstanceNeverThrown" })
+	@SuppressWarnings({ "ThrowableInstanceNeverThrown" })
 	PersistenceException wrapStaleStateException(StaleStateException e) {
 		if ( e instanceof StaleObjectStateException ) {
 			StaleObjectStateException sose = (StaleObjectStateException) e;

@@ -52,7 +52,7 @@ public class ConcurrencyTest extends SearchTestCase {
 		try {
 			s.getTransaction().commit();
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			//Check for error logs from JDBCTransaction
 		}
 		s.close();

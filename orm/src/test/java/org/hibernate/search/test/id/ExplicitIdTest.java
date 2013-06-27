@@ -124,7 +124,7 @@ public class ExplicitIdTest extends SearchTestCase {
 		}
 		catch ( SearchException e ) {
 			assertEquals(
-					"Loading entity of type org.hibernate.search.test.id.Article using 'documentId' as document id and '1'  as value was not unique",
+					"Loading entity of type org.hibernate.search.test.id.Article using 'documentId' as document id and '1' as value was not unique",
 					e.getMessage()
 			);
 		}

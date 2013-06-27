@@ -48,7 +48,9 @@ public class NoServiceDirectoryProvider extends RAMDirectoryProvider {
 
 	@Override
 	public void start(DirectoryBasedIndexManager indexManager) {
-		if (foo == null) throw new RuntimeException( "service should be started" );
+		if ( foo == null ) {
+			throw new RuntimeException( "service should be started" );
+		}
 		super.start( indexManager );
 	}
 

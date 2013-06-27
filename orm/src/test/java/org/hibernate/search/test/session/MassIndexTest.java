@@ -58,7 +58,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.doWork( new Work() {
 			@Override
 			public void execute(Connection connection) throws SQLException {
-				for (int i = 0; i < loop; i++) {
+				for ( int i = 0; i < loop; i++ ) {
 					Statement statmt = connection.createStatement();
 						statmt.executeUpdate( "insert into Domain(id, name) values( + "
 								+ ( i + 1 ) + ", 'sponge" + i + "')" );
@@ -79,7 +79,9 @@ public class MassIndexTest extends SearchTestCase {
 		while ( results.next() ) {
 			index++;
 			s.index( results.get( 0 ) );
-			if ( index % 5 == 0 ) s.clear();
+			if ( index % 5 == 0 ) {
+				s.clear();
+			}
 		}
 		tx.commit(); // if you get a LazyInitializationException, that's because we clear() the session in the loop.. it only works with a batch size of 5 (the point of the test)
 		s.clear();
@@ -87,7 +89,7 @@ public class MassIndexTest extends SearchTestCase {
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 14, result.size() );
-		for (Object object : result) {
+		for ( Object object : result ) {
 			s.delete( object );
 		}
 		tx.commit();
@@ -99,7 +101,7 @@ public class MassIndexTest extends SearchTestCase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		final int loop = 4;
-		for (int i = 0; i < loop; i++) {
+		for ( int i = 0; i < loop; i++ ) {
 			Email email = new Email();
 			email.setId( (long) i + 1 );
 			email.setTitle( "JBoss World Berlin" );
@@ -148,13 +150,15 @@ public class MassIndexTest extends SearchTestCase {
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
 		assertEquals( 0, result.size() );
 		result = s.createCriteria( Email.class ).list();
-		for (int i = 0; i < loop / 2; i++)
+		for ( int i = 0; i < loop / 2; i++ ) {
 			s.index( result.get( i ) );
+		}
 		tx.commit(); //do the process
 		s.index( result.get( loop / 2 ) ); //do the process out of tx
 		tx = s.beginTransaction();
-		for (int i = loop / 2 + 1; i < loop; i++)
+		for ( int i = loop / 2 + 1; i < loop; i++ ) {
 			s.index( result.get( i ) );
+		}
 		tx.commit(); //do the process
 		s.close();
 

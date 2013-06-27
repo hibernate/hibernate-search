@@ -51,11 +51,11 @@ public class ManualTransactionContext implements TransactionContext {
 
 	public void end() {
 		this.progress = false;
-		for (Synchronization sync : syncs) {
+		for ( Synchronization sync : syncs ) {
 			sync.beforeCompletion();
 		}
 
-		for (Synchronization sync : syncs) {
+		for ( Synchronization sync : syncs ) {
 			sync.afterCompletion( Status.STATUS_COMMITTED );
 		}
 	}

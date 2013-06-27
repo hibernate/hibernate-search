@@ -40,7 +40,38 @@
             <property name="ignoreComments" value="true" />
         </module>
 
-        <!-- Checks for imports -->
+        <!-- Check parentheses padding -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="^\t+(if|for|while|catch)([^ ])\(" />
+            <property name="message" value="Left parentheses should be preceeded by 1 whitespace" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="^\t+(if|for|while|catch) \( .+[^ ]\) \{$" />
+            <property name="message" value="Right parentheses should be preceeded by 1 white space" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="^\t+(if|for|while|catch) \([^ $]" />
+            <property name="message" value="Left parenthesis should be followed by 1 whitespace" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\)([^ ])\{$" />
+            <property name="message" value="Right parentheses should be followed by 1 white space" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\)\s+;$" />
+            <property name="message" value="Unecessary whitespace after parentheses" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+       <!-- Checks for imports -->
         <module name="AvoidStarImport" />
         <module name="RedundantImport" />
         <module name="UnusedImports" />
@@ -55,7 +86,7 @@
         <module name="PackageAnnotation" />
         <module name="CovariantEquals" />
         <module name="ModifiedControlVariable" />
-        <!-- <module name="NeedBraces" /> -->
+        <module name="NeedBraces" />
         <module name="OneStatementPerLine" />
         <module name="EmptyStatement" />
         <module name="DefaultComesLast" />
@@ -81,6 +112,12 @@
             <property name="tokens" value="CTOR_CALL, METHOD_CALL, SUPER_CTOR_CALL" />
             <property name="option" value="space" />
         </module>
+
+        <module name="DoubleSpaces">
+            <property name="ignoreComments" value="true" />
+            <property name="ignoreStrings" value="true" />
+        </module>
+
     </module>
 
     <!-- We are not using NewLineAtEndOfFile because the new line chars change

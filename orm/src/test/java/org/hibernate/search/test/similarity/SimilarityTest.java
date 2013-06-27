@@ -62,7 +62,7 @@ public class SimilarityTest extends SearchTestCase {
 	}
 
 	public void testClassAndGlobalSimilarity() throws Exception {
-		Session s = openSession(  );
+		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 		Trash trash = new Trash();
 		trash.setName( "Green trash" );
@@ -87,13 +87,17 @@ public class SimilarityTest extends SearchTestCase {
 		assertEquals( 2, results.size() );
 		assertEquals( "Similarity not overridden at the class level", ( (Object[]) results.get( 0 ) )[0], ( (Object[]) results.get( 1 ) )[0]);
 		assertEquals( "Similarity not overridden", 1.0f, ( (Object[]) results.get( 0 ) )[0] );
-		for (Object result : results) s.delete( ( (Object[]) result )[1] );
+		for ( Object result : results ) {
+			s.delete( ( (Object[]) result )[1] );
+		}
 
 		results = fts.createFullTextQuery( tq, Can.class ).setProjection( FullTextQuery.SCORE, FullTextQuery.THIS ).list();
 		assertEquals( 2, results.size() );
 		assertEquals( "Similarity not overridden by the global setting", ( (Object[]) results.get( 0 ) )[0], ( (Object[]) results.get( 1 ) )[0]);
 		assertFalse( "Similarity not overridden by the global setting", new Float(1.0f).equals( ( (Object[]) results.get( 0 ) )[0] ) );
-		for (Object result : results) s.delete( ( (Object[]) result )[1] );
+		for ( Object result : results ) {
+			s.delete( ( (Object[]) result )[1] );
+		}
 
 		tx.commit();
 		s.close();

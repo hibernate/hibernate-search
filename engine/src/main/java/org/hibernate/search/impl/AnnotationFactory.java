@@ -49,10 +49,10 @@ class AnnotationFactory {
 		try {
 			return getProxyInstance( proxyClass, handler );
 		}
-		catch (RuntimeException e) {
+		catch ( RuntimeException e ) {
 			throw e;
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			throw new RuntimeException( e );
 		}
 	}

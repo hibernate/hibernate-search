@@ -50,7 +50,9 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	private ReflectionManager reflectionManager;
 
 	public SearchConfigurationFromHibernateCore(org.hibernate.cfg.Configuration cfg) {
-		if ( cfg == null ) throw new NullPointerException( "Configuration is null" );
+		if ( cfg == null ) {
+			throw new NullPointerException( "Configuration is null" );
+		}
 		this.cfg = cfg;
 	}
 
@@ -80,7 +82,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 						(ReflectionManager) cfg.getClass().getMethod( "getReflectionManager" ).invoke( cfg );
 
 			}
-			catch (Exception e) {
+			catch ( Exception e ) {
 				reflectionManager = new JavaReflectionManager();
 			}
 		}
@@ -105,7 +107,9 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 		public boolean hasNext() {
 			//we need to read the next non null one. getMappedClass() can return null and should be ignored
-			if ( future != null) return true;
+			if ( future != null ) {
+				return true;
+			}
 			do {
 				if ( ! hibernatePersistentClassIterator.hasNext() ) {
 					future = null;
@@ -120,7 +124,9 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 		public Class<?> next() {
 			//run hasNext to init the next element
-			if ( ! hasNext() ) throw new NoSuchElementException();
+			if ( ! hasNext() ) {
+				throw new NoSuchElementException();
+			}
 			Class<?> result = future;
 			future = null;
 			return result;

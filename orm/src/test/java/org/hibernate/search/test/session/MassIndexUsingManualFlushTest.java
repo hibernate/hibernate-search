@@ -52,7 +52,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestCase {
 		s.doWork( new Work() {
 			@Override
 			public void execute(Connection connection) throws SQLException {
-				for (int i = 0; i < loop; i++) {
+				for ( int i = 0; i < loop; i++ ) {
 					Statement statmt = connection.createStatement();
 					statmt.executeUpdate( "insert into Domain(id, name) values( + "
 							+ ( i + 1 ) + ", 'sponge" + i + "')" );
@@ -86,7 +86,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestCase {
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 14, result.size() );
-		for (Object object : result) {
+		for ( Object object : result ) {
 			s.delete( object );
 		}
 		tx.commit();

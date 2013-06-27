@@ -76,8 +76,8 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 			Serializer serializer = provider.getSerializer();
 			serializer.luceneWorks( works );
 
-			for (LuceneWork work : works) {
-				if (work instanceof OptimizeLuceneWork) {
+			for ( LuceneWork work : works ) {
+				if ( work instanceof OptimizeLuceneWork ) {
 					serializer.addOptimizeAll();
 				}
 				else if (work instanceof PurgeAllLuceneWork) {
@@ -90,7 +90,7 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 				else if (work instanceof AddLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
 					processId( work, serializer );
-					serializer.addAdd( work.getEntityClass().getName(),  work.getFieldToAnalyzerMap() );
+					serializer.addAdd( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
 				}
 				else if (work instanceof UpdateLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
@@ -196,16 +196,16 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 				if ( safeField.isBinary() ) {
 					serializer.addFieldWithBinaryData( new LuceneFieldContext( safeField ) );
 				}
-				else if ( safeField.stringValue() != null )  {
+				else if ( safeField.stringValue() != null ) {
 					serializer.addFieldWithStringData( new LuceneFieldContext( safeField ) );
 				}
-				else if ( safeField.readerValue() != null && safeField.readerValue() instanceof Serializable )  {
+				else if ( safeField.readerValue() != null && safeField.readerValue() instanceof Serializable ) {
 					serializer.addFieldWithSerializableReaderData( new LuceneFieldContext( safeField ) );
 				}
-				else if ( safeField.readerValue() != null )  {
+				else if ( safeField.readerValue() != null ) {
 					throw log.conversionFromReaderToStringNotYetImplemented();
 				}
-				else if ( safeField.tokenStreamValue() != null )  {
+				else if ( safeField.tokenStreamValue() != null ) {
 					serializer.addFieldWithTokenStreamData( new LuceneFieldContext( safeField ) );
 				}
 				else {

@@ -101,7 +101,7 @@ public class QueryLoaderTest extends SearchTestCase {
 		music.getAuthors().clear();
 		music2.getAuthors().clear();
 
-		for (Object o : s.createCriteria( Object.class ).list()) {
+		for ( Object o : s.createCriteria( Object.class ).list() ) {
 			s.delete( o );
 		}
 

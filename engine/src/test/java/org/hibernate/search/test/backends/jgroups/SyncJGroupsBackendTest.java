@@ -99,7 +99,7 @@ public class SyncJGroupsBackendTest {
 			storeDvd( 1, "Hibernate Search in Action" );
 			System.out.println( "[POSTSEND] Timestamp: " + System.nanoTime() );
 		}
-		catch (SearchException se) {
+		catch ( SearchException se ) {
 			//Expected: we're inducing the RPC into timeout by blocking receiver processing
 			Throwable cause = se.getCause();
 			Assert.assertTrue( "Cause was not a TimeoutException but a " + cause, cause instanceof TimeoutException );
@@ -126,7 +126,7 @@ public class SyncJGroupsBackendTest {
 		try {
 			storeDvd( 2, "Byteman in Action" ); //not actually needing Byteman here
 		}
-		catch (SearchException se) {
+		catch ( SearchException se ) {
 			//Expected: we're inducing the RPC into NPE
 			Throwable cause = se.getCause().getCause();
 			Assert.assertTrue( "Cause was not a NullPointerException but a " + cause, cause instanceof NullPointerException );
@@ -149,7 +149,7 @@ public class SyncJGroupsBackendTest {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, "dvds" );
 		JGroupsBackendQueueProcessor jgroupsProcessor = (JGroupsBackendQueueProcessor) backendQueueProcessor;
 		long messageTimeout = jgroupsProcessor.getMessageTimeout();
-		Assert.assertEquals( "message timeout configuration property not applied",  200,  messageTimeout );
+		Assert.assertEquals( "message timeout configuration property not applied", 200, messageTimeout );
 	}
 
 	private JGroupsReceivingMockBackend extractMockBackend(String indexName) {
@@ -164,7 +164,7 @@ public class SyncJGroupsBackendTest {
 		return (JGroupsBackendQueueProcessor) backendQueueProcessor;
 	}
 
-	private static BackendQueueProcessor  extractBackendQueue(TestingSearchFactoryHolder node, String indexName) {
+	private static BackendQueueProcessor extractBackendQueue(TestingSearchFactoryHolder node, String indexName) {
 		IndexManager indexManager = node.getSearchFactory().getIndexManagerHolder().getIndexManager( indexName );
 		Assert.assertNotNull( indexManager );
 		DirectoryBasedIndexManager dbi = (DirectoryBasedIndexManager) indexManager;

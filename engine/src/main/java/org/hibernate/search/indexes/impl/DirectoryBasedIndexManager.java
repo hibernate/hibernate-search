@@ -128,7 +128,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor,  boolean forceAsync) {
+	public void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync) {
 		//TODO implement async
 		backend.applyStreamWork( singleOperation, monitor );
 	}
@@ -225,11 +225,11 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	protected DirectoryBasedReaderProvider createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-		return  CommonPropertiesParse.createDirectoryBasedReaderProvider( this, cfg );
+		return CommonPropertiesParse.createDirectoryBasedReaderProvider( this, cfg );
 	}
 
 	protected DirectoryProvider createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-		return  DirectoryProviderFactory.createDirectoryProvider( indexName, cfg, buildContext );
+		return DirectoryProviderFactory.createDirectoryProvider( indexName, cfg, buildContext );
 	}
 
 }

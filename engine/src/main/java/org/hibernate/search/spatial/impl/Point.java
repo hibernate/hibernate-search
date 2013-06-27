@@ -69,7 +69,7 @@ public final class Point implements Coordinates {
 	 * @return longitude normalized in ]-180;+180]
 	 */
 	public static double normalizeLongitude(double longitude) {
-		if ( longitude ==  ( -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) {
+		if ( longitude == ( -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) {
 			return GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ;
 		}
 		else {
@@ -87,7 +87,7 @@ public final class Point implements Coordinates {
 			// shift 180 and normalize full circle turn
 			_longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.WHOLE_CIRCLE_DEGREE_RANGE );
 			// as Java % is not a math modulus we may have negative numbers so the unshift is sign dependant
-			if ( _longitude < 0) {
+			if ( _longitude < 0 ) {
 				_longitude = _longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 			}
 			else {

@@ -54,7 +54,7 @@ public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 				try {
 					stringValue = CompressionTools.decompressString( field.getBinaryValue() );
 				}
-				catch ( DataFormatException e) {
+			catch ( DataFormatException e ) {
 					throw new SearchException( "Field " + name + " looks like binary but couldn't be decompressed" );
 				}
 			}
@@ -66,6 +66,6 @@ public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
 	public String objectToString(Object value) {
 		String originalValue = value.toString();
-		return  "<b>" + originalValue + "</b>";
+		return "<b>" + originalValue + "</b>";
 	}
 }

@@ -139,7 +139,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx = s.beginTransaction();
 
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
-		org.apache.lucene.search.Query luceneQuery =  parser.parse( "street1_ngram:pea" );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "street1_ngram:pea" );
 
 		final FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( "Analyzer inoperant", 1, query.getResultSize() );
@@ -547,7 +547,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		List<Departments> result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "incorrect number of results returned", 2, result.size() );
-		for (Departments d : result) {
+		for ( Departments d : result ) {
 			assertEquals( "incorrect manufacturer", "C", d.getManufacturer() );
 		}
 
@@ -578,7 +578,9 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertEquals( "incorrect number of results returned", 1, result.size() );
 
 		//cleanup
-		for (Object element : s.createQuery( "from " + Departments.class.getName() ).list()) s.delete( element );
+		for ( Object element : s.createQuery( "from " + Departments.class.getName() ).list() ) {
+			s.delete( element );
+		}
 		tx.commit();
 		s.close();
 	}

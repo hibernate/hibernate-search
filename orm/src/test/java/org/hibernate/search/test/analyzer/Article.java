@@ -57,7 +57,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
 				filters = {
 						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
-						@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params =   {
+						@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
 							@Parameter(name = "language", value = "English")
 						})
 				}),

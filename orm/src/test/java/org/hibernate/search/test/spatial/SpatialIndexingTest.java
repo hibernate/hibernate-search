@@ -45,11 +45,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testIndexing() throws Exception {
 		POI poi = new POI( 1, "Test", 24.0d, 32.0d, "" );
-		POI poi2 = new POI(  2, "Test2", 0.0d, -179.0d, "" );
-		POI poi3 = new POI(  3, "Test3", 0.0d, 179.0d, "" );
-		POI poi4 = new POI(  4, "Test4", 89.0d, 1.0d, "" );
-		POI poi5 = new POI(  5, "Test5", -90.0d, 17.0d, "" );
-		POI poi6 = new POI(  6, "Test6", 47.0d, 154.0d, "" );
+		POI poi2 = new POI( 2, "Test2", 0.0d, -179.0d, "" );
+		POI poi3 = new POI( 3, "Test3", 0.0d, 179.0d, "" );
+		POI poi4 = new POI( 4, "Test4", 89.0d, 1.0d, "" );
+		POI poi5 = new POI( 5, "Test5", -90.0d, 17.0d, "" );
+		POI poi6 = new POI( 6, "Test6", 47.0d, 154.0d, "" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
 		Transaction tx = fullTextSession.beginTransaction();
@@ -98,7 +98,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 6, results4.size() );
 
 		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for (Object entity : pois) {
+		for ( Object entity : pois ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -163,11 +163,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testDistanceSort() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
-		POI poi2 = new POI(  2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
-		POI poi3 = new POI(  3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
-		POI poi4 = new POI(  4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
-		POI poi5 = new POI(  5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
-		POI poi6 = new POI(  6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
+		POI poi2 = new POI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
+		POI poi3 = new POI( 3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
+		POI poi4 = new POI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
+		POI poi5 = new POI( 5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
+		POI poi6 = new POI( 6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
@@ -194,13 +194,13 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ));
-		hibQuery.setSort(  distanceSort );
+		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.list();
 
 		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for (Object entity : pois) {
+		for ( Object entity : pois ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -209,11 +209,11 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 	public void testNonGeoDistanceSort() throws Exception {
 		NonGeoPOI poi = new NonGeoPOI( 1, "Distance to 24,32 : 0", 24.0d, null, "" );
-		NonGeoPOI poi2 = new NonGeoPOI(  2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
-		NonGeoPOI poi3 = new NonGeoPOI(  3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
-		NonGeoPOI poi4 = new NonGeoPOI(  4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
-		NonGeoPOI poi5 = new NonGeoPOI(  5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
-		NonGeoPOI poi6 = new NonGeoPOI(  6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
+		NonGeoPOI poi2 = new NonGeoPOI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
+		NonGeoPOI poi3 = new NonGeoPOI( 3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
+		NonGeoPOI poi4 = new NonGeoPOI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
+		NonGeoPOI poi5 = new NonGeoPOI( 5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
+		NonGeoPOI poi6 = new NonGeoPOI( 6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
@@ -239,13 +239,13 @@ public class SpatialIndexingTest extends SearchTestCase {
 
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, NonGeoPOI.class );
 		Sort distanceSort = new Sort( new DistanceSortField( centerLatitude, centerLongitude, "location" ));
-		hibQuery.setSort(  distanceSort );
+		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		List results = hibQuery.list();
 
 		List<?> pois = fullTextSession.createQuery( "from " + NonGeoPOI.class.getName() ).list();
-		for (Object entity : pois) {
+		for ( Object entity : pois ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -286,7 +286,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + Event.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -324,7 +324,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + User.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -362,7 +362,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + UserRange.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -397,7 +397,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + UserEx.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -438,7 +438,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + RangeEvent.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -476,7 +476,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + Hotel.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -536,7 +536,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 3, results4.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + RangeHotel.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -544,7 +544,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 	}
 
 	public void testSpatialAnnotationOnEmbeddableFieldLevel() throws Exception {
-		Restaurant restaurant = new Restaurant( 1, "Al's kitchen", "42, space avenue CA8596 BYOB Street",  24.0d, 32.0d);
+		Restaurant restaurant = new Restaurant( 1, "Al's kitchen", "42, space avenue CA8596 BYOB Street", 24.0d, 32.0d);
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 
 		Transaction tx = fullTextSession.beginTransaction();
@@ -574,7 +574,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + Restaurant.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();
@@ -612,7 +612,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		Assert.assertEquals( 1, results2.size() );
 
 		List<?> events = fullTextSession.createQuery( "from " + GetterUser.class.getName() ).list();
-		for (Object entity : events) {
+		for ( Object entity : events ) {
 			fullTextSession.delete( entity );
 		}
 		tx.commit();

@@ -51,8 +51,8 @@ public class FilterOptimizationHelper {
 		List<OpenBitSet> openBitSets = new ArrayList<OpenBitSet>( size );
 		List<DocIdBitSet> docIdBitSets = new ArrayList<DocIdBitSet>( size );
 		List<DocIdSet> nonMergeAble = new ArrayList<DocIdSet>( size );
-		for (DocIdSet set : docIdSets) {
-			if (set instanceof OpenBitSet) {
+		for ( DocIdSet set : docIdSets ) {
+			if ( set instanceof OpenBitSet ) {
 				openBitSets.add( (OpenBitSet) set );
 			}
 			else if (set instanceof DocIdBitSet) {

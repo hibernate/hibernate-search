@@ -98,7 +98,7 @@ public class QueryLoader extends AbstractLoader {
 	}
 
 	public void setCriteria(Criteria criteria) {
-		if (criteria != null) {
+		if ( criteria != null ) {
 			isExplicitCriteria = true;
 			sizeSafe = true;
 			if ( criteria instanceof CriteriaImpl ) {

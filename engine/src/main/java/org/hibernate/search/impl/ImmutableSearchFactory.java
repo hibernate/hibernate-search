@@ -167,7 +167,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	public void close() {
-		if ( stopped.compareAndSet( false, true ) ) {  //make sure we only stop once
+		if ( stopped.compareAndSet( false, true ) ) { //make sure we only stop once
 			try {
 				worker.close();
 			}

@@ -44,7 +44,7 @@ public class UriBridge implements TwoWayStringBridge {
 			try {
 				return new URI( stringValue );
 			}
-			catch (URISyntaxException e) {
+			catch ( URISyntaxException e ) {
 				throw new SearchException( "Unable to build URI: " + stringValue, e );
 			}
 		}

@@ -118,7 +118,7 @@ public class WorkSequencesTest extends SearchTestCase {
 			session.persist( new Domain( 8, "somethingnew.org" ) );
 			session.getTransaction().commit();
 		}
-		assertEquals( 1, countDomainsByFullText(  "somethingnew" ) );
+		assertEquals( 1, countDomainsByFullText( "somethingnew" ) );
 
 		session.close();
 	}

@@ -97,7 +97,7 @@ public class CopyTokenStream extends TokenStream implements Serializable {
 	private static List<List<AttributeImpl>> fillCache(TokenStream input) throws IOException {
 		List<List<AttributeImpl>> results = new ArrayList<List<AttributeImpl>>();
 		while ( input.incrementToken() ) {
-			List<AttributeImpl> attrs = new ArrayList<AttributeImpl>(  );
+			List<AttributeImpl> attrs = new ArrayList<AttributeImpl>();
 			results.add( attrs );
 			Iterator<AttributeImpl> iter = input.getAttributeImplsIterator();
 			while ( iter.hasNext() ) {

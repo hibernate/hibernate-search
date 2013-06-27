@@ -60,8 +60,12 @@ public class RetryInitializeTest {
 
 	@After
 	public void tearDown() throws Exception {
-		if ( slave != null ) slave.close();
-		if ( master != null ) master.close();
+		if ( slave != null ) {
+			slave.close();
+		}
+		if ( master != null ) {
+			master.close();
+		}
 		FSSlaveAndMasterDPTest.cleanupDirectories( root );
 	}
 

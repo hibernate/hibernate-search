@@ -284,7 +284,7 @@ public class QueryHits {
 	}
 
 	private Collector optionallyEnableDistanceCollector(Collector collector, int maxDocs) {
-		if ( spatialFieldName == null || spatialFieldName.isEmpty() || spatialSearchCenter == null) {
+		if ( spatialFieldName == null || spatialFieldName.isEmpty() || spatialSearchCenter == null ) {
 			return collector;
 		}
 		distanceCollector = new DistanceCollector( collector, spatialSearchCenter, maxDocs, spatialFieldName );

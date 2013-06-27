@@ -72,7 +72,7 @@ public class CustomLockProviderTest {
 			builder.close();
 			fail();
 		}
-		catch (SearchException e) {
+		catch ( SearchException e ) {
 			assertEquals( "Unable to find locking_strategy implementation class: org.hibernate.NotExistingFactory", e.getCause().getMessage() );
 		}
 	}

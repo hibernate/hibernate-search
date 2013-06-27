@@ -68,7 +68,7 @@ public class Comment implements IComment {
 	@JoinColumn(name = "profileid")
 	@ContainedIn
 	public IProfile getProfile() {
-		if (parent == null && getRootComment() != null) {
+		if ( parent == null && getRootComment() != null ) {
 			return getRootComment().getProfile();
 		}
 		return parent;
