@@ -37,7 +37,6 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.BoostStrategy;
@@ -46,7 +45,6 @@ import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.ContainedInMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -327,13 +325,14 @@ public abstract class AbstractDocumentBuilder<T> {
 	}
 
 	/**
-	 * Hibernate entities might be considered dirty, but still have only changes that
-	 * don't affect indexing. So this isDirty() implementation will return true only
-	 * if the proposed change is possibly affecting the index.
+	 * Hibernate entities might be dirty (their state has changed), but none of these changes would effect
+	 * the the index state. This method will return {@code true} if any of changed entity properties identified
+	 * by their names ({@code dirtyPropertyNames}) will effect the index state.
 	 *
-	 * @param dirtyPropertyNames Contains the property name of each value which changed, or null for everything.
+	 * @param dirtyPropertyNames array of property names for the changed entity properties, {@code null} in case the
+	 * changed properties cannot be specified.
 	 *
-	 * @return true if it can't make sure the index doesn't need an update
+	 * @return {@code true} if the entity changes will effect the index state, {@code false} otherwise
 	 *
 	 * @since 3.4
 	 */
@@ -346,23 +345,11 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 
 		for ( String dirtyPropertyName : dirtyPropertyNames ) {
-			// Hibernate core will do an in-depth comparison of collections, taking care of creating new values,
-			// so it looks like we can rely on reference equality comparisons, or at least that seems a safe way:
 			PropertyMetadata propertyMetadata = typeMetadata.getPropertyMetadataForProperty( dirtyPropertyName );
 			if ( propertyMetadata != null ) {
-				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
-					// take care of indexed fields:
-					if ( fieldMetadata.getIndex().isIndexed() ) {
-						return true;
-					}
-
-					// take care of stored fields:
-					Store store = fieldMetadata.getStore();
-					if ( store.equals( Store.YES ) || store.equals( Store.COMPRESS ) ) {
-						// unless Store.NO, which doesn't affect the index
-						return true;
-					}
-				}
+				// if there is a property metadata it means that there is at least one @Field.
+				// Fields are either indexed or stored, so we need to re-index
+				return true;
 			}
 
 			// consider IndexedEmbedded:
