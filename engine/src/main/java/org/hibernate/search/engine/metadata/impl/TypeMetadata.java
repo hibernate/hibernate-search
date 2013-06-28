@@ -251,9 +251,7 @@ public class TypeMetadata {
 			Object value) {
 		return new LuceneOptionsImpl(
 				fieldMetadata,
-				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value ),
-				fieldMetadata.indexNullAs(),
-				fieldMetadata.getPrecisionStep()
+				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value )
 		);
 	}
 

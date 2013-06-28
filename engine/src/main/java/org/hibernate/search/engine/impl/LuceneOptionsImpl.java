@@ -36,8 +36,6 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 
-import static org.hibernate.search.annotations.NumericField.PRECISION_STEP_DEFAULT;
-
 /**
  * A wrapper class for Lucene parameters needed for indexing.
  *
@@ -57,18 +55,18 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	private final String indexNullAs;
 
 	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata) {
-		this( fieldMetadata, fieldMetadata.getBoost(), null, PRECISION_STEP_DEFAULT );
+		this( fieldMetadata, fieldMetadata.getBoost() );
 	}
 
-	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float boost, String indexNullAs, int precisionStep) {
+	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float boost) {
 		this.indexMode = fieldMetadata.getIndex();
 		this.termVector = fieldMetadata.getTermVector();
 		this.boost = boost;
 		this.storeType = fieldMetadata.getStore();
 		this.storeCompressed = this.storeType.equals( Store.COMPRESS );
 		this.storeUncompressed = this.storeType.equals( Store.YES );
-		this.indexNullAs = indexNullAs;
-		this.precisionStep = precisionStep;
+		this.indexNullAs = fieldMetadata.indexNullAs();
+		this.precisionStep = fieldMetadata.getPrecisionStep();
 	}
 
 	public void addFieldToDocument(String name, String indexedString, Document document) {
