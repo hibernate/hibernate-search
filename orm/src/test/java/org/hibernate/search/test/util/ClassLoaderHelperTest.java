@@ -65,7 +65,7 @@ public class ClassLoaderHelperTest {
 			);
 			fail( "was expecting a SearchException" );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			assertEquals( e.getClass(), SearchException.class );
 			assertEquals( "Unable to find backend implementation class: HeyThisClassIsNotThere", e.getMessage() );
 		}
@@ -140,7 +140,7 @@ public class ClassLoaderHelperTest {
 			);
 			fail( "We should not be able to instantiate a analyzer with no default constructor or simple Version parameter." );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertEquals( e.getClass(), SearchException.class );
 			assertEquals(
 					"Unable to instantiate analyzer class: org.hibernate.search.test.util.BarAnalyzer. " +
@@ -155,7 +155,7 @@ public class ClassLoaderHelperTest {
 			ClassLoaderHelper.instanceFromClass( interf, impl, componentName );
 			fail( "was expecting a SearchException" );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			assertEquals( e.getClass(), SearchException.class );
 			assertEquals( expectedErrorMessage, e.getMessage() );
 		}

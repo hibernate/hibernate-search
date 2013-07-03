@@ -89,7 +89,7 @@ public class AvroDeserializer implements Deserializer {
 		try {
 			result = reader.read( null, decoder );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw log.unableToDeserializeAvroStream( e );
 		}
 

@@ -73,11 +73,11 @@ public class JPATimeoutTest extends JPATestCase {
 			hibernateQuery.getResultSize();
 			fail( "timeout exception should happen" );
 		}
-		catch ( QueryTimeoutException e ) {
+		catch (QueryTimeoutException e) {
 			//good
 			e.printStackTrace();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			fail( "Expected a QueryTimeoutException" );
 		}
 		em.getTransaction().commit();

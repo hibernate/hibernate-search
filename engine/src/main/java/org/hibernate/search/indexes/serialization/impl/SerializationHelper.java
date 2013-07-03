@@ -45,7 +45,7 @@ public class SerializationHelper {
 			stream.writeObject( instance );
 			stream.close();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw log.failToSerializeObject( instance.getClass(), e );
 		}
 		return out.toByteArray();
@@ -57,10 +57,10 @@ public class SerializationHelper {
 			ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, clazz.getClassLoader() );
 			return (T) in.readObject();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw log.failToDeserializeObject( e );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			throw log.failToDeserializeObject( e );
 		}
 	}
@@ -71,10 +71,10 @@ public class SerializationHelper {
 			ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, loader );
 			return (Serializable) in.readObject();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw log.failToDeserializeObject( e );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			throw log.failToDeserializeObject( e );
 		}
 	}
@@ -94,7 +94,7 @@ public class SerializationHelper {
 				Class<?> clazz = Class.forName( desc.getName(), false, classLoader );
 				return clazz;
 			}
-			catch ( ClassNotFoundException ex ) {
+			catch (ClassNotFoundException ex) {
 				return super.resolveClass( desc );
 			}
 		}

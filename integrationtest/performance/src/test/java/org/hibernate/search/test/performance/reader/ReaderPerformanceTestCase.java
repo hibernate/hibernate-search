@@ -192,7 +192,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 				s.close();
 				// count++;
 			}
-			catch ( Throwable t ) {
+			catch (Throwable t) {
 				t.printStackTrace();
 			}
 			finally {
@@ -205,7 +205,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 						s.close();
 					}
 				}
-				catch ( Throwable t ) {
+				catch (Throwable t) {
 					t.printStackTrace();
 				}
 			}
@@ -216,7 +216,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 			try {
 				luceneQuery = parser.parse( queryString );
 			}
-			catch ( ParseException e ) {
+			catch (ParseException e) {
 				e.printStackTrace();
 			}
 			return Search.getFullTextSession( s ).createFullTextQuery( luceneQuery );
@@ -270,7 +270,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 			try {
 				luceneQuery = parser.parse( queryString );
 			}
-			catch ( ParseException e ) {
+			catch (ParseException e) {
 				e.printStackTrace();
 			}
 			return Search.getFullTextSession( s ).createFullTextQuery( luceneQuery );

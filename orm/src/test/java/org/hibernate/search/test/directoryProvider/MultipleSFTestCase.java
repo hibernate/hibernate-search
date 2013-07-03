@@ -83,7 +83,7 @@ public abstract class MultipleSFTestCase extends TestCase {
 				setDialect( Dialect.getDialect() );
 				sessionFactories[sfIndex] = cfgs[sfIndex].buildSessionFactory( /*new TestInterceptor()*/ );
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				e.printStackTrace();
 				throw e;
 			}

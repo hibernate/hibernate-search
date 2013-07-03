@@ -69,7 +69,7 @@ public class TikaBridgeTest extends SearchTestCase {
 			File mp3File = new File( TikaBridgeTest.class.getResource( TEST_MP3_DOCUMENT ).toURI() );
 			PATH_TO_TEST_MP3 = mp3File.getAbsolutePath();
 		}
-		catch ( URISyntaxException e ) {
+		catch (URISyntaxException e) {
 			throw new RuntimeException( "Unable to determine file path for test document" );
 		}
 	}
@@ -110,7 +110,7 @@ public class TikaBridgeTest extends SearchTestCase {
 			tx.commit();
 			fail();
 		}
-		catch ( HibernateException e ) {
+		catch (HibernateException e) {
 			// hmm, a lot of exception wrapping going on
 			assertTrue( e.getCause() instanceof BridgeException );
 			BridgeException bridgeException = (BridgeException) e.getCause();
@@ -189,7 +189,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		try {
 			queryBuilder.keyword().onField( "mp3FileName" ).ignoreFieldBridge().matching( "Emmanuel" ).createQuery();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			exceptionCaught = true;
 			Assert.assertTrue( e instanceof SearchException );
 			Assert.assertTrue( e.getMessage().contains( "The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" ) );

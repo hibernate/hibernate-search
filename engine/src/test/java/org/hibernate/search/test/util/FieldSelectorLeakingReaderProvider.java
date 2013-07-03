@@ -78,13 +78,13 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 				ReflectionHelper.setAccessible( field );
 				fieldSelections = (Map<String, FieldSelectorResult>) field.get( selector );
 			}
-			catch ( NoSuchFieldException e ) {
+			catch (NoSuchFieldException e) {
 				throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
 			}
-			catch ( IllegalArgumentException e ) {
+			catch (IllegalArgumentException e) {
 				throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
 			}
-			catch ( IllegalAccessException e ) {
+			catch (IllegalAccessException e) {
 				throw new SearchException( "Incompatible version of Lucene: MapFieldSelector.fieldSelections not available", e );
 			}
 			assertNotNull( fieldSelections );

@@ -98,7 +98,7 @@ public class JGroupsBackendQueueTask {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );
 			}
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw log.unableToSendWorkViaJGroups( e );
 		}
 	}

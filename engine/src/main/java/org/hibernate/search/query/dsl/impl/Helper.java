@@ -68,7 +68,7 @@ class Helper {
 			}
 			return termsFromText.size() == 0 ? null : termsFromText.get( 0 );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new AssertionFailure("IO exception while reading String stream??", e);
 		}
 	}

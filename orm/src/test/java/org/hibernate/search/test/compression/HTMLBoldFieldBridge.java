@@ -54,7 +54,7 @@ public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 				try {
 					stringValue = CompressionTools.decompressString( field.getBinaryValue() );
 				}
-			catch ( DataFormatException e ) {
+			catch (DataFormatException e) {
 					throw new SearchException( "Field " + name + " looks like binary but couldn't be decompressed" );
 				}
 			}

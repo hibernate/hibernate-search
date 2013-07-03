@@ -98,7 +98,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		try {
 			indexName = indexDir.getCanonicalPath();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
@@ -118,7 +118,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				try {
 					Thread.sleep( TimeUnit.SECONDS.toMillis( 5 ) );
 				}
-				catch ( InterruptedException e ) {
+				catch (InterruptedException e) {
 					//continue
 					Thread.currentThread().interrupt();
 				}
@@ -187,7 +187,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 							destinationFile, true, copyChunkSize
 					);
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					throw new SearchException( "Unable to synchronize directory: " + indexName, e );
 				}
 				if ( !currentMarker.createNewFile() ) {
@@ -196,7 +196,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			}
 			log.debugf( "Current directory: %d", currentToBe );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		updateTask = new UpdateTask( sourceIndexDir, indexDir );
@@ -268,7 +268,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 					cancel();
 				}
 			}
-			catch ( RuntimeException re ) {
+			catch (RuntimeException re) {
 				// we need this to make sure the error is logged somewhere,
 				// as we're executing it in the timer thread
 				log.failedSlaveDirectoryProviderInitialization( indexName, re );
@@ -352,7 +352,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 						return;
 					}
 				}
-				catch ( IOException ioe ) {
+				catch (IOException ioe) {
 					log.unableToCompareSourceWithDestinationDirectory( sourceFile.getName(), currentDestinationFile.getName() );
 				}
 
@@ -366,7 +366,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 					current = index;
 					log.tracef( "Copy for %s took %d ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					//don't change current
 					log.unableToSynchronizeSource( indexName, e );
 					return;
@@ -377,7 +377,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 				try {
 					new File( indexName, "current" + index ).createNewFile();
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					log.unableToCreateCurrentMarker( indexName, e );
 				}
 			}
@@ -419,7 +419,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			try {
 				directory.close();
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				log.unableToCloseLuceneDirectory( directory, e );
 			}
 		}

@@ -66,12 +66,12 @@ final class LuceneBackendQueueTask implements Runnable {
 		try {
 			applyUpdates();
 		}
-		catch ( InterruptedException e ) {
+		catch (InterruptedException e) {
 			log.interruptedWhileWaitingForIndexActivity( e );
 			Thread.currentThread().interrupt();
 			handleException( e );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			log.backendError( e );
 			handleException( e );
 		}
@@ -120,7 +120,7 @@ final class LuceneBackendQueueTask implements Runnable {
 					task.get();
 					errorContextBuilder.workCompleted( queue.get( i ) );
 				}
-				catch ( ExecutionException e ) {
+				catch (ExecutionException e) {
 					if ( failedUpdates == null ) {
 						failedUpdates = new LinkedList<LuceneWork>();
 					}

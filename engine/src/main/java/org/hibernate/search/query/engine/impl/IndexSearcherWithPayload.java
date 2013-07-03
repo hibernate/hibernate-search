@@ -72,7 +72,7 @@ public class IndexSearcherWithPayload {
 			try {
 				MultiReaderFactory.closeReader( indexReader );
 			}
-			catch ( SearchException e ) {
+			catch (SearchException e) {
 				//catch is inside the for loop to make sure we try to close all of them
 				log.unableToCloseSearcherDuringQuery( query.toString(), e );
 			}

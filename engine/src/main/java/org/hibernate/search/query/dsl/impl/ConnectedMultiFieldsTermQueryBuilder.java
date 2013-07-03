@@ -180,7 +180,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			try {
 				terms = Helper.getAllTermsFromText( fieldName, localText, analyzer );
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				throw new AssertionFailure( "IO exception while reading String stream??", e );
 			}
 		}

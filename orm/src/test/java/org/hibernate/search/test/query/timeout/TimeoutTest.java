@@ -131,10 +131,10 @@ public class TimeoutTest extends SearchTestCase {
 			hibernateQuery.scroll();
 			fail( "timeout exception should happen" );
 		}
-		catch ( QueryTimeoutException e ) {
+		catch (QueryTimeoutException e) {
 			//good
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			fail( "Expected a QueryTimeoutException" );
 		}
 		fts.clear();
@@ -148,10 +148,10 @@ public class TimeoutTest extends SearchTestCase {
 			hibernateQuery.iterate();
 			fail( "timeout exception should happen" );
 		}
-		catch ( QueryTimeoutException e ) {
+		catch (QueryTimeoutException e) {
 			//good
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			fail( "Expected a QueryTimeoutException" );
 		}
 		fts.clear();
@@ -164,10 +164,10 @@ public class TimeoutTest extends SearchTestCase {
 			hibernateQuery.list();
 			fail( "timeout exception should happen" );
 		}
-		catch ( QueryTimeoutException e ) {
+		catch (QueryTimeoutException e) {
 			//good
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			fail( "Expected a QueryTimeoutException" );
 		}
 		fts.clear();

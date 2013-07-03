@@ -65,7 +65,7 @@ public final class DocumentBuilderHelper {
 			// Use the same class loader used to load this class ...
 			return ClassLoaderHelper.classForName( className, DocumentBuilderHelper.class.getClassLoader() );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			throw new SearchException( "Unable to load indexed class: " + className, e );
 		}
 	}
@@ -239,7 +239,7 @@ public final class DocumentBuilderHelper {
 			try {
 				return CompressionTools.decompressString( field.getBinaryValue() );
 			}
-			catch ( DataFormatException e ) {
+			catch (DataFormatException e) {
 				throw log.fieldLooksBinaryButDecompressionFailed( field.name() );
 			}
 		}

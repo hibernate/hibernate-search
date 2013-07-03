@@ -83,10 +83,10 @@ public class JGroupsMasterMessageListener implements Receiver {
 				//TODO forward to new owner or log error
 			}
 		}
-		catch ( ClassCastException e ) {
+		catch (ClassCastException e) {
 			log.illegalObjectRetrievedFromMessage( e );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			log.illegalObjectRetrievedFromMessage( e );
 		}
 	}

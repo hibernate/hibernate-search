@@ -72,7 +72,7 @@ public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 			calendar.setTime( date );
 			return calendar;
 		}
-		catch ( ParseException e ) {
+		catch (ParseException e) {
 			throw new SearchException( "Unable to parse into calendar: " + stringValue, e );
 		}
 	}

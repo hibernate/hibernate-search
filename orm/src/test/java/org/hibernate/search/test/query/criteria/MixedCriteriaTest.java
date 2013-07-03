@@ -114,7 +114,7 @@ public class MixedCriteriaTest extends SearchTestCase {
 			hibQuery.list();
 			fail();
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertEquals( "Cannot mix criteria and multiple entity types", se.getMessage() );
 		}
 		tx.commit();

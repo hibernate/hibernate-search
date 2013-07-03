@@ -75,7 +75,7 @@ public class Cd {
 		try {
 			this.releaseYear = formatter.parse( releaseYear );
 		}
-		catch ( ParseException e ) {
+		catch (ParseException e) {
 			throw new IllegalArgumentException( "wrong date format" );
 		}
 	}

@@ -118,7 +118,7 @@ public class BenchWithGeonames {
 			sessionFactory.close();
 			buffRead.close();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		finally {
@@ -137,7 +137,7 @@ public class BenchWithGeonames {
 					buffRead.close();
 				}
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -348,7 +348,7 @@ public class BenchWithGeonames {
 					);
 
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		finally {
@@ -415,7 +415,7 @@ public class BenchWithGeonames {
 			session.close();
 			sessionFactory.close();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		finally {

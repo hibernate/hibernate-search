@@ -127,7 +127,7 @@ public final class LuceneBackendResources {
 		try {
 			executor.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );
 		}
-		catch ( InterruptedException e ) {
+		catch (InterruptedException e) {
 			log.interruptedWhileWaitingForIndexActivity( e );
 			Thread.currentThread().interrupt();
 		}

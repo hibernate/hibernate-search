@@ -345,7 +345,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 					.createFacetingRequest();
 			fail( "Unsupported range faceting type" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			// success
 		}
 	}
@@ -360,7 +360,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 					.createFacetingRequest();
 			fail( "Unsupported range faceting type" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			// success
 		}
 	}

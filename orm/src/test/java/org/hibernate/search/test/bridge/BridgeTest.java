@@ -294,10 +294,10 @@ public class BridgeTest extends SearchTestCase {
 			s.flushToIndexes();
 			fail( "Incorrect bridge should fail" );
 		}
-		catch ( BridgeException e ) {
+		catch (BridgeException e) {
 			tx.rollback();
 		}
-		catch ( HibernateException e ) {
+		catch (HibernateException e) {
 			final Throwable throwable = e.getCause();
 			if ( throwable instanceof BridgeException ) {
 				//expected
@@ -310,7 +310,7 @@ public class BridgeTest extends SearchTestCase {
 				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
 			}
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			e.printStackTrace();
 			fail( "Incorrect bridge should raise a SearchException" );
 		}
@@ -336,10 +336,10 @@ public class BridgeTest extends SearchTestCase {
 			textQuery.list();
 			fail( "Incorrect bridge should fail" );
 		}
-		catch ( BridgeException e ) {
+		catch (BridgeException e) {
 			tx.rollback();
 		}
-		catch ( HibernateException e ) {
+		catch (HibernateException e) {
 			final Throwable throwable = e.getCause();
 			if ( throwable instanceof BridgeException ) {
 				//expected
@@ -353,7 +353,7 @@ public class BridgeTest extends SearchTestCase {
 				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
 			}
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			e.printStackTrace();
 			fail( "Incorrect bridge should raise a SearchException" );
 		}
@@ -376,10 +376,10 @@ public class BridgeTest extends SearchTestCase {
 			s.flushToIndexes();
 			fail( "Incorrect bridge should fail" );
 		}
-		catch ( BridgeException e ) {
+		catch (BridgeException e) {
 			tx.rollback();
 		}
-		catch ( HibernateException e ) {
+		catch (HibernateException e) {
 			final Throwable throwable = e.getCause();
 			if ( throwable instanceof BridgeException ) {
 				//expected
@@ -392,7 +392,7 @@ public class BridgeTest extends SearchTestCase {
 				fail( "Incorrect bridge should raise a SearchException: " + e.toString() );
 			}
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			e.printStackTrace();
 			fail( "Incorrect bridge should raise a SearchException" );
 		}

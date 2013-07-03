@@ -218,7 +218,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 				TopDocs topdocs = searcher.search( boolQuery, 1 );
 				return topdocs.totalHits;
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				throw new SearchException( "Unable to execute count query for entity " + entity, e );
 			}
 		}
@@ -240,7 +240,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		try {
 			clazz = ClassLoaderHelper.classForName( entity, StatisticsImpl.class.getClassLoader() );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );
 		}
 		return clazz;

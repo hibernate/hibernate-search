@@ -65,7 +65,7 @@ public class SessionTest extends SearchTestCase {
 		try {
 			Search.getFullTextSession( wrapped );
 		}
-		catch ( ClassCastException e ) {
+		catch (ClassCastException e) {
 			e.printStackTrace();
 			fail( e.toString() );
 		}
@@ -79,7 +79,7 @@ public class SessionTest extends SearchTestCase {
 			Criteria c = dc.getExecutableCriteria( s ).setMaxResults( 10 );
 			c.list();
 		}
-		catch ( ClassCastException e ) {
+		catch (ClassCastException e) {
 			e.printStackTrace();
 			fail( e.toString() );
 		}

@@ -60,7 +60,7 @@ public class TikaBridgeBlobSupportTest extends SearchTestCase {
 			File pdfFile = new File( TikaBridgeBlobSupportTest.class.getResource( TEST_DOCUMENT_PDF ).toURI() );
 			PATH_TO_TEST_DOCUMENT_PDF = pdfFile.getAbsolutePath();
 		}
-		catch ( URISyntaxException e ) {
+		catch (URISyntaxException e) {
 			throw new RuntimeException( "Unable to determine file path for test document" );
 		}
 	}

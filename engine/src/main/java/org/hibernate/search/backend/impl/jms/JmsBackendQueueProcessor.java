@@ -132,7 +132,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 				connection.close();
 			}
 		}
-		catch ( JMSException e ) {
+		catch (JMSException e) {
 			log.unableToCloseJmsConnection( jmsQueueName, e );
 		}
 	}

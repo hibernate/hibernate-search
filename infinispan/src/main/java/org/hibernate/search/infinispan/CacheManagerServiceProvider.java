@@ -97,7 +97,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 				cacheManager = new DefaultCacheManager( configurationBuilderHolder, true );
 				manageCacheManager = true;
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				throw new SearchException(
 						"Could not start Infinispan CacheManager using as configuration file: " + cfgName, e
 				);
@@ -116,7 +116,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 			ctx = new InitialContext( jndiProperties );
 			return (EmbeddedCacheManager) ctx.lookup( jndiNamespace );
 		}
-		catch ( NamingException ne ) {
+		catch (NamingException ne) {
 			String msg = "Unable to retrieve CacheManager from JNDI [" + jndiNamespace + "]";
 			log.unableToRetrieveCacheManagerFromJndi( jndiNamespace, ne );
 			throw new SearchException( msg );
@@ -126,7 +126,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 				try {
 					ctx.close();
 				}
-				catch ( NamingException ne ) {
+				catch (NamingException ne) {
 					log.unableToReleaseInitialContext( ne );
 				}
 			}

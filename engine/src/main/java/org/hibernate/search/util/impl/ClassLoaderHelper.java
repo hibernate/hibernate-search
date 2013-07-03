@@ -82,7 +82,7 @@ public class ClassLoaderHelper {
 			Enumeration<URL> e = cl.getResources( resourceName );
 			urls.addAll( Collections.list( e ) );
 		}
-		catch ( IOException ioe ) {
+		catch (IOException ioe) {
 			throw new SearchException( "Unable to load resource " + resourceName, ioe );
 		}
 	}
@@ -155,13 +155,13 @@ public class ClassLoaderHelper {
 		try {
 			instance = classToLoad.newInstance();
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw new SearchException(
 					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
 							". Class or constructor is not accessible.", e
 			);
 		}
-		catch ( InstantiationException e ) {
+		catch (InstantiationException e) {
 			throw new SearchException(
 					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
 							". Verify it has a no-args public constructor and is not abstract.", e
@@ -197,12 +197,12 @@ public class ClassLoaderHelper {
 		try {
 			constructor = classToInstantiate.getConstructor( Version.class );
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			try {
 				constructor = classToInstantiate.getConstructor();
 				useVersionParameter = false;
 			}
-			catch ( NoSuchMethodException nsme ) {
+			catch (NoSuchMethodException nsme) {
 				StringBuilder msg = new StringBuilder( "Unable to instantiate analyzer class: " );
 				msg.append( classToInstantiate.getName() );
 				msg.append( ". Class neither has a default constructor nor a constructor with a Version parameter" );
@@ -218,19 +218,19 @@ public class ClassLoaderHelper {
 				analyzerInstance = (Analyzer) constructor.newInstance();
 			}
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw new SearchException(
 					"Unable to instantiate analyzer class: " + classToInstantiate.getName() +
 							". Class or constructor is not accessible.", e
 			);
 		}
-		catch ( InstantiationException e ) {
+		catch (InstantiationException e) {
 			throw new SearchException(
 					"Unable to instantiate analyzer class: " + classToInstantiate.getName() +
 							". Verify it has a no-args public constructor and is not abstract.", e
 			);
 		}
-		catch ( InvocationTargetException e ) {
+		catch (InvocationTargetException e) {
 			throw new SearchException(
 					"Unable to instantiate analyzer class: " + classToInstantiate.getName() +
 							". Verify it has a no-args public constructor and is not abstract."
@@ -262,13 +262,13 @@ public class ClassLoaderHelper {
 		try {
 			classToLoad.getConstructor();
 		}
-		catch ( SecurityException e ) {
+		catch (SecurityException e) {
 			throw new SearchException(
 					classToLoad.getName() + " defined for component " + componentDescription
 							+ " could not be instantiated because of a security manager error", e
 			);
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			throw new SearchException(
 					classToLoad.getName() + " defined for component " + componentDescription
 							+ " is missing a no-arguments constructor"
@@ -281,7 +281,7 @@ public class ClassLoaderHelper {
 		try {
 			clazzDef = classForName( classNameToLoad, classLoader );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			throw new SearchException(
 					"Unable to find " + componentDescription +
 							" implementation class: " + classNameToLoad, e
@@ -310,7 +310,7 @@ public class ClassLoaderHelper {
 				return contextClassLoader.loadClass( name );
 			}
 		}
-		catch ( Throwable ignore ) {
+		catch (Throwable ignore) {
 		}
 		return Class.forName( name, true, classLoader );
 	}

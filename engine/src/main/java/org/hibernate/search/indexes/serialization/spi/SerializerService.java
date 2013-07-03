@@ -53,7 +53,7 @@ public class SerializerService implements ServiceProvider<LuceneWorkSerializer> 
 					buildContext.getUninitializedSearchFactory()
 			);
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			if ( e instanceof SearchException ) {
 				throw e;
 			}

@@ -47,7 +47,7 @@ public class UnresolvedBridgeTest {
 			cfg.buildSessionFactory();
 			fail( "Undefined bridge went through" );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			Throwable ee = e;
 			boolean hasSearchException = false;
 			for ( ;; ) {

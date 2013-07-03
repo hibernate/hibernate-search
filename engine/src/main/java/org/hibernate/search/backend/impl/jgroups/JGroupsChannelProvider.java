@@ -131,7 +131,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 				channelContainer = null;
 			}
 		}
-		catch ( Exception toLog ) {
+		catch (Exception toLog) {
 			log.jGroupsClosingChannelError( toLog );
 		}
 	}
@@ -153,7 +153,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 				try {
 					return new InjectedChannelContainer( (org.jgroups.JChannel) channelObject );
 				}
-				catch ( ClassCastException e ) {
+				catch (ClassCastException e) {
 					throw log.jGroupsChannelInjectionError( e, channelObject.getClass() );
 				}
 			}
@@ -164,7 +164,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 					log.startingJGroupsChannel( cfg );
 					return new ManagedChannelContainer( new JChannel( ConfigurationParseHelper.locateConfig( cfg ) ), clusterName );
 				}
-				catch ( Exception e ) {
+				catch (Exception e) {
 					throw log.jGroupsChannelCreationUsingFileError( cfg, e );
 				}
 			}
@@ -182,7 +182,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 				return new ManagedChannelContainer( new JChannel(), clusterName );
 			}
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw log.unableToStartJGroupsChannel( e );
 		}
 	}
@@ -226,7 +226,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 				channel.connect( clusterName );
 				log.jGroupsConnectedToCluster( clusterName, channel.getAddress() );
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				throw log.unableConnectingToJGroupsCluster( clusterName, e );
 			}
 		}

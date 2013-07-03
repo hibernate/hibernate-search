@@ -158,7 +158,7 @@ public final class DirectoryProviderHelper {
 				iw.close();
 			}
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Could not initialize index", e );
 		}
 		finally {
@@ -190,7 +190,7 @@ public final class DirectoryProviderHelper {
 			try {
 				return new SimpleFSLockFactory( indexDir );
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				throw new SearchException( "Could not initialize SimpleFSLockFactory", e );
 			}
 		}
@@ -201,7 +201,7 @@ public final class DirectoryProviderHelper {
 			try {
 				return new NativeFSLockFactory( indexDir );
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				throw new SearchException( "Could not initialize NativeFSLockFactory", e );
 			}
 		}
@@ -299,7 +299,7 @@ public final class DirectoryProviderHelper {
 		try {
 			period = Long.parseLong( refreshPeriod );
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			throw new SearchException(
 					"Unable to initialize index: " + directoryProviderName + "; refresh period is not numeric.", nfe
 			);
@@ -324,7 +324,7 @@ public final class DirectoryProviderHelper {
 			try {
 				size = Long.parseLong( value ) * 1024 * 1024; //from MB to B.
 			}
-			catch ( NumberFormatException nfe ) {
+			catch (NumberFormatException nfe) {
 				throw new SearchException(
 						"Unable to initialize index " +
 								indexName + "; " + COPY_BUFFER_SIZE_PROP_NAME + " is not numeric.", nfe
@@ -362,20 +362,20 @@ public final class DirectoryProviderHelper {
 					Constructor constructor = fsDirectoryClass.getConstructor( File.class, LockFactory.class );
 					directory = (FSDirectory) constructor.newInstance( indexDir, factory );
 				}
-				catch ( NoSuchMethodException e ) {
+				catch (NoSuchMethodException e) {
 					throw new SearchException( "Unable to find appropriate FSDirectory constructor", e );
 				}
-				catch ( InstantiationException e ) {
+				catch (InstantiationException e) {
 					throw new SearchException(
 							"Unable to instantiate FSDirectory class " + fsDirectoryClass.getName(), e
 					);
 				}
-				catch ( IllegalAccessException e ) {
+				catch (IllegalAccessException e) {
 					throw new SearchException(
 							"Unable to instantiate FSDirectory class " + fsDirectoryClass.getName(), e
 					);
 				}
-				catch ( InvocationTargetException e ) {
+				catch (InvocationTargetException e) {
 					throw new SearchException(
 							"Unable to instantiate FSDirectory class " + fsDirectoryClass.getName(), e
 					);
@@ -391,7 +391,7 @@ public final class DirectoryProviderHelper {
 				try {
 					fsDirectoryType = Enum.valueOf( FSDirectoryType.class, fsDirectoryTypeValue.toUpperCase() );
 				}
-				catch ( IllegalArgumentException e ) {
+				catch (IllegalArgumentException e) {
 					throw new SearchException( "Invalid option value for " + FS_DIRECTORY_TYPE_PROP_NAME + ": " + fsDirectoryTypeValue );
 				}
 			}

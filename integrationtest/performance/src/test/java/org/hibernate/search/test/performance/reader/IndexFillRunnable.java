@@ -58,7 +58,7 @@ public class IndexFillRunnable implements Runnable {
 		try {
 			iw.addDocument( d );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

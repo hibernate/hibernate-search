@@ -58,7 +58,7 @@ public class QueryUnindexedEntityTest extends SearchTestCase {
 			hibQuery.list();
 			fail();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertTrue( "Wrong message", e.getMessage().startsWith( "There are no mapped entities" ) );
 		}
 

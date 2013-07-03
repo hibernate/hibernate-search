@@ -52,7 +52,7 @@ public abstract class ReaderProviderHelper {
 			ReflectionHelper.setAccessible( field );
 			return field;
 		}
-		catch ( NoSuchFieldException e ) {
+		catch (NoSuchFieldException e) {
 			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not available", e );
 		}
 	}
@@ -61,7 +61,7 @@ public abstract class ReaderProviderHelper {
 		try {
 			return (IndexReader[]) subReadersField.get( parentReader );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not accessible", e );
 		}
 	}
@@ -82,7 +82,7 @@ public abstract class ReaderProviderHelper {
 				try {
 					reader.close();
 				}
-				catch ( IOException ee ) {
+				catch (IOException ee) {
 					log.unableToCloseLuceneIndexReader( e );
 				}
 			}

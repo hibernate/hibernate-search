@@ -104,7 +104,7 @@ public class AnalyzerTest extends SearchTestCase {
 					optimizationBlackList, HibernateStatelessInitializer.INSTANCE );
 			fail();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertTrue( "Wrong error message", e.getMessage().startsWith( "Multiple AnalyzerDiscriminator defined in the same class hierarchy" ));
 		}
 	}
@@ -169,14 +169,14 @@ public class AnalyzerTest extends SearchTestCase {
 		try {
 			searchFactory.getAnalyzer( (Class) null );
 		}
-		catch ( IllegalArgumentException iae ) {
+		catch (IllegalArgumentException iae) {
 			log.debug( "success" );
 		}
 
 		try {
 			searchFactory.getAnalyzer( String.class );
 		}
-		catch ( IllegalArgumentException iae ) {
+		catch (IllegalArgumentException iae) {
 			log.debug( "success" );
 		}
 

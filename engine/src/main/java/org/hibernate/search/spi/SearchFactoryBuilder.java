@@ -519,10 +519,10 @@ public class SearchFactoryBuilder {
 		try {
 			filterDef.getImpl().newInstance();
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
 		}
-		catch ( InstantiationException e ) {
+		catch (InstantiationException e) {
 			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
 		}
 		for ( Method method : filterDef.getImpl().getMethods() ) {

@@ -88,7 +88,7 @@ public final class UpdateExtWorkDelegate extends UpdateWorkDelegate {
 			}
 			workspace.notifyWorkApplied( work );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			String message = "Unable to update " + managedType + "#" + id + " in index.";
 			throw new SearchException( message, e );
 		}

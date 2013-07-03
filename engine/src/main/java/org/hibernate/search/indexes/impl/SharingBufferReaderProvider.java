@@ -121,7 +121,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 			currentReaders.put( directory, reader );
 			return reader;
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to open Lucene IndexReader for IndexManager " + this.indexName, e );
 		}
 	}
@@ -175,7 +175,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 				try {
 					reader.close();
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					log.unableToCloseLuceneIndexReader( e );
 				}
 				assert removed != null;
@@ -249,7 +249,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 						refreshOperationId++;
 						updatedReader = IndexReader.openIfChanged( beforeUpdateReader );
 					}
-					catch ( IOException e ) {
+					catch (IOException e) {
 						throw new SearchException( "Unable to reopen IndexReader", e );
 					}
 				}

@@ -44,7 +44,7 @@ public class UrlBridge implements TwoWayStringBridge {
 			try {
 				return new URL( stringValue );
 			}
-			catch ( MalformedURLException e ) {
+			catch (MalformedURLException e) {
 				throw new SearchException( "Unable to build URL: " + stringValue, e );
 			}
 		}

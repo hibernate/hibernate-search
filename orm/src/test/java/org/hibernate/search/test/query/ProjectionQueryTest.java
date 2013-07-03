@@ -617,7 +617,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 			hibQuery.list();
 			fail( "Projecting an unstored field should raise an exception" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			//success
 		}
 

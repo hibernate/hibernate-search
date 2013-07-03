@@ -48,20 +48,32 @@
         </module>
 
         <module name="RegexpSinglelineJava">
-            <property name="format" value="^\t+(if|for|while|catch) \( .+[^ ]\) \{$" />
+            <property name="format" value="^\t+(if|for|while) \( .+[^ ]\) \{$" />
             <property name="message" value="Right parentheses should be preceeded by 1 white space" />
             <property name="ignoreComments" value="true" />
         </module>
 
         <module name="RegexpSinglelineJava">
-            <property name="format" value="^\t+(if|for|while|catch) \([^ $]" />
-            <property name="message" value="Left parenthesis should be followed by 1 whitespace" />
+            <property name="format" value="^\t+(if|for|while) \([^ $]" />
+            <property name="message" value="Left parentheses should be followed by 1 whitespace" />
             <property name="ignoreComments" value="true" />
         </module>
 
         <module name="RegexpSinglelineJava">
             <property name="format" value="\)([^ ])\{$" />
             <property name="message" value="Right parentheses should be followed by 1 white space" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="catch \([^\w]" />
+            <property name="message" value="'catch' clause does not require white space after left parentheses" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="catch \(.*\s\) \{" />
+            <property name="message" value="'catch' clause does not require white space before right parentheses" />
             <property name="ignoreComments" value="true" />
         </module>
 

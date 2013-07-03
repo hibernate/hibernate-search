@@ -86,14 +86,14 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 			try {
 				props.load( stream );
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				throw new RuntimeException( "could not load hibernate.properties" );
 			}
 			finally {
 				try {
 					stream.close();
 				}
-				catch ( IOException ioe ) {
+				catch (IOException ioe) {
 				}
 			}
 		}

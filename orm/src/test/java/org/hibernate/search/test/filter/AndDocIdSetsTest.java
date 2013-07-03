@@ -287,7 +287,7 @@ public class AndDocIdSetsTest {
 				assertEquals( iterA.docID(), iterB.docID() );
 			} while ( nextA != DocIdSetIterator.NO_MORE_DOCS );
 		}
-		catch ( IOException ioe ) {
+		catch (IOException ioe) {
 			fail( "these DocIdSetIterator instances should not throw any exceptions" );
 		}
 		return true;

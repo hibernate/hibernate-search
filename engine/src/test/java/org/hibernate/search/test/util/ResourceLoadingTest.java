@@ -54,7 +54,7 @@ public class ResourceLoadingTest {
 		try {
 			FileHelper.readResourceAsString( resource, AvroSerializationProvider.class.getClassLoader() );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertEquals( "Wrong error message", "HSEARCH000114: Could not load resource: 'foo'", e.getMessage() );
 		}
 	}

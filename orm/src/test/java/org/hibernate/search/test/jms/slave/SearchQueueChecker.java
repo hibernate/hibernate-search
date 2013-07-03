@@ -68,10 +68,10 @@ public class SearchQueueChecker implements MessageListener {
 			IndexManager indexManager = searchFactory.getIndexManagerHolder().getIndexManager( indexName );
 			queue = indexManager.getSerializer().toLuceneWorks( (byte[]) objectMessage.getObject() );
 		}
-		catch ( JMSException e ) {
+		catch (JMSException e) {
 			return;
 		}
-		catch ( ClassCastException e ) {
+		catch (ClassCastException e) {
 			return;
 		}
 		queues++;

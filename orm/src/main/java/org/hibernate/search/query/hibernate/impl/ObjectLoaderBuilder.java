@@ -115,7 +115,7 @@ public class ObjectLoaderBuilder {
 							ObjectLoaderBuilder.class.getClassLoader()
 					);
 				}
-				catch ( ClassNotFoundException e ) {
+				catch (ClassNotFoundException e) {
 					throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
 				}
 			}

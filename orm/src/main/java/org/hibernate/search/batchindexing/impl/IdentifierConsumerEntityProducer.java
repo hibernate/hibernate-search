@@ -94,7 +94,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			loadAllFromQueue( session );
 			transaction.commit();
 		}
-		catch ( Throwable e ) {
+		catch (Throwable e) {
 			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
 		}
 		finally {
@@ -119,7 +119,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 			}
 			while ( take != null );
 		}
-		catch ( InterruptedException e ) {
+		catch (InterruptedException e) {
 			// just quit
 			Thread.currentThread().interrupt();
 		}

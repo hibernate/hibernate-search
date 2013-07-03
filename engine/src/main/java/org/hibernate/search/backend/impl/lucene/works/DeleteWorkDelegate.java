@@ -89,7 +89,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		try {
 			writer.deleteDocuments( entityDeletionQuery );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			String message = "Unable to remove " + entityType + "#" + id + " from index.";
 			throw new SearchException( message, e );
 		}

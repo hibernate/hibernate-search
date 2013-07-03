@@ -63,7 +63,7 @@ public class JGroupsReceiver extends ReceiverAdapter {
 			queues++;
 			works += queue.size();
 		}
-		catch ( ClassCastException e ) {
+		catch (ClassCastException e) {
 			throw new SearchException( e );
 		}
 	}

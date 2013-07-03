@@ -90,7 +90,7 @@ public class IdIncludedInPathCaseEmbeddedTest extends SearchTestCase {
 			search( s, "b.skipped.skippedId", "skippedId" );
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 

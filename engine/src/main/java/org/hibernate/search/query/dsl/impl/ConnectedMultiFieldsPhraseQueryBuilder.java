@@ -121,7 +121,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 				}
 			}
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new AssertionFailure( "IOException while reading a string. Doh!", e);
 		}
 		finally {
@@ -130,7 +130,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 					stream.end();
 					stream.close();
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					throw new AssertionFailure( "IOException while reading a string. Doh!", e);
 				}
 			}

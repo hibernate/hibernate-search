@@ -82,7 +82,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 						(ReflectionManager) cfg.getClass().getMethod( "getReflectionManager" ).invoke( cfg );
 
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				reflectionManager = new JavaReflectionManager();
 			}
 		}

@@ -76,7 +76,7 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 			//affect the actual test duration.
 			threadTrap.await( 2, TimeUnit.MINUTES );
 		}
-		catch ( InterruptedException e ) {
+		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			e.printStackTrace();
 		}

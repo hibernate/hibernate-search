@@ -121,7 +121,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 			queryBuilder.keyword().onField( "value" ).ignoreFieldBridge().matching( null ).createQuery();
 			fail();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			// success
 		}
 	}

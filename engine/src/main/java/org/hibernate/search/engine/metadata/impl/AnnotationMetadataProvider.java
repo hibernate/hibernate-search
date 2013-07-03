@@ -246,7 +246,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						ClassLoaderHelper.classForName( "javax.persistence.Id", ConfigContext.class.getClassLoader() );
 				jpaId = member.getAnnotation( jpaIdClass );
 			}
-			catch ( ClassNotFoundException e ) {
+			catch (ClassNotFoundException e) {
 				throw new SearchException( "Unable to load @Id.class even though it should be present ?!" );
 			}
 			if ( jpaId != null ) {
@@ -275,7 +275,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			Method m = idAnnotation.getClass().getMethod( "name" );
 			name = (String) m.invoke( idAnnotation );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			// ignore
 		}
 		return ReflectionHelper.getAttributeName( member, name );
@@ -307,7 +307,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		try {
 			strategy = boostStrategyClass.newInstance();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new SearchException(
 					"Unable to instantiate boost strategy implementation: " + boostStrategyClass.getName()
 			);
@@ -721,19 +721,19 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			Method declaredMethod = annotation.annotationType().getDeclaredMethod( "mappedBy" );
 			return (String) declaredMethod.invoke( annotation );
 		}
-		catch ( SecurityException e ) {
+		catch (SecurityException e) {
 			return UNKNOWN_MAPPED_BY_ROLE;
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			return UNKNOWN_MAPPED_BY_ROLE;
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			return UNKNOWN_MAPPED_BY_ROLE;
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			return UNKNOWN_MAPPED_BY_ROLE;
 		}
-		catch ( InvocationTargetException e ) {
+		catch (InvocationTargetException e) {
 			return UNKNOWN_MAPPED_BY_ROLE;
 		}
 	}
@@ -899,7 +899,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						);
 				transientAnnotation = member.getAnnotation( transientAnnotationClass );
 			}
-			catch ( ClassNotFoundException e ) {
+			catch (ClassNotFoundException e) {
 				throw new SearchException( "Unable to load @Transient.class even though it should be present ?!" );
 			}
 			return transientAnnotation != null;
@@ -981,7 +981,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		try {
 			discriminator = discriminatorClass.newInstance();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new SearchException(
 					"Unable to instantiate analyzer discriminator implementation: " + discriminatorClass.getName()
 			);
@@ -1052,10 +1052,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		try {
 			typeMetadataBuilder.similarity( (Similarity) similarityClass.newInstance() );
 		}
-		catch ( InstantiationException e ) {
+		catch (InstantiationException e) {
 			log.similarityInstantiationException( similarityClass.getName(), clazz.getName() );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			log.similarityInstantiationException( similarityClass.getName(), clazz.getName() );
 		}
 	}

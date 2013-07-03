@@ -53,7 +53,7 @@ public class CopyTokenStream extends TokenStream implements Serializable {
 			List<List<AttributeImpl>> stream = fillCache( tokenStream );
 			return new SerializableTokenStream(stream);
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw log.unableToReadTokenStream();
 		}
 	}

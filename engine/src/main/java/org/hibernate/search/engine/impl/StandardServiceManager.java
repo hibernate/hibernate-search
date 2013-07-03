@@ -91,7 +91,7 @@ public class StandardServiceManager implements ServiceManager {
 				}
 			}
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to read " + SERVICES_FILE, e );
 		}
 	}
@@ -212,7 +212,7 @@ public class StandardServiceManager implements ServiceManager {
 			try {
 				serviceProvider.stop();
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				log.stopServiceFailed( serviceProviderClass, e );
 			}
 		}

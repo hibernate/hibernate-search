@@ -305,7 +305,7 @@ public class MutableFactoryTest {
 					factory.getIndexReaderAccessor().close( indexReader );
 				}
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				this.failure = true;
 				e.printStackTrace();
 				failureInfo = "failure: Emmanuel" + factorOfClassesPerThread + " exception: " + e.toString();

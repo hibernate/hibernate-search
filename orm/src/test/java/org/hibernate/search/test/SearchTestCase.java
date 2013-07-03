@@ -254,15 +254,15 @@ public abstract class SearchTestCase extends TestCase {
 				getCfg().addInputStream( is );
 			}
 		}
-		catch ( HibernateException e ) {
+		catch (HibernateException e) {
 			e.printStackTrace();
 			throw e;
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			e.printStackTrace();
 			throw e;
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException( e );
 		}
@@ -375,11 +375,11 @@ public abstract class SearchTestCase extends TestCase {
 				throw new FailureExpectedTestPassedException();
 			}
 		}
-		catch ( FailureExpectedTestPassedException t ) {
+		catch (FailureExpectedTestPassedException t) {
 			closeResources();
 			throw t;
 		}
-		catch ( Throwable t ) {
+		catch (Throwable t) {
 			if ( t instanceof InvocationTargetException ) {
 				t = ( (InvocationTargetException) t ).getTargetException();
 			}
@@ -436,7 +436,7 @@ public abstract class SearchTestCase extends TestCase {
 		try {
 			runMethod = getClass().getMethod( fName );
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			fail( "Method \"" + fName + "\" not found" );
 		}
 		if ( !Modifier.isPublic( runMethod.getModifiers() ) ) {

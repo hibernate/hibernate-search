@@ -336,7 +336,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestCase {
 		try {
 			luceneQuery = parser.parse( searchQuery );
 		}
-		catch ( ParseException e ) {
+		catch (ParseException e) {
 			throw new RuntimeException( "Unable to parse query", e );
 		}
 		return luceneQuery;

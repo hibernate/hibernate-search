@@ -257,7 +257,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		try {
 			return AnnotationFactory.create( annotation, annotation.type().getClassLoader() );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			//first try, but we have another trick
 		}
 		//Use TCCL

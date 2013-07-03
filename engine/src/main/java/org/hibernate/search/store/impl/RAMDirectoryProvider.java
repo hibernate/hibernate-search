@@ -58,7 +58,7 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 			properties = null;
 			DirectoryProviderHelper.initializeIndexIfNeeded( directory );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + indexName, e );
 		}
 	}

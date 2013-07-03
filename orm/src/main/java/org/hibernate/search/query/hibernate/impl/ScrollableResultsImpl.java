@@ -219,7 +219,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		try {
 			documentExtractor.close();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			log.unableToCloseSearcherInScrollableResult( e );
 		}
 	}
@@ -462,7 +462,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 				try {
 					entityInfo = documentExtractor.extract( x );
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					throw new SearchException( "Unable to read Lucene topDocs[" + x + "]", e );
 				}
 				einfo = new SoftReference<EntityInfo>( entityInfo );

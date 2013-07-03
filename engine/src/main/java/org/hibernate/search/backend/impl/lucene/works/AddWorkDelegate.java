@@ -70,7 +70,7 @@ class AddWorkDelegate implements LuceneWorkDelegate {
 			writer.addDocument( work.getDocument(), analyzer );
 			workspace.notifyWorkApplied( work );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException(
 					"Unable to add to Lucene index: "
 							+ entityType + "#" + work.getId(), e

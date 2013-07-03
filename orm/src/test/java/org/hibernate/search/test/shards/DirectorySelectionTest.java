@@ -77,7 +77,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 			indexReaderAccessor.open( "Products.1", "hoa?" );
 			Assert.fail( "should have failed" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			Assert.assertEquals( "HSEARCH000107: Index names hoa? is not defined", se.getMessage() );
 		}
 	}
@@ -87,7 +87,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 			indexReaderAccessor.open( new String[]{} );
 			Assert.fail( "should have failed" );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			Assert.assertEquals( "HSEARCH000111: At least one index name must be provided: can't open an IndexReader on nothing", e.getMessage() );
 		}
 	}
@@ -97,7 +97,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 			indexReaderAccessor.open( (String) null );
 			Assert.fail( "should have failed" );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			Assert.assertEquals( "HSEARCH000111: At least one index name must be provided: can't open an IndexReader on nothing", e.getMessage() );
 		}
 	}
@@ -107,7 +107,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 			indexReaderAccessor.open( this.getClass() );
 			Assert.fail( "should have failed" );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			Assert.assertEquals(
 					"HSEARCH000109: org.hibernate.search.test.shards.DirectorySelectionTest is not an indexed type",
 					e.getMessage()
@@ -120,7 +120,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 			indexReaderAccessor.open( new Class<?>[]{} );
 			Assert.fail( "should have failed" );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			Assert.assertEquals( "HSEARCH000112: At least one entity type must be provided: can't open an IndexReader on nothing", e.getMessage() );
 		}
 	}
@@ -130,7 +130,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 			indexReaderAccessor.open( (Class<?>) null );
 			Assert.fail( "should have failed" );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			Assert.assertEquals( "HSEARCH000110: 'null' is not a valid indexed type", e.getMessage() );
 		}
 	}

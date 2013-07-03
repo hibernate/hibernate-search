@@ -277,7 +277,7 @@ public final class BridgeFactory {
 						( (ParameterizedBridge) instance ).setParameterValues( params );
 					}
 				}
-				catch ( Exception e ) {
+				catch (Exception e) {
 					throw LOG.cannotInstantiateClassBridgeOfType( impl.getName(), clazz.getName(), e );
 				}
 			}
@@ -303,7 +303,7 @@ public final class BridgeFactory {
 		try {
 			bridge = buildSpatialBridge( spatial, latitudeField, longitudeField );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
 		}
 		if ( bridge == null ) {
@@ -325,7 +325,7 @@ public final class BridgeFactory {
 		try {
 			bridge = buildSpatialBridge( spatial, null, null );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw LOG.unableToInstantiateSpatial( member.getName(), e );
 		}
 		if ( bridge == null ) {
@@ -429,7 +429,7 @@ public final class BridgeFactory {
 			tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME, BridgeFactory.class.getClassLoader() );
 			tikaBridge = ClassLoaderHelper.instanceFromClass( FieldBridge.class, tikaBridgeClass, "Tika bridge" );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			throw new AssertionFailure( "Unable to find Tika bridge class: " + TIKA_BRIDGE_NAME );
 		}
 
@@ -461,7 +461,7 @@ public final class BridgeFactory {
 			Method m = tikaBridgeClass.getMethod( setter, Class.class );
 			m.invoke( tikaBridge, clazz );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw LOG.unableToConfigureTikaBridge( TIKA_BRIDGE_NAME, e );
 		}
 	}
@@ -606,7 +606,7 @@ public final class BridgeFactory {
 			}
 			populateReturnType( appliedOnType, impl, instance );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw LOG.unableToInstantiateFieldBridge( appliedOnName, appliedOnType.getName(), e );
 		}
 		return bridge;

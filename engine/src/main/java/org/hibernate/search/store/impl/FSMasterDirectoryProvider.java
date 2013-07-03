@@ -95,7 +95,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			indexName = indexDir.getCanonicalPath();
 			directory = DirectoryProviderHelper.createFSIndex( indexDir, properties );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		copyChunkSize = DirectoryProviderHelper.getCopyBufferSize( directoryProviderName, properties );
@@ -127,7 +127,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			new File( sourceDir, CURRENT_DIR_NAME[currentLocal] ).createNewFile();
 			log.debugf( "Current directory: %d", currentLocal );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 		task = new FSMasterDirectoryProvider.TriggerTask( indexDir, sourceDir );
@@ -180,7 +180,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		try {
 			directory.close();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			log.unableToCloseLuceneDirectory( directory.getDirectory(), e );
 		}
 	}
@@ -232,7 +232,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 					FileHelper.synchronize( source, destinationFile, true, copyChunkSize );
 					current = index;
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					//don't change current
 					log.unableToSynchronizeSource( indexName, e );
 					return;
@@ -243,7 +243,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 				try {
 					new File( destination, CURRENT_DIR_NAME[index] ).createNewFile();
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					log.unableToCreateCurrentMarker( indexName, e );
 				}
 				log.tracef( "Copy for %s took %d ms", indexName, TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start ) );

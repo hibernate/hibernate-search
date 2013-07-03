@@ -180,7 +180,7 @@ public class CompressionTest extends SearchTestCase {
 				CompressionTools.decompressString( field.getBinaryValue() );
 				return true;
 			}
-			catch ( DataFormatException e ) {
+			catch (DataFormatException e) {
 				return false;
 			}
 		}

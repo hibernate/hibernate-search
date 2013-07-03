@@ -69,7 +69,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 			//this is cheap so it's not done in start()
 			directory = DirectoryProviderHelper.createFSIndex( indexDir, properties );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );
 		}
 	}
@@ -83,7 +83,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 		try {
 			directory.close();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			log.unableToCloseLuceneDirectory( directory.getDirectory(), e );
 		}
 	}

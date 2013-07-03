@@ -112,7 +112,7 @@ public class TikaBridge implements FieldBridge {
 			// allow for optional indexing of metadata by the user
 			metadataProcessor.set( name, value, document, luceneOptions, metadata );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw log.unableToParseDocument( e );
 		}
 		finally {
@@ -125,7 +125,7 @@ public class TikaBridge implements FieldBridge {
 			try {
 				return ( (Blob) object ).getBinaryStream();
 			}
-			catch ( SQLException e ) {
+			catch (SQLException e) {
 				throw log.unableToGetInputStreamFromBlob( e );
 			}
 		}
@@ -163,7 +163,7 @@ public class TikaBridge implements FieldBridge {
 		try {
 			return new FileInputStream( file );
 		}
-		catch ( FileNotFoundException e ) {
+		catch (FileNotFoundException e) {
 			throw log.fileDoesNotExist( file.toString() );
 		}
 	}

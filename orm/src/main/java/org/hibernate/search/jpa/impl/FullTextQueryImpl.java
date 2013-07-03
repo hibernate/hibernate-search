@@ -110,7 +110,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		try {
 			return query.getResultSize();
 		}
-		catch ( QueryTimeoutException e ) {
+		catch (QueryTimeoutException e) {
 			throwQueryTimeoutException( e );
 		}
 		return 0;
@@ -159,19 +159,19 @@ public class FullTextQueryImpl implements FullTextQuery {
 		try {
 			return query.list();
 		}
-		catch ( QueryTimeoutException e ) {
+		catch (QueryTimeoutException e) {
 			throwQueryTimeoutException( e );
 			return null; //never happens
 		}
-		catch ( QueryExecutionRequestException he ) {
+		catch (QueryExecutionRequestException he) {
 			//TODO when an illegal state exception should be raised?
 			throw new IllegalStateException( he );
 		}
-		catch ( TypeMismatchException e ) {
+		catch (TypeMismatchException e) {
 			//TODO when an illegal arg exception should be raised?
 			throw new IllegalArgumentException( e );
 		}
-		catch ( SearchException he ) {
+		catch (SearchException he) {
 			throwPersistenceException( he );
 			throw he;
 		}
@@ -299,17 +299,17 @@ public class FullTextQueryImpl implements FullTextQuery {
 			}
 			return null; //should never happen
 		}
-		catch ( QueryTimeoutException e ) {
+		catch (QueryTimeoutException e) {
 			throwQueryTimeoutException( e );
 			return null; //never happens
 		}
-		catch ( QueryExecutionRequestException he ) {
+		catch (QueryExecutionRequestException he) {
 			throw new IllegalStateException( he );
 		}
-		catch ( TypeMismatchException e ) {
+		catch (TypeMismatchException e) {
 			throw new IllegalArgumentException( e );
 		}
-		catch ( HibernateException he ) {
+		catch (HibernateException he) {
 			throwPersistenceException( he );
 			return null;
 		}

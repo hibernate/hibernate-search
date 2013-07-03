@@ -92,7 +92,7 @@ public class JmsBackendQueueTask implements Runnable {
 
 			session.close();
 		}
-		catch ( JMSException e ) {
+		catch (JMSException e) {
 			throw log.unableToSendJMSWork( indexName, processor.getJmsQueueName(), e );
 		}
 	}

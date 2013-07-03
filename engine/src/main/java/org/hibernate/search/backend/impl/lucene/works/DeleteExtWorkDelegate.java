@@ -74,7 +74,7 @@ public final class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 			}
 			workspace.notifyWorkApplied( work );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			String message = "Unable to remove " + managedType + "#" + id + " from index.";
 			throw new SearchException( message, e );
 		}
