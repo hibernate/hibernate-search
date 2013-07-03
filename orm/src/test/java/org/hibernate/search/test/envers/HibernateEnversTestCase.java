@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.test.envers;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -88,10 +87,10 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		assertEquals( 2, findAllAuditedObjects( auditReader, Address.class ).size() );
 		Person hermioneFromHibSearch = findPersonFromIndexBySurname( session, "granger" );
 		Person hermioneAtRevision1 = findPersonFromAuditBySurname( auditReader, "Granger" );
-		verifyPersonObjectsAreEqual( hermioneFromHibSearch, hermioneAtRevision1 );
+		assertEquals( hermioneFromHibSearch, hermioneAtRevision1 );
 		Person harryFromHibSearch = findPersonFromIndexBySurname( session, "potter" );
 		Person harryAtRevision1 = findPersonFromAuditBySurname( auditReader, "Potter" );
-		verifyPersonObjectsAreEqual( harryFromHibSearch, harryAtRevision1 );
+		assertEquals( harryFromHibSearch, harryAtRevision1 );
 
 		tx.commit();
 		session.close();
@@ -116,7 +115,7 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		assertEquals( 1, peopleLivingInPrivetDriveFromHibSearch.size() );
 		Person harryAtRevision2 = auditReader.find( Person.class, harryPotter.getId(), 2 );
 		harryFromHibSearch = peopleLivingInPrivetDriveFromHibSearch.get( 0 );
-		verifyPersonObjectsAreEqual( harryFromHibSearch, harryAtRevision2 );
+		assertEquals( harryFromHibSearch, harryAtRevision2 );
 		assertEquals( 1, findLastRevisionForEntity( auditReader, Person.class ) );
 		assertEquals( 2, findLastRevisionForEntity( auditReader, Address.class ) );
 		assertEquals( 0, howManyChangesAtRevisionNumber( auditReader, Person.class, 2 ) );
@@ -135,7 +134,7 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		assertEquals( 5, privetDriveAtRevision2.houseNumber.intValue() );
 		assertNull( privetDriveAtRevision2.flatNumber );
 		assertEquals( 1, privetDriveAtRevision2.getPersons().size() );
-		verifyAddressObjectsAreEqual( harryFromHibSearch.getAddress(), privetDriveAtRevision2 );
+		assertEquals( harryFromHibSearch.getAddress(), privetDriveAtRevision2 );
 
 		tx.commit();
 		session.close();
@@ -243,26 +242,6 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		return findPeopleFromIndex( session, "address.streetName", streetName );
 	}
 
-	private void verifyPersonObjectsAreEqual(Person person1, Person person2) {
-		assertEquals( person1.getId(), person2.getId() );
-		assertEquals( person1.getName(), person2.getName() );
-		assertEquals( person1.getSurname(), person2.getSurname() );
-		verifyAddressObjectsAreEqual( person1.getAddress(), person2.getAddress() );
-	}
-
-	private void verifyAddressObjectsAreEqual(Address address1, Address address2) {
-		assertEquals( address1.getId(), address2.getId() );
-		assertEquals( address1.getStreetName(), address2.getStreetName() );
-		assertEquals( address1.getHouseNumber(), address2.getHouseNumber() );
-		assertEquals( address1.getFlatNumber(), address2.getFlatNumber() );
-		assertEquals( address1.getPersons().size(), address2.getPersons().size() );
-		Iterator<Person> iterator1 = address1.getPersons().iterator();
-		Iterator<Person> iterator2 = address2.getPersons().iterator();
-		while ( iterator1.hasNext() ) {
-			assertEquals( iterator1.next().getId(), iterator2.next().getId() );
-		}
-	}
-
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, Address.class };
@@ -281,9 +260,9 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		}
 
 		@Id @GeneratedValue @DocumentId
-		private int id;
-		public int getId() { return id; }
-		public void setId(int id) { this.id = id; }
+		private Long id;
+		public Long getId() { return id; }
+		public void setId(Long id) { this.id = id; }
 
 		@Field
 		private String name;
@@ -299,6 +278,52 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		private Address address;
 		public Address getAddress() { return address; }
 		public void setAddress(Address address) { this.address = address; }
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( ( address == null ) ? 0 : address.getId().hashCode() );
+			result = prime * result + ( ( id == null ) ? 0 : id.hashCode() );
+			result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
+			result = prime * result + ( ( surname == null ) ? 0 : surname.hashCode() );
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj )
+				return true;
+			if ( obj == null )
+				return false;
+			if ( getClass() != obj.getClass() )
+				return false;
+			Person other = (Person) obj;
+			if ( address == null ) {
+				if ( other.address != null )
+					return false;
+			}
+			else if ( !address.getId().equals( other.address.getId() ) )
+				return false;
+			if ( id == null ) {
+				if ( other.id != null )
+					return false;
+			}
+			else if ( !id.equals( other.id ) )
+				return false;
+			if ( name == null ) {
+				if ( other.name != null )
+					return false;
+			}
+			else if ( !name.equals( other.name ) )
+				return false;
+			if ( surname == null ) {
+				if ( other.surname != null )
+					return false;
+			}
+			else if ( !surname.equals( other.surname ) )
+				return false;
+			return true;
+		}
 	}
 
 	@Entity
@@ -313,9 +338,9 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		}
 
 		@Id @GeneratedValue @DocumentId
-		private int id;
-		public int getId() { return id; }
-		public void setId(int id) { this.id = id; }
+		private Long id;
+		public Long getId() { return id; }
+		public void setId(Long id) { this.id = id; }
 
 		@Field
 		private String streetName;
@@ -336,5 +361,58 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		private Set<Person> persons;
 		public Set<Person> getPersons() { return persons; }
 		public void setPersons(Set<Person> persons) { this.persons = persons; }
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( ( flatNumber == null ) ? 0 : flatNumber.hashCode() );
+			result = prime * result + ( ( houseNumber == null ) ? 0 : houseNumber.hashCode() );
+			result = prime * result + ( ( id == null ) ? 0 : id.hashCode() );
+			result = prime * result + ( ( persons == null ) ? 0 : persons.hashCode() );
+			result = prime * result + ( ( streetName == null ) ? 0 : streetName.hashCode() );
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj )
+				return true;
+			if ( obj == null )
+				return false;
+			if ( getClass() != obj.getClass() )
+				return false;
+			Address other = (Address) obj;
+			if ( flatNumber == null ) {
+				if ( other.flatNumber != null )
+					return false;
+			}
+			else if ( !flatNumber.equals( other.flatNumber ) )
+				return false;
+			if ( houseNumber == null ) {
+				if ( other.houseNumber != null )
+					return false;
+			}
+			else if ( !houseNumber.equals( other.houseNumber ) )
+				return false;
+			if ( id == null ) {
+				if ( other.id != null )
+					return false;
+			}
+			else if ( !id.equals( other.id ) )
+				return false;
+			if ( persons == null ) {
+				if ( other.persons != null )
+					return false;
+			}
+			else if ( !persons.equals( other.persons ) )
+				return false;
+			if ( streetName == null ) {
+				if ( other.streetName != null )
+					return false;
+			}
+			else if ( !streetName.equals( other.streetName ) )
+				return false;
+			return true;
+		}
 	}
 }
