@@ -96,11 +96,11 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 			try {
 				future.get();
 			}
-			catch ( InterruptedException e ) {
+			catch (InterruptedException e) {
 				log.interruptedWhileWaitingForIndexActivity( e );
 				Thread.currentThread().interrupt();
 			}
-			catch ( ExecutionException e ) {
+			catch (ExecutionException e) {
 				throw new SearchException( "Error applying updates to the Lucene index", e.getCause() );
 			}
 		}

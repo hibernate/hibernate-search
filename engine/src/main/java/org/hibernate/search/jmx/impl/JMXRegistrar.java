@@ -66,7 +66,7 @@ public final class JMXRegistrar {
 		try {
 			mbs.registerMBean( object, objectName );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new SearchException( "Unable to enable MBean for Hibernate Search", e );
 		}
 		return objectName.toString();
@@ -90,7 +90,7 @@ public final class JMXRegistrar {
 			try {
 				mbs.unregisterMBean( objectName );
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				log.unableToUnregisterExistingMBean( name, e );
 			}
 		}
@@ -120,7 +120,7 @@ public final class JMXRegistrar {
 		try {
 			objectName = new ObjectName( name );
 		}
-		catch ( MalformedObjectNameException e ) {
+		catch (MalformedObjectNameException e) {
 			throw new SearchException( "Invalid JMX Bean name: " + name, e );
 		}
 		return objectName;

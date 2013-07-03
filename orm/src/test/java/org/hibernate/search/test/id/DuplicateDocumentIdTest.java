@@ -46,7 +46,7 @@ public class DuplicateDocumentIdTest extends SearchTestCase {
 			openSessionFactory();
 			fail( "Building the SessionFactory should fail, because Foo defines multiple document ids." );
 		}
-		catch ( SearchException e ) { // getting a HibernateException here, because the listener registration fails
+		catch (SearchException e) { // getting a HibernateException here, because the listener registration fails
 			assertEquals(
 					"HSEARCH000167: More than one @DocumentId specified on entity 'org.hibernate.search.test.id.Foo'",
 					e.getMessage()

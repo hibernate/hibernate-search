@@ -116,12 +116,12 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 						statelessSession.close();
 					}
 				}
-				catch ( Throwable e ) {
+				catch (Throwable e) {
 					errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e);
 					try {
 						transactionManager.rollback();
 					}
-					catch ( SystemException e1 ) {
+					catch (SystemException e1) {
 						// we already have an exception, don't propagate this one
 						log.errorRollingBackTransaction( e.getMessage(), e1 );
 					}
@@ -136,7 +136,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 				}
 			}
 		}
-		catch ( Throwable e ) {
+		catch (Throwable e) {
 			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e);
 		}
 	}
@@ -164,7 +164,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 				return true;
 			}
 		}
-		catch ( SystemException e ) {
+		catch (SystemException e) {
 			log.cannotGuessTransactionStatus( e );
 			return false;
 		}

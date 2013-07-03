@@ -120,7 +120,7 @@ public final class AnnotationProcessingHelper {
 		try {
 			strategy = boostStrategyClass.newInstance();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new SearchException(
 					"Unable to instantiate boost strategy implementation: " + boostStrategyClass.getName()
 			);
@@ -160,13 +160,13 @@ public final class AnnotationProcessingHelper {
 			try {
 				return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, configContext.getLuceneMatchVersion() );
 			}
-			catch ( ClassCastException e ) {
+			catch (ClassCastException e) {
 				throw new SearchException(
 						"Lucene analyzer does not extend " + Analyzer.class.getName() + ": " + analyzerClass.getName(),
 						e
 				);
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				throw new SearchException(
 						"Failed to instantiate lucene analyzer with type " + analyzerClass.getName(), e
 				);

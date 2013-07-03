@@ -48,7 +48,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for DeepPathSimpleTypeCase having invalid path: b.c.dne" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue( "Expected search exception to contain information about invalid path b.c.dne",
 					se.getMessage().contains( "b.c.dne" ) );
 		}
@@ -65,7 +65,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for DeepPathWithLeadingPrefixCase having invalid path: b.c.dne" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue( "Should contain information about invalid path b.c.dne (message: <" + se.getMessage() + ">)" ,
 					se.getMessage().matches( ".*\\sb.c.dne.*" ) );
 			assertFalse( "Should NOT contain information about invalid path prefix: notJustA (message: <" + se.getMessage() + ">)",
@@ -84,7 +84,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for InvalidPrefixCase having invalid path: b.c.dne" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue( "Expected search exception to contain information about invalid path a.b.c.indexed",
 					se.getMessage().contains( "a.b.c.indexed" ) );
 		}
@@ -101,7 +101,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for ShallowPathCase having invalid path: dne" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue( "Expected search exception to contain information about invalid path dne",
 					se.getMessage().contains( "dne" ) );
 		}
@@ -118,7 +118,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for D having invalid path: b.c" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue( "Expected search exception to contain information about invalid path b.c",
 					se.getMessage().contains( "b.c" ) );
 		}
@@ -136,7 +136,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for InvalidEmbeddedPathsCase having invalid path: emb.e4" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue(
 					"Expected search exception to contain information about invalid path emb.e4, instead got error: "
 							+ se.getMessage(), se.getMessage().contains( "emb.e4" ) );
@@ -158,7 +158,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for InvalidEmbeddedNonLeafCase having invalid path: emb.e3" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue(
 					"Expected search exception to contain information about invalid leaf path emb.e3, instead got error: "
 							+ se.getMessage(), se.getMessage().contains( "emb.e3" ) );
@@ -180,7 +180,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for PathNotIndexedCase having invalid path: c.indexed" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue(
 					"Expected search exception to contain information about invalid leaf path c.indexed, instead got error: "
 							+ se.getMessage(), se.getMessage().contains( "c.indexed" ) );
@@ -196,7 +196,7 @@ public class TestInvalidPaths {
 			cfg.build();
 			fail( "Exception should have been thrown for FieldRenamedContainerEntity having invalid path (attribute instead of field name): embedded.field" );
 		}
-		catch ( SearchException se ) {
+		catch (SearchException se) {
 			assertTrue(
 					"Expected search exception to contain information about invalid leaf path embedded.field, instead got error: "
 							+ se.getMessage(), se.getMessage().contains( "embedded.field" ) );

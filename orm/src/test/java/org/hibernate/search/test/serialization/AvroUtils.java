@@ -67,7 +67,7 @@ public class AvroUtils {
 			}
 			return writer.toString();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to read " + filename, e );
 		}
 	}

@@ -52,7 +52,7 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
 			return (QueueConnectionFactory) initialContext.lookup( jmsConnectionFactoryName );
 		}
-		catch ( NamingException e ) {
+		catch (NamingException e) {
 			throw log.jmsLookupException( getJmsQueueName(), jmsConnectionFactoryName, getIndexName(), e );
 		}
 	}
@@ -63,7 +63,7 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
 			return (Queue) initialContext.lookup( getJmsQueueName() );
 		}
-		catch ( NamingException e ) {
+		catch (NamingException e) {
 			throw log.jmsLookupException( getJmsQueueName(), jmsConnectionFactoryName, getIndexName(), e );
 		}
 	}
@@ -80,7 +80,7 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 				return factory.createQueueConnection( login, password );
 			}
 		}
-		catch ( JMSException e ) {
+		catch (JMSException e) {
 			throw log.unableToOpenJMSConnection( getIndexName(), getJmsQueueName(), e );
 		}
 	}

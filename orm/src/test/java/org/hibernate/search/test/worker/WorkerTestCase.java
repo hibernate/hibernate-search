@@ -121,7 +121,7 @@ public class WorkerTestCase extends SearchTestCase {
 				try {
 					query = parser.parse( "name:emmanuel2" );
 				}
-				catch ( ParseException e ) {
+				catch (ParseException e) {
 					throw new RuntimeException( e );
 				}
 				boolean results = Search.getFullTextSession( s ).createFullTextQuery( query ).list().size() > 0;
@@ -146,7 +146,7 @@ public class WorkerTestCase extends SearchTestCase {
 				tx.commit();
 				s.close();
 			}
-			catch ( Throwable t ) {
+			catch (Throwable t) {
 				allFine.set( false );
 				t.printStackTrace();
 			}
@@ -159,7 +159,7 @@ public class WorkerTestCase extends SearchTestCase {
 						s.close();
 					}
 				}
-				catch ( Throwable t ) {
+				catch (Throwable t) {
 					allFine.set( false );
 					t.printStackTrace();
 				}
@@ -208,7 +208,7 @@ public class WorkerTestCase extends SearchTestCase {
 				tx.commit();
 				s.close();
 			}
-			catch ( Throwable t ) {
+			catch (Throwable t) {
 				allFine.set( false );
 				t.printStackTrace();
 			}

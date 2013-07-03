@@ -67,7 +67,7 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 			createSessionFactoryUsingDirectoryType( "foobar" );
 			fail( "Factory creation should fail with invalid 'hibernate.search.default.filesystem_access_type' parameter " );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			//success
 		}
 	}

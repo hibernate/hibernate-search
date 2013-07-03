@@ -60,7 +60,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 			Term term = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
 			writer.deleteDocuments( term );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new SearchException( "Unable to purge all from Lucene index: " + entityType, e );
 		}
 		workspace.notifyWorkApplied( work );

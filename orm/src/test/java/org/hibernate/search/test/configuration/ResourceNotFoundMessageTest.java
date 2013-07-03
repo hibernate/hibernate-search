@@ -53,7 +53,7 @@ public class ResourceNotFoundMessageTest {
 					.build();
 			Assert.fail( "should not reach this" );
 		}
-		catch ( SearchException initException ) {
+		catch (SearchException initException) {
 			String message = initException.getMessage();
 			Assert.assertEquals( "Resource not found: non-existent-resourcename.file", message );
 		}

@@ -76,7 +76,7 @@ public class ResultSizeOnCriteriaTest extends SearchTestCase {
 			hibQuery.getResultSize();
 			assertThat( true ).as( "HSEARCH000105 should have been raised" ).isFalse();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertThat( e.getMessage() ).startsWith( "HSEARCH000105" );
 		}
 		assertThat( result ).hasSize( 1 );

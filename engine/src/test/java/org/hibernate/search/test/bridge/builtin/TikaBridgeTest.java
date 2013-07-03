@@ -59,7 +59,7 @@ public class TikaBridgeTest {
 			File pdfFile = new File( TikaBridgeTest.class.getResource( TEST_DOCUMENT_PDF ).toURI() );
 			PATH_TO_TEST_DOCUMENT_PDF = pdfFile.getAbsolutePath();
 		}
-		catch ( URISyntaxException e ) {
+		catch (URISyntaxException e) {
 			throw new RuntimeException( "Unable to determine file path for test document" );
 		}
 	}
@@ -105,7 +105,7 @@ public class TikaBridgeTest {
 			bridgeUnderTest.setMetadataProcessorClass( this.getClass() );
 			fail();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertEquals(
 					"Wrong error message",
 					"Wrong configuration of Tika parse context provider: class org.hibernate.search.test.bridge.builtin.TikaBridgeTest does not implement interface org.hibernate.search.bridge.TikaMetadataProcessor",
@@ -143,7 +143,7 @@ public class TikaBridgeTest {
 			bridgeUnderTest.setParseContextProviderClass( this.getClass() );
 			fail();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertEquals(
 					"Wrong error message",
 					"Wrong configuration of Tika metadata processor: class org.hibernate.search.test.bridge.builtin.TikaBridgeTest does not implement interface org.hibernate.search.bridge.TikaParseContextProvider",
@@ -170,7 +170,7 @@ public class TikaBridgeTest {
 		try {
 			bridgeUnderTest.set( testFieldName, "/foo", testDocument, options );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertTrue( "Wrong error type", e.getMessage().startsWith( "HSEARCH000152" ) );
 		}
 	}

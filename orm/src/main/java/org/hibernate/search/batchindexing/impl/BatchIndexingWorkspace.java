@@ -166,13 +166,13 @@ public class BatchIndexingWorkspace implements Runnable {
 				producerEndSignal.await(); //await for all work being sent to the backend
 				log.debugf( "All work for type %s has been produced", indexedType.getName() );
 			}
-			catch ( InterruptedException e ) {
+			catch (InterruptedException e) {
 				//restore interruption signal:
 				Thread.currentThread().interrupt();
 				throw new SearchException( "Interrupted on batch Indexing; index will be left in unknown state!", e );
 			}
 		}
-		catch ( RuntimeException re ) {
+		catch (RuntimeException re) {
 			//being this an async thread we want to make sure everything is somehow reported
 			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , re );
 		}

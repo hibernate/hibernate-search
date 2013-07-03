@@ -103,7 +103,7 @@ public class ServiceProviderTest {
 		try {
 			SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			exception = true;
 		}
 		assertTrue( "Service not found should raise a SearchException", exception );

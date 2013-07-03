@@ -182,7 +182,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			try {
 				synchronization.beforeCompletion();
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				throw new HibernateException( "Error while indexing in Hibernate Search (before transaction completion)", e);
 			}
 		}
@@ -199,7 +199,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			try {
 				synchronization.afterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				throw new HibernateException( "Error while indexing in Hibernate Search (ater transaction completion)", e);
 			}
 		}

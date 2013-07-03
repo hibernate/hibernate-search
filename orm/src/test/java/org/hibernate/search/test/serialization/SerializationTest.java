@@ -412,7 +412,7 @@ public class SerializationTest extends SearchTestCase {
 		try {
 			original.reset();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new RuntimeException( e );
 		}
 		SerializableTokenStream serOriginal = CopyTokenStream.buildSerializabletokenStream( original );
@@ -492,7 +492,7 @@ public class SerializationTest extends SearchTestCase {
 			}
 			return copy.read() == -1;
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new RuntimeException( e );
 		}
 	}

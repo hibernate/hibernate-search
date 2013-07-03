@@ -107,7 +107,7 @@ public class WorkerScopeConfigurationTest {
 			new SearchFactoryBuilder().configuration( manualConfiguration ).buildSearchFactory();
 			fail();
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertTrue(
 					"Unexpected error message",
 					e.getMessage().contains( "Unable to find worker implementation class: foo" )

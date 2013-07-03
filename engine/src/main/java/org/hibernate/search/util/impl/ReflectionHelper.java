@@ -61,7 +61,7 @@ public abstract class ReflectionHelper {
 			// at execution time and is faster.
 			member.setAccessible( true );
 		}
-		catch ( SecurityException se ) {
+		catch (SecurityException se) {
 			if ( !Modifier.isPublic( member.getModifiers() ) ) {
 				throw se;
 			}
@@ -77,7 +77,7 @@ public abstract class ReflectionHelper {
 			// at execution time and is faster.
 			member.setAccessible( true );
 		}
-		catch ( SecurityException se ) {
+		catch (SecurityException se) {
 			if ( !Modifier.isPublic( ( (Member) member ).getModifiers() ) ) {
 				throw se;
 			}
@@ -89,7 +89,7 @@ public abstract class ReflectionHelper {
 		try {
 			value = getter.invoke( bean );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new IllegalStateException( "Could not get property value", e );
 		}
 		return value;

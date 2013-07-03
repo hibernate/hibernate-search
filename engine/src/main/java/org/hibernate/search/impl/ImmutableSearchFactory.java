@@ -183,7 +183,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			try {
 				worker.close();
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				log.workerException( e );
 			}
 

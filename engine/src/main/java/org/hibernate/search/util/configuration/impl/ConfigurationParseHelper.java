@@ -55,7 +55,7 @@ public abstract class ConfigurationParseHelper {
 		try {
 			return new URL( path );
 		}
-		catch ( MalformedURLException e ) {
+		catch (MalformedURLException e) {
 			return findAsResource( path );
 		}
 	}
@@ -110,7 +110,7 @@ public abstract class ConfigurationParseHelper {
 			try {
 				return Integer.parseInt( value.trim() );
 			}
-			catch ( NumberFormatException nfe ) {
+			catch (NumberFormatException nfe) {
 				throw new SearchException( errorMsgOnParseFailure, nfe );
 			}
 		}
@@ -132,7 +132,7 @@ public abstract class ConfigurationParseHelper {
 			try {
 				return Long.parseLong( value.trim() );
 			}
-			catch ( NumberFormatException nfe ) {
+			catch (NumberFormatException nfe) {
 				throw new SearchException( errorMsgOnParseFailure, nfe );
 			}
 		}

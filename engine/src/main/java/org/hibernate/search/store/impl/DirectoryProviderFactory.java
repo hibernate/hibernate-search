@@ -83,7 +83,7 @@ public class DirectoryProviderFactory {
 		try {
 			provider.initialize( directoryProviderName, indexProps, context );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
 		}
 		return provider;

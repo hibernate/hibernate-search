@@ -37,14 +37,14 @@ public class FullTextWrapperTest {
 		try {
 			Search.getFullTextSession( null );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			//good
 		}
 
 		try {
 			org.hibernate.search.jpa.Search.getFullTextEntityManager( null );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			//good
 		}
 	}

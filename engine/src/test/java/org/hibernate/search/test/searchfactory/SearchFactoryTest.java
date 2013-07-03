@@ -60,7 +60,7 @@ public class SearchFactoryTest {
 			new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 			fail( "Invalid configuration should have thrown an exception" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertTrue( e.getMessage().startsWith( "HSEARCH000177" ) );
 		}
 	}

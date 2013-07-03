@@ -109,7 +109,7 @@ public class LuceneIndexingParameters implements Serializable {
 				try {
 					entry.getKey().applySetting( writerConfig, entry.getValue() );
 				}
-				catch ( IllegalArgumentException e ) {
+				catch (IllegalArgumentException e) {
 					//TODO if DirectoryProvider had getDirectoryName() exceptions could tell better
 					throw new SearchException(
 							"Illegal IndexWriter setting "
@@ -129,7 +129,7 @@ public class LuceneIndexingParameters implements Serializable {
 				try {
 					entry.getKey().applySetting( logByteSizeMergePolicy, entry.getValue() );
 				}
-				catch ( IllegalArgumentException e ) {
+				catch (IllegalArgumentException e) {
 					//TODO if DirectoryProvider had getDirectoryName() exceptions could tell better
 					throw new SearchException(
 							"Illegal IndexWriter setting "

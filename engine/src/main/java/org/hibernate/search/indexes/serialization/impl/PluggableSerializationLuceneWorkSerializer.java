@@ -100,7 +100,7 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 			}
 			return serializer.serialize();
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			if ( e instanceof SearchException ) {
 				throw e;
 			}
@@ -143,7 +143,7 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 			deserializer.deserialize( data, hydrator );
 			return hydrator.getLuceneWorks();
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			if ( e instanceof SearchException ) {
 				throw e;
 			}

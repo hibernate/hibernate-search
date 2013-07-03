@@ -179,7 +179,7 @@ public final class ConfigContext {
 				// Use the same class loader used to load the SearchConfiguration implementation class ...
 				analyzerClass = ClassLoaderHelper.classForName( analyzerClassName, cfg.getClass().getClassLoader() );
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				return buildLazyAnalyzer( analyzerClassName );
 			}
 		}
@@ -289,7 +289,7 @@ public final class ConfigContext {
 			ClassLoaderHelper.classForName( className, ConfigContext.class.getClassLoader() );
 			return true;
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			return false;
 		}
 	}
@@ -308,7 +308,7 @@ public final class ConfigContext {
 					log.debug( "Setting Lucene compatibility to Version " + version.name() );
 				}
 			}
-			catch ( IllegalArgumentException e ) {
+			catch (IllegalArgumentException e) {
 				StringBuilder msg = new StringBuilder( tmp );
 				msg.append( " is a invalid value for the Lucene match version. Possible values are: " );
 				for ( Version v : Version.values() ) {

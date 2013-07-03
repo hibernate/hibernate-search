@@ -47,7 +47,7 @@ public class OptimisticLockingCompatibilityHelper {
 		try {
 			return Class.forName( parentOptimisticLockExceptionClassName, true, Session.class.getClassLoader() );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			// the failing class was introduced in Hibernate Core 4.0.0.CR7 only; fall back to old name when it's not found:
 			try {
 				return Class.forName(
@@ -56,7 +56,7 @@ public class OptimisticLockingCompatibilityHelper {
 						Session.class.getClassLoader()
 				);
 			}
-			catch ( ClassNotFoundException e1 ) {
+			catch (ClassNotFoundException e1) {
 				// this is fatal, will need to check for null at runtime
 				return null;
 			}

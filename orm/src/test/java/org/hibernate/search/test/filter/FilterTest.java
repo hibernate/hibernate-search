@@ -89,7 +89,7 @@ public class FilterTest extends SearchTestCase {
 		try {
 			ftQuery.getResultSize();
 		}
-		catch ( IllegalStateException e ) {
+		catch (IllegalStateException e) {
 			fail( "Cache results does not work" );
 		}
 
@@ -144,7 +144,7 @@ public class FilterTest extends SearchTestCase {
 			ftQuery.enableFullTextFilter( "foo" );
 			fail( "Retrieving an unknown filter should throw a SearchException" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			assertEquals( "Wrong message", "HSEARCH000115: Unknown @FullTextFilter: 'foo'", e.getMessage() );
 		}
 	}

@@ -122,7 +122,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				oneWayBridge.set( name, value, document, luceneOptions );
 			}
-			catch ( RuntimeException e ) {
+			catch (RuntimeException e) {
 				throw buildBridgeException( e, "set" );
 			}
 		}
@@ -135,7 +135,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				return twoWayBridge.get( name, document );
 			}
-			catch ( RuntimeException e ) {
+			catch (RuntimeException e) {
 				throw buildBridgeException( e, "get" );
 			}
 		}
@@ -145,7 +145,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				return twoWayBridge.objectToString( object );
 			}
-			catch ( RuntimeException e ) {
+			catch (RuntimeException e) {
 				throw buildBridgeException( e, "objectToString" );
 			}
 		}
@@ -155,7 +155,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				twoWayBridge.set( name, value, document, luceneOptions );
 			}
-			catch ( RuntimeException e ) {
+			catch (RuntimeException e) {
 				throw buildBridgeException( e, "set" );
 			}
 		}
@@ -168,7 +168,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 			try {
 				return stringBridge.objectToString( object );
 			}
-			catch ( RuntimeException e ) {
+			catch (RuntimeException e) {
 				throw buildBridgeException( e, "objectToString" );
 			}
 		}

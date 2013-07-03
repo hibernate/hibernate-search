@@ -116,7 +116,7 @@ class IndexWriterHolder {
 						log.trace( "IndexWriter opened" );
 						writer.set( indexWriter );
 					}
-					catch ( IOException ioe ) {
+					catch (IOException ioe) {
 						indexWriter = null;
 						writer.set( null );
 						handleIOException( ioe, errorContextBuilder );
@@ -160,7 +160,7 @@ class IndexWriterHolder {
 				indexWriter.commit();
 				log.trace( "Index changes committed." );
 			}
-			catch ( IOException ioe ) {
+			catch (IOException ioe) {
 				handleIOException( ioe, errorContextBuilder );
 			}
 		}
@@ -183,7 +183,7 @@ class IndexWriterHolder {
 				toClose.close();
 				log.trace( "IndexWriter closed" );
 			}
-			catch ( IOException ioe ) {
+			catch (IOException ioe) {
 				forceLockRelease();
 				handleIOException( ioe, null );
 			}
@@ -208,7 +208,7 @@ class IndexWriterHolder {
 				IndexWriter.unlock( directoryProvider.getDirectory() );
 			}
 		}
-		catch ( IOException ioe ) {
+		catch (IOException ioe) {
 			handleIOException( ioe, null );
 		}
 		finally {
@@ -234,10 +234,10 @@ class IndexWriterHolder {
 		}
 		// following exceptions should be propagated as the IndexReader is needed by
 		// the main thread
-		catch ( CorruptIndexException cie ) {
+		catch (CorruptIndexException cie) {
 			throw log.cantOpenCorruptedIndex( cie, indexName );
 		}
-		catch ( IOException ioe ) {
+		catch (IOException ioe) {
 			throw log.ioExceptionOnIndex( ioe, indexName );
 		}
 	}
@@ -251,10 +251,10 @@ class IndexWriterHolder {
 		}
 		// following exceptions should be propagated as the IndexReader is needed by
 		// the main thread
-		catch ( CorruptIndexException cie ) {
+		catch (CorruptIndexException cie) {
 			throw log.cantOpenCorruptedIndex( cie, indexName );
 		}
-		catch ( IOException ioe ) {
+		catch (IOException ioe) {
 			throw log.ioExceptionOnIndex( ioe, indexName );
 		}
 	}

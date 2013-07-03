@@ -87,7 +87,7 @@ public class MultiplePathCaseEmbeddedTest extends SearchTestCase {
 			search( s, "b.indexed.field", "indexed" );
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 
@@ -96,7 +96,7 @@ public class MultiplePathCaseEmbeddedTest extends SearchTestCase {
 			search( s, "b.indexed.renamedSkipped", "indexed" );
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 
@@ -106,7 +106,7 @@ public class MultiplePathCaseEmbeddedTest extends SearchTestCase {
 			search( s, "b.skipped.indexed", "indexed" );
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 
@@ -115,7 +115,7 @@ public class MultiplePathCaseEmbeddedTest extends SearchTestCase {
 			search( s, "b.indexed.skipped", "skipped" );
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 

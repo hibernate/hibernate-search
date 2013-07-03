@@ -45,7 +45,7 @@ public class LoaderHelper {
 					)
 			);
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			//leave it alone
 		}
 		try {
@@ -56,7 +56,7 @@ public class LoaderHelper {
 					)
 			);
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			//leave it alone
 		}
 	}

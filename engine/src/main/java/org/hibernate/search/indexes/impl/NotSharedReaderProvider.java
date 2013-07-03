@@ -52,7 +52,7 @@ public class NotSharedReaderProvider implements DirectoryBasedReaderProvider {
 		try {
 			return IndexReader.open( directory );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Could not open index \"" + indexName + "\"", e );
 		}
 	}
@@ -62,7 +62,7 @@ public class NotSharedReaderProvider implements DirectoryBasedReaderProvider {
 		try {
 			reader.close();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			log.unableToCloseLuceneIndexReader( e );
 		}
 	}

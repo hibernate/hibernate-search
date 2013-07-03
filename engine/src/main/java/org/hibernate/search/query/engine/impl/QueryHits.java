@@ -242,7 +242,7 @@ public class QueryHits {
 			try {
 				searcher.getSearcher().search( weight, filter, collector );
 			}
-			catch ( TimeLimitingCollector.TimeExceededException e ) {
+			catch (TimeLimitingCollector.TimeExceededException e) {
 				//we have reached the time limit and stopped before the end
 				//TimeoutManager.isTimedOut should be above that limit but set if for safety
 				timeoutManager.forceTimedOut();

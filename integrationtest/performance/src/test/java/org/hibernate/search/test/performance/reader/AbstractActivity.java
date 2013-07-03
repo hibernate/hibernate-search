@@ -68,7 +68,7 @@ public abstract class AbstractActivity implements Runnable {
 		try {
 			startSignal.await();
 		}
-		catch ( InterruptedException e ) {
+		catch (InterruptedException e) {
 			e.printStackTrace();
 			return;
 		}
@@ -100,7 +100,7 @@ public abstract class AbstractActivity implements Runnable {
 		try {
 			luceneQuery = parsers.get().parse( queryString );
 		}
-		catch ( ParseException e ) {
+		catch (ParseException e) {
 			e.printStackTrace();
 		}
 		return s.createFullTextQuery( luceneQuery, classes );

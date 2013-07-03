@@ -58,7 +58,7 @@ public class TransactionSynchronizationTest extends SearchTestCase {
 			transaction.commit();
 			fail( "An exception should have been raised" );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			//good
 			raised = true;
 			transaction.rollback();

@@ -61,7 +61,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 			tx.commit();
 			fail();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
 			String expectedErrorMessage = "Exception while calling bridge#set\n" +
@@ -80,7 +80,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 			tx.commit();
 			fail();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
 			String expectedErrorMessage = "Exception while calling bridge#set\n" +
@@ -101,7 +101,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 			tx.commit();
 			fail();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
 			String expectedErrorMessage = "Exception while calling bridge#set\n" +
@@ -123,7 +123,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 			tx.commit();
 			fail();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			Throwable cause = e.getCause();
 			assertTrue( cause instanceof BridgeException );
 			String expectedErrorMessage = "Exception while calling bridge#set\n" +

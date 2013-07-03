@@ -94,7 +94,7 @@ public class IndexControl implements IndexControlMBean {
 					.threadsForSubsequentFetching( numberOfFetchingThreads )
 					.startAndWait();
 		}
-		catch ( InterruptedException e ) {
+		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new SearchException( "Unable to complete indexing" );
 		}
@@ -130,7 +130,7 @@ public class IndexControl implements IndexControlMBean {
 		try {
 			clazz = ClassLoaderHelper.classForName( entity, IndexControl.class.getClassLoader() );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );
 		}
 		return clazz;
@@ -147,7 +147,7 @@ public class IndexControl implements IndexControlMBean {
 			}
 			return (SessionFactory) initialContext.lookup( sessionFactoryJndiName );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new UnsupportedOperationException(
 					"In order for this operation to work the SessionFactory must be bound to JNDI"
 			);

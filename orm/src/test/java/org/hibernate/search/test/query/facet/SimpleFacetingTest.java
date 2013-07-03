@@ -151,7 +151,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 					.createFacetingRequest();
 			fail( "null should not be a valid field name" );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			// success
 		}
 	}
@@ -165,7 +165,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 					.createFacetingRequest();
 			fail( "null should not be a valid request name" );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			// success
 		}
 	}
@@ -192,7 +192,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 					.createFacetingRequest();
 			fail( "RANGE_DEFINITION_ODER not allowed on discrete faceting" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			// success
 		}
 	}

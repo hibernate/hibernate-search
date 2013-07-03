@@ -79,7 +79,7 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 		try {
 			return DateTools.stringToDate( stringValue );
 		}
-		catch ( ParseException e ) {
+		catch (ParseException e) {
 			throw new SearchException( "Unable to parse into date: " + stringValue, e );
 		}
 	}

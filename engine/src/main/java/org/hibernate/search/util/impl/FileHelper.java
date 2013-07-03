@@ -263,7 +263,7 @@ public abstract class FileHelper {
 		try {
 			s = FileHelper.readInputStream( in );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw log.unableToReadFile( resourceName, e );
 		}
 		finally {
@@ -295,7 +295,7 @@ public abstract class FileHelper {
 			try {
 				resource.close();
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				//we don't really care if we can't close
 				log.couldNotCloseResource( e );
 			}

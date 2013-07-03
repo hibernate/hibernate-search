@@ -94,13 +94,13 @@ public class FilterDef {
 		try {
 			method.invoke( filter, parameterValue );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: " + this.impl, e );
 		}
-		catch ( InvocationTargetException e ) {
+		catch (InvocationTargetException e) {
 			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: " + this.impl, e );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: "
 					+ this.impl + " : " + e.getMessage(), e );
 		}

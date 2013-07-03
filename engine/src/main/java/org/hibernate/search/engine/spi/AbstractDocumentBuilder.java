@@ -242,7 +242,7 @@ public abstract class AbstractDocumentBuilder<T> {
 					collection = getActualCollection( member, value );
 					collection.size(); //load it
 				}
-				catch ( Exception e ) {
+				catch (Exception e) {
 					if ( e.getClass().getName().contains( "org.hibernate.LazyInitializationException" ) ) {
 						/* A deleted entity not having its collection initialized
 						 * leads to a LIE because the collection is no longer attached to the session

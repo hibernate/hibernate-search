@@ -94,7 +94,7 @@ public class DirectoryProviderHelperTest {
 		try {
 			DirectoryProviderHelper.getCopyBufferSize( "testIdx", prop );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			testOk = true;
 		}
 		assertTrue( testOk );
@@ -103,7 +103,7 @@ public class DirectoryProviderHelperTest {
 		try {
 			DirectoryProviderHelper.getCopyBufferSize( "testIdx", prop );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			testOk = true;
 		}
 		assertTrue( testOk );

@@ -67,7 +67,7 @@ public class Generator {
 			fw.write( generated.toString() );
 			fw.close();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			System.out.println( "Error while generating classes" );
 			e.printStackTrace();
 		}

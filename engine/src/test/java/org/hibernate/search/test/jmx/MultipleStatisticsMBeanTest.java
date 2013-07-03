@@ -126,7 +126,7 @@ public class MultipleStatisticsMBeanTest {
 		try {
 			mBean = mbeanServer.getObjectInstance( statisticsBeanObjectName );
 		}
-		catch ( InstanceNotFoundException e ) {
+		catch (InstanceNotFoundException e) {
 			fail( "The mbean " + statisticsBeanObjectName.getCanonicalName() + " should be registered with the MBean server " );
 		}
 		assertEquals( StatisticsInfo.class.getName(), mBean.getClassName() );

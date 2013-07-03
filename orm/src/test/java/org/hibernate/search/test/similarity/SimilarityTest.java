@@ -52,7 +52,7 @@ public class SimilarityTest extends SearchTestCase {
 			config.buildSessionFactory();
 			fail( "Session creation should have failed due to duplicate similarity definition" );
 		}
-		catch ( SearchException e ) { // the SearchException will be wrapped in a HibernateException
+		catch (SearchException e) { // the SearchException will be wrapped in a HibernateException
 			assertTrue(
 					e.getMessage().startsWith(
 							"Multiple similarities defined"

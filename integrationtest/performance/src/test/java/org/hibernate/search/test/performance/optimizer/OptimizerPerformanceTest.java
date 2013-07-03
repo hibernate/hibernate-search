@@ -124,7 +124,7 @@ public class OptimizerPerformanceTest extends SearchTestCase {
 				try {
 					Thread.sleep( 50 );
 				}
-				catch ( InterruptedException e ) {
+				catch (InterruptedException e) {
 					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 				}
 
@@ -137,7 +137,7 @@ public class OptimizerPerformanceTest extends SearchTestCase {
 				try {
 					query = parser.parse( "name:Gavin" );
 				}
-				catch ( ParseException e ) {
+				catch (ParseException e) {
 					throw new RuntimeException( e );
 				}
 				boolean results = fts.createFullTextQuery( query ).list().size() > 0;
@@ -156,7 +156,7 @@ public class OptimizerPerformanceTest extends SearchTestCase {
 				s.close();
 				count++;
 			}
-			catch ( Throwable t ) {
+			catch (Throwable t) {
 				t.printStackTrace();
 			}
 		}
@@ -198,7 +198,7 @@ public class OptimizerPerformanceTest extends SearchTestCase {
 				tx.commit();
 				s.close();
 			}
-			catch ( Throwable t ) {
+			catch (Throwable t) {
 				t.printStackTrace();
 			}
 		}

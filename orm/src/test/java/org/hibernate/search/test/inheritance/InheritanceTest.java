@@ -65,7 +65,7 @@ public class InheritanceTest extends SearchTestCase {
 			tx.commit();
 			fail();
 		}
-		catch ( IllegalArgumentException iae ) {
+		catch (IllegalArgumentException iae) {
 			log.debug( "success" );
 			tx.rollback();
 		}
@@ -178,7 +178,7 @@ public class InheritanceTest extends SearchTestCase {
 			hibQuery.list();
 			fail();
 		}
-		catch ( IllegalArgumentException iae ) {
+		catch (IllegalArgumentException iae) {
 			log.debug( "success" );
 		}
 
@@ -245,7 +245,7 @@ public class InheritanceTest extends SearchTestCase {
 			tx.commit();
 			fail();
 		}
-		catch ( IllegalArgumentException iae ) {
+		catch (IllegalArgumentException iae) {
 			log.debug( "Success" );
 		}
 		s.close();

@@ -134,7 +134,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 			search( session, "parents.parents.parents.parents.name", "Bertrade de Montfort" );
 			fail( "Should not index a field if it is beyond the depth threshold" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 		checkRawIndexFields();
 	}
@@ -145,7 +145,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 			search( session, "parents.employees.employees.name", "Techincal Manager" );
 			fail( "Should not index a field if it is beyond the depth threshold, considering minimum depth along paths" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 		checkRawIndexFields();
 	}
@@ -155,7 +155,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 			search( session, "employees.employees.name", "Techincal Manager" );
 			fail( "Should not index a field if it is beyond the depth threshold" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 		checkRawIndexFields();
 	}

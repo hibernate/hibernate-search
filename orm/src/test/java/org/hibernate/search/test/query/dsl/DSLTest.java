@@ -672,7 +672,7 @@ public class DSLTest extends SearchTestCase {
 
 			fail( "Obtaining a builder not allowed for unindexed type without any indexed sub-types." );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 			// success
 		}
 		finally {

@@ -84,7 +84,7 @@ public class PathEmbeddedDepthTest extends SearchTestCase {
 			search( session, "parents.parents.parents.surname", "de Montfort" );
 			fail( "Shoudl not index a field if not in path and over the depth threshold" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 

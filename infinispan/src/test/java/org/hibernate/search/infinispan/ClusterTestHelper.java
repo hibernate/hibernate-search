@@ -83,7 +83,7 @@ public class ClusterTestHelper {
 			try {
 				Thread.sleep( 10 );
 			}
-			catch ( InterruptedException e ) {
+			catch (InterruptedException e) {
 				throw new AssertionFailedError( e.getMessage() );
 			}
 			currentSize = clusterSize( node, entityType );

@@ -79,7 +79,7 @@ public class PrefixedEmbeddedCaseInPathTest extends SearchTestCase {
 			search( s, "prefixed_idx_skipped", "skipped" );
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 
@@ -88,7 +88,7 @@ public class PrefixedEmbeddedCaseInPathTest extends SearchTestCase {
 			search( s, "prefixed_skp_field", "indexed" );
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 
@@ -97,7 +97,7 @@ public class PrefixedEmbeddedCaseInPathTest extends SearchTestCase {
 			search( s, "prefixed_skp_skipped", "skipped" );
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
-		catch ( SearchException e ) {
+		catch (SearchException e) {
 		}
 	}
 

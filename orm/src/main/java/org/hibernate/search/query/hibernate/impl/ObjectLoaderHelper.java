@@ -50,7 +50,7 @@ public class ObjectLoaderHelper {
 		try {
 			HibernateHelper.initialize( maybeProxy );
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			if ( LoaderHelper.isObjectNotFoundException( e ) ) {
 				log.debugf(
 						"Object found in Search index but not in database: %s with id %s",
@@ -102,7 +102,7 @@ public class ObjectLoaderHelper {
 			try {
 				maybeProxy = criteria.uniqueResult();
 			}
-			catch ( HibernateException e ) {
+			catch (HibernateException e) {
 				//FIXME should not raise an exception but return something like null
 				//FIXME this happens when the index is out of sync with the db)
 				throw new SearchException(

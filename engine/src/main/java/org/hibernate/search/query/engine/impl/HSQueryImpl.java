@@ -267,7 +267,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 			return infos;
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to query Lucene index", e );
 		}
 		finally {
@@ -309,7 +309,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			int max = max( first, queryHits.getTotalHits() );
 			return buildDocumentExtractor( openSearcher, queryHits, first, max );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			closeSearcher( openSearcher );
 			throw new SearchException( "Unable to query Lucene index", e );
 		}
@@ -329,7 +329,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					QueryHits queryHits = getQueryHits( searcher, 0 );
 					resultSize = queryHits.getTotalHits();
 				}
-				catch ( IOException e ) {
+				catch (IOException e) {
 					throw new SearchException( "Unable to query Lucene index", e );
 				}
 				finally {
@@ -355,7 +355,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			buildFilters();
 			explanation = searcher.getSearcher().explain( filteredQuery, documentId );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new SearchException( "Unable to query Lucene index and build explanation", e );
 		}
 		finally {
@@ -747,19 +747,19 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			try {
 				filter = (Filter) def.getFactoryMethod().invoke( instance );
 			}
-			catch ( IllegalAccessException e ) {
+			catch (IllegalAccessException e) {
 				throw new SearchException(
 						"Unable to access @Factory method: "
 								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
 				);
 			}
-			catch ( InvocationTargetException e ) {
+			catch (InvocationTargetException e) {
 				throw new SearchException(
 						"Unable to access @Factory method: "
 								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
 				);
 			}
-			catch ( ClassCastException e ) {
+			catch (ClassCastException e) {
 				throw new SearchException(
 						"@Key method does not return a org.apache.lucene.search.Filter class: "
 								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
@@ -770,7 +770,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			try {
 				filter = (Filter) instance;
 			}
-			catch ( ClassCastException e ) {
+			catch (ClassCastException e) {
 				throw new SearchException(
 						"Filter implementation does not implement the Filter interface: "
 								+ def.getImpl().getName() + ". "
@@ -826,19 +826,19 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			try {
 				key = (FilterKey) def.getKeyMethod().invoke( instance );
 			}
-			catch ( IllegalAccessException e ) {
+			catch (IllegalAccessException e) {
 				throw new SearchException(
 						"Unable to access @Key method: "
 								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
 				);
 			}
-			catch ( InvocationTargetException e ) {
+			catch (InvocationTargetException e) {
 				throw new SearchException(
 						"Unable to access @Key method: "
 								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
 				);
 			}
-			catch ( ClassCastException e ) {
+			catch (ClassCastException e) {
 				throw new SearchException(
 						"@Key method does not return FilterKey: "
 								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
@@ -860,10 +860,10 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		try {
 			instance = def.getImpl().newInstance();
 		}
-		catch ( InstantiationException e ) {
+		catch (InstantiationException e) {
 			throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
 		}
 		for ( Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet() ) {

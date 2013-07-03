@@ -313,10 +313,10 @@ public class AvroTest {
 				assertTermVector( field );
 				assertField( field );
 			}
-			catch ( EOFException eof ) {
+			catch (EOFException eof) {
 				break;
 			}
-			catch ( Exception ex ) {
+			catch (Exception ex) {
 				ex.printStackTrace();
 				throw ex;
 			}
