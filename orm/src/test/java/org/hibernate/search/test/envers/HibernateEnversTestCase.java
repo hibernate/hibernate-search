@@ -29,10 +29,12 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.apache.lucene.index.Term;
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
@@ -45,6 +47,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.TestForIssue;
 
 /**
@@ -85,10 +88,10 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		assertEquals( 2, howManyChangesAtRevisionNumber( auditReader, Address.class, 1 ) );
 		assertEquals( 2, findAllAuditedObjects( auditReader, Person.class ).size() );
 		assertEquals( 2, findAllAuditedObjects( auditReader, Address.class ).size() );
-		Person hermioneFromHibSearch = findPersonFromIndexBySurname( session, "granger" );
+		Person hermioneFromHibSearch = findPersonFromIndexBySurname( session, "Granger" );
 		Person hermioneAtRevision1 = findPersonFromAuditBySurname( auditReader, "Granger" );
 		assertEquals( hermioneFromHibSearch, hermioneAtRevision1 );
-		Person harryFromHibSearch = findPersonFromIndexBySurname( session, "potter" );
+		Person harryFromHibSearch = findPersonFromIndexBySurname( session, "Potter" );
 		Person harryAtRevision1 = findPersonFromAuditBySurname( auditReader, "Potter" );
 		assertEquals( harryFromHibSearch, harryAtRevision1 );
 
@@ -111,7 +114,7 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		tx = session.beginTransaction();
 		auditReader = AuditReaderFactory.get( session );
 
-		List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "privet" );
+		List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "Privet" );
 		assertEquals( 1, peopleLivingInPrivetDriveFromHibSearch.size() );
 		Person harryAtRevision2 = auditReader.find( Person.class, harryPotter.getId(), 2 );
 		harryFromHibSearch = peopleLivingInPrivetDriveFromHibSearch.get( 0 );
@@ -155,7 +158,7 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		tx = session.beginTransaction();
 		auditReader = AuditReaderFactory.get( session );
 
-		peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "privet" );
+		peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "Privet" );
 		assertEquals( 2, peopleLivingInPrivetDriveFromHibSearch.size() );
 		@SuppressWarnings("unchecked")
 		List<Person> peopleWhoHasMovedHouseAtRevision3 = auditReader.createQuery()
@@ -187,10 +190,10 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		tx = session.beginTransaction();
 		auditReader = AuditReaderFactory.get( session );
 
-		assertNull( findPersonFromIndexBySurname( session, "potter" ) );
-		assertNull( findPersonFromIndexBySurname( session, "granger" ) );
-		assertEquals( 0, findPeopleFromIndexByStreetName( session, "privet" ).size() );
-		assertEquals( 0, findPeopleFromIndexByStreetName( session, "guillaume" ).size() );
+		assertNull( findPersonFromIndexBySurname( session, "Potter" ) );
+		assertNull( findPersonFromIndexBySurname( session, "Granger" ) );
+		assertEquals( 0, findPeopleFromIndexByStreetName( session, "Privet" ).size() );
+		assertEquals( 0, findPeopleFromIndexByStreetName( session, "Guillaume" ).size() );
 		assertEquals( 4, findLastRevisionForEntity( auditReader, Person.class ) );
 		assertEquals( 4, findLastRevisionForEntity( auditReader, Address.class ) );
 		assertEquals( 2, howManyChangesAtRevisionNumber( auditReader, Person.class, 4 ) );
@@ -223,7 +226,8 @@ public class HibernateEnversTestCase extends SearchTestCase {
 
 	@SuppressWarnings("unchecked")
 	private List<Person> findPeopleFromIndex(FullTextSession session, String term, String value) {
-		return session.createFullTextQuery( new TermQuery( new Term( term, value ) ), Person.class )
+		Query luceneQuery = createLuceneQuery( term, value );
+		return session.createFullTextQuery( luceneQuery, Person.class )
 				.setSort( new Sort( new SortField( "surname", SortField.STRING ) ) ).list();
 	}
 
@@ -240,6 +244,19 @@ public class HibernateEnversTestCase extends SearchTestCase {
 
 	private List<Person> findPeopleFromIndexByStreetName(FullTextSession session, String streetName) {
 		return findPeopleFromIndex( session, "address.streetName", streetName );
+	}
+
+	private Query createLuceneQuery(String term, String value) {
+		String searchQuery = term + ":" + value;
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), term, new StopAnalyzer(TestConstants.getTargetLuceneVersion()) );
+		Query luceneQuery;
+		try {
+			luceneQuery = parser.parse( searchQuery );
+		}
+		catch ( ParseException e ) {
+			throw new RuntimeException("Unable to parse query", e );
+		}
+		return luceneQuery;
 	}
 
 	@Override
