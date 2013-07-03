@@ -58,16 +58,34 @@ import org.hibernate.search.test.util.TestForIssue;
  */
 public class HibernateEnversTestCase extends SearchTestCase {
 
+	private Person harryPotter;
+	private Person hermioneGranger;
+	private Address privetDriveAddress;
+	private Address grimmauldPlaceAddress;
+
+	/**
+	 * This test case aims to verify that insertion, updating and deleting operations work correctly
+	 * for both Hibernate Search and Hibernate Envers
+	 */
 	@TestForIssue(jiraKey = "HSEARCH-1293")
-	public void testUpdateIndexedEmbeddedCollectionWithNull() throws Exception {
+	public void testHibernateSearchAndEnversIntegration() throws Exception {
+		atRevision1();
+		atRevision2();
+		atRevision3();
+		atRevision4();
+	}
 
-		Address privetDriveAddress = new Address( "Privet Drive", 121 );
+	/**
+	 * It verifies that insertion operation works correctly
+	 */
+	private void atRevision1() {
+		// Objects creation
+		privetDriveAddress = new Address( "Privet Drive", 121 );
 		privetDriveAddress.setFlatNumber( 2 );
-		Person harryPotter = new Person( "Harry", "Potter", privetDriveAddress );
-		Address grimmauldPlaceAddress = new Address( "Grimmauld Place", 12 );
-		Person hermioneGranger = new Person( "Hermione", "Granger", grimmauldPlaceAddress );
+		harryPotter = new Person( "Harry", "Potter", privetDriveAddress );
+		grimmauldPlaceAddress = new Address( "Grimmauld Place", 12 );
+		hermioneGranger = new Person( "Hermione", "Granger", grimmauldPlaceAddress );
 
-		// Revision 1: objects creation
 		FullTextSession session = Search.getFullTextSession( openSession() );
 		Transaction tx = session.beginTransaction();
 		session.save( privetDriveAddress );
@@ -77,17 +95,18 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		tx.commit();
 		session.close();
 
-		// Revision 1: let's assert that everything got audited and indexed correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
 
+		//Let's assert that Hibernate Envers has audited correctly
 		AuditReader auditReader = AuditReaderFactory.get( session );
 		assertEquals( 1, findLastRevisionForEntity( auditReader, Person.class ) );
 		assertEquals( 1, findLastRevisionForEntity( auditReader, Address.class ) );
-		assertEquals( 2, howManyChangesAtRevisionNumber( auditReader, Person.class, 1 ) );
-		assertEquals( 2, howManyChangesAtRevisionNumber( auditReader, Address.class, 1 ) );
-		assertEquals( 2, findAllAuditedObjects( auditReader, Person.class ).size() );
-		assertEquals( 2, findAllAuditedObjects( auditReader, Address.class ).size() );
+		assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 1 ) );
+		assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 1 ) );
+		assertEquals( 2, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
+		assertEquals( 2, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
+		//Let's compares that entities from Hibernate Search and last revision entities from Hibernate Envers are equals
 		Person hermioneFromHibSearch = findPersonFromIndexBySurname( session, "Granger" );
 		Person hermioneAtRevision1 = findPersonFromAuditBySurname( auditReader, "Granger" );
 		assertEquals( hermioneFromHibSearch, hermioneAtRevision1 );
@@ -97,10 +116,15 @@ public class HibernateEnversTestCase extends SearchTestCase {
 
 		tx.commit();
 		session.close();
+	}
 
-		// Revision 2: changing the address's house number and flat number
-		session = Search.getFullTextSession( openSession() );
-		tx = session.beginTransaction();
+	/**
+	 * It verifies that updating operation on Address entity works correctly
+	 */
+	private void atRevision2() {
+		// Changing the address's house number and flat number
+		FullTextSession session = Search.getFullTextSession( openSession() );
+		Transaction tx = session.beginTransaction();
 
 		privetDriveAddress = (Address) session.merge( privetDriveAddress );
 		privetDriveAddress.setHouseNumber( 5 );
@@ -109,22 +133,17 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		tx.commit();
 		session.close();
 
-		// Revision 2: assert that everything got audited and indexed correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		auditReader = AuditReaderFactory.get( session );
+		AuditReader auditReader = AuditReaderFactory.get( session );
 
-		List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "Privet" );
-		assertEquals( 1, peopleLivingInPrivetDriveFromHibSearch.size() );
-		Person harryAtRevision2 = auditReader.find( Person.class, harryPotter.getId(), 2 );
-		harryFromHibSearch = peopleLivingInPrivetDriveFromHibSearch.get( 0 );
-		assertEquals( harryFromHibSearch, harryAtRevision2 );
+		//Let's assert that Hibernate Envers has audited everything correctly
 		assertEquals( 1, findLastRevisionForEntity( auditReader, Person.class ) );
 		assertEquals( 2, findLastRevisionForEntity( auditReader, Address.class ) );
-		assertEquals( 0, howManyChangesAtRevisionNumber( auditReader, Person.class, 2 ) );
-		assertEquals( 1, howManyChangesAtRevisionNumber( auditReader, Address.class, 2 ) );
-		assertEquals( 2, findAllAuditedObjects( auditReader, Person.class ).size() );
-		assertEquals( 3, findAllAuditedObjects( auditReader, Address.class ).size() );
+		assertEquals( 0, howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 2 ) );
+		assertEquals( 1, howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 2 ) );
+		assertEquals( 2, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
+		assertEquals( 3, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
 		@SuppressWarnings("unchecked")
 		List<Address> houseNumberAddressChangedAtRevision2 = auditReader.createQuery()
 				.forEntitiesModifiedAtRevision( Address.class, 2 )
@@ -132,20 +151,27 @@ public class HibernateEnversTestCase extends SearchTestCase {
 				.add( AuditEntity.property( "flatNumber" ).hasChanged() )
 				.add( AuditEntity.property( "streetName" ).hasNotChanged() ).getResultList();
 		assertEquals( 1, houseNumberAddressChangedAtRevision2.size() );
-		Address privetDriveAtRevision2 = houseNumberAddressChangedAtRevision2.get( 0 );
-		assertEquals( "Privet Drive", privetDriveAtRevision2.streetName );
-		assertEquals( 5, privetDriveAtRevision2.houseNumber.intValue() );
-		assertNull( privetDriveAtRevision2.flatNumber );
-		assertEquals( 1, privetDriveAtRevision2.getPersons().size() );
-		assertEquals( harryFromHibSearch.getAddress(), privetDriveAtRevision2 );
+
+		//Let's assert that Hibernate Search has indexed everything correctly
+		List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "Privet" );
+		assertEquals( 1, peopleLivingInPrivetDriveFromHibSearch.size() );
+		//Let's campare that entities from Hibernate Search and last revision entities from Hibernate Envers are equals
+		Person harryFromHibSearch = peopleLivingInPrivetDriveFromHibSearch.get( 0 );
+		Person harryAtRevision2 = findPersonFromAuditBySurname( auditReader, "Potter" );
+		assertEquals( harryFromHibSearch, harryAtRevision2 );
 
 		tx.commit();
 		session.close();
+	}
 
-		// Revision 3: moving Hermione to Harry
-		session = Search.getFullTextSession( openSession() );
-		tx = session.beginTransaction();
-		auditReader = AuditReaderFactory.get( session );
+	/**
+	 * It verifies that updating operation on Person entity works correctly
+	 */
+	private void atRevision3() {
+		// Moving Hermione to Harry
+		FullTextSession session = Search.getFullTextSession( openSession() );
+		Transaction tx = session.beginTransaction();
+		AuditReader auditReader = AuditReaderFactory.get( session );
 
 		hermioneGranger = (Person) session.merge( hermioneGranger );
 		hermioneGranger.setAddress( privetDriveAddress );
@@ -153,13 +179,11 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		tx.commit();
 		session.close();
 
-		// Revision 3: assert that everything got audited and indexed correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
 		auditReader = AuditReaderFactory.get( session );
 
-		peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "Privet" );
-		assertEquals( 2, peopleLivingInPrivetDriveFromHibSearch.size() );
+		//Let's assert that Hibernate Envers has audited everything correctly
 		@SuppressWarnings("unchecked")
 		List<Person> peopleWhoHasMovedHouseAtRevision3 = auditReader.createQuery()
 				.forEntitiesModifiedAtRevision( Person.class, 3 ).add( AuditEntity.property( "address" ).hasChanged() )
@@ -167,17 +191,25 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		assertEquals( 1, peopleWhoHasMovedHouseAtRevision3.size() );
 		assertEquals( 3, findLastRevisionForEntity( auditReader, Person.class ) );
 		assertEquals( 3, findLastRevisionForEntity( auditReader, Address.class ) );
-		assertEquals( 1, howManyChangesAtRevisionNumber( auditReader, Person.class, 3 ) );
-		assertEquals( 2, howManyChangesAtRevisionNumber( auditReader, Address.class, 3 ) );
-		assertEquals( 3, findAllAuditedObjects( auditReader, Person.class ).size() );
-		assertEquals( 5, findAllAuditedObjects( auditReader, Address.class ).size() );
+		assertEquals( 1, howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 3 ) );
+		assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 3 ) );
+		assertEquals( 3, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
+		assertEquals( 5, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
+		//Let's assert that Hibernate Search has indexed everything correctly
+		List<Person> peopleLivingInPrivetDriveFromHibSearch = findPeopleFromIndexByStreetName( session, "Privet" );
+		assertEquals( 2, peopleLivingInPrivetDriveFromHibSearch.size() );
 
 		tx.commit();
 		session.close();
+	}
 
-		// Revision 4: Now let's clean up everything
-		session = Search.getFullTextSession( openSession() );
-		tx = session.beginTransaction();
+	/**
+	 * It verifies that deleting operation on Person entity works correctly
+	 */
+	private void atRevision4() {
+		// Now let's clean up everything
+		FullTextSession session = Search.getFullTextSession( openSession() );
+		Transaction tx = session.beginTransaction();
 		session.delete( harryPotter );
 		session.delete( hermioneGranger );
 		session.delete( grimmauldPlaceAddress );
@@ -185,35 +217,39 @@ public class HibernateEnversTestCase extends SearchTestCase {
 		tx.commit();
 		session.close();
 
-		// Revision 4: assert that everything got audited and indexed correctly
 		session = Search.getFullTextSession( openSession() );
 		tx = session.beginTransaction();
-		auditReader = AuditReaderFactory.get( session );
+		AuditReader auditReader = AuditReaderFactory.get( session );
 
+		//Let's assert that Hibernate Envers has audited everything correctly
+		assertEquals( 4, findLastRevisionForEntity( auditReader, Person.class ) );
+		assertEquals( 4, findLastRevisionForEntity( auditReader, Address.class ) );
+		assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Person.class, 4 ) );
+		assertEquals( 2, howManyEntitiesChangedAtRevisionNumber( auditReader, Address.class, 4 ) );
+		assertEquals( 7, howManyAuditedObjectsSoFar( auditReader, Address.class ) );
+		assertEquals( 5, howManyAuditedObjectsSoFar( auditReader, Person.class ) );
+		//Let's assert that Hibernate Search has indexed everything correctly
 		assertNull( findPersonFromIndexBySurname( session, "Potter" ) );
 		assertNull( findPersonFromIndexBySurname( session, "Granger" ) );
 		assertEquals( 0, findPeopleFromIndexByStreetName( session, "Privet" ).size() );
 		assertEquals( 0, findPeopleFromIndexByStreetName( session, "Guillaume" ).size() );
-		assertEquals( 4, findLastRevisionForEntity( auditReader, Person.class ) );
-		assertEquals( 4, findLastRevisionForEntity( auditReader, Address.class ) );
-		assertEquals( 2, howManyChangesAtRevisionNumber( auditReader, Person.class, 4 ) );
-		assertEquals( 2, howManyChangesAtRevisionNumber( auditReader, Address.class, 4 ) );
-		assertEquals( 7, findAllAuditedObjects( auditReader, Address.class ).size() );
-		assertEquals( 5, findAllAuditedObjects( auditReader, Person.class ).size() );
 
 		tx.commit();
 		session.close();
 	}
 
-	private int howManyChangesAtRevisionNumber(AuditReader auditReader, Class<?> clazz, Number revision) {
+	/** It returns how many entities are modified for a specific class and number revision. */
+	private int howManyEntitiesChangedAtRevisionNumber(AuditReader auditReader, Class<?> clazz, Number revision) {
 		return ( (Long) auditReader.createQuery().forEntitiesModifiedAtRevision( clazz, revision )
 				.addProjection( AuditEntity.id().count() ).getSingleResult() ).intValue();
 	}
 
-	private List<?> findAllAuditedObjects(AuditReader auditReader, Class<?> clazz) {
-		return auditReader.createQuery().forRevisionsOfEntity( clazz, true, true ).getResultList();
+	/** It returns how many audited objects are there globally for a specific class. */
+	private int howManyAuditedObjectsSoFar(AuditReader auditReader, Class<?> clazz) {
+		return auditReader.createQuery().forRevisionsOfEntity( clazz, true, true ).getResultList().size();
 	}
 
+	/** It returns the last revision for a specific class. */
 	private Number findLastRevisionForEntity(AuditReader auditReader, Class<?> clazz) {
 		return (Number) auditReader.createQuery().forRevisionsOfEntity( clazz, false, true )
 				.addProjection( AuditEntity.revisionNumber().max() ).getSingleResult();
