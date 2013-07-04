@@ -340,14 +340,14 @@ public class Book {
   <emphasis role="bold">@Field(index=Index.YES, analyze=Analyze.YES, store=Store.NO)</emphasis>
   private String subtitle; 
 
-<emphasis role="bold">  @Field(index = Index.YES, analyze=Analyze.NO, store = Store.YES)
+  <emphasis role="bold">@Field(index = Index.YES, analyze=Analyze.NO, store = Store.YES)
   @DateBridge(resolution = Resolution.DAY)</emphasis>
   private Date publicationDate;
 
   <emphasis role="bold">@IndexedEmbedded</emphasis>
   @ManyToMany 
   private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
-<emphasis role="bold"/>
+  <emphasis role="bold"/>
   public Book() {
   } 
   
@@ -413,9 +413,9 @@ fullTextEntityManager.createIndexer().startAndWait();</programlisting>
     <title>Searching</title>
 
     <para>Now it is time to execute a first search. The general approach is to
-    create a Lucene query (either via the Lucene API (<xref
+    create a Lucene query, either via the Lucene API (<xref
     linkend="search-query-lucene-api"/>) or via the Hibernate Search query DSL
-    (<xref linkend="search-query-querydsl"/>)) and then wrap this query into a
+    (<xref linkend="search-query-querydsl"/>), and then wrap this query into a
     <classname>org.hibernate.Query</classname> in order to get all the
     functionality one is used to from the Hibernate API. The following code
     will prepare a query against the indexed fields, execute it and return a
@@ -431,7 +431,7 @@ Transaction tx = fullTextSession.beginTransaction();
 // alternatively you can write the Lucene query using the Lucene query parser
 // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
 QueryBuilder qb = fullTextSession.getSearchFactory()
-    .buildQueryBuilder().forEntity( Book.class ).get();
+    .buildQueryBuilder().forEntity(Book.class).get();
 org.apache.lucene.search.Query query = qb
   .keyword()
   .onFields("title", "subtitle", "authors.name")
@@ -461,7 +461,7 @@ em.getTransaction().begin();
 // alternatively you can write the Lucene query using the Lucene query parser
 // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
 QueryBuilder qb = fullTextEntityManager.getSearchFactory()
-    .buildQueryBuilder().forEntity( Book.class ).get();
+    .buildQueryBuilder().forEntity(Book.class).get();
 org.apache.lucene.search.Query query = qb
   .keyword()
   .onFields("title", "subtitle", "authors.name")
@@ -566,7 +566,7 @@ public class Book {
   @ManyToMany 
   private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
 
-<emphasis role="bold"> </emphasis> @Field(index = Index.YES, analyze = Analyze.NO, store = Store.YES)
+  @Field(index = Index.YES, analyze = Analyze.NO, store = Store.YES)
   @DateBridge(resolution = Resolution.DAY)
   private Date publicationDate;
   

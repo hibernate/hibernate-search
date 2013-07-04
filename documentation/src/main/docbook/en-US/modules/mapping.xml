@@ -375,7 +375,7 @@ public class Essay {
     public String getText() { return text; }
 
     <emphasis role="bold">@Field 
-    @NumericField( precisionStep = 6)</emphasis>
+    @NumericField(precisionStep = 6)</emphasis>
     public float getGrade() { return grade; }
 }</programlisting>
         </example>
@@ -403,7 +403,7 @@ public class Essay {
         <title>Using @Fields to map a property multiple times</title>
 
         <programlisting language="JAVA" role="JAVA">@Entity
-@Indexed(index = "Book" )
+@Indexed(index = "Book")
 public class Book {
     <emphasis role="bold">@Fields( {</emphasis>
             @Field,
@@ -468,7 +468,7 @@ public class Place {
     @Field
     private String name;
 
-    @OneToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     <emphasis role="bold">@IndexedEmbedded</emphasis>
     private Address address;
     ....
@@ -527,7 +527,7 @@ public class Place {
     @Field
     private String name;
 
-    @OneToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     <emphasis role="bold">@IndexedEmbedded</emphasis>
     private Address address;
     ....
@@ -600,7 +600,7 @@ public class Owner {
         <para>The prefix cannot be set to the empty string.</para>
       </note>
 
-      <para>The<literal> depth</literal> property is necessary when the object
+      <para>The <literal>depth</literal> property is necessary when the object
       graph contains a cyclic dependency of classes (not instances). For
       example, if <classname>Owner</classname> points to
       <classname>Place</classname>. Hibernate Search will stop including
@@ -676,7 +676,6 @@ public class Address {
     @IndexedEmbedded(depth = 1, prefix = "ownedBy_", <emphasis role="bold">targetElement = Owner.class</emphasis>)
     @Target(Owner.class)
     private Person ownedBy;
-
 
     ...
 }
@@ -1025,7 +1024,7 @@ public class MyEntity {
     <emphasis role="bold">@Analyzer(impl = PropertyAnalyzer.class)</emphasis>
     private String summary;
 
-    @Field(<emphasis><emphasis role="bold">analyzer = @Analyzer(impl = FieldAnalyzer.class</emphasis></emphasis>)
+    @Field(<emphasis role="bold">analyzer = @Analyzer(impl = FieldAnalyzer.class</emphasis>)
     private String body;
 
     ...
@@ -1845,14 +1844,14 @@ List result = fullTextSession.createFullTextQuery( query ).list();</programlisti
  */
 public class PaddedIntegerBridge implements <emphasis role="bold">StringBridge</emphasis> {
 
-    private int PADDING = 5;
+    private int padding = 5;
 
     <emphasis role="bold">public String objectToString(Object object)</emphasis> {
-        String rawInteger = ( (Integer) object ).toString();
-        if (rawInteger.length() &gt; PADDING) 
-            throw new IllegalArgumentException( "Try to pad on a number too big" );
-        StringBuilder paddedInteger = new StringBuilder( );
-        for ( int padIndex = rawInteger.length() ; padIndex &lt; PADDING ; padIndex++ ) {
+        String rawInteger = ((Integer) object).toString();
+        if (rawInteger.length() &gt; padding)
+            throw new IllegalArgumentException("Number too big to be padded");
+        StringBuilder paddedInteger = new StringBuilder();
+        for (int padIndex = rawInteger.length(); padIndex &lt; padding; padIndex++) {
             paddedInteger.append('0');
         }
         return paddedInteger.append( rawInteger ).toString();
@@ -1893,19 +1892,18 @@ private Integer length;                </programlisting>
     }
 
     public String objectToString(Object object) {
-        String rawInteger = ( (Integer) object ).toString();
+        String rawInteger = ((Integer) object).toString();
         if (rawInteger.length() &gt; padding) 
-            throw new IllegalArgumentException( "Try to pad on a number too big" );
+            throw new IllegalArgumentException("Number too big to be padded");
         StringBuilder paddedInteger = new StringBuilder( );
-        for ( int padIndex = rawInteger.length() ; padIndex &lt; padding ; padIndex++ ) {
+        for (int padIndex = rawInteger.length(); padIndex &lt; padding; padIndex++) {
             paddedInteger.append('0');
         }
-        return paddedInteger.append( rawInteger ).toString();
+        return paddedInteger.append(rawInteger).toString();
     }
 }
 
-
-//property
+//on the property:
 @FieldBridge(impl = PaddedIntegerBridge.class,
              <emphasis role="bold">params = @Parameter(name="padding", value="10")</emphasis>
             )
@@ -1969,19 +1967,19 @@ private Integer length;                </programlisting>
     private int padding = 5; //default
 
     public void setParameterValues(Map parameters) {
-        Object padding = parameters.get( PADDING_PROPERTY );
+        Object padding = parameters.get(PADDING_PROPERTY);
         if (padding != null) this.padding = (Integer) padding;
     }
 
     public String objectToString(Object object) {
-        String rawInteger = ( (Integer) object ).toString();
+        String rawInteger = ((Integer) object).toString();
         if (rawInteger.length() &gt; padding) 
-            throw new IllegalArgumentException( "Try to pad on a number too big" );
-        StringBuilder paddedInteger = new StringBuilder( );
-        for ( int padIndex = rawInteger.length() ; padIndex &lt; padding ; padIndex++ ) {
+            throw new IllegalArgumentException("Number too big to be padded");
+        StringBuilder paddedInteger = new StringBuilder();
+        for (int padIndex = rawInteger.length(); padIndex &lt; padding ; padIndex++) {
             paddedInteger.append('0');
         }
-        return paddedInteger.append( rawInteger ).toString();
+        return paddedInteger.append(rawInteger).toString();
     }
 
     <emphasis role="bold">public Object stringToObject(String stringValue)</emphasis> {
@@ -1989,8 +1987,7 @@ private Integer length;                </programlisting>
     }
 }
 
-
-//id property
+//On an id property:
 @DocumentId
 @FieldBridge(impl = PaddedIntegerBridge.class,
              params = @Parameter(name="padding", value="10") 
