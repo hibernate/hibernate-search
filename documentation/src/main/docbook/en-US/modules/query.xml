@@ -81,7 +81,7 @@ FullTextSession fullTextSession = Search.getFullTextSession(session);    </progr
   this:</para>
 
   <programlisting language="JAVA" role="JAVA">QueryBuilder b = fullTextSession.getSearchFactory()
-    .buildQueryBuilder().forEntity( Myth.class ).get();
+    .buildQueryBuilder().forEntity(Myth.class).get();
 
 org.apache.lucene.search.Query luceneQuery =
     b.keyword()
@@ -89,7 +89,7 @@ org.apache.lucene.search.Query luceneQuery =
         .matching("storm")
         .createQuery();
 
-org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
+org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery(luceneQuery);
 List result = fullTextQuery.list(); //return a list of managed objects
 </programlisting>
 
@@ -103,9 +103,9 @@ List result = fullTextQuery.list(); //return a list of managed objects
 <programlisting language="JAVA" role="JAVA">
 SearchFactory searchFactory = fullTextSession.getSearchFactory();
 org.apache.lucene.queryParser.QueryParser parser = 
-    new QueryParser("title", searchFactory.getAnalyzer(Myth.class) );
+    new QueryParser("title", searchFactory.getAnalyzer(Myth.class));
 try {
-    org.apache.lucene.search.Query luceneQuery = parser.parse( "history:storm^3" );
+    org.apache.lucene.search.Query luceneQuery = parser.parse("history:storm^3");
 }
 catch (ParseException e) {
     //handle parsing failure
@@ -394,8 +394,8 @@ Query luceneQuery =
         <programlisting language="JAVA" role="JAVA">Query luceneQuery = mythQB
     .keyword()
       .fuzzy()
-        .withThreshold( .8f )
-        .withPrefixLength( 1 )
+        .withThreshold(.8f)
+        .withPrefixLength(1)
     .onField("history")
     .matching("starm")
     .createQuery();</programlisting>
@@ -563,7 +563,7 @@ Query luceneQuery = mythQB
           </listitem>
 
           <listitem>
-            <para><methodname>filteredBy(Filter) </methodname>(on query):
+            <para><methodname>filteredBy(Filter)</methodname> (on query):
             filter query results using the <classname>Filter</classname>
             instance</para>
           </listitem>
@@ -634,12 +634,12 @@ org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQ
           <title>Filtering the search result by entity type</title>
 
           <programlisting language="JAVA" role="JAVA">fullTextQuery = fullTextSession
-    .createFullTextQuery( luceneQuery, Customer.class );
+    .createFullTextQuery(luceneQuery, Customer.class);
 
 // or
 
 fullTextQuery = fullTextSession
-    .createFullTextQuery( luceneQuery, Item.class, Actor.class );</programlisting>
+    .createFullTextQuery(luceneQuery, Item.class, Actor.class);</programlisting>
         </example>
 
         <para>In <xref linkend="example-filtering-by-entity-type" /> the first
@@ -666,7 +666,7 @@ fullTextQuery = fullTextSession
           <title>Defining pagination for a search query</title>
 
           <programlisting language="JAVA" role="JAVA">org.hibernate.Query fullTextQuery = 
-    fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+    fullTextSession.createFullTextQuery(luceneQuery, Customer.class);
 fullTextQuery.setFirstResult(15); //start from the 15th element
 fullTextQuery.setMaxResults(10); //return 10 elements</programlisting>
         </example>
@@ -721,8 +721,8 @@ List results = query.list();
           query</title>
 
           <programlisting language="JAVA" role="JAVA">Criteria criteria = 
-    s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN );
-s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisting>
+    s.createCriteria(Book.class).setFetchMode("authors", FetchMode.JOIN);
+s.createFullTextQuery(luceneQuery).setCriteriaQuery(criteria);</programlisting>
         </example>
 
         <para>In this example, the query will return all Books matching the
@@ -763,8 +763,8 @@ s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</programlisti
           object</title>
 
           <programlisting language="JAVA" role="JAVA">org.hibernate.search.FullTextQuery query = 
-    s.createFullTextQuery( luceneQuery, Book.class );
-query.<emphasis role="bold">setProjection( "id", "summary", "body", "mainAuthor.name" )</emphasis>;
+    s.createFullTextQuery(luceneQuery, Book.class);
+query.<emphasis role="bold">setProjection("id", "summary", "body", "mainAuthor.name")</emphasis>;
 List results = query.list();
 Object[] firstResult = (Object[]) results.get(0);
 Integer id = firstResult[0];
@@ -820,7 +820,7 @@ String authorName = firstResult[3];</programlisting>
           <title>Using projection in order to retrieve meta data</title>
 
           <programlisting language="JAVA" role="JAVA">org.hibernate.search.FullTextQuery query = 
-    s.createFullTextQuery( luceneQuery, Book.class );
+    s.createFullTextQuery(luceneQuery, Book.class);
 query.<emphasis role="bold">setProjection( 
     FullTextQuery.SCORE, 
     FullTextQuery.THIS, 
@@ -1205,12 +1205,12 @@ if ( query.hasPartialResults() ) {
         <title>Determining the result size of a query</title>
 
         <programlisting language="JAVA" role="JAVA">org.hibernate.search.FullTextQuery query = 
-    s.createFullTextQuery( luceneQuery, Book.class );
+    s.createFullTextQuery(luceneQuery, Book.class);
 //return the number of matching books without loading a single one
 assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; 
 
 org.hibernate.search.FullTextQuery query = 
-    s.createFullTextQuery( luceneQuery, Book.class );
+    s.createFullTextQuery(luceneQuery, Book.class);
 query.setMaxResult(10);
 List results = query.list();
 //return the total number of matching books regardless of pagination
@@ -1237,8 +1237,8 @@ assert 3245 == <emphasis role="bold">query.getResultSize()</emphasis>; </program
         <title>Using ResultTransformer in conjunction with projections</title>
 
         <programlisting language="JAVA" role="JAVA">org.hibernate.search.FullTextQuery query = 
-    s.createFullTextQuery( luceneQuery, Book.class );
-query.setProjection( "title", "mainAuthor.name" );
+    s.createFullTextQuery(luceneQuery, Book.class);
+query.setProjection("title", "mainAuthor.name");
 
 <emphasis role="bold">query.setResultTransformer( 
     new StaticAliasToBeanResultTransformer( 
@@ -1247,8 +1247,8 @@ query.setProjection( "title", "mainAuthor.name" );
         "author" ) 
 );</emphasis>
 List&lt;BookView&gt; results = (List&lt;BookView&gt;) query.list();
-for(BookView view : results) {
-    log.info( "Book: " + view.getTitle() + ", " + view.getAuthor() );
+for (BookView view : results) {
+    log.info("Book: " + view.getTitle() + ", " + view.getAuthor());
 }</programlisting>
       </example>
 
@@ -1350,9 +1350,9 @@ for (Object[] result : results) {
     <example>
       <title>Enabling fulltext filters for a given query</title>
 
-      <programlisting language="JAVA" role="JAVA">fullTextQuery = s.createFullTextQuery( query, Driver.class );
+      <programlisting language="JAVA" role="JAVA">fullTextQuery = s.createFullTextQuery(query, Driver.class);
 fullTextQuery.enableFullTextFilter("bestDriver");
-fullTextQuery.enableFullTextFilter("security").setParameter( "login", "andre" );
+fullTextQuery.enableFullTextFilter("security").setParameter("login", "andre");
 fullTextQuery.list(); //returns only best drivers where andre has credentials</programlisting>
     </example>
 
@@ -1434,8 +1434,8 @@ public class BestDriversFilterFactory {
     <example>
       <title>Passing parameters to a defined filter</title>
 
-      <programlisting language="JAVA" role="JAVA">fullTextQuery = s.createFullTextQuery( query, Driver.class );
-fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParameter( "level", 5 )</emphasis>;</programlisting>
+      <programlisting language="JAVA" role="JAVA">fullTextQuery = s.createFullTextQuery(query, Driver.class);
+fullTextQuery.enableFullTextFilter("security")<emphasis role="bold">.setParameter("level", 5)</emphasis>;</programlisting>
     </example>
 
     <para>Each parameter name should have an associated setter on either the
@@ -1804,15 +1804,15 @@ public class Cd {
 
           <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
     .buildQueryBuilder()
-        .forEntity( Cd.class )
+        .forEntity(Cd.class)
             .get();
 FacetingRequest labelFacetingRequest = builder.facet()
-    .name( "labelFaceting" )
-    .onField( "label")
+    .name("labelFaceting")
+    .onField("label")
     .discrete()
-    .orderedBy( FacetSortOrder.COUNT_DESC )
-    .includeZeroCounts( false )
-    .maxFacetCount( 1 )
+    .orderedBy(FacetSortOrder.COUNT_DESC)
+    .includeZeroCounts(false)
+    .maxFacetCount(1)
     .createFacetingRequest();</programlisting>
         </example>
 
@@ -1878,15 +1878,15 @@ private int price;
 
           <programlisting language="JAVA" role="JAVA">QueryBuilder builder = fullTextSession.getSearchFactory()
     .buildQueryBuilder()
-        .forEntity( Cd.class )
+        .forEntity(Cd.class)
             .get();
 FacetingRequest priceFacetingRequest = builder.facet()
-    .name( "priceFaceting" )
-    .onField( "price_facet" )
+    .name("priceFaceting")
+    .onField("price_facet")
     .range()
-    .below( 1000 )
-    .from( 1001 ).to( 1500 )
-    .above( 1500 ).excludeLimit()
+    .below(1000)
+    .from(1001).to(1500)
+    .above(1500).excludeLimit()
     .createFacetingRequest();</programlisting>
         </example>
       </section>
@@ -1906,18 +1906,18 @@ FacetingRequest priceFacetingRequest = builder.facet()
 
         <programlisting language="JAVA" role="JAVA">// create a fulltext query
 Query luceneQuery = builder.all().createQuery(); // match all query
-FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Cd.class );
+FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(luceneQuery, Cd.class);
 
 // retrieve facet manager and apply faceting request
 FacetManager facetManager = fullTextQuery.getFacetManager();
-facetManager.enableFaceting( priceFacetingRequest );
+facetManager.enableFaceting(priceFacetingRequest);
 
 // get the list of Cds 
 List&lt;Cd&gt; cds = fullTextQuery.list();
 ...
 
 // retrieve the faceting results
-List&lt;Facet&gt; facets = facetManager.getFacets( "priceFaceting" );
+List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
 ...</programlisting>
       </example>
 

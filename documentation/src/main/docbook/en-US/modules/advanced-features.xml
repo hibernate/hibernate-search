@@ -475,7 +475,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     }
 
     public void start() {
-        Cache cache = context.requestService( CacheServiceProvider.class );
+        Cache cache = context.requestService(CacheServiceProvider.class);
         //use cache
     }
 
@@ -485,7 +485,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
 
     public stop() {
         //stop services
-        context.releaseService( CacheServiceProvider.class );
+        context.releaseService(CacheServiceProvider.class);
     } 
 }</programlisting>
       </example>
