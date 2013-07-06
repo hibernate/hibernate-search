@@ -33,6 +33,12 @@ import org.hibernate.search.bridge.StringBridge;
  */
 public class DefaultStringBridge implements StringBridge {
 
+	public static final DefaultStringBridge INSTANCE = new DefaultStringBridge();
+
+	private DefaultStringBridge() {
+		//don't create instances
+	}
+
 	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {

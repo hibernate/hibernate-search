@@ -94,7 +94,7 @@ import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFie
  */
 public class AnnotationMetadataProvider implements MetadataProvider {
 	private static final Log log = LoggerFactory.make();
-	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = new DefaultStringBridge();
+	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = DefaultStringBridge.INSTANCE;
 	private static final String UNKNOWN_MAPPED_BY_ROLE = "";
 	private static final String EMPTY_PREFIX = "";
 

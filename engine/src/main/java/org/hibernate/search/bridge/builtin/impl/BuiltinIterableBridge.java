@@ -30,7 +30,7 @@ import org.hibernate.search.bridge.builtin.IterableBridge;
  */
 public class BuiltinIterableBridge extends IterableBridge implements StringBridge {
 
-	private static final String2FieldBridgeAdaptor DEFAULT_STRING_BRIDGE = new String2FieldBridgeAdaptor( new DefaultStringBridge() );
+	private static final String2FieldBridgeAdaptor DEFAULT_STRING_BRIDGE = new String2FieldBridgeAdaptor( DefaultStringBridge.INSTANCE );
 
 	private final StringBridge bridge;
 
