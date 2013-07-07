@@ -139,7 +139,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 		return new Class[] { Driver.class, Truck.class, Item.class };
 	}
 
-	@Entity
+	@Entity(name = "Driver")
 	@Indexed
 	public static class Driver {
 		public Driver(String firstName, String lastName) {
@@ -168,7 +168,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 		private Truck truck;
 	}
 
-	@Entity
+	@Entity(name = "Truck")
 	@Indexed
 	public static class Truck {
 		public Truck(String numberPlate) {
@@ -192,7 +192,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 		private Set<Item> items;
 	}
 
-	@Entity
+	@Entity(name = "Item")
 	@Indexed
 	public static class Item {
 		public Item(String description, Integer quantity) {

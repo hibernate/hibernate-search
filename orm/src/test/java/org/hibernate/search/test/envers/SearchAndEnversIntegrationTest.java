@@ -58,7 +58,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestCase {
 	 * for both Hibernate Search and Hibernate Envers
 	 */
 	@TestForIssue(jiraKey = "HSEARCH-1293")
-	public void testHibernateSearchAndEnversIntegration() throws Exception {
+	public void testHibernateSearchAndEnversIntegration() {
 		atRevision1();
 		atRevision2();
 		atRevision3();
