@@ -33,6 +33,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.metadata.PropertyDescriptor;
 
 /**
  * @author Hardy Ferentschik
@@ -63,6 +64,12 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	}
 
 	@Override
+	// TODO - HSEARCH-436
+	public boolean isSharded() {
+		return false;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	@Override
 	public float getStaticBoost() {
 		return classBoost;
 	}
@@ -73,8 +80,15 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	}
 
 	@Override
-	public IndexDescriptor getIndexDescriptor() {
-		return indexDescriptor;
+	// TODO - HSEARCH-436
+	public Set<IndexDescriptor> getIndexDescriptors() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	}
+
+	@Override
+	// TODO - HSEARCH-436
+	public Set<PropertyDescriptor> getIndexedProperties() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
@@ -90,6 +104,12 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	// TODO - HSEARCH-436
+	public Set<FieldDescriptor> getFieldsForProperty(String propertyName, PropertyDescriptor.AccessType... accessTypes) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override

@@ -55,7 +55,6 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.metadata.FieldDescriptor;
-import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -139,21 +138,22 @@ public class MetadataTest {
 		assertTrue( typeDescriptor.getDynamicBoost() instanceof DoublingBoost );
 	}
 
-	@Test
-	public void testIdFieldDescriptor() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Fubar.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyUnShardedIndexManager()
-		);
-
-		assertTrue( typeDescriptor.getIndexedFields().size() == 1 );
-
-		FieldDescriptor fieldDescriptor = typeDescriptor.getIndexedFields().iterator().next();
-		String fieldName = fieldDescriptor.getName();
-		assertEquals( "Wrong field name", "id", fieldName );
-		assertTrue( "This field should be the id field", fieldDescriptor.isId() );
-	}
+	// TODO - HSEARCH-436
+//	@Test
+//	public void testIdFieldDescriptor() {
+//		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Fubar.class );
+//		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
+//				typeMetadata,
+//				getDummyUnShardedIndexManager()
+//		);
+//
+//		assertTrue( typeDescriptor.getIndexedFields().size() == 1 );
+//
+//		FieldDescriptor fieldDescriptor = typeDescriptor.getIndexedFields().iterator().next();
+//		String fieldName = fieldDescriptor.getName();
+//		assertEquals( "Wrong field name", "id", fieldName );
+//		assertTrue( "This field should be the id field", fieldDescriptor.isId() );
+//	}
 
 	@Test
 	public void testFieldDescriptorLuceneOptions() {
@@ -237,35 +237,37 @@ public class MetadataTest {
 		assertTrue( fieldDescriptor.getFieldBridge() instanceof StringBridge );
 	}
 
-	@Test
-	public void testIndexInformation() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyUnShardedIndexManager()
-		);
+	// TODO - HSEARCH-436
+//	@Test
+//	public void testIndexInformation() {
+//		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
+//		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
+//				typeMetadata,
+//				getDummyUnShardedIndexManager()
+//		);
+//
+//		IndexDescriptor indexDescriptor = typeDescriptor.getIndexDescriptor();
+//		assertFalse( indexDescriptor.isSharded() );
+//		assertEquals( "Wrong index name", TEST_INDEX_NAMES[0], indexDescriptor.getName() );
+//	}
 
-		IndexDescriptor indexDescriptor = typeDescriptor.getIndexDescriptor();
-		assertFalse( indexDescriptor.isSharded() );
-		assertEquals( "Wrong index name", TEST_INDEX_NAMES[0], indexDescriptor.getName() );
-	}
-
-	@Test
-	public void testSharedIndexInformation() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyShardedIndexManager()
-		);
-
-		IndexDescriptor indexDescriptor = typeDescriptor.getIndexDescriptor();
-		assertTrue( indexDescriptor.isSharded() );
-		assertEquals( "Wrong index name", TEST_INDEX_NAMES[0], indexDescriptor.getName() );
-		assertTrue( indexDescriptor.getShardNames().size() == 3 );
-		for ( String indexName : TEST_INDEX_NAMES ) {
-			assertTrue( "Missing shard name " + indexName, indexDescriptor.getShardNames().contains( indexName ) );
-		}
-	}
+	// TODO - HSEARCH-436
+//	@Test
+//	public void testSharedIndexInformation() {
+//		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
+//		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
+//				typeMetadata,
+//				getDummyShardedIndexManager()
+//		);
+//
+//		IndexDescriptor indexDescriptor = typeDescriptor.getIndexDescriptor();
+//		assertTrue( indexDescriptor.isSharded() );
+//		assertEquals( "Wrong index name", TEST_INDEX_NAMES[0], indexDescriptor.getName() );
+//		assertTrue( indexDescriptor.getShardNames().size() == 3 );
+//		for ( String indexName : TEST_INDEX_NAMES ) {
+//			assertTrue( "Missing shard name " + indexName, indexDescriptor.getShardNames().contains( indexName ) );
+//		}
+//	}
 
 	private FieldDescriptor getFieldDescriptor(Class<?> clazz, String fieldName) {
 		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( clazz );

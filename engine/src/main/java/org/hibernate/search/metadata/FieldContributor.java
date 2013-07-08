@@ -21,16 +21,19 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.search.metadata;
+
+import java.util.Set;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface IndexDescriptor {
+public interface FieldContributor {
 	/**
-	 * @return the name of the Lucene index
+	 * @return a set of {@code FieldDescriptor}s for the fields contributed by this element
 	 */
-	String getName();
+	Set<FieldDescriptor> getIndexedFields();
 }
 
 

@@ -24,11 +24,6 @@
 package org.hibernate.search.metadata;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Norms;
-import org.hibernate.search.annotations.Store;
-import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.FieldBridge;
 
 /**
@@ -36,48 +31,12 @@ import org.hibernate.search.bridge.FieldBridge;
  *
  * @author Hardy Ferentschik
  */
-public interface FieldDescriptor {
-	/**
-	 * Returns the Lucene {@code Document} field name for this indexed property.
-	 *
-	 * @return Returns the field name for this index property
-	 */
-	String getName();
+public interface FieldDescriptor extends FieldSettingsDescriptor {
 
 	/**
-	 * @return {@code true} if the field is the document id, {@code false} otherwise
+	 * @return the field type for this field
 	 */
-	boolean isId();
-
-	/**
-	 * @return an {@code Index} enum instance defining whether this field is indexed
-	 */
-	Index getIndex();
-
-	/**
-	 * @return an {@code Analyze} enum instance defining the type of analyzing applied to this field
-	 */
-	Analyze getAnalyze();
-
-	/**
-	 * @return a {@code Store} enum instance defining whether the index value is stored in the index itself
-	 */
-	Store getStore();
-
-	/**
-	 * @return a {@code TermVector} enum instance defining whether and how term vectors are stored for this field
-	 */
-	TermVector getTermVector();
-
-	/**
-	 * @return a {@code Norms} enum instance defining whether and how norms are stored for this field
-	 */
-	Norms getNorms();
-
-	/**
-	 * @return the boost value for this field. 1 being the default value.
-	 */
-	float getBoost();
+	Type getFieldType();
 
 	/**
 	 * @return the string used to index {@code null} values. {@code null} in case null values are not indexed
@@ -113,4 +72,19 @@ public interface FieldDescriptor {
 	 * @return the analyzer used for this field, {@code null} if the field is not analyzed
 	 */
 	Analyzer getAnalyzer();
+
+	/**
+	 * Defines different logical field types
+	 */
+	public static enum Type {
+		/**
+		 * This field is used as the document id
+		 */
+		ID,
+
+		/**
+		 * A basic field generate by a field bridge
+		 */
+		BASIC
+	}
 }

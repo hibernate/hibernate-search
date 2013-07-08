@@ -31,6 +31,7 @@ import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.metadata.PropertyDescriptor;
 
 /**
  * Dummy descriptor for an unindexed type
@@ -49,6 +50,11 @@ public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescrip
 	}
 
 	@Override
+	public boolean isSharded() {
+		return false;
+	}
+
+	@Override
 	public float getStaticBoost() {
 		return 1;
 	}
@@ -59,8 +65,13 @@ public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescrip
 	}
 
 	@Override
-	public IndexDescriptor getIndexDescriptor() {
-		return null;
+	public Set<IndexDescriptor> getIndexDescriptors() {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public Set<PropertyDescriptor> getIndexedProperties() {
+		return Collections.emptySet();
 	}
 
 	@Override
@@ -71,6 +82,11 @@ public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescrip
 	@Override
 	public FieldDescriptor getIndexedField(String fieldName) {
 		return null;
+	}
+
+	@Override
+	public Set<FieldDescriptor> getFieldsForProperty(String propertyName, PropertyDescriptor.AccessType... accessTypes) {
+		return Collections.emptySet();
 	}
 }
 

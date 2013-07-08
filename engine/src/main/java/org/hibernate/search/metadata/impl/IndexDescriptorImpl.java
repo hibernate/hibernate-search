@@ -23,9 +23,6 @@
  */
 package org.hibernate.search.metadata.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexDescriptor;
 
@@ -33,40 +30,22 @@ import org.hibernate.search.metadata.IndexDescriptor;
  * @author Hardy Ferentschik
  */
 public class IndexDescriptorImpl implements IndexDescriptor {
-	private final boolean sharded;
-	private final Set<String> indexNames;
-	private final String primaryIndexName;
+	private final String indexName;
 
+	// TODO - HSEARCH-436 fix constructor arguments
 	public IndexDescriptorImpl(IndexManager[] indexManagers) {
-		primaryIndexName = indexManagers[0].getIndexName();
-		sharded = indexManagers.length > 1;
-		indexNames = new HashSet<String>();
-		for ( IndexManager indexManager : indexManagers ) {
-			indexNames.add( indexManager.getIndexName() );
-		}
+		indexName = indexManagers[0].getIndexName();
 	}
 
 	@Override
 	public String getName() {
-		return primaryIndexName;
-	}
-
-	@Override
-	public boolean isSharded() {
-		return sharded;
-	}
-
-	@Override
-	public Set<String> getShardNames() {
-		return indexNames;
+		return indexName;
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "IndexDescriptorImpl{" );
-		sb.append( "sharded=" ).append( sharded );
-		sb.append( ", indexNames=" ).append( indexNames );
-		sb.append( ", primaryIndexName='" ).append( primaryIndexName ).append( '\'' );
+		sb.append( "indexName='" ).append( indexName ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
 	}

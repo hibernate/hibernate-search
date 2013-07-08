@@ -74,9 +74,10 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		return name;
 	}
 
+	// TODO - HSEARCH-436
 	@Override
-	public boolean isId() {
-		return isId;
+	public Type getFieldType() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override

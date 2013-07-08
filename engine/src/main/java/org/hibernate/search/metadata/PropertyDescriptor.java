@@ -26,11 +26,33 @@ package org.hibernate.search.metadata;
 /**
  * @author Hardy Ferentschik
  */
-public interface IndexDescriptor {
+public interface PropertyDescriptor extends FieldContributor {
 	/**
-	 * @return the name of the Lucene index
+	 * Name of the property.
+	 *
+	 * @return name of the property
 	 */
-	String getName();
+	String getPropertyName();
+
+	/*
+	 * @return the type with which the property will be accessed
+	 */
+	AccessType getPropertyAccess();
+
+	/**
+	 * Enum defining how a property is accessed
+	 */
+	public static enum AccessType {
+		/**
+		 * Access via the field instance
+		 */
+		FIELD,
+
+		/**
+		 * Access via the property getter
+		 */
+		METHOD
+	}
 }
 
 
