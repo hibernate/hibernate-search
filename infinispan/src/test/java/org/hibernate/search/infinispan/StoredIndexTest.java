@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.infinispan;
 
+import java.io.File;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -31,6 +32,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.util.impl.FileHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -177,6 +179,18 @@ public class StoredIndexTest {
 	@AfterClass
 	public static void shutdownConnectionPool() {
 		ClusterSharedConnectionProvider.realStop();
+	}
+
+	/**
+	 * The test configuration for Infinispan is setup to offload indexes in java.io.tmpdir:
+	 * clean them up. This is particularly important when changing Infinispan versions
+	 * as the binary format is not necessarily compatible across releases.
+	 */
+	@AfterClass
+	public static void removeFileSystemStoredIndexes() {
+		String tmpDir = System.getProperty( "java.io.tmpdir" );
+		FileHelper.delete( new File( tmpDir, "LuceneIndexesData" ) );
+		FileHelper.delete( new File( tmpDir, "LuceneIndexesMetaData" ) );
 	}
 
 }
