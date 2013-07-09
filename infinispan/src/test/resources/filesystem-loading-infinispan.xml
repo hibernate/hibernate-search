@@ -52,7 +52,7 @@
       <loader
         class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" purgeOnStartup="false">
         <properties>
-          <property name="location" value="${java.io.tmpdir}" />
+          <property name="location" value="${project.build.directory}" />
         </properties>
       </loader>
     </loaders>
@@ -64,7 +64,7 @@
       <loader
         class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" purgeOnStartup="false">
         <properties>
-          <property name="location" value="${java.io.tmpdir}" />
+          <property name="location" value="${project.build.directory}" />
         </properties>
       </loader>
     </loaders>

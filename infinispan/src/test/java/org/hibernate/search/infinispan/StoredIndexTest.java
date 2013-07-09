@@ -31,6 +31,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.util.impl.FileHelper;
 import org.junit.AfterClass;
@@ -188,9 +189,9 @@ public class StoredIndexTest {
 	 */
 	@AfterClass
 	public static void removeFileSystemStoredIndexes() {
-		String tmpDir = System.getProperty( "java.io.tmpdir" );
-		FileHelper.delete( new File( tmpDir, "LuceneIndexesData" ) );
-		FileHelper.delete( new File( tmpDir, "LuceneIndexesMetaData" ) );
+		File targetDir = TestConstants.getTargetDir( StoredIndexTest.class );
+		FileHelper.delete( new File( targetDir, "LuceneIndexesData" ) );
+		FileHelper.delete( new File( targetDir, "LuceneIndexesMetaData" ) );
 	}
 
 }
