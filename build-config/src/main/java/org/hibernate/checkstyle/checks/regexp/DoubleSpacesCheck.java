@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package com.puppycrawl.tools.checkstyle.checks.regexp;
+package org.hibernate.checkstyle.checks.regexp;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -34,7 +34,7 @@ import com.puppycrawl.tools.checkstyle.api.FileContents;
 /**
  * Check if the code contains two consecutive whitespace characters.
  * <p>
- * This check considers a whitespace chararcters only the one generated with the space bar button.
+ * This check considers a whitespace characters only the one generated with the space bar button.
  * All the other whitespace characters are not included ( example: \t\n\x0B\f\r).
  *
  * @author Davide D'Alto <davide@hibernate.org>
@@ -67,8 +67,7 @@ public class DoubleSpacesCheck extends Check {
 	/**
 	 * Process a set of lines looking for matches.
 	 *
-	 * @param aLines
-	 *            the lines to process.
+	 * @param aLines the lines to process.
 	 */
 	public void processLines(List<String> aLines) {
 		int lineno = 0;
@@ -112,8 +111,7 @@ public class DoubleSpacesCheck extends Check {
 	/**
 	 * Whether or not comments should be checked.
 	 *
-	 * @param ignoreComments
-	 *            if true, comments won't be checked
+	 * @param ignoreComments if true, comments won't be checked
 	 */
 	public void setIgnoreComments(boolean ignoreComments) {
 		if ( ignoreComments ) {
@@ -127,8 +125,7 @@ public class DoubleSpacesCheck extends Check {
 	/**
 	 * Whether or not {@link String} content should be checked.
 	 *
-	 * @param ignoreStrings
-	 *            if true, double spaces inside a String won't be checked
+	 * @param ignoreStrings if true, double spaces inside a String won't be checked
 	 */
 	public void setIgnoreStrings(boolean ignoreStrings) {
 		if ( ignoreStrings ) {
@@ -138,5 +135,4 @@ public class DoubleSpacesCheck extends Check {
 			suppressors.add( NeverSuppress.INSTANCE );
 		}
 	}
-
 }

@@ -18,12 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package com.puppycrawl.tools.checkstyle.checks.regexp;
+package org.hibernate.checkstyle.checks.regexp;
 
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 
 /**
- * {@link MatchSuppressor} used to suppress a violation if it happens inside a {@link String}.
+ * {@link com.puppycrawl.tools.checkstyle.checks.regexp.MatchSuppressor} used to suppress a violation if it happens inside a {@link String}.
  *
  * @author Davide D'Alto <davide@hibernate.org>
  */
