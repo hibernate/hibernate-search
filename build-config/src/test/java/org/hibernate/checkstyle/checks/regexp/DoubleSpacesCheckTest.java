@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package com.puppycrawl.tools.checkstyle.checks.regexp;
+package org.hibernate.checkstyle.checks.regexp;
 
 import java.io.File;
 import java.util.ArrayList;
