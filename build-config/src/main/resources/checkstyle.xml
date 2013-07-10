@@ -125,7 +125,7 @@
             <property name="option" value="space" />
         </module>
 
-        <module name="DoubleSpaces">
+        <module name="org.hibernate.checkstyle.checks.regexp.DoubleSpaces">
             <property name="ignoreComments" value="true" />
             <property name="ignoreStrings" value="true" />
         </module>
