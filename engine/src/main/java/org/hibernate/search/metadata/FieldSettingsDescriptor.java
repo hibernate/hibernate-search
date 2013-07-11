@@ -31,7 +31,9 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 
 /**
- * Metadata related to a single indexed field focusing on the Lucene field settings.
+ * Metadata related to a single Lucene Document field and its options. Some of the values in this interface do not have
+ * a direct counterpart in the Lucene works, but are an abstraction of Hibernate Search and mapped to the appropriate Lucene
+ * construct.
  *
  * @author Hardy Ferentschik
  */
@@ -72,4 +74,19 @@ public interface FieldSettingsDescriptor {
 	 * @return the boost value for this field. 1 being the default value.
 	 */
 	float getBoost();
+
+	/**
+	 * @return the numeric precision step in case this field is indexed as a numeric value. If the field is not numeric
+	 *         {@code null} is returned.
+	 */
+	Integer precisionStep();
+
+	/**
+	 * @return {@code true} if this field is indexed as numeric field, {@code false} otherwise
+	 *
+	 * @see #precisionStep()
+	 */
+	boolean isNumeric();
 }
+
+

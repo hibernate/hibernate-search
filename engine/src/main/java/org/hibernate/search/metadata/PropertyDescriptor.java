@@ -32,27 +32,9 @@ public interface PropertyDescriptor extends FieldContributor {
 	 *
 	 * @return name of the property
 	 */
-	String getPropertyName();
+	String getName();
 
-	/*
-	 * @return the type with which the property will be accessed
-	 */
-	AccessType getPropertyAccess();
 
-	/**
-	 * Enum defining how a property is accessed
-	 */
-	public static enum AccessType {
-		/**
-		 * Access via the field instance
-		 */
-		FIELD,
-
-		/**
-		 * Access via the property getter
-		 */
-		METHOD
-	}
 }
 
 

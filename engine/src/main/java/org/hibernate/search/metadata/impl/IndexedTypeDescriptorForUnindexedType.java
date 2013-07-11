@@ -39,9 +39,15 @@ import org.hibernate.search.metadata.PropertyDescriptor;
  * @author Hardy Ferentschik
  */
 public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescriptor {
-	public static final IndexedTypeDescriptor INSTANCE = new IndexedTypeDescriptorForUnindexedType();
+	private final Class<?> type;
 
-	private IndexedTypeDescriptorForUnindexedType() {
+	public IndexedTypeDescriptorForUnindexedType(Class<?> type) {
+		this.type = type;
+	}
+
+	@Override
+	public Class<?> getType() {
+		return type;
 	}
 
 	@Override
@@ -85,8 +91,16 @@ public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescrip
 	}
 
 	@Override
-	public Set<FieldDescriptor> getFieldsForProperty(String propertyName, PropertyDescriptor.AccessType... accessTypes) {
+	public Set<FieldDescriptor> getFieldsForProperty(String propertyName) {
 		return Collections.emptySet();
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "IndexedTypeDescriptorForUnindexedType{" );
+		sb.append( "type=" ).append( type );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
 

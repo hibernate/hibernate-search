@@ -23,30 +23,56 @@
  */
 package org.hibernate.search.metadata.impl;
 
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.metadata.IndexDescriptor;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.hibernate.search.metadata.FieldDescriptor;
+import org.hibernate.search.metadata.PropertyDescriptor;
 
 /**
  * @author Hardy Ferentschik
  */
-public class IndexDescriptorImpl implements IndexDescriptor {
-	private final String indexName;
+public class PropertyDescriptorImpl implements PropertyDescriptor {
+	private final String name;
+	private final Set<FieldDescriptor> fieldDescriptors;
 
-	public IndexDescriptorImpl(IndexManager indexManager) {
-		indexName = indexManager.getIndexName();
+	public PropertyDescriptorImpl(String name, Set<FieldDescriptor> fieldDescriptors) {
+		this.name = name;
+		this.fieldDescriptors = Collections.unmodifiableSet( new HashSet<FieldDescriptor>( fieldDescriptors ) );
 	}
 
 	@Override
 	public String getName() {
-		return indexName;
+		return name;
 	}
 
 	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder( "IndexDescriptorImpl{" );
-		sb.append( "indexName='" ).append( indexName ).append( '\'' );
-		sb.append( '}' );
-		return sb.toString();
+	public Set<FieldDescriptor> getIndexedFields() {
+		return fieldDescriptors;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		PropertyDescriptorImpl that = (PropertyDescriptorImpl) o;
+
+		if ( !name.equals( that.name ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return name.hashCode();
 	}
 }
 

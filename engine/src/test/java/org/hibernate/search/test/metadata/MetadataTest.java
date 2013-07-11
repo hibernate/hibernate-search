@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.test.metadata;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -55,11 +57,14 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.metadata.FieldDescriptor;
+import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.metadata.PropertyDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.test.util.FooAnalyzer;
 import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,8 +77,15 @@ import static junit.framework.Assert.assertTrue;
 /**
  * @author Hardy Ferentschik
  */
+@TestForIssue(jiraKey = "HSEARCH-436")
 public class MetadataTest {
-	private static final String[] TEST_INDEX_NAMES = new String[] { "index-0", "index-1", "index-2" };
+	private static final List<String> TEST_INDEX_NAMES = new ArrayList<String>();
+
+	static {
+		TEST_INDEX_NAMES.add( "index-0" );
+		TEST_INDEX_NAMES.add( "index-0" );
+		TEST_INDEX_NAMES.add( "index-0" );
+	}
 
 	private AnnotationMetadataProvider metadataProvider;
 
@@ -85,86 +97,50 @@ public class MetadataTest {
 
 	@Test
 	public void testIsIndexed() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyUnShardedIndexManager()
-		);
-
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( Foo.class );
+		assertEquals( "Wrong indexed type", Foo.class, typeDescriptor.getType() );
 		assertTrue( typeDescriptor.isIndexed() );
 	}
 
 	@Test
 	public void testDefaultStaticBoost() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyUnShardedIndexManager()
-		);
-
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( Foo.class );
 		assertEquals( "The default boost should be 1.0f", 1.0f, typeDescriptor.getStaticBoost() );
 	}
 
 	@Test
 	public void testExplicitStaticBoost() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Fubar.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyUnShardedIndexManager()
-		);
-
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( Fubar.class );
 		assertEquals( "The default boost should be 42.0f", 42.0f, typeDescriptor.getStaticBoost() );
 	}
 
 	@Test
 	public void testDefaultDynamicBoost() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyUnShardedIndexManager()
-		);
-
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( Foo.class );
 		assertTrue( typeDescriptor.getDynamicBoost() instanceof DefaultBoostStrategy );
 	}
 
 	@Test
 	public void testExplicitDynamicBoost() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Fubar.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyUnShardedIndexManager()
-		);
-
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( Fubar.class );
 		assertTrue( typeDescriptor.getDynamicBoost() instanceof DoublingBoost );
 	}
 
-	// TODO - HSEARCH-436
-//	@Test
-//	public void testIdFieldDescriptor() {
-//		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Fubar.class );
-//		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-//				typeMetadata,
-//				getDummyUnShardedIndexManager()
-//		);
-//
-//		assertTrue( typeDescriptor.getIndexedFields().size() == 1 );
-//
-//		FieldDescriptor fieldDescriptor = typeDescriptor.getIndexedFields().iterator().next();
-//		String fieldName = fieldDescriptor.getName();
-//		assertEquals( "Wrong field name", "id", fieldName );
-//		assertTrue( "This field should be the id field", fieldDescriptor.isId() );
-//	}
+	@Test
+	public void testIdFieldDescriptor() {
+		FieldDescriptor fieldDescriptor = getFieldDescriptor( Fubar.class, "id" );
+		String fieldName = fieldDescriptor.getName();
+		assertEquals( "Wrong field name", "id", fieldName );
+		assertTrue(
+				"This field should be the id field",
+				fieldDescriptor.getFieldType().equals( FieldDescriptor.Type.ID )
+		);
+	}
 
 	@Test
 	public void testFieldDescriptorLuceneOptions() {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Snafu.class );
-		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-				typeMetadata,
-				getDummyUnShardedIndexManager()
-		);
-
 		String fieldName = "my-snafu";
-		FieldDescriptor fieldDescriptor = typeDescriptor.getIndexedField( fieldName );
+		FieldDescriptor fieldDescriptor = getFieldDescriptor( Snafu.class, fieldName );
 
 		assertEquals( "Wrong field name", fieldName, fieldDescriptor.getName() );
 		assertEquals( Index.NO, fieldDescriptor.getIndex() );
@@ -237,51 +213,76 @@ public class MetadataTest {
 		assertTrue( fieldDescriptor.getFieldBridge() instanceof StringBridge );
 	}
 
-	// TODO - HSEARCH-436
-//	@Test
-//	public void testIndexInformation() {
-//		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
-//		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-//				typeMetadata,
-//				getDummyUnShardedIndexManager()
-//		);
-//
-//		IndexDescriptor indexDescriptor = typeDescriptor.getIndexDescriptor();
-//		assertFalse( indexDescriptor.isSharded() );
-//		assertEquals( "Wrong index name", TEST_INDEX_NAMES[0], indexDescriptor.getName() );
-//	}
+	@Test
+	public void testIndexInformation() {
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( Foo.class );
 
-	// TODO - HSEARCH-436
-//	@Test
-//	public void testSharedIndexInformation() {
-//		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
-//		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
-//				typeMetadata,
-//				getDummyShardedIndexManager()
-//		);
-//
-//		IndexDescriptor indexDescriptor = typeDescriptor.getIndexDescriptor();
-//		assertTrue( indexDescriptor.isSharded() );
-//		assertEquals( "Wrong index name", TEST_INDEX_NAMES[0], indexDescriptor.getName() );
-//		assertTrue( indexDescriptor.getShardNames().size() == 3 );
-//		for ( String indexName : TEST_INDEX_NAMES ) {
-//			assertTrue( "Missing shard name " + indexName, indexDescriptor.getShardNames().contains( indexName ) );
-//		}
-//	}
+		Set<IndexDescriptor> indexDescriptors = typeDescriptor.getIndexDescriptors();
+		assertEquals( "Wrong index name", TEST_INDEX_NAMES.get( 0 ), indexDescriptors.iterator().next().getName() );
+	}
 
-	private FieldDescriptor getFieldDescriptor(Class<?> clazz, String fieldName) {
-		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( clazz );
+	@Test
+	public void testSharedIndexInformation() {
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( Foo.class );
 		IndexedTypeDescriptor typeDescriptor = new IndexedTypeDescriptorImpl(
+				typeMetadata,
+				getDummyShardedIndexManager()
+		);
+		assertTrue( typeDescriptor.isSharded() );
+
+		Set<IndexDescriptor> indexDescriptors = typeDescriptor.getIndexDescriptors();
+		assertTrue( indexDescriptors.size() == 3 );
+		for ( IndexDescriptor indexDescriptor : indexDescriptors ) {
+			String shardName = indexDescriptor.getName();
+			assertTrue( "Missing shard name: " + shardName, TEST_INDEX_NAMES.contains( indexDescriptor.getName() ) );
+		}
+	}
+
+	@Test
+	public void testFieldAnnotationOnFieldAndGetterCreatesTwoFieldDescriptors() {
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( Susfu.class );
+
+		Set<FieldDescriptor> fieldDescriptors = typeDescriptor.getFieldsForProperty( "susfu" );
+		assertEquals( "There should be two field descriptors", 2, fieldDescriptors.size() );
+	}
+
+	@Test
+	public void testRetrievingPropertyDescriptors() {
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( Snafu.class );
+
+		Set<PropertyDescriptor> propertyDescriptors = typeDescriptor.getIndexedProperties();
+		assertEquals( "There should be 5 properties defined in Snafu", 5, propertyDescriptors.size() );
+		Set<String> expectedPropertyNames = new HashSet<String>();
+		expectedPropertyNames.add( "id" );
+		expectedPropertyNames.add( "snafu" );
+		expectedPropertyNames.add( "numericField" );
+		expectedPropertyNames.add( "nullValue" );
+		expectedPropertyNames.add( "custom" );
+
+		for ( PropertyDescriptor propertyDescriptor : propertyDescriptors ) {
+			assertTrue(
+					"Unexpected property name: " + propertyDescriptor.getName(),
+					expectedPropertyNames.contains( propertyDescriptor.getName() )
+			);
+		}
+	}
+
+	private IndexedTypeDescriptor getTypeDescriptor(Class<?> clazz) {
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( clazz );
+		return new IndexedTypeDescriptorImpl(
 				typeMetadata,
 				getDummyUnShardedIndexManager()
 		);
+	}
 
+	private FieldDescriptor getFieldDescriptor(Class<?> clazz, String fieldName) {
+		IndexedTypeDescriptor typeDescriptor = getTypeDescriptor( clazz );
 		return typeDescriptor.getIndexedField( fieldName );
 	}
 
 	private IndexManager[] getDummyUnShardedIndexManager() {
 		IndexManager[] managers = new IndexManager[1];
-		managers[0] = new DummyIndexManager( TEST_INDEX_NAMES[0] );
+		managers[0] = new DummyIndexManager( TEST_INDEX_NAMES.get( 0 ) );
 		return managers;
 	}
 
@@ -333,6 +334,19 @@ public class MetadataTest {
 		@Field
 		@org.hibernate.search.annotations.Analyzer(impl = FooAnalyzer.class)
 		private String custom;
+	}
+
+	public static class Susfu {
+		@DocumentId
+		private long id;
+
+		@Field
+		private String susfu;
+
+		@Field
+		public String getSusfu() {
+			return susfu;
+		}
 	}
 
 	public static class DoublingBoost implements BoostStrategy {

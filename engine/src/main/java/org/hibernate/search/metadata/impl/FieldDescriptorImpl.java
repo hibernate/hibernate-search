@@ -40,7 +40,6 @@ import org.hibernate.search.metadata.FieldDescriptor;
  */
 public class FieldDescriptorImpl implements FieldDescriptor {
 	private final String name;
-	private final boolean isId;
 	private final Index index;
 	private final Analyze analyze;
 	private final Store store;
@@ -52,10 +51,10 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 	private final FieldBridge fieldBridge;
 	private final boolean numeric;
 	private final Integer precisionStep;
+	private final Type fieldType;
 
 	public FieldDescriptorImpl(DocumentFieldMetadata documentFieldMetadata) {
 		this.name = documentFieldMetadata.getName();
-		this.isId = documentFieldMetadata.isId();
 		this.index = determineIndexType( documentFieldMetadata.getIndex() );
 		this.analyze = determineAnalyzeType( documentFieldMetadata.getIndex() );
 		this.store = documentFieldMetadata.getStore();
@@ -67,6 +66,7 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		this.fieldBridge = documentFieldMetadata.getFieldBridge();
 		this.numeric = documentFieldMetadata.isNumeric();
 		this.precisionStep = documentFieldMetadata.isNumeric() ? documentFieldMetadata.getPrecisionStep() : null;
+		this.fieldType = determineFieldType( documentFieldMetadata );
 	}
 
 	@Override
@@ -74,10 +74,9 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		return name;
 	}
 
-	// TODO - HSEARCH-436
 	@Override
 	public Type getFieldType() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return fieldType;
 	}
 
 	@Override
@@ -144,7 +143,6 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "FieldDescriptorImpl{" );
 		sb.append( "name='" ).append( name ).append( '\'' );
-		sb.append( ", isId=" ).append( isId );
 		sb.append( ", index=" ).append( index );
 		sb.append( ", analyze=" ).append( analyze );
 		sb.append( ", store=" ).append( store );
@@ -156,8 +154,18 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		sb.append( ", fieldBridge=" ).append( fieldBridge );
 		sb.append( ", numeric=" ).append( numeric );
 		sb.append( ", precisionStep=" ).append( precisionStep );
+		sb.append( ", fieldType=" ).append( fieldType );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	private Type determineFieldType(DocumentFieldMetadata documentFieldMetadata) {
+		if ( documentFieldMetadata.isId() ) {
+			return Type.ID;
+		}
+		else {
+			return Type.BASIC;
+		}
 	}
 
 	private Index determineIndexType(Field.Index index) {
