@@ -23,28 +23,14 @@
  */
 package org.hibernate.search.metadata;
 
-import java.util.Set;
-
 /**
  * @author Hardy Ferentschik
  */
 public interface IndexDescriptor {
 	/**
-	 * @return the name of the Lucene index (unless it is sharded in which case {@link #getShardNames()} should be used. In the case of
-	 *         a sharded this method will return an arbitrary valid index name from the set of shard index names.
+	 * @return the name of the Lucene index
 	 */
 	String getName();
-
-	/**
-	 * @return {@code true} is this index is sharded, {@code false} otherwise
-	 */
-	boolean isSharded();
-
-	/**
-	 * @return the set of index names for a sharded index. In case the index is not sharded the set will just contain the
-	 *         single index name. See {@link #getName()}.
-	 */
-	Set<String> getShardNames();
 }
 
 

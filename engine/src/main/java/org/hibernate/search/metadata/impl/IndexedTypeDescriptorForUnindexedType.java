@@ -31,6 +31,7 @@ import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.metadata.PropertyDescriptor;
 
 /**
  * Dummy descriptor for an unindexed type
@@ -38,13 +39,24 @@ import org.hibernate.search.metadata.IndexedTypeDescriptor;
  * @author Hardy Ferentschik
  */
 public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescriptor {
-	public static final IndexedTypeDescriptor INSTANCE = new IndexedTypeDescriptorForUnindexedType();
+	private final Class<?> type;
 
-	private IndexedTypeDescriptorForUnindexedType() {
+	public IndexedTypeDescriptorForUnindexedType(Class<?> type) {
+		this.type = type;
+	}
+
+	@Override
+	public Class<?> getType() {
+		return type;
 	}
 
 	@Override
 	public boolean isIndexed() {
+		return false;
+	}
+
+	@Override
+	public boolean isSharded() {
 		return false;
 	}
 
@@ -59,8 +71,13 @@ public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescrip
 	}
 
 	@Override
-	public IndexDescriptor getIndexDescriptor() {
-		return null;
+	public Set<IndexDescriptor> getIndexDescriptors() {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public Set<PropertyDescriptor> getIndexedProperties() {
+		return Collections.emptySet();
 	}
 
 	@Override
@@ -71,6 +88,19 @@ public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescrip
 	@Override
 	public FieldDescriptor getIndexedField(String fieldName) {
 		return null;
+	}
+
+	@Override
+	public Set<FieldDescriptor> getFieldsForProperty(String propertyName) {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "IndexedTypeDescriptorForUnindexedType{" );
+		sb.append( "type=" ).append( type );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
 

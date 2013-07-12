@@ -448,7 +448,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			EntityIndexBinding indexBinder = indexBindingForEntities.get( entityType );
 			IndexedTypeDescriptor indexedTypeDescriptor;
 			if ( indexBinder == null ) {
-				indexedTypeDescriptor = IndexedTypeDescriptorForUnindexedType.INSTANCE;
+				indexedTypeDescriptor = new IndexedTypeDescriptorForUnindexedType(entityType);
 			}
 			else {
 				indexedTypeDescriptor = new IndexedTypeDescriptorImpl(

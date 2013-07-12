@@ -58,6 +58,11 @@ public class TypeMetadata {
 	private static final Log log = LoggerFactory.make();
 
 	/**
+	 * The type for this metadata
+	 */
+	private final Class<?> indexedType;
+
+	/**
 	 * The class boost for this type (class level @Boost)
 	 */
 	private final float boost;
@@ -86,7 +91,7 @@ public class TypeMetadata {
 	/**
 	 * Metadata for a document field keyed against the field name
 	 */
-	private final Map<String, DocumentFieldMetadata> documentFieldNameFieldMetadata;
+	private final Map<String, DocumentFieldMetadata> documentFieldNameToFieldMetadata;
 
 	/**
 	 * Metadata for a Java property (field or getter) keyed  the property name
@@ -153,6 +158,7 @@ public class TypeMetadata {
 	private final Set<XClass> optimizationBlackList;
 
 	protected TypeMetadata(Builder builder) {
+		this.indexedType = builder.indexedType;
 		this.boost = builder.boost;
 		this.scopedAnalyzer = builder.scopedAnalyzer;
 		this.scopedAnalyzer.setGlobalAnalyzer( builder.analyzer );
@@ -170,8 +176,12 @@ public class TypeMetadata {
 		this.classBridgeFields = Collections.unmodifiableSet( builder.classBridgeFields );
 		this.propertyMetadataSet = Collections.unmodifiableSet( builder.propertyMetadataList );
 		this.propertyGetterNameToPropertyMetadata = keyPropertyMetadata( builder.propertyMetadataList );
-		this.documentFieldNameFieldMetadata = keyFieldMetadata( builder.propertyMetadataList );
+		this.documentFieldNameToFieldMetadata = keyFieldMetadata( builder.propertyMetadataList );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
+	}
+
+	public Class<?> getType() {
+		return indexedType;
 	}
 
 	public Set<PropertyMetadata> getAllPropertyMetadata() {
@@ -191,11 +201,7 @@ public class TypeMetadata {
 	}
 
 	public DocumentFieldMetadata getDocumentFieldMetadataFor(String fieldName) {
-		return documentFieldNameFieldMetadata.get( fieldName );
-	}
-
-	public Set<String> getAllFieldNames() {
-		return documentFieldNameFieldMetadata.keySet();
+		return documentFieldNameToFieldMetadata.get( fieldName );
 	}
 
 	public Set<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
@@ -278,7 +284,7 @@ public class TypeMetadata {
 		sb.append( ", discriminator=" ).append( discriminator );
 		sb.append( ", discriminatorGetter=" ).append( discriminatorGetter );
 		sb.append( ", classBoostStrategy=" ).append( classBoostStrategy );
-		sb.append( ", documentFieldNameToFieldMetadata=" ).append( documentFieldNameFieldMetadata );
+		sb.append( ", documentFieldNameToFieldMetadata=" ).append( documentFieldNameToFieldMetadata );
 		sb.append( ", propertyGetterNameToFieldMetadata=" ).append( propertyGetterNameToPropertyMetadata );
 		sb.append( ", idPropertyMetadata=" ).append( idPropertyMetadata );
 		sb.append( ", classBridgeFields=" ).append( classBridgeFieldNameToDocumentFieldMetadata );

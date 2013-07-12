@@ -21,33 +21,20 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.metadata.impl;
-
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.metadata.IndexDescriptor;
+package org.hibernate.search.metadata;
 
 /**
  * @author Hardy Ferentschik
  */
-public class IndexDescriptorImpl implements IndexDescriptor {
-	private final String indexName;
+public interface PropertyDescriptor extends FieldContributor {
+	/**
+	 * Name of the property.
+	 *
+	 * @return name of the property
+	 */
+	String getName();
 
-	public IndexDescriptorImpl(IndexManager indexManager) {
-		indexName = indexManager.getIndexName();
-	}
 
-	@Override
-	public String getName() {
-		return indexName;
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder( "IndexDescriptorImpl{" );
-		sb.append( "indexName='" ).append( indexName ).append( '\'' );
-		sb.append( '}' );
-		return sb.toString();
-	}
 }
 
 

@@ -23,43 +23,81 @@
  */
 package org.hibernate.search.metadata.impl;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.metadata.PropertyDescriptor;
 
 /**
  * @author Hardy Ferentschik
  */
 public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
+	private final Class<?> indexedType;
 	private final float classBoost;
 	private final BoostStrategy boostStrategy;
-	private final Set<FieldDescriptor> fieldDescriptors;
-	private final IndexDescriptor indexDescriptor;
+	private final Map<String, PropertyDescriptor> keyedPropertyDescriptors;
+	private final Set<PropertyDescriptor> propertyDescriptors;
+	private final Set<FieldDescriptor> classBridgeFieldDescriptors;
+	private final Set<IndexDescriptor> indexDescriptors;
+	private final Map<String, FieldDescriptor> allFieldDescriptors;
+	private final boolean sharded;
 
 	public IndexedTypeDescriptorImpl(TypeMetadata typeMetadata, IndexManager[] indexManagers) {
+		this.indexedType = typeMetadata.getType();
 		this.classBoost = typeMetadata.getStaticBoost();
 		this.boostStrategy = typeMetadata.getDynamicBoost();
+		this.sharded = indexManagers.length > 1;
 
-		this.fieldDescriptors = new HashSet<FieldDescriptor>();
-		for ( String fieldName : typeMetadata.getAllFieldNames() ) {
-			DocumentFieldMetadata documentFieldMetadata = typeMetadata.getDocumentFieldMetadataFor( fieldName );
+		// create the class bridge fields
+		Set<FieldDescriptor> fieldDescriptorTmp = new HashSet<FieldDescriptor>();
+		for ( DocumentFieldMetadata documentFieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
 			FieldDescriptor fieldDescriptor = new FieldDescriptorImpl( documentFieldMetadata );
-			fieldDescriptors.add( fieldDescriptor );
+			fieldDescriptorTmp.add( fieldDescriptor );
 		}
+		this.classBridgeFieldDescriptors = Collections.unmodifiableSet( fieldDescriptorTmp );
 
-		indexDescriptor = new IndexDescriptorImpl( indexManagers );
+		// handle the property descriptor and their fields
+		this.keyedPropertyDescriptors = Collections.unmodifiableMap( createPropertyDescriptors( typeMetadata ) );
+		this.propertyDescriptors = Collections.unmodifiableSet(
+				new HashSet<PropertyDescriptor>(
+						createPropertyDescriptors( typeMetadata ).values()
+				)
+		);
+		this.allFieldDescriptors = Collections.unmodifiableMap( createAllFieldDescriptors() );
+
+		// create the index descriptors
+		Set<IndexDescriptor> indexDescriptorTmp = new HashSet<IndexDescriptor>();
+		for ( IndexManager indexManager : indexManagers ) {
+			indexDescriptorTmp.add( new IndexDescriptorImpl( indexManager ) );
+		}
+		this.indexDescriptors = Collections.unmodifiableSet( indexDescriptorTmp );
+
+	}
+
+	@Override
+	public Class<?> getType() {
+		return indexedType;
 	}
 
 	@Override
 	public boolean isIndexed() {
 		return true;
+	}
+
+	@Override
+	public boolean isSharded() {
+		return sharded;
 	}
 
 	@Override
@@ -73,34 +111,90 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	}
 
 	@Override
-	public IndexDescriptor getIndexDescriptor() {
-		return indexDescriptor;
+	public Set<IndexDescriptor> getIndexDescriptors() {
+		return indexDescriptors;
+	}
+
+	@Override
+	public Set<PropertyDescriptor> getIndexedProperties() {
+		return propertyDescriptors;
 	}
 
 	@Override
 	public Set<FieldDescriptor> getIndexedFields() {
-		return fieldDescriptors;
+		return classBridgeFieldDescriptors;
 	}
 
 	@Override
 	public FieldDescriptor getIndexedField(String fieldName) {
-		for ( FieldDescriptor fieldDescriptor : fieldDescriptors ) {
-			if ( fieldDescriptor.getName().equals( fieldName ) ) {
-				return fieldDescriptor;
-			}
+		return allFieldDescriptors.get( fieldName );
+	}
+
+	@Override
+	public Set<FieldDescriptor> getFieldsForProperty(String propertyName) {
+		if ( keyedPropertyDescriptors.containsKey( propertyName ) ) {
+			return keyedPropertyDescriptors.get( propertyName ).getIndexedFields();
 		}
-		return null;
+		else {
+			return Collections.emptySet();
+		}
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "IndexedTypeDescriptorImpl{" );
-		sb.append( "classBoost=" ).append( classBoost );
+		sb.append( "indexedType=" ).append( indexedType );
+		sb.append( ", classBoost=" ).append( classBoost );
 		sb.append( ", boostStrategy=" ).append( boostStrategy );
-		sb.append( ", fieldDescriptors=" ).append( fieldDescriptors );
-		sb.append( ", indexDescriptor=" ).append( indexDescriptor );
+		sb.append( ", keyedPropertyDescriptors=" ).append( keyedPropertyDescriptors );
+		sb.append( ", propertyDescriptors=" ).append( propertyDescriptors );
+		sb.append( ", classBridgeFieldDescriptors=" ).append( classBridgeFieldDescriptors );
+		sb.append( ", indexDescriptors=" ).append( indexDescriptors );
+		sb.append( ", allFieldDescriptors=" ).append( allFieldDescriptors );
+		sb.append( ", sharded=" ).append( sharded );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	private Map<String, PropertyDescriptor> createPropertyDescriptors(TypeMetadata typeMetadata) {
+		Map<String, PropertyDescriptor> propertyDescriptorsTmp = new HashMap<String, PropertyDescriptor>();
+		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
+			createOrMergeProperDescriptor( propertyDescriptorsTmp, propertyMetadata );
+		}
+		createOrMergeProperDescriptor( propertyDescriptorsTmp, typeMetadata.getIdPropertyMetadata() );
+		return propertyDescriptorsTmp;
+	}
+
+	private void createOrMergeProperDescriptor(Map<String, PropertyDescriptor> propertyDescriptorsTmp, PropertyMetadata propertyMetadata) {
+		String propertyName = propertyMetadata.getPropertyAccessorName();
+		Set<FieldDescriptor> tmpSet = new HashSet<FieldDescriptor>();
+		if ( propertyDescriptorsTmp.containsKey( propertyName ) ) {
+			tmpSet.addAll( propertyDescriptorsTmp.get( propertyName ).getIndexedFields() );
+		}
+
+		for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
+			FieldDescriptor fieldDescriptor = new FieldDescriptorImpl( documentFieldMetadata );
+			tmpSet.add( fieldDescriptor );
+		}
+		PropertyDescriptor propertyDescriptor = new PropertyDescriptorImpl(
+				propertyMetadata.getPropertyAccessorName(),
+				tmpSet
+		);
+
+		propertyDescriptorsTmp.put( propertyDescriptor.getName(), propertyDescriptor );
+	}
+
+	private Map<String, FieldDescriptor> createAllFieldDescriptors() {
+		Map<String, FieldDescriptor> fieldDescriptorMap = new HashMap<String, FieldDescriptor>();
+		for ( FieldDescriptor fieldDescriptor : classBridgeFieldDescriptors ) {
+			fieldDescriptorMap.put( fieldDescriptor.getName(), fieldDescriptor );
+		}
+		for ( PropertyDescriptor propertyDescriptor : propertyDescriptors ) {
+			for ( FieldDescriptor fieldDescriptor : propertyDescriptor.getIndexedFields() ) {
+				fieldDescriptorMap.put( fieldDescriptor.getName(), fieldDescriptor );
+			}
+		}
+		return fieldDescriptorMap;
 	}
 }
 
