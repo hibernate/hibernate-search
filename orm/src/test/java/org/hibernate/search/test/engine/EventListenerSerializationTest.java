@@ -41,7 +41,7 @@ public class EventListenerSerializationTest {
 
 	@Test
 	public void testEventListenerSerializable() throws IOException, ClassNotFoundException {
-		FullTextIndexEventListener eventListener = new FullTextIndexEventListener( FullTextIndexEventListener.Installation.SINGLE_INSTANCE );
+		FullTextIndexEventListener eventListener = new FullTextIndexEventListener();
 		eventListener.addSynchronization( null, null );
 
 		Object secondListener = SerializationTestHelper
