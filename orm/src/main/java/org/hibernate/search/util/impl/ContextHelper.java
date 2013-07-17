@@ -25,6 +25,7 @@ package org.hibernate.search.util.impl;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -37,7 +38,10 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
  * @author Emmanuel Bernard
  * @deprecated Use {@link org.hibernate.search.FullTextSession#getSearchFactory()} instead.
  */
-public abstract class ContextHelper {
+public class ContextHelper {
+
+	private ContextHelper() {
+	}
 
 	public static SearchFactoryImplementor getSearchFactory(Session session) {
 		return getSearchFactoryBySessionImplementor( (SessionImplementor) session );
