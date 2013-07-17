@@ -83,6 +83,8 @@ import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.spi.MassIndexerFactory;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.impl.HibernateHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.stat.SessionStatistics;
 import org.hibernate.type.Type;
 
@@ -94,6 +96,8 @@ import org.hibernate.type.Type;
  * @author Hardy Ferentschik
  */
 public class FullTextSessionImpl implements FullTextSession, SessionImplementor {
+	private static final Log log = LoggerFactory.make();
+
 	private final Session session;
 	private final SessionImplementor sessionImplementor;
 	private transient SearchFactoryImplementor searchFactory;
@@ -102,7 +106,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	public FullTextSessionImpl(org.hibernate.Session session) {
 		if ( session == null ) {
-			throw new IllegalArgumentException( "Unable to create a FullTextSession from an null Session object" );
+			throw log.getNullSessionPassedToFullTextSessionCreationException();
 		}
 		this.session = session;
 		this.transactionContext = new EventSourceTransactionContext( (EventSource) session );
