@@ -33,8 +33,7 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.Session;
-import org.hibernate.annotations.common.util.StringHelper;
-import org.hibernate.cfg.Configuration;
+
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.event.spi.AbstractCollectionEvent;
@@ -55,29 +54,20 @@ import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.Version;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.jmx.IndexControl;
-import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.impl.WeakIdentityHashMap;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.event.impl.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
-
 /**
- * This listener supports setting a parent directory for all generated index files.
- * It also supports setting the analyzer class to be used.
+ * Hibernate ORM event listener called by various ORM life cycle events. This listener must be registered in order
+ * to enable automatic index updates.
  *
  * @author Gavin King
  * @author Emmanuel Bernard
@@ -85,25 +75,20 @@ import static org.hibernate.search.event.impl.FullTextIndexEventListener.Install
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-//TODO make this class final as soon as FullTextIndexCollectionEventListener is removed.
 @SuppressWarnings("serial")
 public class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
-		PostCollectionUpdateEventListener, FlushEventListener {
+		PostCollectionUpdateEventListener, FlushEventListener,
+		Serializable {
 
 	private static final Log log = LoggerFactory.make();
-	private final Installation installation;
+	private static final String INDEXING_STRATEGY_MANUAL = "manual";
+	private static final String INDEXING_STRATEGY_EVENT = "event";
 
-	private String indexControlMBeanName;
-
-	protected boolean used;
-	protected boolean skipDirtyChecks = true;
-	protected SearchFactoryImplementor searchFactoryImplementor;
-
-	static {
-		Version.touch();
-	}
+	private boolean disabled;
+	private boolean skipDirtyChecks = true;
+	private SearchFactoryImplementor searchFactoryImplementor;
 
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
 	// transient because it's not serializable (and state doesn't need to live longer than a flush).
@@ -114,110 +99,93 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			0
 	);
 
-	public FullTextIndexEventListener(Installation installation) {
-		this.installation = installation;
-	}
-
-	/**
-	 * Initialize method called by Hibernate Core when the SessionFactory starts
-	 */
-	public void initialize(Configuration cfg) {
-		if ( installation != SINGLE_INSTANCE ) {
-			throw new SearchException( "Only Installation.SINGLE_INSTANCE is supported" );
-		}
-
-		if ( searchFactoryImplementor == null ) {
-			searchFactoryImplementor = new SearchFactoryBuilder()
-					.configuration( new SearchConfigurationFromHibernateCore( cfg ) )
-					.buildSearchFactory();
-		}
-
-		String enableJMX = cfg.getProperty( Environment.JMX_ENABLED );
-		if ( "true".equalsIgnoreCase( enableJMX ) ) {
-			enableIndexControlBean( cfg );
-		}
-
-		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
-		if ( "event".equals( indexingStrategy ) ) {
-			used = searchFactoryImplementor.getIndexBindings().size() != 0;
-		}
-		else if ( "manual".equals( indexingStrategy ) ) {
-			used = false;
-		}
-
-		log.debug( "Hibernate Search event listeners " + ( used ? "activated" : "deactivated" ) );
-
-		skipDirtyChecks = !searchFactoryImplementor.isDirtyChecksEnabled();
-		log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
-	}
-
-	private void enableIndexControlBean(Configuration cfg) {
-		// if we don't have a JNDI bound SessionFactory we cannot enable the index control bean
-		if ( StringHelper.isEmpty( cfg.getProperty( "hibernate.session_factory_name" ) ) ) {
-			log.debug(
-					"In order to bind the IndexControlMBean the Hibernate SessionFactory has to be available via JNDI"
-			);
+	@Override
+	public void onPostDelete(PostDeleteEvent event) {
+		if ( disabled ) {
 			return;
 		}
 
-		String mbeanNameSuffix = cfg.getProperty( Environment.JMX_BEAN_SUFFIX );
-		String objectName = JMXRegistrar.buildMBeanName(
-				IndexControl.INDEX_CTRL_MBEAN_OBJECT_NAME,
-				mbeanNameSuffix
-		);
+		final Object entity = event.getEntity();
+		if ( getDocumentBuilder( entity ) != null ) {
+			// FIXME The engine currently needs to know about details such as identifierRollbackEnabled
+			// but we should not move the responsibility to figure out the proper id to the engine
+			boolean identifierRollbackEnabled = event.getSession()
+					.getFactory()
+					.getSettings()
+					.isIdentifierRollbackEnabled();
+			processWork( entity, event.getId(), WorkType.DELETE, event, identifierRollbackEnabled );
+		}
+	}
 
-		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
-		if ( JMXRegistrar.isNameRegistered( objectName ) ) {
-			JMXRegistrar.unRegisterMBean( objectName );
+	@Override
+	public void onPostInsert(PostInsertEvent event) {
+		if ( disabled ) {
+			return;
 		}
 
-		IndexControl indexCtrlBean = new IndexControl( cfg.getProperties() );
-		JMXRegistrar.registerMBean( indexCtrlBean, objectName );
-		indexControlMBeanName = objectName;
+		final Object entity = event.getEntity();
+		if ( getDocumentBuilder( entity ) != null ) {
+			Serializable id = event.getId();
+			processWork( entity, id, WorkType.ADD, event, false );
+		}
+	}
+
+	@Override
+	public void onPostUpdate(PostUpdateEvent event) {
+		if ( disabled ) {
+			return;
+		}
+
+		final Object entity = event.getEntity();
+		final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
+		if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty(
+				getDirtyPropertyNames(
+						event
+				)
+		) ) ) {
+			Serializable id = event.getId();
+			processWork( entity, id, WorkType.UPDATE, event, false );
+		}
+	}
+
+	@Override
+	public void onPostRecreateCollection(PostCollectionRecreateEvent event) {
+		processCollectionEvent( event );
+	}
+
+	@Override
+	public void onPostRemoveCollection(PostCollectionRemoveEvent event) {
+		processCollectionEvent( event );
+	}
+
+	@Override
+	public void onPostUpdateCollection(PostCollectionUpdateEvent event) {
+		processCollectionEvent( event );
+	}
+
+	/**
+	 * Make sure the indexes are updated right after the hibernate flush,
+	 * avoiding object loading during a flush. Not needed during transactions.
+	 */
+	@Override
+	public void onFlush(FlushEvent event) {
+		if ( disabled ) {
+			return;
+		}
+
+		Session session = event.getSession();
+		Synchronization synchronization = flushSynch.get( session );
+		if ( synchronization != null ) {
+			//first cleanup
+			flushSynch.remove( session );
+			log.debug( "flush event causing index update out of transaction" );
+			synchronization.beforeCompletion();
+			synchronization.afterCompletion( Status.STATUS_COMMITTED );
+		}
 	}
 
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
 		return searchFactoryImplementor;
-	}
-
-	public void onPostDelete(PostDeleteEvent event) {
-		if ( used ) {
-			final Object entity = event.getEntity();
-			if ( getDocumentBuilder( entity ) != null ) {
-				// FIXME The engine currently needs to know about details such as identifierRollbackEnabled
-				// but we should not move the responsibility to figure out the proper id to the engine
-				boolean identifierRollbackEnabled = event.getSession()
-						.getFactory()
-						.getSettings()
-						.isIdentifierRollbackEnabled();
-				processWork( entity, event.getId(), WorkType.DELETE, event, identifierRollbackEnabled );
-			}
-		}
-	}
-
-	public void onPostInsert(PostInsertEvent event) {
-		if ( used ) {
-			final Object entity = event.getEntity();
-			if ( getDocumentBuilder( entity ) != null ) {
-				Serializable id = event.getId();
-				processWork( entity, id, WorkType.ADD, event, false );
-			}
-		}
-	}
-
-	public void onPostUpdate(PostUpdateEvent event) {
-		if ( used ) {
-			final Object entity = event.getEntity();
-			final AbstractDocumentBuilder docBuilder = getDocumentBuilder( entity );
-			if ( docBuilder != null && ( skipDirtyChecks || docBuilder.isDirty(
-					getDirtyPropertyNames(
-							event
-					)
-			) ) ) {
-				Serializable id = event.getId();
-				processWork( entity, id, WorkType.UPDATE, event, false );
-			}
-		}
 	}
 
 	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
@@ -237,92 +205,23 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		}
 	}
 
-	protected <T> void processWork(T entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {
-		Work<T> work = new Work<T>( entity, id, workType, identifierRollbackEnabled );
-		final EventSourceTransactionContext transactionContext = new EventSourceTransactionContext( event.getSession() );
-		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
-	}
-
-	public void cleanup() {
-		searchFactoryImplementor.close();
-		if ( indexControlMBeanName != null ) {
-			JMXRegistrar.unRegisterMBean( indexControlMBeanName );
-		}
-	}
-
-	public void onPostRecreateCollection(PostCollectionRecreateEvent event) {
-		processCollectionEvent( event );
-	}
-
-	public void onPostRemoveCollection(PostCollectionRemoveEvent event) {
-		processCollectionEvent( event );
-	}
-
-	public void onPostUpdateCollection(PostCollectionUpdateEvent event) {
-		processCollectionEvent( event );
-	}
-
-	protected void processCollectionEvent(AbstractCollectionEvent event) {
-		if ( used ) {
-			Object entity = event.getAffectedOwnerOrNull();
-			if ( entity == null ) {
-				//Hibernate cannot determine every single time the owner especially in case detached objects are involved
-				// or property-ref is used
-				//Should log really but we don't know if we're interested in this collection for indexing
-				return;
-			}
-			PersistentCollection persistentCollection = event.getCollection();
-			final String collectionRole;
-			if ( persistentCollection != null ) {
-				if ( !persistentCollection.wasInitialized() ) {
-					// non-initialized collections will still trigger events, but we want to skip them
-					// as they won't contain new values affecting the index state
-					return;
-				}
-				collectionRole = persistentCollection.getRole();
-			}
-			else {
-				collectionRole = null;
-			}
-			AbstractDocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
-
-			if ( documentBuilder != null && documentBuilder.collectionChangeRequiresIndexUpdate( collectionRole ) ) {
-				Serializable id = getId( entity, event );
-				if ( id == null ) {
-					log.idCannotBeExtracted( event.getAffectedOwnerEntityName() );
-					return;
-				}
-				processWork( entity, id, WorkType.COLLECTION, event, false );
-			}
-		}
-	}
-
-	private Serializable getId(Object entity, AbstractCollectionEvent event) {
-		Serializable id = event.getAffectedOwnerIdOrNull();
-		if ( id == null ) {
-			// most likely this recovery is unnecessary since Hibernate Core probably try that
-			EntityEntry entityEntry = event.getSession().getPersistenceContext().getEntry( entity );
-			id = entityEntry == null ? null : entityEntry.getId();
-		}
-		return id;
-	}
-
 	/**
-	 * Make sure the indexes are updated right after the hibernate flush,
-	 * avoiding object loading during a flush. Not needed during transactions.
+	 * Initialize method called by Hibernate Core when the SessionFactory starts
 	 */
-	public void onFlush(FlushEvent event) {
-		if ( used ) {
-			Session session = event.getSession();
-			Synchronization synchronization = flushSynch.get( session );
-			if ( synchronization != null ) {
-				//first cleanup
-				flushSynch.remove( session );
-				log.debug( "flush event causing index update out of transaction" );
-				synchronization.beforeCompletion();
-				synchronization.afterCompletion( Status.STATUS_COMMITTED );
-			}
+	public void initialize(SearchFactoryImplementor searchFactoryImplementor) {
+		this.searchFactoryImplementor = searchFactoryImplementor;
+		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
+		if ( INDEXING_STRATEGY_EVENT.equals( indexingStrategy ) ) {
+			disabled = searchFactoryImplementor.getIndexBindings().size() == 0;
 		}
+		else if ( INDEXING_STRATEGY_MANUAL.equals( indexingStrategy ) ) {
+			disabled = true;
+		}
+
+		log.debug( "Hibernate Search event listeners " + ( disabled ? "activated" : "deactivated" ) );
+
+		skipDirtyChecks = !searchFactoryImplementor.isDirtyChecksEnabled();
+		log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
 	}
 
 	/**
@@ -338,6 +237,59 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	 */
 	public void addSynchronization(EventSource eventSource, Synchronization synchronization) {
 		this.flushSynch.put( eventSource, synchronization );
+	}
+
+	protected <T> void processWork(T entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {
+		Work<T> work = new Work<T>( entity, id, workType, identifierRollbackEnabled );
+		final EventSourceTransactionContext transactionContext = new EventSourceTransactionContext( event.getSession() );
+		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+	}
+
+	protected void processCollectionEvent(AbstractCollectionEvent event) {
+		if ( disabled ) {
+			return;
+		}
+
+		Object entity = event.getAffectedOwnerOrNull();
+		if ( entity == null ) {
+			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
+			// or property-ref is used
+			//Should log really but we don't know if we're interested in this collection for indexing
+			return;
+		}
+		PersistentCollection persistentCollection = event.getCollection();
+		final String collectionRole;
+		if ( persistentCollection != null ) {
+			if ( !persistentCollection.wasInitialized() ) {
+				// non-initialized collections will still trigger events, but we want to skip them
+				// as they won't contain new values affecting the index state
+				return;
+			}
+			collectionRole = persistentCollection.getRole();
+		}
+		else {
+			collectionRole = null;
+		}
+		AbstractDocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
+
+		if ( documentBuilder != null && documentBuilder.collectionChangeRequiresIndexUpdate( collectionRole ) ) {
+			Serializable id = getId( entity, event );
+			if ( id == null ) {
+				log.idCannotBeExtracted( event.getAffectedOwnerEntityName() );
+				return;
+			}
+			processWork( entity, id, WorkType.COLLECTION, event, false );
+		}
+	}
+
+	private Serializable getId(Object entity, AbstractCollectionEvent event) {
+		Serializable id = event.getAffectedOwnerIdOrNull();
+		if ( id == null ) {
+			// most likely this recovery is unnecessary since Hibernate Core probably try that
+			EntityEntry entityEntry = event.getSession().getPersistenceContext().getEntry( entity );
+			id = entityEntry == null ? null : entityEntry.getId();
+		}
+		return id;
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException {
@@ -362,12 +314,12 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	 * use cases implementors might need this method. If you have to extent this, please report
 	 * your use case so that better long term solutions can be discussed.
 	 *
-	 * @param entity
+	 * @param instance the object instance for which to retrieve the document builder
 	 *
-	 * @return the DocumentBuilder for the specified entity
+	 * @return the {@code DocumentBuilder} for the specified object
 	 */
-	protected AbstractDocumentBuilder getDocumentBuilder(final Object entity) {
-		Class<?> clazz = entity.getClass();
+	protected AbstractDocumentBuilder getDocumentBuilder(final Object instance) {
+		Class<?> clazz = instance.getClass();
 		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding( clazz );
 		if ( entityIndexBinding != null ) {
 			return entityIndexBinding.getDocumentBuilder();
@@ -375,9 +327,5 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		else {
 			return searchFactoryImplementor.getDocumentBuilderContainedEntity( clazz );
 		}
-	}
-
-	public static enum Installation {
-		SINGLE_INSTANCE
 	}
 }

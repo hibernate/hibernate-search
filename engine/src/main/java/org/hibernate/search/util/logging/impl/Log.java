@@ -707,9 +707,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 177, value = "Unable to find a valid document id for entity '%1$s'")
 	SearchException noDocumentIdFoundException( String entityName );
 
-	@Message(id = 178, value = "Unable to create a FullTextSession from an null Session")
+	@Message(id = 178, value = "Unable to create a FullTextSession from a null Session")
 	IllegalArgumentException getNullSessionPassedToFullTextSessionCreationException();
 
-	@Message(id = 179, value = "Unable to create a FullTextEntityManager from an null EntityManager")
+	@Message(id = 179, value = "Unable to create a FullTextEntityManager from a null EntityManager")
 	IllegalArgumentException getNullSessionPassedToFullEntityManagerCreationException();
 }

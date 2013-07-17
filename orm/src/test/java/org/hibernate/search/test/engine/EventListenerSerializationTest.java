@@ -29,8 +29,9 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertNotNull;
 import static org.jgroups.util.Util.assertTrue;
-import static org.junit.Assert.assertNotNull;
+
 
 /**
  * Tests that the {@code FullTextIndexEventListener} is {@code Serializable}.
@@ -41,7 +42,7 @@ public class EventListenerSerializationTest {
 
 	@Test
 	public void testEventListenerSerializable() throws IOException, ClassNotFoundException {
-		FullTextIndexEventListener eventListener = new FullTextIndexEventListener( FullTextIndexEventListener.Installation.SINGLE_INSTANCE );
+		FullTextIndexEventListener eventListener = new FullTextIndexEventListener();
 		eventListener.addSynchronization( null, null );
 
 		Object secondListener = SerializationTestHelper
