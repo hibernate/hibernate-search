@@ -311,6 +311,16 @@
                 <version>4.8.2</version>
             </dependency>
             <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>2.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.unitils</groupId>
+                <artifactId>unitils-easymock</artifactId>
+                <version>3.3</version>
+            </dependency>
+            <dependency>
                 <groupId>simple-jndi</groupId>
                 <artifactId>simple-jndi</artifactId>
                 <version>0.11.4.1</version>
