@@ -21,27 +21,20 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.search.metadata;
 
 /**
+ * Metadata related to a numeric field
+ *
  * @author Hardy Ferentschik
  */
-public interface PropertyDescriptor extends FieldContributor {
-	/**
-	 * Name of the property.
-	 *
-	 * @return name of the property
-	 */
-	String getName();
+public interface NumericFieldSettingsDescriptor extends FieldSettingsDescriptor {
 
 	/**
-	 * Returns {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @return {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @see {@link org.hibernate.search.annotations.DocumentId}
+	 * @return the numeric precision step for this numeric field.
 	 */
-	boolean isId();
+	int precisionStep();
 }
 
 

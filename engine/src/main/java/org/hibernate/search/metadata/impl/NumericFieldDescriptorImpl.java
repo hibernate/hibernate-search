@@ -21,27 +21,35 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.metadata;
+
+package org.hibernate.search.metadata.impl;
+
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface PropertyDescriptor extends FieldContributor {
-	/**
-	 * Name of the property.
-	 *
-	 * @return name of the property
-	 */
-	String getName();
+public class NumericFieldDescriptorImpl extends FieldDescriptorImpl implements NumericFieldSettingsDescriptor {
+	private final int precisionStep;
 
-	/**
-	 * Returns {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @return {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @see {@link org.hibernate.search.annotations.DocumentId}
-	 */
-	boolean isId();
+	public NumericFieldDescriptorImpl(DocumentFieldMetadata documentFieldMetadata) {
+		super( documentFieldMetadata );
+		this.precisionStep = documentFieldMetadata.getPrecisionStep();
+	}
+
+	@Override
+	public int precisionStep() {
+		return precisionStep;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "NumericFieldDescriptorImpl{" );
+		sb.append( "precisionStep=" ).append( precisionStep );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
 
 

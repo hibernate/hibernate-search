@@ -38,11 +38,15 @@ import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.PropertyDescriptor;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
 public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
+	private static final Log log = LoggerFactory.make();
+
 	private final Class<?> indexedType;
 	private final float classBoost;
 	private final BoostStrategy boostStrategy;
@@ -62,7 +66,13 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 		// create the class bridge fields
 		Set<FieldDescriptor> fieldDescriptorTmp = new HashSet<FieldDescriptor>();
 		for ( DocumentFieldMetadata documentFieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
-			FieldDescriptor fieldDescriptor = new FieldDescriptorImpl( documentFieldMetadata );
+			FieldDescriptor fieldDescriptor;
+			if ( documentFieldMetadata.isNumeric() ) {
+				fieldDescriptor = new NumericFieldDescriptorImpl( documentFieldMetadata );
+			}
+			else {
+				fieldDescriptor = new FieldDescriptorImpl( documentFieldMetadata );
+			}
 			fieldDescriptorTmp.add( fieldDescriptor );
 		}
 		this.classBridgeFieldDescriptors = Collections.unmodifiableSet( fieldDescriptorTmp );
@@ -121,17 +131,36 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	}
 
 	@Override
+	public PropertyDescriptor getProperty(String propertyName) {
+		if ( propertyName == null ) {
+			throw log.getPropertyNameCannotBeNullException();
+		}
+		for ( PropertyDescriptor propertyDescriptor : propertyDescriptors ) {
+			if ( propertyDescriptor.getName().equals( propertyName ) ) {
+				return propertyDescriptor;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public Set<FieldDescriptor> getIndexedFields() {
 		return classBridgeFieldDescriptors;
 	}
 
 	@Override
 	public FieldDescriptor getIndexedField(String fieldName) {
+		if ( fieldName == null ) {
+			throw log.getFieldNameCannotBeNullException();
+		}
 		return allFieldDescriptors.get( fieldName );
 	}
 
 	@Override
 	public Set<FieldDescriptor> getFieldsForProperty(String propertyName) {
+		if ( propertyName == null ) {
+			throw log.getPropertyNameCannotBeNullException();
+		}
 		if ( keyedPropertyDescriptors.containsKey( propertyName ) ) {
 			return keyedPropertyDescriptors.get( propertyName ).getIndexedFields();
 		}
@@ -172,12 +201,23 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 			tmpSet.addAll( propertyDescriptorsTmp.get( propertyName ).getIndexedFields() );
 		}
 
+		boolean id = false;
 		for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
-			FieldDescriptor fieldDescriptor = new FieldDescriptorImpl( documentFieldMetadata );
+			if ( documentFieldMetadata.isId() ) {
+				id = true;
+			}
+			FieldDescriptor fieldDescriptor;
+			if ( documentFieldMetadata.isNumeric() ) {
+				fieldDescriptor = new NumericFieldDescriptorImpl( documentFieldMetadata );
+			}
+			else {
+				fieldDescriptor = new FieldDescriptorImpl( documentFieldMetadata );
+			}
 			tmpSet.add( fieldDescriptor );
 		}
 		PropertyDescriptor propertyDescriptor = new PropertyDescriptorImpl(
 				propertyMetadata.getPropertyAccessorName(),
+				id,
 				tmpSet
 		);
 

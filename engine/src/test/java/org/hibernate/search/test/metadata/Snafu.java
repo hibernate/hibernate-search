@@ -21,27 +21,48 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.metadata;
+
+package org.hibernate.search.test.metadata;
+
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Boost;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Norms;
+import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.test.util.FooAnalyzer;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface PropertyDescriptor extends FieldContributor {
-	/**
-	 * Name of the property.
-	 *
-	 * @return name of the property
-	 */
-	String getName();
+@Indexed
+public class Snafu {
+	@DocumentId
+	private long id;
 
-	/**
-	 * Returns {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @return {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @see {@link org.hibernate.search.annotations.DocumentId}
-	 */
-	boolean isId();
+	@Field(name = "my-snafu",
+			index = Index.NO,
+			store = Store.YES,
+			analyze = Analyze.NO,
+			norms = Norms.NO,
+			termVector = TermVector.WITH_POSITIONS,
+			boost = @Boost(10.0f))
+	private String snafu;
+
+	@Field
+	@NumericField(precisionStep = 16)
+	private int numericField;
+
+	@Field(indexNullAs = "snafu")
+	private String nullValue;
+
+	@Field
+	@org.hibernate.search.annotations.Analyzer(impl = FooAnalyzer.class)
+	private String custom;
 }
 
 
