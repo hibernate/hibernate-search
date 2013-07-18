@@ -48,8 +48,10 @@ public interface SearchConfiguration {
 
 	/**
 	 * Returns a {@link java.lang.Class} from a String parameter.
-	 * @param name
-	 * @return corresponding class instance.
+	 *
+	 * @param name the class name as string
+	 *
+	 * @return corresponding class instance
 	 */
 
 	Class<?> getClassMapping(String name);
@@ -59,6 +61,7 @@ public interface SearchConfiguration {
 	 * or null if not present
 	 *
 	 * @param propertyName - as a String.
+	 *
 	 * @return the property as a String
 	 */
 	String getProperty(String propertyName);
@@ -67,6 +70,7 @@ public interface SearchConfiguration {
 	 * Gets properties as a java.util.Properties object.
 	 *
 	 * @return a java.util.Properties object.
+	 *
 	 * @see java.util.Properties object
 	 */
 	Properties getProperties();
@@ -92,8 +96,10 @@ public interface SearchConfiguration {
 	 * {@link org.hibernate.search.spi.BuildContext#requestService(Class)} API
 	 *
 	 * Note that the lifecycle methods:
-	 *  - {@link org.hibernate.search.spi.ServiceProvider#start(java.util.Properties)}
-	 *  - {@link org.hibernate.search.spi.ServiceProvider#stop()}
+	 * <ul>
+	 * <li> {@link org.hibernate.search.spi.ServiceProvider#start(java.util.Properties, org.hibernate.search.spi.BuildContext)}  </li>
+	 * <li> {@link org.hibernate.search.spi.ServiceProvider#stop()}  </li>
+	 * </ul>
 	 * of the provider are *not* called.
 	 *
 	 * For services using the same ServiceProvider class, provided services have priority
@@ -111,8 +117,8 @@ public interface SearchConfiguration {
 
 	/**
 	 * @return {@code true} if it is safe to assume that the information we have about
-	 * index metadata is accurate. This should be set to false for example if the index
-	 * could contain Documents related to types not known to this SearchFactory instance.
+	 *         index metadata is accurate. This should be set to false for example if the index
+	 *         could contain Documents related to types not known to this SearchFactory instance.
 	 */
 	boolean isIndexMetadataComplete();
 
@@ -120,14 +126,14 @@ public interface SearchConfiguration {
 
 	/**
 	 * @return {@code true} if we should treat indexed entities as implicitly annotated
-	 * with a {@link org.hibernate.search.annotations.ProvidedId}, if no other Id is specified.
+	 *         with a {@link org.hibernate.search.annotations.ProvidedId}, if no other Id is specified.
 	 */
 	boolean isIdProvidedImplicit();
 
 	/**
 	 * @return the component responsible to create IndexManager instances; this might be a custom
-	 * component to allow for different default implementations, custom aliases, different
-	 * classloaders.
+	 *         component to allow for different default implementations, custom aliases, different
+	 *         classloaders.
 	 */
 	IndexManagerFactory getIndexManagerFactory();
 }

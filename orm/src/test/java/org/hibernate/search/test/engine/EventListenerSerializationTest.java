@@ -23,17 +23,18 @@
  */
 package org.hibernate.search.test.engine;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertNotNull;
+import static org.jgroups.util.Util.assertTrue;
+
+
 /**
- * Tests that the FullTextIndexEventListener is Serializable
+ * Tests that the {@code FullTextIndexEventListener} is {@code Serializable}.
  *
  * @author Sanne Grinovero
  */
@@ -41,11 +42,13 @@ public class EventListenerSerializationTest {
 
 	@Test
 	public void testEventListenerSerializable() throws IOException, ClassNotFoundException {
-		FullTextIndexEventListener eventListener = new FullTextIndexEventListener( FullTextIndexEventListener.Installation.SINGLE_INSTANCE );
+		FullTextIndexEventListener eventListener = new FullTextIndexEventListener();
 		eventListener.addSynchronization( null, null );
+
 		Object secondListener = SerializationTestHelper
 				.duplicateBySerialization( eventListener );
+
 		assertNotNull( secondListener );
-		assertFalse( secondListener == eventListener );
+		assertTrue( secondListener != eventListener );
 	}
 }

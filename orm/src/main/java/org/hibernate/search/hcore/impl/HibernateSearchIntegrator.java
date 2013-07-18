@@ -49,43 +49,58 @@ public class HibernateSearchIntegrator implements Integrator {
 	private static final Log log = LoggerFactory.make();
 	public static final String AUTO_REGISTER = "hibernate.search.autoregister_listeners";
 
-	private FullTextIndexEventListener listener;
-
 	@Override
 	public void integrate(
 			Configuration configuration,
 			SessionFactoryImplementor sessionFactory,
 			SessionFactoryServiceRegistry serviceRegistry) {
-		final boolean registerListeners = ConfigurationHelper.getBoolean(
-				AUTO_REGISTER,
-				configuration.getProperties(),
-				true
-		);
-		if ( !registerListeners ) {
-			log.debug( "Skipping Hibernate Search event listener auto registration" );
+
+		if ( !hibernateSearchNeedsToBeEnabled( configuration ) ) {
 			return;
 		}
 
-		listener = new FullTextIndexEventListener( FullTextIndexEventListener.Installation.SINGLE_INSTANCE );
+		FullTextIndexEventListener fullTextIndexEventListener = new FullTextIndexEventListener();
+		registerHibernateSearchEventListener( fullTextIndexEventListener, serviceRegistry );
 
-		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
-		//TODO if the event is duplicated, do not initialize the newly created listener
-		listenerRegistry.addDuplicationStrategy( new DuplicationStrategyImpl( FullTextIndexEventListener.class ) );
-
-		listenerRegistry.getEventListenerGroup( EventType.POST_INSERT ).appendListener( listener );
-		listenerRegistry.getEventListenerGroup( EventType.POST_UPDATE ).appendListener( listener );
-		listenerRegistry.getEventListenerGroup( EventType.POST_DELETE ).appendListener( listener );
-		listenerRegistry.getEventListenerGroup( EventType.POST_COLLECTION_RECREATE ).appendListener( listener );
-		listenerRegistry.getEventListenerGroup( EventType.POST_COLLECTION_REMOVE ).appendListener( listener );
-		listenerRegistry.getEventListenerGroup( EventType.POST_COLLECTION_UPDATE ).appendListener( listener );
-		listenerRegistry.getEventListenerGroup( EventType.FLUSH ).appendListener( listener );
-
-		listener.initialize( configuration );
+		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
+				configuration,
+				fullTextIndexEventListener
+		);
+		sessionFactory.addObserver( observer );
 	}
 
 	@Override
 	public void integrate(MetadataImplementor metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 		// todo - HSEARCH-856
+	}
+
+	@Override
+	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+	}
+
+	private boolean hibernateSearchNeedsToBeEnabled(Configuration configuration) {
+		final boolean enableHibernateSearch = ConfigurationHelper.getBoolean(
+				AUTO_REGISTER,
+				configuration.getProperties(),
+				true
+		);
+		if ( !enableHibernateSearch ) {
+			log.debug( "Skipping Hibernate Search event listener auto registration" );
+		}
+		return enableHibernateSearch;
+	}
+
+	private void registerHibernateSearchEventListener(FullTextIndexEventListener eventListener, SessionFactoryServiceRegistry serviceRegistry) {
+		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
+		listenerRegistry.addDuplicationStrategy( new DuplicationStrategyImpl( FullTextIndexEventListener.class ) );
+
+		listenerRegistry.appendListeners( EventType.POST_INSERT, eventListener );
+		listenerRegistry.appendListeners( EventType.POST_UPDATE, eventListener );
+		listenerRegistry.appendListeners( EventType.POST_DELETE, eventListener );
+		listenerRegistry.appendListeners( EventType.POST_COLLECTION_RECREATE, eventListener );
+		listenerRegistry.appendListeners( EventType.POST_COLLECTION_REMOVE, eventListener );
+		listenerRegistry.appendListeners( EventType.POST_COLLECTION_UPDATE, eventListener );
+		listenerRegistry.appendListeners( EventType.FLUSH, eventListener );
 	}
 
 	public static class DuplicationStrategyImpl implements DuplicationStrategy {
@@ -104,13 +119,6 @@ public class HibernateSearchIntegrator implements Integrator {
 		@Override
 		public Action getAction() {
 			return Action.KEEP_ORIGINAL;
-		}
-	}
-
-	@Override
-	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-		if ( listener != null ) {
-			listener.cleanup();
 		}
 	}
 }

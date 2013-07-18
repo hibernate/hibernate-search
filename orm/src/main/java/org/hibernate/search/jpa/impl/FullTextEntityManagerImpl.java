@@ -43,18 +43,23 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
 import org.hibernate.Session;
 
 /**
  * @author Emmanuel Bernard
  */
 public class FullTextEntityManagerImpl implements FullTextEntityManager, Serializable {
+	private static final Log log = LoggerFactory.make();
+
 	private final EntityManager em;
 	private FullTextSession ftSession;
 
 	public FullTextEntityManagerImpl(EntityManager em) {
 		if ( em == null ) {
-			throw new IllegalArgumentException("Unable to create a FullTextEntityManager from a null EntityManager");
+			throw log.getNullSessionPassedToFullEntityManagerCreationException();
 		}
 		this.em = em;
 	}

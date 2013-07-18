@@ -27,25 +27,33 @@ package org.hibernate.search.test.engine;
 import org.hibernate.search.Search;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 /**
  * @author Emmanuel Bernard
  */
-public class FullTextWrapperTest {
+public class FullTextSessionAndEntityManagerCreationTest {
 
 	@Test
-	public void testSearch() throws Exception {
+	public void testCreatingFullTextSessionByPassingNullFails() throws Exception {
 		try {
 			Search.getFullTextSession( null );
+			fail( "A valid session must be passed" );
 		}
 		catch (IllegalArgumentException e) {
-			//good
+			assertTrue( "Unexpected error code: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000178" ) );
 		}
+	}
 
+	@Test
+	public void testCreatingFullEntityManagerByPassingNullFails() throws Exception {
 		try {
 			org.hibernate.search.jpa.Search.getFullTextEntityManager( null );
+			fail( "A valid session must be passed" );
 		}
 		catch (IllegalArgumentException e) {
-			//good
+			assertTrue( "Unexpected error code: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000179" ) );
 		}
 	}
 }
