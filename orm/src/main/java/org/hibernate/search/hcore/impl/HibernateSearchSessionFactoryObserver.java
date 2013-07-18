@@ -53,7 +53,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Configuration configuration;
+	private Configuration configuration;
 	private final FullTextIndexEventListener listener;
 
 	private String indexControlMBeanName;
@@ -77,7 +77,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			if ( "true".equalsIgnoreCase( enableJMX ) ) {
 				enableIndexControlBean();
 			}
-
+			configuration = null; //free up some memory as we no longer need it
 			listener.initialize( searchFactoryImplementor );
 		}
 		catch (RuntimeException e) {
