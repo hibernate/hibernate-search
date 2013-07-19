@@ -36,15 +36,22 @@ import org.hibernate.search.metadata.PropertyDescriptor;
 public class PropertyDescriptorImpl implements PropertyDescriptor {
 	private final String name;
 	private final Set<FieldDescriptor> fieldDescriptors;
+	private final boolean id;
 
-	public PropertyDescriptorImpl(String name, Set<FieldDescriptor> fieldDescriptors) {
+	public PropertyDescriptorImpl(String name, boolean id, Set<FieldDescriptor> fieldDescriptors) {
 		this.name = name;
 		this.fieldDescriptors = Collections.unmodifiableSet( new HashSet<FieldDescriptor>( fieldDescriptors ) );
+		this.id = id;
 	}
 
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public boolean isId() {
+		return id;
 	}
 
 	@Override
@@ -73,6 +80,16 @@ public class PropertyDescriptorImpl implements PropertyDescriptor {
 	@Override
 	public int hashCode() {
 		return name.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "PropertyDescriptorImpl{" );
+		sb.append( "name='" ).append( name ).append( '\'' );
+		sb.append( ", fieldDescriptors=" ).append( fieldDescriptors );
+		sb.append( ", id=" ).append( id );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
 

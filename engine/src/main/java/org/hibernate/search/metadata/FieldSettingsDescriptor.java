@@ -76,17 +76,36 @@ public interface FieldSettingsDescriptor {
 	float getBoost();
 
 	/**
-	 * @return the numeric precision step in case this field is indexed as a numeric value. If the field is not numeric
-	 *         {@code null} is returned.
+	 * @return {@code Type} of this field
 	 */
-	Integer precisionStep();
+	Type getType();
 
 	/**
-	 * @return {@code true} if this field is indexed as numeric field, {@code false} otherwise
+	 * Narrows the type of this descriptor down to the specified {@code type}. The appropriate
+	 * type should be checked beforehand by calling {@link #getType()}.
 	 *
-	 * @see #precisionStep()
+	 * @param <T> the type to narrow down to
+	 * @param type class object representing the descriptor type to narrow down to
+	 * to
+	 *
+	 * @return this descriptor narrowed down to the given type.
 	 */
-	boolean isNumeric();
+	<T extends FieldSettingsDescriptor> T as(Class<T> type);
+
+	/**
+	 * Defines different logical field types
+	 */
+	public enum Type {
+		/**
+		 * A basic field
+		 */
+		BASIC,
+
+		/**
+		 * A numeric field
+		 */
+		NUMERIC
+	}
 }
 
 

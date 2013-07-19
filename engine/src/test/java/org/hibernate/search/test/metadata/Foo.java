@@ -21,27 +21,19 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.metadata;
+
+package org.hibernate.search.test.metadata;
+
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface PropertyDescriptor extends FieldContributor {
-	/**
-	 * Name of the property.
-	 *
-	 * @return name of the property
-	 */
-	String getName();
-
-	/**
-	 * Returns {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @return {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @see {@link org.hibernate.search.annotations.DocumentId}
-	 */
-	boolean isId();
+@Indexed
+public class Foo {
+	@DocumentId
+	private long id;
 }
 
 

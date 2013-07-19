@@ -34,11 +34,17 @@ import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.metadata.FieldDescriptor;
+import org.hibernate.search.metadata.FieldSettingsDescriptor;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
 public class FieldDescriptorImpl implements FieldDescriptor {
+	private static final Log log = LoggerFactory.make();
+
 	private final String name;
 	private final Index index;
 	private final Analyze analyze;
@@ -49,8 +55,6 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 	private final String indexNullAs;
 	private final Analyzer analyzer;
 	private final FieldBridge fieldBridge;
-	private final boolean numeric;
-	private final Integer precisionStep;
 	private final Type fieldType;
 
 	public FieldDescriptorImpl(DocumentFieldMetadata documentFieldMetadata) {
@@ -64,19 +68,12 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		this.indexNullAs = documentFieldMetadata.indexNullAs();
 		this.analyzer = documentFieldMetadata.getAnalyzer();
 		this.fieldBridge = documentFieldMetadata.getFieldBridge();
-		this.numeric = documentFieldMetadata.isNumeric();
-		this.precisionStep = documentFieldMetadata.isNumeric() ? documentFieldMetadata.getPrecisionStep() : null;
 		this.fieldType = determineFieldType( documentFieldMetadata );
 	}
 
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	public Type getFieldType() {
-		return fieldType;
 	}
 
 	@Override
@@ -110,6 +107,24 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 	}
 
 	@Override
+	public Type getType() {
+		return fieldType;
+	}
+
+	@Override
+	public <T extends FieldSettingsDescriptor> T as(Class<T> type) {
+		if ( fieldType == Type.NUMERIC && type == NumericFieldSettingsDescriptor.class ) {
+			return type.cast( this );
+		}
+
+		throw log.getUnableToNarrowFieldDescriptorException(
+				this.getClass().getName(),
+				fieldType.toString(),
+				type == null ? "null" : type.getName()
+		);
+	}
+
+	@Override
 	public String indexNullAs() {
 		return indexNullAs;
 	}
@@ -117,16 +132,6 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 	@Override
 	public boolean indexNull() {
 		return indexNullAs != null;
-	}
-
-	@Override
-	public Integer precisionStep() {
-		return precisionStep;
-	}
-
-	@Override
-	public boolean isNumeric() {
-		return numeric;
 	}
 
 	@Override
@@ -152,16 +157,14 @@ public class FieldDescriptorImpl implements FieldDescriptor {
 		sb.append( ", indexNullAs='" ).append( indexNullAs ).append( '\'' );
 		sb.append( ", analyzer=" ).append( analyzer );
 		sb.append( ", fieldBridge=" ).append( fieldBridge );
-		sb.append( ", numeric=" ).append( numeric );
-		sb.append( ", precisionStep=" ).append( precisionStep );
 		sb.append( ", fieldType=" ).append( fieldType );
 		sb.append( '}' );
 		return sb.toString();
 	}
 
 	private Type determineFieldType(DocumentFieldMetadata documentFieldMetadata) {
-		if ( documentFieldMetadata.isId() ) {
-			return Type.ID;
+		if ( documentFieldMetadata.isNumeric() ) {
+			return Type.NUMERIC;
 		}
 		else {
 			return Type.BASIC;

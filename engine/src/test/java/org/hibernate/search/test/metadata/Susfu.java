@@ -21,27 +21,28 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.metadata;
+
+package org.hibernate.search.test.metadata;
+
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface PropertyDescriptor extends FieldContributor {
-	/**
-	 * Name of the property.
-	 *
-	 * @return name of the property
-	 */
-	String getName();
+@Indexed
+public class Susfu {
+	@DocumentId
+	private long id;
 
-	/**
-	 * Returns {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @return {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @see {@link org.hibernate.search.annotations.DocumentId}
-	 */
-	boolean isId();
+	@Field
+	private String susfu;
+
+	@Field
+	public String getSusfu() {
+		return susfu;
+	}
 }
 
 

@@ -21,27 +21,31 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.metadata;
+
+package org.hibernate.search.test.metadata;
+
+import org.hibernate.search.annotations.Boost;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.DynamicBoost;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.engine.BoostStrategy;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface PropertyDescriptor extends FieldContributor {
-	/**
-	 * Name of the property.
-	 *
-	 * @return name of the property
-	 */
-	String getName();
+@Indexed
+@Boost(42.0f)
+@DynamicBoost(impl = Fubar.DoublingBoost.class)
+public class Fubar {
+	@DocumentId
+	private long id;
 
-	/**
-	 * Returns {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @return {@code true} if the property is the document id, {@code false} otherwise
-	 *
-	 * @see {@link org.hibernate.search.annotations.DocumentId}
-	 */
-	boolean isId();
+	public static class DoublingBoost implements BoostStrategy {
+		@Override
+		public float defineBoost(Object value) {
+			return 2.0f;
+		}
+	}
 }
 
 

@@ -81,6 +81,11 @@ public class IndexedTypeDescriptorForUnindexedType implements IndexedTypeDescrip
 	}
 
 	@Override
+	public PropertyDescriptor getProperty(String propertyName) {
+		return null;
+	}
+
+	@Override
 	public Set<FieldDescriptor> getIndexedFields() {
 		return Collections.emptySet();
 	}
