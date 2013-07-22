@@ -24,7 +24,7 @@
 
 package org.hibernate.search.test.metadata;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,22 +43,17 @@ import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-436")
 public class PropertyDescriptorTest {
-	private static final List<String> TEST_INDEX_NAMES = new ArrayList<String>();
 
-	static {
-		TEST_INDEX_NAMES.add( "index-0" );
-		TEST_INDEX_NAMES.add( "index-0" );
-		TEST_INDEX_NAMES.add( "index-0" );
-	}
-
+	private static final List<String> TEST_INDEX_NAMES = Arrays.asList(
+			"index-0", "index-0", "index-0" );
 	private AnnotationMetadataProvider metadataProvider;
 
 	@Before
@@ -67,18 +62,16 @@ public class PropertyDescriptorTest {
 		metadataProvider = new AnnotationMetadataProvider( new JavaReflectionManager(), configContext );
 	}
 
-
 	@Test
 	public void testIdProperty() {
 		PropertyDescriptor propertyDescriptor = getPropertyDescriptor( Fubar.class, "id" );
 		String propertyName = propertyDescriptor.getName();
 		assertEquals( "Wrong property name", "id", propertyName );
 		assertTrue(
-				"This property should  should host the id field",
+				"This property should should host the id field",
 				propertyDescriptor.isId()
 		);
 	}
-
 
 	@Test
 	public void testIndexInformation() {
@@ -139,5 +132,3 @@ public class PropertyDescriptorTest {
 		return typeDescriptor.getProperty( propertyName );
 	}
 }
-
-

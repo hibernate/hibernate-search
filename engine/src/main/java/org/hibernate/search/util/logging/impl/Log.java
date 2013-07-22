@@ -24,12 +24,6 @@
 
 package org.hibernate.search.util.logging.impl;
 
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.DEBUG;
-import static org.jboss.logging.Logger.Level.TRACE;
-import static org.jboss.logging.Logger.Level.WARN;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
@@ -51,6 +45,12 @@ import org.jboss.logging.MessageLogger;
 import org.jgroups.Address;
 import org.jgroups.SuspectedException;
 import org.jgroups.TimeoutException;
+
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.TRACE;
+import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -600,7 +600,7 @@ public interface Log extends BasicLogger {
 	SearchException fieldBridgeNotAnInstanceof(String className);
 
 	@Message(id = 145, value = "Spatial field name not defined for class level annotation on class %1$s")
-	SearchException spatialFieldNameNotDefined( String className );
+	SearchException spatialFieldNameNotDefined(String className);
 
 	@Message(id = 146, value = "The query string '%2$s' applied on field '%1$s' has no meaningfull tokens to be matched. Validate the query input " +
 			"against the Analyzer applied on this field.")
@@ -622,13 +622,13 @@ public interface Log extends BasicLogger {
 	SearchException unsupportedTikaBridgeType();
 
 	@Message(id = 152, value = "File %1$s does not exist")
-	SearchException fileDoesNotExist( String fileName );
+	SearchException fileDoesNotExist(String fileName);
 
 	@Message(id = 153, value = "%1$s is a directory and not a file")
-	SearchException fileIsADirectory( String fileName );
+	SearchException fileIsADirectory(String fileName);
 
 	@Message(id = 154, value = "File %1$s is not readable")
-	SearchException fileIsNotReadable( String fileName );
+	SearchException fileIsNotReadable(String fileName);
 
 	@Message(id = 155, value = "Unable to configure %1$s")
 	SearchException unableToConfigureTikaBridge(String bridgeName, @Cause Throwable e);
@@ -677,7 +677,7 @@ public interface Log extends BasicLogger {
 	void indexManagerUsesSerializationService(String indexName, String serializerDescription);
 
 	@Message(id = 169, value = "FieldBridge '%1$s' does not have a objectToString method: field '%2$s' in '%3$s'" +
-			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query" )
+			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query")
 	SearchException fieldBridgeNotTwoWay(Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
 
 	@LogMessage(level = Level.DEBUG)
@@ -705,7 +705,7 @@ public interface Log extends BasicLogger {
 	SearchException unableToParseDocument(@Cause Throwable cause);
 
 	@Message(id = 177, value = "Unable to find a valid document id for entity '%1$s'")
-	SearchException noDocumentIdFoundException( String entityName );
+	SearchException noDocumentIdFoundException(String entityName);
 
 	@Message(id = 178, value = "Unable to create a FullTextSession from a null Session")
 	IllegalArgumentException getNullSessionPassedToFullTextSessionCreationException();
@@ -721,4 +721,5 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 182, value = "'null' is not a valid field name")
 	IllegalArgumentException getFieldNameCannotBeNullException();
+
 }

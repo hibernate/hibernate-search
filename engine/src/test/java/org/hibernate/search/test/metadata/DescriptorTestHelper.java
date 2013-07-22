@@ -24,7 +24,7 @@
 
 package org.hibernate.search.test.metadata;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
@@ -37,13 +37,9 @@ import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
  * @author Hardy Ferentschik
  */
 public class DescriptorTestHelper {
-	public static final List<String> TEST_INDEX_NAMES = new ArrayList<String>();
 
-	static {
-		TEST_INDEX_NAMES.add( "index-0" );
-		TEST_INDEX_NAMES.add( "index-0" );
-		TEST_INDEX_NAMES.add( "index-0" );
-	}
+	public static final List<String> TEST_INDEX_NAMES = Arrays.asList(
+			"index-0", "index-0", "index-0" );
 
 	public static IndexedTypeDescriptor getTypeDescriptor(AnnotationMetadataProvider metadataProvider, Class<?> clazz) {
 		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( clazz );
@@ -69,5 +65,3 @@ public class DescriptorTestHelper {
 		return managers;
 	}
 }
-
-

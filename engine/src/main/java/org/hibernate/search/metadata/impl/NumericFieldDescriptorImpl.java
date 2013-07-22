@@ -51,5 +51,3 @@ public class NumericFieldDescriptorImpl extends FieldDescriptorImpl implements N
 		return sb.toString();
 	}
 }
-
-
