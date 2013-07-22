@@ -38,9 +38,9 @@ import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -66,7 +66,7 @@ public class IndexedTypeDescriptorTest {
 	@Test
 	public void testDefaultStaticBoost() {
 		IndexedTypeDescriptor typeDescriptor = DescriptorTestHelper.getTypeDescriptor( metadataProvider, Foo.class );
-		assertEquals( "The default boost should be 1.0f", 1.0f, typeDescriptor.getStaticBoost() );
+		assertEquals( "The default boost should be 1.0f", 1.0f, typeDescriptor.getStaticBoost(), 0f );
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class IndexedTypeDescriptorTest {
 	@Test
 	public void testExplicitStaticBoost() {
 		IndexedTypeDescriptor typeDescriptor = DescriptorTestHelper.getTypeDescriptor( metadataProvider, Fubar.class );
-		assertEquals( "The default boost should be 42.0f", 42.0f, typeDescriptor.getStaticBoost() );
+		assertEquals( "The default boost should be 42.0f", 42.0f, typeDescriptor.getStaticBoost(), 0f );
 	}
 
 	@Test
@@ -123,11 +123,9 @@ public class IndexedTypeDescriptorTest {
 		assertTrue( typeDescriptor.getDynamicBoost() instanceof Fubar.DoublingBoost );
 	}
 
-
 	@Test
 	public void testFieldAnnotationOnFieldAndGetterCreatesTwoFieldDescriptors() {
 		IndexedTypeDescriptor typeDescriptor = DescriptorTestHelper.getTypeDescriptor( metadataProvider, Susfu.class );
-
 		Set<FieldDescriptor> fieldDescriptors = typeDescriptor.getFieldsForProperty( "susfu" );
 		assertEquals( "There should be two field descriptors", 2, fieldDescriptors.size() );
 	}
@@ -153,5 +151,3 @@ public class IndexedTypeDescriptorTest {
 		}
 	}
 }
-
-

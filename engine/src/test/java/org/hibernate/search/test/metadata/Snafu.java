@@ -64,5 +64,3 @@ public class Snafu {
 	@org.hibernate.search.annotations.Analyzer(impl = FooAnalyzer.class)
 	private String custom;
 }
-
-

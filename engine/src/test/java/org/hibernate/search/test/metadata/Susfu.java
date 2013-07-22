@@ -44,5 +44,3 @@ public class Susfu {
 		return susfu;
 	}
 }
-
-
