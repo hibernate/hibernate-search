@@ -22,7 +22,9 @@
   ~  51 Franklin Street, Fifth Floor
   ~  Boston, MA  02110-1301  USA
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -50,6 +52,22 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-analyzers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-serialization-avro</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- HSEARCH-1365 Needed for tests, test should probably move -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-backend-jgroups</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-backend-jms</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
@@ -169,10 +187,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <threadCount>1</threadCount>
-                    <reuseForks>true</reuseForks>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <runOrder>alphabetical</runOrder>
                     <systemPropertyVariables>
                         <!-- java.net.preferIPv4Stack and jgroups.bind_addr are needed for JGroups -->
                         <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>

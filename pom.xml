@@ -40,10 +40,14 @@
         <module>build-config</module>
         <module>legacy</module>
         <module>engine</module>
+        <module>serialization/java</module>
+        <module>serialization/avro</module>
+        <module>backends/jgroups</module>
+        <module>backends/jms</module>
+        <module>backends/infinispan</module>
         <module>orm</module>
         <module>analyzers</module>
         <module>testing</module>
-        <module>infinispan</module>
         <module>modules</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
@@ -254,6 +258,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>${commonsCompressVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-serialization-avro</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -768,7 +777,10 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.16</version>
                     <configuration>
+                        <threadCount>1</threadCount>
+                        <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <runOrder>alphabetical</runOrder>
                         <systemPropertyVariables>
                             <!-- See HSEARCH-1444 -->
                             <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
@@ -1222,7 +1234,7 @@
             </properties>
         </profile>
 
-        <!-- The SQLServer2008 R2 (MS JDBC) test envionment -->
+        <!-- The SQLServer2008 R2 (MS JDBC) test environment -->
         <profile>
             <id>mssql2008R2</id>
             <dependencies>

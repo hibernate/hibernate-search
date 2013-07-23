@@ -27,13 +27,14 @@
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search-parent</artifactId>
         <version>5.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>hibernate-search-modules</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Module</name>
-    <description>Hibernate Search modules creation to use in JBoss AS</description>
+    <name>Hibernate Search Wildfly Module</name>
+    <description>Hibernate Search modules creation to use in Wildfly</description>
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
@@ -42,6 +43,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-serialization-avro</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-infinispan</artifactId>

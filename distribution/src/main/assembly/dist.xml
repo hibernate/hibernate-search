@@ -89,13 +89,37 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/clustering</outputDirectory>
+            <outputDirectory>dist/lib/clustering/infinispan</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
                 <include>org.hibernate:hibernate-search-infinispan</include>
                 <include>org.infinispan:infinispan-lucene-directory</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/clustering/jgroups</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-backend-jgroups</include>
+                <include>org.hibernate:hibernate-search-serialization-avro</include>
+                <include>org.apache.avro:avro</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/clustering/jms</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-backend-jms</include>
+                <include>org.hibernate:hibernate-search-serialization-avro</include>
+                <include>org.apache.avro:avro</include>
             </includes>
         </dependencySet>
 

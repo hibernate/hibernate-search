@@ -22,28 +22,26 @@ package org.hibernate.search.indexes.serialization.spi;
 
 import java.util.Properties;
 
-import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 
 public class SerializationProviderService implements ServiceProvider<SerializationProvider> {
 
-	private AvroSerializationProvider avroSerializationProvider;
+	//private JavaSerializationSerializationProvider serializationProvider;
 
 	@Override
 	public void start(Properties properties, BuildContext buildContext) {
-		//TODO Make the implementation configurable
-		avroSerializationProvider = new AvroSerializationProvider();
+		//serializationProvider = new JavaSerializationSerializationProvider();
 	}
 
 	@Override
 	public SerializationProvider getService() {
-		return avroSerializationProvider;
+		//return serializationProvider;
+		return null;
 	}
 
 	@Override
 	public void stop() {
 		//nothing to do
 	}
-
 }

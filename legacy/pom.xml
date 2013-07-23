@@ -34,7 +34,7 @@
 
     <artifactId>hibernate-search</artifactId>
 
-    <name>Hibernate Search</name>
+    <name>Hibernate Search Legacy</name>
     <description>Hibernate Search</description>
 
     <dependencies>
