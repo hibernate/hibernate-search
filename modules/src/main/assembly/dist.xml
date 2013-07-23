@@ -67,6 +67,7 @@
                 <include>org.hibernate:hibernate-search-engine</include>
                 <include>org.hibernate:hibernate-search-analyzer</include>
                 <include>org.hibernate:hibernate-search-infinispan</include>
+                <include>org.hibernate:hibernate-search-avro-serialization</include>
             </includes>
             <excludes>
                 <exclude>org.apache.lucene:*</exclude>

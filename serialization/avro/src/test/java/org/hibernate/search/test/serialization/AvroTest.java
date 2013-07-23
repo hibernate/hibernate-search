@@ -20,10 +20,6 @@
  */
 package org.hibernate.search.test.serialization;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.search.test.serialization.AvroUtils.parseProtocol;
-import static org.hibernate.search.test.serialization.AvroUtils.parseSchema;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -46,6 +42,10 @@ import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.util.Utf8;
 import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.search.test.serialization.AvroUtils.parseProtocol;
+import static org.hibernate.search.test.serialization.AvroUtils.parseSchema;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>

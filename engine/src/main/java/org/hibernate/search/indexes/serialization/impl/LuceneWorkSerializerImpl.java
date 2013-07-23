@@ -48,21 +48,19 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.toByteArray;
 
 /**
- * Serializes List<LuceneWork> back and forth using
- * a pluggable SerializerProvider.
+ * Serializes {@code List<LuceneWork>} instances back and forth using a pluggable {@code SerializerProvider}.
  *
- * This class control the over all traversal process and delegates true serialization
- * work to the SerializerProvider.
+ * This class controls the overall traversal process and delegates true serialization work to the {@code SerializerProvider}.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSerializer {
+public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 	private static Log log = LoggerFactory.make();
 
 	private SearchFactoryImplementor searchFactory;
 	private SerializationProvider provider;
 
-	public PluggableSerializationLuceneWorkSerializer(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
+	public LuceneWorkSerializerImpl(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
 		this.provider = provider;
 		this.searchFactory = searchFactory;
 	}

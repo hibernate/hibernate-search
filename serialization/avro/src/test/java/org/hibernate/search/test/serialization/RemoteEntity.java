@@ -26,7 +26,6 @@ import javax.persistence.Id;
 
 import org.apache.solr.analysis.NGramFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
-
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.Boost;

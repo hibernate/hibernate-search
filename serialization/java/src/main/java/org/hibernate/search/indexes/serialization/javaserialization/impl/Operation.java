@@ -2,7 +2,7 @@
  * Hibernate, Relational Persistence for Idiomatic Java
  *
  * JBoss, Home of Professional Open Source
- * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -18,30 +18,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.indexes.serialization.spi;
+package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
-import java.util.Properties;
+import java.io.Serializable;
 
-import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.spi.ServiceProvider;
-
-public class SerializationProviderService implements ServiceProvider<SerializationProvider> {
-
-	//private JavaSerializationSerializationProvider serializationProvider;
-
-	@Override
-	public void start(Properties properties, BuildContext buildContext) {
-		//serializationProvider = new JavaSerializationSerializationProvider();
-	}
-
-	@Override
-	public SerializationProvider getService() {
-		//return serializationProvider;
-		return null;
-	}
-
-	@Override
-	public void stop() {
-		//nothing to do
-	}
+/**
+ * A message is made of:
+ * - a protocol version number
+ * - a set of operations
+ *
+ * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ */
+public interface Operation extends Serializable {
 }

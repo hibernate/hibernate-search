@@ -32,7 +32,7 @@
     <artifactId>hibernate-search-modules</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Module</name>
+    <name>Hibernate Search AS Module</name>
     <description>Hibernate Search modules creation to use in JBoss AS</description>
 
     <properties>
@@ -42,6 +42,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-avro-serialization</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-infinispan</artifactId>

@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.avro.Protocol;
-
 import org.hibernate.search.SearchException;
 
 /**

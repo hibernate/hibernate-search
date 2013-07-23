@@ -20,54 +20,24 @@
  */
 package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
-import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.apache.lucene.util.AttributeImpl;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorksBuilder;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class JavaSerializationDeserializer implements Deserializer {
-	private static final Log log = LoggerFactory.make();
 
 	@Override
 	public void deserialize(byte[] data, LuceneWorksBuilder hydrator) {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-		int majorVersion = inputStream.read();
-		int minorVersion = inputStream.read();
-		if ( AvroSerializationProvider.getMajorVersion() != majorVersion ) {
-			throw new SearchException(
-					"Unable to parse message from protocol version "
-							+ majorVersion + "." + minorVersion
-							+ ". Current protocol version: "
-							+ AvroSerializationProvider.getMajorVersion()
-							+ "." + AvroSerializationProvider.getMinorVersion() );
-		}
-		if ( AvroSerializationProvider.getMinorVersion() < minorVersion ) {
-			//TODO what to do about it? Log each time? Once?
-			if ( log.isTraceEnabled() ) {
-				log.tracef( "Parsing message from a future protocol version. Some feature might not be propagated. Message version: "
-								+ majorVersion + "." + minorVersion
-								+ ". Current protocol version: "
-								+ AvroSerializationProvider.getMajorVersion()
-								+ "." + AvroSerializationProvider.getMinorVersion()
-				);
-			}
-		}
-		byte[] newData = new byte[data.length - 2];
-		System.arraycopy( data, 2, newData, 0, newData.length );
-		Message message = SerializationHelper.toInstance( newData, Message.class );
+		Message message = SerializationHelper.toInstance( data, Message.class );
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		for ( Operation operation : message.getOperations() ) {
 			if ( operation instanceof OptimizeAll ) {

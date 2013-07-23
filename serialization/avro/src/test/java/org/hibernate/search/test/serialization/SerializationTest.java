@@ -51,8 +51,6 @@ import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.Payload;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
-import org.junit.Test;
-
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -61,27 +59,35 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
-import org.hibernate.search.indexes.serialization.impl.PluggableSerializationLuceneWorkSerializer;
+import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Rule;
+import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializationTest extends SearchTestCase {
+public class SerializationTest {
 	private static final Log log = LoggerFactory.make();
+
+	@Rule
+	public SearchFactoryHolder searchFactoryHolder = new SearchFactoryHolder( RemoteEntity.class );
 
 	@Test
 	public void testAvroSerialization() throws Exception {
-		LuceneWorkSerializer converter = new PluggableSerializationLuceneWorkSerializer(
+		LuceneWorkSerializer converter = new LuceneWorkSerializerImpl(
 				new AvroSerializationProvider(),
-				getSearchFactoryImpl()
+				searchFactoryHolder.getSearchFactory()
 		);
 		List<LuceneWork> works = buildWorks();
 
@@ -151,9 +157,9 @@ public class SerializationTest extends SearchTestCase {
 	 */
 	public void testAvroSerializationPerf() throws Exception {
 		final int loop = 10; //TODO do 10000 or 100000
-		LuceneWorkSerializer converter = new PluggableSerializationLuceneWorkSerializer(
+		LuceneWorkSerializer converter = new LuceneWorkSerializerImpl(
 				new AvroSerializationProvider(),
-				getSearchFactoryImpl()
+				searchFactoryHolder.getSearchFactory()
 		);
 		List<LuceneWork> works = buildWorks();
 
@@ -534,13 +540,6 @@ public class SerializationTest extends SearchTestCase {
 	private void assertPurgeAll(PurgeAllLuceneWork work, PurgeAllLuceneWork copy) {
 		assertThat( work.getEntityClass() ).as( "PurgeAllLuceneWork.getEntityClass is not copied" )
 				.isEqualTo( copy.getEntityClass() );
-	}
-
-	@Override
-	protected Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] {
-				RemoteEntity.class
-		};
 	}
 
 	private static class SerializableStringReader extends Reader implements Serializable {

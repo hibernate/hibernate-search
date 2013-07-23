@@ -23,15 +23,13 @@
  */
 package org.hibernate.search.test.util;
 
+import org.hibernate.search.SearchException;
+import org.hibernate.search.util.impl.FileHelper;
 import org.junit.Test;
 
-import org.hibernate.search.SearchException;
-import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
-import org.hibernate.search.util.impl.FileHelper;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Hardy Ferentschik
@@ -41,18 +39,20 @@ public class ResourceLoadingTest {
 	@Test
 	public void testOpenKnownResource() throws Exception {
 		// using a known resource for testing
-		String resource = "org/hibernate/search/remote/codex/avro/v1_0/Message.avro";
-		String resourceContent = FileHelper.readResourceAsString( resource, AvroSerializationProvider.class.getClassLoader() );
+		String resource = "log4j.properties";
+		String resourceContent = FileHelper.readResourceAsString(
+				resource,
+				ResourceLoadingTest.class.getClassLoader()
+		);
 		assertNotNull( resourceContent );
 		assertFalse( resourceContent.isEmpty() );
 	}
 
 	@Test
 	public void testUnKnownResource() throws Exception {
-		// using a known resource for testing
 		String resource = "foo";
 		try {
-			FileHelper.readResourceAsString( resource, AvroSerializationProvider.class.getClassLoader() );
+			FileHelper.readResourceAsString( resource, ResourceLoadingTest.class.getClassLoader() );
 		}
 		catch (SearchException e) {
 			assertEquals( "Wrong error message", "HSEARCH000114: Could not load resource: 'foo'", e.getMessage() );
