@@ -171,7 +171,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 
 		private IndexManager[] getIndexManagersFromShards(String[] shards) {
 			ArrayList<IndexManager> managers = new ArrayList<IndexManager>( shards.length );
-			for (String shard : shards) {
+			for ( String shard : shards ) {
 				managers.add( indexManagerHolder.getOrCreateLateIndexManager( getProviderName( shard ), DynamicShardingEntityIndexBinding.this ) );
 			}
 			return managers.toArray( new IndexManager[shards.length] );

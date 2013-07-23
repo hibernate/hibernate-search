@@ -113,7 +113,7 @@ public class IndexManagerHolder {
 		}
 
 		IndexManager[] providers;
-		if (isDynamicSharding) {
+		if ( isDynamicSharding ) {
 			providers = new IndexManager[0];
 		}
 		else {
@@ -168,7 +168,7 @@ public class IndexManagerHolder {
 
 		ShardIdentifierProvider shardIdentifierProvider = null;
 		String shardIdentityProviderName = indexProps[0].getProperty( SHARD_IDENTITY_PROVIDER );
-		if (isDynamicSharding) {
+		if ( isDynamicSharding ) {
 			shardIdentifierProvider = ClassLoaderHelper.instanceFromName(
 						ShardIdentifierProvider.class,
 						shardIdentityProviderName, DirectoryProviderFactory.class, "ShardIdentifierProvider"

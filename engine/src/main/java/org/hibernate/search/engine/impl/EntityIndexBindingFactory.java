@@ -60,7 +60,7 @@ public class EntityIndexBindingFactory {
 			throw log.entityWithNoShard( type );
 		}
 		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T>) interceptor;
-		if (isDynamicSharding) {
+		if ( isDynamicSharding ) {
 			return new DynamicShardingEntityIndexBinding<T>( shardIdentifierProvider, similarityInstance, safeInterceptor,
 					properties, indexManagerFactory, context.getUninitializedSearchFactory(), indexManagerHolder,
 					rootDirectoryProviderName );
@@ -75,7 +75,7 @@ public class EntityIndexBindingFactory {
 		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) entityMapping.getEntityIndexingInterceptor();
 		boolean isDynamicSharding = entityMapping instanceof DynamicShardingEntityIndexBinding;
 		MutableEntityIndexBinding<T> newMapping;
-		if (isDynamicSharding) {
+		if ( isDynamicSharding ) {
 			newMapping = ( (DynamicShardingEntityIndexBinding<T>) entityMapping ).cloneWithSimilarity( entitySimilarity );
 
 		}
