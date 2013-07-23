@@ -73,9 +73,9 @@ finally {
     </example>
 
     <para>In this example the <classname>SearchFactory</classname> figures out
-    which indexes are needed to query this entity (considering a Sharding
-    strategy). Using the configured <classname>ReaderProvider</classname>
-    (described in<xref linkend="search-architecture-readerstrategy"/>) on each
+    which indexes are needed to query this entity, for example by resolving a Sharding
+    strategy. Using the configured <classname>ReaderProvider</classname>
+    (described in <xref linkend="search-architecture-readerstrategy"/>) on each
     index, it returns a compound <literal>IndexReader</literal> on top of all
     involved indexes. Because this <classname>IndexReader</classname> is
     shared amongst several clients, you must adhere to the following
@@ -84,13 +84,13 @@ finally {
     <itemizedlist>
       <listitem>
         <para>Never call indexReader.close(), but always call
-        readerProvider.closeReader(reader), preferably in a finally
+        readerProvider.closeReader(reader), using a finally
         block.</para>
       </listitem>
 
       <listitem>
         <para>Don't use this <classname>IndexReader</classname> for
-        modification operations (it's a readonly
+        modification operations: it's a readonly
         <classname>IndexReader</classname>, you would get an
         exception).</para>
       </listitem>
@@ -98,9 +98,9 @@ finally {
 
     <para>Aside from those rules, you can use the
     <classname>IndexReader</classname> freely, especially to do native Lucene
-    queries. Using the shared <classname>IndexReader</classname>s will make
-    most queries more efficient than by opening one directly from - for
-    example - the filesystem.</para>
+    queries. Using this shared <classname>IndexReader</classname>s will be
+    more efficient than by opening one directly from - for example - the
+    filesystem.</para>
 
     <para>As an alternative to the method <methodname>open(Class...
     types)</methodname> you can use <methodname>open(String...
@@ -128,16 +128,16 @@ finally {
     an index does not necessarily need to be implemented by a
     <classname>Directory</classname>.</para>
 
-    <para>If you know your index is represented as a
+    <para>If you are certain that your index is represented as a
     <classname>Directory</classname> and need to access it, you can get a
     reference to the <classname>Directory</classname> via the
-    <classname>IndexManager</classname>. Cast the
-    <classname>IndexManager</classname> to a
+    <classname>IndexManager</classname>. You will have to cast the
+    <classname>IndexManager</classname> instance to a
     <classname>DirectoryBasedIndexManager</classname> and then use
     <literal>getDirectoryProvider().getDirectory()</literal> to get a
     reference to the underlying <classname>Directory</classname>. This is not
-    recommended, we would encourage to use the
-    <classname>IndexReader</classname> instead.</para>
+    recommended, if you need low level access to the index using Lucene APIs
+    we suggest to see <xref linkend="IndexReaders"/> instead.</para>
   </section>
 
   <section id="search-configuration-directory-sharding" revision="1">
@@ -145,12 +145,6 @@ finally {
 
     <para>In some cases it can be useful to split (shard) the indexed data of
     a given entity into several Lucene indexes.</para>
-
-    <note>
-      <para>This solution is not recommended unless there is a pressing need.
-      Searches will be slower as all shards have to be opened for a single
-      search. Don't do it until you have a real use case!</para>
-    </note>
 
     <para>Possible use cases for sharding are:</para>
 
