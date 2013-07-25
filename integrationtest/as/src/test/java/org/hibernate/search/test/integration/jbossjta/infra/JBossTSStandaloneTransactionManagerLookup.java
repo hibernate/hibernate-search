@@ -21,28 +21,39 @@
 package org.hibernate.search.test.integration.jbossjta.infra;
 
 import java.lang.reflect.Method;
-import java.util.Properties;
+
+import javax.transaction.Synchronization;
+import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.hibernate.HibernateException;
-import org.hibernate.transaction.TransactionManagerLookup;
+import org.hibernate.TransactionException;
+import org.hibernate.engine.transaction.internal.jta.JtaStatusHelper;
+import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 
 /**
  * Return a standalone JTA transaction manager for JBoss Transactions
  *
  * @author Emmanuel Bernard
  */
-public class JBossTSStandaloneTransactionManagerLookup implements TransactionManagerLookup {
+public class JBossTSStandaloneTransactionManagerLookup implements JtaPlatform {
 
-	public TransactionManager getTransactionManager(Properties props) throws HibernateException {
+	@Override
+	public Object getTransactionIdentifier(Transaction transaction) {
+		return transaction;
+	}
+
+	@Override
+	public TransactionManager retrieveTransactionManager() {
 		try {
-			//Call jtaPropertyManager.getJTAEnvironmentBean().getTransactionManager();
+			// Call jtaPropertyManager.getJTAEnvironmentBean().getTransactionManager();
 
-			//improper camel case name for the class
+			// improper camel case name for the class
 			Class<?> propertyManager = Class.forName( "com.arjuna.ats.jta.common.jtaPropertyManager" );
 			final Method getJTAEnvironmentBean = propertyManager.getMethod( "getJTAEnvironmentBean" );
-			//static method
+			// static method
 			final Object jtaEnvironmentBean = getJTAEnvironmentBean.invoke( null );
 			final Method getTransactionManager = jtaEnvironmentBean.getClass().getMethod( "getTransactionManager" );
 			return (TransactionManager) getTransactionManager.invoke( jtaEnvironmentBean );
@@ -52,11 +63,29 @@ public class JBossTSStandaloneTransactionManagerLookup implements TransactionMan
 		}
 	}
 
-	public String getUserTransactionName() {
+	@Override
+	public UserTransaction retrieveUserTransaction() {
 		return null;
 	}
 
-	public Object getTransactionIdentifier(Transaction transaction) {
-		return transaction;
+	@Override
+	public boolean canRegisterSynchronization() {
+		return JtaStatusHelper.isActive( retrieveTransactionManager() );
 	}
+
+	@Override
+	public void registerSynchronization(Synchronization synchronization) {
+		try {
+			retrieveTransactionManager().getTransaction().registerSynchronization( synchronization );
+		}
+		catch (Exception e) {
+			throw new TransactionException( "Could not obtain transaction from TM" );
+		}
+	}
+
+	@Override
+	public int getCurrentStatus() throws SystemException {
+		return JtaStatusHelper.getStatus( retrieveTransactionManager() );
+	}
+
 }

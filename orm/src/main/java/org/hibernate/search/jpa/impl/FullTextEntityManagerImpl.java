@@ -24,29 +24,34 @@
 package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
-import javax.persistence.EntityTransaction;
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.TypedQuery;
-import javax.persistence.metamodel.Metamodel;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaBuilder;
-
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.FullTextQuery;
-import org.hibernate.search.MassIndexer;
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.metamodel.Metamodel;
 
 import org.hibernate.Session;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.MassIndexer;
+import org.hibernate.search.Search;
+import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -295,6 +300,60 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 
 	public MassIndexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );
+	}
+
+	@Override
+	public Query createQuery(CriteriaUpdate updateQuery) {
+		return em.createQuery( updateQuery );
+	}
+
+	public Query createQuery(CriteriaDelete deleteQuery) {
+		return em.createQuery( deleteQuery );
+	}
+
+	@Override
+	public StoredProcedureQuery createNamedStoredProcedureQuery(String name) {
+		return createNamedStoredProcedureQuery( name );
+	}
+
+	@Override
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName) {
+		return em.createStoredProcedureQuery( procedureName );
+	}
+
+	@Override
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class... resultClasses) {
+		return em.createStoredProcedureQuery( procedureName, resultClasses );
+	}
+
+	@Override
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, String... resultSetMappings) {
+		return em.createStoredProcedureQuery( procedureName, resultSetMappings );
+	}
+
+	@Override
+	public boolean isJoinedToTransaction() {
+		return em.isJoinedToTransaction();
+	}
+
+	@Override
+	public <T> EntityGraph<T> createEntityGraph(Class<T> rootType) {
+		return em.createEntityGraph( rootType );
+	}
+
+	@Override
+	public EntityGraph<?> createEntityGraph(String graphName) {
+		return em.createEntityGraph( graphName );
+	}
+
+	@Override
+	public <T> EntityGraph<T> getEntityGraph(String graphName) {
+		return em.getEntityGraph( graphName );
+	}
+
+	@Override
+	public <T> List<EntityGraph<? super T>> getEntityGraphs(Class<T> entityClass) {
+		return em.getEntityGraphs( entityClass );
 	}
 
 }

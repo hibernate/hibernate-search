@@ -24,16 +24,15 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
-import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.util.logging.impl.Log;
-
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.engine.transaction.spi.TransactionFactory;
-import org.hibernate.service.jta.platform.spi.JtaPlatform;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Wrap the subsequent Runnable in a JTA Transaction if necessary:
