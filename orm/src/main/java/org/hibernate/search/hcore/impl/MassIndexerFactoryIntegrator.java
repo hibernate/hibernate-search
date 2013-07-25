@@ -23,6 +23,8 @@ package org.hibernate.search.hcore.impl;
 import java.util.Map;
 import java.util.Properties;
 
+import org.hibernate.boot.registry.StandardServiceInitiator;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.integrator.spi.ServiceContributingIntegrator;
@@ -30,8 +32,6 @@ import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.search.impl.DefaultMassIndexerFactory;
 import org.hibernate.search.spi.MassIndexerFactory;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.service.ServiceRegistryBuilder;
-import org.hibernate.service.spi.BasicServiceInitiator;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
@@ -43,7 +43,7 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
  * @author Davide D'Alto <davide@hibernate.org>
  */
 public class MassIndexerFactoryIntegrator implements ServiceContributingIntegrator,
-		BasicServiceInitiator<MassIndexerFactory> {
+		StandardServiceInitiator<MassIndexerFactory> {
 
 	public static final String MASS_INDEXER_FACTORY_CLASSNAME = "hibernate.search.massindexer.factoryclass";
 
@@ -94,8 +94,11 @@ public class MassIndexerFactoryIntegrator implements ServiceContributingIntegrat
 	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.hibernate.integrator.spi.ServiceContributingIntegrator#prepareServices(org.hibernate.boot.registry.StandardServiceRegistryBuilder)
+	 */
 	@Override
-	public void prepareServices(ServiceRegistryBuilder serviceRegistryBuilder) {
+	public void prepareServices(StandardServiceRegistryBuilder serviceRegistryBuilder) {
 		serviceRegistryBuilder.addInitiator( this );
 	}
 

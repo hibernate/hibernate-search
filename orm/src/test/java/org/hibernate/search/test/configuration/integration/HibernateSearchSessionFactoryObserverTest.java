@@ -23,23 +23,24 @@
  */
 package org.hibernate.search.test.configuration.integration;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
+
 import java.util.Properties;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.util.BytemanHelper;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMRules;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -68,10 +69,10 @@ public class HibernateSearchSessionFactoryObserverTest {
 		properties.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		hibernateConfiguration.getProperties().putAll( properties );
 
-		ServiceRegistryBuilder registryBuilder = new ServiceRegistryBuilder();
+		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 		registryBuilder.applySettings( hibernateConfiguration.getProperties() );
 
-		ServiceRegistry serviceRegistry = registryBuilder.buildServiceRegistry();
+		ServiceRegistry serviceRegistry = registryBuilder.build();
 		try {
 			hibernateConfiguration.buildSessionFactory( serviceRegistry );
 			fail( "ByteMan should have forced an exception" );

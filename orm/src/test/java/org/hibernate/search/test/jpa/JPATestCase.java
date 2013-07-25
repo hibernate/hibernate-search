@@ -23,23 +23,24 @@
  */
 package org.hibernate.search.test.jpa;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.ArrayList;import java.util.Arrays;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.util.Version;
 import org.hibernate.cfg.Environment;
-import org.hibernate.ejb.AvailableSettings;
-import org.hibernate.ejb.HibernatePersistence;
+import org.hibernate.jpa.AvailableSettings;
 import org.hibernate.search.test.TestConstants;
 import org.junit.After;
 import org.junit.Before;
-import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.util.Version;
 
 /**
  * @author Emmanuel Bernard
@@ -57,7 +58,7 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 
 	@Before
 	public void setUp() {
-		factory = new HibernatePersistence().createEntityManagerFactory( getConfig() );
+		factory = Persistence.createEntityManagerFactory( "JPATestCase", getConfig() );
 	}
 
 	@After

@@ -23,12 +23,15 @@
  */
 package org.hibernate.search.event.impl;
 
+import static org.hibernate.search.event.impl.FullTextIndexEventListener.Installation.SINGLE_INSTANCE;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
+
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
@@ -327,5 +330,17 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		else {
 			return searchFactoryImplementor.getDocumentBuilderContainedEntity( clazz );
 		}
+	}
+
+	public static enum Installation {
+		SINGLE_INSTANCE
+	}
+
+	/* (non-Javadoc)
+	 * @see org.hibernate.event.spi.PostDeleteEventListener#requiresPostCommitHanding(org.hibernate.persister.entity.EntityPersister)
+	 */
+	@Override
+	public boolean requiresPostCommitHanding(EntityPersister persister) {
+		return false;
 	}
 }

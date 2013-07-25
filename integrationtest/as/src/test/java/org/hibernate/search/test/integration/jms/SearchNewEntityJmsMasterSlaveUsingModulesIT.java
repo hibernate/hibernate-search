@@ -33,6 +33,7 @@ import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
 /**
@@ -42,6 +43,7 @@ import org.junit.runner.RunWith;
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
+@Ignore
 @RunWith(Arquillian.class)
 public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends SearchNewEntityJmsMasterSlave {
 

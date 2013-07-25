@@ -153,8 +153,17 @@
             </thread-pools>
             <iiop enable-by-default="false" use-qualified-name="false"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:infinispan:1.2" default-cache-container="hibernate">
-            <cache-container name="hibernate" default-cache="local-query">
+        <subsystem xmlns="urn:jboss:domain:io:1.0">
+            <worker name="default" io-threads="3"/>
+            <buffer-pool name="default" buffer-size="16384" buffers-per-slice="128"/>
+        </subsystem>
+        <subsystem xmlns="urn:jboss:domain:infinispan:2.0">
+            <cache-container name="web" aliases="standard-session-cache" default-cache="local-web" module="org.wildfly.clustering.web.infinispan">
+                <local-cache name="local-web" batching="true">
+                    <file-store passivation="false" purge="false"/>
+                </local-cache>
+            </cache-container>
+            <cache-container name="hibernate" default-cache="local-query" module="org.hibernate">
                 <local-cache name="entity">
                     <transaction mode="NON_XA"/>
                     <eviction strategy="LRU" max-entries="10000"/>

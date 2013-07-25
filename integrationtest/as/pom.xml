@@ -40,7 +40,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.jboss.as>7.2.0.Alpha1-redhat-4</version.jboss.as>
+        <version.wildfly>8.0.0.Alpha3</version.wildfly>
         <version.arquillian>1.0.3.Final</version.arquillian>
         <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
     </properties>
@@ -115,9 +115,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-arquillian-container-managed</artifactId>
-            <version>7.2.0.Final</version>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-arquillian-container-managed</artifactId>
+            <version>${version.wildfly}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -188,10 +188,10 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.jboss.as</groupId>
-                                    <artifactId>jboss-as-dist</artifactId>
-                                    <version>${version.jboss.as}</version>
-                                    <type>zip</type>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${version.wildfly}</version>
+                                    <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
@@ -202,7 +202,7 @@
                                     <classifier>jbossas-72-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/jboss-eap-6.1/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/wildfly-${version.wildfly}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -221,7 +221,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/jboss-eap-6.1</outputDirectory>
+                            <outputDirectory>${basedir}/target/wildfly-${version.wildfly}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>

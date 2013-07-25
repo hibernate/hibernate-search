@@ -46,15 +46,16 @@ import org.hibernate.ReplicationMode;
 import org.hibernate.SQLQuery;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.SimpleNaturalIdLoadAccess;
 import org.hibernate.Transaction;
 import org.hibernate.TypeHelper;
 import org.hibernate.UnknownProfileException;
-import org.hibernate.Session;
 import org.hibernate.cache.spi.CacheKey;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.jdbc.spi.JdbcConnectionAccess;
+import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.engine.query.spi.sql.NativeSQLQuerySpecification;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.LoadQueryInfluencers;
@@ -63,21 +64,21 @@ import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.engine.transaction.spi.TransactionCoordinator;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.procedure.ProcedureCall;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextSharedSessionBuilder;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.TransactionContext;
+import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.spi.MassIndexerFactory;
@@ -796,6 +797,26 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	@Override
 	public SimpleNaturalIdLoadAccess bySimpleNaturalId(Class entityClass) {
 		return session.bySimpleNaturalId( entityClass );
+	}
+
+	@Override
+	public ProcedureCall getNamedProcedureCall(String name) {
+		return session.getNamedProcedureCall( name );
+	}
+
+	@Override
+	public ProcedureCall createStoredProcedureCall(String procedureName) {
+		return session.createStoredProcedureCall( procedureName );
+	}
+
+	@Override
+	public ProcedureCall createStoredProcedureCall(String procedureName, Class... resultClasses) {
+		return session.createStoredProcedureCall( procedureName, resultClasses );
+	}
+
+	@Override
+	public ProcedureCall createStoredProcedureCall(String procedureName, String... resultSetMappings) {
+		return createStoredProcedureCall( procedureName, resultSetMappings );
 	}
 
 }

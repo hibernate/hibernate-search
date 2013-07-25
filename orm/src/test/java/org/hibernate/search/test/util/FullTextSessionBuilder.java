@@ -31,9 +31,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.analysis.StopAnalyzer;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -48,7 +48,6 @@ import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.testing.cache.CachingRegionFactory;
 
@@ -174,10 +173,10 @@ public class FullTextSessionBuilder {
 		}
 		hibConfiguration.getProperties().putAll( cfg );
 
-		ServiceRegistryBuilder registryBuilder = new ServiceRegistryBuilder();
+		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder();
 		registryBuilder.applySettings( hibConfiguration.getProperties() );
 
-		final ServiceRegistry serviceRegistry = registryBuilder.buildServiceRegistry();
+		final ServiceRegistry serviceRegistry = registryBuilder.build();
 		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory(
 				serviceRegistry
 		);
