@@ -328,4 +328,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			return searchFactoryImplementor.getDocumentBuilderContainedEntity( clazz );
 		}
 	}
+
+	public boolean requiresPostCommitHanding(EntityPersister persister) {
+		return false;
+	}
 }
