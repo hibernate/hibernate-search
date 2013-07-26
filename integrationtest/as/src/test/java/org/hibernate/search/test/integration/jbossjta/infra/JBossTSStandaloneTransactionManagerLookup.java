@@ -21,22 +21,26 @@
 package org.hibernate.search.test.integration.jbossjta.infra;
 
 import java.lang.reflect.Method;
-import java.util.Properties;
+
+import javax.transaction.Synchronization;
+import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.hibernate.HibernateException;
-import org.hibernate.transaction.TransactionManagerLookup;
+import org.hibernate.TransactionException;
+import org.hibernate.engine.transaction.internal.jta.JtaStatusHelper;
+import org.hibernate.service.jta.platform.spi.JtaPlatform;
 
 /**
  * Return a standalone JTA transaction manager for JBoss Transactions
  *
  * @author Emmanuel Bernard
  */
-public class JBossTSStandaloneTransactionManagerLookup implements TransactionManagerLookup {
+public class JBossTSStandaloneTransactionManagerLookup implements JtaPlatform {
 
-	@Override
-	public TransactionManager getTransactionManager(Properties props) throws HibernateException {
+	public TransactionManager retrieveTransactionManager() {
 		try {
 			//Call jtaPropertyManager.getJTAEnvironmentBean().getTransactionManager();
 
@@ -53,12 +57,27 @@ public class JBossTSStandaloneTransactionManagerLookup implements TransactionMan
 		}
 	}
 
-	@Override
-	public String getUserTransactionName() {
+	public UserTransaction retrieveUserTransaction() {
 		return null;
 	}
 
-	@Override
+	public boolean canRegisterSynchronization() {
+		return JtaStatusHelper.isActive( retrieveTransactionManager() );
+	}
+
+	public void registerSynchronization(Synchronization synchronization) {
+		try {
+			retrieveTransactionManager().getTransaction().registerSynchronization( synchronization );
+		}
+		catch (Exception e) {
+			throw new TransactionException( "Could not obtain transaction from TM" );
+		}
+	}
+
+	public int getCurrentStatus() throws SystemException {
+		return JtaStatusHelper.getStatus( retrieveTransactionManager() );
+	}
+
 	public Object getTransactionIdentifier(Transaction transaction) {
 		return transaction;
 	}
