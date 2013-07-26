@@ -44,7 +44,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
-import org.hibernate.service.jta.platform.spi.JtaPlatform;
+import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 
 /**
  * Implementation of the transactional context on top of an EventSource (Session)

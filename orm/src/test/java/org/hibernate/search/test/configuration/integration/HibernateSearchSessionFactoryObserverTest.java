@@ -71,7 +71,7 @@ public class HibernateSearchSessionFactoryObserverTest {
 		ServiceRegistryBuilder registryBuilder = new ServiceRegistryBuilder();
 		registryBuilder.applySettings( hibernateConfiguration.getProperties() );
 
-		ServiceRegistry serviceRegistry = registryBuilder.buildServiceRegistry();
+		ServiceRegistry serviceRegistry = registryBuilder.build();
 		try {
 			hibernateConfiguration.buildSessionFactory( serviceRegistry );
 			fail( "ByteMan should have forced an exception" );

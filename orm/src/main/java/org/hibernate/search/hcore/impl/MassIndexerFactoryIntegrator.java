@@ -31,7 +31,8 @@ import org.hibernate.search.impl.DefaultMassIndexerFactory;
 import org.hibernate.search.spi.MassIndexerFactory;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.service.ServiceRegistryBuilder;
-import org.hibernate.service.spi.BasicServiceInitiator;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.registry.StandardServiceInitiator;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
@@ -43,7 +44,7 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
  * @author Davide D'Alto <davide@hibernate.org>
  */
 public class MassIndexerFactoryIntegrator implements ServiceContributingIntegrator,
-		BasicServiceInitiator<MassIndexerFactory> {
+		StandardServiceInitiator<MassIndexerFactory> {
 
 	public static final String MASS_INDEXER_FACTORY_CLASSNAME = "hibernate.search.massindexer.factoryclass";
 
@@ -94,8 +95,13 @@ public class MassIndexerFactoryIntegrator implements ServiceContributingIntegrat
 	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 	}
 
-	@Override
+	/* Hibernate ORM 4.2.x */
 	public void prepareServices(ServiceRegistryBuilder serviceRegistryBuilder) {
+		serviceRegistryBuilder.addInitiator( this );
+	}
+
+	/* Hibernate ORM 4.3.x */
+	public void prepareServices(StandardServiceRegistryBuilder serviceRegistryBuilder) {
 		serviceRegistryBuilder.addInitiator( this );
 	}
 

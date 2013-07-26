@@ -34,7 +34,6 @@ import javax.persistence.Persistence;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
-import org.hibernate.ejb.HibernatePersistence;
 import org.hibernate.search.test.TestConstants;
 import org.junit.After;
 import org.junit.Before;
@@ -57,7 +56,7 @@ public abstract class JPATestCase extends junit.framework.TestCase {
 
 	@Before
 	public void setUp() {
-		factory = new HibernatePersistence().createEntityManagerFactory( getConfig() );
+		factory = Persistence.createEntityManagerFactory( "JPATestCasePU", getConfig() );
 	}
 
 	@After
