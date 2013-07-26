@@ -22,7 +22,7 @@ package org.hibernate.search.infinispan;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
+import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.

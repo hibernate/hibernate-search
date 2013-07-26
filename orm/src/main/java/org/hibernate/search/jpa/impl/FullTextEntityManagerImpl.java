@@ -25,16 +25,21 @@ package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.List;
+import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.persistence.EntityTransaction;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaUpdate;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
@@ -295,6 +300,50 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 
 	public MassIndexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );
+	}
+
+	public Query createQuery(CriteriaUpdate updateQuery) {
+		return em.createQuery( updateQuery );
+	}
+
+	public Query createQuery(CriteriaDelete deleteQuery) {
+		return em.createQuery( deleteQuery );
+	}
+
+	public StoredProcedureQuery createNamedStoredProcedureQuery(String name) {
+		return em.createNamedStoredProcedureQuery( name );
+	}
+
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName) {
+		return em.createStoredProcedureQuery( procedureName );
+	}
+
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class... resultClasses) {
+		return em.createStoredProcedureQuery( procedureName, resultClasses );
+	}
+
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, String... resultSetMappings) {
+		return em.createStoredProcedureQuery( procedureName, resultSetMappings );
+	}
+
+	public boolean isJoinedToTransaction() {
+		return em.isJoinedToTransaction();
+	}
+
+	public <T> EntityGraph<T> createEntityGraph(Class<T> rootType) {
+		return em.createEntityGraph( rootType );
+	}
+
+	public EntityGraph<?> createEntityGraph(String graphName) {
+		return em.createEntityGraph( graphName );
+	}
+
+	public <T> EntityGraph<T> getEntityGraph(String graphName) {
+		return em.getEntityGraph( graphName );
+	}
+
+	public <T> List<EntityGraph<? super T>> getEntityGraphs(Class<T> entityClass) {
+		return em.getEntityGraphs( entityClass );
 	}
 
 }
