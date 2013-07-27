@@ -55,6 +55,13 @@
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
             <version>5.6</version>
+            <exclusions>
+                <!-- Not excluding com.sun:tools causes project import errors on Windows -->
+                <exclusion>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
