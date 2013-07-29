@@ -55,8 +55,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Component of batch-indexing pipeline, using chained producer-consumers.
- * This Runnable will consume entities taken one-by-one from the queue
- * and produce for each entity an AddLuceneWork to the output queue.
+ * This {@code Runnable} will consume entities by taking them one-by-one from the queue
+ * and produce for each entity an {@code AddLuceneWork} instance for the output queue.
  *
  * @author Sanne Grinovero
  */

@@ -77,7 +77,7 @@ public class EmptyBuildContext implements BuildContext {
 
 	/**
 	 * To not be used on this BuildContext implementation.
-	 * @throws SearchException Always thrown.
+	 * @throws org.hibernate.search.SearchException Always thrown.
 	 */
 	@Override
 	public String getIndexingStrategy() {
@@ -86,7 +86,7 @@ public class EmptyBuildContext implements BuildContext {
 
 	/**
 	 * To not be used on this BuildContext implementation.
-	 * @throws SearchException Always thrown.
+	 * @throws org.hibernate.search.SearchException Always thrown.
 	 */
 	@Override
 	public IndexManagerHolder getAllIndexesManager() {
@@ -95,7 +95,7 @@ public class EmptyBuildContext implements BuildContext {
 
 	/**
 	 * To not be used on this BuildContext implementation.
-	 * @throws SearchException Always thrown.
+	 * @throws org.hibernate.search.SearchException Always thrown.
 	 */
 	@Override
 	public ErrorHandler getErrorHandler() {
