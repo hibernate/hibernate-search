@@ -114,7 +114,9 @@ public class JBossTSIT {
 
 	@AfterClass
 	public static void tearDown() {
-		factory.close();
+		if ( factory != null ) {
+			factory.close();
+		}
 		FileHelper.delete( tempDirectory );
 	}
 
