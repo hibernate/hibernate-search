@@ -21,16 +21,14 @@
 
 package org.hibernate.search.test.batchindexing;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.AssertingMassIndexerProgressMonitor;
 
 /**
  * @author Hardy Ferentschik
@@ -46,13 +44,13 @@ public class ProgressMonitorTest extends SearchTestCase {
 
 	public void testAllRelevantProgressMonitoringOperationsCalled() throws InterruptedException {
 		// let mass indexer re-index the data in the db (created in initializeData())
-		DelegatingProgressMonitor monitor = new DelegatingProgressMonitor();
+		AssertingMassIndexerProgressMonitor monitor = new AssertingMassIndexerProgressMonitor( 10, 10 );
 		fullTextSession.createIndexer( LegacyCar.class )
 				.progressMonitor( monitor )
 				.startAndWait();
 		fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), LegacyCar.class )
 				.getResultSize();
-		monitor.assertProgress();
+		monitor.assertExpectedProgressMade();
 	}
 
 	private static void initializeData(FullTextSession fullTextSession) {
@@ -70,44 +68,5 @@ public class ProgressMonitorTest extends SearchTestCase {
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { LegacyCarPlant.class, LegacyCar.class, LegacyTire.class };
-	}
-
-	private static class DelegatingProgressMonitor implements MassIndexerProgressMonitor {
-		MassIndexerProgressMonitor monitor;
-		final AtomicLong totalCount = new AtomicLong();
-		final AtomicLong finishedCount = new AtomicLong();
-		final AtomicLong addedDocuments = new AtomicLong();
-
-		DelegatingProgressMonitor() {
-			monitor = new SimpleIndexingProgressMonitor( 1 );
-		}
-
-		public void documentsAdded(long increment) {
-			addedDocuments.addAndGet( increment );
-			monitor.documentsAdded( increment );
-		}
-
-		public void documentsBuilt(int number) {
-			monitor.documentsBuilt( number );
-		}
-
-		public void entitiesLoaded(int size) {
-			monitor.entitiesLoaded( size );
-		}
-
-		public void addToTotalCount(long count) {
-			totalCount.addAndGet( count );
-			monitor.addToTotalCount( count );
-		}
-
-		public void indexingCompleted() {
-			finishedCount.incrementAndGet();
-		}
-
-		public void assertProgress() {
-			assertEquals( "Unexpected number of added documents", 10, addedDocuments.get() );
-			assertEquals( "Unexpected total count", 10, totalCount.get() );
-			assertEquals( "Finished called more than once", 1, finishedCount.get() );
-		}
 	}
 }
