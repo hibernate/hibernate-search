@@ -124,9 +124,9 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	private void timeMs() throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		CountDownLatch startSignal = new CountDownLatch( 1 );
-		InsertActivity insertionTask = new InsertActivity( getSessions(), startSignal );
-		SearchActivity searchTask = new SearchActivity( getSessions(), startSignal );
-		UpdateActivity updateTask = new UpdateActivity( getSessions(), startSignal );
+		InsertActivity insertionTask = new InsertActivity( getSessionFactory(), startSignal );
+		SearchActivity searchTask = new SearchActivity( getSessionFactory(), startSignal );
+		UpdateActivity updateTask = new UpdateActivity( getSessionFactory(), startSignal );
 		//we declare needed activities in order, scheduler will "mix":
 		for ( int batch = 0; batch <= TOTAL_WORK_BATCHES; batch++ ) {
 			for ( int inserters = 0; inserters < INSERTIONS_PER_BATCH; inserters++ ) {

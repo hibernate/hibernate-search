@@ -28,8 +28,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import junit.framework.Assert;
-
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -40,21 +38,22 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.TestConstants;
+import org.junit.Assert;
 
 /**
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class WorkerTestCase extends SearchTestCase {
+public class WorkerTestCase extends SearchTestCaseJUnit4 {
 
 	public void testConcurrency() throws Exception {
 		final AtomicBoolean allFine = new AtomicBoolean( true );
 		int nThreads = 15;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
-		Work work = new Work( getSessions(), allFine, isWorkerSync() );
-		ReverseWork reverseWork = new ReverseWork( getSessions(), allFine );
+		Work work = new Work( getSessionFactory(), allFine, isWorkerSync() );
+		ReverseWork reverseWork = new ReverseWork( getSessionFactory(), allFine );
 		long start = System.nanoTime();
 		int iteration = 100;
 		for ( int i = 0; i < iteration; i++ ) {
@@ -63,8 +62,11 @@ public class WorkerTestCase extends SearchTestCase {
 		}
 		es.shutdown();
 		es.awaitTermination( 100, TimeUnit.MINUTES );
-		getSessions().close();
-		Assert.assertTrue( "Something was wrong in the concurrent threads, please check logs for stacktraces", allFine.get() );
+		getSessionFactory().close();
+		Assert.assertTrue(
+				"Something was wrong in the concurrent threads, please check logs for stacktraces",
+				allFine.get()
+		);
 		System.out.println(
 				iteration + " iterations (8 tx per iteration) in " + nThreads + " threads: "
 						+ TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - start )

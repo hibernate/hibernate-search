@@ -44,7 +44,6 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -61,12 +60,10 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	static final AtomicInteger WORK_COUNTER = new AtomicInteger();
 
 	public void testErrorHandling() {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		EntityIndexBinding mappingForEntity = searchFactory.getIndexBinding( Document.class );
+		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
+		EntityIndexBinding mappingForEntity = getSearchFactoryImpl().getIndexBinding( Foo.class );
 		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
-		ErrorHandler errorHandler = searchFactory.getErrorHandler();
-		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
-		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
+
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( new HarmlessWork( "firstWork" ) );
 		queue.add( new HarmlessWork( "secondWork" ) );
@@ -102,8 +99,15 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		Assert.assertEquals( "failed work message", exception.getMessage() );
 	}
 
+	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
+		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
+		ErrorHandler errorHandler = searchFactory.getErrorHandler();
+		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
+		return (MockErrorHandler)errorHandler;
+	}
+
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] { Document.class };
+		return new Class[] { Foo.class };
 	}
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
@@ -118,7 +122,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	static class HarmlessWork extends DeleteLuceneWork {
 
 		public HarmlessWork(String workIdentifier) {
-			super( workIdentifier, workIdentifier, Document.class );
+			super( workIdentifier, workIdentifier, Foo.class );
 		}
 
 		@Override
@@ -158,7 +162,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 	static class FailingWork extends DeleteLuceneWork {
 
 		public FailingWork(String workIdentifier) {
-			super( workIdentifier, workIdentifier, Document.class );
+			super( workIdentifier, workIdentifier, Foo.class );
 		}
 
 		@Override

@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test;
+package org.hibernate.search.test.engine;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -31,6 +31,8 @@ import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
+import org.hibernate.search.test.Document;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Emmanuel Bernard
@@ -38,7 +40,7 @@ import org.hibernate.jdbc.Work;
 public class TransactionTest extends SearchTestCase {
 
 	public void testTransactionCommit() throws Exception {
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.persist(
 				new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" )
@@ -54,7 +56,7 @@ public class TransactionTest extends SearchTestCase {
 
 		assertEquals( "transaction.commit() should index", 3, getDocumentNumber() );
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.persist(
 				new Document(
@@ -67,7 +69,7 @@ public class TransactionTest extends SearchTestCase {
 
 		assertEquals( "rollback() should not index", 3, getDocumentNumber() );
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.doWork( new Work() {
 			@Override
 			public void execute(Connection connection) throws SQLException {

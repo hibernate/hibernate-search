@@ -40,6 +40,7 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jpa.JPATestCase;
+import org.junit.Test;
 
 /**
  * @author Davide D'Alto <davide@hibernate.org>
@@ -75,6 +76,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 		}
 	}
 
+	@Test
 	@SuppressWarnings("unchecked")
 	public void testResultOrderedByDateDescending() throws Exception {
 		EntityTransaction tx = em.getTransaction();

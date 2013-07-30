@@ -61,7 +61,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 	 */
 	public void testEntityResurrection() {
 		final Long id = 5l;
-		Session session = getSessions().openSession();
+		Session session = getSessionFactory().openSession();
 		session.getTransaction().begin();
 
 		AlternateDocument docOnInfinispan = new AlternateDocument( id, "On Infinispan", "a book about Infinispan", "content" );
@@ -100,13 +100,13 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 	}
 
 	public void testMultipleEntitiesPerIndex() throws Exception {
-		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( (SessionFactoryImplementor) getSessions() );
+		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( (SessionFactoryImplementor) getSessionFactory() );
 		IndexManager documentsIndexManager = searchFactoryBySFI.getIndexManagerHolder().getIndexManager( "Documents" );
 		Assert.assertNotNull( documentsIndexManager );
 		Assert.assertTrue( documentsIndexManager.getClass().equals( org.hibernate.search.indexes.impl.NRTIndexManager.class ) );
 		NRTIndexManager indexManager = (NRTIndexManager) documentsIndexManager;
 
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		Document document =
 				new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" );
@@ -126,7 +126,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 		assertEquals( 0, getDocumentNbrFromFilesystem( indexManager ) );
 		assertEquals( 2, getDocumentNbrFromReaderProvider( indexManager ) );
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		TermQuery q = new TermQuery( new Term( "alt_title", "hibernate" ) );
 		assertEquals(
@@ -143,7 +143,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 		s.getTransaction().commit();
 		s.close();
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 
 		assertEquals( 0, getDocumentNbrFromFilesystem( indexManager ) ); //filesystem only sees changes from a fully closed IW
@@ -154,7 +154,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 		s.getTransaction().commit();
 		s.close();
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 
 		assertEquals( 0, getDocumentNbrFromFilesystem( indexManager ) );
@@ -196,7 +196,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 		}
 	}
 
-	protected Class<?>[] getAnnotatedClasses() {
+	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Document.class,
 				AlternateDocument.class

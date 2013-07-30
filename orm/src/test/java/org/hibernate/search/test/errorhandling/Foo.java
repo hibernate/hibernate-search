@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,15 +21,30 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.backend;
 
-import org.hibernate.search.Environment;
+package org.hibernate.search.test.errorhandling;
 
-public class AsyncBackendLongWorklistsStressTest extends SyncBackendLongWorklistsStressTest {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.WORKER_EXECUTION, "async" );
+import org.hibernate.search.annotations.Indexed;
+
+/**
+ * @author Hardy Ferentschik
+ */
+@Entity
+@Indexed
+public class Foo {
+	@Id
+	@GeneratedValue
+	private long id;
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "Foo{" );
+		sb.append( "id=" ).append( id );
+		sb.append( '}' );
+		return sb.toString();
 	}
-
 }

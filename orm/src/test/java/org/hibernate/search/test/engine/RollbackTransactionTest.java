@@ -104,8 +104,8 @@ public class RollbackTransactionTest extends SearchTestCase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
+		configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		configuration.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 
 }

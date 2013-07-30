@@ -39,7 +39,7 @@ public class ManualIndexingStrategyTest extends SearchTestCase {
 
 	public void testMultipleEntitiesPerIndex() throws Exception {
 
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		Document document =
 				new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" );
@@ -58,7 +58,7 @@ public class ManualIndexingStrategyTest extends SearchTestCase {
 
 		assertEquals( 0, getDocumentNbr() );
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.delete( s.get( AlternateDocument.class, document.getId() ) );
 		s.delete( s.createCriteria( Document.class ).uniqueResult() );

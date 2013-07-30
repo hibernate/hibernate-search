@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test;
+package org.hibernate.search.test.engine;
 
 import java.util.List;
 
@@ -30,6 +30,8 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.query.AlternateBook;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;

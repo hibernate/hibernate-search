@@ -44,7 +44,7 @@ public class NestedContainedInTest extends SearchTestCase {
 		String tagName = "animal";
 		createHelpItem( tagName );
 		doQuery( tagName );
-		session.close();
+		getSession().close();
 	}
 
 	public void testChangeTagName() {
@@ -58,16 +58,16 @@ public class NestedContainedInTest extends SearchTestCase {
 		String newTagName = "automobile";
 		tag.setName( newTagName );
 
-		Transaction tx = session.beginTransaction();
-		session.saveOrUpdate( tag );
+		Transaction tx = getSession().beginTransaction();
+		getSession().saveOrUpdate( tag );
 		tx.commit();
 
 		doQuery( newTagName );
-		session.close();
+		getSession().close();
 	}
 
 	private void createHelpItem(String tagName) {
-		Transaction tx = session.beginTransaction();
+		Transaction tx = getSession().beginTransaction();
 		HelpItem helpItem = new HelpItem();
 		helpItem.setTitle( "The quick brown fox jumps over the lazy dog." );
 
@@ -81,16 +81,16 @@ public class NestedContainedInTest extends SearchTestCase {
 		helpItem.getTags().add( helpItemTag );
 		tag.getHelpItems().add( helpItemTag );
 
-		session.save( helpItem );
-		session.save( tag );
-		session.save( helpItemTag );
+		getSession().save( helpItem );
+		getSession().save( tag );
+		getSession().save( helpItemTag );
 
 		tx.commit();
 	}
 
 	private HelpItem doQuery(String tagName) {
-		Transaction tx = session.beginTransaction();
-		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		Transaction tx = getSession().beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( getSession() );
 		Query termQuery = new TermQuery( new Term( "tags.tag.name", tagName ) );
 		FullTextQuery fullTextQuery =
 				fullTextSession.createFullTextQuery( termQuery, HelpItem.class );

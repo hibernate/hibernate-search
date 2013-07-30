@@ -381,7 +381,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		searcher.close();
 		fullTextSession.getSearchFactory().getIndexReaderAccessor().close( indexReader );
 		transaction.commit();
-		session.close();
+		getSession().close();
 
 		assertEquals( 3, hits.totalHits );
 	}

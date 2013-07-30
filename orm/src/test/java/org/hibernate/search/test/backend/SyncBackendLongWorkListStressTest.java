@@ -25,7 +25,6 @@ package org.hibernate.search.test.backend;
 
 import java.io.File;
 
-import junit.framework.Assert;
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
 
@@ -34,10 +33,10 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.Clock;
 import org.hibernate.search.test.SearchTestCase;
+import org.junit.Assert;
 
-public class SyncBackendLongWorklistsStressTest extends SearchTestCase {
+public class SyncBackendLongWorkListStressTest extends SearchTestCase {
 
 	/* needs to be sensibly higher than org.hibernate.search.batchindexing.Executors.QUEUE_MAX_LENGTH */
 	private static final int NUM_SAVED_ENTITIES = 40;

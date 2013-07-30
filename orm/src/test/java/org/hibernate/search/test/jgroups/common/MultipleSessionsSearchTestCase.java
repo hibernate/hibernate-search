@@ -23,19 +23,18 @@
  */
 package org.hibernate.search.test.jgroups.common;
 
-import java.io.InputStream;
-
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.Session;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.SessionFactory;
+
+import org.hibernate.cfg.Configuration;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 
 /**
  * Test class to simulate clustered environment (one master, and one slave node)
  *
  * @author Lukasz Moren
  */
-public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
+public abstract class MultipleSessionsSearchTestCase extends SearchTestCaseJUnit4 {
 
 	protected static final String masterCopy = "/master/copy";
 
@@ -80,6 +79,7 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		cfg.setProperty(
 				"hibernate.search.default.directory_provider", "filesystem-slave"
 		);
+		cfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
 	}
 
 	@Override
@@ -104,18 +104,8 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 		}
 		setCommonCfg( new Configuration() );
 		commonConfigure( commonCfg );
-		if ( recreateSchema() ) {
-			commonCfg.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, "create-drop" );
-		}
-		for ( String aPackage : getCommonAnnotatedPackages() ) {
-			getCommonConfiguration().addPackage( aPackage );
-		}
 		for ( Class<?> aClass : getCommonAnnotatedClasses() ) {
 			getCommonConfiguration().addAnnotatedClass( aClass );
-		}
-		for ( String xmlFile : getCommonXmlFiles() ) {
-			InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream( xmlFile );
-			getCommonConfiguration().addInputStream( is );
 		}
 		slaveSessionFactory = getCommonConfiguration().buildSessionFactory();
 	}
@@ -134,14 +124,6 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCase {
 
 	protected static SessionFactory getSlaveSessionFactory() {
 		return slaveSessionFactory;
-	}
-
-	private String[] getCommonAnnotatedPackages() {
-		return new String[] { };
-	}
-
-	private String[] getCommonXmlFiles() {
-		return new String[] { };
 	}
 
 	protected abstract Class<?>[] getAnnotatedClasses();

@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test;
+package org.hibernate.search.test.directoryProvider;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -29,6 +29,9 @@ import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Session;
 import org.hibernate.search.Search;
+import org.hibernate.search.test.AlternateDocument;
+import org.hibernate.search.test.Document;
+import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author Emmanuel Bernard
@@ -36,7 +39,7 @@ import org.hibernate.search.Search;
 public class RamDirectoryTest extends SearchTestCase {
 
 	public void testMultipleEntitiesPerIndex() throws Exception {
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		Document document =
 				new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" );
@@ -55,7 +58,7 @@ public class RamDirectoryTest extends SearchTestCase {
 
 		assertEquals( 2, getDocumentNbr() );
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		TermQuery q = new TermQuery( new Term( "alt_title", "hibernate" ) );
 		assertEquals(
@@ -74,7 +77,7 @@ public class RamDirectoryTest extends SearchTestCase {
 
 		assertEquals( 1, getDocumentNbr() );
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.delete( s.createCriteria( Document.class ).uniqueResult() );
 		s.getTransaction().commit();

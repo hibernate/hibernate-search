@@ -57,6 +57,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 	private static final Log log = LoggerFactory.make();
 
 	public void setUp() throws Exception {
+		forceConfigurationRebuild();
 		File sub = getBaseIndexDir();
 		sub.mkdir();
 		File[] files = sub.listFiles();
@@ -80,7 +81,6 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
-		setCfg( null );  //we need a fresh session factory each time for index set up
 	}
 
 	public boolean insert = true;
@@ -114,8 +114,8 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 
 		int nThreads = 15;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
-		Work work = new Work( getSessions() );
-		ReverseWork reverseWork = new ReverseWork( getSessions() );
+		Work work = new Work( getSessionFactory() );
+		ReverseWork reverseWork = new ReverseWork( getSessionFactory() );
 		long start = System.nanoTime();
 		int iteration = 100;
 		log.info( "Starting worker threads." );

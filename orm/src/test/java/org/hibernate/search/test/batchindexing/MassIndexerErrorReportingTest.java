@@ -23,23 +23,22 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import junit.framework.Assert;
-
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(BMUnitRunner.class)
-public class MassIndexerErrorReportingTest extends SearchTestCase {
+public class MassIndexerErrorReportingTest extends SearchTestCaseJUnit4 {
 
 	@Ignore // This test is occasionally failing, needs to be inspected. See HSEARCH-1278
 	@Test
@@ -55,7 +54,7 @@ public class MassIndexerErrorReportingTest extends SearchTestCase {
 
 		fullTextSession.createIndexer( Book.class ).startAndWait();
 
-		session.close();
+		getSession().close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Assert.assertEquals( "HSEARCH000116: Unexpected error during MassIndexer operation", errorMessage );
 		Throwable exception = mockErrorHandler.getLastException();
@@ -70,8 +69,8 @@ public class MassIndexerErrorReportingTest extends SearchTestCase {
 		return mockErrorHandler;
 	}
 
-	static FullTextSession prepareSomeData(SearchTestCase testcase) {
-		FullTextSession fullTextSession = Search.getFullTextSession( testcase.openSession() );
+	static FullTextSession prepareSomeData(SearchTestCaseJUnit4 testCase) {
+		FullTextSession fullTextSession = Search.getFullTextSession( testCase.openSession() );
 		fullTextSession.beginTransaction();
 		Nation france = new Nation( "France", "FR" );
 		fullTextSession.save( france );

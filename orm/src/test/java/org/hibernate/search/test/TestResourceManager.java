@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,48 +21,50 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
 package org.hibernate.search.test;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.io.File;
 
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
+import org.apache.lucene.store.Directory;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
+import org.hibernate.cfg.Configuration;
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
 /**
- * @author Emmanuel Bernard
+ * Interface defining ORM and Search infrastructure methods a test base class needs to offer.
+ *
+ * @author Hardy Ferentschik
  */
-@Entity
-@Indexed
-public class Clock {
-	private Integer id;
-	private String brand;
+public interface TestResourceManager {
 
-	public Clock() { }
+	Configuration getCfg();
 
-	public Clock(Integer id, String brand) {
-		this.id = id;
-		this.brand = brand;
-	}
+	void openSessionFactory();
 
-	@Field(store = Store.YES)
-	public String getBrand() {
-		return brand;
-	}
+	void closeSessionFactory();
 
-	public void setBrand(String brand) {
-		this.brand = brand;
-	}
+	SessionFactory getSessionFactory();
 
-	@Id
-	@DocumentId
-	public Integer getId() {
-		return id;
-	}
+	Session openSession();
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+	Session getSession();
+
+	SearchFactory getSearchFactory();
+
+	SearchFactoryImplementor getSearchFactoryImpl();
+
+	Directory getDirectory(Class<?> clazz);
+
+	void ensureIndexesAreEmpty();
+
+	File getBaseIndexDir();
+
+	void forceConfigurationRebuild();
+
+	boolean needsConfigurationRebuild();
 }

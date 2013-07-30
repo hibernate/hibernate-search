@@ -56,7 +56,7 @@ public class ProgrammaticIndexAndQueryNullTest extends SearchTestCase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		session.save( nullValue );
+		getSession().save( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();

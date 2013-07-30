@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test;
+package org.hibernate.search.test.directoryProvider;
 
 import java.io.File;
 import java.util.List;
@@ -40,6 +40,9 @@ import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
+import org.hibernate.search.test.Document;
+import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 
 /**
@@ -48,8 +51,7 @@ import org.hibernate.search.util.impl.FileHelper;
 public class FSDirectoryTest extends SearchTestCase {
 
 	public void testEventIntegration() throws Exception {
-
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.persist(
 				new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" )
@@ -57,9 +59,9 @@ public class FSDirectoryTest extends SearchTestCase {
 		s.getTransaction().commit();
 		s.close();
 
-		Directory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
+		Directory dir = FSDirectory.open( new File( getBaseIndexDir().toString(), "Documents" ) );
 		try {
-			IndexReader reader = IndexReader.open( dir, true );
+			IndexReader reader = IndexReader.open( dir );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
@@ -77,7 +79,7 @@ public class FSDirectoryTest extends SearchTestCase {
 				reader.close();
 			}
 
-			s = getSessions().openSession();
+			s = getSessionFactory().openSession();
 			s.getTransaction().begin();
 			Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
 			entity.setSummary( "Object/relational mapping with EJB3" );
@@ -98,7 +100,7 @@ public class FSDirectoryTest extends SearchTestCase {
 				reader.close();
 			}
 
-			s = getSessions().openSession();
+			s = getSessionFactory().openSession();
 			s.getTransaction().begin();
 			s.delete( entity );
 			s.getTransaction().commit();
@@ -122,7 +124,7 @@ public class FSDirectoryTest extends SearchTestCase {
 			dir.close();
 		}
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.delete( s.createCriteria( Document.class ).uniqueResult() );
 		s.getTransaction().commit();
@@ -130,7 +132,7 @@ public class FSDirectoryTest extends SearchTestCase {
 	}
 
 	public void testBoost() throws Exception {
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.persist(
 				new Document( "Hibernate in Action", "Object and Relational", "blah blah blah" )
@@ -159,7 +161,7 @@ public class FSDirectoryTest extends SearchTestCase {
 			dir.close();
 		}
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		List list = s.createQuery( "from Document" ).list();
 		for ( Document document : (List<Document>) list ) {
@@ -167,11 +169,11 @@ public class FSDirectoryTest extends SearchTestCase {
 		}
 		s.getTransaction().commit();
 		s.close();
-		getSessions().close(); //run the searchfactory.close() operations
+		getSessionFactory().close(); //run the searchfactory.close() operations
 	}
 
 	public void testSearchOnDeletedIndex() throws Exception {
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.persist( new Document( "Hibernate Search in Action", "", "" ) );
 		s.getTransaction().commit();
@@ -201,8 +203,8 @@ public class FSDirectoryTest extends SearchTestCase {
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+		File baseIndexDir = getBaseIndexDir();
+		cfg.setProperty( "hibernate.search.default.indexBase", baseIndexDir.getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}

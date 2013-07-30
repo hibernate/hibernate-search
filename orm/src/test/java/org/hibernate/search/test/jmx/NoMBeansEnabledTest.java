@@ -86,7 +86,7 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 		}
 
 		// build the new configuration
-		setCfg( null ); // force a rebuild of the configuration
+		forceConfigurationRebuild();
 		super.setUp();
 	}
 

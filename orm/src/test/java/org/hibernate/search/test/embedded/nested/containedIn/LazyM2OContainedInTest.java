@@ -44,7 +44,7 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 
 	//HSEARCH-385
 	public void testDocumentsAt0() {
-		FullTextSession fts = Search.getFullTextSession( getSessions().openSession() );
+		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Transaction tx = fts.beginTransaction();
 		final Entity1ForDoc0 ent1 = new Entity1ForDoc0();
 		final Entity2ForDoc0 ent2 = new Entity2ForDoc0();
@@ -85,7 +85,7 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 
 	//HSEARCH-386
 	public void testContainedInAndLazy() {
-		FullTextSession fts = Search.getFullTextSession( getSessions().openSession() );
+		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Entity1ForUnindexed ent1_0 = new Entity1ForUnindexed();
 		Entity1ForUnindexed ent1_1 = new Entity1ForUnindexed();
 

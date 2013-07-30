@@ -26,8 +26,6 @@ package org.hibernate.search.test.analyzer;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.queryParser.QueryParser;
@@ -49,6 +47,7 @@ import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Assert;
 
 /**
  * @author Emmanuel Bernard
@@ -94,7 +93,7 @@ public class AnalyzerTest extends SearchTestCase {
 	}
 
 	public void testMultipleAnalyzerDiscriminatorDefinitions() {
-		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( cfg );
+		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( getCfg() );
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
 		Set<XClass> optimizationBlackList = new HashSet<XClass>();

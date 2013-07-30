@@ -121,7 +121,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 
 	@Override
 	public void setUp() throws Exception {
-		setCfg( null ); // force a rebuild of the configuration
+		forceConfigurationRebuild();
 		super.setUp();
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
 		statisticsBeanObjectName = new ObjectName( StatisticsInfoMBean.STATISTICS_MBEAN_OBJECT_NAME );

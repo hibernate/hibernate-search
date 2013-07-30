@@ -722,4 +722,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 182, value = "'null' is not a valid field name")
 	IllegalArgumentException getFieldNameCannotBeNullException();
 
+	@Message(id = 183, value = "Unable to index instance of type %s while batch indexing: %s")
+	String massIndexerUnableToIndexInstance(String clazz, String value);
+
 }

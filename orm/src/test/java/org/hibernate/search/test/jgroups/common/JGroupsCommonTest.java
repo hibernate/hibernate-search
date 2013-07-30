@@ -26,13 +26,12 @@ package org.hibernate.search.test.jgroups.common;
 import java.util.List;
 import java.util.UUID;
 
-import junit.framework.Assert;
-
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -40,6 +39,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jgroups.master.TShirt;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * In case of running test outside Hibernate Search Maven configuration set following VM configuration:
@@ -62,6 +63,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	 */
 	public static final String CHANNEL_NAME = UUID.randomUUID().toString();
 
+	@Test
 	public void testJGroupsBackend() throws Exception {
 
 		//get slave session
@@ -79,7 +81,11 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		slaveSession.persist( ts2 );
 		tx.commit();
 
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				"id",
+				TestConstants.stopAnalyzer
+		);
 		FullTextSession masterSession = Search.getFullTextSession( openSession() ); //this is the master Session
 
 		// since this is an async backend, we expect to see
@@ -170,16 +176,21 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		//slave jgroups configuration
 		super.commonConfigure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
+		cfg.setProperty( "hibernate.search.default.retry_initialize_period", "1" );
 		applyJGroupsChannelConfiguration( cfg );
 	}
 
 	/**
 	 * Used to isolate the JGroups channel name from other potentially running tests
+	 *
 	 * @param cfg the configuration to isolate
 	 */
 	protected void applyJGroupsChannelConfiguration(Configuration cfg) {
 		cfg.setProperty( "hibernate.search.default." + JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( "hibernate.search.default." + JGroupsChannelProvider.CONFIGURATION_FILE, TESTING_JGROUPS_CONFIGURATION_FILE );
+		cfg.setProperty(
+				"hibernate.search.default." + JGroupsChannelProvider.CONFIGURATION_FILE,
+				TESTING_JGROUPS_CONFIGURATION_FILE
+		);
 	}
 
 	@Override

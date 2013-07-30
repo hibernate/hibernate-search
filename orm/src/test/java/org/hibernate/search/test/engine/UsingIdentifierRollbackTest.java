@@ -25,8 +25,6 @@ package org.hibernate.search.test.engine;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
@@ -36,6 +34,7 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.LeakingLuceneBackend;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
+import org.junit.Assert;
 
 /**
  * When using hibernate.use_identifier_rollback=true special care must be applied during event processing to get a
@@ -50,13 +49,13 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
 		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
 
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.persist( new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" ) );
 		s.getTransaction().commit();
 		s.close();
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		Document entity = (Document) s.get( Document.class, Long.valueOf( 1 ) );
 		Assert.assertNotNull( entity );
@@ -70,13 +69,13 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
 		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
 
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		s.persist( new PersonWithBrokenSocialSecurityNumber( Long.valueOf( 2 ), "This guy is unaffected by identifier rollback" ) );
 		s.getTransaction().commit();
 		s.close();
 
-		s = getSessions().openSession();
+		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		PersonWithBrokenSocialSecurityNumber entity = (PersonWithBrokenSocialSecurityNumber) s.get( PersonWithBrokenSocialSecurityNumber.class, Long.valueOf( 2 ) );
 		Assert.assertNotNull( entity );

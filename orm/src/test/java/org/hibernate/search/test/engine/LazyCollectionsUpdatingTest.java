@@ -116,14 +116,14 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		openSession();
 		Transaction tx = null;
 		try {
-			tx = session.beginTransaction();
+			tx = getSession().beginTransaction();
 			BusLine bus = new BusLine();
 			bus.setBusLineName( "Linea 64" );
 			addBusStop( bus, "Stazione Termini" );
 			addBusStop( bus, "via Gregorio VII" );
 			addBusStop( bus, "via Alessandro III" );
 			addBusStop( bus, "via M.Buonarroti" );
-			session.persist( bus );
+			getSession().persist( bus );
 			tx.commit();
 		}
 		catch (Throwable t) {
@@ -132,7 +132,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 			}
 		}
 		finally {
-			session.close();
+			getSession().close();
 		}
 	}
 
@@ -153,9 +153,9 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
-		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
+		configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
+		configuration.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
+		configuration.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 
 }

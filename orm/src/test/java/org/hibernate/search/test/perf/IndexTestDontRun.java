@@ -83,7 +83,7 @@ public class IndexTestDontRun extends SearchTestCase {
 		for ( int i = 0; i < TOTAL_SEARCHES; i++ ) {
 			// Create a thread and invoke it
 			//if ( i % 100 == 0) indexSearcher = getNewSearcher();
-			SearcherThread searcherThread = new SearcherThread( i, "name:maria OR description:long" + i, getSessions(), indexSearcher, plainLucene, startSignal );
+			SearcherThread searcherThread = new SearcherThread( i, "name:maria OR description:long" + i, getSessionFactory(), indexSearcher, plainLucene, startSignal );
 			threadsList.add( searcherThread );
 			threadPool.execute( searcherThread );
 		}
@@ -102,7 +102,7 @@ public class IndexTestDontRun extends SearchTestCase {
 	}
 
 	private IndexSearcher getNewSearcher() {
-		final org.hibernate.Session session = getSessions().openSession();
+		final org.hibernate.Session session = getSessionFactory().openSession();
 		IndexReader indexReader = Search.getFullTextSession( session ).getSearchFactory().getIndexReaderAccessor().open( Boat.class );
 		IndexSearcher indexsearcher = new IndexSearcher( indexReader );
 		return indexsearcher;

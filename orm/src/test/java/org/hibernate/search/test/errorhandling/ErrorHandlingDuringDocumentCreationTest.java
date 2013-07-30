@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,15 +23,19 @@
  */
 package org.hibernate.search.test.errorhandling;
 
-import java.io.IOException;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.MassIndexer;
+import org.hibernate.search.Search;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.util.AssertingMassIndexerProgressMonitor;
+import org.hibernate.search.test.util.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
@@ -39,38 +43,41 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * This test uses Byteman. Byteman is activated at the invocation of the test
- * in this class, and it will have the IndexWriter fail during segments merge,
- * which means the commit on the index from our part.
- * The tricky issue is that the merger works in a separate thread and some
- * inner private classes are involved.
+ * Test to verify the configured ErrorHandler is used for building the Lucene document and for example
+ * errors in the bridges are caught.
  *
- * The Byteman rules are defined in a resources file ConcurrentMergeErrorTest.bytemanrules
- *
- * The goal of the test is to make sure we can catch and report the errors
- * thrown by the merger via whatever is configured as Environment.ERROR_HANDLER.
- *
- * @author Sanne Grinovero
- * @see Environment#ERROR_HANDLER
+ * @author Hardy Ferentschik
  */
+@TestForIssue(jiraKey = "HSEARCH-1354")
 @RunWith(BMUnitRunner.class)
-public class ConcurrentMergeErrorHandledTest extends SearchTestCaseJUnit4 {
+public class ErrorHandlingDuringDocumentCreationTest extends SearchTestCaseJUnit4 {
 
 	@Test
-	@BMRule(targetClass = "org.apache.lucene.index.ConcurrentMergeScheduler",
-			targetMethod = "merge",
-			action = "throw new IOException(\"Byteman said: your disk is full!\")",
-			name = "testLuceneMergerErrorHandling")
-	public void testLuceneMergerErrorHandling() {
+	@BMRule(targetClass = "org.hibernate.search.batchindexing.impl.EntityConsumerLuceneWorkProducer",
+			targetMethod = "index",
+			action = "throw new RuntimeException(\"Byteman said: Error in document creation!\")",
+			name = "testErrorInBuildingLuceneDocumentGetsCaughtByErrorHandler")
+	public void testErrorInBuildingLuceneDocumentGetsCaughtByErrorHandler() throws Exception {
 		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
+		AssertingMassIndexerProgressMonitor progressMonitor = new AssertingMassIndexerProgressMonitor( 0, 1 );
 
 		indexSingleFooInstance();
+		massIndexFooInstances( progressMonitor );
 
 		String errorMessage = mockErrorHandler.getErrorMessage();
-		Assert.assertEquals( "HSEARCH000117: IOException on the IndexWriter", errorMessage );
+		Assert.assertTrue( "Wrong error code: " + errorMessage, errorMessage.startsWith( "HSEARCH000183" ) );
 		Throwable exception = mockErrorHandler.getLastException();
-		Assert.assertTrue( exception instanceof IOException );
-		Assert.assertEquals( "Byteman said: your disk is full!", exception.getMessage() );
+		Assert.assertTrue( exception instanceof RuntimeException );
+		Assert.assertEquals( "Byteman said: Error in document creation!", exception.getMessage() );
+		progressMonitor.assertExpectedProgressMade();
+	}
+
+	private void massIndexFooInstances(MassIndexerProgressMonitor monitor) throws InterruptedException {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		MassIndexer massIndexer = fullTextSession.createIndexer( Foo.class );
+		massIndexer.progressMonitor( monitor );
+		massIndexer.startAndWait();
+		fullTextSession.close();
 	}
 
 	private void indexSingleFooInstance() {
