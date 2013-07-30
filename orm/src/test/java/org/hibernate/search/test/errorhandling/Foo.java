@@ -25,6 +25,7 @@
 package org.hibernate.search.test.errorhandling;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Indexed;
@@ -36,5 +37,14 @@ import org.hibernate.search.annotations.Indexed;
 @Indexed
 public class Foo {
 	@Id
+	@GeneratedValue
 	private long id;
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "Foo{" );
+		sb.append( "id=" ).append( id );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }

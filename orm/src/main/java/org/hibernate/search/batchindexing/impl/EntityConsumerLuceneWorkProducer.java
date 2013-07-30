@@ -34,6 +34,7 @@ import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
@@ -105,7 +106,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 			transaction.commit();
 		}
 		catch (Throwable e) {
-			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
+			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage(), e );
 		}
 		finally {
 			producerEndSignal.countDown();
@@ -118,7 +119,8 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 
 	private void indexAllQueue(Session session) {
 		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
-				(SessionImplementor) session );
+				(SessionImplementor) session
+		);
 		try {
 			ConversionContext contextualBridge = new ContextualExceptionBridgeHelper();
 			while ( true ) {
@@ -128,11 +130,24 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 				}
 				else {
 					log.tracef( "received a list of objects to index: %s", takeList );
-					for ( Object take : takeList ) {
+					for ( Object object : takeList ) {
 						//trick to attach the objects to session:
-						session.buildLockRequest( LockOptions.NONE ).lock( take );
-						index( take, session, sessionInitializer, contextualBridge );
-						monitor.documentsBuilt( 1 );
+						session.buildLockRequest( LockOptions.NONE ).lock( object );
+						try {
+							index( object, session, sessionInitializer, contextualBridge );
+							monitor.documentsBuilt( 1 );
+						}
+						catch (InterruptedException ie) {
+							// rethrowing the interrupted exception
+							throw ie;
+						}
+						catch (RuntimeException e) {
+							String errorMsg = log.massIndexerUnableToIndexInstance(
+									object.getClass().getName(),
+									object.toString()
+							);
+							errorHandler.handleException( errorMsg, e );
+						}
 						session.clear();
 					}
 				}
@@ -161,9 +176,9 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		if ( interceptor != null ) {
 			IndexingOverride onAdd = interceptor.onAdd( entity );
 			switch ( onAdd ) {
-			case REMOVE:
-			case SKIP:
-				return;
+				case REMOVE:
+				case SKIP:
+					return;
 			}
 			//default: continue indexing this instance
 		}
