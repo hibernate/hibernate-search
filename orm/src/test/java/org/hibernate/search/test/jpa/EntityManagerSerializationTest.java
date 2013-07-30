@@ -32,6 +32,8 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.test.TestConstants;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Serialization test for entity manager. HSEARCH-117.
  *
