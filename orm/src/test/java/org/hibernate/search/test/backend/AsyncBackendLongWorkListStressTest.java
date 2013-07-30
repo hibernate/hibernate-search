@@ -23,13 +23,13 @@
  */
 package org.hibernate.search.test.backend;
 
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 
-public class AsyncBackendLongWorklistsStressTest extends SyncBackendLongWorklistsStressTest {
+public class AsyncBackendLongWorkListStressTest extends SyncBackendLongWorkListStressTest {
 
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
+	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.WORKER_EXECUTION, "async" );
 	}
-
 }

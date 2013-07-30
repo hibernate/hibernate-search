@@ -49,9 +49,10 @@ import org.hibernate.search.util.impl.FileHelper;
 /**
  * @author Emmanuel Bernard
  */
-public class OptimizerPerformanceTest extends SearchTestCase {
+public class OptimizerPerformanceTest extends SearchTestCaseJunit4 {
 	@Before
 	public void setUp() throws Exception {
+		forceConfigurationRebuild();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
 		sub.mkdirs();
@@ -69,15 +70,14 @@ public class OptimizerPerformanceTest extends SearchTestCase {
 		super.tearDown();
 		File sub = getBaseIndexDir();
 		FileHelper.delete( sub );
-		setCfg( null ); //we need a fresh session factory each time for index set up
 	}
 
 	@Test
 	public void testConcurrency() throws Exception {
 		int nThreads = 15;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
-		Work work = new Work( getSessions() );
-		ReverseWork reverseWork = new ReverseWork( getSessions() );
+		Work work = new Work( getSessionFactory() );
+		ReverseWork reverseWork = new ReverseWork( getSessionFactory() );
 		long start = System.nanoTime();
 		int iteration = 100;
 		for ( int i = 0; i < iteration; i++ ) {
@@ -125,7 +125,7 @@ public class OptimizerPerformanceTest extends SearchTestCase {
 					Thread.sleep( 50 );
 				}
 				catch (InterruptedException e) {
-					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+					e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
 				}
 
 				s = sf.openSession();

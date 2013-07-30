@@ -23,11 +23,13 @@
  */
 package org.hibernate.search.test.performance.optimizer;
 
+import org.hibernate.cfg.Configuration;
+
 /**
  * @author Emmanuel Bernard
  */
 public class IncrementalOptimizerStrategyPerformanceTest extends OptimizerPerformanceTest {
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
+	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.optimizer.transaction_limit.max", "10" );
 	}

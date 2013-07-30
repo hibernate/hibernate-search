@@ -200,7 +200,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 				synchronization.afterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
 			}
 			catch (Exception e) {
-				throw new HibernateException( "Error while indexing in Hibernate Search (ater transaction completion)", e);
+				throw new HibernateException( "Error while indexing in Hibernate Search (after transaction completion)", e);
 			}
 		}
 	}
