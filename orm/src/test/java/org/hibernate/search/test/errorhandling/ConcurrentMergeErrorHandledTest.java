@@ -29,12 +29,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
@@ -66,21 +62,10 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCaseJUnit4 {
 			action = "throw new IOException(\"Byteman said: your disk is full!\")",
 			name = "testLuceneMergerErrorHandling")
 	public void testLuceneMergerErrorHandling() {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		ErrorHandler errorHandler = searchFactory.getErrorHandler();
-		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
-		MockErrorHandler mockErrorHandler = (MockErrorHandler) errorHandler;
-		Session session = openSession();
-		Transaction transaction = session.beginTransaction();
-		session.persist(
-				new Document(
-						"Byteman Programmers Guider",
-						"Version 1.5.2 Draft",
-						"contains general guidelines to use Byteman"
-				)
-		);
-		transaction.commit();
-		session.close();
+		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
+
+		indexSingleFooInstance();
+
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Assert.assertEquals( "HSEARCH000117: IOException on the IndexWriter", errorMessage );
 		Throwable exception = mockErrorHandler.getLastException();
@@ -88,20 +73,27 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCaseJUnit4 {
 		Assert.assertEquals( "Byteman said: your disk is full!", exception.getMessage() );
 	}
 
-	public SearchFactoryImplementor getSearchFactoryImpl() {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		s.close();
-		SearchFactory searchFactory = s.getSearchFactory();
-		return (SearchFactoryImplementor) searchFactory;
+	private void indexSingleFooInstance() {
+		Session session = openSession();
+		Transaction transaction = session.beginTransaction();
+		session.persist( new Foo() );
+		transaction.commit();
+		session.close();
+	}
+
+	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
+		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
+		ErrorHandler errorHandler = searchFactory.getErrorHandler();
+		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
+		return (MockErrorHandler) errorHandler;
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] { Document.class };
+		return new Class[] { Foo.class };
 	}
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}
-
 }
