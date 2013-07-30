@@ -154,7 +154,7 @@ public class NullEmbeddedTest extends SearchTestCase {
 		s.persist( puppy2 );
 		tx.commit();
 
-		List<Man> result = findNullsFor( session, "pet", Man.NO_PET );
+		List<Man> result = findNullsFor( getSession(), "pet", Man.NO_PET );
 		assertEquals( "Wrong number of results found", 1, result.size() );
 		assertEquals( "Wrong result returned", me, result.get( 0 ) );
 

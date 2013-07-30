@@ -24,7 +24,6 @@
 
 package org.hibernate.search.test.configuration;
 
-import junit.framework.Assert;
 import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.StopFilterFactory;
@@ -35,6 +34,7 @@ import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

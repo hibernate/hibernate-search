@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.engine;
 
-import junit.framework.Assert;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 
 import org.hibernate.Transaction;
@@ -32,6 +31,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.junit.Assert;
 
 /**
  * See HSEARCH-361 and HSEARCH-5 : avoid reindexing objects for which
@@ -50,7 +50,7 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 		line1.setBusLineName( "Line Uno" );
 		LazyCollectionsUpdatingTest.addBusStop( line1, "Gateshead" );
 		LazyCollectionsUpdatingTest.addBusStop( line1, "The Sage" );
-		session.persist( line1 );
+		getSession().persist( line1 );
 		tx.commit();
 
 		Assert.assertEquals( 1, LeakingLuceneBackend.getLastProcessedQueue().size() );
@@ -105,8 +105,8 @@ public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
-		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
-		cfg.setProperty(
+		configuration.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
+		configuration.setProperty(
 				"hibernate.search.default.worker.backend",
 				LeakingLuceneBackend.class.getName()
 		);

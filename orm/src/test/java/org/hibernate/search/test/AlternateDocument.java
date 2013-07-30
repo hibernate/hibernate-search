@@ -44,7 +44,7 @@ public class AlternateDocument {
 	private String summary;
 	private String text;
 
-	AlternateDocument() {
+	public AlternateDocument() {
 	}
 
 	public AlternateDocument(Long id, String title, String summary, String text) {

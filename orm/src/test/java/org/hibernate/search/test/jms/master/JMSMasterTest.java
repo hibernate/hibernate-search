@@ -111,7 +111,7 @@ public class JMSMasterTest extends SearchTestCase {
 
 	private void registerMessageListener() throws Exception {
 		MessageConsumer consumer = getQueueSession().createConsumer( getMessageQueue() );
-		consumer.setMessageListener( new MDBSearchController( getSessions() ) );
+		consumer.setMessageListener( new MDBSearchController( getSessionFactory() ) );
 	}
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {

@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.test.interceptor;
 
-import junit.framework.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
@@ -31,6 +30,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.util.TestForIssue;
+import org.junit.Assert;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.

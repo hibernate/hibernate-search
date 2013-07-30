@@ -58,8 +58,8 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		session.save( fooValue );
-		session.save( nullValue );
+		getSession().save( fooValue );
+		getSession().save( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();
@@ -77,7 +77,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		session.save( nullValue );
+		getSession().save( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();
@@ -98,7 +98,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		session.save( nullValue );
+		getSession().save( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();
@@ -131,7 +131,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		session.save( nullValue );
+		getSession().save( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();
@@ -164,7 +164,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		session.save( nullValue );
+		getSession().save( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();
@@ -186,7 +186,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
-		session.save( nullValue );
+		getSession().save( nullValue );
 		tx.commit();
 
 		fullTextSession.clear();

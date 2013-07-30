@@ -53,9 +53,9 @@ public class IndexControlMBeanWithSuffixTest extends SearchTestCase {
 
 	@Override
 	public void setUp() throws Exception {
-		setCfg( null ); // force a rebuild of the configuration
+		forceConfigurationRebuild();
 		super.setUp();
-		String suffix = cfg.getProperty( Environment.JMX_BEAN_SUFFIX );
+		String suffix = getCfg().getProperty( Environment.JMX_BEAN_SUFFIX );
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
 		indexBeanObjectName = new ObjectName(
 				JMXRegistrar.buildMBeanName(

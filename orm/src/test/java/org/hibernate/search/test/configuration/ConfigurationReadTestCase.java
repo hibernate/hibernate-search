@@ -36,8 +36,7 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
- * Contains some utility methods to simplify coding of
- * testcases about configuration parsing.
+ * Contains some utility methods to simplify coding of test cases about configuration parsing.
  *
  * @author Sanne Grinovero
  */
@@ -46,7 +45,6 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 	private SearchFactoryImplementor searchFactory;
 
 	public ConfigurationReadTestCase() {
-
 	}
 
 	@Override
@@ -77,7 +75,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 				(int) getParameter( shard, setting, testEntity ) );
 	}
 
-	protected final SearchFactoryImplementor getSearchFactory() {
+	public final SearchFactoryImplementor getSearchFactory() {
 		return searchFactory;
 	}
 

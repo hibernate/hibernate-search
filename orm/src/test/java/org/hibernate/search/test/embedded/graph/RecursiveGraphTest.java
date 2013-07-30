@@ -57,7 +57,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 			if ( person == null ) {
 				continue;
 			}
-			Session s = getSessions().openSession();
+			Session s = getSessionFactory().openSession();
 			s.getTransaction().begin();
 			s.save( person );
 			s.getTransaction().commit();

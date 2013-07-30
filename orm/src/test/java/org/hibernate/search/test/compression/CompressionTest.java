@@ -26,7 +26,6 @@ package org.hibernate.search.test.compression;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
-import junit.framework.Assert;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
@@ -46,6 +45,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
+import org.junit.Assert;
 
 /**
  * @author Sanne Grinovero
@@ -117,7 +117,7 @@ public class CompressionTest extends SearchTestCase {
 	private void assertFindsN(int expectedToFind, String queryString) throws ParseException {
 		openSession().beginTransaction();
 		try {
-			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			FullTextSession fullTextSession = Search.getFullTextSession( getSession() );
 			QueryParser queryParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "", new SimpleAnalyzer( TestConstants.getTargetLuceneVersion() ) );
 			Query query = queryParser.parse( queryString );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
@@ -132,8 +132,8 @@ public class CompressionTest extends SearchTestCase {
 			}
 		}
 		finally {
-			session.getTransaction().commit();
-			session.close();
+			getSession().getTransaction().commit();
+			getSession().close();
 		}
 	}
 
@@ -143,7 +143,7 @@ public class CompressionTest extends SearchTestCase {
 	public void testProjectionOnCompressedFields() {
 		openSession().beginTransaction();
 		try {
-			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			FullTextSession fullTextSession = Search.getFullTextSession( getSession() );
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
 					new MatchAllDocsQuery(),
 					LargeDocument.class
@@ -156,8 +156,8 @@ public class CompressionTest extends SearchTestCase {
 			Assert.assertEquals( "This is a placeholder for the new text that you should write", results[2] );
 		}
 		finally {
-			session.getTransaction().commit();
-			session.close();
+			getSession().getTransaction().commit();
+			getSession().close();
 		}
 	}
 

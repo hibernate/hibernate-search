@@ -87,14 +87,14 @@ public class SessionTest extends SearchTestCase {
 	}
 
 	public void testThreadBoundSessionWrappingOutOfTransaction() throws Exception {
-		final Session session = getSessions().getCurrentSession();
+		final Session session = getSessionFactory().getCurrentSession();
 		try {
 			FullTextSession fts = Search.getFullTextSession( session );
 			//success
 		}
 		finally {
 			//clean up after the mess
-			ThreadLocalSessionContext.unbind( getSessions() );
+			ThreadLocalSessionContext.unbind( getSessionFactory() );
 		}
 	}
 
