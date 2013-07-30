@@ -34,7 +34,6 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.spatial.POI;
 import org.junit.Assert;
-import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -46,7 +45,6 @@ import static org.hamcrest.CoreMatchers.not;
  */
 public class SpatialQueryingJPATest extends JPATestCase {
 
-	@Test
 	public void testDistanceProjection() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
@@ -103,7 +101,6 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		em.close();
 	}
 
-	@Test
 	public void testDistanceSort() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
@@ -161,7 +158,6 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		em.close();
 	}
 
-	@Test
 	public void testDistanceSort2() throws Exception {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 
@@ -222,7 +218,6 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		em.close();
 	}
 
-	@Test
 	public void testDistanceSortWithMaxResult() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
@@ -276,8 +271,4 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		em.close();
 	}
 
-	@Override
-	public Class[] getAnnotatedClasses() {
-		return new Class<?>[] { POI.class };
-	}
 }
