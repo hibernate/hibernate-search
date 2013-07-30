@@ -20,28 +20,31 @@
  */
 package org.hibernate.search.test.query.criteria;
 
+import java.util.List;
+
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.junit.Test;
 
-import java.util.List;
-
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Julie Ingignoli
  * @author Emmanuel Bernard <emmanuel@hibernate,org>
  */
-public class ResultSizeOnCriteriaTest extends SearchTestCase {
+public class ResultSizeOnCriteriaTest extends SearchTestCaseJUnit4 {
 
 	@Test
 	public void testResultSize() {
@@ -61,7 +64,8 @@ public class ResultSizeOnCriteriaTest extends SearchTestCase {
 		Criteria criteria = session.createCriteria( Tractor.class );
 		criteria.add( Restrictions.eq( "hasColor", Boolean.FALSE ) );
 
-		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Tractor.class ).setCriteriaQuery( criteria );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Tractor.class )
+				.setCriteriaQuery( criteria );
 		List<Tractor> result = hibQuery.list();
 		//Result size is ok
 		assertEquals( 1, result.size() );

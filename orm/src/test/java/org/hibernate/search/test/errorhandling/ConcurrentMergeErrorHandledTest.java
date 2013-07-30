@@ -25,10 +25,9 @@ package org.hibernate.search.test.errorhandling;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -36,9 +35,10 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -54,11 +54,11 @@ import org.junit.runner.RunWith;
  * The goal of the test is to make sure we can catch and report the errors
  * thrown by the merger via whatever is configured as Environment.ERROR_HANDLER.
  *
- * @see Environment#ERROR_HANDLER
  * @author Sanne Grinovero
+ * @see Environment#ERROR_HANDLER
  */
 @RunWith(BMUnitRunner.class)
-public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
+public class ConcurrentMergeErrorHandledTest extends SearchTestCaseJUnit4 {
 
 	@Test
 	@BMRule(targetClass = "org.apache.lucene.index.ConcurrentMergeScheduler",
@@ -69,11 +69,16 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
-		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
+		MockErrorHandler mockErrorHandler = (MockErrorHandler) errorHandler;
 		Session session = openSession();
 		Transaction transaction = session.beginTransaction();
-		session.persist( new Document(
-				"Byteman Programmers Guider", "Version 1.5.2 Draft", "contains general guidelines to use Byteman" ) );
+		session.persist(
+				new Document(
+						"Byteman Programmers Guider",
+						"Version 1.5.2 Draft",
+						"contains general guidelines to use Byteman"
+				)
+		);
 		transaction.commit();
 		session.close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
@@ -83,15 +88,15 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestCase {
 		Assert.assertEquals( "Byteman said: your disk is full!", exception.getMessage() );
 	}
 
-	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] { Document.class };
-	}
-
-	protected SearchFactoryImplementor getSearchFactoryImpl() {
+	public SearchFactoryImplementor getSearchFactoryImpl() {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		s.close();
 		SearchFactory searchFactory = s.getSearchFactory();
 		return (SearchFactoryImplementor) searchFactory;
+	}
+
+	protected Class<?>[] getAnnotatedClasses() {
+		return new Class[] { Document.class };
 	}
 
 	protected void configure(org.hibernate.cfg.Configuration cfg) {

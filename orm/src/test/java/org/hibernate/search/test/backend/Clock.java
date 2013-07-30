@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,28 +21,48 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+package org.hibernate.search.test.backend;
 
-package org.hibernate.search.test.engine;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
- * Verify functionality of Environment.ENABLE_DIRTY_CHECK
- *
- * @author Sanne Grinovero
- * @since 3.4
+ * @author Emmanuel Bernard
  */
-public class DirtyChecksDisabledTest extends SkipIndexingWorkForUnaffectingChangesTest {
+@Entity
+@Indexed
+public class Clock {
+	private Integer id;
+	private String brand;
 
-	@Override
-	protected boolean isDirtyCheckEnabled() {
-		return false;
+	public Clock() { }
+
+	public Clock(Integer id, String brand) {
+		this.id = id;
+		this.brand = brand;
 	}
 
-	@Override
-	protected void configure(Configuration configuration) {
-		super.configure( configuration );
-		configuration.setProperty( Environment.ENABLE_DIRTY_CHECK, " false" ); //intentional space in the value
+	@Field(store = Store.YES)
+	public String getBrand() {
+		return brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+
+	@Id
+	@DocumentId
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 }

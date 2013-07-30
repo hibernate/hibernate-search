@@ -20,15 +20,15 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import junit.framework.Assert;
-
+import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.hibernate.testing.RequiresDialect;
 import org.hibernate.testing.junit4.CustomRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -39,8 +39,8 @@ import org.junit.runner.RunWith;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-@RunWith(CustomRunner.class)//needed to enable @RequiresDialect functionality
-public class FetchSizeConfigurationTest extends SearchTestCase {
+@RunWith(CustomRunner.class) //needed to enable @RequiresDialect functionality
+public class FetchSizeConfigurationTest extends SearchTestCaseJUnit4 {
 
 	@Test
 	@RequiresDialect(comment = "H2 does not accept negative fetch sizes",
@@ -53,7 +53,7 @@ public class FetchSizeConfigurationTest extends SearchTestCase {
 
 		fullTextSession.createIndexer( Book.class ).idFetchSize( -1 ).startAndWait();
 
-		session.close();
+		getSession().close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Assert.assertEquals( "HSEARCH000116: Unexpected error during MassIndexer operation", errorMessage );
 		Throwable exception = mockErrorHandler.getLastException();
@@ -71,7 +71,7 @@ public class FetchSizeConfigurationTest extends SearchTestCase {
 
 		fullTextSession.createIndexer( Book.class ).idFetchSize( Integer.MIN_VALUE ).startAndWait();
 
-		session.close();
+		getSession().close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Assert.assertEquals( null, errorMessage );
 	}
@@ -80,7 +80,7 @@ public class FetchSizeConfigurationTest extends SearchTestCase {
 		return new Class[] { Book.class, Nation.class };
 	}
 
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
+	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
 	}

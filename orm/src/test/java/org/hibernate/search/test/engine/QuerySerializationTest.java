@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -35,9 +37,11 @@ import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * This test is meant to verify that HSQuery implementation is able to
@@ -45,11 +49,11 @@ import org.junit.Test;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class QuerySerializationTest extends SearchTestCase {
+public class QuerySerializationTest extends SearchTestCaseJUnit4 {
 
 	@Test
 	public void testQueryObjectIsSerializable() throws IOException, ClassNotFoundException {
-		Session s = getSessions().openSession();
+		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		Document document =
 				new Document( "Hibernate OGM in Action", "Cloud mapping with Hibernate", "blah blah cloud blah cloud" );
@@ -63,7 +67,9 @@ public class QuerySerializationTest extends SearchTestCase {
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 
 		//this is *not* the standard way to create a Query:
-		HSQuery hsQuery = searchFactory.createHSQuery().luceneQuery( query ).targetedEntities( new ArrayList<Class<?>>() );
+		HSQuery hsQuery = searchFactory.createHSQuery()
+				.luceneQuery( query )
+				.targetedEntities( new ArrayList<Class<?>>() );
 		int size = extractResultSize( hsQuery );
 
 		assertEquals( "Should have found a match", 1, size );

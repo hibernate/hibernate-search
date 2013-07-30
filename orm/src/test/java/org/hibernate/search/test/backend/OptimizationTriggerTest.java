@@ -20,28 +20,30 @@
  */
 package org.hibernate.search.test.backend;
 
-import junit.framework.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
-import org.hibernate.search.test.Clock;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class OptimizationTriggerTest extends SearchTestCase {
+public class OptimizationTriggerTest extends SearchTestCaseJUnit4 {
 
 	@Test
 	public void testOptimizationIsTriggered() throws InterruptedException {
@@ -124,5 +126,4 @@ public class OptimizationTriggerTest extends SearchTestCase {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Clock.class };
 	}
-
 }

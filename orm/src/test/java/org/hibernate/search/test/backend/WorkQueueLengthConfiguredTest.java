@@ -24,9 +24,10 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.Clock;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verifies the is <code>max_queue_length</code> parameter for Lucene backend is read.
@@ -34,7 +35,7 @@ import org.junit.Test;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class WorkQueueLengthConfiguredTest extends SearchTestCase {
+public class WorkQueueLengthConfiguredTest extends SearchTestCaseJUnit4 {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {

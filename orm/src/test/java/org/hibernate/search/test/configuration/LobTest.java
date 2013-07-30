@@ -30,10 +30,10 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 
 import org.apache.lucene.search.Query;
-import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.dialect.Sybase11Dialect;
 import org.hibernate.dialect.SybaseASE15Dialect;
 import org.hibernate.search.FullTextQuery;
@@ -42,9 +42,12 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.util.TestForIssue;
 import org.hibernate.testing.SkipForDialect;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests that a field can be mapped as {@code @Lob}.
@@ -52,7 +55,7 @@ import org.hibernate.testing.SkipForDialect;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-993")
-public class LobTest extends SearchTestCase {
+public class LobTest extends SearchTestCaseJUnit4 {
 
 	@Test
 	@SkipForDialect(value = { SybaseASE15Dialect.class, Sybase11Dialect.class },
