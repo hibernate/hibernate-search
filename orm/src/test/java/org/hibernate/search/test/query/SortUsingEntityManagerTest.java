@@ -127,9 +127,4 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 		em.clear();
 	}
 
-	@Override
-	public Class[] getAnnotatedClasses() {
-		return new Class[] { ProductArticle.class };
-	}
-
 }

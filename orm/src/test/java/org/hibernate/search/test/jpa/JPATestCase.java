@@ -23,33 +23,44 @@
  */
 package org.hibernate.search.test.jpa;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Properties;
+import java.util.ArrayList;import java.util.Arrays;
+import java.io.InputStream;
+import java.io.IOException;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.util.Version;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
 import org.hibernate.search.test.TestConstants;
 import org.junit.After;
 import org.junit.Before;
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.util.Version;
 
 /**
  * @author Emmanuel Bernard
  */
-public abstract class JPATestCase {
+public abstract class JPATestCase extends junit.framework.TestCase {
 	protected EntityManagerFactory factory;
+
+	public JPATestCase() {
+		super();
+	}
+
+	public JPATestCase(String name) {
+		super( name );
+	}
+
+	protected String getPersistenceUnitName() {
+		return getClass().getSimpleName() + "PU";
+	}
 
 	@Before
 	public void setUp() {
-		factory = Persistence.createEntityManagerFactory( "JPATestCasePU", getConfig() );
+		factory = Persistence.createEntityManagerFactory( getPersistenceUnitName(), getConfig() );
 	}
 
 	@After
@@ -57,10 +68,8 @@ public abstract class JPATestCase {
 		factory.close();
 	}
 
-	public abstract Class[] getAnnotatedClasses();
-
 	public String[] getEjb3DD() {
-		return new String[] { };
+		return new String[]{};
 	}
 
 	public Map<Class, String> getCachedClasses() {
@@ -94,10 +103,9 @@ public abstract class JPATestCase {
 	}
 
 	public Map getConfig() {
-		Map<Object, Object> config = loadProperties();
+		Map config = loadProperties();
 		ArrayList<Class> classes = new ArrayList<Class>();
 
-		classes.addAll( Arrays.asList( getAnnotatedClasses() ) );
 		config.put( AvailableSettings.LOADED_CLASSES, classes );
 		for ( Map.Entry<Class, String> entry : getCachedClasses().entrySet() ) {
 			config.put(

@@ -30,16 +30,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.index.Term;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
 public class EntityManagerTest extends JPATestCase {
 
-	@Test
 	public void testQuery() throws Exception {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
@@ -54,7 +50,7 @@ public class EntityManagerTest extends JPATestCase {
 		query = new TermQuery( new Term("saltQty", "23.0") );
 		assertEquals( "getResultList", 1, em.createFullTextQuery( query ).getResultList().size() );
 		assertEquals( "getSingleResult and object retrieval", 23f,
-				( (Bretzel) em.createFullTextQuery( query ).getSingleResult() ).getSaltQty(), 0f );
+				( (Bretzel) em.createFullTextQuery( query ).getSingleResult() ).getSaltQty() );
 		assertEquals( 1, em.createFullTextQuery( query ).getResultSize() );
 		em.getTransaction().commit();
 
@@ -66,7 +62,6 @@ public class EntityManagerTest extends JPATestCase {
 		em.close();
 	}
 
-	@Test
 	public void testIndex() {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
@@ -87,10 +82,4 @@ public class EntityManagerTest extends JPATestCase {
 		em.close();
 	}
 
-	@Override
-	public Class[] getAnnotatedClasses() {
-		return new Class[] {
-				Bretzel.class
-		};
-	}
 }
