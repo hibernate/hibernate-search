@@ -18,11 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hibernate.search.hcore.impl.MassIndexerFactoryIntegrator.MASS_INDEXER_FACTORY_CLASSNAME;
-import static org.junit.Assert.assertThat;
+package org.hibernate.search.test.batchindexing;
 
 import java.util.Properties;
 import java.util.concurrent.Future;
@@ -30,18 +26,25 @@ import java.util.concurrent.Future;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.MassIndexerFactory;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hibernate.search.hcore.impl.MassIndexerFactoryIntegrator.MASS_INDEXER_FACTORY_CLASSNAME;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Davide D'Alto <davide@hibernate.org>
  */
-public class CustomMassIndexerFactoryTest extends SearchTestCase {
+public class CustomMassIndexerFactoryTest extends SearchTestCaseJUnit4 {
 
 	@Test
 	public void testCreationOfTheSelectedMassIndexer() throws Exception {
@@ -167,6 +170,5 @@ public class CustomMassIndexerFactoryTest extends SearchTestCase {
 		public MassIndexer idFetchSize(int idFetchSize) {
 			return null;
 		}
-
 	}
 }
