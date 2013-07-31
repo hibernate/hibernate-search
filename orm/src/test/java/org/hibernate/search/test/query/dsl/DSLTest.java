@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.test.query.dsl;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +61,7 @@ import org.hibernate.search.test.util.TestForIssue;
  * @author Hardy Ferentschik
  */
 //DO NOT AUTO INDENT THIS FILE.
-//MY DSL IS BEAUTIFUL, DUMP INDENTATION IS SCREWING IT UP
+//MY DSL IS BEAUTIFUL, DUMB INDENTATION IS SCREWING IT UP
 public class DSLTest extends SearchTestCase {
 	private final Calendar calendar = Calendar.getInstance();
 
@@ -81,7 +83,6 @@ public class DSLTest extends SearchTestCase {
 		cleanUpTestData();
 		super.tearDown();
 	}
-
 
 	public void testUseOfFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -553,6 +554,67 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	public void testNumericRangeQueryAbove() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		//inclusive
+		Query query = monthQb
+				.range()
+					.onField( "raindropInMm" )
+					.above( 0.231d )
+					.createQuery();
+
+		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
+
+		List<?> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		assertThat( results ).onProperty( "name" ).containsOnly( "January", "February", "March" );
+
+		//exclusive
+		query = monthQb
+				.range()
+					.onField( "raindropInMm" )
+					.above( 0.231d )
+					.excludeLimit()
+					.createQuery();
+
+		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		assertThat( results ).onProperty( "name" ).containsOnly( "February", "March" );
+
+		transaction.commit();
+	}
+
+	public void testNumericRangeQueryBelow() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		//inclusive
+		Query query = monthQb
+				.range()
+					.onField( "raindropInMm" )
+					.below( 0.435d )
+					.createQuery();
+
+		assertTrue( query.getClass().isAssignableFrom( NumericRangeQuery.class ) );
+
+		List<?> results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		assertThat( results ).onProperty( "name" ).containsOnly( "January", "February", "March" );
+
+		//exclusive
+		query = monthQb
+				.range()
+					.onField( "raindropInMm" )
+					.below( 0.435d )
+					.excludeLimit()
+					.createQuery();
+
+		results = fullTextSession.createFullTextQuery( query, Month.class ).list();
+		assertThat( results ).onProperty( "name" ).containsOnly( "January" );
+
+		transaction.commit();
+	}
 
 	public void testNumericFieldsTermQuery() {
 		Transaction transaction = fullTextSession.beginTransaction();
