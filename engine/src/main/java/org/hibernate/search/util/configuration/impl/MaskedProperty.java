@@ -161,7 +161,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	@Override
-	public Enumeration<?> propertyNames() {
+	public synchronized Enumeration<?> propertyNames() {
 		initPropertyNames();
 		return Collections.enumeration( propertyNames );
 	}
@@ -308,7 +308,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	}
 
 	@Override
-	public Set<Object> keySet() {
+	public synchronized Set<Object> keySet() {
 		initPropertyNames();
 		return propertyNames;
 	}
