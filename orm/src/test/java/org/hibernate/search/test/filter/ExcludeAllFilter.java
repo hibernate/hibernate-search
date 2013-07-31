@@ -45,10 +45,10 @@ public class ExcludeAllFilter extends Filter implements Serializable {
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 		verifyItsAReadOnlySegmentReader( reader );
-		if ( invokedOnReaders.containsKey( reader ) ) {
+		final IndexReader previousValue = invokedOnReaders.put( reader, reader );
+		if ( previousValue != null ) {
 			throw new IllegalStateException( "Called twice" );
 		}
-		invokedOnReaders.put( reader, reader );
 		return DocIdSet.EMPTY_DOCIDSET;
 	}
 
