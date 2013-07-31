@@ -31,7 +31,6 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
-
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
@@ -59,6 +58,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		this.queryContext = queryContext;
 	}
 
+	@Override
 	public RangeTerminationExcludable excludeLimit() {
 		if ( rangeContext.getFrom() != null && rangeContext.getTo() != null ) {
 			rangeContext.setExcludeTo( true );
@@ -75,6 +75,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		return this;
 	}
 
+	@Override
 	public Query createQuery() {
 		final int size = fieldContexts.size();
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
@@ -99,7 +100,6 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 
 		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
 
-
 		final Object fromObject = rangeContext.getFrom();
 		final Object toObject = rangeContext.getTo();
 
@@ -108,8 +108,8 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 					fieldName,
 					fromObject,
 					toObject,
-					!rangeContext.isExcludeTo(),
-					!rangeContext.isExcludeFrom()
+					!rangeContext.isExcludeFrom(),
+					!rangeContext.isExcludeTo()
 			);
 		}
 		else {
@@ -136,8 +136,6 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 			);
 		}
 
-
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
-
 }
