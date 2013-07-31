@@ -32,24 +32,25 @@ import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.impl.FullTextSessionImpl;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Emmanuel Bernard
  */
-public class OptimizerPerformanceTest extends SearchTestCaseJunit4 {
+public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 	@Before
 	public void setUp() throws Exception {
 		forceConfigurationRebuild();
@@ -131,8 +132,10 @@ public class OptimizerPerformanceTest extends SearchTestCaseJunit4 {
 				s = sf.openSession();
 				tx = s.beginTransaction();
 				FullTextSession fts = new FullTextSessionImpl( s );
-				QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(),
-						"id", TestConstants.stopAnalyzer );
+				QueryParser parser = new QueryParser(
+						TestConstants.getTargetLuceneVersion(),
+						"id", TestConstants.stopAnalyzer
+				);
 				Query query;
 				try {
 					query = parser.parse( "name:Gavin" );

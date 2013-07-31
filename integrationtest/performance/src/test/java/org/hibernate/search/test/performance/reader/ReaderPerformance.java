@@ -58,13 +58,13 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	private static final int WARM_UP_CYCLES = 6;
 
 	public void setUp() throws Exception {
+		super.setUp();
 		File baseIndexDir = getBaseIndexDir();
 		baseIndexDir.mkdirs();
 		File[] files = baseIndexDir.listFiles();
 		for ( File file : files ) {
 			FileHelper.delete( file );
 		}
-		super.setUp();
 	}
 
 	public void tearDown() throws Exception {
