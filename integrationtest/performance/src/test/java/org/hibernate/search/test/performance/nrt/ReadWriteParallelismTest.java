@@ -144,7 +144,7 @@ public class ReadWriteParallelismTest {
 			final Integer bookId = Integer.valueOf( threadId );
 			final Query query = new TermQuery( new Term( "title", title ) );
 			try {
-				while ( running.get()) {
+				while ( running.get() ) {
 					cyclesCompleted.incrementAndGet();
 					verifyMatches( searchFactory, 0, query );
 					writeABook( bookId, title, worker );

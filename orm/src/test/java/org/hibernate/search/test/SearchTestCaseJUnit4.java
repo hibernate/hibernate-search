@@ -43,12 +43,13 @@ import org.junit.Before;
  * @author Hardy Ferentschik
  */
 public abstract class SearchTestCaseJUnit4 implements TestResourceManager {
+	// access only via getter, since instance gets lazily initalized
 	private DefaultTestResourceManager testResourceManager;
 
 	@Before
 	public void setUp() throws Exception {
-		if ( testResourceManager == null || testResourceManager.needsConfigurationRebuild() ) {
-			testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
+		DefaultTestResourceManager testResourceManager = getTestResourceManager();
+		if ( testResourceManager.needsConfigurationRebuild() ) {
 			configure( testResourceManager.getCfg() );
 			testResourceManager.buildConfiguration();
 		}
@@ -57,80 +58,85 @@ public abstract class SearchTestCaseJUnit4 implements TestResourceManager {
 
 	@After
 	public void tearDown() throws Exception {
-		testResourceManager.defaultTearDown();
+		getTestResourceManager().defaultTearDown();
 	}
 
 	@Override
 	public final Configuration getCfg() {
-		return testResourceManager.getCfg();
+		return getTestResourceManager().getCfg();
 	}
 
 	@Override
 	public final void openSessionFactory() {
-		testResourceManager.openSessionFactory();
+		getTestResourceManager().openSessionFactory();
 	}
 
 	@Override
 	public final void closeSessionFactory() {
-		testResourceManager.closeSessionFactory();
+		getTestResourceManager().closeSessionFactory();
 	}
 
 	@Override
 	public final SessionFactory getSessionFactory() {
-		return testResourceManager.getSessionFactory();
+		return getTestResourceManager().getSessionFactory();
 	}
 
 	@Override
 	public final SearchFactory getSearchFactory() {
-		return testResourceManager.getSearchFactory();
+		return getTestResourceManager().getSearchFactory();
 	}
 
 	@Override
 	public SearchFactoryImplementor getSearchFactoryImpl() {
-		return testResourceManager.getSearchFactoryImpl();
+		return getTestResourceManager().getSearchFactoryImpl();
 	}
 
 	@Override
 	public final Session openSession() throws HibernateException {
-		return testResourceManager.openSession();
+		return getTestResourceManager().openSession();
 	}
 
 	@Override
 	public final Session getSession() {
-		return testResourceManager.getSession();
+		return getTestResourceManager().getSession();
 	}
 
 	@Override
 	public void ensureIndexesAreEmpty() {
-		testResourceManager.ensureIndexesAreEmpty();
+		getTestResourceManager().ensureIndexesAreEmpty();
 	}
 
 	@Override
 	public File getBaseIndexDir() {
-		return testResourceManager.getBaseIndexDir();
+		return getTestResourceManager().getBaseIndexDir();
 	}
 
 	@Override
 	public Directory getDirectory(Class<?> clazz) {
-		return testResourceManager.getDirectory( clazz );
+		return getTestResourceManager().getDirectory( clazz );
 	}
 
 	@Override
 	public void forceConfigurationRebuild() {
-		if ( testResourceManager == null ) {
-			testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
-		}
-		testResourceManager.forceConfigurationRebuild();
+		getTestResourceManager().forceConfigurationRebuild();
 	}
 
 	@Override
 	public boolean needsConfigurationRebuild() {
-		return testResourceManager.needsConfigurationRebuild();
+		return getTestResourceManager().needsConfigurationRebuild();
 	}
 
 	protected abstract Class<?>[] getAnnotatedClasses();
 
 	protected void configure(Configuration cfg) {
-		testResourceManager.applyDefaultConfiguration( cfg );
+		getTestResourceManager().applyDefaultConfiguration( cfg );
+	}
+
+	// synchronized due to lazy initialization
+	private synchronized DefaultTestResourceManager getTestResourceManager() {
+		if ( testResourceManager == null ) {
+			testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
+		}
+		return testResourceManager;
 	}
 }

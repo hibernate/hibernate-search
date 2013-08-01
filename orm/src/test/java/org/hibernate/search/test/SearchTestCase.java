@@ -52,11 +52,12 @@ import org.hibernate.testing.SkipForDialect;
  * @author Hardy Ferentschik
  */
 public abstract class SearchTestCase extends TestCase implements TestResourceManager {
+	// access only via getter, since instance gets lazily initalized
 	private DefaultTestResourceManager testResourceManager;
 
 	public void setUp() throws Exception {
-		if ( testResourceManager == null || testResourceManager.needsConfigurationRebuild() ) {
-			testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
+		DefaultTestResourceManager testResourceManager = getTestResourceManager();
+		if ( testResourceManager.needsConfigurationRebuild() ) {
 			configure( testResourceManager.getCfg() );
 			testResourceManager.buildConfiguration();
 		}
@@ -64,81 +65,78 @@ public abstract class SearchTestCase extends TestCase implements TestResourceMan
 	}
 
 	public void tearDown() throws Exception {
-		testResourceManager.defaultTearDown();
+		getTestResourceManager().defaultTearDown();
 	}
 
 	@Override
 	public final Configuration getCfg() {
-		return testResourceManager.getCfg();
+		return getTestResourceManager().getCfg();
 	}
 
 	@Override
 	public final void openSessionFactory() {
-		testResourceManager.openSessionFactory();
+		getTestResourceManager().openSessionFactory();
 	}
 
 	@Override
 	public SearchFactory getSearchFactory() {
-		return testResourceManager.getSearchFactory();
+		return getTestResourceManager().getSearchFactory();
 	}
 
 	@Override
 	public final SessionFactory getSessionFactory() {
-		return testResourceManager.getSessionFactory();
+		return getTestResourceManager().getSessionFactory();
 	}
 
 	@Override
 	public final void closeSessionFactory() {
-		testResourceManager.closeSessionFactory();
+		getTestResourceManager().closeSessionFactory();
 	}
 
 	@Override
 	public SearchFactoryImplementor getSearchFactoryImpl() {
-		return testResourceManager.getSearchFactoryImpl();
+		return getTestResourceManager().getSearchFactoryImpl();
 	}
 
 	@Override
 	public final Session openSession() throws HibernateException {
-		return testResourceManager.openSession();
+		return getTestResourceManager().openSession();
 	}
 
 	@Override
 	public final Session getSession() {
-		return testResourceManager.getSession();
+		return getTestResourceManager().getSession();
 	}
 
 	@Override
 	public File getBaseIndexDir() {
-		return testResourceManager.getBaseIndexDir();
+		return getTestResourceManager().getBaseIndexDir();
 	}
 
 	@Override
 	public void ensureIndexesAreEmpty() {
-		testResourceManager.ensureIndexesAreEmpty();
+		getTestResourceManager().ensureIndexesAreEmpty();
 	}
 
 	@Override
 	public Directory getDirectory(Class<?> clazz) {
-		return testResourceManager.getDirectory( clazz );
+		return getTestResourceManager().getDirectory( clazz );
 	}
 
 	@Override
 	public void forceConfigurationRebuild() {
-		if ( testResourceManager == null ) {
-			testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
-		}
-		testResourceManager.forceConfigurationRebuild();
+		getTestResourceManager().forceConfigurationRebuild();
 	}
 
 	@Override
 	public boolean needsConfigurationRebuild() {
-		return testResourceManager.needsConfigurationRebuild();
+		return getTestResourceManager().needsConfigurationRebuild();
 	}
 
 	protected abstract Class<?>[] getAnnotatedClasses();
 
 	protected void configure(Configuration cfg) {
-		testResourceManager.applyDefaultConfiguration( cfg );
+		getTestResourceManager().applyDefaultConfiguration( cfg );
 	}
 
 	@Override
@@ -197,6 +195,14 @@ public abstract class SearchTestCase extends TestCase implements TestResourceMan
 		finally {
 			tearDown();
 		}
+	}
+
+	// synchronized due to lazy initialization
+	private synchronized DefaultTestResourceManager getTestResourceManager() {
+		if ( testResourceManager == null ) {
+			testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
+		}
+		return testResourceManager;
 	}
 
 	private void reportSkip(Skip skip) {
