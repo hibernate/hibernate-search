@@ -1,6 +1,34 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.0.Alpha1 (02-08-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-703] - QueryBuilder should support specialization by superclasses of indexed entities
+    * [HSEARCH-1374] - IDE project import error on Windows: com.sun:tools dependency missing
+    * [HSEARCH-1377] - Polish some minor concurrency mistakes
+    * [HSEARCH-1378] - Inclusive flags swapped for numeric range queries
+
+** Improvement
+    * [HSEARCH-1352] - Clarify limitations of programmatic mapping not recognizing inherited properties
+    * [HSEARCH-1354] - Document parse failures need graceful recovery
+    * [HSEARCH-1355] - Rename EntityIndexBinder to EntityIndexBinding
+    * [HSEARCH-1361] - Upgrade to Hibernate ORM 4.2.3.Final
+    * [HSEARCH-1362] - Upgrade to Infinispan 5.3.0.Final and JGroups 3.3.2
+    * [HSEARCH-1363] - Formatting and style improvements in the documentation
+
+** New Feature
+    * [HSEARCH-436] - Expose a metadata API
+
+** Task
+    * [HSEARCH-1293] - Verify Hibernate Envers integration
+    * [HSEARCH-1326] - Checkstyle Improvement
+    * [HSEARCH-1360] - UpdateIndexedEmbeddedCollectionTest failing on Oracle, DB2 and MySQL of too long table names
+    * [HSEARCH-1366] - Allow ORM SessionFactory to be completely created prior to bootstrapping the Search factory
+    * [HSEARCH-1371] - Update Maven plugin versions
+
+
 Version 4.3.0.Final (08-06-2013)
 ------------------------
 
