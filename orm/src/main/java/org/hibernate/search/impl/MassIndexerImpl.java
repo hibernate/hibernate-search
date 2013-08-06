@@ -57,6 +57,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	protected Set<Class<?>> rootEntities = new HashSet<Class<?>>();
 
+	private int batchIndexingThreads; //default value defined in the constructor as rootEntities.size()
 	// default settings defined here:
 	private int objectLoadingThreads = 2; //loading the main entity
 	private int collectionLoadingThreads = 4; //also responsible for loading of lazy @IndexedEmbedded collections
@@ -73,6 +74,7 @@ public class MassIndexerImpl implements MassIndexer {
 		this.searchFactoryImplementor = searchFactory;
 		this.sessionFactory = sessionFactory;
 		rootEntities = toRootEntities( searchFactoryImplementor, entities );
+		batchIndexingThreads = rootEntities.size();
 		if ( searchFactoryImplementor.isJMXEnabled() ) {
 			monitor = new IndexingProgressMonitor();
 		}
@@ -125,6 +127,14 @@ public class MassIndexerImpl implements MassIndexer {
 		cleaned.removeAll( toRemove );
 		log.debugf( "Targets for indexing job: %s", cleaned );
 		return cleaned;
+	}
+	
+	public MassIndexer threadsToIndexObjects(int numberOfThreads) {
+		if ( numberOfThreads < 1 ) {
+			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
+		}
+		this.batchIndexingThreads = numberOfThreads;
+		return this;
 	}
 
 	public MassIndexer cacheMode(CacheMode cacheMode) {
@@ -208,7 +218,7 @@ public class MassIndexerImpl implements MassIndexer {
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
 				rootEntities, searchFactoryImplementor, sessionFactory,
-				objectLoadingThreads, collectionLoadingThreads,
+				batchIndexingThreads, objectLoadingThreads, collectionLoadingThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
 				monitor, idFetchSize
