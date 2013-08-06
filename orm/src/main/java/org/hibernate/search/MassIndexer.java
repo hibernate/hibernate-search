@@ -37,10 +37,10 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
  * @author Sanne Grinovero
  */
 public interface MassIndexer {
-	
+
 	/**
 	 * Sets the number of entity types to be indexed in parallel.
-	 * Defaults to the number of root entities to index.
+	 * Defaults to 1.
 	 * @return <tt>this</tt> for method chaining
 	 */
 	MassIndexer threadsToIndexObjects(int threadsToIndexObjects);

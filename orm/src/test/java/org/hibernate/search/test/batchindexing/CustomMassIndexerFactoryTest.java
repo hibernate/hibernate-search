@@ -105,7 +105,7 @@ public class CustomMassIndexerFactoryTest extends SearchTestCaseJUnit4 {
 		public boolean isConfigurationReadable() {
 			return configurationReadable;
 		}
-		
+
 		@Override
 		public MassIndexer threadsToIndexObjects(int threadsToIndexObjects) {
 			return null;
