@@ -136,7 +136,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	/**
 	 * This is a simplified version of org.apache.lucene.queryparser.classic.QueryParser#getFieldQuery()
 	 * adapted to work in the Hibernate Search context.
-	 * 
+	 *
 	 * It is based on the QueryParser of Lucene 4.4.0.
 	 */
 	protected Query getFieldQuery(FieldContext fieldContext, String queryText, Analyzer analyzer) {
@@ -147,7 +147,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			source = analyzer.reusableTokenStream( field, new StringReader( queryText ) );
 			source.reset();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			source = analyzer.tokenStream( field, new StringReader( queryText ) );
 		}
 		CachingTokenFilter buffer = new CachingTokenFilter( source );
@@ -160,7 +160,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			buffer.reset();
 			success = true;
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			// success==false if we hit an exception
 		}
 		if ( success ) {
@@ -187,7 +187,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 					hasMoreTokens = buffer.incrementToken();
 				}
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				// ignore
 			}
 		}
@@ -198,7 +198,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 			// close original stream - all tokens buffered
 			source.close();
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			// ignore
 		}
 
@@ -212,13 +212,13 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				assert hasNext == true;
 				term = termAtt.toString();
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				// safe to ignore, because we know the number of tokens
 			}
 			return createTermQuery( fieldContext, term );
 		}
 		else {
-			if (positionCount == 1) {
+			if ( positionCount == 1 ) {
 				BooleanQuery q = new BooleanQuery( true );
 
 				BooleanClause.Occur occur = positionCount > 1 && fieldContext.isWithAllTerms() ? BooleanClause.Occur.MUST
@@ -231,7 +231,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 						assert hasNext == true;
 						term = termAtt.toString();
 					}
-					catch ( IOException e ) {
+					catch (IOException e) {
 						// safe to ignore, because we know the number of tokens
 					}
 
@@ -253,7 +253,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 						assert hasNext == true;
 						term = termAtt.toString();
 					}
-					catch ( IOException e ) {
+					catch (IOException e) {
 						// safe to ignore, because we know the number of tokens
 					}
 					if ( posIncrAtt != null && posIncrAtt.getPositionIncrement() == 0 ) {
@@ -262,8 +262,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 							currentQuery = new BooleanQuery( true );
 							( (BooleanQuery) currentQuery ).add( t, BooleanClause.Occur.SHOULD );
 						}
-						( (BooleanQuery) currentQuery ).add(
-								createTermQuery( fieldContext, term ),
+						( (BooleanQuery) currentQuery ).add( createTermQuery( fieldContext, term ),
 								BooleanClause.Occur.SHOULD );
 					}
 					else {
