@@ -40,4 +40,10 @@ public interface TermMatchingContext extends FieldCustomization<TermMatchingCont
 	 * field / property the term query is executed on
 	 */
 	TermMatchingContext andField(String field);
+
+	/**
+	 * Search for all the terms specified in matching().
+	 */
+	TermMatchingContext withAllTerms();
+
 }

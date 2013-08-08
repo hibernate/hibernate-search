@@ -25,10 +25,14 @@
 package org.hibernate.search.query.dsl.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.StringReader;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CachingTokenFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -36,7 +40,6 @@ import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
-
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
@@ -99,28 +102,11 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 		String searchTerm = buildSearchTerm( fieldContext, documentBuilder, conversionContext );
 
-		if ( fieldContext.isIgnoreAnalyzer() ) {
+		if ( fieldContext.isIgnoreAnalyzer() || termContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {
 			perFieldQuery = createTermQuery( fieldContext, searchTerm );
 		}
 		else {
-			List<String> terms = getAllTermsFromText(
-					fieldContext.getField(), searchTerm, queryContext.getQueryAnalyzer()
-			);
-
-			if ( terms.size() == 0 ) {
-				throw log.queryWithNoTermsAfterAnalysis( fieldContext.getField(), searchTerm );
-			}
-			else if ( terms.size() == 1 ) {
-				perFieldQuery = createTermQuery( fieldContext, terms.get( 0 ) );
-			}
-			else {
-				BooleanQuery booleanQuery = new BooleanQuery();
-				for ( String localTerm : terms ) {
-					Query termQuery = createTermQuery( fieldContext, localTerm );
-					booleanQuery.add( termQuery, BooleanClause.Occur.SHOULD );
-				}
-				perFieldQuery = booleanQuery;
-			}
+			perFieldQuery = getFieldQuery( fieldContext, searchTerm, queryContext.getQueryAnalyzer() );
 		}
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
@@ -147,6 +133,151 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		}
 	}
 
+	/**
+	 * This is a simplified version of org.apache.lucene.queryparser.classic.QueryParser#getFieldQuery()
+	 * adapted to work in the Hibernate Search context.
+	 *
+	 * It is based on the QueryParser of Lucene 4.4.0.
+	 */
+	protected Query getFieldQuery(FieldContext fieldContext, String queryText, Analyzer analyzer) {
+		final String field = fieldContext.getField();
+
+		TokenStream source;
+		try {
+			source = analyzer.reusableTokenStream( field, new StringReader( queryText ) );
+			source.reset();
+		}
+		catch (IOException e) {
+			source = analyzer.tokenStream( field, new StringReader( queryText ) );
+		}
+		CachingTokenFilter buffer = new CachingTokenFilter( source );
+		CharTermAttribute termAtt = null;
+		PositionIncrementAttribute posIncrAtt = null;
+		int numTokens = 0;
+
+		boolean success = false;
+		try {
+			buffer.reset();
+			success = true;
+		}
+		catch (IOException e) {
+			// success==false if we hit an exception
+		}
+		if ( success ) {
+			if ( buffer.hasAttribute( CharTermAttribute.class ) ) {
+				termAtt = buffer.getAttribute( CharTermAttribute.class );
+			}
+			if ( buffer.hasAttribute( PositionIncrementAttribute.class ) ) {
+				posIncrAtt = buffer.getAttribute( PositionIncrementAttribute.class );
+			}
+		}
+
+		int positionCount = 0;
+
+		boolean hasMoreTokens = false;
+		if ( termAtt != null ) {
+			try {
+				hasMoreTokens = buffer.incrementToken();
+				while ( hasMoreTokens ) {
+					numTokens++;
+					int positionIncrement = ( posIncrAtt != null ) ? posIncrAtt.getPositionIncrement() : 1;
+					if ( positionIncrement != 0 ) {
+						positionCount += positionIncrement;
+					}
+					hasMoreTokens = buffer.incrementToken();
+				}
+			}
+			catch (IOException e) {
+				// ignore
+			}
+		}
+		try {
+			// rewind the buffer stream
+			buffer.reset();
+
+			// close original stream - all tokens buffered
+			source.close();
+		}
+		catch (IOException e) {
+			// ignore
+		}
+
+		if ( numTokens == 0 ) {
+			throw log.queryWithNoTermsAfterAnalysis( fieldContext.getField(), queryText );
+		}
+		else if ( numTokens == 1 ) {
+			String term = null;
+			try {
+				boolean hasNext = buffer.incrementToken();
+				assert hasNext == true;
+				term = termAtt.toString();
+			}
+			catch (IOException e) {
+				// safe to ignore, because we know the number of tokens
+			}
+			return createTermQuery( fieldContext, term );
+		}
+		else {
+			if ( positionCount == 1 ) {
+				BooleanQuery q = new BooleanQuery( true );
+
+				BooleanClause.Occur occur = positionCount > 1 && fieldContext.isWithAllTerms() ? BooleanClause.Occur.MUST
+						: BooleanClause.Occur.SHOULD;
+
+				for ( int i = 0; i < numTokens; i++ ) {
+					String term = null;
+					try {
+						boolean hasNext = buffer.incrementToken();
+						assert hasNext == true;
+						term = termAtt.toString();
+					}
+					catch (IOException e) {
+						// safe to ignore, because we know the number of tokens
+					}
+
+					Query currentQuery = createTermQuery( fieldContext, term );
+					q.add( currentQuery, occur );
+				}
+				return q;
+			}
+			else {
+				// multiple positions
+				BooleanQuery q = new BooleanQuery( false );
+				final BooleanClause.Occur occur = fieldContext.isWithAllTerms() ? BooleanClause.Occur.MUST
+						: BooleanClause.Occur.SHOULD;
+				Query currentQuery = null;
+				for ( int i = 0; i < numTokens; i++ ) {
+					String term = null;
+					try {
+						boolean hasNext = buffer.incrementToken();
+						assert hasNext == true;
+						term = termAtt.toString();
+					}
+					catch (IOException e) {
+						// safe to ignore, because we know the number of tokens
+					}
+					if ( posIncrAtt != null && posIncrAtt.getPositionIncrement() == 0 ) {
+						if ( !( currentQuery instanceof BooleanQuery ) ) {
+							Query t = currentQuery;
+							currentQuery = new BooleanQuery( true );
+							( (BooleanQuery) currentQuery ).add( t, BooleanClause.Occur.SHOULD );
+						}
+						( (BooleanQuery) currentQuery ).add( createTermQuery( fieldContext, term ),
+								BooleanClause.Occur.SHOULD );
+					}
+					else {
+						if ( currentQuery != null ) {
+							q.add( currentQuery, occur );
+						}
+						currentQuery = createTermQuery( fieldContext, term );
+					}
+				}
+				q.add( currentQuery, occur );
+				return q;
+			}
+		}
+	}
+
 	private Query createTermQuery(FieldContext fieldContext, String term) {
 		Query query;
 		final String fieldName = fieldContext.getField();
@@ -170,20 +301,4 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		return query;
 	}
 
-	private List<String> getAllTermsFromText(String fieldName, String localText, Analyzer analyzer) {
-		//it's better not to apply the analyzer with wildcard as * and ? can be mistakenly removed
-		List<String> terms = new ArrayList<String>();
-		if ( termContext.getApproximation() == TermQueryContext.Approximation.WILDCARD ) {
-			terms.add( localText );
-		}
-		else {
-			try {
-				terms = Helper.getAllTermsFromText( fieldName, localText, analyzer );
-			}
-			catch (IOException e) {
-				throw new AssertionFailure( "IO exception while reading String stream??", e );
-			}
-		}
-		return terms;
-	}
 }
