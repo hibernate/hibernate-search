@@ -39,6 +39,9 @@ import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
 import org.apache.solr.analysis.StopFilterFactory;
+import org.apache.solr.analysis.SynonymFilterFactory;
+import org.apache.solr.analysis.WhitespaceTokenizerFactory;
+import org.apache.solr.analysis.WordDelimiterFilterFactory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -744,6 +747,35 @@ public class DSLTest extends SearchTestCase {
 		}
 	}
 
+	@TestForIssue(jiraKey = "HSEARCH-917 ")
+	public void testWithAllTerms() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( Month.class )
+				.get();
+
+		Query query;
+
+		// term query based on several words with default OR
+		query = monthQb.keyword().onField( "mythology" ).matching( "colder darker" ).createQuery();
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		// term query based on several words with AND using withAllTerms
+		query = monthQb.keyword().onField( "mythology" ).withAllTerms().matching( "colder darker" ).createQuery();
+		assertEquals( 0, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword().onField( "mythology" ).withAllTerms().matching( "month whitening" ).createQuery();
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		// more advanced usage with the word delimiter filter of Solr and synonyms
+		query = monthQb.keyword().onField( "history_synonym" ).withAllTerms().matching( "Historically children landscape" ).createQuery();
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		query = monthQb.keyword().onField( "history_worddelimiter" ).withAllTerms().matching( "which i-pod snowboarding" ).createQuery();
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+
+		transaction.commit();
+	}
+
 	private void indexTestData() {
 		Transaction tx = fullTextSession.beginTransaction();
 		final Calendar calendar = Calendar.getInstance();
@@ -779,7 +811,7 @@ public class DSLTest extends SearchTestCase {
 						"March",
 						3,
 						"Month of fake spring",
-						"Historically, the month in which we actually find time to go snowboarding.",
+						"Historically, the month in which we actually find time to go snowboarding and listen to our ipod.",
 						march,
 						0.435d
 				)
@@ -845,18 +877,29 @@ public class DSLTest extends SearchTestCase {
 			SearchMapping mapping = new SearchMapping();
 			mapping
 					.analyzerDef( "stemmer", StandardTokenizerFactory.class )
-					.filter( StandardFilterFactory.class )
-					.filter( LowerCaseFilterFactory.class )
-					.filter( StopFilterFactory.class )
-					.filter( SnowballPorterFilterFactory.class )
-					.param( "language", "English" )
+						.filter( StandardFilterFactory.class )
+						.filter( LowerCaseFilterFactory.class )
+						.filter( StopFilterFactory.class )
+						.filter( SnowballPorterFilterFactory.class )
+						.param( "language", "English" )
 					.analyzerDef( "ngram", StandardTokenizerFactory.class )
-					.filter( StandardFilterFactory.class )
-					.filter( LowerCaseFilterFactory.class )
-					.filter( StopFilterFactory.class )
-					.filter( NGramFilterFactory.class )
-					.param( "minGramSize", "3" )
-					.param( "maxGramSize", "3" );
+						.filter( StandardFilterFactory.class )
+						.filter( LowerCaseFilterFactory.class )
+						.filter( StopFilterFactory.class )
+						.filter( NGramFilterFactory.class )
+						.param( "minGramSize", "3" )
+						.param( "maxGramSize", "3" )
+					.analyzerDef( "synonym", StandardTokenizerFactory.class )
+						.filter( LowerCaseFilterFactory.class )
+						.filter( SynonymFilterFactory.class )
+						.param( "synonyms", "org/hibernate/search/test/query/dsl/synonyms.properties" )
+					.analyzerDef( "worddelimiter", WhitespaceTokenizerFactory.class )
+						.filter( WordDelimiterFilterFactory.class )
+						.param( "preserveOriginal", "1" )
+						.param( "generateWordParts", "0" )
+						.param( "catenateWords", "1" )
+						.filter( LowerCaseFilterFactory.class )
+					;
 			return mapping;
 		}
 	}

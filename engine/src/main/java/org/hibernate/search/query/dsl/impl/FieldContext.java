@@ -32,6 +32,7 @@ public class FieldContext {
 	private boolean ignoreAnalyzer;
 	private final QueryCustomizer fieldCustomizer;
 	private boolean ignoreFieldBridge;
+	private boolean withAllTerms;
 
 	public FieldContext(String field) {
 		this.field = field;
@@ -60,5 +61,13 @@ public class FieldContext {
 
 	public void setIgnoreFieldBridge(boolean ignoreFieldBridge) {
 		this.ignoreFieldBridge = ignoreFieldBridge;
+	}
+
+	public boolean isWithAllTerms() {
+		return withAllTerms;
+	}
+
+	public void setWithAllTerms(boolean withAllTerms) {
+		this.withAllTerms = withAllTerms;
 	}
 }

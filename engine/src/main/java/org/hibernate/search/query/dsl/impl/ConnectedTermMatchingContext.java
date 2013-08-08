@@ -79,10 +79,6 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 		return this;
 	}
 
-	private List<FieldContext> getCurrentFieldContexts() {
-		return fieldContexts.subList( firstOfContext, fieldContexts.size() );
-	}
-
 	public TermMatchingContext ignoreAnalyzer() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreAnalyzer( true );
@@ -95,5 +91,16 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 			fieldContext.setIgnoreFieldBridge( true );
 		}
 		return this;
+	}
+
+	public TermMatchingContext withAllTerms() {
+		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
+			fieldContext.setWithAllTerms( true );
+		}
+		return this;
+	}
+
+	private List<FieldContext> getCurrentFieldContexts() {
+		return fieldContexts.subList( firstOfContext, fieldContexts.size() );
 	}
 }

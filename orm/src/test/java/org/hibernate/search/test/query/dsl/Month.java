@@ -122,7 +122,11 @@ public class Month {
 
 	private String mythology;
 
-	@Field
+	@Fields({
+			@Field,
+			@Field(name = "history_synonym", analyzer = @Analyzer(definition = "synonym")),
+			@Field(name = "history_worddelimiter", analyzer = @Analyzer(definition = "worddelimiter"))
+	})
 	public String getHistory() {
 		return history;
 	}
