@@ -50,6 +50,9 @@
 
             <!-- Note that the JGroups transport uses sensible defaults if no configuration 
                 property is defined. See the JGroupsTransport javadocs for more flags -->
+                <properties>
+                    <property name="configurationFile" value="default-hibernatesearch-jgroups-udp.xml" />
+                </properties>
         </transport>
 
         <!-- Note that the JGroups transport uses sensible defaults if no configuration property 
