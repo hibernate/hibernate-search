@@ -263,6 +263,29 @@ transaction.commit();</programlisting>
       <literal>worker.thread_pool.size</literal> in <xref
       linkend="table-work-execution-configuration"/>.</para>
 
+      <para>As of Hibernate Search 4.4.0, instead of indexing all the types
+      in parallel, the MassIndexer is configured by default to index only
+      one type in parallel. It prevents resource exhaustion especially
+      database connections and usually does not slow down the indexing.
+      You can however configure this behavior using
+      <classname>MassIndexer</classname>.<methodname>typesToIndexInParallel(int threadsToIndexObjects)</methodname>:
+      </para>
+
+      <example>
+        <title>Configuring the MassIndexer to index several types in parallel</title>
+
+        <programlisting language="JAVA" role="JAVA">fullTextSession
+ .createIndexer( User.class, Customer.class )
+ .typesToIndexInParallel( 2 )
+ .batchSizeToLoadObjects( 25 )
+ .cacheMode( CacheMode.NORMAL )
+ .threadsToLoadObjects( 5 )
+ .idFetchSize( 150 )
+ .threadsForSubsequentFetching( 20 )
+ .progressMonitor( monitor ) //a MassIndexerProgressMonitor implementation
+ .startAndWait();</programlisting>
+      </example>
+
       <para>It is recommended to leave cacheMode to
       <literal>CacheMode.IGNORE</literal> (the default), as in most reindexing
       situations the cache will be a useless additional overhead; it might be
