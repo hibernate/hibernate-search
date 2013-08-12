@@ -253,7 +253,7 @@ transaction.commit();</programlisting>
  .startAndWait();</programlisting>
       </example>
 
-      <para>This will rebuild the index of all User instances (and subtypes).
+      <para>This will rebuild the index of all User instances (and subtypes),
       and will create 5 parallel threads to load the User instances using
       batches of 25 objects per query; these loaded User instances are then
       pipelined to 20 parallel threads to load the attached lazy collections
