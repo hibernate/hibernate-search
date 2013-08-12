@@ -40,15 +40,18 @@ public class FullTextFilterImpl implements FullTextFilterImplementor {
 		this.name = name;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public FullTextFilter setParameter(String name, Object value) {
 		parameters.put( name, value );
 		return this;
 	}
 
+	@Override
 	public Object getParameter(String name) {
 		return parameters.get( name );
 	}

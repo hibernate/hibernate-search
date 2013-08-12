@@ -34,10 +34,12 @@ public class StringBridge implements TwoWayStringBridge {
 
 	public static final StringBridge INSTANCE = new StringBridge();
 
+	@Override
 	public Object stringToObject(String stringValue) {
 		return stringValue;
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		return (String) object;
 	}

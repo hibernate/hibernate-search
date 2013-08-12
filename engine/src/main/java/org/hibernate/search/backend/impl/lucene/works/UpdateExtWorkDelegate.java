@@ -68,6 +68,7 @@ public final class UpdateExtWorkDelegate extends UpdateWorkDelegate {
 		this.idIsNumeric = DeleteWorkDelegate.isIdNumeric( builder );
 	}
 
+	@Override
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		checkType( work );
 		final Serializable id = work.getId();

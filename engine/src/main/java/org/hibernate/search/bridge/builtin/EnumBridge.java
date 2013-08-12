@@ -37,6 +37,7 @@ public class EnumBridge implements TwoWayStringBridge, AppliedOnTypeAwareBridge 
 
 	private Class<? extends Enum> clazz = null;
 
+	@Override
 	public Enum<? extends Enum> stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
 			return null;
@@ -44,11 +45,13 @@ public class EnumBridge implements TwoWayStringBridge, AppliedOnTypeAwareBridge 
 		return Enum.valueOf( clazz, stringValue );
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		Enum e = (Enum) object;
 		return e != null ? e.name() : null;
 	}
 
+	@Override
 	public void setAppliedOnType(Class<?> returnType) {
 		@SuppressWarnings("unchecked") //only called for an enum
 		Class<? extends Enum> enumReturnType = (Class<? extends Enum>) returnType;

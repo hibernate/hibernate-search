@@ -38,6 +38,7 @@ public class LoggerHelper {
 	}
 
 	static class CustomByteArrayOutputStream extends ByteArrayOutputStream {
+		@Override
 		public void flush() throws IOException {
 			log.debug( this.toString() );
 			super.flush();

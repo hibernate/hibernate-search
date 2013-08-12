@@ -365,6 +365,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		}
 	}
 
+	@Override
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
 		for ( int i = 0; i < albums.length; i++ ) {
@@ -383,6 +384,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		session.clear();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Cd.class,

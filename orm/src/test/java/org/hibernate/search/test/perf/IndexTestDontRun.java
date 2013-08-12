@@ -108,12 +108,14 @@ public class IndexTestDontRun extends SearchTestCase {
 		return indexsearcher;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Boat.class
 		};
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );

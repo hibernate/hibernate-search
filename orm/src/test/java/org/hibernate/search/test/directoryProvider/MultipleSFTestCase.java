@@ -90,11 +90,13 @@ public abstract class MultipleSFTestCase extends TestCase {
 		}
 	}
 
+	@Override
 	protected void setUp() throws Exception {
 		buildSessionFactories( getAnnotatedClasses(), getAnnotatedPackages(), getXmlFiles() );
 		lastTestClass = getClass();
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		for ( SessionFactory sf : getSessionFactories() ) {
 			sf.close();

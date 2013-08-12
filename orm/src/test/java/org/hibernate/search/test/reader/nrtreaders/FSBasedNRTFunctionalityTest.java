@@ -30,6 +30,7 @@ import org.hibernate.cfg.Configuration;
  */
 public class FSBasedNRTFunctionalityTest extends BasicNRTFunctionalityTest {
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );

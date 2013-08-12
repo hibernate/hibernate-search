@@ -49,6 +49,7 @@ public class QueryLoader extends AbstractLoader {
 	private ObjectsInitializer objectsInitializer;
 	private boolean sizeSafe = true;
 
+	@Override
 	public void init(Session session,
 					SearchFactoryImplementor searchFactoryImplementor,
 					ObjectsInitializer objectsInitializer,
@@ -69,6 +70,7 @@ public class QueryLoader extends AbstractLoader {
 		this.entityType = entityType;
 	}
 
+	@Override
 	public final Object executeLoad(EntityInfo entityInfo) {
 		//if explicit criteria, make sure to use it to load the objects
 		if ( isExplicitCriteria ) {
@@ -79,6 +81,7 @@ public class QueryLoader extends AbstractLoader {
 		return result;
 	}
 
+	@Override
 	public final List executeLoad(EntityInfo... entityInfos) {
 		if ( entityInfos.length == 0 ) {
 			return Collections.EMPTY_LIST;

@@ -40,6 +40,7 @@ public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBri
 
 	private int padding = 5; //default
 
+	@Override
 	public void setParameterValues(Map<String,String> parameters) {
 		String padding = parameters.get( PADDING_PROPERTY );
 		if ( padding != null ) {
@@ -47,6 +48,7 @@ public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBri
 		}
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		String rawInteger = object.toString();
 		if ( rawInteger.length() > padding ) {
@@ -59,6 +61,7 @@ public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBri
 		return paddedInteger.append( rawInteger ).toString();
 	}
 
+	@Override
 	public Object stringToObject(String stringValue) {
 		return new Integer( stringValue );
 	}

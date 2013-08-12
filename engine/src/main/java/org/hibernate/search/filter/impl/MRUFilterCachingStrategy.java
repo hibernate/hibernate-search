@@ -50,15 +50,18 @@ public class MRUFilterCachingStrategy implements FilterCachingStrategy {
 	 */
 	private static final int HARD_TO_SOFT_RATIO = 15;
 
+	@Override
 	public void initialize(Properties properties) {
 		int size = ConfigurationParseHelper.getIntValue( properties, SIZE, DEFAULT_SIZE );
 		cache = new SoftLimitMRUCache( size, size * HARD_TO_SOFT_RATIO );
 	}
 
+	@Override
 	public Filter getCachedFilter(FilterKey key) {
 		return (Filter) cache.get( key );
 	}
 
+	@Override
 	public void addCachedFilter(FilterKey key, Filter filter) {
 		cache.put( key, filter );
 	}

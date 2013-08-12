@@ -61,6 +61,7 @@ final class LuceneBackendQueueTask implements Runnable {
 		this.modificationLock = resources.getParallelModificationLock();
 	}
 
+	@Override
 	public void run() {
 		modificationLock.lock();
 		try {

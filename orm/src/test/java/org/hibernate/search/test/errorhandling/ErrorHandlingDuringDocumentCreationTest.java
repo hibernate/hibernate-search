@@ -95,10 +95,12 @@ public class ErrorHandlingDuringDocumentCreationTest extends SearchTestCaseJUnit
 		return (MockErrorHandler) errorHandler;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Foo.class };
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );

@@ -53,6 +53,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 		this.workspace = workspace;
 	}
 
+	@Override
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		log.tracef( "purgeAll Lucene index using IndexWriter for type: %s", entityType );

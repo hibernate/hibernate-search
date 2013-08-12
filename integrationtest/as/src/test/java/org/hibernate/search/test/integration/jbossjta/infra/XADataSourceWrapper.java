@@ -95,6 +95,7 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 	 *
 	 * @throws SQLException
 	 */
+	@Override
 	public Connection getConnection() throws SQLException {
 		String url = TransactionalDriver.arjunaDriver + _name;
 		// although we are not setting any properties, the driver will barf if we pass 'null'.
@@ -112,6 +113,7 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 	 *
 	 * @throws SQLException
 	 */
+	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
 		String url = TransactionalDriver.arjunaDriver + _name;
 		Properties properties = new Properties(defaultProperties);
@@ -155,10 +157,12 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 	// We don't really care, it's the underlying implementations problem
 	// to disambiguate them if required.
 
+	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
 		return iface.isAssignableFrom( XADataSource.class );
 	}
 
+	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		if ( isWrapperFor( iface ) ) {
 			return (T) getUnwrappedXADataSource();
@@ -168,26 +172,32 @@ class XADataSourceWrapper implements XADataSource, DataSource {
 		}
 	}
 
+	@Override
 	public XAConnection getXAConnection() throws SQLException {
 		return _theXADataSource.getXAConnection();
 	}
 
+	@Override
 	public XAConnection getXAConnection(String user, String password) throws SQLException {
 		return _theXADataSource.getXAConnection( user, password );
 	}
 
+	@Override
 	public PrintWriter getLogWriter() throws SQLException {
 		return _theXADataSource.getLogWriter();
 	}
 
+	@Override
 	public void setLogWriter(PrintWriter out) throws SQLException {
 		_theXADataSource.setLogWriter( out );
 	}
 
+	@Override
 	public void setLoginTimeout(int seconds) throws SQLException {
 		_theXADataSource.setLoginTimeout( seconds );
 	}
 
+	@Override
 	public int getLoginTimeout() throws SQLException {
 		return _theXADataSource.getLoginTimeout();
 	}

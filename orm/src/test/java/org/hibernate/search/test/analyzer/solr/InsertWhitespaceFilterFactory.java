@@ -30,6 +30,7 @@ import org.apache.solr.analysis.BaseTokenFilterFactory;
  * @author Hardy Ferentschik
  */
 public class InsertWhitespaceFilterFactory extends BaseTokenFilterFactory {
+	@Override
 	public InsertWhitespaceFilter create(TokenStream input) {
 		return new InsertWhitespaceFilter( input );
 	}

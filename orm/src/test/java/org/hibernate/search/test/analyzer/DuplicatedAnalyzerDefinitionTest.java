@@ -48,6 +48,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 
 	public static final Log log = LoggerFactory.make();
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { };
 	}

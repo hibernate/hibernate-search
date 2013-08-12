@@ -238,12 +238,14 @@ public class MassIndexTest extends SearchTestCase {
 		return s;
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.QUEUEINGPROCESSOR_BATCHSIZE, "5" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Email.class,

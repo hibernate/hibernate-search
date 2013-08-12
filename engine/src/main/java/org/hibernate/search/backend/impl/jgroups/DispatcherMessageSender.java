@@ -55,18 +55,22 @@ final class DispatcherMessageSender implements MessageSender {
 		this.channel = dispatcher.getChannel();
 	}
 
+	@Override
 	public Address getAddress() {
 		return channel.getAddress();
 	}
 
+	@Override
 	public View getView() {
 		return channel.getView();
 	}
 
+	@Override
 	public void stop() {
 		dispatcher.stop();
 	}
 
+	@Override
 	public void send(final Message message, final boolean synchronous, final long timeout) throws Exception {
 		final RequestOptions options = synchronous ? RequestOptions.SYNC() : RequestOptions.ASYNC();
 		options.setExclusionList( dispatcher.getChannel().getAddress() );

@@ -63,6 +63,7 @@ public class JmsBackendQueueTask implements Runnable {
 		this.processor = jmsBackendQueueProcessor;
 	}
 
+	@Override
 	public void run() {
 		List<LuceneWork> filteredQueue = new ArrayList<LuceneWork>(queue);
 		for ( LuceneWork work : queue ) {

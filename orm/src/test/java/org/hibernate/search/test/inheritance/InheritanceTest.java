@@ -47,6 +47,7 @@ public class InheritanceTest extends SearchTestCase {
 
 	private static final Log log = LoggerFactory.make();
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 	}
@@ -304,6 +305,7 @@ public class InheritanceTest extends SearchTestCase {
 		assertEquals( "Wrong animal name", "Elephant", mammal.getName() );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Animal.class,

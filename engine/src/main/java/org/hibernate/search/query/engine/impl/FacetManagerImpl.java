@@ -80,12 +80,14 @@ public class FacetManagerImpl implements FacetManager {
 		this.query = query;
 	}
 
+	@Override
 	public FacetManager enableFaceting(FacetingRequest facetingRequest) {
 		facetRequests.put( facetingRequest.getFacetingName(), (FacetingRequestImpl) facetingRequest );
 		queryHasChanged();
 		return this;
 	}
 
+	@Override
 	public void disableFaceting(String facetingName) {
 		facetRequests.remove( facetingName );
 		if ( facetResults != null ) {
@@ -94,6 +96,7 @@ public class FacetManagerImpl implements FacetManager {
 		queryHasChanged();
 	}
 
+	@Override
 	public List<Facet> getFacets(String facetingName) {
 		// if there are no facet requests we don't have to do anything
 		if ( facetRequests.isEmpty() || !facetRequests.containsKey( facetingName ) ) {
@@ -122,6 +125,7 @@ public class FacetManagerImpl implements FacetManager {
 		}
 	}
 
+	@Override
 	public FacetSelection getFacetGroup(String groupName) {
 		if ( groupName == null ) {
 			throw new IllegalArgumentException( "null is not a valid facet selection group name" );
@@ -179,6 +183,7 @@ public class FacetManagerImpl implements FacetManager {
 			return facetList;
 		}
 
+		@Override
 		public void selectFacets(Facet... facets) {
 			if ( facets == null ) {
 				return;
@@ -187,10 +192,12 @@ public class FacetManagerImpl implements FacetManager {
 			queryHasChanged();
 		}
 
+		@Override
 		public List<Facet> getSelectedFacets() {
 			return Collections.unmodifiableList( facetList );
 		}
 
+		@Override
 		public void deselectFacets(Facet... facets) {
 			boolean hasChanged = facetList.removeAll( Arrays.asList( facets ) );
 			if ( hasChanged ) {
@@ -198,6 +205,7 @@ public class FacetManagerImpl implements FacetManager {
 			}
 		}
 
+		@Override
 		public void clearSelectedFacets() {
 			facetList.clear();
 			queryHasChanged();

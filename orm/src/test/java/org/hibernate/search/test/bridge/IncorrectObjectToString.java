@@ -52,10 +52,12 @@ public class IncorrectObjectToString {
 
 	public static class ErrorOnGetBridge implements TwoWayStringBridge {
 
+		@Override
 		public Object stringToObject(String stringValue) {
 			return stringValue;
 		}
 
+		@Override
 		public String objectToString(Object object) {
 			throw new RuntimeException("Failure");
 		}

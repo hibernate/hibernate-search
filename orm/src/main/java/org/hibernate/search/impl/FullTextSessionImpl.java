@@ -119,6 +119,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 *
 	 * @param entities must be immutable for the lifetime of the query object
 	 */
+	@Override
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
 		return new FullTextQueryImpl(
 				luceneQuery,
@@ -131,10 +132,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public <T> void purgeAll(Class<T> entityType) {
 		purge( entityType, null );
 	}
 
+	@Override
 	public void flushToIndexes() {
 		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
 		searchFactoryImplementor.getWorker().flushWorks( transactionContext );
@@ -143,6 +146,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public <T> void purge(Class<T> entityType, Serializable id) {
 		if ( entityType == null ) {
 			return;
@@ -182,6 +186,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	 *
 	 * @throws IllegalArgumentException if entity is null or not an @Indexed entity
 	 */
+	@Override
 	public <T> void index(T entity) {
 		if ( entity == null ) {
 			throw new IllegalArgumentException( "Entity to index should not be null" );
@@ -208,6 +213,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		//this is an open discussion
 	}
 
+	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
 		MassIndexerFactory factory = requestService( MassIndexerFactory.class );
 		return factory.createMassIndexer( getSearchFactoryImplementor(), getSessionFactory(), types );
@@ -217,6 +223,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.getFactory().getServiceRegistry().getService( serviceRole );
 	}
 
+	@Override
 	public SearchFactory getSearchFactory() {
 		return getSearchFactoryImplementor();
 	}
@@ -233,75 +240,93 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.getTenantIdentifier();
 	}
 
+	@Override
 	public Transaction beginTransaction() throws HibernateException {
 		return session.beginTransaction();
 	}
 
+	@Override
 	public void cancelQuery() throws HibernateException {
 		session.cancelQuery();
 	}
 
+	@Override
 	public void clear() {
 		//FIXME should session clear work with the lucene queue
 		session.clear();
 	}
 
+	@Override
 	public Connection close() throws HibernateException {
 		return session.close();
 	}
 
+	@Override
 	public boolean contains(Object object) {
 		return session.contains( object );
 	}
 
+	@Override
 	public Criteria createCriteria(String entityName) {
 		return session.createCriteria( entityName );
 	}
 
+	@Override
 	public Criteria createCriteria(String entityName, String alias) {
 		return session.createCriteria( entityName, alias );
 	}
 
+	@Override
 	public Criteria createCriteria(Class persistentClass) {
 		return session.createCriteria( persistentClass );
 	}
 
+	@Override
 	public Criteria createCriteria(Class persistentClass, String alias) {
 		return session.createCriteria( persistentClass, alias );
 	}
 
+	@Override
 	public Query createFilter(Object collection, String queryString) throws HibernateException {
 		return session.createFilter( collection, queryString );
 	}
 
+	@Override
 	public Query createQuery(String queryString) throws HibernateException {
 		return session.createQuery( queryString );
 	}
 
+	@Override
 	public SQLQuery createSQLQuery(String queryString) throws HibernateException {
 		return session.createSQLQuery( queryString );
 	}
 
+	@Override
 	public void delete(String entityName, Object object) throws HibernateException {
 		session.delete( entityName, object );
 	}
 
+	@Override
 	public void delete(Object object) throws HibernateException {
 		session.delete( object );
 	}
 
+	@Override
 	public void disableFilter(String filterName) {
 		session.disableFilter( filterName );
 	}
 
+	@Override
 	public Connection disconnect() throws HibernateException {
 		return session.disconnect();
 	}
 
+	@Override
 	public Filter enableFilter(String filterName) {
 		return session.enableFilter( filterName );
 	}
 
+	@Override
 	public void evict(Object object) throws HibernateException {
 		session.evict( object );
 	}
@@ -311,42 +336,52 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return new FullTextSharedSessionBuilderDelegator( session.sessionWithOptions() );
 	}
 
+	@Override
 	public void flush() throws HibernateException {
 		session.flush();
 	}
 
+	@Override
 	public Object get(Class clazz, Serializable id) throws HibernateException {
 		return session.get( clazz, id );
 	}
 
+	@Override
 	public Object get(Class clazz, Serializable id, LockMode lockMode) throws HibernateException {
 		return session.get( clazz, id, lockMode );
 	}
 
+	@Override
 	public Object get(Class clazz, Serializable id, LockOptions lockOptions) throws HibernateException {
 		return session.get( clazz, id, lockOptions );
 	}
 
+	@Override
 	public Object get(String entityName, Serializable id) throws HibernateException {
 		return session.get( entityName, id );
 	}
 
+	@Override
 	public Object get(String entityName, Serializable id, LockMode lockMode) throws HibernateException {
 		return session.get( entityName, id, lockMode );
 	}
 
+	@Override
 	public Object get(String entityName, Serializable id, LockOptions lockOptions) throws HibernateException {
 		return session.get( entityName, id, lockOptions );
 	}
 
+	@Override
 	public CacheMode getCacheMode() {
 		return session.getCacheMode();
 	}
 
+	@Override
 	public LockMode getCurrentLockMode(Object object) throws HibernateException {
 		return session.getCurrentLockMode( object );
 	}
 
+	@Override
 	public Filter getEnabledFilter(String filterName) {
 		return session.getEnabledFilter( filterName );
 	}
@@ -366,10 +401,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.generateCacheKey( id, type, entityOrRoleName );
 	}
 
+	@Override
 	public Interceptor getInterceptor() {
 		return sessionImplementor.getInterceptor();
 	}
 
+	@Override
 	public void setAutoClear(boolean enabled) {
 		sessionImplementor.setAutoClear( enabled );
 	}
@@ -379,39 +416,48 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		sessionImplementor.disableTransactionAutoJoin();
 	}
 
+	@Override
 	public boolean isTransactionInProgress() {
 		return sessionImplementor.isTransactionInProgress();
 	}
 
+	@Override
 	public void initializeCollection(PersistentCollection collection, boolean writing) throws HibernateException {
 		sessionImplementor.initializeCollection( collection, writing );
 	}
 
+	@Override
 	public Object internalLoad(String entityName, Serializable id, boolean eager, boolean nullable)
 			throws HibernateException {
 		return sessionImplementor.internalLoad( entityName, id, eager, nullable );
 	}
 
+	@Override
 	public Object immediateLoad(String entityName, Serializable id) throws HibernateException {
 		return sessionImplementor.immediateLoad( entityName, id );
 	}
 
+	@Override
 	public long getTimestamp() {
 		return sessionImplementor.getTimestamp();
 	}
 
+	@Override
 	public SessionFactoryImplementor getFactory() {
 		return sessionImplementor.getFactory();
 	}
 
+	@Override
 	public List list(String query, QueryParameters queryParameters) throws HibernateException {
 		return sessionImplementor.list( query, queryParameters );
 	}
 
+	@Override
 	public Iterator iterate(String query, QueryParameters queryParameters) throws HibernateException {
 		return sessionImplementor.iterate( query, queryParameters );
 	}
 
+	@Override
 	public ScrollableResults scroll(String query, QueryParameters queryParameters) throws HibernateException {
 		return sessionImplementor.scroll( query, queryParameters );
 	}
@@ -426,44 +472,54 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.list( criteria );
 	}
 
+	@Override
 	public List listFilter(Object collection, String filter, QueryParameters queryParameters)
 			throws HibernateException {
 		return sessionImplementor.listFilter( collection, filter, queryParameters );
 	}
 
+	@Override
 	public Iterator iterateFilter(Object collection, String filter, QueryParameters queryParameters)
 			throws HibernateException {
 		return sessionImplementor.iterateFilter( collection, filter, queryParameters );
 	}
 
+	@Override
 	public EntityPersister getEntityPersister(String entityName, Object object) throws HibernateException {
 		return sessionImplementor.getEntityPersister( entityName, object );
 	}
 
+	@Override
 	public Object getEntityUsingInterceptor(EntityKey key) throws HibernateException {
 		return sessionImplementor.getEntityUsingInterceptor( key );
 	}
 
+	@Override
 	public Serializable getContextEntityIdentifier(Object object) {
 		return sessionImplementor.getContextEntityIdentifier( object );
 	}
 
+	@Override
 	public String bestGuessEntityName(Object object) {
 		return sessionImplementor.bestGuessEntityName( object );
 	}
 
+	@Override
 	public String guessEntityName(Object entity) throws HibernateException {
 		return sessionImplementor.guessEntityName( entity );
 	}
 
+	@Override
 	public Object instantiate(String entityName, Serializable id) throws HibernateException {
 		return sessionImplementor.instantiate( entityName, id );
 	}
 
+	@Override
 	public List listCustomQuery(CustomQuery customQuery, QueryParameters queryParameters) throws HibernateException {
 		return sessionImplementor.listCustomQuery( customQuery, queryParameters );
 	}
 
+	@Override
 	public ScrollableResults scrollCustomQuery(CustomQuery customQuery, QueryParameters queryParameters)
 			throws HibernateException {
 		return sessionImplementor.scrollCustomQuery( customQuery, queryParameters );
@@ -480,26 +536,32 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.scroll( spec, queryParameters );
 	}
 
+	@Override
 	public Object getFilterParameterValue(String filterParameterName) {
 		return sessionImplementor.getFilterParameterValue( filterParameterName );
 	}
 
+	@Override
 	public Type getFilterParameterType(String filterParameterName) {
 		return sessionImplementor.getFilterParameterType( filterParameterName );
 	}
 
+	@Override
 	public Map getEnabledFilters() {
 		return sessionImplementor.getEnabledFilters();
 	}
 
+	@Override
 	public int getDontFlushFromFind() {
 		return sessionImplementor.getDontFlushFromFind();
 	}
 
+	@Override
 	public PersistenceContext getPersistenceContext() {
 		return sessionImplementor.getPersistenceContext();
 	}
 
+	@Override
 	public int executeUpdate(String query, QueryParameters queryParameters) throws HibernateException {
 		return sessionImplementor.executeUpdate( query, queryParameters );
 	}
@@ -510,42 +572,52 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.executeNativeUpdate( specification, queryParameters );
 	}
 
+	@Override
 	public NonFlushedChanges getNonFlushedChanges() throws HibernateException {
 		return sessionImplementor.getNonFlushedChanges();
 	}
 
+	@Override
 	public void applyNonFlushedChanges(NonFlushedChanges nonFlushedChanges) throws HibernateException {
 		sessionImplementor.applyNonFlushedChanges( nonFlushedChanges );
 	}
 
+	@Override
 	public String getEntityName(Object object) throws HibernateException {
 		return session.getEntityName( object );
 	}
 
+	@Override
 	public FlushMode getFlushMode() {
 		return session.getFlushMode();
 	}
 
+	@Override
 	public Serializable getIdentifier(Object object) throws HibernateException {
 		return session.getIdentifier( object );
 	}
 
+	@Override
 	public Query getNamedQuery(String queryName) throws HibernateException {
 		return session.getNamedQuery( queryName );
 	}
 
+	@Override
 	public Query getNamedSQLQuery(String name) {
 		return sessionImplementor.getNamedSQLQuery( name );
 	}
 
+	@Override
 	public boolean isEventSource() {
 		return sessionImplementor.isEventSource();
 	}
 
+	@Override
 	public void afterScrollOperation() {
 		sessionImplementor.afterScrollOperation();
 	}
 
+	@Override
 	public void setFetchProfile(String name) {
 		sessionImplementor.setFetchProfile( name );
 	}
@@ -555,18 +627,22 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return sessionImplementor.getTransactionCoordinator();
 	}
 
+	@Override
 	public String getFetchProfile() {
 		return sessionImplementor.getFetchProfile();
 	}
 
+	@Override
 	public boolean isClosed() {
 		return sessionImplementor.isClosed();
 	}
 
+	@Override
 	public LoadQueryInfluencers getLoadQueryInfluencers() {
 		return sessionImplementor.getLoadQueryInfluencers();
 	}
 
+	@Override
 	public SessionFactory getSessionFactory() {
 		return session.getSessionFactory();
 	}

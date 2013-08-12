@@ -36,6 +36,7 @@ public class LegacyTirePKBridge implements TwoWayFieldBridge {
 	private static final String CAR_ID = ".carId";
 	private static final String TIRE_ID = ".tireId";
 
+	@Override
 	public Object get(String name, Document document) {
 		LegacyTirePK id = new LegacyTirePK();
 		Fieldable field = document.getFieldable( name + CAR_ID );
@@ -45,11 +46,13 @@ public class LegacyTirePKBridge implements TwoWayFieldBridge {
 		return id;
 	}
 
+	@Override
 	public String objectToString(Object o) {
 		LegacyTirePK id = (LegacyTirePK) o;
 		return new StringBuilder().append( id.getCarId() ).append( "-" ).append( id.getTireId() ).toString();
 	}
 
+	@Override
 	public void set(String name, Object o, Document document, LuceneOptions luceneOptions) {
 		LegacyTirePK id = (LegacyTirePK) o;
 		luceneOptions.addFieldToDocument( name + CAR_ID, id.getCarId(), document );

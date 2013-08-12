@@ -45,6 +45,7 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 
 	public static final Log log = LoggerFactory.make();
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { MyEntity.class, AlarmEntity.class };
 	}

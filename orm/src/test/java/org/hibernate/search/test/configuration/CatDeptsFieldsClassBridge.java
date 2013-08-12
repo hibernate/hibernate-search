@@ -37,10 +37,12 @@ public class CatDeptsFieldsClassBridge implements FieldBridge, ParameterizedBrid
 
 	private String sepChar;
 
+	@Override
 	public void setParameterValues(Map<String,String> parameters) {
 		this.sepChar = parameters.get( "sepChar" );
 	}
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		// In this particular class the name of the new field was passed
 		// from the name field of the ClassBridge Annotation. This is not

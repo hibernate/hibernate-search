@@ -50,6 +50,7 @@ import org.hibernate.search.test.util.RamIndexManager;
  */
 public class ShardsTest extends SearchTestCase {
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
@@ -199,6 +200,7 @@ public class ShardsTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {

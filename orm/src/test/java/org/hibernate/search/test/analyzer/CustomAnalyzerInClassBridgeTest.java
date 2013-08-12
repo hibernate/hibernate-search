@@ -65,6 +65,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 
 	public static final Log log = LoggerFactory.make();
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Foo.class, Bar.class };
 	}
@@ -146,6 +147,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 			}
 		}
 
+		@Override
 		public String getAnalyzerDefinitionName(Object value, Object entity, String field) {
 			for ( int i = 0; i < fieldNames.length; i++ ) {
 				if ( fieldNames[i].equals( field ) ) {

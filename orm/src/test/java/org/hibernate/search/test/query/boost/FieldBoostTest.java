@@ -210,6 +210,7 @@ public class FieldBoostTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				BoostedDescriptionLibrary.class,

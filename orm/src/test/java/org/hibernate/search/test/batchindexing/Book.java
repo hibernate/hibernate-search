@@ -54,15 +54,18 @@ public class Book implements TitleAble {
 		this.id = id;
 	}
 
+	@Override
 	@Field
 	public String getTitle() {
 		return title;
 	}
 
+	@Override
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
+	@Override
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Fetch(FetchMode.SELECT)
 	@IndexedEmbedded(depth = 3)
@@ -70,6 +73,7 @@ public class Book implements TitleAble {
 		return firstPublishedIn;
 	}
 
+	@Override
 	public void setFirstPublishedIn(Nation firstPublishedIn) {
 		this.firstPublishedIn = firstPublishedIn;
 	}

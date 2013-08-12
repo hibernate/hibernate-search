@@ -44,25 +44,30 @@ class ConnectedPhraseContext implements PhraseContext {
 		this.queryContext = queryContext;
 	}
 
+	@Override
 	public PhraseContext withSlop(int slop) {
 		phraseContext.setSlop( slop );
 		return this;
 	}
 
+	@Override
 	public PhraseMatchingContext onField(String fieldName) {
 		return new ConnectedPhraseMatchingContext(fieldName, phraseContext, queryCustomizer, queryContext);
 	}
 
+	@Override
 	public PhraseContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
 	}
 
+	@Override
 	public PhraseContext withConstantScore() {
 		queryCustomizer.withConstantScore();
 		return this;
 	}
 
+	@Override
 	public PhraseContext filteredBy(Filter filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;

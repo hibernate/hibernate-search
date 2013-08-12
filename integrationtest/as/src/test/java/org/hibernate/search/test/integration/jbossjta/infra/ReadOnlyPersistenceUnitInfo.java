@@ -63,69 +63,86 @@ class ReadOnlyPersistenceUnitInfo implements PersistenceUnitInfo {
 		this.classLoader = classLoader;
 	}
 
+	@Override
 	public String getPersistenceUnitName() {
 		return persistenceUnitName;
 	}
 
+	@Override
 	public String getPersistenceProviderClassName() {
 		return persistenceProviderClassName;
 	}
 
+	@Override
 	public PersistenceUnitTransactionType getTransactionType() {
 		return transactionType;
 	}
 
+	@Override
 	public DataSource getJtaDataSource() {
 		return jtaDataSource;
 	}
 
+	@Override
 	public DataSource getNonJtaDataSource() {
 		return null;
 	}
 
+	@Override
 	public List<String> getMappingFileNames() {
 		return Collections.EMPTY_LIST;
 	}
 
+	@Override
 	public List<URL> getJarFileUrls() {
 		return Collections.EMPTY_LIST;
 	}
 
+	@Override
 	public URL getPersistenceUnitRootUrl() {
 		return persistenceUnitRootUrl;
 	}
 
+	@Override
 	public List<String> getManagedClassNames() {
 		return managedClassNames;
 	}
 
+	@Override
 	public boolean excludeUnlistedClasses() {
 		return excludeUnlistedClasses;
 	}
 
+	@Override
 	public SharedCacheMode getSharedCacheMode() {
 		return sharedCacheMode;
 	}
 
+	@Override
 	public ValidationMode getValidationMode() {
 		return validationMode;
 	}
 
+	@Override
 	public Properties getProperties() {
 		return properties;
 	}
 
+	@Override
 	public String getPersistenceXMLSchemaVersion() {
 		return persistenceXMLSchemaVersion;
 	}
 
+	@Override
 	public ClassLoader getClassLoader() {
 		return classLoader;
 	}
 
+	@Override
 	public void addTransformer(ClassTransformer transformer) {
 	}
 
+	@Override
 	public ClassLoader getNewTempClassLoader() {
 		return null;
 	}

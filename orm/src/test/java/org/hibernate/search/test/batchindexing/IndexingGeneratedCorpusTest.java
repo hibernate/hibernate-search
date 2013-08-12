@@ -286,19 +286,24 @@ public class IndexingGeneratedCorpusTest {
 
 		volatile boolean finished = false;
 
+		@Override
 		public void documentsAdded(long increment) {
 		}
 
+		@Override
 		public void documentsBuilt(int number) {
 		}
 
+		@Override
 		public void entitiesLoaded(int size) {
 		}
 
+		@Override
 		public void addToTotalCount(long count) {
 			objectsCounter.addAndGet( count );
 		}
 
+		@Override
 		public void indexingCompleted() {
 			finished = true;
 			log.debug( "Finished indexing " + objectsCounter.get() + " entities" );

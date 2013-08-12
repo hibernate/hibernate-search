@@ -28,6 +28,7 @@ import org.hibernate.search.Environment;
 
 public class AsyncBackendLongWorkListStressTest extends SyncBackendLongWorkListStressTest {
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.WORKER_EXECUTION, "async" );

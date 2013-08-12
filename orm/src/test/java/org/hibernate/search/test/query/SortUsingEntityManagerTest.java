@@ -52,6 +52,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	private FullTextEntityManager em;
 	private QueryParser queryParser;
 
+	@Override
 	public void setUp() {
 		super.setUp();
 		em = org.hibernate.search.jpa.Search.getFullTextEntityManager( factory.createEntityManager() );
@@ -92,6 +93,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 		em.clear();
 	}
 
+	@Override
 	public void tearDown() {
 		deleteArticles();
 		super.tearDown();

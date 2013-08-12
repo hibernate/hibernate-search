@@ -34,6 +34,7 @@ import org.hibernate.transform.ResultTransformer;
  */
 public class ProjectionToMapResultTransformer implements ResultTransformer {
 
+	@Override
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		Map result = new HashMap( tuple.length );
 		for ( int i = 0; i < tuple.length; i++ ) {
@@ -45,6 +46,7 @@ public class ProjectionToMapResultTransformer implements ResultTransformer {
 		return result;
 	}
 
+	@Override
 	public List transformList(List collection) {
 		return collection;
 	}

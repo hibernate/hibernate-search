@@ -42,11 +42,13 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  */
 public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		String fieldValue = objectToString( value );
 		luceneOptions.addFieldToDocument( name, fieldValue, document );
 	}
 
+	@Override
 	public Object get(String name, Document document) {
 		Fieldable field = document.getFieldable( name );
 			String stringValue;
@@ -64,6 +66,7 @@ public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 			return stringValue.substring( 3, stringValue.length() - 4 );
 	}
 
+	@Override
 	public String objectToString(Object value) {
 		String originalValue = value.toString();
 		return "<b>" + originalValue + "</b>";

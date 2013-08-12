@@ -51,10 +51,12 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 		this.charset = charset;
 	}
 
+	@Override
 	public InputStream openResource(String resource) throws IOException {
 		return FileHelper.openResource( resource );
 	}
 
+	@Override
 	public List<String> getLines(String resource) throws IOException {
 		final InputStream stream = openResource( resource );
 		if ( stream == null ) {
@@ -87,6 +89,7 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 		}
 	}
 
+	@Override
 	public Object newInstance(String cname, String... subpackages) {
 		if ( subpackages != null && subpackages.length > 0 ) {
 			throw new UnsupportedOperationException( "newInstance(classname, packages) not implemented" );

@@ -85,6 +85,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	/**
 	 * Process the Hibernate Search work queues received
 	 */
+	@Override
 	public void onMessage(Message message) {
 		if ( !( message instanceof ObjectMessage ) ) {
 			log.incorrectMessageType( message.getClass() );

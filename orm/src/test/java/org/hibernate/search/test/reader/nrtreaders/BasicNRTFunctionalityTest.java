@@ -196,6 +196,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 		}
 	}
 
+	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Document.class,
@@ -203,6 +204,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 		};
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.indexmanager", "near-real-time" );

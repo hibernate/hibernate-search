@@ -67,6 +67,7 @@ public class TransactionalWorker implements Worker {
 
 	private boolean transactionExpected;
 
+	@Override
 	public void performWork(Work<?> work, TransactionContext transactionContext) {
 		final Class<?> entityType = instanceInitializer.getClassFromWork( work );
 		EntityIndexBinding indexBindingForEntity = factory.getIndexBinding( entityType );
@@ -160,6 +161,7 @@ public class TransactionalWorker implements Worker {
 		return result;
 	}
 
+	@Override
 	public void initialize(Properties props, WorkerBuildContext context, QueueingProcessor queueingProcessor) {
 		this.queueingProcessor = queueingProcessor;
 		this.factory = context.getUninitializedSearchFactory();
@@ -167,9 +169,11 @@ public class TransactionalWorker implements Worker {
 		this.instanceInitializer = context.getInstanceInitializer();
 	}
 
+	@Override
 	public void close() {
 	}
 
+	@Override
 	public void flushWorks(TransactionContext transactionContext) {
 		if ( transactionContext.isTransactionInProgress() ) {
 			Object transaction = transactionContext.getTransactionIdentifier();

@@ -41,20 +41,24 @@ class ConnectedRangeContext implements RangeContext {
 		this.queryCustomizer = new QueryCustomizer();
 	}
 
+	@Override
 	public RangeMatchingContext onField(String fieldName) {
 		return new ConnectedRangeMatchingContext(fieldName, queryCustomizer, queryContext);
 	}
 
+	@Override
 	public RangeContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
 	}
 
+	@Override
 	public RangeContext withConstantScore() {
 		queryCustomizer.withConstantScore();
 		return this;
 	}
 
+	@Override
 	public RangeContext filteredBy(Filter filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;

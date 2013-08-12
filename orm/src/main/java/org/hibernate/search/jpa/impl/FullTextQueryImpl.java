@@ -96,16 +96,19 @@ public class FullTextQueryImpl implements FullTextQuery {
 		this.session = session;
 	}
 
+	@Override
 	public FullTextQuery setSort(Sort sort) {
 		query.setSort( sort );
 		return this;
 	}
 
+	@Override
 	public FullTextQuery setFilter(Filter filter) {
 		query.setFilter( filter );
 		return this;
 	}
 
+	@Override
 	public int getResultSize() {
 		try {
 			return query.getResultSize();
@@ -120,11 +123,13 @@ public class FullTextQueryImpl implements FullTextQuery {
 		throw new javax.persistence.QueryTimeoutException( e.getMessage(), e, this );
 	}
 
+	@Override
 	public FullTextQuery setCriteriaQuery(Criteria criteria) {
 		query.setCriteriaQuery( criteria );
 		return this;
 	}
 
+	@Override
 	public FullTextQuery setProjection(String... fields) {
 		query.setProjection( fields );
 		return this;
@@ -142,19 +147,23 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return this;
 	}
 
+	@Override
 	public FullTextFilter enableFullTextFilter(String name) {
 		return query.enableFullTextFilter( name );
 	}
 
+	@Override
 	public void disableFullTextFilter(String name) {
 		query.disableFullTextFilter( name );
 	}
 
+	@Override
 	public FullTextQuery setResultTransformer(ResultTransformer transformer) {
 		query.setResultTransformer( transformer );
 		return this;
 	}
 
+	@Override
 	public List getResultList() {
 		try {
 			return query.list();
@@ -177,6 +186,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		}
 	}
 
+	@Override
 	public FacetManager getFacetManager() {
 		return query.getFacetManager();
 	}
@@ -277,6 +287,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		}
 	}
 
+	@Override
 	@SuppressWarnings( { "ThrowableInstanceNeverThrown", "unchecked" })
 	public Object getSingleResult() {
 		try {
@@ -315,6 +326,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		}
 	}
 
+	@Override
 	public Query setMaxResults(int maxResults) {
 		if ( maxResults < 0 ) {
 			throw new IllegalArgumentException(
@@ -328,12 +340,14 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return this;
 	}
 
+	@Override
 	public int getMaxResults() {
 		return maxResults == null || maxResults == -1
 				? Integer.MAX_VALUE
 				: maxResults;
 	}
 
+	@Override
 	public Query setFirstResult(int firstResult) {
 		if ( firstResult < 0 ) {
 			throw new IllegalArgumentException(
@@ -347,32 +361,39 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return this;
 	}
 
+	@Override
 	public int getFirstResult() {
 		return firstResult == null ? 0 : firstResult;
 	}
 
+	@Override
 	public Explanation explain(int documentId) {
 		return query.explain( documentId );
 	}
 
+	@Override
 	public FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
 		query.limitExecutionTimeTo( timeout, timeUnit );
 		return this;
 	}
 
+	@Override
 	public boolean hasPartialResults() {
 		return query.hasPartialResults();
 	}
 
+	@Override
 	public FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
 		query.initializeObjectsWith( lookupMethod, retrievalMethod );
 		return this;
 	}
 
+	@Override
 	public int executeUpdate() {
 		throw new IllegalStateException( "Update not allowed in FullTextQueries" );
 	}
 
+	@Override
 	public Query setHint(String hintName, Object value) {
 		hints.put( hintName, value );
 		if ( "javax.persistence.query.timeout".equals( hintName ) ) {
@@ -389,83 +410,103 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return this;
 	}
 
+	@Override
 	public Map<String, Object> getHints() {
 		return hints;
 	}
 
+	@Override
 	public <T> Query setParameter(Parameter<T> tParameter, T t) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Query setParameter(Parameter<Calendar> calendarParameter, Calendar calendar, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Query setParameter(Parameter<Date> dateParameter, Date date, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Query setParameter(String name, Object value) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Query setParameter(String name, Date value, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Query setParameter(String name, Calendar value, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Query setParameter(int position, Object value) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Query setParameter(int position, Date value, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<Parameter<?>> getParameters() {
 		return Collections.EMPTY_SET;
 	}
 
+	@Override
 	public Query setParameter(int position, Calendar value, TemporalType temporalType) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Parameter<?> getParameter(String name) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Parameter<?> getParameter(int position) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public <T> Parameter<T> getParameter(String name, Class<T> type) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public <T> Parameter<T> getParameter(int position, Class<T> type) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public boolean isBound(Parameter<?> param) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public <T> T getParameterValue(Parameter<T> param) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Object getParameterValue(String name) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Object getParameterValue(int position) {
 		throw new UnsupportedOperationException( "parameters not supported in fullText queries" );
 	}
 
+	@Override
 	public Query setFlushMode(FlushModeType flushMode) {
 		this.jpaFlushMode = flushMode;
 		if ( flushMode == FlushModeType.AUTO ) {
@@ -477,6 +518,7 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return this;
 	}
 
+	@Override
 	public FlushModeType getFlushMode() {
 		if ( jpaFlushMode != null ) {
 			return jpaFlushMode;
@@ -493,14 +535,17 @@ public class FullTextQueryImpl implements FullTextQuery {
 		}
 	}
 
+	@Override
 	public Query setLockMode(LockModeType lockModeType) {
 		throw new UnsupportedOperationException( "lock modes not supported in fullText queries" );
 	}
 
+	@Override
 	public LockModeType getLockMode() {
 		throw new UnsupportedOperationException( "lock modes not supported in fullText queries" );
 	}
 
+	@Override
 	public <T> T unwrap(Class<T> type) {
 		//I've purposely decided not to return the underlying Hibernate FullTextQuery
 		//as I see this as an implementation detail that should not be exposed.

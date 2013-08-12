@@ -109,6 +109,7 @@ public class BlogEntry {
 	}
 	public static class BlogLangDiscriminator implements Discriminator {
 
+		@Override
 		public String getAnalyzerDefinitionName(Object value, Object entity, String field) {
 			if ( value == null ) {
 				return null;

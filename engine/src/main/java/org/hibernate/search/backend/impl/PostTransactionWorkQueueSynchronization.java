@@ -71,6 +71,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 		return consumed;
 	}
 
+	@Override
 	public void beforeCompletion() {
 		if ( prepared ) {
 			if ( log.isTraceEnabled() ) {
@@ -88,6 +89,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 		}
 	}
 
+	@Override
 	public void afterCompletion(int i) {
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {

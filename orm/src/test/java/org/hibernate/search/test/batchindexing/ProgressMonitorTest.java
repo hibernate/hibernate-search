@@ -36,6 +36,7 @@ import org.hibernate.search.test.util.AssertingMassIndexerProgressMonitor;
 public class ProgressMonitorTest extends SearchTestCase {
 	FullTextSession fullTextSession;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );

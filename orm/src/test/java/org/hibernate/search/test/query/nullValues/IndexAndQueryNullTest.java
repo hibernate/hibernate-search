@@ -246,11 +246,13 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		assertEquals( "Wrong number of results", expectedNumberOfResults, valueList.size() );
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default_null_token", "fubar" );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Value.class,

@@ -140,6 +140,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean next() {
 		//	Increases cursor pointer by one. If this places it >
 		//	max + 1 (afterLast) then set it to afterLast and return
@@ -151,6 +152,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return true;
 	}
 
+	@Override
 	public boolean previous() {
 		//	Decreases cursor pointer by one. If this places it <
 		//	first - 1 (beforeFirst) then set it to beforeFirst and
@@ -162,6 +164,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return true;
 	}
 
+	@Override
 	public boolean scroll(int i) {
 		//  Since we have to take into account that we can scroll any
 		//  amount positive or negative, we perform the same tests that
@@ -180,6 +183,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		}
 	}
 
+	@Override
 	public boolean last() {
 		current = max;
 		if ( current < first ) {
@@ -189,6 +193,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return max >= first;
 	}
 
+	@Override
 	public boolean first() {
 		current = first;
 		if ( current > max ) {
@@ -198,23 +203,28 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return max >= first;
 	}
 
+	@Override
 	public void beforeFirst() {
 		current = first - 1;
 	}
 
+	@Override
 	public void afterLast() {
 		current = max + 1;
 		//TODO help gc by clearing all structures when using forwardonly scrollmode.
 	}
 
+	@Override
 	public boolean isFirst() {
 		return current == first;
 	}
 
+	@Override
 	public boolean isLast() {
 		return current == max;
 	}
 
+	@Override
 	public void close() {
 		try {
 			documentExtractor.close();
@@ -224,6 +234,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		}
 	}
 
+	@Override
 	public Object[] get() throws HibernateException {
 		// don't throw an exception here just
 		// return 'null' this is similar to the
@@ -242,6 +253,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Object get(int i) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -250,6 +262,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Type getType(int i) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -258,6 +271,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Integer getInteger(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -266,6 +280,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Long getLong(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -274,6 +289,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Float getFloat(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -282,6 +298,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Boolean getBoolean(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -290,6 +307,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Double getDouble(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -298,6 +316,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Short getShort(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -306,6 +325,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Byte getByte(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -314,6 +334,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Character getCharacter(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -322,6 +343,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public byte[] getBinary(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -330,6 +352,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public String getText(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -338,6 +361,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Blob getBlob(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -346,6 +370,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Clob getClob(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -354,6 +379,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public String getString(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -362,6 +388,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public BigDecimal getBigDecimal(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -370,6 +397,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public BigInteger getBigInteger(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -378,6 +406,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Date getDate(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -386,6 +415,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Locale getLocale(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -394,6 +424,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public Calendar getCalendar(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
@@ -402,10 +433,12 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	 * This method is not supported on Lucene based queries
 	 * @throws UnsupportedOperationException always thrown
 	 */
+	@Override
 	public TimeZone getTimeZone(int col) {
 		throw new UnsupportedOperationException( "Lucene does not work on columns" );
 	}
 
+	@Override
 	public int getRowNumber() {
 		if ( max < first ) {
 			return -1;
@@ -413,6 +446,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 		return current - first;
 	}
 
+	@Override
 	public boolean setRowNumber(int rowNumber) {
 		if ( rowNumber >= 0 ) {
 			current = first + rowNumber;

@@ -400,6 +400,7 @@ public class BridgeTest extends SearchTestCase {
 	}
 
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Cloud.class,
@@ -410,6 +411,7 @@ public class BridgeTest extends SearchTestCase {
 	}
 
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );

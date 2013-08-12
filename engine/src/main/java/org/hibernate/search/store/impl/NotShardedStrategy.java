@@ -39,6 +39,7 @@ public class NotShardedStrategy implements IndexShardingStrategy {
 
 	private IndexManager[] directoryProvider;
 
+	@Override
 	public void initialize(Properties properties, IndexManager[] providers) {
 		this.directoryProvider = providers;
 		if ( directoryProvider.length > 1 ) {
@@ -46,18 +47,22 @@ public class NotShardedStrategy implements IndexShardingStrategy {
 		}
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForAllShards() {
 		return directoryProvider;
 	}
 
+	@Override
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return directoryProvider[0];
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return directoryProvider;
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return directoryProvider;
 	}

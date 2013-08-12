@@ -42,16 +42,19 @@ class QueryCustomizer implements QueryCustomization<QueryCustomizer> {
 	private Query wrappedQuery;
 	private Filter filter;
 
+	@Override
 	public QueryCustomizer boostedTo(float boost) {
 		this.boost = boost * this.boost;
 		return this;
 	}
 
+	@Override
 	public QueryCustomizer withConstantScore() {
 		constantScore = true;
 		return this;
 	}
 
+	@Override
 	public QueryCustomizer filteredBy(Filter filter) {
 		this.filter = filter;
 		return this;

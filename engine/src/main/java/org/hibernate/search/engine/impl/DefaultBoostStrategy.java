@@ -36,6 +36,7 @@ public final class DefaultBoostStrategy implements BoostStrategy {
 		//don't create unneeded instances
 	}
 
+	@Override
 	public float defineBoost(Object value) {
 		return 1.0f;
 	}

@@ -69,6 +69,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		this.precisionStep = fieldMetadata.getPrecisionStep();
 	}
 
+	@Override
 	public void addFieldToDocument(String name, String indexedString, Document document) {
 		//Do not add fields on empty strings, seems a sensible default in most situations
 		if ( StringHelper.isNotEmpty( indexedString ) ) {
@@ -81,6 +82,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		}
 	}
 
+	@Override
 	public void addNumericFieldToDocument(String fieldName, Object value, Document document) {
 		if ( storeType == Store.COMPRESS ) {
 			throw new SearchException( "Error indexing field " + fieldName + ", @NumericField cannot be compressed" );
@@ -113,22 +115,27 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		document.add( field );
 	}
 
+	@Override
 	public float getBoost() {
 		return boost;
 	}
 
+	@Override
 	public String indexNullAs() {
 		return indexNullAs;
 	}
 
+	@Override
 	public boolean isCompressed() {
 		return storeCompressed;
 	}
 
+	@Override
 	public Index getIndex() {
 		return this.indexMode;
 	}
 
+	@Override
 	public org.apache.lucene.document.Field.Store getStore() {
 		if ( storeUncompressed || storeCompressed ) {
 			return org.apache.lucene.document.Field.Store.YES;
@@ -138,6 +145,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		}
 	}
 
+	@Override
 	public TermVector getTermVector() {
 		return this.termVector;
 	}

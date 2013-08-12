@@ -33,6 +33,7 @@ public class LegacyCarPlantPKBridge implements TwoWayFieldBridge {
 	private static final String PLANT_ID = ".plantId";
 	private static final String CAR_ID = ".carId";
 
+	@Override
 	public Object get(String name, Document document) {
 		LegacyCarPlantPK id = new LegacyCarPlantPK();
 		Fieldable field = document.getFieldable( name + PLANT_ID );
@@ -43,6 +44,7 @@ public class LegacyCarPlantPKBridge implements TwoWayFieldBridge {
 		return id;
 	}
 
+	@Override
 	public String objectToString(Object o) {
 		LegacyCarPlantPK id = (LegacyCarPlantPK) o;
 		StringBuilder sb = new StringBuilder();
@@ -50,6 +52,7 @@ public class LegacyCarPlantPKBridge implements TwoWayFieldBridge {
 		return sb.toString();
 	}
 
+	@Override
 	public void set(String name, Object o, Document document, LuceneOptions luceneOptions) {
 		LegacyCarPlantPK id = (LegacyCarPlantPK) o;
 		Field.Store store = luceneOptions.getStore();

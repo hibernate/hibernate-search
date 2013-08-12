@@ -34,6 +34,7 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Emmanuel Bernard
  */
 public class ClassBridge implements TwoWayStringBridge {
+	@Override
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
 			return null;
@@ -48,6 +49,7 @@ public class ClassBridge implements TwoWayStringBridge {
 		}
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		return object == null ? null : ( (Class) object ).getName();
 	}

@@ -72,6 +72,7 @@ public class OptimizeTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();
@@ -80,6 +81,7 @@ public class OptimizeTest extends SearchTestCase {
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {

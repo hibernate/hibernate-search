@@ -56,30 +56,37 @@ public class IndexControl implements IndexControlMBean {
 		this.jndiProperties = JNDIHelper.getJndiProperties( props, JNDIHelper.HIBERNATE_JNDI_PREFIX );
 	}
 
+	@Override
 	public void setBatchSize(int batchSize) {
 		this.batchSize = batchSize;
 	}
 
+	@Override
 	public int getBatchSize() {
 		return batchSize;
 	}
 
+	@Override
 	public void setNumberOfObjectLoadingThreads(int numberOfThreads) {
 		this.numberOfObjectLoadingThreads = numberOfThreads;
 	}
 
+	@Override
 	public int getNumberOfObjectLoadingThreads() {
 		return numberOfObjectLoadingThreads;
 	}
 
+	@Override
 	public void setNumberOfFetchingThreads(int numberOfThreads) {
 		this.numberOfFetchingThreads = numberOfThreads;
 	}
 
+	@Override
 	public int getNumberOfFetchingThreads() {
 		return numberOfFetchingThreads;
 	}
 
+	@Override
 	public void index(String entity) {
 		Class<?> clazz = getEntityClass( entity );
 
@@ -101,6 +108,7 @@ public class IndexControl implements IndexControlMBean {
 		session.close();
 	}
 
+	@Override
 	public void optimize(String entity) {
 		Class<?> clazz = getEntityClass( entity );
 
@@ -113,6 +121,7 @@ public class IndexControl implements IndexControlMBean {
 		session.close();
 	}
 
+	@Override
 	public void purge(String entity) {
 		Class<?> clazz = getEntityClass( entity );
 

@@ -41,6 +41,7 @@ public final class MessageListenerToRequestHandlerAdapter implements RequestHand
 		this.delegate = delegate;
 	}
 
+	@Override
 	public Object handle(final Message msg) throws Exception {
 		delegate.receive( msg );
 		return null;

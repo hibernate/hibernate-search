@@ -38,22 +38,27 @@ import org.hibernate.search.indexes.spi.IndexManager;
  */
 public class UselessShardingStrategy implements IndexShardingStrategy {
 
+	@Override
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return null;
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForAllShards() {
 		return null;
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		return null;
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return null;
 	}
 
+	@Override
 	public void initialize(Properties properties, IndexManager[] providers) {
 		Enumeration<?> propertyNames = properties.propertyNames();
 		int counter;

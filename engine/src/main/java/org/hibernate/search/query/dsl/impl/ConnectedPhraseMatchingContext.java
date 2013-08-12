@@ -53,17 +53,20 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 		this.fieldContexts.add( new FieldContext( fieldName ) );
 	}
 
+	@Override
 	public PhraseMatchingContext andField(String field) {
 		this.fieldContexts.add( new FieldContext( field ) );
 		this.firstOfContext = fieldContexts.size() - 1;
 		return this;
 	}
 
+	@Override
 	public PhraseTermination sentence(String sentence) {
 		phraseContext.setSentence( sentence );
 		return new ConnectedMultiFieldsPhraseQueryBuilder( phraseContext, queryCustomizer, fieldContexts, queryContext );
 	}
 
+	@Override
 	public PhraseMatchingContext boostedTo(float boost) {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.getFieldCustomizer().boostedTo( boost );
@@ -75,6 +78,7 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 		return fieldContexts.subList( firstOfContext, fieldContexts.size() );
 	}
 
+	@Override
 	public PhraseMatchingContext ignoreAnalyzer() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreAnalyzer( true );
@@ -82,6 +86,7 @@ public class ConnectedPhraseMatchingContext implements PhraseMatchingContext {
 		return this;
 	}
 
+	@Override
 	public PhraseMatchingContext ignoreFieldBridge() {
 		//this is a no-op
 		return this;

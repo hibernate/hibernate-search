@@ -59,22 +59,27 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 		this.flushDelegate = new FlushWorkDelegate( workspace );
 	}
 
+	@Override
 	public LuceneWorkDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 
+	@Override
 	public LuceneWorkDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
 		return deleteDelegate;
 	}
 
+	@Override
 	public LuceneWorkDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
 		return optimizeDelegate;
 	}
 
+	@Override
 	public LuceneWorkDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
 		return purgeAllDelegate;
 	}
 
+	@Override
 	public LuceneWorkDelegate getDelegate(UpdateLuceneWork updateLuceneWork) {
 		return updateDelegate;
 	}

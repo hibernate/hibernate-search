@@ -388,10 +388,12 @@ public class EmbeddedTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Tower.class, Address.class, Product.class, Order.class, Author.class, Country.class,

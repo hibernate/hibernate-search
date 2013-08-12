@@ -139,12 +139,14 @@ public class TikaBridgeBlobSupportTest extends SearchTestCase {
 	}
 
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class
 		};
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.INDEXING_STRATEGY, "manual" );

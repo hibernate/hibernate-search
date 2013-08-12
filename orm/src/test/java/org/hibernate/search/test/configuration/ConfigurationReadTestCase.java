@@ -75,6 +75,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 				(int) getParameter( shard, setting, testEntity ) );
 	}
 
+	@Override
 	public final SearchFactoryImplementor getSearchFactory() {
 		return searchFactory;
 	}
@@ -86,6 +87,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 		return luceneIndexingParameters.getIndexParameters().getCurrentValueFor( setting );
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );

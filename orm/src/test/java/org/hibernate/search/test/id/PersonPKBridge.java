@@ -34,6 +34,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
  */
 public class PersonPKBridge implements TwoWayFieldBridge {
 
+	@Override
 	public Object get(String name, Document document) {
 		PersonPK id = new PersonPK();
 		Fieldable field = document.getFieldable( name + ".firstName" );
@@ -43,6 +44,7 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 		return id;
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		PersonPK id = (PersonPK) object;
 		StringBuilder sb = new StringBuilder();
@@ -50,6 +52,7 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 		return sb.toString();
 	}
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		PersonPK id = (PersonPK) value;
 

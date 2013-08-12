@@ -78,6 +78,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestCase {
 		return new Class[] { Clock.class };
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();

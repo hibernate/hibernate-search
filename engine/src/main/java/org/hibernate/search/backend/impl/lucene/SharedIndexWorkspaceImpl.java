@@ -75,6 +75,7 @@ public class SharedIndexWorkspaceImpl extends AbstractWorkspaceImpl {
 		}
 	}
 
+	@Override
 	public IndexWriter getIndexWriter(ErrorContextBuilder errorContextBuilder) {
 		synchronized ( lock ) {
 			IndexWriter indexWriter = super.getIndexWriter( errorContextBuilder );

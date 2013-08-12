@@ -45,6 +45,7 @@ public abstract class AbstractLoader implements Loader {
 		takeTimings = searchFactoryImplementor.getStatistics().isStatisticsEnabled();
 	}
 
+	@Override
 	public final Object load(EntityInfo entityInfo) {
 		long startTime = 0;
 		if ( takeTimings ) {
@@ -57,12 +58,14 @@ public abstract class AbstractLoader implements Loader {
 		return loadedObject;
 	}
 
+	@Override
 	public Object loadWithoutTiming(EntityInfo entityInfo) {
 		return executeLoad( entityInfo );
 	}
 
 	public abstract Object executeLoad(EntityInfo entityInfo);
 
+	@Override
 	public List load(EntityInfo... entityInfos) {
 		long startTime = 0;
 		if ( takeTimings ) {

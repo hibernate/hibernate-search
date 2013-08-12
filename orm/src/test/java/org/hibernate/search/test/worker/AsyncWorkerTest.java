@@ -36,6 +36,7 @@ import org.hibernate.cfg.Configuration;
 @RunWith(BMUnitRunner.class)
 public class AsyncWorkerTest extends WorkerTestCase {
 
+	@Override
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor",
 			targetMethod = "applyWork",

@@ -48,6 +48,7 @@ public class ConnectedAllContext implements AllContext {
 		this.clauses.add( new BooleanClause( new MatchAllDocsQuery(), BooleanClause.Occur.SHOULD ) );
 	}
 
+	@Override
 	public Query createQuery() {
 		Query query;
 		if ( clauses.size() == 1 ) {
@@ -63,6 +64,7 @@ public class ConnectedAllContext implements AllContext {
 		return queryCustomizer.setWrappedQuery( query ).createQuery();
 	}
 
+	@Override
 	public AllContext except(Query... queriesMatchingExcludedDocuments) {
 		for ( Query query : queriesMatchingExcludedDocuments ) {
 			clauses.add( new BooleanClause( query, BooleanClause.Occur.MUST_NOT ) );
@@ -70,16 +72,19 @@ public class ConnectedAllContext implements AllContext {
 		return this;
 	}
 
+	@Override
 	public AllContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
 	}
 
+	@Override
 	public AllContext withConstantScore() {
 		queryCustomizer.withConstantScore();
 		return this;
 	}
 
+	@Override
 	public AllContext filteredBy(Filter filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;

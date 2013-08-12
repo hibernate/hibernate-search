@@ -56,22 +56,27 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		this.cfg = cfg;
 	}
 
+	@Override
 	public Iterator<Class<?>> getClassMappings() {
 		return new ClassIterator( cfg.getClassMappings() );
 	}
 
+	@Override
 	public Class<?> getClassMapping(String name) {
 		return cfg.getClassMapping( name ).getMappedClass();
 	}
 
+	@Override
 	public String getProperty(String propertyName) {
 		return cfg.getProperty( propertyName );
 	}
 
+	@Override
 	public Properties getProperties() {
 		return cfg.getProperties();
 	}
 
+	@Override
 	public ReflectionManager getReflectionManager() {
 		if ( reflectionManager == null ) {
 			try {
@@ -89,10 +94,12 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		return reflectionManager;
 	}
 
+	@Override
 	public SearchMapping getProgrammaticMapping() {
 		return null;
 	}
 
+	@Override
 	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
 		return Collections.emptyMap();
 	}
@@ -105,6 +112,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 			this.hibernatePersistentClassIterator = hibernatePersistentClassIterator;
 		}
 
+		@Override
 		public boolean hasNext() {
 			//we need to read the next non null one. getMappedClass() can return null and should be ignored
 			if ( future != null ) {
@@ -122,6 +130,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 			return true;
 		}
 
+		@Override
 		public Class<?> next() {
 			//run hasNext to init the next element
 			if ( ! hasNext() ) {
@@ -132,6 +141,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 			return result;
 		}
 
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException( "Cannot modify Hibernate Core metadata" );
 		}

@@ -152,10 +152,12 @@ public class NestedEmbeddedTest extends SearchTestCase {
 		//s.close();
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Product.class, Attribute.class, AttributeValue.class, Person.class, Place.class, Address.class

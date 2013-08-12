@@ -136,6 +136,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		this.current = currentLocal; //write to volatile to publish all state
 	}
 
+	@Override
 	public FSDirectory getDirectory() {
 		@SuppressWarnings("unused")
 		int readCurrentState = current; //Unneeded value, needed to ensure visibility of state protected by memory barrier
@@ -172,6 +173,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		return 37 * hash + indexName.hashCode();
 	}
 
+	@Override
 	public void stop() {
 		@SuppressWarnings("unused")
 		int readCurrentState = current; //Another unneeded value, to ensure visibility of state protected by memory barrier
@@ -195,6 +197,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			copyTask = new FSMasterDirectoryProvider.CopyDirectory( source, destination );
 		}
 
+		@Override
 		public void run() {
 			if ( copyTask.inProgress.compareAndSet( false, true ) ) {
 				executor.execute( copyTask );
@@ -219,6 +222,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 			this.destination = destination;
 		}
 
+		@Override
 		public void run() {
 			//TODO get rid of current and use the marker file instead?
 			directoryProviderLock.lock();

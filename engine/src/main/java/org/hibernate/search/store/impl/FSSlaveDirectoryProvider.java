@@ -206,6 +206,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		started = true;
 	}
 
+	@Override
 	public Directory getDirectory() {
 		if ( !started ) {
 			if ( dummyDirectory == null ) {
@@ -305,6 +306,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			copyTask = new CopyDirectory( sourceIndexDir, destination );
 		}
 
+		@Override
 		public void run() {
 			if ( copyTask.inProgress.compareAndSet( false, true ) ) {
 				executor.execute( copyTask );
@@ -333,6 +335,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 			this.destination = destination;
 		}
 
+		@Override
 		public void run() {
 			long start = System.nanoTime();
 			try {
@@ -403,6 +406,7 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		}
 	}
 
+	@Override
 	public void stop() {
 		@SuppressWarnings("unused")
 		int readCurrentState = current; //unneeded value, but ensure visibility of state protected by memory barrier

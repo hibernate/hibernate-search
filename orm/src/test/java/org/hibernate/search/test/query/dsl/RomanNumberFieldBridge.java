@@ -28,6 +28,7 @@ import org.hibernate.search.bridge.StringBridge;
  */
 public class RomanNumberFieldBridge implements StringBridge {
 
+	@Override
 	public String objectToString(Object object) {
 		if ( !( object instanceof Number ) ) {
 			return null;

@@ -33,6 +33,7 @@ import org.jgroups.JChannel;
  */
 public class MSMuxChannelTest extends MuxChannelTest {
 
+	@Override
 	protected JChannel[] createChannels() throws Exception {
 		JChannel[] channels = new JChannel[2];
 		channels[0] = createChannel();
@@ -40,10 +41,12 @@ public class MSMuxChannelTest extends MuxChannelTest {
 		return channels;
 	}
 
+	@Override
 	protected String getMasterBackend() {
 		return "jgroupsMaster";
 	}
 
+	@Override
 	protected String getSlaveBackend() {
 		return "jgroupsSlave";
 	}

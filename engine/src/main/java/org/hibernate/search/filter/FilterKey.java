@@ -48,7 +48,9 @@ public abstract class FilterKey {
 		this.impl = impl;
 	}
 
+	@Override
 	public abstract int hashCode();
 
+	@Override
 	public abstract boolean equals(Object obj);
 }

@@ -52,12 +52,14 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		this.fieldContexts.add( new FieldContext( fieldName ) );
 	}
 
+	@Override
 	public RangeMatchingContext andField(String field) {
 		this.fieldContexts.add( new FieldContext( field ) );
 		this.firstOfContext = fieldContexts.size() - 1;
 		return this;
 	}
 
+	@Override
 	public <T> FromRangeContext<T> from(T from) {
 		rangeContext.setFrom( from );
 		return new ConnectedFromRangeContext<T>(this);
@@ -70,6 +72,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 			this.mother = mother;
 		}
 
+		@Override
 		public RangeTerminationExcludable to(T to) {
 			mother.rangeContext.setTo( to );
 			return new ConnectedMultiFieldsRangeQueryBuilder(
@@ -79,22 +82,26 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 					mother.queryContext);
 		}
 
+		@Override
 		public FromRangeContext<T> excludeLimit() {
 			mother.rangeContext.setExcludeFrom( true );
 			return this;
 		}
 	}
 
+	@Override
 	public RangeTerminationExcludable below(Object below) {
 		rangeContext.setTo( below );
 		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext);
 	}
 
+	@Override
 	public RangeTerminationExcludable above(Object above) {
 		rangeContext.setFrom( above );
 		return new ConnectedMultiFieldsRangeQueryBuilder( rangeContext, queryCustomizer, fieldContexts, queryContext);
 	}
 
+	@Override
 	public RangeMatchingContext boostedTo(float boost) {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.getFieldCustomizer().boostedTo( boost );
@@ -106,6 +113,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		return fieldContexts.subList( firstOfContext, fieldContexts.size() );
 	}
 
+	@Override
 	public RangeMatchingContext ignoreAnalyzer() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreAnalyzer( true );
@@ -113,6 +121,7 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext {
 		return this;
 	}
 
+	@Override
 	public RangeMatchingContext ignoreFieldBridge() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreFieldBridge( true );

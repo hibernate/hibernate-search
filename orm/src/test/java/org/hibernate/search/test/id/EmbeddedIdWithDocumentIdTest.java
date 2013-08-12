@@ -89,6 +89,7 @@ public class EmbeddedIdWithDocumentIdTest extends SearchTestCase {
 		return new Class<?>[]{ PersonCustomDocumentId.class };
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );

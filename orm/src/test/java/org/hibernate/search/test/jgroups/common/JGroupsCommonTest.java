@@ -200,6 +200,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 		};
 	}
 
+	@Override
 	protected Class<?>[] getCommonAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class

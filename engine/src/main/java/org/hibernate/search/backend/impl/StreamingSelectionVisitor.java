@@ -55,32 +55,39 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 		// use INSTANCE as this delegator is stateless
 	}
 
+	@Override
 	public StreamingOperationSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 
+	@Override
 	public StreamingOperationSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 
+	@Override
 	public StreamingOperationSelectionDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
 		return deleteDelegate;
 	}
 
+	@Override
 	public StreamingOperationSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
 		return allManagersDelegate;
 	}
 
+	@Override
 	public StreamingOperationSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
 		return purgeDelegate;
 	}
 
+	@Override
 	public StreamingOperationSelectionDelegate getDelegate(FlushLuceneWork flushLuceneWork) {
 		return allManagersDelegate;
 	}
 
 	private static class AddSelectionDelegate implements StreamingOperationSelectionDelegate {
 
+		@Override
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition(
@@ -96,6 +103,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 
 	private static class DeleteSelectionDelegate implements StreamingOperationSelectionDelegate {
 
+		@Override
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
@@ -112,6 +120,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 
 	private static class AllSelectionDelegate implements StreamingOperationSelectionDelegate {
 
+		@Override
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
@@ -124,6 +133,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 
 	private static class PurgeAllSelectionDelegate implements StreamingOperationSelectionDelegate {
 
+		@Override
 		public final void performStreamOperation(LuceneWork work,
 				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(

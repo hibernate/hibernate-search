@@ -36,6 +36,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
  * @author Emmanuel Bernard
  */
 public class UriBridge implements TwoWayStringBridge {
+	@Override
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
 			return null;
@@ -50,6 +51,7 @@ public class UriBridge implements TwoWayStringBridge {
 		}
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		return object == null ?
 				null :

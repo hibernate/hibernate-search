@@ -41,24 +41,29 @@ public class HibernateStatelessInitializer implements InstanceInitializer {
 		// should not create instances, but allow for extension
 	}
 
+	@Override
 	public <T> Class<T> getClass(T entity) {
 		return HibernateHelper.getClass( entity );
 	}
 
+	@Override
 	public Object unproxy(Object instance) {
 		return HibernateHelper.unproxy( instance );
 	}
 
+	@Override
 	public <T> Collection<T> initializeCollection(Collection<T> value) {
 		// supports pass-through only, would need HibernateSessionLoadingInitializer
 		return value;
 	}
 
+	@Override
 	public <K, V> Map<K, V> initializeMap(Map<K, V> value) {
 		// supports pass-through only, would need HibernateSessionLoadingInitializer
 		return value;
 	}
 
+	@Override
 	public Object[] initializeArray(Object[] value) {
 		// hibernate doesn't allow lazy initialization of arrays,
 		// so this must be initialized already.

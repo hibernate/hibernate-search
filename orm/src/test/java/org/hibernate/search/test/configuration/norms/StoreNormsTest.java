@@ -78,6 +78,7 @@ public class StoreNormsTest extends SearchTestCase {
 		return new Class<?>[] { NormsTestEntity.class };
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );

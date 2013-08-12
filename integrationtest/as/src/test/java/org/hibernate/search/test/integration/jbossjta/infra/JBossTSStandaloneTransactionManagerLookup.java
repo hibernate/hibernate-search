@@ -35,6 +35,7 @@ import org.hibernate.transaction.TransactionManagerLookup;
  */
 public class JBossTSStandaloneTransactionManagerLookup implements TransactionManagerLookup {
 
+	@Override
 	public TransactionManager getTransactionManager(Properties props) throws HibernateException {
 		try {
 			//Call jtaPropertyManager.getJTAEnvironmentBean().getTransactionManager();
@@ -52,10 +53,12 @@ public class JBossTSStandaloneTransactionManagerLookup implements TransactionMan
 		}
 	}
 
+	@Override
 	public String getUserTransactionName() {
 		return null;
 	}
 
+	@Override
 	public Object getTransactionIdentifier(Transaction transaction) {
 		return transaction;
 	}

@@ -222,6 +222,7 @@ public class FacetCollector extends Collector {
 			this.sortOder = sortOrder;
 		}
 
+		@Override
 		public int compare(Entry<String, Integer> entry1, Entry<String, Integer> entry2) {
 			if ( FacetSortOrder.COUNT_ASC.equals( sortOder ) ) {
 				return entry1.getValue() - entry2.getValue();
@@ -237,6 +238,7 @@ public class FacetCollector extends Collector {
 
 	public static class RangeDefinitionOrderFacetComparator implements Comparator<Facet>, Serializable {
 
+		@Override
 		public int compare(Facet facet1, Facet facet2) {
 			return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
 		}
@@ -268,6 +270,7 @@ public class FacetCollector extends Collector {
 	}
 
 	static class SimpleFacetCounter extends FacetCounter {
+		@Override
 		void countValue(Object value) {
 			incrementCount( (String) value );
 		}
@@ -283,6 +286,7 @@ public class FacetCollector extends Collector {
 			}
 		}
 
+		@Override
 		@SuppressWarnings("unchecked")
 		void countValue(Object value) {
 			for ( FacetRange<T> range : ranges ) {

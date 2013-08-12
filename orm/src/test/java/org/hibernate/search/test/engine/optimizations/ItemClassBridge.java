@@ -28,6 +28,7 @@ import org.hibernate.search.bridge.LuceneOptions;
  */
 public class ItemClassBridge implements FieldBridge {
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		// not very relevant what we do here, but in theory I could navigate all the graph from value
 		// and affect the index state.

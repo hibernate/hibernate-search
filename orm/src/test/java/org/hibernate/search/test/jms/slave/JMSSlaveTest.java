@@ -156,6 +156,7 @@ public class JMSSlaveTest extends SearchTestCase {
 		return queueSession;
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jms" );
@@ -172,6 +173,7 @@ public class JMSSlaveTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default.worker.jndi.queue.queue/searchtest", "searchQueue" );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class

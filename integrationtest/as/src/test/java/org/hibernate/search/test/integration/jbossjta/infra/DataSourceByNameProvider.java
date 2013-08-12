@@ -37,6 +37,7 @@ class DataSourceByNameProvider implements DynamicClass {
 		this.datasource = datasource;
 	}
 
+	@Override
 	public XADataSource getDataSource(String dbName) throws SQLException {
 		if ( name.equals( dbName ) ) {
 			return datasource;

@@ -31,6 +31,7 @@ import org.hibernate.search.Environment;
  */
 public class SyncWorkerTest extends WorkerTestCase {
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.WORKER_SCOPE, "transaction" );

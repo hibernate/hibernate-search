@@ -50,6 +50,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	private TimeoutManager timeoutManager;
 	private ObjectsInitializer objectsInitializer;
 
+	@Override
 	public void init(Session session,
 					SearchFactoryImplementor searchFactoryImplementor,
 					ObjectsInitializer objectsInitializer,
@@ -88,12 +89,14 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		}
 	}
 
+	@Override
 	public Object executeLoad(EntityInfo entityInfo) {
 		final Object result = ObjectLoaderHelper.load( entityInfo, session );
 		timeoutManager.isTimedOut();
 		return result;
 	}
 
+	@Override
 	public List executeLoad(EntityInfo... entityInfos) {
 		if ( entityInfos.length == 0 ) {
 			return Collections.EMPTY_LIST;

@@ -44,10 +44,12 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 		this.stringBridge = stringBridge;
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		return stringBridge.objectToString( object );
 	}
 
+	@Override
 	public Object get(String name, Document document) {
 		Fieldable field = document.getFieldable( name );
 		if ( field == null ) {

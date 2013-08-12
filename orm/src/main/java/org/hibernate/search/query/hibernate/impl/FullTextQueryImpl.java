@@ -103,6 +103,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public FullTextQuery setSort(Sort sort) {
 		hSearchQuery.sort( sort );
 		return this;
@@ -111,6 +112,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public FullTextQuery setFilter(Filter filter) {
 		hSearchQuery.filter( filter );
 		return this;
@@ -120,6 +122,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * Return an iterator on the results.
 	 * Retrieve the object one by one (initialize it during the next() operation)
 	 */
+	@Override
 	public Iterator iterate() throws HibernateException {
 		//implement an iterator which keep the id/class for each hit and get the object on demand
 		//cause I can't keep the searcher and hence the hit opened. I don't have any hook to know when the
@@ -184,6 +187,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return loader;
 	}
 
+	@Override
 	public ScrollableResults scroll() throws HibernateException {
 		//keep the searcher open until the resultset is closed
 
@@ -200,11 +204,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		);
 	}
 
+	@Override
 	public ScrollableResults scroll(ScrollMode scrollMode) throws HibernateException {
 		//TODO think about this scrollmode
 		return scroll();
 	}
 
+	@Override
 	public List list() throws HibernateException {
 		hSearchQuery.getTimeoutManager().start();
 		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
@@ -222,10 +228,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return list;
 	}
 
+	@Override
 	public Explanation explain(int documentId) {
 		return hSearchQuery.explain( documentId );
 	}
 
+	@Override
 	public int getResultSize() {
 		if ( getLoader().isSizeSafe() ) {
 			return hSearchQuery.queryResultSize();
@@ -235,11 +243,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		}
 	}
 
+	@Override
 	public FullTextQuery setCriteriaQuery(Criteria criteria) {
 		this.criteria = criteria;
 		return this;
 	}
 
+	@Override
 	public FullTextQuery setProjection(String... fields) {
 		hSearchQuery.projection( fields );
 		return this;
@@ -257,16 +267,19 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
+	@Override
 	public FullTextQuery setFirstResult(int firstResult) {
 		hSearchQuery.firstResult( firstResult );
 		return this;
 	}
 
+	@Override
 	public FullTextQuery setMaxResults(int maxResults) {
 		hSearchQuery.maxResults( maxResults );
 		return this;
 	}
 
+	@Override
 	public FullTextQuery setFetchSize(int fetchSize) {
 		super.setFetchSize( fetchSize );
 		if ( fetchSize <= 0 ) {
@@ -276,6 +289,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
+	@Override
 	public Query setLockOptions(LockOptions lockOptions) {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
@@ -287,6 +301,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> type) {
 		if ( type == org.apache.lucene.search.Query.class ) {
@@ -295,14 +310,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		throw new IllegalArgumentException( "Cannot unwrap " + type.getName() );
 	}
 
+	@Override
 	public LockOptions getLockOptions() {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
+	@Override
 	public int executeUpdate() throws HibernateException {
 		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
 	}
 
+	@Override
 	public Query setLockMode(String alias, LockMode lockMode) {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
@@ -311,14 +329,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
 
+	@Override
 	public FullTextFilter enableFullTextFilter(String name) {
 		return hSearchQuery.enableFullTextFilter( name );
 	}
 
+	@Override
 	public void disableFullTextFilter(String name) {
 		hSearchQuery.disableFullTextFilter( name );
 	}
 
+	@Override
 	public FacetManager getFacetManager() {
 		return hSearchQuery.getFacetManager();
 	}
@@ -328,6 +349,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return setTimeout( timeout, TimeUnit.SECONDS );
 	}
 
+	@Override
 	public FullTextQuery setTimeout(long timeout, TimeUnit timeUnit) {
 		super.setTimeout( (int) timeUnit.toSeconds( timeout ) );
 		hSearchQuery.getTimeoutManager().setTimeout( timeout, timeUnit );
@@ -335,16 +357,19 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
+	@Override
 	public FullTextQuery limitExecutionTimeTo(long timeout, TimeUnit timeUnit) {
 		hSearchQuery.getTimeoutManager().setTimeout( timeout, timeUnit );
 		hSearchQuery.getTimeoutManager().limitFetchingOnTimeout();
 		return this;
 	}
 
+	@Override
 	public boolean hasPartialResults() {
 		return hSearchQuery.getTimeoutManager().hasPartialResults();
 	}
 
+	@Override
 	public FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
 		this.lookupMethod = lookupMethod;
 		this.retrievalMethod = retrievalMethod;
@@ -356,20 +381,24 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	private static final Loader noLoader = new Loader() {
+		@Override
 		public void init(Session session,
 						SearchFactoryImplementor searchFactoryImplementor,
 						ObjectsInitializer objectsInitializer,
 						TimeoutManager timeoutManager) {
 		}
 
+		@Override
 		public Object load(EntityInfo entityInfo) {
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
 
+		@Override
 		public Object loadWithoutTiming(EntityInfo entityInfo) {
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
 
+		@Override
 		public List load(EntityInfo... entityInfos) {
 			throw new UnsupportedOperationException( "noLoader should not be used" );
 		}
@@ -382,6 +411,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	private static final TimeoutExceptionFactory exceptionFactory = new TimeoutExceptionFactory() {
 
+		@Override
 		public RuntimeException createTimeoutException(String message, org.apache.lucene.search.Query luceneQuery) {
 			return new QueryTimeoutException( message, (SQLException) null, luceneQuery.toString() );
 		}

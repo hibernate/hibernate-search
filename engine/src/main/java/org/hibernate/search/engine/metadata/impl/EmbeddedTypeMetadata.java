@@ -122,6 +122,7 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 			return embeddedContainer;
 		}
 
+		@Override
 		public EmbeddedTypeMetadata build() {
 			return new EmbeddedTypeMetadata( this );
 		}

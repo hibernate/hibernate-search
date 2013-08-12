@@ -164,21 +164,25 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	/**
 	 * {@link Query#setFirstResult}
 	 */
+	@Override
 	FullTextQuery setFirstResult(int firstResult);
 
 	/**
 	 * {@link Query#setMaxResults}
 	 */
+	@Override
 	FullTextQuery setMaxResults(int maxResults);
 
 	/**
 	 * Defines scrollable result fetch size as well as the JDBC fetch size
 	 */
+	@Override
 	FullTextQuery setFetchSize(int i);
 
 	/**
 	 * defines a result transformer used during projection, the Aliases provided are the projection aliases.
 	 */
+	@Override
 	FullTextQuery setResultTransformer(ResultTransformer transformer);
 
 	/**

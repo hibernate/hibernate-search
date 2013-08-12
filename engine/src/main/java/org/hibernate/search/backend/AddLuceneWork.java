@@ -48,6 +48,7 @@ public class AddLuceneWork extends LuceneWork implements Serializable {
 		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
 	}
 
+	@Override
 	public Map<String, String> getFieldToAnalyzerMap() {
 		return fieldToAnalyzerMap;
 	}

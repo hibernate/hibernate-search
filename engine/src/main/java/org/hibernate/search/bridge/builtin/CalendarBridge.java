@@ -56,12 +56,14 @@ public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 		this.resolution = DateResolutionUtil.getLuceneResolution( resolution);
 	}
 
+	@Override
 	public void setParameterValues(Map<String,String> parameters) {
 		Object resolution = parameters.get( RESOLUTION_PARAMETER );
 		Resolution hibResolution = Resolution.valueOf( ( (String) resolution ).toUpperCase( Locale.ENGLISH ) );
 		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
 	}
 
+	@Override
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
 			return null;
@@ -77,6 +79,7 @@ public class CalendarBridge implements TwoWayStringBridge, ParameterizedBridge {
 		}
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {
 			return null;

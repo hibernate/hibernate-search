@@ -208,11 +208,13 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		return root;
 	}
 
+	@Override
 	protected void setUp() throws Exception {
 		this.root = prepareDirectories( getClass().getSimpleName() + "." + this.getName() );
 		super.setUp();
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		cleanupDirectories( root );
@@ -223,10 +225,12 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		FileHelper.delete( root );
 	}
 
+	@Override
 	protected int getSFNbrs() {
 		return 2;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				SnowStorm.class
@@ -258,6 +262,7 @@ public class FSSlaveAndMasterDPTest extends MultipleSFTestCase {
 		}
 	}
 
+	@Override
 	protected void configure(Configuration[] cfg) {
 		//master
 		cfg[0].setProperty( "hibernate.search.default.sourceBase", root.getAbsolutePath() + masterCopy );

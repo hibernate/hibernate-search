@@ -35,15 +35,18 @@ public class NoMetadataFileServiceProvider implements ServiceProvider<MyService>
 	private static volatile Boolean active = null;
 	private MyService foo;
 
+	@Override
 	public void start(Properties properties, BuildContext context) {
 		foo = new MyService();
 		active = Boolean.TRUE;
 	}
 
+	@Override
 	public MyService getService() {
 		return foo;
 	}
 
+	@Override
 	public void stop() {
 		foo = null;
 		active = Boolean.FALSE;

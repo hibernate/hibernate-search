@@ -123,6 +123,7 @@ public class DynamicBoostingTest extends SearchTestCase {
 		return score;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				DynamicBoostedDescriptionLibrary.class

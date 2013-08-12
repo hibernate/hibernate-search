@@ -57,10 +57,12 @@ public class DefaultBatchBackend implements BatchBackend {
 		this.progressMonitor = progressMonitor;
 	}
 
+	@Override
 	public void enqueueAsyncWork(LuceneWork work) throws InterruptedException {
 		sendWorkToShards( work, true );
 	}
 
+	@Override
 	public void doWorkInSync(LuceneWork work) {
 		sendWorkToShards( work, false );
 	}

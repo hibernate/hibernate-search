@@ -46,6 +46,7 @@ class ClassloaderMessageListener implements MessageListener {
 		this.cl = cl;
 	}
 
+	@Override
 	public void receive(final Message msg) {
 		final Thread currentThread = Thread.currentThread();
 		final ClassLoader previous = currentThread.getContextClassLoader();
@@ -58,6 +59,7 @@ class ClassloaderMessageListener implements MessageListener {
 		}
 	}
 
+	@Override
 	public void getState(final OutputStream output) throws Exception {
 		final Thread currentThread = Thread.currentThread();
 		final ClassLoader previous = currentThread.getContextClassLoader();
@@ -70,6 +72,7 @@ class ClassloaderMessageListener implements MessageListener {
 		}
 	}
 
+	@Override
 	public void setState(final InputStream input) throws Exception {
 		final Thread currentThread = Thread.currentThread();
 		final ClassLoader previous = currentThread.getContextClassLoader();

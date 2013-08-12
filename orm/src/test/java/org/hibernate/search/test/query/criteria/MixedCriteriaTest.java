@@ -141,6 +141,7 @@ public class MixedCriteriaTest extends SearchTestCase {
 	}
 
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				AbstractCar.class, CombiCar.class, SportCar.class, Bike.class

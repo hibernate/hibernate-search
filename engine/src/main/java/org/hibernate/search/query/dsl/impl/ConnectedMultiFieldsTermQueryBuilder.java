@@ -74,6 +74,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		this.fieldContexts = fieldContexts;
 	}
 
+	@Override
 	public Query createQuery() {
 		final int size = fieldContexts.size();
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();

@@ -99,10 +99,12 @@ public class CachingWrapperFilter extends Filter {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return this.getClass().getName() + "(" + filter + ")";
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		if ( !( o instanceof CachingWrapperFilter ) ) {
 			return false;
@@ -110,6 +112,7 @@ public class CachingWrapperFilter extends Filter {
 		return this.filter.equals( ( (CachingWrapperFilter) o ).filter );
 	}
 
+	@Override
 	public int hashCode() {
 		return filter.hashCode() ^ 0x1117BF25;
 	}

@@ -55,30 +55,37 @@ public class EntityInfoImpl implements EntityInfo {
 
 	private final List<Integer> indexesOfThis = new LinkedList<Integer>();
 
+	@Override
 	public Class<?> getClazz() {
 		return clazz;
 	}
 
+	@Override
 	public Serializable getId() {
 		return id;
 	}
 
+	@Override
 	public String getIdName() {
 		return idName;
 	}
 
+	@Override
 	public Object[] getProjection() {
 		return projection;
 	}
 
+	@Override
 	public List<Integer> getIndexesOfThis() {
 		return indexesOfThis;
 	}
 
+	@Override
 	public boolean isProjectThis() {
 		return indexesOfThis.size() != 0;
 	}
 
+	@Override
 	public void populateWithEntityInstance(Object entity) {
 		for ( int index : indexesOfThis ) {
 			projection[index] = entity;
