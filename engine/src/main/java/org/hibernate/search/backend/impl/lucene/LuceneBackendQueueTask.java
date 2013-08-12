@@ -106,28 +106,11 @@ final class LuceneBackendQueueTask implements Runnable {
 		}
 		LinkedList<LuceneWork> failedUpdates = null;
 		try {
-			ExecutorService executor = resources.getWorkersExecutor();
-			int queueSize = queue.size();
-			Future[] submittedTasks = new Future[ queueSize ];
-			for ( int i = 0; i < queueSize; i++ ) {
-				SingleTaskRunnable task = new SingleTaskRunnable( queue.get( i ), resources, indexWriter, monitor );
-				submittedTasks[i] = executor.submit( task );
+			if ( queue.size() == 1 ) {
+				failedUpdates = runSingleTask( queue.get( 0 ), resources, indexWriter, monitor, errorContextBuilder );
 			}
-			// now wait for all tasks being completed before releasing our lock
-			// (this thread waits even in async backend mode)
-			for ( int i = 0; i < queueSize; i++ ) {
-				Future task = submittedTasks[i];
-				try {
-					task.get();
-					errorContextBuilder.workCompleted( queue.get( i ) );
-				}
-				catch (ExecutionException e) {
-					if ( failedUpdates == null ) {
-						failedUpdates = new LinkedList<LuceneWork>();
-					}
-					failedUpdates.add( queue.get( i ) );
-					errorContextBuilder.errorThatOccurred( e.getCause() );
-				}
+			else {
+				failedUpdates = runMultipleTasks( queue, resources, indexWriter, monitor, errorContextBuilder );
 			}
 			if ( failedUpdates != null ) {
 				errorContextBuilder.addAllWorkThatFailed( failedUpdates );
@@ -139,6 +122,58 @@ final class LuceneBackendQueueTask implements Runnable {
 		}
 		finally {
 			workspace.afterTransactionApplied( failedUpdates != null, false );
+		}
+	}
+
+	/**
+	 * Applies each modification in parallel using the backend workers pool
+	 * @throws InterruptedException
+	 */
+	private LinkedList<LuceneWork> runMultipleTasks(final List<LuceneWork> queue, final LuceneBackendResources resources,
+			final IndexWriter indexWriter, final IndexingMonitor monitor, final ErrorContextBuilder errorContextBuilder) throws InterruptedException {
+		final int queueSize = queue.size();
+		final ExecutorService executor = resources.getWorkersExecutor();
+		final Future[] submittedTasks = new Future[ queueSize ];
+		LinkedList<LuceneWork> failedUpdates = null;
+		for ( int i = 0; i < queueSize; i++ ) {
+			SingleTaskRunnable task = new SingleTaskRunnable( queue.get( i ), resources, indexWriter, monitor );
+			submittedTasks[i] = executor.submit( task );
+		}
+		// now wait for all tasks being completed before releasing our lock
+		// (this thread waits even in async backend mode)
+		for ( int i = 0; i < queueSize; i++ ) {
+			Future task = submittedTasks[i];
+			try {
+				task.get();
+				errorContextBuilder.workCompleted( queue.get( i ) );
+			}
+			catch (ExecutionException e) {
+				if ( failedUpdates == null ) {
+					failedUpdates = new LinkedList<LuceneWork>();
+				}
+				failedUpdates.add( queue.get( i ) );
+				errorContextBuilder.errorThatOccurred( e.getCause() );
+			}
+		}
+		return failedUpdates;
+	}
+
+	/**
+	 * Applies a single modification using the caller's thread to avoid pointless context
+	 * switching.
+	 */
+	private LinkedList<LuceneWork> runSingleTask(final LuceneWork luceneWork, final LuceneBackendResources resources,
+			final IndexWriter indexWriter, final IndexingMonitor monitor, final ErrorContextBuilder errorContextBuilder) {
+		final SingleTaskRunnable task = new SingleTaskRunnable( queue.get( 0 ), resources, indexWriter, monitor );
+		try {
+			task.run();
+			return null;
+		}
+		catch (RuntimeException re) {
+			errorContextBuilder.errorThatOccurred( re );
+			LinkedList<LuceneWork> failedUpdates = new LinkedList<LuceneWork>();
+			failedUpdates.add( luceneWork );
+			return failedUpdates;
 		}
 	}
 
