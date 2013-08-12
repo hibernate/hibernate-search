@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
- * 
+ *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
  * Lesser General Public License, as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
  * for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this distribution; if not, write to:
  * Free Software Foundation, Inc.
@@ -33,8 +33,8 @@
 
     <global>
 
-        <!-- Duplicate domains are allowed so that multiple deployments with default configuration 
-            of Hibernate Search applications work - if possible it would be better to use JNDI to share 
+        <!-- Duplicate domains are allowed so that multiple deployments with default configuration
+            of Hibernate Search applications work - if possible it would be better to use JNDI to share
             the CacheManager across applications -->
         <globalJmxStatistics
             enabled="false"
@@ -48,18 +48,18 @@
             clusterName="HibernateSearch-Infinispan-cluster"
             >
 
-            <!-- Note that the JGroups transport uses sensible defaults if no configuration 
+            <!-- Note that the JGroups transport uses sensible defaults if no configuration
                 property is defined. See the JGroupsTransport javadocs for more flags -->
                 <properties>
                     <property name="configurationFile" value="default-hibernatesearch-jgroups-udp.xml" />
                 </properties>
         </transport>
 
-        <!-- Note that the JGroups transport uses sensible defaults if no configuration property 
+        <!-- Note that the JGroups transport uses sensible defaults if no configuration property
             is defined. See the Infinispan wiki for more JGroups settings:
             http://community.jboss.org/wiki/ClusteredConfigurationQuickStart -->
 
-        <!-- Used to register JVM shutdown hooks. hookBehavior: DEFAULT, REGISTER, DONT_REGISTER. 
+        <!-- Used to register JVM shutdown hooks. hookBehavior: DEFAULT, REGISTER, DONT_REGISTER.
             Hibernate Search takes care to stop the CacheManager so registering is not needed -->
         <shutdown
             hookBehavior="DONT_REGISTER" />
@@ -81,9 +81,9 @@
         <invocationBatching
             enabled="false" />
 
-        <!-- This element specifies that the cache is clustered. modes supported: distribution 
-            (d), replication (r) or invalidation (i). Don't use invalidation to store Lucene indexes (as 
-            with Hibernate Search DirectoryProvider). Replication is recommended for best performance of 
+        <!-- This element specifies that the cache is clustered. modes supported: distribution
+            (d), replication (r) or invalidation (i). Don't use invalidation to store Lucene indexes (as
+            with Hibernate Search DirectoryProvider). Replication is recommended for best performance of
             Lucene indexes, but make sure you have enough memory to store the index in your heap.
             Also distribution scales much better than replication on high number of nodes in the cluster. -->
         <clustering
