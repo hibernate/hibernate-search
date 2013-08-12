@@ -34,7 +34,7 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.Similarity;
-
+import org.apache.lucene.store.Directory;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
@@ -205,7 +205,10 @@ class IndexWriterHolder {
 				}
 			}
 			finally {
-				IndexWriter.unlock( directoryProvider.getDirectory() );
+				final Directory directory = directoryProvider.getDirectory();
+				if ( IndexWriter.isLocked( directory ) ) {
+					IndexWriter.unlock( directory );
+				}
 			}
 		}
 		catch (IOException ioe) {
