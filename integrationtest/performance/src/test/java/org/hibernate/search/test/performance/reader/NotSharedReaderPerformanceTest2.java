@@ -30,6 +30,7 @@ import org.hibernate.search.Environment;
  * @author Emmanuel Bernard
  */
 public class NotSharedReaderPerformanceTest2 extends ReaderPerformanceTestCase {
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.READER_STRATEGY, "not-shared" );

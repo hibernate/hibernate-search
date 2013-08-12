@@ -35,6 +35,7 @@ public class CustomLockFactoryProvider implements LockFactoryProvider {
 	// A real implementation would probably not use a static field; useful to keep the test simple.
 	static String optionValue;
 
+	@Override
 	public LockFactory createLockFactory(File indexDir, Properties dirConfiguration) {
 		optionValue = dirConfiguration.getProperty( "locking_option" );
 		return new SingleInstanceLockFactory();

@@ -119,6 +119,7 @@ public class TermVectorTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { ElectricalProperties.class, Employee.class };
 	}

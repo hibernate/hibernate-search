@@ -64,19 +64,23 @@ public class StateCandidate implements Person {
 		this.state = state;
 	}
 
+	@Override
 	public Address getAddress() {
 		return address;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public void setAddress( Address address ) {
 		this.address = address;
 
 	}
 
+	@Override
 	public void setName( String name ) {
 		this.name = name;
 	}

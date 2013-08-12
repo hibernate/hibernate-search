@@ -51,6 +51,7 @@ class OptimizeWorkDelegate implements LuceneWorkDelegate {
 		this.workspace = workspace;
 	}
 
+	@Override
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
 		log.tracef( "optimize Lucene index: %s", entityType );

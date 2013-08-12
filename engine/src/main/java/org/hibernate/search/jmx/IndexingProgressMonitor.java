@@ -54,35 +54,43 @@ public class IndexingProgressMonitor implements IndexingProgressMonitorMBean, Ma
 		registeredName = JMXRegistrar.registerMBean( this, name );
 	}
 
+	@Override
 	public final void documentsAdded(long increment) {
 		documentsDoneCounter.addAndGet( increment );
 	}
 
+	@Override
 	public final void documentsBuilt(int number) {
 		documentsBuiltCounter.addAndGet( number );
 	}
 
+	@Override
 	public final void entitiesLoaded(int size) {
 		entitiesLoadedCounter.addAndGet( size );
 	}
 
+	@Override
 	public final void addToTotalCount(long count) {
 		totalCounter.addAndGet( count );
 	}
 
+	@Override
 	public final void indexingCompleted() {
 		log.indexingCompletedAndMBeanUnregistered( totalCounter.get() );
 		JMXRegistrar.unRegisterMBean( registeredName );
 	}
 
+	@Override
 	public final long getLoadedEntitiesCount() {
 		return entitiesLoadedCounter.get();
 	}
 
+	@Override
 	public final long getDocumentsAddedCount() {
 		return documentsDoneCounter.get();
 	}
 
+	@Override
 	public final long getNumberOfEntitiesToIndex() {
 		return totalCounter.get();
 	}

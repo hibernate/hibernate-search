@@ -106,10 +106,12 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		return (MockErrorHandler)errorHandler;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Foo.class };
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );
@@ -149,6 +151,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
 		}
 
+		@Override
 		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 			WORK_COUNTER.incrementAndGet();
 		}
@@ -189,6 +192,7 @@ public class LuceneErrorHandlingTest extends SearchTestCase {
 		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
 		}
 
+		@Override
 		public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 			throw new SearchException( "failed work message" );
 		}

@@ -32,6 +32,7 @@ import org.hibernate.transform.ResultTransformer;
  */
 public class ProjectionToDelimStringResultTransformer implements ResultTransformer {
 
+	@Override
 	public Object transformTuple(Object[] tuple, String[] aliases) {
 		String s = tuple[0].toString();
 		for ( int i = 1; i < tuple.length; i++ ) {
@@ -40,6 +41,7 @@ public class ProjectionToDelimStringResultTransformer implements ResultTransform
 		return s;
 	}
 
+	@Override
 	public List transformList(List collection) {
 		return collection;
 	}

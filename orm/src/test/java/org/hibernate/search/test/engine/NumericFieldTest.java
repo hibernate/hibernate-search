@@ -45,6 +45,7 @@ public class NumericFieldTest extends SearchTestCase {
 
 	FullTextSession fullTextSession;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -52,6 +53,7 @@ public class NumericFieldTest extends SearchTestCase {
 		prepareData();
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		cleanData();
 		assertTrue( indexIsEmpty() );

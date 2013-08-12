@@ -37,6 +37,7 @@ import org.apache.lucene.util.OpenBitSet;
  */
 public class BestDriversFilter extends Filter {
 
+	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 		OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
 		TermDocs termDocs = reader.termDocs( new Term( "score", "5" ) );

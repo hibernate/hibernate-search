@@ -29,6 +29,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 
 public class UUIDBridge implements TwoWayStringBridge {
 
+	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {
 			return null;
@@ -36,6 +37,7 @@ public class UUIDBridge implements TwoWayStringBridge {
 		return object.toString();
 	}
 
+	@Override
 	public UUID stringToObject(String stringValue) {
 		if ( stringValue == null || stringValue.isEmpty() ) {
 			return null;

@@ -123,6 +123,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Foo.class, Song.class

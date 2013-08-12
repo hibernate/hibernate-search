@@ -54,26 +54,32 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		// use INSTANCE as this delegator is stateless
 	}
 
+	@Override
 	public ContextAwareSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 
+	@Override
 	public ContextAwareSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
 		return addDelegate;
 	}
 
+	@Override
 	public ContextAwareSelectionDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
 		return deleteDelegate;
 	}
 
+	@Override
 	public ContextAwareSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
 		return optimizeDelegate;
 	}
 
+	@Override
 	public ContextAwareSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
 		return purgeDelegate;
 	}
 
+	@Override
 	public ContextAwareSelectionDelegate getDelegate(FlushLuceneWork flushLuceneWork) {
 		return flushDelegate;
 	}

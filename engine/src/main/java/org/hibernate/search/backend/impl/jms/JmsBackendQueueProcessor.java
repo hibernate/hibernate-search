@@ -126,6 +126,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 		return connection;
 	}
 
+	@Override
 	public void close() {
 		try {
 			if ( connection != null ) {

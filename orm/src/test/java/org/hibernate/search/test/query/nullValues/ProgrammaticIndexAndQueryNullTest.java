@@ -103,11 +103,13 @@ public class ProgrammaticIndexAndQueryNullTest extends SearchTestCase {
 		return mapping;
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.getProperties().put( Environment.MODEL_MAPPING, createSearchMapping() );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				ProgrammaticConfiguredValue.class

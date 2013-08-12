@@ -196,6 +196,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 		super.tearDown();
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		// JGroups configuration for master node
@@ -204,6 +205,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				TShirt.class

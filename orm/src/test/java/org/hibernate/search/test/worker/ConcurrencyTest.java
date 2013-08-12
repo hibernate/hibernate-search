@@ -68,6 +68,7 @@ public class ConcurrencyTest extends SearchTestCase {
 
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Drink.class,

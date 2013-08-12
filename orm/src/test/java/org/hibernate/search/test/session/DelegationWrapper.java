@@ -40,6 +40,7 @@ public class DelegationWrapper implements InvocationHandler, Serializable {
 		this.realSession = session;
 	}
 
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		try {
 			return method.invoke( realSession, args );

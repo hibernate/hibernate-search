@@ -117,157 +117,195 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			this.delegate = wrapped;
 		}
 
+		@Override
 		public int hashCode() {
 			return delegate.hashCode();
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			return delegate.equals( obj );
 		}
 
+		@Override
 		public String toString() {
 			return delegate.toString();
 		}
 
+		@Override
 		public Object clone() {
 			return delegate.clone();
 		}
 
+		@Override
 		public IndexReader clone(boolean openReadOnly) throws CorruptIndexException, IOException {
 			return delegate.clone( openReadOnly );
 		}
 
+		@Override
 		public Directory directory() {
 			return delegate.directory();
 		}
 
+		@Override
 		public long getVersion() {
 			return delegate.getVersion();
 		}
 
+		@Override
 		public Map<String, String> getCommitUserData() {
 			return delegate.getCommitUserData();
 		}
 
+		@Override
 		public boolean isCurrent() throws CorruptIndexException, IOException {
 			return delegate.isCurrent();
 		}
 
+		@Override
 		public TermFreqVector[] getTermFreqVectors(int docNumber) throws IOException {
 			return delegate.getTermFreqVectors( docNumber );
 		}
 
+		@Override
 		public TermFreqVector getTermFreqVector(int docNumber, String field) throws IOException {
 			return delegate.getTermFreqVector( docNumber, field );
 		}
 
+		@Override
 		public void getTermFreqVector(int docNumber, String field, TermVectorMapper mapper) throws IOException {
 			delegate.getTermFreqVector( docNumber, field, mapper );
 		}
 
+		@Override
 		public void getTermFreqVector(int docNumber, TermVectorMapper mapper) throws IOException {
 			delegate.getTermFreqVector( docNumber, mapper );
 		}
 
+		@Override
 		public int numDocs() {
 			return delegate.numDocs();
 		}
 
+		@Override
 		public int maxDoc() {
 			return delegate.maxDoc();
 		}
 
+		@Override
 		public Document document(int n, FieldSelector fieldSelector) throws CorruptIndexException, IOException {
 			FieldSelectorLeakingReaderProvider.fieldSelector = fieldSelector;
 			return delegate.document( n, fieldSelector );
 		}
 
+		@Override
 		public boolean isDeleted(int n) {
 			return delegate.isDeleted( n );
 		}
 
+		@Override
 		public boolean hasDeletions() {
 			return delegate.hasDeletions();
 		}
 
+		@Override
 		public boolean hasNorms(String field) throws IOException {
 			return delegate.hasNorms( field );
 		}
 
+		@Override
 		public byte[] norms(String field) throws IOException {
 			return delegate.norms( field );
 		}
 
+		@Override
 		public void norms(String field, byte[] bytes, int offset) throws IOException {
 			delegate.norms( field, bytes, offset );
 		}
 
+		@Override
 		public TermEnum terms() throws IOException {
 			return delegate.terms();
 		}
 
+		@Override
 		public TermEnum terms(Term t) throws IOException {
 			return delegate.terms( t );
 		}
 
+		@Override
 		public int docFreq(Term t) throws IOException {
 			return delegate.docFreq( t );
 		}
 
+		@Override
 		public TermDocs termDocs(Term term) throws IOException {
 			return delegate.termDocs( term );
 		}
 
+		@Override
 		public TermDocs termDocs() throws IOException {
 			return delegate.termDocs();
 		}
 
+		@Override
 		public TermPositions termPositions() throws IOException {
 			return delegate.termPositions();
 		}
 
+		@Override
 		public IndexCommit getIndexCommit() throws IOException {
 			return delegate.getIndexCommit();
 		}
 
+		@Override
 		public IndexReader[] getSequentialSubReaders() {
 			return delegate.getSequentialSubReaders();
 		}
 
+		@Override
 		public Object getCoreCacheKey() {
 			return delegate.getCoreCacheKey();
 		}
 
+		@Override
 		public Object getDeletesCacheKey() {
 			return delegate.getDeletesCacheKey();
 		}
 
+		@Override
 		public long getUniqueTermCount() throws IOException {
 			return delegate.getUniqueTermCount();
 		}
 
+		@Override
 		public int getTermInfosIndexDivisor() {
 			return delegate.getTermInfosIndexDivisor();
 		}
 
+		@Override
 		protected void doSetNorm(int doc, String field, byte value) throws CorruptIndexException, IOException {
 			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
 		}
 
+		@Override
 		protected void doDelete(int docNum) throws CorruptIndexException, IOException {
 			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
 		}
 
+		@Override
 		protected void doUndeleteAll() throws CorruptIndexException, IOException {
 			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
 		}
 
+		@Override
 		protected void doCommit(Map<String, String> commitUserData) throws IOException {
 			//can't implement as method is not visibile
 			//not important either as method is deprecated and all Readers are read-only: nothing to commit
 			//also, method is going to be removed.
 		}
 
+		@Override
 		protected void doClose() throws IOException {
 			//can't implement as method is not visibile
 			//not important either as method is deprecated and all Readers are read-only: nothing to flush on close

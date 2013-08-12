@@ -83,6 +83,7 @@ public abstract class AbstractFacetTest extends SearchTestCase {
 	protected FullTextSession fullTextSession;
 	protected Transaction tx;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
@@ -90,6 +91,7 @@ public abstract class AbstractFacetTest extends SearchTestCase {
 		tx = fullTextSession.beginTransaction();
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		tx.commit();
 		fullTextSession.clear();

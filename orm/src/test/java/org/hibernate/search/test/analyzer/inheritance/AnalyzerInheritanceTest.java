@@ -101,6 +101,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { SubClass.class };
 	}

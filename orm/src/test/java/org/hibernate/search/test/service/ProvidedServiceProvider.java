@@ -34,15 +34,18 @@ import org.hibernate.search.spi.ServiceProvider;
 public class ProvidedServiceProvider implements ServiceProvider<ProvidedService> {
 	private static volatile boolean active = false;
 
+	@Override
 	public void start(Properties properties, BuildContext context) {
 		throw new RuntimeException( "should not be started" );
 	}
 
+	@Override
 	public ProvidedService getService() {
 		active = true;
 		return new ProvidedService();
 	}
 
+	@Override
 	public void stop() {
 		throw new RuntimeException( "should not be stopped" );
 	}

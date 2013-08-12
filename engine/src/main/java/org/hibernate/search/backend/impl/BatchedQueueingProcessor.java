@@ -56,6 +56,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		batchSize = ConfigurationParseHelper.getIntValue( properties, Environment.QUEUEINGPROCESSOR_BATCHSIZE, 0 );
 	}
 
+	@Override
 	public void add(Work work, WorkQueue workQueue) {
 		//don't check for builder it's done in prepareWork
 		//FIXME WorkType.COLLECTION does not play well with batchSize
@@ -67,10 +68,12 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		}
 	}
 
+	@Override
 	public void prepareWorks(WorkQueue workQueue) {
 		workQueue.prepareWorkPlan();
 	}
 
+	@Override
 	public void performWorks(WorkQueue workQueue) {
 		List<LuceneWork> sealedQueue = workQueue.getSealedQueue();
 		if ( log.isTraceEnabled() ) {
@@ -96,6 +99,7 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 		context.commitOperations( null );
 	}
 
+	@Override
 	public void cancelWorks(WorkQueue workQueue) {
 		workQueue.clear();
 	}

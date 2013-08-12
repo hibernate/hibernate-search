@@ -38,6 +38,7 @@ import org.hibernate.search.test.util.LeakingLuceneBackend;
  */
 public class DocumentIdContainedInTest extends RecursiveGraphTest {
 
+	@Override
 	public void testCorrectDepthIndexed() {
 		Session session = openSession();
 		try {

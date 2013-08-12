@@ -132,6 +132,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		delegatedBackend = BackendFactory.createBackend( backend, indexManager, context, props );
 	}
 
+	@Override
 	public void close() {
 		serviceManager.releaseService( MasterSelectorServiceProvider.class );
 		serviceManager.releaseService( JGroupsChannelProvider.class );

@@ -31,6 +31,7 @@ import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
  * @author Emmanuel Bernard
  */
 public class SharedBufferedReaderPerformanceTest extends ReaderPerformanceTestCase {
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getCanonicalName() );

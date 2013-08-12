@@ -37,14 +37,17 @@ public class ManualTransactionContext implements TransactionContext {
 	private boolean progress = true;
 	private List<Synchronization> syncs = new ArrayList<Synchronization>();
 
+	@Override
 	public boolean isTransactionInProgress() {
 		return progress;
 	}
 
+	@Override
 	public Object getTransactionIdentifier() {
 		return this;
 	}
 
+	@Override
 	public void registerSynchronization(Synchronization synchronization) {
 		syncs.add( synchronization );
 	}

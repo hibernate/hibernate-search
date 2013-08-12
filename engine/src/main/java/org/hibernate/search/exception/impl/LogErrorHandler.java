@@ -40,6 +40,7 @@ public class LogErrorHandler implements ErrorHandler {
 
 	private static final Log log = LoggerFactory.make();
 
+	@Override
 	public void handle(ErrorContext context) {
 
 		final List<LuceneWork> failingOperations = context.getFailingOperations();

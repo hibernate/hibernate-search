@@ -89,10 +89,12 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 		Assert.assertEquals( "100", luceneWork.getIdInString() );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class, PersonWithBrokenSocialSecurityNumber.class };
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.use_identifier_rollback", "true" );

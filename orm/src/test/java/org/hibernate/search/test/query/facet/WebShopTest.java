@@ -106,6 +106,7 @@ public class WebShopTest extends AbstractFacetTest {
 	}
 
 
+	@Override
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
 		List<Car> allCars = newArrayList();
@@ -123,6 +124,7 @@ public class WebShopTest extends AbstractFacetTest {
 		session.clear();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Car.class,

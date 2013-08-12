@@ -848,6 +848,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		cfg.getProperties().put( Environment.MODEL_MAPPING, ProgrammaticSearchMappingFactory.class.getName() );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
 				Address.class,

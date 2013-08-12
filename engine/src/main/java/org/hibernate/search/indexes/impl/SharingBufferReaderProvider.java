@@ -188,6 +188,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 			}
 		}
 
+		@Override
 		public String toString() {
 			return "Reader:" + this.hashCode() + " ref.count=" + usageCounter.get();
 		}

@@ -30,26 +30,31 @@ import java.util.Map;
  */
 public enum FieldCacheLoadingType {
 	STRING {
+		@Override
 		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new StringFieldLoadingStrategy( fieldName );
 		}
 	},
 	INT {
+		@Override
 		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new IntFieldLoadingStrategy( fieldName );
 		}
 	},
 	LONG {
+		@Override
 		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new LongFieldLoadingStrategy( fieldName );
 		}
 	},
 	DOUBLE {
+		@Override
 		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new DoubleFieldLoadingStrategy( fieldName );
 		}
 	},
 	FLOAT {
+		@Override
 		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
 			return new FloatFieldLoadingStrategy( fieldName );
 		}

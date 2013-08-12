@@ -94,6 +94,7 @@ public class DslEmbeddedSearchTest extends SearchTestCase {
 		return combinedQuery.list();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { ContainerEntity.class };
 	}

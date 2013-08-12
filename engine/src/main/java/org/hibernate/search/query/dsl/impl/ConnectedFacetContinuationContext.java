@@ -38,11 +38,13 @@ public class ConnectedFacetContinuationContext implements FacetContinuationConte
 		this.context = context;
 	}
 
+	@Override
 	public <T> FacetRangeAboveBelowContext<T> range() {
 		context.setRangeQuery( true );
 		return new ConnectedFacetRangeAboveBelowContext<T>(context);
 	}
 
+	@Override
 	public DiscreteFacetContext discrete() {
 		return new ConnectedDiscreteFacetContext(context);
 	}

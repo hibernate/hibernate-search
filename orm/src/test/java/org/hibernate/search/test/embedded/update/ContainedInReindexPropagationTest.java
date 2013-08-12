@@ -121,6 +121,7 @@ public class ContainedInReindexPropagationTest extends SearchTestCase {
 		return (Long) results.get( 0 )[0];
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Dad.class, Grandpa.class, Son.class

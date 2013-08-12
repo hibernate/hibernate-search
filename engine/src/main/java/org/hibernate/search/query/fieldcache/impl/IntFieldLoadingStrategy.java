@@ -39,10 +39,12 @@ public final class IntFieldLoadingStrategy implements FieldLoadingStrategy {
 		this.fieldName = fieldName;
 	}
 
+	@Override
 	public void loadNewCacheValues(IndexReader reader) throws IOException {
 		currentCache = FieldCache.DEFAULT.getInts( reader, fieldName );
 	}
 
+	@Override
 	public Integer collect(int relativeDocId) {
 		return currentCache[relativeDocId];
 	}

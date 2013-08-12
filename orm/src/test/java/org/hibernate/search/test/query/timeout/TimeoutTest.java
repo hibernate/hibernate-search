@@ -50,6 +50,7 @@ public class TimeoutTest extends SearchTestCase {
 	private Query noMatchQuery;
 	private Query matchAllQuery;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		fts = Search.getFullTextSession( openSession() );
@@ -61,6 +62,7 @@ public class TimeoutTest extends SearchTestCase {
 		storeClocks( fts );
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		try {
 			Transaction tx = fts.getTransaction();

@@ -39,10 +39,12 @@ public final class LongFieldLoadingStrategy implements FieldLoadingStrategy {
 		this.fieldName = fieldName;
 	}
 
+	@Override
 	public void loadNewCacheValues(IndexReader reader) throws IOException {
 		currentCache = FieldCache.DEFAULT.getLongs( reader, fieldName );
 	}
 
+	@Override
 	public Long collect(int relativeDocId) {
 		return currentCache[relativeDocId];
 	}

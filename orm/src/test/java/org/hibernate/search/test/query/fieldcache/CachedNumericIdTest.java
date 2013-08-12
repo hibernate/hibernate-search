@@ -48,6 +48,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 
 	private static final int NUM_LOCATIONS = 50;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		prepareData();
@@ -94,6 +95,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		cleanData();
 		super.tearDown();
@@ -104,6 +106,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		return new Class<?>[] { PinPoint.class, Location.class };
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		// force multiple segments to also verify the docId transformations

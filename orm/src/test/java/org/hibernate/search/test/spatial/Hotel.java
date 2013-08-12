@@ -71,10 +71,12 @@ public class Hotel implements Coordinates {
 		return name;
 	}
 
+	@Override
 	public Double getLatitude() {
 		return latitude;
 	}
 
+	@Override
 	public Double getLongitude() {
 		return longitude;
 	}

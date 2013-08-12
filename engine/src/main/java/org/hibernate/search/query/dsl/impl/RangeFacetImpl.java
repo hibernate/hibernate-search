@@ -93,18 +93,22 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 		return rangeIndex;
 	}
 
+	@Override
 	public T getMin() {
 		return range.getMin();
 	}
 
+	@Override
 	public T getMax() {
 		return range.getMax();
 	}
 
+	@Override
 	public boolean isIncludeMin() {
 		return range.isMinIncluded();
 	}
 
+	@Override
 	public boolean isIncludeMax() {
 		return range.isMaxIncluded();
 	}

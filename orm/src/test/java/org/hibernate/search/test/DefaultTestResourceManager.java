@@ -249,6 +249,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	private static class RollbackWork implements Work {
 
+		@Override
 		public void execute(Connection connection) throws SQLException {
 			connection.rollback();
 		}

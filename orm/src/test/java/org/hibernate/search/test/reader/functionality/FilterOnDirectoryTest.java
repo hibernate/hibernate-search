@@ -77,12 +77,14 @@ public class FilterOnDirectoryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() );
 		cfg.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, SharingBufferReaderProvider.class.getName() );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Detective.class,

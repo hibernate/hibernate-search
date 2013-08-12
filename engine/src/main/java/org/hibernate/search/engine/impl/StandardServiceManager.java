@@ -96,6 +96,7 @@ public class StandardServiceManager implements ServiceManager {
 		}
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass, BuildContext context) {
 		//provided services have priority over managed services
@@ -125,6 +126,7 @@ public class StandardServiceManager implements ServiceManager {
 		return wrapper.getService();
 	}
 
+	@Override
 	public void releaseService(Class<? extends ServiceProvider<?>> serviceProviderClass) {
 		//provided services have priority over managed services
 		if ( providedProviders.containsKey( serviceProviderClass ) ) {
@@ -139,6 +141,7 @@ public class StandardServiceManager implements ServiceManager {
 		wrapper.stopVirtual();
 	}
 
+	@Override
 	public void stopServices() {
 		for ( ServiceProviderWrapper wrapper : managedProviders.values() ) {
 			wrapper.ensureStopped();

@@ -132,6 +132,7 @@ public class ExplicitIdTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Article.class

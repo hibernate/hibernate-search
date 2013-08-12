@@ -44,6 +44,7 @@ import org.hibernate.search.test.query.Book;
  */
 public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 
@@ -114,6 +115,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Document.class, 1, MAX_MERGE_DOCS, 11 );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,

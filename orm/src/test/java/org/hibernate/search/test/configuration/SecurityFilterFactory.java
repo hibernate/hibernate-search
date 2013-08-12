@@ -68,6 +68,7 @@ public class SecurityFilterFactory {
 			this.ownerName = ownerName;
 		}
 
+		@Override
 		public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 			OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
 			TermDocs termDocs = reader.termDocs( new Term( "owner", ownerName ) );

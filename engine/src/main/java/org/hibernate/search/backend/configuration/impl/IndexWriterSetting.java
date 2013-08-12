@@ -41,6 +41,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.IndexWriterConfig#setMaxBufferedDeleteTerms(int)
 	 */
 	MAX_BUFFERED_DELETE_TERMS( "max_buffered_delete_terms" ) {
+		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
 			writerConfig.setMaxBufferedDeleteTerms( value );
 		}
@@ -49,6 +50,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.IndexWriterConfig#setMaxBufferedDocs(int)
 	 */
 	MAX_BUFFERED_DOCS( "max_buffered_docs" ) {
+		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
 			writerConfig.setMaxBufferedDocs( value );
 		}
@@ -57,6 +59,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeDocs(int)
 	 */
 	MAX_MERGE_DOCS( "max_merge_docs" ) {
+		@Override
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
 			logByteSizeMergePolicy.setMaxMergeDocs( value );
 		}
@@ -65,6 +68,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMergeFactor(int)
 	 */
 	MERGE_FACTOR( "merge_factor" ) {
+		@Override
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
 			logByteSizeMergePolicy.setMergeFactor( value );
 		}
@@ -73,6 +77,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMinMergeMB(double)
 	 */
 	MERGE_MIN_SIZE( "merge_min_size" ) {
+		@Override
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
 			logByteSizeMergePolicy.setMinMergeMB( value );
 		}
@@ -81,6 +86,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeMB(double)
 	 */
 	MERGE_MAX_SIZE( "merge_max_size" ) {
+		@Override
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
 			logByteSizeMergePolicy.setMaxMergeMB( value );
 		}
@@ -89,6 +95,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setMaxMergeMBForForcedMerge(double)
 	 */
 	MERGE_MAX_OPTIMIZE_SIZE( "merge_max_optimize_size" ) {
+		@Override
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
 			logByteSizeMergePolicy.setMaxMergeMBForForcedMerge( value );
 		}
@@ -97,6 +104,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setCalibrateSizeByDeletes(boolean)
 	 */
 	MERGE_CALIBRATE_BY_DELETES( "merge_calibrate_by_deletes" ) {
+		@Override
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
 			boolean calibrateByDeletes = intToBoolean( value );
 			logByteSizeMergePolicy.setCalibrateSizeByDeletes( calibrateByDeletes );
@@ -106,6 +114,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.IndexWriterConfig#setRAMBufferSizeMB(double)
 	 */
 	RAM_BUFFER_SIZE( "ram_buffer_size" ) {
+		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
 			writerConfig.setRAMBufferSizeMB( value );
 		}
@@ -114,6 +123,7 @@ public enum IndexWriterSetting implements Serializable {
 	 * @see org.apache.lucene.index.IndexWriterConfig#setTermIndexInterval(int)
 	 */
 	TERM_INDEX_INTERVAL( "term_index_interval" ) {
+		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
 			writerConfig.setTermIndexInterval( value );
 		}

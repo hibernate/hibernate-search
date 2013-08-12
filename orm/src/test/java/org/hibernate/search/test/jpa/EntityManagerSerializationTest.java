@@ -61,6 +61,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 		em.close();
 	}
 
+	@Override
 	public Class[] getAnnotatedClasses() {
 		return new Class[] { Bretzel.class };
 	}

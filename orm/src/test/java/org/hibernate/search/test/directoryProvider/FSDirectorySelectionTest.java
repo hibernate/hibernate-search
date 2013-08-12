@@ -96,6 +96,7 @@ public class FSDirectorySelectionTest extends SearchTestCase {
 		return config.buildSessionFactory();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { };
 	}

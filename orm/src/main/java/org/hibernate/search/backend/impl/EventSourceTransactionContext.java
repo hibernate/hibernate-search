@@ -74,6 +74,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 		this.flushListener = getIndexWorkFlushEventListener();
 	}
 
+	@Override
 	public Object getTransactionIdentifier() {
 		if ( isRealTransactionInProgress() ) {
 			return eventSource.getTransaction();
@@ -83,6 +84,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 		}
 	}
 
+	@Override
 	public void registerSynchronization(Synchronization synchronization) {
 		if ( isRealTransactionInProgress() ) {
 			//use {Before|After}TransactionCompletionProcess instead of registerTransaction because it does not
@@ -158,6 +160,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	//The code is not really fitting the method name;
 	//(unless you consider a flush as a mini-transaction)
 	//This is because we want to behave as "inTransaction" if the flushListener is registered.
+	@Override
 	public boolean isTransactionInProgress() {
 		// either it is a real transaction, or if we are capable to manage this in the IndexWorkFlushEventListener
 		return getIndexWorkFlushEventListener() != null || isRealTransactionInProgress();
@@ -178,6 +181,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			this.synchronization = synchronization;
 		}
 
+		@Override
 		public void doBeforeTransactionCompletion(SessionImplementor sessionImplementor) {
 			try {
 				synchronization.beforeCompletion();
@@ -195,6 +199,7 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			this.synchronization = synchronization;
 		}
 
+		@Override
 		public void doAfterTransactionCompletion(boolean success, SessionImplementor sessionImplementor) {
 			try {
 				synchronization.afterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
@@ -212,10 +217,12 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 			this.synchronization = sync;
 		}
 
+		@Override
 		public void beforeCompletion() {
 			this.synchronization.beforeCompletion();
 		}
 
+		@Override
 		public void afterCompletion(int status) {
 			//do not delegate
 		}

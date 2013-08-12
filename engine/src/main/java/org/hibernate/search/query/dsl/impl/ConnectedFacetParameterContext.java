@@ -38,21 +38,25 @@ public class ConnectedFacetParameterContext implements FacetParameterContext {
 		this.context = context;
 	}
 
+	@Override
 	public FacetParameterContext orderedBy(FacetSortOrder sort) {
 		context.setSort( sort );
 		return this;
 	}
 
+	@Override
 	public FacetParameterContext includeZeroCounts(boolean zeroCounts) {
 		context.setIncludeZeroCount( zeroCounts );
 		return this;
 	}
 
+	@Override
 	public FacetParameterContext maxFacetCount(int maxFacetCount) {
 		context.setMaxFacetCount( maxFacetCount );
 		return this;
 	}
 
+	@Override
 	public FacetingRequest createFacetingRequest() {
 		return context.getFacetingRequest();
 	}

@@ -33,6 +33,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
  */
 public class CharacterBridge implements TwoWayStringBridge {
 
+	@Override
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
 			return null;
@@ -43,6 +44,7 @@ public class CharacterBridge implements TwoWayStringBridge {
 		return stringValue.charAt( 0 );
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		return object == null
 				? null

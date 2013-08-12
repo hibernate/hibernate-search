@@ -98,6 +98,7 @@ public class BatchCoordinator implements Runnable {
 		this.errorHandler = searchFactoryImplementor.getErrorHandler();
 	}
 
+	@Override
 	public void run() {
 		try {
 			final BatchBackend backend = searchFactoryImplementor.makeBatchBackend( monitor );

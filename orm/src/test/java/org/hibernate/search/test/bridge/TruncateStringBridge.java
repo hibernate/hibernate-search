@@ -39,11 +39,13 @@ public class TruncateStringBridge implements StringBridge, ParameterizedBridge {
 		return stringValue;
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		String string = (String) object;
 		return object != null ? string.substring( 0, string.length() / div ) : null;
 	}
 
+	@Override
 	public void setParameterValues(Map<String, String> parameters) {
 		div = Integer.parseInt( parameters.get( "dividedBy" ) );
 	}

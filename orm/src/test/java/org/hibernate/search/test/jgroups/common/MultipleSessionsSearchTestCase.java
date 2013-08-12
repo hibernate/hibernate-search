@@ -126,6 +126,7 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCaseJUnit
 		return slaveSessionFactory;
 	}
 
+	@Override
 	protected abstract Class<?>[] getAnnotatedClasses();
 
 	protected abstract Class<?>[] getCommonAnnotatedClasses();

@@ -94,6 +94,7 @@ public class RamDirectoryTest extends SearchTestCase {
 		}
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Document.class,

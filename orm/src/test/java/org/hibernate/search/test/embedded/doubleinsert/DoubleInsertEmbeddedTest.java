@@ -106,6 +106,7 @@ public class DoubleInsertEmbeddedTest extends SearchTestCase {
 		return contact;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Phone.class,

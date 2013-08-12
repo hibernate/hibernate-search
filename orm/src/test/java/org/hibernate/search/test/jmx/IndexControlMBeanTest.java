@@ -179,6 +179,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 			super();
 		}
 
+		@Override
 		public Context getInitialContext(Hashtable environment) throws NamingException {
 			return new CloseNoOpMemoryContext( environment );
 		}

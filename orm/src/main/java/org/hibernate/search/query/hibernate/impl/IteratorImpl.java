@@ -49,6 +49,7 @@ public class IteratorImpl implements Iterator<Object> {
 	}
 
 	//side effect is to set up next
+	@Override
 	public boolean hasNext() {
 		if ( nextObjectIndex == index ) {
 			return next != null;
@@ -73,6 +74,7 @@ public class IteratorImpl implements Iterator<Object> {
 		return true;
 	}
 
+	@Override
 	public Object next() {
 		//hasNext() has side effect
 		if ( !hasNext() ) {
@@ -82,6 +84,7 @@ public class IteratorImpl implements Iterator<Object> {
 		return next;
 	}
 
+	@Override
 	public void remove() {
 		//TODO this is theoretically doable
 		throw new UnsupportedOperationException( "Cannot remove from a lucene query iterator" );

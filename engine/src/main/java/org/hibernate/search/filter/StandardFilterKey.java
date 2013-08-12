@@ -37,6 +37,7 @@ public class StandardFilterKey extends FilterKey {
 	private final List<Object> parameters = new ArrayList<Object>();
 	private boolean implSet;
 
+	@Override
 	public void setImpl(Class<?> impl) {
 		super.setImpl( impl );
 		//add impl once and only once
@@ -53,6 +54,7 @@ public class StandardFilterKey extends FilterKey {
 		parameters.add( value );
 	}
 
+	@Override
 	public int hashCode() {
 		int hash = 23;
 		for ( Object param : parameters ) {
@@ -61,6 +63,7 @@ public class StandardFilterKey extends FilterKey {
 		return hash;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if ( !( obj instanceof StandardFilterKey ) ) {
 			return false;

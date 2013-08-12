@@ -63,6 +63,7 @@ public class ConnectedMultiFieldsPhraseQueryBuilder implements PhraseTermination
 		this.fieldContexts = fieldContexts;
 	}
 
+	@Override
 	public Query createQuery() {
 		final int size = fieldContexts.size();
 		if ( size == 1 ) {

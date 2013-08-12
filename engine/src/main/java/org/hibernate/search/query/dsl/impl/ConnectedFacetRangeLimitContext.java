@@ -37,11 +37,13 @@ public class ConnectedFacetRangeLimitContext<T> implements FacetRangeLimitContex
 		this.context = context;
 	}
 
+	@Override
 	public FacetRangeLimitContext<T> excludeLimit() {
 		context.setIncludeRangeStart( false );
 		return this;
 	}
 
+	@Override
 	public FacetRangeEndContext<T> to(T upperLimit) {
 		context.setRangeEnd( upperLimit );
 		return new ConnectedFacetRangeEndContext( context );

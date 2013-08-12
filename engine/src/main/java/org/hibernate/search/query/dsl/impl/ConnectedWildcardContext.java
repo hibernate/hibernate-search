@@ -43,20 +43,24 @@ class ConnectedWildcardContext implements WildcardContext {
 		this.termContext = new TermQueryContext( TermQueryContext.Approximation.WILDCARD );
 	}
 
+	@Override
 	public TermMatchingContext onField(String field) {
 		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext);
 	}
 
+	@Override
 	public WildcardContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
 	}
 
+	@Override
 	public WildcardContext withConstantScore() {
 		queryCustomizer.withConstantScore();
 		return this;
 	}
 
+	@Override
 	public WildcardContext filteredBy(Filter filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;

@@ -64,10 +64,12 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 	}
 
 
+	@Override
 	public RAMDirectory getDirectory() {
 		return directory;
 	}
 
+	@Override
 	public void stop() {
 		directory.close();
 	}

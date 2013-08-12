@@ -62,10 +62,12 @@ public class IncorrectGet {
 
 	public static class ErrorOnGetBridge implements TwoWayStringBridge {
 
+		@Override
 		public Object stringToObject(String stringValue) {
 			throw new RuntimeException("Failure");
 		}
 
+		@Override
 		public String objectToString(Object object) {
 			return object.toString();
 		}

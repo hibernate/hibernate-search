@@ -62,16 +62,19 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 		}
 	}
 
+	@Override
 	public TermTermination matching(Object value) {
 		return new ConnectedMultiFieldsTermQueryBuilder( termContext, value, fieldContexts, queryCustomizer, queryContext);
 	}
 
+	@Override
 	public TermMatchingContext andField(String field) {
 		this.fieldContexts.add( new FieldContext( field ) );
 		this.firstOfContext = fieldContexts.size() - 1;
 		return this;
 	}
 
+	@Override
 	public TermMatchingContext boostedTo(float boost) {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.getFieldCustomizer().boostedTo( boost );
@@ -83,6 +86,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 		return fieldContexts.subList( firstOfContext, fieldContexts.size() );
 	}
 
+	@Override
 	public TermMatchingContext ignoreAnalyzer() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreAnalyzer( true );
@@ -90,6 +94,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 		return this;
 	}
 
+	@Override
 	public TermMatchingContext ignoreFieldBridge() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreFieldBridge( true );

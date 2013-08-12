@@ -39,10 +39,12 @@ public final class DoubleFieldLoadingStrategy implements FieldLoadingStrategy {
 		this.fieldName = fieldName;
 	}
 
+	@Override
 	public void loadNewCacheValues(IndexReader reader) throws IOException {
 		currentCache = FieldCache.DEFAULT.getDoubles( reader, fieldName );
 	}
 
+	@Override
 	public Double collect(int relativeDocId) {
 		return currentCache[relativeDocId];
 	}

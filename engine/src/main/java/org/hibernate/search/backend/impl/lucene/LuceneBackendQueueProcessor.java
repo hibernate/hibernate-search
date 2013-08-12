@@ -58,6 +58,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	private AbstractWorkspaceImpl workspaceOverride;
 	private LuceneBackendTaskStreamer streamWorker;
 
+	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
 		sync = BackendFactory.isConfiguredAsSync( props );
 		if ( workspaceOverride == null ) {
@@ -69,6 +70,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		streamWorker = new LuceneBackendTaskStreamer( resources );
 	}
 
+	@Override
 	public void close() {
 		resources.shutdown();
 	}

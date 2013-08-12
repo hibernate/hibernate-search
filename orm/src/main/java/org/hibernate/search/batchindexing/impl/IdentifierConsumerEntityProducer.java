@@ -79,6 +79,7 @@ public class IdentifierConsumerEntityProducer implements SessionAwareRunnable {
 		log.trace( "created" );
 	}
 
+	@Override
 	public void run(Session upperSession) {
 		log.trace( "started" );
 		Session session = upperSession;

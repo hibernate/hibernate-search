@@ -40,6 +40,7 @@ import org.hibernate.search.test.SearchTestCase;
 public class DirectorySelectionTest extends SearchTestCase {
 	private IndexReaderAccessor indexReaderAccessor;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		FullTextSession fts = indexData();
@@ -158,6 +159,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		return fts;
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty(
@@ -167,6 +169,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.Products.sharding_strategy.nbr_of_shards", "2" );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {

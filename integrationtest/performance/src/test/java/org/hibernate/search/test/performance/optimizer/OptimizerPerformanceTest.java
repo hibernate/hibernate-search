@@ -51,6 +51,7 @@ import org.junit.Test;
  * @author Emmanuel Bernard
  */
 public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		forceConfigurationRebuild();
@@ -66,6 +67,7 @@ public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 		super.setUp();
 	}
 
+	@Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
@@ -102,6 +104,7 @@ public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 			this.sf = sf;
 		}
 
+		@Override
 		public void run() {
 			try {
 				Session s = sf.openSession();
@@ -172,6 +175,7 @@ public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 			this.sf = sf;
 		}
 
+		@Override
 		public void run() {
 			try {
 				Session s = sf.openSession();
@@ -207,6 +211,7 @@ public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 		}
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();
@@ -215,6 +220,7 @@ public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Worker.class,

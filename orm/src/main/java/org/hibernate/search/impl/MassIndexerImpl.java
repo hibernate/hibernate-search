@@ -128,6 +128,7 @@ public class MassIndexerImpl implements MassIndexer {
 		return cleaned;
 	}
 
+	@Override
 	public MassIndexer typesToIndexInParallel(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
@@ -136,6 +137,7 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
+	@Override
 	public MassIndexer cacheMode(CacheMode cacheMode) {
 		if ( cacheMode == null ) {
 			throw new IllegalArgumentException( "cacheMode must not be null" );
@@ -144,6 +146,7 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
+	@Override
 	public MassIndexer threadsToLoadObjects(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
@@ -152,6 +155,7 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
+	@Override
 	public MassIndexer batchSizeToLoadObjects(int batchSize) {
 		if ( batchSize < 1 ) {
 			throw new IllegalArgumentException( "batchSize must be at least 1" );
@@ -160,6 +164,7 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
+	@Override
 	public MassIndexer threadsForSubsequentFetching(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
@@ -168,32 +173,38 @@ public class MassIndexerImpl implements MassIndexer {
 		return this;
 	}
 
+	@Override
 	@Deprecated
 	public MassIndexer threadsForIndexWriter(int numberOfThreads) {
 		log.massIndexerIndexWriterThreadsIgnored();
 		return this;
 	}
 
+	@Override
 	public MassIndexer progressMonitor(MassIndexerProgressMonitor monitor) {
 		this.monitor = monitor;
 		return this;
 	}
 
+	@Override
 	public MassIndexer optimizeOnFinish(boolean optimize) {
 		this.optimizeAtEnd = optimize;
 		return this;
 	}
 
+	@Override
 	public MassIndexer optimizeAfterPurge(boolean optimize) {
 		this.optimizeAfterPurge = optimize;
 		return this;
 	}
 
+	@Override
 	public MassIndexer purgeAllOnStart(boolean purgeAll) {
 		this.purgeAtStart = purgeAll;
 		return this;
 	}
 
+	@Override
 	public Future<?> start() {
 		BatchCoordinator coordinator = createCoordinator();
 		ExecutorService executor = Executors.newFixedThreadPool( 1, "batch coordinator" );
@@ -206,6 +217,7 @@ public class MassIndexerImpl implements MassIndexer {
 		}
 	}
 
+	@Override
 	public void startAndWait() throws InterruptedException {
 		BatchCoordinator coordinator = createCoordinator();
 		coordinator.run();
@@ -224,6 +236,7 @@ public class MassIndexerImpl implements MassIndexer {
 		);
 	}
 
+	@Override
 	public MassIndexer limitIndexedObjectsTo(long maximum) {
 		this.objectsLimit = maximum;
 		return this;

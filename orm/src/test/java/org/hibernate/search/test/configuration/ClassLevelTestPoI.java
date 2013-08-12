@@ -41,10 +41,12 @@ public class ClassLevelTestPoI implements Coordinates {
 	private Double latitude;
 	private Double longitude;
 
+	@Override
 	public Double getLatitude() {
 		return latitude;
 	}
 
+	@Override
 	public Double getLongitude() {
 		return longitude;
 	}

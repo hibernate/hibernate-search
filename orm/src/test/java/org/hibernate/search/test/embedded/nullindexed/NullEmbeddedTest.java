@@ -181,6 +181,7 @@ public class NullEmbeddedTest extends SearchTestCase {
 		return result;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Man.class, Pet.class, Puppy.class, Woman.class };
 	}

@@ -50,20 +50,24 @@ public class Dvd implements TitleAble {
 		this.unusuallyNamedIdentifier = unusuallyNamedIdentifier;
 	}
 
+	@Override
 	@Field
 	public String getTitle() {
 		return title;
 	}
 
+	@Override
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
+	@Override
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	public Nation getFirstPublishedIn() {
 		return firstPublishedIn;
 	}
 
+	@Override
 	public void setFirstPublishedIn(Nation firstPublishedIn) {
 		this.firstPublishedIn = firstPublishedIn;
 	}

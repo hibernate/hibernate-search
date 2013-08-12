@@ -91,6 +91,7 @@ public final class ScopedAnalyzer extends Analyzer {
 		return analyzer;
 	}
 
+	@Override
 	public ScopedAnalyzer clone() {
 		ScopedAnalyzer clone = new ScopedAnalyzer( globalAnalyzer, scopedAnalyzers );
 		return clone;

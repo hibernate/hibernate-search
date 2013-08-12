@@ -44,6 +44,7 @@ public class IndexFillRunnable implements Runnable {
 		this.iw = iw;
 	}
 
+	@Override
 	public void run() {
 		Field f1 = new Field( "name", "Some One " + jobSeed++, Store.NO, Index.ANALYZED );
 		Field f2 = new Field(

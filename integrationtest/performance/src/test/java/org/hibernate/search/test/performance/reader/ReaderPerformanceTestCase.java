@@ -56,6 +56,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 
 	private static final Log log = LoggerFactory.make();
 
+	@Override
 	public void setUp() throws Exception {
 		forceConfigurationRebuild();
 		File sub = getBaseIndexDir();
@@ -69,6 +70,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 		super.setUp();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
@@ -77,6 +79,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 		};
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
 		File sub = getBaseIndexDir();
@@ -140,6 +143,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 			this.sf = sf;
 		}
 
+		@Override
 		public void run() {
 			Session s = null;
 			Transaction tx = null;
@@ -231,6 +235,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 			this.sf = sf;
 		}
 
+		@Override
 		public void run() {
 			Session s = sf.openSession();
 			Transaction tx = s.beginTransaction();
@@ -277,6 +282,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 		}
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		File sub = getBaseIndexDir();
