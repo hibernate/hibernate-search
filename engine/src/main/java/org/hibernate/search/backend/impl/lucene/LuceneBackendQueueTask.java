@@ -51,11 +51,11 @@ final class LuceneBackendQueueTask implements Runnable {
 
 	private final Lock modificationLock;
 	private final LuceneBackendResources resources;
-	private final List<LuceneWork> queue;
+	private final List<LuceneWork> workList;
 	private final IndexingMonitor monitor;
 
-	LuceneBackendQueueTask(List<LuceneWork> queue, LuceneBackendResources resources, IndexingMonitor monitor) {
-		this.queue = queue;
+	LuceneBackendQueueTask(List<LuceneWork> workList, LuceneBackendResources resources, IndexingMonitor monitor) {
+		this.workList = workList;
 		this.resources = resources;
 		this.monitor = monitor;
 		this.modificationLock = resources.getParallelModificationLock();
@@ -83,7 +83,7 @@ final class LuceneBackendQueueTask implements Runnable {
 
 	private void handleException(Exception e) {
 		ErrorContextBuilder builder = new ErrorContextBuilder();
-		builder.allWorkToBeDone( queue );
+		builder.allWorkToBeDone( workList );
 		builder.errorThatOccurred( e );
 		resources.getErrorHandler().handle( builder.createErrorContext() );
 	}
@@ -97,7 +97,7 @@ final class LuceneBackendQueueTask implements Runnable {
 		AbstractWorkspaceImpl workspace = resources.getWorkspace();
 
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
-		errorContextBuilder.allWorkToBeDone( queue );
+		errorContextBuilder.allWorkToBeDone( workList );
 
 		IndexWriter indexWriter = workspace.getIndexWriter( errorContextBuilder );
 		if ( indexWriter == null ) {
@@ -106,28 +106,11 @@ final class LuceneBackendQueueTask implements Runnable {
 		}
 		LinkedList<LuceneWork> failedUpdates = null;
 		try {
-			ExecutorService executor = resources.getWorkersExecutor();
-			int queueSize = queue.size();
-			Future[] submittedTasks = new Future[ queueSize ];
-			for ( int i = 0; i < queueSize; i++ ) {
-				SingleTaskRunnable task = new SingleTaskRunnable( queue.get( i ), resources, indexWriter, monitor );
-				submittedTasks[i] = executor.submit( task );
+			if ( workList.size() == 1 ) {
+				failedUpdates = runSingleTask( workList.get( 0 ), resources, indexWriter, errorContextBuilder );
 			}
-			// now wait for all tasks being completed before releasing our lock
-			// (this thread waits even in async backend mode)
-			for ( int i = 0; i < queueSize; i++ ) {
-				Future task = submittedTasks[i];
-				try {
-					task.get();
-					errorContextBuilder.workCompleted( queue.get( i ) );
-				}
-				catch (ExecutionException e) {
-					if ( failedUpdates == null ) {
-						failedUpdates = new LinkedList<LuceneWork>();
-					}
-					failedUpdates.add( queue.get( i ) );
-					errorContextBuilder.errorThatOccurred( e.getCause() );
-				}
+			else {
+				failedUpdates = runMultipleTasks( resources, indexWriter, errorContextBuilder );
 			}
 			if ( failedUpdates != null ) {
 				errorContextBuilder.addAllWorkThatFailed( failedUpdates );
@@ -139,6 +122,57 @@ final class LuceneBackendQueueTask implements Runnable {
 		}
 		finally {
 			workspace.afterTransactionApplied( failedUpdates != null, false );
+		}
+	}
+
+	/**
+	 * Applies each modification in parallel using the backend workers pool
+	 * @throws InterruptedException
+	 */
+	private LinkedList<LuceneWork> runMultipleTasks(final LuceneBackendResources resources,
+			final IndexWriter indexWriter, final ErrorContextBuilder errorContextBuilder) throws InterruptedException {
+		final int queueSize = workList.size();
+		final ExecutorService executor = resources.getWorkersExecutor();
+		final Future[] submittedTasks = new Future[ queueSize ];
+		LinkedList<LuceneWork> failedUpdates = null;
+		for ( int i = 0; i < queueSize; i++ ) {
+			SingleTaskRunnable task = new SingleTaskRunnable( workList.get( i ), resources, indexWriter, monitor );
+			submittedTasks[i] = executor.submit( task );
+		}
+		// now wait for all tasks being completed before releasing our lock
+		// (this thread waits even in async backend mode)
+		for ( int i = 0; i < queueSize; i++ ) {
+			Future<?> task = submittedTasks[i];
+			try {
+				task.get();
+				errorContextBuilder.workCompleted( workList.get( i ) );
+			}
+			catch (ExecutionException e) {
+				if ( failedUpdates == null ) {
+					failedUpdates = new LinkedList<LuceneWork>();
+				}
+				failedUpdates.add( workList.get( i ) );
+				errorContextBuilder.errorThatOccurred( e.getCause() );
+			}
+		}
+		return failedUpdates;
+	}
+
+	/**
+	 * Applies a single modification using the caller's thread to avoid pointless context
+	 * switching.
+	 */
+	private LinkedList<LuceneWork> runSingleTask(final LuceneWork luceneWork, final LuceneBackendResources resources,
+			final IndexWriter indexWriter, final ErrorContextBuilder errorContextBuilder) {
+		try {
+			SingleTaskRunnable.performWork( luceneWork, resources, indexWriter, monitor );
+			return null;
+		}
+		catch (RuntimeException re) {
+			errorContextBuilder.errorThatOccurred( re );
+			LinkedList<LuceneWork> failedUpdates = new LinkedList<LuceneWork>();
+			failedUpdates.add( luceneWork );
+			return failedUpdates;
 		}
 	}
 

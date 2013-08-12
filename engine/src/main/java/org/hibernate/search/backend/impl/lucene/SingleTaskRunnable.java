@@ -29,7 +29,7 @@ import org.hibernate.search.backend.LuceneWork;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class SingleTaskRunnable implements Runnable {
+public final class SingleTaskRunnable implements Runnable {
 
 	private final LuceneWork work;
 	private final LuceneBackendResources resources;
@@ -45,6 +45,10 @@ public class SingleTaskRunnable implements Runnable {
 
 	@Override
 	public void run() {
+		performWork( work, resources, indexWriter, monitor );
+	}
+
+	static void performWork(final LuceneWork work, final LuceneBackendResources resources, final IndexWriter indexWriter, final IndexingMonitor monitor) {
 		work.getWorkDelegate( resources.getVisitor() ).performWork( work, indexWriter, monitor );
 	}
 
