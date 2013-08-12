@@ -43,7 +43,7 @@ public interface MassIndexer {
 	 * Defaults to 1.
 	 * @return <tt>this</tt> for method chaining
 	 */
-	MassIndexer threadsToIndexObjects(int threadsToIndexObjects);
+	MassIndexer typesToIndexInParallel(int threadsToIndexObjects);
 
 	/**
 	 * Set the number of threads to be used to load

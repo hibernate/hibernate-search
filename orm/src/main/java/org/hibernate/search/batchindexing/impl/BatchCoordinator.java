@@ -52,7 +52,7 @@ public class BatchCoordinator implements Runnable {
 	private final Class<?>[] rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final SessionFactory sessionFactory;
-	private final int batchIndexingThreads;
+	private final int typesToIndexInParallel;
 	private final int objectLoadingThreads;
 	private final int collectionLoadingThreads;
 	private final CacheMode cacheMode;
@@ -69,7 +69,7 @@ public class BatchCoordinator implements Runnable {
 	public BatchCoordinator(Set<Class<?>> rootEntities,
 							SearchFactoryImplementor searchFactoryImplementor,
 							SessionFactory sessionFactory,
-							int batchIndexingThreads,
+							int typesToIndexInParallel,
 							int objectLoadingThreads,
 							int collectionLoadingThreads,
 							CacheMode cacheMode,
@@ -84,7 +84,7 @@ public class BatchCoordinator implements Runnable {
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.sessionFactory = sessionFactory;
-		this.batchIndexingThreads = batchIndexingThreads;
+		this.typesToIndexInParallel = typesToIndexInParallel;
 		this.objectLoadingThreads = objectLoadingThreads;
 		this.collectionLoadingThreads = collectionLoadingThreads;
 		this.cacheMode = cacheMode;
@@ -130,7 +130,7 @@ public class BatchCoordinator implements Runnable {
 	 * @throws InterruptedException if interrupted while waiting for endAllSignal.
 	 */
 	private void doBatchWork(BatchBackend backend) throws InterruptedException {
-		ExecutorService executor = Executors.newFixedThreadPool( batchIndexingThreads, "BatchIndexingWorkspace" );
+		ExecutorService executor = Executors.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
 			executor.execute(
 					new BatchIndexingWorkspace(

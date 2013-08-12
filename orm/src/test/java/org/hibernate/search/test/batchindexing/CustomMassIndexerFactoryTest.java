@@ -107,7 +107,7 @@ public class CustomMassIndexerFactoryTest extends SearchTestCaseJUnit4 {
 		}
 
 		@Override
-		public MassIndexer threadsToIndexObjects(int threadsToIndexObjects) {
+		public MassIndexer typesToIndexInParallel(int threadsToIndexObjects) {
 			return null;
 		}
 

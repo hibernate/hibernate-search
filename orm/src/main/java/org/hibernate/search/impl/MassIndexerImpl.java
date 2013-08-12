@@ -58,7 +58,7 @@ public class MassIndexerImpl implements MassIndexer {
 	protected Set<Class<?>> rootEntities = new HashSet<Class<?>>();
 
 	// default settings defined here:
-	private int batchIndexingThreads = 1;
+	private int typesToIndexInParallel = 1;
 	private int objectLoadingThreads = 2; //loading the main entity
 	private int collectionLoadingThreads = 4; //also responsible for loading of lazy @IndexedEmbedded collections
 	private int objectLoadingBatchSize = 10;
@@ -128,11 +128,11 @@ public class MassIndexerImpl implements MassIndexer {
 		return cleaned;
 	}
 
-	public MassIndexer threadsToIndexObjects(int numberOfThreads) {
+	public MassIndexer typesToIndexInParallel(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
-		this.batchIndexingThreads = Math.min( numberOfThreads, rootEntities.size() );
+		this.typesToIndexInParallel = Math.min( numberOfThreads, rootEntities.size() );
 		return this;
 	}
 
@@ -217,7 +217,7 @@ public class MassIndexerImpl implements MassIndexer {
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
 				rootEntities, searchFactoryImplementor, sessionFactory,
-				batchIndexingThreads, objectLoadingThreads, collectionLoadingThreads,
+				typesToIndexInParallel, objectLoadingThreads, collectionLoadingThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
 				monitor, idFetchSize
