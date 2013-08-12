@@ -89,6 +89,7 @@ public class SharingBufferIndexProviderTest {
 	}
 
 	private class SearchTask implements Runnable {
+		@Override
 		public void run() {
 			try {
 				startSignal.await();
@@ -106,6 +107,7 @@ public class SharingBufferIndexProviderTest {
 	}
 
 	private class ChangeTask extends SearchTask {
+		@Override
 		public void run() {
 			super.run();
 			Thread.yield();
@@ -115,6 +117,7 @@ public class SharingBufferIndexProviderTest {
 	}
 
 	private class DirectorySwitchTask extends ChangeTask {
+		@Override
 		public void run() {
 			super.run();
 			Thread.yield();

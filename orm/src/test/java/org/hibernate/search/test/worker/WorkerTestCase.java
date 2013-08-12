@@ -84,6 +84,7 @@ public class WorkerTestCase extends SearchTestCaseJUnit4 {
 			this.isWorkerSync = isWorkerSync;
 		}
 
+		@Override
 		public void run() {
 			Session s = null;
 			Transaction tx = null;
@@ -178,6 +179,7 @@ public class WorkerTestCase extends SearchTestCaseJUnit4 {
 			this.allFine = allFine;
 		}
 
+		@Override
 		public void run() {
 			try {
 				Session s = sf.openSession();
@@ -216,6 +218,7 @@ public class WorkerTestCase extends SearchTestCaseJUnit4 {
 		}
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
@@ -224,6 +227,7 @@ public class WorkerTestCase extends SearchTestCaseJUnit4 {
 		cfg.setProperty( "hibernate.format_sql", "false" );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {

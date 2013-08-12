@@ -40,18 +40,22 @@ import org.hibernate.search.store.IndexShardingStrategy;
 public class IdHashShardingStrategy implements IndexShardingStrategy {
 
 	private IndexManager[] providers;
+	@Override
 	public void initialize(Properties properties, IndexManager[] providers) {
 		this.providers = providers;
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForAllShards() {
 		return providers;
 	}
 
+	@Override
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		return providers[hashKey( idInString )];
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
 		if ( idInString == null ) {
 			return providers;
@@ -59,6 +63,7 @@ public class IdHashShardingStrategy implements IndexShardingStrategy {
 		return new IndexManager[] { providers[hashKey( idInString )] };
 	}
 
+	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 		return getIndexManagersForAllShards();
 	}

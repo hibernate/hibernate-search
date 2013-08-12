@@ -91,6 +91,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		this.entityIndexBinders = searchFactory.getIndexBindings();
 	}
 
+	@Override
 	public void run(Session upperSession) {
 		Session session = upperSession;
 		if ( upperSession == null ) {

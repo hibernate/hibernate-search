@@ -150,6 +150,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Person.class, EmailAddress.class, SpecialPerson.class };
 	}

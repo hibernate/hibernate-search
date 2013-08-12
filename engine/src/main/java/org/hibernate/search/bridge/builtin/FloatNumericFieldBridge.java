@@ -29,6 +29,7 @@ import org.apache.lucene.document.Document;
  */
 public class FloatNumericFieldBridge extends NumericFieldBridge {
 
+	@Override
 	public Object get(String name, Document document) {
 		return Float.valueOf( document.getFieldable( name ).stringValue() );
 	}

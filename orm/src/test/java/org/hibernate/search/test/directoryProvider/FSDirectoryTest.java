@@ -195,12 +195,14 @@ public class FSDirectoryTest extends SearchTestCase {
 		dir.close();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Document.class
 		};
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		File baseIndexDir = getBaseIndexDir();

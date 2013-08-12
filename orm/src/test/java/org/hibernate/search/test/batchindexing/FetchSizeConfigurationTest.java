@@ -76,10 +76,12 @@ public class FetchSizeConfigurationTest extends SearchTestCaseJUnit4 {
 		Assert.assertEquals( null, errorMessage );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Book.class, Nation.class };
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ERROR_HANDLER, MockErrorHandler.class.getName() );

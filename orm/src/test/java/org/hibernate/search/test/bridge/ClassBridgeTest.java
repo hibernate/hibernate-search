@@ -328,6 +328,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		return depts;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Department.class,
@@ -335,6 +336,7 @@ public class ClassBridgeTest extends SearchTestCase {
 		};
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );

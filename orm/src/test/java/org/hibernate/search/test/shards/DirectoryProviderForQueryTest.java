@@ -40,6 +40,7 @@ import org.hibernate.search.test.TestConstants;
  */
 public class DirectoryProviderForQueryTest extends SearchTestCase {
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		// this strategy allows the caller to use a pre-search filter to define which index to hit
@@ -88,6 +89,7 @@ public class DirectoryProviderForQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {

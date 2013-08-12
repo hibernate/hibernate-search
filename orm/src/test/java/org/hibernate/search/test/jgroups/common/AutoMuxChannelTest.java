@@ -33,6 +33,7 @@ import org.jgroups.JChannel;
  */
 public class AutoMuxChannelTest extends MuxChannelTest {
 
+	@Override
 	protected JChannel[] createChannels() throws Exception {
 		JChannel[] channels = new JChannel[2];
 		channels[1] = createChannel(); // order matters in AutoNodeSelector -- 1 ~ "slave"
@@ -40,10 +41,12 @@ public class AutoMuxChannelTest extends MuxChannelTest {
 		return channels;
 	}
 
+	@Override
 	protected String getMasterBackend() {
 		return "jgroups";
 	}
 
+	@Override
 	protected String getSlaveBackend() {
 		return "jgroups";
 	}

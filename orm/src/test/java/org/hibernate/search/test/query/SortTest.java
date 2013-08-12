@@ -58,6 +58,7 @@ public class SortTest extends SearchTestCase {
 	private static FullTextSession fullTextSession;
 	private static QueryParser queryParser;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
@@ -71,6 +72,7 @@ public class SortTest extends SearchTestCase {
 		createTestNumbers();
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		// check for ongoing transaction which is an indicator that something went wrong
 		// don't call the cleanup methods in this case. Otherwise the original error get swallowed
@@ -257,6 +259,7 @@ public class SortTest extends SearchTestCase {
 		fullTextSession.clear();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,

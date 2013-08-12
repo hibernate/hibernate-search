@@ -30,6 +30,7 @@ import org.hibernate.search.bridge.StringBridge;
  * @author Hardy Ferentschik
  */
 public class DummyStringBridge implements StringBridge {
+	@Override
 	public String objectToString(Object object) {
 		return object == null ? null : object.toString();
 	}

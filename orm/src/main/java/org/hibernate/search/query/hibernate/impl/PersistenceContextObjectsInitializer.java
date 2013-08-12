@@ -47,6 +47,7 @@ public class PersistenceContextObjectsInitializer implements ObjectsInitializer 
 		this.delegate = delegate;
 	}
 
+	@Override
 	public void initializeObjects(EntityInfo[] entityInfos,
 										Criteria criteria, Class<?> entityType,
 										SearchFactoryImplementor searchFactoryImplementor,

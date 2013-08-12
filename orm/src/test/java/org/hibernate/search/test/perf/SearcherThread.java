@@ -77,6 +77,7 @@ public class SearcherThread implements Runnable {
 	/**
 	 * @see java.lang.Runnable#run()
 	 */
+	@Override
 	public void run() {
 		try {
 			startSignal.await();

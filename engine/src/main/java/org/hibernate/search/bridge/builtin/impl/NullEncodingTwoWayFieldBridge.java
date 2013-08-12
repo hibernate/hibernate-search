@@ -43,6 +43,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 		this.nullMarker = nullMarker;
 	}
 
+	@Override
 	public Object get(String name, Document document) {
 		Fieldable field = document.getFieldable( name );
 		String stringValue = field.stringValue();
@@ -54,6 +55,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 		}
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {
 			return nullMarker;
@@ -67,6 +69,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 		return fieldBridge;
 	}
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		fieldBridge.set( name, value, document, luceneOptions );
 	}

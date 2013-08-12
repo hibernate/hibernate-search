@@ -38,6 +38,7 @@ public class TruncateFieldBridge implements FieldBridge {
 		return field.stringValue();
 	}
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		String stringValue = (String) value;
 		if ( stringValue != null ) {

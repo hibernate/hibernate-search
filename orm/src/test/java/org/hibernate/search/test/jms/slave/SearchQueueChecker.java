@@ -55,6 +55,7 @@ public class SearchQueueChecker implements MessageListener {
 		works = 0;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public void onMessage(Message message) {
 		if ( !( message instanceof ObjectMessage ) ) {

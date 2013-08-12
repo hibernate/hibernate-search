@@ -307,6 +307,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		return new Class<?>[] { WorkingPerson.class };
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );

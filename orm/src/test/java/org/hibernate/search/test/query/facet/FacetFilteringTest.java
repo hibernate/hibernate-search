@@ -152,6 +152,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		assertFacetCounts( newFacetList, new int[] { 2, 0, 0, 0 } );
 	}
 
+	@Override
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
 		for ( int i = 0; i < fruits.length; i++ ) {
@@ -176,6 +177,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		session.clear();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Car.class,

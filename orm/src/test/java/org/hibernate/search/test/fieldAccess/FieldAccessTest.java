@@ -82,6 +82,7 @@ public class FieldAccessTest extends SearchTestCase {
 
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class };
 	}

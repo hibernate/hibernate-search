@@ -88,6 +88,7 @@ public class QuerySerializationTest extends SearchTestCaseJUnit4 {
 		return topDocs.totalHits;
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Document.class,

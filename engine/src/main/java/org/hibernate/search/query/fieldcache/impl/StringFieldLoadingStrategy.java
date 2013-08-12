@@ -40,10 +40,12 @@ public final class StringFieldLoadingStrategy implements FieldLoadingStrategy {
 		this.fieldName = fieldName;
 	}
 
+	@Override
 	public void loadNewCacheValues(IndexReader reader) throws IOException {
 		currentCache = FieldCache.DEFAULT.getStrings( reader, fieldName );
 	}
 
+	@Override
 	public String collect(int relativeDocId) {
 		return currentCache[relativeDocId];
 	}

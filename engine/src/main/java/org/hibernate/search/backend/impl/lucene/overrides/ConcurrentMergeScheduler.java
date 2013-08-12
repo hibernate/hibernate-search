@@ -69,6 +69,7 @@ public class ConcurrentMergeScheduler extends org.apache.lucene.index.Concurrent
 	 * Overrides method to customize the thread Name
 	 * @see org.apache.lucene.index.ConcurrentMergeScheduler#getMergeThread(org.apache.lucene.index.IndexWriter, org.apache.lucene.index.MergePolicy.OneMerge)
 	 */
+	@Override
 	protected synchronized MergeThread getMergeThread(IndexWriter writer, MergePolicy.OneMerge merge) throws IOException {
 		final MergeThread thread = new MergeThread( writer, merge );
 		thread.setThreadPriority( getMergeThreadPriority() );

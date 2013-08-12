@@ -45,11 +45,13 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 	private Article article;
 	TotalArticle totalArticle;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		createPersistAndIndexTestData();
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		if ( !fullTextSession.getTransaction().isActive() ) {
 			Transaction tx = fullTextSession.beginTransaction();

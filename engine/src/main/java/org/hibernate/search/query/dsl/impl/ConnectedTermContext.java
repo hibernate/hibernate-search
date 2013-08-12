@@ -45,32 +45,39 @@ class ConnectedTermContext implements TermContext {
 		this.termContext = new TermQueryContext( TermQueryContext.Approximation.EXACT );
 	}
 
+	@Override
 	public TermMatchingContext onField(String field) {
 		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext );
 	}
 
+	@Override
 	public TermMatchingContext onFields(String... fields) {
 		return new ConnectedTermMatchingContext( termContext, fields, queryCustomizer, queryContext );
 	}
 
+	@Override
 	public FuzzyContext fuzzy() {
 		return new ConnectedFuzzyContext( queryCustomizer, queryContext );
 	}
 
+	@Override
 	public WildcardContext wildcard() {
 		return new ConnectedWildcardContext( queryCustomizer, queryContext );
 	}
 
+	@Override
 	public ConnectedTermContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
 	}
 
+	@Override
 	public ConnectedTermContext withConstantScore() {
 		queryCustomizer.withConstantScore();
 		return this;
 	}
 
+	@Override
 	public ConnectedTermContext filteredBy(Filter filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;

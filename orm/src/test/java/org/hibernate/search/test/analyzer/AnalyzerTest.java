@@ -204,6 +204,7 @@ public class AnalyzerTest extends SearchTestCase {
 		}
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { MyEntity.class, Article.class };
 	}

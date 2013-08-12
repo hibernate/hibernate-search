@@ -59,16 +59,19 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 	private final TwoWayConversionContextImpl twoWayAdapter = new TwoWayConversionContextImpl();
 	private final StringConversionContextImpl stringAdapter = new StringConversionContextImpl();
 
+	@Override
 	public ConversionContext setClass(Class<?> clazz) {
 		this.clazz = clazz;
 		return this;
 	}
 
+	@Override
 	public ConversionContext pushProperty(String property) {
 		path.add( property );
 		return this;
 	}
 
+	@Override
 	public ConversionContext popProperty() {
 		if ( path.size() == 0 ) {
 			throw new IllegalStateException( "Trying to pop a property from an empty conversion context" );
@@ -77,6 +80,7 @@ public final class ContextualExceptionBridgeHelper implements ConversionContext 
 		return this;
 	}
 
+	@Override
 	public ConversionContext pushIdentifierProperty() {
 		pushProperty( IDENTIFIER );
 		return this;

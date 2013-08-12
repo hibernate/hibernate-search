@@ -81,6 +81,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 		this.errorHandler = errorHandler;
 	}
 
+	@Override
 	public void run() {
 		try {
 			final boolean wrapInTransaction = wrapInTransaction();

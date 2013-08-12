@@ -770,6 +770,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,

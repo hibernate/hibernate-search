@@ -53,6 +53,7 @@ public class CriteriaObjectsInitializer implements ObjectsInitializer {
 		// use INSTANCE instead of constructor
 	}
 
+	@Override
 	public void initializeObjects(EntityInfo[] entityInfos,
 										Criteria criteria, Class<?> entityType,
 										SearchFactoryImplementor searchFactoryImplementor,

@@ -41,11 +41,13 @@ public class ConnectedFacetRangeEndContext<T> extends ConnectedFacetParameterCon
 		this.context = context;
 	}
 
+	@Override
 	public FacetRangeEndContext<T> excludeLimit() {
 		context.setIncludeRangeEnd( false );
 		return this;
 	}
 
+	@Override
 	public FacetRangeAboveContext<T> above(T max) {
 		context.makeRange();
 		context.setRangeStart( max );
@@ -53,12 +55,14 @@ public class ConnectedFacetRangeEndContext<T> extends ConnectedFacetParameterCon
 		return new ConnectedFacetRangeAboveContext<T>( context );
 	}
 
+	@Override
 	public FacetRangeLimitContext<T> from(T rangeStart) {
 		context.makeRange();
 		context.setRangeStart( rangeStart );
 		return new ConnectedFacetRangeLimitContext<T>( context );
 	}
 
+	@Override
 	public FacetingRequest createFacetingRequest() {
 		context.makeRange();
 		return context.getFacetingRequest();

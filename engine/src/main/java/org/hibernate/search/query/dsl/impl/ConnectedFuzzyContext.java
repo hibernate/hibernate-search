@@ -43,34 +43,41 @@ class ConnectedFuzzyContext implements FuzzyContext {
 		this.queryContext = queryContext;
 	}
 
+	@Override
 	public TermMatchingContext onField(String field) {
 		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext );
 	}
 
+	@Override
 	public TermMatchingContext onFields(String... fields) {
 		return new ConnectedTermMatchingContext( termContext, fields, queryCustomizer, queryContext );
 	}
 
+	@Override
 	public ConnectedFuzzyContext withThreshold(float threshold) {
 		termContext.setThreshold( threshold );
 		return this;
 	}
 
+	@Override
 	public ConnectedFuzzyContext withPrefixLength(int prefixLength) {
 		termContext.setPrefixLength( prefixLength );
 		return this;
 	}
 
+	@Override
 	public FuzzyContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
 	}
 
+	@Override
 	public FuzzyContext withConstantScore() {
 		queryCustomizer.withConstantScore();
 		return this;
 	}
 
+	@Override
 	public FuzzyContext filteredBy(Filter filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;

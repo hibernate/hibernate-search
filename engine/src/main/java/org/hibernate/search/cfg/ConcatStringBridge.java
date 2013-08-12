@@ -35,6 +35,7 @@ public class ConcatStringBridge implements StringBridge, ParameterizedBridge {
 	public static final String SIZE = "size";
 	private int size;
 
+	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {
 			return "";
@@ -47,6 +48,7 @@ public class ConcatStringBridge implements StringBridge, ParameterizedBridge {
 		return string.substring( 0, maxSize );
 	}
 
+	@Override
 	public void setParameterValues(Map<String,String> parameters) {
 		size = Integer.valueOf( parameters.get( SIZE ) );
 	}

@@ -48,6 +48,7 @@ public class ProjectionLoader implements Loader {
 	private String[] aliases;
 	private ObjectLoaderBuilder loaderBuilder;
 
+	@Override
 	public void init(Session session,
 					SearchFactoryImplementor searchFactoryImplementor,
 					ObjectsInitializer objectsInitializer,
@@ -66,6 +67,7 @@ public class ProjectionLoader implements Loader {
 		this.loaderBuilder = loaderBuilder;
 	}
 
+	@Override
 	public Object load(EntityInfo entityInfo) {
 		//no need to timeouManage here, the underlying loader is the real time consumer
 		if ( projectionEnabledOnThis( entityInfo ) ) {
@@ -81,6 +83,7 @@ public class ProjectionLoader implements Loader {
 		}
 	}
 
+	@Override
 	public Object loadWithoutTiming(EntityInfo entityInfo) {
 		throw new AssertionFailure( "This method is not meant to be used on ProjectionLoader" );
 	}
@@ -93,6 +96,7 @@ public class ProjectionLoader implements Loader {
 		return projectThis;
 	}
 
+	@Override
 	public List load(EntityInfo... entityInfos) {
 		//no need to timeouManage here, the underlying loader is the real time consumer
 		List results = new ArrayList( entityInfos.length );

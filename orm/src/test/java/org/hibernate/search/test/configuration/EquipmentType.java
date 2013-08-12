@@ -38,11 +38,13 @@ public class EquipmentType implements FieldBridge, ParameterizedBridge {
 
 	private Map<String,String> equips;
 
+	@Override
 	public void setParameterValues(Map<String,String> parameters) {
 		// This map was defined by the parameters of the ClassBridge annotation.
 		this.equips = parameters;
 	}
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		// In this particular class the name of the new field was passed
 		// from the name field of the ClassBridge Annotation. This is not

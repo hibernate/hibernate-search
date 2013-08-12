@@ -29,6 +29,7 @@ import org.apache.lucene.document.Document;
  */
 public class LongNumericFieldBridge extends NumericFieldBridge {
 
+	@Override
 	public Object get(String name, Document document) {
 		return Long.valueOf( document.getFieldable( name ).stringValue() );
 	}

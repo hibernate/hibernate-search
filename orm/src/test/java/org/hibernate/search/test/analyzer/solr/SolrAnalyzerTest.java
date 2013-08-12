@@ -189,12 +189,14 @@ public class SolrAnalyzerTest extends SearchTestCase {
 		fts.close();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Team.class
 		};
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.lucene_version", org.apache.lucene.util.Version.LUCENE_30.name() );

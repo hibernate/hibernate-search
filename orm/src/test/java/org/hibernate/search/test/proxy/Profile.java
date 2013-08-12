@@ -44,22 +44,26 @@ public class Profile implements IProfile {
 	private Integer id;
 	private Set<IComment> comments;
 
+	@Override
 	@Id
 	@DocumentId
 	@Column(name = "profileid")
 	public Integer getId() {
 		return id;
 	}
+	@Override
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
+	@Override
 	@OneToMany(targetEntity = Comment.class, mappedBy = "profile")
 	@IndexedEmbedded(targetElement = Comment.class)
 	public Set<IComment> getComments() {
 		return comments;
 	}
 
+	@Override
 	public void setComments(Set<IComment> c) {
 		this.comments = c;
 	}

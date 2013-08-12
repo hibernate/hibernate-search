@@ -72,6 +72,7 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 		this.resolution = DateResolutionUtil.getLuceneResolution( resolution );
 	}
 
+	@Override
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
 			return null;
@@ -84,12 +85,14 @@ public class DateBridge implements TwoWayStringBridge, ParameterizedBridge {
 		}
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		return object != null ?
 				DateTools.dateToString( (Date) object, resolution ) :
 				null;
 	}
 
+	@Override
 	public void setParameterValues(Map<String,String> parameters) {
 		String resolution = parameters.get( "resolution" );
 		Resolution hibResolution = Resolution.valueOf( resolution.toUpperCase( Locale.ENGLISH ) );

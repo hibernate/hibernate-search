@@ -71,10 +71,12 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 		this.fieldName = fieldName;
 	}
 
+	@Override
 	public String getFacetingName() {
 		return name;
 	}
 
+	@Override
 	public String getFieldName() {
 		return fieldName;
 	}
@@ -83,10 +85,12 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 		this.sort = sort;
 	}
 
+	@Override
 	public FacetSortOrder getSort() {
 		return sort;
 	}
 
+	@Override
 	public int getMaxNumberOfFacets() {
 		return maxNumberOfFacets;
 	}
@@ -99,6 +103,7 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 
 	public abstract Facet createFacet(String value, int count);
 
+	@Override
 	public boolean hasZeroCountsIncluded() {
 		return includeZeroCounts;
 	}

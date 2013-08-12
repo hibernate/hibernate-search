@@ -49,24 +49,29 @@ public class AssertingMassIndexerProgressMonitor implements MassIndexerProgressM
 		this.monitor = new SimpleIndexingProgressMonitor( 1 );
 	}
 
+	@Override
 	public void documentsAdded(long increment) {
 		addedDocuments.addAndGet( increment );
 		monitor.documentsAdded( increment );
 	}
 
+	@Override
 	public void documentsBuilt(int number) {
 		monitor.documentsBuilt( number );
 	}
 
+	@Override
 	public void entitiesLoaded(int size) {
 		monitor.entitiesLoaded( size );
 	}
 
+	@Override
 	public void addToTotalCount(long count) {
 		totalCount.addAndGet( count );
 		monitor.addToTotalCount( count );
 	}
 
+	@Override
 	public void indexingCompleted() {
 		finishedCount.incrementAndGet();
 	}

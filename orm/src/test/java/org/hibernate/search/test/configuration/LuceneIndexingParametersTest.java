@@ -44,6 +44,7 @@ import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting
  */
 public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 
@@ -95,6 +96,7 @@ public class LuceneIndexingParametersTest extends ConfigurationReadTestCase {
 		assertEquals( param.getIndexParameters(), paramCopy.getIndexParameters() );
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Book.class,

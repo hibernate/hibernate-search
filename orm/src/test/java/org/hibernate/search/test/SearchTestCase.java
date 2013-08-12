@@ -55,6 +55,7 @@ public abstract class SearchTestCase extends TestCase implements TestResourceMan
 	// access only via getter, since instance gets lazily initalized
 	private DefaultTestResourceManager testResourceManager;
 
+	@Override
 	public void setUp() throws Exception {
 		DefaultTestResourceManager testResourceManager = getTestResourceManager();
 		if ( testResourceManager.needsConfigurationRebuild() ) {
@@ -64,6 +65,7 @@ public abstract class SearchTestCase extends TestCase implements TestResourceMan
 		testResourceManager.openSessionFactory();
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		getTestResourceManager().defaultTearDown();
 	}

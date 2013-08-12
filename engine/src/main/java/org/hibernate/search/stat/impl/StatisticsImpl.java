@@ -81,6 +81,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
 
+	@Override
 	public void clear() {
 		searchQueryCount.set( 0 );
 		searchExecutionTotalTime.set( 0 );
@@ -92,18 +93,22 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		objectLoadTotalTime.set( 0 );
 	}
 
+	@Override
 	public long getSearchQueryExecutionCount() {
 		return searchQueryCount.get();
 	}
 
+	@Override
 	public long getSearchQueryTotalTime() {
 		return searchExecutionTotalTime.get();
 	}
 
+	@Override
 	public long getSearchQueryExecutionMaxTime() {
 		return searchExecutionMaxTime.get();
 	}
 
+	@Override
 	public long getSearchQueryExecutionAvgTime() {
 		writeLock.lock();
 		try {
@@ -118,10 +123,12 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		}
 	}
 
+	@Override
 	public String getSearchQueryExecutionMaxTimeQueryString() {
 		return queryExecutionMaxTimeQueryString;
 	}
 
+	@Override
 	public void searchExecuted(String searchString, long time) {
 		readLock.lock();
 		try {
@@ -142,18 +149,22 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		}
 	}
 
+	@Override
 	public long getObjectsLoadedCount() {
 		return objectLoadedCount.get();
 	}
 
+	@Override
 	public long getObjectLoadingTotalTime() {
 		return objectLoadTotalTime.get();
 	}
 
+	@Override
 	public long getObjectLoadingExecutionMaxTime() {
 		return objectLoadMaxTime.get();
 	}
 
+	@Override
 	public long getObjectLoadingExecutionAvgTime() {
 		writeLock.lock();
 		try {
@@ -168,6 +179,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		}
 	}
 
+	@Override
 	public void objectLoadExecuted(long numberOfObjectsLoaded, long time) {
 		readLock.lock();
 		try {
@@ -184,18 +196,22 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		}
 	}
 
+	@Override
 	public boolean isStatisticsEnabled() {
 		return isStatisticsEnabled;
 	}
 
+	@Override
 	public void setStatisticsEnabled(boolean b) {
 		isStatisticsEnabled = b;
 	}
 
+	@Override
 	public String getSearchVersion() {
 		return Version.getVersionString();
 	}
 
+	@Override
 	public Set<String> getIndexedClassNames() {
 		Set<String> indexedClasses = new HashSet<String>();
 		for ( Class clazz : searchFactoryImplementor.getIndexBindings().keySet() ) {
@@ -204,6 +220,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		return indexedClasses;
 	}
 
+	@Override
 	public int getNumberOfIndexedEntities(String entity) {
 		Class<?> clazz = getEntityClass( entity );
 		IndexReader indexReader = searchFactoryImplementor.getIndexReaderAccessor().open( clazz );
@@ -227,6 +244,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		}
 	}
 
+	@Override
 	public Map<String, Integer> indexedEntitiesCount() {
 		Map<String, Integer> countPerEntity = new HashMap<String, Integer>();
 		for ( String className : getIndexedClassNames() ) {

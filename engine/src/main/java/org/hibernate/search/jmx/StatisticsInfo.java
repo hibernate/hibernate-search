@@ -40,66 +40,82 @@ public class StatisticsInfo implements StatisticsInfoMBean {
 		this.delegate = delegate;
 	}
 
+	@Override
 	public void clear() {
 		delegate.clear();
 	}
 
+	@Override
 	public long getSearchQueryExecutionCount() {
 		return delegate.getSearchQueryExecutionCount();
 	}
 
+	@Override
 	public long getSearchQueryTotalTime() {
 		return delegate.getSearchQueryTotalTime();
 	}
 
+	@Override
 	public long getSearchQueryExecutionMaxTime() {
 		return delegate.getSearchQueryExecutionMaxTime();
 	}
 
+	@Override
 	public long getSearchQueryExecutionAvgTime() {
 		return delegate.getSearchQueryExecutionAvgTime();
 	}
 
+	@Override
 	public String getSearchQueryExecutionMaxTimeQueryString() {
 		return delegate.getSearchQueryExecutionMaxTimeQueryString();
 	}
 
+	@Override
 	public long getObjectLoadingTotalTime() {
 		return delegate.getObjectLoadingTotalTime();
 	}
 
+	@Override
 	public long getObjectLoadingExecutionMaxTime() {
 		return delegate.getObjectLoadingExecutionMaxTime();
 	}
 
+	@Override
 	public long getObjectLoadingExecutionAvgTime() {
 		return delegate.getObjectLoadingExecutionAvgTime();
 	}
 
+	@Override
 	public long getObjectsLoadedCount() {
 		return delegate.getObjectsLoadedCount();
 	}
 
+	@Override
 	public boolean isStatisticsEnabled() {
 		return delegate.isStatisticsEnabled();
 	}
 
+	@Override
 	public void setStatisticsEnabled(boolean b) {
 		delegate.setStatisticsEnabled( b );
 	}
 
+	@Override
 	public String getSearchVersion() {
 		return delegate.getSearchVersion();
 	}
 
+	@Override
 	public Set<String> getIndexedClassNames() {
 		return delegate.getIndexedClassNames();
 	}
 
+	@Override
 	public int getNumberOfIndexedEntities(String entity) {
 		return delegate.getNumberOfIndexedEntities( entity );
 	}
 
+	@Override
 	public Map<String, Integer> indexedEntitiesCount() {
 		return delegate.indexedEntitiesCount();
 	}

@@ -31,6 +31,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
  * @author Emmanuel Bernard
  */
 public abstract class NumberBridge implements TwoWayStringBridge {
+	@Override
 	public String objectToString(Object object) {
 		return object != null ?
 				object.toString() :

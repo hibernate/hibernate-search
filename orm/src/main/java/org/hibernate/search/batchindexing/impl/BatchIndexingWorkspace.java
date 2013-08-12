@@ -128,6 +128,7 @@ public class BatchIndexingWorkspace implements Runnable {
 		this.objectsLimit = objectsLimit;
 	}
 
+	@Override
 	public void run() {
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		try {

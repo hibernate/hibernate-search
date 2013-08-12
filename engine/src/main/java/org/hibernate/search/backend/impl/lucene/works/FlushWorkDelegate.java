@@ -49,6 +49,7 @@ class FlushWorkDelegate implements LuceneWorkDelegate {
 		this.workspace = workspace;
 	}
 
+	@Override
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		log.debug( "performing FlushWorkDelegate" );
 		workspace.flush();

@@ -130,6 +130,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		this.timeoutExceptionFactory = searchFactoryImplementor.getDefaultTimeoutExceptionFactory();
 	}
 
+	@Override
 	public void afterDeserialise(SearchFactoryImplementor searchFactoryImplementor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 	}
@@ -141,12 +142,14 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return this;
 	}
 
+	@Override
 	public HSQuery luceneQuery(Query query) {
 		clearCachedResults();
 		this.luceneQuery = query;
 		return this;
 	}
 
+	@Override
 	public HSQuery targetedEntities(List<Class<?>> classes) {
 		clearCachedResults();
 		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>( classes );
@@ -159,22 +162,26 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return this;
 	}
 
+	@Override
 	public HSQuery sort(Sort sort) {
 		this.sort = sort;
 		return this;
 	}
 
+	@Override
 	public HSQuery filter(Filter filter) {
 		clearCachedResults();
 		this.userFilter = filter;
 		return this;
 	}
 
+	@Override
 	public HSQuery timeoutExceptionFactory(TimeoutExceptionFactory exceptionFactory) {
 		this.timeoutExceptionFactory = exceptionFactory;
 		return this;
 	}
 
+	@Override
 	public HSQuery projection(String... fields) {
 		if ( fields == null || fields.length == 0 ) {
 			this.projectedFields = null;
@@ -185,6 +192,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return this;
 	}
 
+	@Override
 	public HSQuery firstResult(int firstResult) {
 		if ( firstResult < 0 ) {
 			throw new IllegalArgumentException( "'first' pagination parameter less than 0" );
@@ -193,6 +201,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return this;
 	}
 
+	@Override
 	public HSQuery maxResults(int maxResults) {
 		if ( maxResults < 0 ) {
 			throw new IllegalArgumentException( "'max' pagination parameter less than 0" );
@@ -205,6 +214,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	/**
 	 * List of targeted entities as described by the user
 	 */
+	@Override
 	public List<Class<?>> getTargetedEntities() {
 		return targetedEntities;
 	}
@@ -212,10 +222,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	/**
 	 * Set of indexed entities corresponding to the class hierarchy of the targeted entities
 	 */
+	@Override
 	public Set<Class<?>> getIndexedTargetedEntities() {
 		return indexedTargetedEntities;
 	}
 
+	@Override
 	public String[] getProjectedFields() {
 		return projectedFields;
 	}
@@ -230,10 +242,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return timeoutManager;
 	}
 
+	@Override
 	public TimeoutManager getTimeoutManager() {
 		return getTimeoutManagerImpl();
 	}
 
+	@Override
 	public FacetManagerImpl getFacetManager() {
 		if ( facetManager == null ) {
 			facetManager = new FacetManagerImpl( this );
@@ -241,10 +255,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return facetManager;
 	}
 
+	@Override
 	public Query getLuceneQuery() {
 		return luceneQuery;
 	}
 
+	@Override
 	public List<EntityInfo> queryEntityInfos() {
 		IndexSearcherWithPayload searcher = buildSearcher();
 		if ( searcher == null ) {
@@ -298,6 +314,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *
 	 * DocumentExtractor objects *must* be closed when the results are no longer traversed.
 	 */
+	@Override
 	public DocumentExtractor queryDocumentExtractor() {
 		//keep the searcher open until the resultset is closed
 		//find the directories
@@ -315,6 +332,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		}
 	}
 
+	@Override
 	public int queryResultSize() {
 		if ( resultSize == null ) {
 			//the timeoutManager does not need to be stopped nor reset as a start does indeed reset
@@ -340,6 +358,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return this.resultSize;
 	}
 
+	@Override
 	public Explanation explain(int documentId) {
 		//don't use TimeoutManager here as explain is a dev tool when things are weird... or slow :)
 		Explanation explanation = null;
@@ -364,6 +383,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return explanation;
 	}
 
+	@Override
 	public FullTextFilter enableFullTextFilter(String name) {
 		clearCachedResults();
 		FullTextFilterImpl filterDefinition = filterDefinitions.get( name );
@@ -381,6 +401,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return filterDefinition;
 	}
 
+	@Override
 	public void disableFullTextFilter(String name) {
 		clearCachedResults();
 		filterDefinitions.remove( name );
@@ -809,10 +830,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 
 		if ( def.getKeyMethod() == null ) {
 			key = new FilterKey() {
+				@Override
 				public int hashCode() {
 					return getImpl().hashCode();
 				}
 
+				@Override
 				public boolean equals(Object obj) {
 					if ( !( obj instanceof FilterKey ) ) {
 						return false;
@@ -909,6 +932,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		}
 	}
 
+	@Override
 	public SearchFactoryImplementor getSearchFactoryImplementor() {
 		return searchFactoryImplementor;
 	}

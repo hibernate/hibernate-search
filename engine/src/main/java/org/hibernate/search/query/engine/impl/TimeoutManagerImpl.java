@@ -51,6 +51,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	}
 
 	/** we start counting from this method call (if needed) */
+	@Override
 	public void start() {
 		if ( timeout == null ) {
 			return;
@@ -59,10 +60,12 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		this.partialResults = false;
 	}
 
+	@Override
 	public Long getTimeoutLeftInMilliseconds() {
 		return getTimeoutLeft( 1000000 );
 	}
 
+	@Override
 	public Long getTimeoutLeftInSeconds() {
 		return getTimeoutLeft( 1000000000 );
 	}
@@ -95,6 +98,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
+	@Override
 	public boolean isTimedOut() {
 		if ( timeout == null ) {
 			return false;
@@ -125,6 +129,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
+	@Override
 	public void stop() {
 		this.timeout = null;
 		this.type = Type.NONE;
@@ -132,6 +137,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		//this.partialResults = false;
 	}
 
+	@Override
 	public void setTimeout(long timeout, TimeUnit timeUnit) {
 		this.timeout = timeUnit.toNanos( timeout );
 		//timeout of 0 means no more timeout
@@ -148,6 +154,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
+	@Override
 	public void raiseExceptionOnTimeout() {
 		if ( this.type == Type.LIMIT ) {
 			throw new SearchException("Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team");
@@ -155,6 +162,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		this.type = Type.EXCEPTION;
 	}
 
+	@Override
 	public void limitFetchingOnTimeout() {
 		if ( this.type == Type.EXCEPTION ) {
 			throw new SearchException("Cannot define both setTimeout and limitFetchingTime on a full-text query. Please report your need to the Hibernate team");
@@ -162,6 +170,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		this.type = Type.LIMIT;
 	}
 
+	@Override
 	public void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e) {
 		if ( type == Type.LIMIT ) {
 			//we stop where we are return what we have
@@ -177,10 +186,12 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
+	@Override
 	public boolean hasPartialResults() {
 		return partialResults;
 	}
 
+	@Override
 	public Type getType() {
 		return type;
 	}

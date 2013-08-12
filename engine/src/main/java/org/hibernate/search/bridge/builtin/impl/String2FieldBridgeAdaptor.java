@@ -42,6 +42,7 @@ public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge {
 		this.stringBridge = stringBridge;
 	}
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		String indexedString = stringBridge.objectToString( value );
 		if ( indexedString == null && luceneOptions.indexNullAs() != null ) {
@@ -50,6 +51,7 @@ public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge {
 		luceneOptions.addFieldToDocument( name, indexedString, document );
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		return stringBridge.objectToString( object );
 	}

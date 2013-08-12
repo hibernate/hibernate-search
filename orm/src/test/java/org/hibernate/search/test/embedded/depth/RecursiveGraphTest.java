@@ -190,6 +190,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 		return new Class[] { Person.class };
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.worker.backend", LeakingLuceneBackend.class.getName() );

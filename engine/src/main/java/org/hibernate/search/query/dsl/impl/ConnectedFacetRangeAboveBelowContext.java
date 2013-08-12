@@ -38,17 +38,20 @@ public class ConnectedFacetRangeAboveBelowContext<T> implements FacetRangeAboveB
 		this.context = context;
 	}
 
+	@Override
 	public FacetRangeLimitContext<T> from(T rangeStart) {
 		context.setRangeStart( rangeStart );
 		return new ConnectedFacetRangeLimitContext<T>( context );
 	}
 
+	@Override
 	public FacetRangeBelowContinuationContext<T> below(T min) {
 		context.setRangeStart( null );
 		context.setRangeEnd( min );
 		return new ConnectedFacetRangeBelowContinuationContext( context );
 	}
 
+	@Override
 	public FacetRangeAboveContext<T> above(T max) {
 		context.setRangeStart( max );
 		context.setRangeEnd( null );

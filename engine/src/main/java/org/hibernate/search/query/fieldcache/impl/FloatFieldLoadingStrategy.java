@@ -39,10 +39,12 @@ public final class FloatFieldLoadingStrategy implements FieldLoadingStrategy {
 		this.fieldName = fieldName;
 	}
 
+	@Override
 	public void loadNewCacheValues(IndexReader reader) throws IOException {
 		currentCache = FieldCache.DEFAULT.getFloats( reader, fieldName );
 	}
 
+	@Override
 	public Float collect(int relativeDocId) {
 		return currentCache[relativeDocId];
 	}

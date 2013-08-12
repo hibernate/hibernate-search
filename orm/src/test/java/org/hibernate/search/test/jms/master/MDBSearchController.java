@@ -38,10 +38,12 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController {
 		this.sessionFactory = sessionFactory;
 	}
 
+	@Override
 	protected Session getSession() {
 		return sessionFactory.openSession( );
 	}
 
+	@Override
 	protected void cleanSessionIfNeeded(Session session) {
 		session.close();
 	}

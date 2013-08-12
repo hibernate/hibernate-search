@@ -74,6 +74,7 @@ public final class DefaultTimingSource implements TimingSource {
 
 	private class TriggerTask extends TimerTask {
 
+		@Override
 		public void run() {
 			DefaultTimingSource.this.currentTimeApproximation = currentTime();
 		}

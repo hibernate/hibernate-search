@@ -98,6 +98,7 @@ public class TransactionTest extends SearchTestCase {
 		}
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Document.class };
 	}

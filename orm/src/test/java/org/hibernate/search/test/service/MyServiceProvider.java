@@ -37,6 +37,7 @@ public class MyServiceProvider implements ServiceProvider<MyService> {
 	private static volatile boolean simulateCircularDependency = false;
 	private MyService foo;
 
+	@Override
 	public void start(Properties properties, BuildContext context) {
 		foo = new MyService();
 		active = true;
@@ -45,10 +46,12 @@ public class MyServiceProvider implements ServiceProvider<MyService> {
 		}
 	}
 
+	@Override
 	public MyService getService() {
 		return foo;
 	}
 
+	@Override
 	public void stop() {
 		foo = null;
 		active = false;

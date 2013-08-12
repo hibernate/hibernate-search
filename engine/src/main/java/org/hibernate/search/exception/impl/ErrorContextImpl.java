@@ -42,6 +42,7 @@ class ErrorContextImpl implements ErrorContext {
 
 	private Throwable throwable;
 
+	@Override
 	public List<LuceneWork> getFailingOperations() {
 		if ( failingOperations == null ) {
 			failingOperations = new ArrayList<LuceneWork>();
@@ -49,10 +50,12 @@ class ErrorContextImpl implements ErrorContext {
 		return Collections.unmodifiableList( failingOperations );
 	}
 
+	@Override
 	public LuceneWork getOperationAtFault() {
 		return this.operationAtFault;
 	}
 
+	@Override
 	public Throwable getThrowable() {
 		return this.throwable;
 	}
@@ -69,6 +72,7 @@ class ErrorContextImpl implements ErrorContext {
 		this.operationAtFault = operationAtFault;
 	}
 
+	@Override
 	public boolean hasErrors() {
 		return failingOperations != null && failingOperations.size() > 0;
 	}

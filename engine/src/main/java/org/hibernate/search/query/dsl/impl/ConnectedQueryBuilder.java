@@ -45,27 +45,33 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 		this.context = context;
 	}
 
+	@Override
 	public TermContext keyword() {
 		return new ConnectedTermContext( context );
 	}
 
+	@Override
 	public RangeContext range() {
 		return new ConnectedRangeContext( context );
 	}
 
+	@Override
 	public PhraseContext phrase() {
 		return new ConnectedPhraseContext( context );
 	}
 
 	//fixme Have to use raw types but would be nice to not have to
+	@Override
 	public BooleanJunction bool() {
 		return new BooleanQueryBuilder();
 	}
 
+	@Override
 	public AllContext all() {
 		return new ConnectedAllContext();
 	}
 
+	@Override
 	public FacetContext facet() {
 		return new ConnectedFacetContext( new FacetBuildingContext( context.getFactory(), context.getEntityType() ) );
 	}

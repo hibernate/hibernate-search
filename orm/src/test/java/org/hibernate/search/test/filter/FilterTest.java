@@ -182,6 +182,7 @@ public class FilterTest extends SearchTestCase {
 		s.getTransaction().commit();
 	}
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		createData();
@@ -190,12 +191,14 @@ public class FilterTest extends SearchTestCase {
 		fullTextSession.getTransaction().begin();
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		fullTextSession.getTransaction().commit();
 		fullTextSession.close();
 		super.tearDown();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Driver.class,
@@ -203,6 +206,7 @@ public class FilterTest extends SearchTestCase {
 		};
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.filter.cache_docidresults.size", "10" );

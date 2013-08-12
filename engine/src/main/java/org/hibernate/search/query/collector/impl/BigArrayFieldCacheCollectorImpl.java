@@ -61,6 +61,7 @@ final class BigArrayFieldCacheCollectorImpl extends FieldCacheCollector {
 		this.delegate.setNextReader( reader, docBase );
 	}
 
+	@Override
 	public Object getValue(int docId) {
 		return valuePerDocumentId[docId];
 	}

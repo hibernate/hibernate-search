@@ -203,6 +203,7 @@ public class Address implements Serializable {
 		this.contact = contact;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if ( !( object instanceof Address ) ) {
 			return false;
@@ -242,6 +243,7 @@ public class Address implements Serializable {
 		return o == null ? 0 : o.hashCode();
 	}
 
+	@Override
 	public int hashCode() {
 		int a = 13;
 		a = a * 23 + hashCode( this.getAddress1() );
@@ -254,6 +256,7 @@ public class Address implements Serializable {
 //		return new HashCodeBuilder().append(new Object[]{this.getAddress1(), this.getAddress2(), this.getCounty(), this.getTown(), this.getPostcode(), this.getContact()}).hashCode();
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		displayAddress( buf, this );

@@ -101,159 +101,198 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		return ftSession;
 	}
 
+	@Override
 	public FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities) {
 		FullTextSession ftSession = getFullTextSession();
 		return new FullTextQueryImpl( ftSession.createFullTextQuery( luceneQuery, entities ), ftSession );
 	}
 
+	@Override
 	public <T> void index(T entity) {
 		getFullTextSession().index( entity );
 	}
 
+	@Override
 	public SearchFactory getSearchFactory() {
 		return getFullTextSession().getSearchFactory();
 	}
 
+	@Override
 	public <T> void purge(Class<T> entityType, Serializable id) {
 		getFullTextSession().purge( entityType, id );
 	}
 
+	@Override
 	public <T> void purgeAll(Class<T> entityType) {
 		getFullTextSession().purgeAll( entityType );
 	}
 
+	@Override
 	public void flushToIndexes() {
 		getFullTextSession().flushToIndexes();
 	}
 
+	@Override
 	public void persist(Object entity) {
 		em.persist( entity );
 	}
 
+	@Override
 	public <T> T merge(T entity) {
 		return em.merge( entity );
 	}
 
+	@Override
 	public void remove(Object entity) {
 		em.remove( entity );
 	}
 
+	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
 		return em.find( entityClass, primaryKey );
 	}
 
+	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> hints) {
 		return em.find( entityClass, primaryKey, hints );
 	}
 
+	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockModeType) {
 		return em.find( entityClass, primaryKey, lockModeType );
 	}
 
+	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockModeType, Map<String, Object> hints) {
 		return em.find( entityClass, primaryKey, lockModeType, hints );
 	}
 
+	@Override
 	public <T> T getReference(Class<T> entityClass, Object primaryKey) {
 		return em.getReference( entityClass, primaryKey );
 	}
 
+	@Override
 	public void flush() {
 		em.flush();
 	}
 
+	@Override
 	public void setFlushMode(FlushModeType flushMode) {
 		em.setFlushMode( flushMode );
 	}
 
+	@Override
 	public FlushModeType getFlushMode() {
 		return em.getFlushMode();
 	}
 
+	@Override
 	public void lock(Object entity, LockModeType lockMode) {
 		em.lock( entity, lockMode );
 	}
 
+	@Override
 	public void lock(Object entity, LockModeType lockModeType, Map<String, Object> hints) {
 		em.lock( entity, lockModeType, hints );
 	}
 
+	@Override
 	public void refresh(Object entity) {
 		em.refresh( entity );
 	}
 
+	@Override
 	public void refresh(Object entity, Map<String, Object> hints) {
 		em.refresh( entity, hints );
 	}
 
+	@Override
 	public void refresh(Object entity, LockModeType lockModeType) {
 		em.refresh( entity, lockModeType );
 	}
 
+	@Override
 	public void refresh(Object entity, LockModeType lockModeType, Map<String, Object> hints) {
 		em.refresh( entity, lockModeType, hints );
 	}
 
+	@Override
 	public void clear() {
 		em.clear();
 	}
 
+	@Override
 	public void detach(Object entity) {
 		em.detach( entity );
 	}
 
+	@Override
 	public boolean contains(Object entity) {
 		return em.contains( entity );
 	}
 
+	@Override
 	public LockModeType getLockMode(Object entity) {
 		return em.getLockMode( entity );
 	}
 
+	@Override
 	public void setProperty(String key, Object value) {
 		em.setProperty( key, value );
 	}
 
+	@Override
 	public Map<String, Object> getProperties() {
 		return em.getProperties();
 	}
 
+	@Override
 	public Query createQuery(String ejbqlString) {
 		return em.createQuery( ejbqlString );
 	}
 
+	@Override
 	public <T> TypedQuery<T> createQuery(CriteriaQuery<T> criteriaQuery) {
 		return em.createQuery( criteriaQuery );
 	}
 
+	@Override
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
 		return em.createQuery( qlString, resultClass );
 	}
 
+	@Override
 	public Query createNamedQuery(String name) {
 		return em.createNamedQuery( name );
 	}
 
+	@Override
 	public <T> TypedQuery<T> createNamedQuery(String name, Class<T> resultClass) {
 		return em.createNamedQuery( name, resultClass );
 	}
 
+	@Override
 	public Query createNativeQuery(String sqlString) {
 		return em.createNativeQuery( sqlString );
 	}
 
+	@Override
 	public Query createNativeQuery(String sqlString, Class resultClass) {
 		return em.createNativeQuery( sqlString, resultClass );
 	}
 
+	@Override
 	public Query createNativeQuery(String sqlString, String resultSetMapping) {
 		return em.createNativeQuery( sqlString, resultSetMapping );
 	}
 
+	@Override
 	public void joinTransaction() {
 		em.joinTransaction();
 	}
 
+	@Override
 	public <T> T unwrap(Class<T> type) {
 		if ( type.equals( FullTextSession.class ) ) {
 			@SuppressWarnings("unchecked")
@@ -265,34 +304,42 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 		}
 	}
 
+	@Override
 	public Object getDelegate() {
 		return em.getDelegate();
 	}
 
+	@Override
 	public void close() {
 		em.close();
 	}
 
+	@Override
 	public boolean isOpen() {
 		return em.isOpen();
 	}
 
+	@Override
 	public EntityTransaction getTransaction() {
 		return em.getTransaction();
 	}
 
+	@Override
 	public EntityManagerFactory getEntityManagerFactory() {
 		return em.getEntityManagerFactory();
 	}
 
+	@Override
 	public CriteriaBuilder getCriteriaBuilder() {
 		return em.getCriteriaBuilder();
 	}
 
+	@Override
 	public Metamodel getMetamodel() {
 		return em.getMetamodel();
 	}
 
+	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );
 	}

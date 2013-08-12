@@ -57,6 +57,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 
 	private static final int WARM_UP_CYCLES = 6;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		File baseIndexDir = getBaseIndexDir();
@@ -67,6 +68,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		}
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
 		FileHelper.delete( getBaseIndexDir() );
@@ -99,6 +101,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		System.out.println( "Index created." );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
@@ -107,6 +110,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		};
 	}
 
+	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );

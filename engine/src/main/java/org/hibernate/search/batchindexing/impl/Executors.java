@@ -96,6 +96,7 @@ public class Executors {
 			namePrefix = THREAD_GROUP_PREFIX + groupname + "-";
 		}
 
+		@Override
 		public Thread newThread(Runnable r) {
 			Thread t = new Thread( group, r, namePrefix + threadNumber.getAndIncrement(), 0 );
 			return t;
@@ -120,6 +121,7 @@ public class Executors {
 		 * @param r the runnable task requested to be executed
 		 * @param e the executor attempting to execute this task
 		 */
+		@Override
 		public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
 			try {
 				e.getQueue().put( r );

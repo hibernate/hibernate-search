@@ -46,22 +46,27 @@ public abstract class AbstractFacet implements Facet {
 		this.value = value;
 	}
 
+	@Override
 	public int getCount() {
 		return count;
 	}
 
+	@Override
 	public String getValue() {
 		return value;
 	}
 
+	@Override
 	public String getFieldName() {
 		return fieldName;
 	}
 
+	@Override
 	public String getFacetingName() {
 		return facetingName;
 	}
 
+	@Override
 	public abstract Query getFacetQuery();
 
 	@Override

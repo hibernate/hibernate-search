@@ -59,30 +59,37 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 		}
 	}
 
+	@Override
 	public Iterator<Class<?>> getClassMappings() {
 		return classes.iterator();
 	}
 
+	@Override
 	public Class<?> getClassMapping(String name) {
 		return classesByName.get( name );
 	}
 
+	@Override
 	public String getProperty(String propertyName) {
 		return properties.getProperty( propertyName );
 	}
 
+	@Override
 	public Properties getProperties() {
 		return properties;
 	}
 
+	@Override
 	public ReflectionManager getReflectionManager() {
 		return reflectionManager;
 	}
 
+	@Override
 	public SearchMapping getProgrammaticMapping() {
 		return state.getProgrammaticMapping();
 	}
 
+	@Override
 	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
 		return Collections.emptyMap();
 	}

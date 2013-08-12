@@ -112,6 +112,7 @@ public class EmbeddedIdTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Person.class

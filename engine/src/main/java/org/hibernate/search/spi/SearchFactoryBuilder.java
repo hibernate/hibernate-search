@@ -625,19 +625,23 @@ public class SearchFactoryBuilder {
 	private class BuildContext implements WritableBuildContext, WorkerBuildContext {
 		private final SearchFactoryState factoryState = SearchFactoryBuilder.this.factoryState;
 
+		@Override
 		public SearchFactoryImplementor getUninitializedSearchFactory() {
 			return rootFactory;
 		}
 
+		@Override
 		public String getIndexingStrategy() {
 			return factoryState.getIndexingStrategy();
 		}
 
+		@Override
 		@Deprecated
 		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
 			return factoryState.getServiceManager().requestService( provider, this );
 		}
 
+		@Override
 		@Deprecated
 		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
 			factoryState.getServiceManager().releaseService( provider );

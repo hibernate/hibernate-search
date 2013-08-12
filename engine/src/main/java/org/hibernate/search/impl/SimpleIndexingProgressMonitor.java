@@ -61,10 +61,12 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 		this.logAfterNumberOfDocuments = logAfterNumberOfDocuments;
 	}
 
+	@Override
 	public void entitiesLoaded(int size) {
 		//not used
 	}
 
+	@Override
 	public void documentsAdded(long increment) {
 		long current = documentsDoneCounter.addAndGet( increment );
 		if ( current == increment ) {
@@ -75,15 +77,18 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 		}
 	}
 
+	@Override
 	public void documentsBuilt(int number) {
 		//not used
 	}
 
+	@Override
 	public void addToTotalCount(long count) {
 		totalCounter.addAndGet( count );
 		log.indexingEntities( count );
 	}
 
+	@Override
 	public void indexingCompleted() {
 		log.indexingEntitiesCompleted( totalCounter.get() );
 	}

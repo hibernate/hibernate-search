@@ -268,6 +268,7 @@ public class MutableFactoryTest {
 			this.nbrOfClassesPerThread = nbrOfClassesPerThread;
 		}
 
+		@Override
 		public void run() {
 
 			try {

@@ -69,6 +69,7 @@ public class ExplanationTest extends SearchTestCase {
 		s.close();
 
 	}
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Dvd.class

@@ -36,6 +36,7 @@ class CommentSuppressor implements MatchSuppressor {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean shouldSuppress(int aStartLineNo, int aStartColNo,
 			int aEndLineNo, int aEndColNo) {
 		return ( null != mCurrentContents )

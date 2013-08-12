@@ -64,6 +64,7 @@ final class MapFieldCacheCollectorImpl extends FieldCacheCollector {
 		this.delegate.setNextReader( reader, docBase );
 	}
 
+	@Override
 	public Object getValue(int docId) {
 		return valuePerDocumentId.get( docId );
 	}

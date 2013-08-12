@@ -70,6 +70,7 @@ public final class PassThroughAnalyzer extends Analyzer {
 		public PassThroughTokenizer(Version luceneVersion, Reader input) {
 			super( luceneVersion, input );
 		}
+		@Override
 		protected boolean isTokenChar(int c) {
 			return true;
 		}
@@ -85,6 +86,7 @@ public final class PassThroughAnalyzer extends Analyzer {
 		}
 
 		//@Override not really: will be removed in Lucene 4.0
+		@Override
 		protected boolean isTokenChar(char c) {
 			return true;
 		}

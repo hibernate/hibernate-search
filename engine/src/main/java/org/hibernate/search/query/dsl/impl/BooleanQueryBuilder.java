@@ -50,6 +50,7 @@ class BooleanQueryBuilder implements MustJunction {
 		queryCustomizer = new QueryCustomizer();
 	}
 
+	@Override
 	public BooleanJunction not() {
 		final int lastIndex = clauses.size() - 1;
 		final BooleanClause last = clauses.get( lastIndex );
@@ -60,31 +61,37 @@ class BooleanQueryBuilder implements MustJunction {
 		return this;
 	}
 
+	@Override
 	public BooleanJunction should(Query query) {
 		clauses.add( new BooleanClause( query, BooleanClause.Occur.SHOULD ) );
 		return this;
 	}
 
+	@Override
 	public MustJunction must(Query query) {
 		clauses.add( new BooleanClause( query, BooleanClause.Occur.MUST ) );
 		return this;
 	}
 
+	@Override
 	public MustJunction boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
 	}
 
+	@Override
 	public MustJunction withConstantScore() {
 		queryCustomizer.withConstantScore();
 		return this;
 	}
 
+	@Override
 	public MustJunction filteredBy(Filter filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
 	}
 
+	@Override
 	public Query createQuery() {
 		final int nbrOfClauses = clauses.size();
 		if ( nbrOfClauses == 0 ) {

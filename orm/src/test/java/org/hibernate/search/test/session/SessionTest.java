@@ -98,6 +98,7 @@ public class SessionTest extends SearchTestCase {
 		}
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Email.class,
@@ -105,6 +106,7 @@ public class SessionTest extends SearchTestCase {
 		};
 	}
 
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		// for this test we explcitly set the auto commit mode since we are not explcitly starting a transaction

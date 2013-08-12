@@ -37,6 +37,7 @@ import org.hibernate.search.test.TestConstants;
  */
 public final class ISOLatin1Analyzer extends Analyzer {
 
+	@Override
 	public TokenStream tokenStream(String s, Reader reader) {
 		TokenStream result = new StandardTokenizer( TestConstants.getTargetLuceneVersion(), reader );
 		return new ASCIIFoldingFilter( result );

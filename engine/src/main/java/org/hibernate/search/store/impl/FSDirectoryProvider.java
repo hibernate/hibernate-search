@@ -79,6 +79,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 		//all the process is done in initialize
 	}
 
+	@Override
 	public void stop() {
 		try {
 			directory.close();
@@ -88,6 +89,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 		}
 	}
 
+	@Override
 	public FSDirectory getDirectory() {
 		return directory;
 	}

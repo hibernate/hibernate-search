@@ -55,15 +55,18 @@ public class Comment implements IComment {
 	private IComment root;
 	private List<IComment> replies = new ArrayList<IComment>();
 
+	@Override
 	@Id
 	@Column(name = "commentid")
 	public Integer getId() {
 		return id;
 	}
+	@Override
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
+	@Override
 	@ManyToOne(targetEntity = Profile.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "profileid")
 	@ContainedIn
@@ -74,34 +77,41 @@ public class Comment implements IComment {
 		return parent;
 	}
 
+	@Override
 	public void setProfile(IProfile p) {
 		this.parent = p;
 	}
 
+	@Override
 	@Column(name = "content")
 	@Field(name = "content")
 	public String getContent() {
 		return name;
 	}
+	@Override
 	public void setContent(String name) {
 		this.name = name;
 	}
 
+	@Override
 	@ManyToOne(targetEntity = Comment.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "rootid")
 	public IComment getRootComment() {
 		return root;
 	}
+	@Override
 	public void setRootComment(IComment root) {
 		this.root = root;
 	}
 
+	@Override
 	@OneToMany(targetEntity = Comment.class, mappedBy = "rootComment", fetch = FetchType.LAZY)
 	@Cascade(CascadeType.DELETE)
 	public List<IComment> getReplies() {
 		return replies;
 	}
 
+	@Override
 	public void setReplies(List<IComment> replies) {
 		this.replies = replies;
 	}

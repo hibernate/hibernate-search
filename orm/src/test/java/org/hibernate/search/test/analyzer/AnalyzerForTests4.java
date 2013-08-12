@@ -34,6 +34,7 @@ public final class AnalyzerForTests4 extends AbstractTestAnalyzer {
 	public AnalyzerForTests4(Version version) {
 	}
 
+	@Override
 	protected String[] getTokens() {
 		return tokens;
 	}

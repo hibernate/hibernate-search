@@ -83,10 +83,12 @@ import org.hibernate.search.cfg.SearchMapping;
 public class MappingModelMetadataProvider implements MetadataProvider {
 
 	private static final Filter FILTER = new Filter() {
+		@Override
 		public boolean returnStatic() {
 			return false;
 		}
 
+		@Override
 		public boolean returnTransient() {
 			return true;
 		}
@@ -102,6 +104,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		this.mapping = mapping;
 	}
 
+	@Override
 	public Map<Object, Object> getDefaults() {
 		if ( defaults == null ) {
 			final Map<Object, Object> delegateDefaults = delegate.getDefaults();
@@ -116,6 +119,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		return defaults;
 	}
 
+	@Override
 	public AnnotationReader getAnnotationReader(AnnotatedElement annotatedElement) {
 		AnnotationReader reader = cache.get( annotatedElement );
 		if ( reader == null ) {
@@ -734,18 +738,21 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 		}
 
+		@Override
 		@SuppressWarnings("unchecked")
 		public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
 			initAnnotations();
 			return (T) annotations.get( annotationType );
 		}
 
+		@Override
 		@SuppressWarnings("unchecked")
 		public <T extends Annotation> boolean isAnnotationPresent(Class<T> annotationType) {
 			initAnnotations();
 			return (T) annotations.get( annotationType ) != null;
 		}
 
+		@Override
 		public Annotation[] getAnnotations() {
 			initAnnotations();
 			return new Annotation[0];

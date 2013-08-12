@@ -62,6 +62,7 @@ public class ImplicitIdTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Animal.class

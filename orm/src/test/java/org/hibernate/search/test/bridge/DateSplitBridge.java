@@ -42,6 +42,7 @@ public class DateSplitBridge implements FieldBridge {
 
 	private static final TimeZone GMT = TimeZone.getTimeZone( "GMT" );
 
+	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		Date date = (Date) value;
 		Calendar cal = GregorianCalendar.getInstance( GMT );

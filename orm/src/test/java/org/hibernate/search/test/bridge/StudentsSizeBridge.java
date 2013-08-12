@@ -31,6 +31,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
  */
 public class StudentsSizeBridge implements TwoWayStringBridge {
 
+	@Override
 	public Object stringToObject(String stringValue) {
 		if ( null == stringValue || stringValue.equals( "" ) ) {
 			return 0;
@@ -38,6 +39,7 @@ public class StudentsSizeBridge implements TwoWayStringBridge {
 		return Integer.parseInt( stringValue );
 	}
 
+	@Override
 	public String objectToString(Object object) {
 		if ( object instanceof Teacher ) {
 			Teacher teacher = (Teacher) object;

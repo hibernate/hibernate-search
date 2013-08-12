@@ -112,6 +112,7 @@ public class MultiClassesQueryLoaderTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Author.class,

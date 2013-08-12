@@ -235,6 +235,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		}
 	}
 
+	@Override
 	public EntityInfo extract(int scoreDocIndex) throws IOException {
 		int docId = queryHits.docId( scoreDocIndex );
 		Document document = extractDocument( scoreDocIndex );
@@ -275,14 +276,17 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		return entityInfo;
 	}
 
+	@Override
 	public int getFirstIndex() {
 		return firstIndex;
 	}
 
+	@Override
 	public int getMaxIndex() {
 		return maxIndex;
 	}
 
+	@Override
 	public void close() {
 		searcher.closeSearcher( query, searchFactoryImplementor );
 	}

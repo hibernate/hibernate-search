@@ -37,6 +37,7 @@ public abstract class AbstractTestAnalyzer extends Analyzer {
 
 	protected abstract String[] getTokens();
 
+	@Override
 	public TokenStream tokenStream(String fieldName, Reader reader) {
 		return new InternalTokenStream();
 	}

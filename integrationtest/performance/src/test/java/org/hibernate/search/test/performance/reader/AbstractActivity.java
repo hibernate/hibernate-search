@@ -64,6 +64,7 @@ public abstract class AbstractActivity implements Runnable {
 		this.sf = sf;
 	}
 
+	@Override
 	public final void run() {
 		try {
 			startSignal.await();

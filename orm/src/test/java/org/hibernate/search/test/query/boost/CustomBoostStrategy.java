@@ -34,6 +34,7 @@ import org.hibernate.search.engine.BoostStrategy;
  */
 public class CustomBoostStrategy implements BoostStrategy {
 
+	@Override
 	public float defineBoost(Object value) {
 		DynamicBoostedDescriptionLibrary indexed = (DynamicBoostedDescriptionLibrary) value;
 		return indexed.getDynScore();

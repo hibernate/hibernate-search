@@ -265,6 +265,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		return query;
 	}
 
+	@Override
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
 		for ( String make : makes ) {
@@ -284,6 +285,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		session.clear();
 	}
 
+	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Car.class

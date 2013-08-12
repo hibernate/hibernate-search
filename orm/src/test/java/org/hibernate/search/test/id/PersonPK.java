@@ -50,6 +50,7 @@ public class PersonPK implements Serializable {
 		this.firstName = firstName;
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -69,6 +70,7 @@ public class PersonPK implements Serializable {
 		return true;
 	}
 
+	@Override
 	public int hashCode() {
 		int result;
 		result = ( firstName != null ? firstName.hashCode() : 0 );
