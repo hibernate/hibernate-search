@@ -132,11 +132,12 @@ final class LuceneBackendQueueTask implements Runnable {
 	private boolean runMultipleTasks(final IndexWriter indexWriter, final ErrorContextBuilder errorContextBuilder) throws InterruptedException {
 		final int queueSize = workList.size();
 		final ExecutorService executor = resources.getWorkersExecutor();
-		final Future<?>[] submittedTasks = new Future[ queueSize ];
+		final Future<LuceneWork>[] submittedTasks = new Future[ queueSize ];
 
 		for ( int i = 0; i < queueSize; i++ ) {
-			SingleTaskRunnable task = new SingleTaskRunnable( workList.get( i ), resources, indexWriter, monitor );
-			submittedTasks[i] = executor.submit( task );
+			LuceneWork luceneWork = workList.get( i );
+			SingleTaskRunnable task = new SingleTaskRunnable( luceneWork, resources, indexWriter, monitor );
+			submittedTasks[i] = executor.submit( task, luceneWork );
 		}
 
 		boolean allTasksSuccessful = true;
@@ -144,10 +145,10 @@ final class LuceneBackendQueueTask implements Runnable {
 		// now wait for all tasks being completed before releasing our lock
 		// (this thread waits even in async backend mode)
 		for ( int i = 0; i < queueSize; i++ ) {
-			Future<?> task = submittedTasks[i];
+			Future<LuceneWork> task = submittedTasks[i];
 			try {
-				task.get();
-				errorContextBuilder.workCompleted( workList.get( i ) );
+				LuceneWork work = task.get();
+				errorContextBuilder.workCompleted( work );
 			}
 			catch (ExecutionException e) {
 				errorContextBuilder.addWorkThatFailed( workList.get( i ) );
