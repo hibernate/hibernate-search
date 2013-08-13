@@ -44,7 +44,7 @@ class ErrorContextImpl implements ErrorContext {
 	@Override
 	public List<LuceneWork> getFailingOperations() {
 		if ( failingOperations == null ) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 		return Collections.unmodifiableList( failingOperations );
 	}
