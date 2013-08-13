@@ -45,6 +45,11 @@ public class ErrorContextBuilder {
 		return this;
 	}
 
+	public ErrorContextBuilder addWorkThatFailed(LuceneWork failedWork) {
+		this.failingOperations.add( failedWork );
+		return this;
+	}
+
 	public ErrorContextBuilder addAllWorkThatFailed(List<LuceneWork> worksThatFailed) {
 		this.failingOperations.addAll( worksThatFailed );
 		return this;
