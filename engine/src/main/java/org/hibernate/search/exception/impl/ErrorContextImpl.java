@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.exception.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,7 +44,7 @@ class ErrorContextImpl implements ErrorContext {
 	@Override
 	public List<LuceneWork> getFailingOperations() {
 		if ( failingOperations == null ) {
-			failingOperations = new ArrayList<LuceneWork>();
+			return Collections.EMPTY_LIST;
 		}
 		return Collections.unmodifiableList( failingOperations );
 	}
