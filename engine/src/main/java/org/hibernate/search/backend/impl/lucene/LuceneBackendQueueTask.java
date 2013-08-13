@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -51,11 +50,11 @@ final class LuceneBackendQueueTask implements Runnable {
 
 	private final Lock modificationLock;
 	private final LuceneBackendResources resources;
-	private final List<LuceneWork> queue;
+	private final List<LuceneWork> workList;
 	private final IndexingMonitor monitor;
 
-	LuceneBackendQueueTask(List<LuceneWork> queue, LuceneBackendResources resources, IndexingMonitor monitor) {
-		this.queue = queue;
+	LuceneBackendQueueTask(List<LuceneWork> workList, LuceneBackendResources resources, IndexingMonitor monitor) {
+		this.workList = workList;
 		this.resources = resources;
 		this.monitor = monitor;
 		this.modificationLock = resources.getParallelModificationLock();
@@ -83,7 +82,7 @@ final class LuceneBackendQueueTask implements Runnable {
 
 	private void handleException(Exception e) {
 		ErrorContextBuilder builder = new ErrorContextBuilder();
-		builder.allWorkToBeDone( queue );
+		builder.allWorkToBeDone( workList );
 		builder.errorThatOccurred( e );
 		resources.getErrorHandler().handle( builder.createErrorContext() );
 	}
@@ -97,40 +96,24 @@ final class LuceneBackendQueueTask implements Runnable {
 		AbstractWorkspaceImpl workspace = resources.getWorkspace();
 
 		ErrorContextBuilder errorContextBuilder = new ErrorContextBuilder();
-		errorContextBuilder.allWorkToBeDone( queue );
+		errorContextBuilder.allWorkToBeDone( workList );
 
 		IndexWriter indexWriter = workspace.getIndexWriter( errorContextBuilder );
 		if ( indexWriter == null ) {
 			log.cannotOpenIndexWriterCausePreviousError();
 			return;
 		}
-		LinkedList<LuceneWork> failedUpdates = null;
+
+		boolean taskExecutionSuccessful = true;
+
 		try {
-			ExecutorService executor = resources.getWorkersExecutor();
-			int queueSize = queue.size();
-			Future[] submittedTasks = new Future[ queueSize ];
-			for ( int i = 0; i < queueSize; i++ ) {
-				SingleTaskRunnable task = new SingleTaskRunnable( queue.get( i ), resources, indexWriter, monitor );
-				submittedTasks[i] = executor.submit( task );
+			if ( workList.size() == 1 ) {
+				taskExecutionSuccessful = runSingleTask( workList.get( 0 ), indexWriter, errorContextBuilder );
 			}
-			// now wait for all tasks being completed before releasing our lock
-			// (this thread waits even in async backend mode)
-			for ( int i = 0; i < queueSize; i++ ) {
-				Future task = submittedTasks[i];
-				try {
-					task.get();
-					errorContextBuilder.workCompleted( queue.get( i ) );
-				}
-				catch (ExecutionException e) {
-					if ( failedUpdates == null ) {
-						failedUpdates = new LinkedList<LuceneWork>();
-					}
-					failedUpdates.add( queue.get( i ) );
-					errorContextBuilder.errorThatOccurred( e.getCause() );
-				}
+			else {
+				taskExecutionSuccessful = runMultipleTasks( indexWriter, errorContextBuilder );
 			}
-			if ( failedUpdates != null ) {
-				errorContextBuilder.addAllWorkThatFailed( failedUpdates );
+			if ( !taskExecutionSuccessful ) {
 				resources.getErrorHandler().handle( errorContextBuilder.createErrorContext() );
 			}
 			else {
@@ -138,7 +121,58 @@ final class LuceneBackendQueueTask implements Runnable {
 			}
 		}
 		finally {
-			workspace.afterTransactionApplied( failedUpdates != null, false );
+			workspace.afterTransactionApplied( !taskExecutionSuccessful, false );
+		}
+	}
+
+	/**
+	 * Applies each modification in parallel using the backend workers pool
+	 * @throws InterruptedException
+	 */
+	private boolean runMultipleTasks(final IndexWriter indexWriter, final ErrorContextBuilder errorContextBuilder) throws InterruptedException {
+		final int queueSize = workList.size();
+		final ExecutorService executor = resources.getWorkersExecutor();
+		final Future<LuceneWork>[] submittedTasks = new Future[ queueSize ];
+
+		for ( int i = 0; i < queueSize; i++ ) {
+			LuceneWork luceneWork = workList.get( i );
+			SingleTaskRunnable task = new SingleTaskRunnable( luceneWork, resources, indexWriter, monitor );
+			submittedTasks[i] = executor.submit( task, luceneWork );
+		}
+
+		boolean allTasksSuccessful = true;
+
+		// now wait for all tasks being completed before releasing our lock
+		// (this thread waits even in async backend mode)
+		for ( int i = 0; i < queueSize; i++ ) {
+			Future<LuceneWork> task = submittedTasks[i];
+			try {
+				LuceneWork work = task.get();
+				errorContextBuilder.workCompleted( work );
+			}
+			catch (ExecutionException e) {
+				errorContextBuilder.addWorkThatFailed( workList.get( i ) );
+				errorContextBuilder.errorThatOccurred( e.getCause() );
+				allTasksSuccessful = false;
+			}
+		}
+
+		return allTasksSuccessful;
+	}
+
+	/**
+	 * Applies a single modification using the caller's thread to avoid pointless context
+	 * switching.
+	 */
+	private boolean runSingleTask(final LuceneWork luceneWork, final IndexWriter indexWriter, final ErrorContextBuilder errorContextBuilder) {
+		try {
+			SingleTaskRunnable.performWork( luceneWork, resources, indexWriter, monitor );
+			return true;
+		}
+		catch (RuntimeException re) {
+			errorContextBuilder.errorThatOccurred( re );
+			errorContextBuilder.addWorkThatFailed( luceneWork );
+			return false;
 		}
 	}
 

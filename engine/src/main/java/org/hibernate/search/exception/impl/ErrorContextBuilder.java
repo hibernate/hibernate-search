@@ -37,21 +37,26 @@ public class ErrorContextBuilder {
 
 	private Throwable th;
 	private List<LuceneWork> workToBeDone;
-	private List<LuceneWork> failingOperations = new ArrayList<LuceneWork>();
-	private List<LuceneWork> operationsThatWorked = new ArrayList<LuceneWork>();
+	private List<LuceneWork> failingOperations;
+	private List<LuceneWork> operationsThatWorked;
 
 	public ErrorContextBuilder errorThatOccurred(Throwable th) {
 		this.th = th;
 		return this;
 	}
 
+	public ErrorContextBuilder addWorkThatFailed(LuceneWork failedWork) {
+		this.getFailingOperations().add( failedWork );
+		return this;
+	}
+
 	public ErrorContextBuilder addAllWorkThatFailed(List<LuceneWork> worksThatFailed) {
-		this.failingOperations.addAll( worksThatFailed );
+		this.getFailingOperations().addAll( worksThatFailed );
 		return this;
 	}
 
 	public ErrorContextBuilder workCompleted(LuceneWork luceneWork) {
-		this.operationsThatWorked.add( luceneWork );
+		this.getOperationsThatWorked().add( luceneWork );
 		return this;
 
 	}
@@ -69,17 +74,31 @@ public class ErrorContextBuilder {
 		// for situation when there is a primary failure
 		if ( workToBeDone != null ) {
 			List<LuceneWork> workLeft = new ArrayList<LuceneWork>( workToBeDone );
-			if ( !operationsThatWorked.isEmpty() ) {
+			if ( operationsThatWorked != null ) {
 				workLeft.removeAll( operationsThatWorked );
 			}
 
 			if ( !workLeft.isEmpty() ) {
 				context.setOperationAtFault( workLeft.remove( 0 ) );
-				failingOperations.addAll( workLeft );
+				getFailingOperations().addAll( workLeft );
 			}
 		}
-		context.setFailingOperations( failingOperations );
+		context.setFailingOperations( getFailingOperations() );
 		return context;
+	}
+
+	private List<LuceneWork> getFailingOperations() {
+		if ( failingOperations == null ) {
+			failingOperations = new ArrayList<LuceneWork>();
+		}
+		return failingOperations;
+	}
+
+	private List<LuceneWork> getOperationsThatWorked() {
+		if ( operationsThatWorked == null ) {
+			operationsThatWorked = new ArrayList<LuceneWork>();
+		}
+		return operationsThatWorked;
 	}
 
 }
