@@ -157,7 +157,6 @@
         <jacksonAslVersion>1.9.2</jacksonAslVersion>
         <commonsIoVersion>1.4</commonsIoVersion>
         <commonsCodecVersion>1.5</commonsCodecVersion>
-        <commonsLangVersion>2.6</commonsLangVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
         <!-- Used in the hibernate-search-modules project -->
         <paranamerVersion>2.3</paranamerVersion>
