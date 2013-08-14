@@ -156,6 +156,7 @@
         <avroVersion>1.7.5</avroVersion>
         <jacksonAslVersion>1.9.2</jacksonAslVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
+        <jbossTransactionApiVersion>1.0.1.Final</jbossTransactionApiVersion>
         <!-- Used in the hibernate-search-modules project -->
         <paranamerVersion>2.3</paranamerVersion>
     </properties>
@@ -550,6 +551,11 @@
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.spec.javax.transaction</groupId>
+                <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                <version>${jbossTransactionApiVersion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
