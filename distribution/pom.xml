@@ -58,10 +58,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>javassist</groupId>-->
-            <!--<artifactId>javassist</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>javax.transaction</groupId>
             <artifactId>jta</artifactId>
