@@ -235,7 +235,13 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@Override
 	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
-		return new EntityIndexBindingWrapper( indexBindingForEntities.get( entityType ) );
+		final EntityIndexBinding entityIndexBinding = indexBindingForEntities.get( entityType );
+		if ( entityIndexBinding == null ) {
+			return null;
+		}
+		else {
+			return new EntityIndexBindingWrapper( entityIndexBinding );
+		}
 	}
 
 	@Override
