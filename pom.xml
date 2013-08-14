@@ -345,10 +345,6 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4jVersion}</version>
             </dependency>
-            <!--
-            Defining log4j here, but due to a bug in Shrinkwrap we still need to define the version explicitly
-            in the sub modules. See HSEARCH-970
-            -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
