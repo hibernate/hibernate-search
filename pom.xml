@@ -330,11 +330,6 @@
                 <artifactId>fest-assert</artifactId>
                 <version>1.4</version>
             </dependency>
-            <dependency>
-                <groupId>javassist</groupId>
-                <artifactId>javassist</artifactId>
-                <version>3.12.1.GA</version>
-            </dependency>
             <!--
             We need to keep the slf4j dependencies listed here even though we are not using slf4j anymore.
             Listing them within dependencyManagement will ensure that ${slf4jVersion} is used as slf4j version
