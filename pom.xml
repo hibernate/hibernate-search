@@ -155,8 +155,6 @@
         <narayanaVersion>4.17.4.Final</narayanaVersion>
         <avroVersion>1.7.5</avroVersion>
         <jacksonAslVersion>1.9.2</jacksonAslVersion>
-        <commonsIoVersion>1.4</commonsIoVersion>
-        <commonsCodecVersion>1.5</commonsCodecVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
         <!-- Used in the hibernate-search-modules project -->
         <paranamerVersion>2.3</paranamerVersion>
@@ -235,16 +233,6 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-analyzers</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>${commonsCodecVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commonsIoVersion}</version>
             </dependency>
              <dependency>
                 <groupId>org.apache.commons</groupId>
