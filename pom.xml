@@ -144,7 +144,6 @@
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.6.2</luceneVersion>
         <luceneRegexVersion>3.0.3</luceneRegexVersion>
-        <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
         <infinispanVersion>5.3.0.Final</infinispanVersion>
         <jgroupsVersion>3.3.4.Final</jgroupsVersion>
         <hibernateVersion>4.2.5.Final</hibernateVersion>
