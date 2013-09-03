@@ -24,7 +24,9 @@
 package org.hibernate.search.jpa.impl;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
@@ -342,6 +344,54 @@ public class FullTextEntityManagerImpl implements FullTextEntityManager, Seriali
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
 		return getFullTextSession().createIndexer( types );
+	}
+
+	/**
+	 * Methods below require JPA 2.1
+	 */
+
+	public <T> javax.persistence.EntityGraph<T> createEntityGraph(Class<T> arg0) {
+		return em.createEntityGraph( arg0 );
+	}
+
+	public javax.persistence.EntityGraph<?> createEntityGraph(String arg0) {
+		return em.createEntityGraph( arg0 );
+	}
+
+	public javax.persistence.StoredProcedureQuery createNamedStoredProcedureQuery(String arg0) {
+		return em.createNamedStoredProcedureQuery( arg0 );
+	}
+
+	public Query createQuery(javax.persistence.criteria.CriteriaUpdate arg0) {
+		return em.createQuery( arg0 );
+	}
+
+	public Query createQuery(javax.persistence.criteria.CriteriaDelete arg0) {
+		return em.createQuery( arg0 );
+	}
+
+	public javax.persistence.StoredProcedureQuery createStoredProcedureQuery(String arg0) {
+		return em.createStoredProcedureQuery( arg0 );
+	}
+
+	public javax.persistence.StoredProcedureQuery createStoredProcedureQuery(String arg0, Class... arg1) {
+		return em.createStoredProcedureQuery(arg0, arg1);
+	}
+
+	public javax.persistence.StoredProcedureQuery createStoredProcedureQuery(String arg0, String... arg1) {
+		return em.createStoredProcedureQuery(arg0, arg1);
+	}
+
+	public <T> javax.persistence.EntityGraph<T> getEntityGraph(String arg0) {
+		return em.getEntityGraph(arg0);
+	}
+
+	public <T> List<javax.persistence.EntityGraph<? super T>> getEntityGraphs(Class<T> arg0) {
+		return em.getEntityGraphs(arg0);
+	}
+
+	public boolean isJoinedToTransaction() {
+		return em.isJoinedToTransaction();
 	}
 
 }
