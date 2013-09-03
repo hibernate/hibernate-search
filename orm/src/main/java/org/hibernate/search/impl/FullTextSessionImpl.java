@@ -78,7 +78,9 @@ import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.hcore.impl.MassIndexerFactoryProvider;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.spi.MassIndexerFactory;
 import org.hibernate.search.util.impl.ContextHelper;
@@ -215,12 +217,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
-		MassIndexerFactory factory = requestService( MassIndexerFactory.class );
-		return factory.createMassIndexer( getSearchFactoryImplementor(), getSessionFactory(), types );
-	}
-
-	private MassIndexerFactory requestService(Class<MassIndexerFactory> serviceRole) {
-		return sessionImplementor.getFactory().getServiceRegistry().getService( serviceRole );
+		//We shouldn't expose the ServiceManager in phases other than startup or teardown, that's why the cast is required.
+		//Exceptionally, this very specific case is fine. TODO: cleanup this mess.
+		MutableSearchFactory msf = (MutableSearchFactory) getSearchFactoryImplementor();
+		ServiceManager serviceManager = msf.getServiceManager();
+		MassIndexerFactory service = serviceManager.requestService( MassIndexerFactoryProvider.class, null );
+		return service.createMassIndexer( getSearchFactoryImplementor(), getSessionFactory(), types );
 	}
 
 	@Override
@@ -872,6 +874,27 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	@Override
 	public SimpleNaturalIdLoadAccess bySimpleNaturalId(Class entityClass) {
 		return session.bySimpleNaturalId( entityClass );
+	}
+
+	/**
+	 * Methods below are introduced in Hibernate ORM 4.3
+	 * org.hibernate.procedure.ProcedureCall might not be available on classpath
+	 */
+
+	public org.hibernate.procedure.ProcedureCall createStoredProcedureCall(String procedureName) {
+		return session.createStoredProcedureCall( procedureName );
+	}
+
+	public org.hibernate.procedure.ProcedureCall createStoredProcedureCall(String procedureName, Class... resultClasses) {
+		return session.createStoredProcedureCall( procedureName, resultClasses );
+	}
+
+	public org.hibernate.procedure.ProcedureCall createStoredProcedureCall(String procedureName, String... resultSetMappings) {
+		return session.createStoredProcedureCall( procedureName, resultSetMappings );
+	}
+
+	public org.hibernate.procedure.ProcedureCall getNamedProcedureCall(String name) {
+		return session.getNamedProcedureCall( name );
 	}
 
 }

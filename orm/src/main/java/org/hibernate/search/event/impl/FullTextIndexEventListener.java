@@ -328,4 +328,14 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			return searchFactoryImplementor.getDocumentBuilderContainedEntity( clazz );
 		}
 	}
+
+	/**
+	 * Required since Hibernate ORM 4.3
+	 */
+	public boolean requiresPostCommitHanding(EntityPersister persister) {
+		// TODO Tests seem to pass using _false_ but we might be able to take
+		// advantage of this new hook?
+		return false;
+	}
+
 }

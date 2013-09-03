@@ -32,8 +32,6 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.test.TestConstants;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Serialization test for entity manager. HSEARCH-117.
  *
@@ -59,11 +57,6 @@ public class EntityManagerSerializationTest extends JPATestCase {
 
 		clone.close();
 		em.close();
-	}
-
-	@Override
-	public Class[] getAnnotatedClasses() {
-		return new Class[] { Bretzel.class };
 	}
 
 	/**
