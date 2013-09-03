@@ -20,83 +20,15 @@
  */
 package org.hibernate.search.hcore.impl;
 
-import java.util.Map;
-import java.util.Properties;
-
-import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.integrator.spi.ServiceContributingIntegrator;
-import org.hibernate.metamodel.source.MetadataImplementor;
-import org.hibernate.search.impl.DefaultMassIndexerFactory;
-import org.hibernate.search.spi.MassIndexerFactory;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.service.ServiceRegistryBuilder;
-import org.hibernate.service.spi.BasicServiceInitiator;
-import org.hibernate.service.spi.ServiceRegistryImplementor;
-import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
 /**
- * Registers a {@link MassIndexerFactory} in the {@link org.hibernate.service.ServiceRegistry}.
- * <p>
- * The type of the factory can be specified in the configuration otherwise a defaul one is used.
- *
- * @author Davide D'Alto <davide@hibernate.org>
+ * @deprecated This class will be removed, the constant {@code MASS_INDEXER_FACTORY_CLASSNAME}
+ * was moved into {@link MassIndexerFactoryProvider}.
+ * @see org.hibernate.search.hcore.impl.MassIndexerFactoryProvider
  */
-public class MassIndexerFactoryIntegrator implements ServiceContributingIntegrator,
-		BasicServiceInitiator<MassIndexerFactory> {
+@Deprecated
+public class MassIndexerFactoryIntegrator {
 
-	public static final String MASS_INDEXER_FACTORY_CLASSNAME = "hibernate.search.massindexer.factoryclass";
-
-	@Override
-	public Class<MassIndexerFactory> getServiceInitiated() {
-		return MassIndexerFactory.class;
-	}
-
-	@Override
-	public MassIndexerFactory initiateService(Map configurationValues, ServiceRegistryImplementor registry) {
-		String factoryClassName = (String) configurationValues.get( MASS_INDEXER_FACTORY_CLASSNAME );
-		MassIndexerFactory factory = createFactory( factoryClassName );
-		factory.initialize( properties( configurationValues ) );
-		return factory;
-	}
-
-	private Properties properties(Map configurationValues) {
-		Properties properties = new Properties();
-		properties.putAll( configurationValues );
-		return properties;
-	}
-
-	private MassIndexerFactory createFactory(String factoryClassName) {
-		if ( factoryClassName == null ) {
-			return new DefaultMassIndexerFactory();
-		}
-		else {
-			return customFactory( factoryClassName );
-		}
-	}
-
-	private MassIndexerFactory customFactory(String factoryClassName) {
-		return ClassLoaderHelper.instanceFromName( MassIndexerFactory.class, factoryClassName, getClass()
-				.getClassLoader(), "Mass indexer factory" );
-	}
-
-	@Override
-	public void integrate(Configuration configuration, SessionFactoryImplementor sessionFactory,
-			SessionFactoryServiceRegistry serviceRegistry) {
-	}
-
-	@Override
-	public void integrate(MetadataImplementor metadata, SessionFactoryImplementor sessionFactory,
-			SessionFactoryServiceRegistry serviceRegistry) {
-	}
-
-	@Override
-	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-	}
-
-	@Override
-	public void prepareServices(ServiceRegistryBuilder serviceRegistryBuilder) {
-		serviceRegistryBuilder.addInitiator( this );
-	}
+	public static final String MASS_INDEXER_FACTORY_CLASSNAME = MassIndexerFactoryProvider.MASS_INDEXER_FACTORY_CLASSNAME;
 
 }

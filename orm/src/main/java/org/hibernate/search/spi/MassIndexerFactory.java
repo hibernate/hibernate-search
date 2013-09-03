@@ -25,15 +25,13 @@ import java.util.Properties;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.service.Service;
 
 /**
  * Contains methods that can be used to create a {@link MassIndexer}.
  *
  * @author Davide D'Alto <davide@hibernate.org>
- * @see Service
  */
-public interface MassIndexerFactory extends Service {
+public interface MassIndexerFactory {
 
 	/**
 	 * Called after the creation of the factory, can be used to read configuration parameters.
