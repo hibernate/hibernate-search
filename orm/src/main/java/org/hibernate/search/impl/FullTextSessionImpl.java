@@ -876,4 +876,25 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.bySimpleNaturalId( entityClass );
 	}
 
+	/**
+	 * Methods below are introduced in Hibernate ORM 4.3
+	 * org.hibernate.procedure.ProcedureCall might not be available on classpath
+	 */
+
+	public org.hibernate.procedure.ProcedureCall createStoredProcedureCall(String procedureName) {
+		return session.createStoredProcedureCall( procedureName );
+	}
+
+	public org.hibernate.procedure.ProcedureCall createStoredProcedureCall(String procedureName, Class... resultClasses) {
+		return session.createStoredProcedureCall( procedureName, resultClasses );
+	}
+
+	public org.hibernate.procedure.ProcedureCall createStoredProcedureCall(String procedureName, String... resultSetMappings) {
+		return session.createStoredProcedureCall( procedureName, resultSetMappings );
+	}
+
+	public org.hibernate.procedure.ProcedureCall getNamedProcedureCall(String name) {
+		return session.getNamedProcedureCall( name );
+	}
+
 }
