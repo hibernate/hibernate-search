@@ -24,12 +24,14 @@
 package org.hibernate.search.test.configuration.integration;
 
 import java.util.Properties;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.util.BytemanHelper;
+import org.hibernate.search.test.util.ServiceRegistryTools;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.jboss.byteman.contrib.bmunit.BMRule;
@@ -71,7 +73,7 @@ public class HibernateSearchSessionFactoryObserverTest {
 		ServiceRegistryBuilder registryBuilder = new ServiceRegistryBuilder();
 		registryBuilder.applySettings( hibernateConfiguration.getProperties() );
 
-		ServiceRegistry serviceRegistry = registryBuilder.buildServiceRegistry();
+		ServiceRegistry serviceRegistry = ServiceRegistryTools.build( registryBuilder );
 		try {
 			hibernateConfiguration.buildSessionFactory( serviceRegistry );
 			fail( "ByteMan should have forced an exception" );

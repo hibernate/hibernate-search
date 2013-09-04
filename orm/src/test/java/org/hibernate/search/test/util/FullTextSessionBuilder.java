@@ -177,7 +177,7 @@ public class FullTextSessionBuilder {
 		ServiceRegistryBuilder registryBuilder = new ServiceRegistryBuilder();
 		registryBuilder.applySettings( hibConfiguration.getProperties() );
 
-		final ServiceRegistry serviceRegistry = registryBuilder.buildServiceRegistry();
+		final ServiceRegistry serviceRegistry = ServiceRegistryTools.build( registryBuilder );
 		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory(
 				serviceRegistry
 		);
