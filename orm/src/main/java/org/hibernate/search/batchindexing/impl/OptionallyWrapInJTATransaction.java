@@ -33,7 +33,6 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.engine.transaction.spi.TransactionFactory;
-import org.hibernate.service.jta.platform.spi.JtaPlatform;
 
 /**
  * Wrap the subsequent Runnable in a JTA Transaction if necessary:
@@ -52,8 +51,10 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 	private final SessionAwareRunnable sessionAwareRunnable;
 	private final StatelessSessionAwareRunnable statelessSessionAwareRunnable;
 	private final ErrorHandler errorHandler;
+	private final TransactionManager transactionManager;
 
-	public OptionallyWrapInJTATransaction(SessionFactory factory, ErrorHandler errorHandler, SessionAwareRunnable sessionAwareRunnable) {
+	public OptionallyWrapInJTATransaction(SessionFactory factory, ErrorHandler errorHandler,
+			SessionAwareRunnable sessionAwareRunnable, TransactionManager transactionManager) {
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
 		 *  - whether or not we need to start the JTA transaction
@@ -65,9 +66,11 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 		this.sessionAwareRunnable = sessionAwareRunnable;
 		this.statelessSessionAwareRunnable = null;
 		this.errorHandler = errorHandler;
+		this.transactionManager = transactionManager;
 	}
 
-	public OptionallyWrapInJTATransaction(SessionFactory factory, ErrorHandler errorHandler, StatelessSessionAwareRunnable statelessSessionAwareRunnable) {
+	public OptionallyWrapInJTATransaction(SessionFactory factory, ErrorHandler errorHandler,
+			StatelessSessionAwareRunnable statelessSessionAwareRunnable, TransactionManager transactionManager) {
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
 		 *  - whether or not we need to start the JTA transaction
@@ -79,6 +82,7 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 		this.sessionAwareRunnable = null;
 		this.statelessSessionAwareRunnable = statelessSessionAwareRunnable;
 		this.errorHandler = errorHandler;
+		this.transactionManager = transactionManager;
 	}
 
 	@Override
@@ -86,7 +90,6 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 		try {
 			final boolean wrapInTransaction = wrapInTransaction();
 			if ( wrapInTransaction ) {
-				TransactionManager transactionManager = getTransactionManager();
 				try {
 					final Session session;
 					final StatelessSession statelessSession;
@@ -142,10 +145,6 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 		}
 	}
 
-	private TransactionManager getTransactionManager() {
-		return factory.getServiceRegistry().getService( JtaPlatform.class ).retrieveTransactionManager();
-	}
-
 	boolean wrapInTransaction() {
 		final TransactionFactory transactionFactory = factory.getServiceRegistry().getService( TransactionFactory.class );
 		if ( !transactionFactory.compatibleWithJtaSynchronization() ) {
@@ -153,7 +152,6 @@ public class OptionallyWrapInJTATransaction implements Runnable {
 			log.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );
 			return false;
 		}
-		final TransactionManager transactionManager = getTransactionManager();
 		if ( transactionManager == null ) {
 			//no TM, nothing to do OR configuration mistake
 			log.trace( "No TransactionManager found, do not start a surrounding JTA transaction" );
