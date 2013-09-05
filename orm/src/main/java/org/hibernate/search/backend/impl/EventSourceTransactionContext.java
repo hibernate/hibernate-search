@@ -44,7 +44,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
-import org.hibernate.service.jta.platform.spi.JtaPlatform;
 
 /**
  * Implementation of the transactional context on top of an EventSource (Session)
@@ -132,8 +131,13 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	}
 
 	private boolean isLocalTransaction() {
-		//TODO make it better but I don't know how we can optimize it.
-		final TransactionManager transactionManager = getService( JtaPlatform.class ).retrieveTransactionManager();
+		TransactionManager transactionManager = eventSource
+			.getTransactionCoordinator()
+			.getTransactionContext()
+			.getTransactionEnvironment()
+			.getJtaPlatform()
+			//.canRegisterSynchronization() <- TODO explore: possibly a better option?
+			.retrieveTransactionManager();
 		return transactionManager == null;
 	}
 

@@ -28,11 +28,10 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.CacheMode;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.impl.BatchCoordinator;
 import org.hibernate.search.batchindexing.impl.Executors;
@@ -53,7 +52,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private static final Log log = LoggerFactory.make();
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
-	private final SessionFactory sessionFactory;
+	private final SessionFactoryImplementor sessionFactory;
 
 	protected Set<Class<?>> rootEntities = new HashSet<Class<?>>();
 
@@ -70,7 +69,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private MassIndexerProgressMonitor monitor;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 
-	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory, Class<?>... entities) {
+	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory, Class<?>... entities) {
 		this.searchFactoryImplementor = searchFactory;
 		this.sessionFactory = sessionFactory;
 		rootEntities = toRootEntities( searchFactoryImplementor, entities );
