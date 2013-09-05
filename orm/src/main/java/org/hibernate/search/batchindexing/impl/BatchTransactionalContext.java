@@ -28,7 +28,6 @@ import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.transaction.spi.TransactionFactory;
 import org.hibernate.event.spi.EventSource;
@@ -52,8 +51,8 @@ public class BatchTransactionalContext {
 	final TransactionManager transactionManager;
 	final TransactionFactory<?> transactionFactory;
 
-	public BatchTransactionalContext(SessionFactory sessionFactory, ErrorHandler errorHandler) {
-		this.factory = (SessionFactoryImplementor) sessionFactory;
+	public BatchTransactionalContext(SessionFactoryImplementor sessionFactory, ErrorHandler errorHandler) {
+		this.factory = sessionFactory;
 		this.errorHandler = errorHandler;
 		this.transactionManager = lookupTransactionManager( factory );
 		this.transactionFactory = lookupTransactionFactory( factory );

@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.hibernate.CacheMode;
-import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -49,7 +49,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private static final Log log = LoggerFactory.make();
 
 	private final SearchFactoryImplementor searchFactory;
-	private final SessionFactory sessionFactory;
+	private final SessionFactoryImplementor sessionFactory;
 
 	//following order shows the 4 stages of an entity flowing to the index:
 	private final ThreadPoolExecutor execIdentifiersLoader;
@@ -81,7 +81,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final int idFetchSize;
 
 	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor,
-								SessionFactory sessionFactory,
+								SessionFactoryImplementor sessionFactory,
 								Class<?> entityType,
 								int objectLoadingThreads,
 								int collectionLoadingThreads,
