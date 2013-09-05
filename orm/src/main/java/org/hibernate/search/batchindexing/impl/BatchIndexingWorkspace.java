@@ -29,7 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.hibernate.CacheMode;
-import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -49,7 +49,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private static final Log log = LoggerFactory.make();
 
 	private final SearchFactoryImplementor searchFactory;
-	private final SessionFactory sessionFactory;
+	private final SessionFactoryImplementor sessionFactory;
 
 	//following order shows the 4 stages of an entity flowing to the index:
 	private final ThreadPoolExecutor execIdentifiersLoader;
@@ -81,7 +81,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	private final int idFetchSize;
 
 	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor,
-								SessionFactory sessionFactory,
+								SessionFactoryImplementor sessionFactory,
 								Class<?> entityType,
 								int objectLoadingThreads,
 								int collectionLoadingThreads,
@@ -132,6 +132,7 @@ public class BatchIndexingWorkspace implements Runnable {
 	public void run() {
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		try {
+			final BatchTransactionalContext btctx = new BatchTransactionalContext( sessionFactory, errorHandler );
 
 			//first start the consumers, then the producers (reverse order):
 			for ( int i = 0; i < luceneWorkerBuildingThreadNum; i++ ) {
@@ -141,7 +142,7 @@ public class BatchIndexingWorkspace implements Runnable {
 						sessionFactory, producerEndSignal, searchFactory,
 						cacheMode, backend, errorHandler
 				);
-				execDocBuilding.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
+				execDocBuilding.execute( new OptionallyWrapInJTATransaction( btctx, producer ) );
 			}
 			for ( int i = 0; i < objectLoadingThreadNum; i++ ) {
 				//from primary key to loaded entity:
@@ -149,7 +150,7 @@ public class BatchIndexingWorkspace implements Runnable {
 						fromIdentifierListToEntities, fromEntityToAddwork, monitor,
 						sessionFactory, cacheMode, indexedType, idNameOfIndexedType, errorHandler
 				);
-				execFirstLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
+				execFirstLoader.execute( new OptionallyWrapInJTATransaction( btctx, producer ) );
 			}
 			//from class definition to all primary keys:
 			final IdentifierProducer producer = new IdentifierProducer(
@@ -157,7 +158,7 @@ public class BatchIndexingWorkspace implements Runnable {
 					objectLoadingBatchSize, indexedType, monitor,
 					objectsLimit, errorHandler, idFetchSize
 			);
-			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( sessionFactory, errorHandler, producer ) );
+			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( btctx, producer ) );
 
 			//shutdown all executors:
 			execIdentifiersLoader.shutdown();
@@ -181,4 +182,5 @@ public class BatchIndexingWorkspace implements Runnable {
 			endAllSignal.countDown();
 		}
 	}
+
 }

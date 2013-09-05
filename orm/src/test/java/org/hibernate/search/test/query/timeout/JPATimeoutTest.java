@@ -159,11 +159,6 @@ public class JPATimeoutTest extends JPATestCase {
 	}
 
 	@Override
-	public Class[] getAnnotatedClasses() {
-		return new Class[] { Clock.class };
-	}
-
-	@Override
 	protected void configure(Map cfg) {
 		cfg.put( "hibernate.jdbc.batch_size", "1000" );
 		super.configure( cfg );

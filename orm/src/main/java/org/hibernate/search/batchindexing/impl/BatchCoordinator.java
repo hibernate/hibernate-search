@@ -27,12 +27,11 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.CacheMode;
-import org.hibernate.SessionFactory;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -51,7 +50,7 @@ public class BatchCoordinator implements Runnable {
 
 	private final Class<?>[] rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final SearchFactoryImplementor searchFactoryImplementor;
-	private final SessionFactory sessionFactory;
+	private final SessionFactoryImplementor sessionFactory;
 	private final int typesToIndexInParallel;
 	private final int objectLoadingThreads;
 	private final int collectionLoadingThreads;
@@ -68,7 +67,7 @@ public class BatchCoordinator implements Runnable {
 
 	public BatchCoordinator(Set<Class<?>> rootEntities,
 							SearchFactoryImplementor searchFactoryImplementor,
-							SessionFactory sessionFactory,
+							SessionFactoryImplementor sessionFactory,
 							int typesToIndexInParallel,
 							int objectLoadingThreads,
 							int collectionLoadingThreads,
