@@ -74,6 +74,10 @@
                 <exclude>org.hibernate.common:*</exclude>
                 <exclude>org.slf4j:slf4j-api:*</exclude>
                 <exclude>org.jboss.logging:*</exclude>
+                <exclude>org.jboss.spec.javax.transaction:*</exclude>
+                <exclude>org.jgroups:jgroups</exclude>
+                <exclude>org.infinispan:*</exclude>
+                <exclude>org.apache.commons:*</exclude>
             </excludes>
         </dependencySet>
 

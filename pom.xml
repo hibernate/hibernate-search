@@ -154,14 +154,13 @@
         <jbossLoggingVersion>3.1.0.GA</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.3.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>4.17.4.Final</narayanaVersion>
-        <avroVersion>1.6.3</avroVersion>
+        <avroVersion>1.7.5</avroVersion>
         <jacksonAslVersion>1.9.2</jacksonAslVersion>
         <commonsIoVersion>1.4</commonsIoVersion>
         <commonsCodecVersion>1.5</commonsCodecVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
         <!-- Used in the hibernate-search-modules project -->
         <paranamerVersion>2.3</paranamerVersion>
-        <snappyVersion>1.0.4.1</snappyVersion>
     </properties>
 
     <dependencyManagement>
@@ -210,6 +209,16 @@
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
                 <version>${avroVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.xerial.snappy</groupId>
+                        <artifactId>snappy-java</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.tukaani</groupId>
+                        <artifactId>xz</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <!-- To force testing of Apache Avro integration with the version of Jackson used in AS 7.1 -->
