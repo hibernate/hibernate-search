@@ -32,7 +32,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
 
@@ -62,7 +61,7 @@ public class OptimizeTest extends SearchTestCase {
 		s.close();
 
 		//check non indexed object get indexed by s.index
-		s = new FullTextSessionImpl( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		int result = s.createFullTextQuery( parser.parse( "body:wrote" ) ).getResultSize();

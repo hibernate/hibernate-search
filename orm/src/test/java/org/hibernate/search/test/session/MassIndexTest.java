@@ -42,7 +42,6 @@ import org.hibernate.jdbc.Work;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
 
@@ -72,7 +71,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.close();
 
 		//check non created object does get found!!1
-		s = new FullTextSessionImpl( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		ScrollableResults results = s.createCriteria( Email.class ).scroll( ScrollMode.FORWARD_ONLY );
 		int index = 0;
@@ -112,7 +111,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.close();
 
 		//check non created object does get found!!1
-		s = new FullTextSessionImpl( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		List result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
@@ -120,7 +119,7 @@ public class MassIndexTest extends SearchTestCase {
 		tx.commit();
 		s.close();
 
-		s = new FullTextSessionImpl( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		s.getTransaction().begin();
 		s.doWork( new Work() {
 			@Override
@@ -144,7 +143,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.getTransaction().commit();
 		s.close();
 
-		s = new FullTextSessionImpl( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 		result = s.createFullTextQuery( parser.parse( "body:write" ) ).list();
@@ -171,7 +170,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.close();
 
 		//check non indexed object get indexed by s.index
-		s = new FullTextSessionImpl( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		result = s.createFullTextQuery( parser.parse( "body:create" ) ).list();
 		assertEquals( 1, result.size() );

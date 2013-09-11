@@ -34,7 +34,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.Environment;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.Transaction;
 import org.hibernate.ScrollableResults;
 import org.hibernate.ScrollMode;
@@ -67,7 +66,7 @@ public class MassIndexUsingManualFlushTest extends SearchTestCase {
 		s.close();
 
 		//check non created object does get found!!1
-		s = new FullTextSessionImpl( openSession() );
+		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		ScrollableResults results = s.createCriteria( Email.class ).scroll( ScrollMode.FORWARD_ONLY );
 		int index = 0;
