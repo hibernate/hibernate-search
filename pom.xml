@@ -161,7 +161,6 @@
         <commonsLangVersion>2.6</commonsLangVersion>
         <!-- Used in the hibernate-search-modules project -->
         <paranamerVersion>2.3</paranamerVersion>
-        <snappyVersion>1.0.5</snappyVersion>
     </properties>
 
     <dependencyManagement>
@@ -210,6 +209,12 @@
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
                 <version>${avroVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.xerial.snappy</groupId>
+                        <artifactId>snappy-java</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <!-- To force testing of Apache Avro integration with the version of Jackson used in AS 7.1 -->

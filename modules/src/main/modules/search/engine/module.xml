@@ -31,7 +31,6 @@
         <resource-root path="jackson-core-asl-${jacksonAslVersion}.jar" />
         <resource-root path="jackson-mapper-asl-${jacksonAslVersion}.jar" />
         <resource-root path="paranamer-${paranamerVersion}.jar" />
-        <resource-root path="snappy-java-${snappyVersion}.jar" />
     </resources>
     <dependencies>
         <module name="javax.transaction.api" />
