@@ -154,14 +154,14 @@
         <jbossLoggingVersion>3.1.0.GA</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.3.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>4.17.4.Final</narayanaVersion>
-        <avroVersion>1.6.3</avroVersion>
+        <avroVersion>1.7.5</avroVersion>
         <jacksonAslVersion>1.9.2</jacksonAslVersion>
         <commonsIoVersion>1.4</commonsIoVersion>
         <commonsCodecVersion>1.5</commonsCodecVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
         <!-- Used in the hibernate-search-modules project -->
         <paranamerVersion>2.3</paranamerVersion>
-        <snappyVersion>1.0.4.1</snappyVersion>
+        <snappyVersion>1.0.5</snappyVersion>
     </properties>
 
     <dependencyManagement>
