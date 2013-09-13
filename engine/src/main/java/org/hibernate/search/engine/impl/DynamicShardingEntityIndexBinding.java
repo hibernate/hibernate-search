@@ -20,17 +20,13 @@
  */
 package org.hibernate.search.engine.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -66,24 +62,22 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 		this.shardIdentityProvider = shardIdentityProvider;
 		this.similarityInstance = similarityInstance;
 		this.entityIndexingInterceptor = entityIndexingInterceptor;
-		this.shardingStrategy = new DynamicShardsShardingStrategy(); //no need to initialize it
 		this.properties = properties;
 		this.searchFactory = searchFactory;
 		this.indexManagerFactory = indexManagerFactory;
 		this.indexManagerHolder = indexManagerHolder;
 		this.rootDirectoryProviderName = rootDirectoryProviderName;
+		this.shardingStrategy = new DynamicShardingStrategy(
+				shardIdentityProvider,
+				indexManagerHolder,
+				this,
+				rootDirectoryProviderName
+		);
 	}
 
+	@Override
 	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder) {
 		this.documentBuilder = documentBuilder;
-	}
-
-	public Properties getProperties() {
-		return properties;
-	}
-
-	public SearchFactoryImplementor getSearchFactory() {
-		return searchFactory;
 	}
 
 	@Override
@@ -122,6 +116,14 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 		return entityIndexingInterceptor;
 	}
 
+	public Properties getProperties() {
+		return properties;
+	}
+
+	public SearchFactoryImplementor getSearchFactory() {
+		return searchFactory;
+	}
+
 	public IndexManagerFactory getIndexManagerFactory() {
 		return indexManagerFactory;
 	}
@@ -137,56 +139,5 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 				indexManagerHolder,
 				rootDirectoryProviderName
 		);
-	}
-
-	private class DynamicShardsShardingStrategy implements IndexShardingStrategy {
-
-		@Override
-		public void initialize(Properties properties, IndexManager[] providers) {
-		}
-
-		@Override
-		public IndexManager[] getIndexManagersForAllShards() {
-			String[] shards = shardIdentityProvider.getAllShardIdentifiers();
-			return getIndexManagersFromShards( shards );
-		}
-
-		@Override
-		public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-			String shard = shardIdentityProvider.getShardIdentifier( entity, id, idInString, document );
-			return indexManagerHolder.getOrCreateLateIndexManager(
-					getProviderName( shard ),
-					DynamicShardingEntityIndexBinding.this
-			);
-		}
-
-		@Override
-		public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
-			String[] shards = shardIdentityProvider.getShardIdentifiers( entity, id, idInString );
-			return getIndexManagersFromShards( shards );
-		}
-
-		private IndexManager[] getIndexManagersFromShards(String[] shards) {
-			ArrayList<IndexManager> managers = new ArrayList<IndexManager>( shards.length );
-			for ( String shard : shards ) {
-				managers.add(
-						indexManagerHolder.getOrCreateLateIndexManager(
-								getProviderName( shard ),
-								DynamicShardingEntityIndexBinding.this
-						)
-				);
-			}
-			return managers.toArray( new IndexManager[shards.length] );
-		}
-
-		@Override
-		public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-			String[] shards = shardIdentityProvider.getShardIdentifiersForQuery( fullTextFilters );
-			return getIndexManagersFromShards( shards );
-		}
-
-		private String getProviderName(String shard) {
-			return rootDirectoryProviderName + "." + shard;
-		}
 	}
 }
