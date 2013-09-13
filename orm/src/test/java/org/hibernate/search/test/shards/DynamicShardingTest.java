@@ -20,36 +20,121 @@
  */
 package org.hibernate.search.test.shards;
 
-import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.store.FSDirectory;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
-import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.store.ShardIdentifierProvider;
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
-
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.store.FSDirectory;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import org.hibernate.cfg.Configuration;
+import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.filter.FullTextFilterImplementor;
+import org.hibernate.search.store.ShardIdentifierProvider;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.TestConstants;
+import org.junit.Before;
+import org.junit.Test;
+
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DynamicShardingTest extends SearchTestCase {
+public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 
+	private Animal elephant;
+	private Animal spider;
+	private Animal bear;
+
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+
+		elephant = new Animal();
+		elephant.setId( 1 );
+		elephant.setName( "Elephant" );
+		elephant.setType( "Mammal" );
+
+		spider = new Animal();
+		spider.setId( 2 );
+		spider.setName( "Spider" );
+		spider.setType( "Insect" );
+
+		bear = new Animal();
+		bear.setId( 3 );
+		bear.setName( "Bear" );
+		bear.setType( "Mammal" );
+	}
+
+	@Test
+	public void testDynamicCreationOfShards() throws Exception {
+		EntityIndexBinding entityIndexBinding = getSearchFactoryImpl().getIndexBindings().get( Animal.class );
+		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 0 );
+
+		insertAnimals( elephant );
+		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 1 );
+
+		insertAnimals( spider );
+		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
+
+		insertAnimals( bear );
+		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
+
+		assertNumberOfEntitiesInIndex( "Animal.Mammal", 2 );
+		assertNumberOfEntitiesInIndex( "Animal.Insect", 1 );
+	}
+
+	@Test
+	public void testDynamicShardsAreTargetingInQuery() throws Exception {
+		insertAnimals( elephant, spider, bear );
+
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
+		FullTextSession fts = Search.getFullTextSession( session );
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				"id",
+				TestConstants.stopAnalyzer
+		);
+
+		List results = fts.createFullTextQuery( parser.parse( "name:bear OR name:elephant OR name:spider" ) ).list();
+		assertEquals( "Either double insert, single update, or query fails with shards", 3, results.size() );
+		tx.commit();
+		session.close();
+	}
+
+	@Test
+	public void testInitialiseDynamicShardsOnStartup() throws Exception {
+		EntityIndexBinding entityIndexBinding = getSearchFactoryImpl().getIndexBindings().get( Animal.class );
+		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 0 );
+
+		insertAnimals( elephant, spider, bear );
+
+		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
+
+		// closing and re-opening the session factory to simulate a restart of the "app"
+		closeSessionFactory();
+		openSessionFactory();
+
+		entityIndexBinding = getSearchFactoryImpl().getIndexBindings().get( Animal.class );
+		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
+	}
+
+	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
@@ -59,100 +144,48 @@ public class DynamicShardingTest extends SearchTestCase {
 		//is the default when multiple shards are set up
 		//cfg.setProperty( "hibernate.search.Animal.sharding_strategy", IdHashShardingStrategy.class );
 		cfg.setProperty( "hibernate.search.Animal.sharding_strategy.nbr_of_shards", "dynamic" );
-		cfg.setProperty( "hibernate.search.Animal.sharding_strategy.shard_identity_provider", AnimalShardProvider.class.getName() );
-	}
-
-
-	public void testSharding() throws Exception {
-		Session s = openSession();
-		EntityIndexBinder binder = getSearchFactoryImpl().getIndexBindingForEntity().get( Animal.class );
-		assertThat( binder.getIndexManagers() ).hasSize( 0 );
-		Transaction tx = s.beginTransaction();
-		Animal a = new Animal();
-		a.setId( 1 );
-		a.setName( "Elephant" );
-		a.setType( "Mammal" );
-		s.persist( a );
-		tx.commit();
-		s.clear();
-
-		assertThat( binder.getIndexManagers() ).hasSize( 1 );
-
-		tx = s.beginTransaction();
-		a = new Animal();
-		a.setId( 2 );
-		a.setName( "Spider" );
-		a.setType( "Insect" );
-		s.persist( a );
-		tx.commit();
-		s.clear();
-
-		assertThat( binder.getIndexManagers() ).hasSize( 2 );
-
-		tx = s.beginTransaction();
-		a = new Animal();
-		a.setId( 3 );
-		a.setName( "Bear" );
-		a.setType( "Mammal" );
-		s.persist( a );
-		tx.commit();
-		s.clear();
-
-		assertThat( binder.getIndexManagers() ).hasSize( 2 );
-
-		FSDirectory animalMammalDirectory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.Mammal" ) );
-		try {
-			IndexReader reader = IndexReader.open( animalMammalDirectory );
-			try {
-				int num = reader.numDocs();
-				assertEquals( 2, num );
-			}
-			finally {
-				reader.close();
-			}
-		}
-		finally {
-			animalMammalDirectory.close();
-		}
-
-		FSDirectory animalInsectDirectory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.Insect" ) );
-		try {
-			IndexReader reader = IndexReader.open( animalInsectDirectory );
-			try {
-				int num = reader.numDocs();
-				assertEquals( 1, num );
-			}
-			finally {
-				reader.close();
-			}
-		}
-		finally {
-			animalInsectDirectory.close();
-		}
-
-		tx = s.beginTransaction();
-		FullTextSession fts = Search.getFullTextSession( s );
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
-
-		List results = fts.createFullTextQuery( parser.parse( "name:bear OR name:elephant OR name:spider" ) ).list();
-		assertEquals( "Either double insert, single update, or query fails with shards", 3, results.size() );
-		for ( Object o : results ) {
-			s.delete( o );
-		}
-		tx.commit();
-		s.close();
+		cfg.setProperty(
+				"hibernate.search.Animal.sharding_strategy.shard_identity_provider",
+				AnimalShardProvider.class.getName()
+		);
 	}
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] {
-				Animal.class,
-				Furniture.class
+				Animal.class
 		};
 	}
 
+	private void assertNumberOfEntitiesInIndex(String indexName, int expectedCount) throws IOException {
+		FSDirectory fsDirectory = FSDirectory.open( new File( getBaseIndexDir(), indexName ) );
+		try {
+			IndexReader reader = IndexReader.open( fsDirectory );
+			try {
+				int actualCount = reader.numDocs();
+				assertEquals( "Unexpected document count", expectedCount, actualCount );
+			}
+			finally {
+				reader.close();
+			}
+		}
+		finally {
+			fsDirectory.close();
+		}
+	}
+
+	private void insertAnimals(Animal... animals) {
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
+		for ( Animal animal : animals ) {
+			session.persist( animal );
+		}
+		tx.commit();
+		session.clear();
+	}
+
 	public static class AnimalShardProvider implements ShardIdentifierProvider {
-		private ConcurrentHashMap<String,String> shards = new ConcurrentHashMap<String,String>();
+		private ConcurrentHashMap<String, String> shards = new ConcurrentHashMap<String, String>();
 
 		@Override
 		public void initialize(Properties properties) {
