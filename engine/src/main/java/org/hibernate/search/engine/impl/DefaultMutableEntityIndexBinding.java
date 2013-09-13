@@ -40,11 +40,6 @@ public class DefaultMutableEntityIndexBinding<T> implements MutableEntityIndexBi
 	private final IndexManager[] indexManagers;
 	private final EntityIndexingInterceptor entityIndexingInterceptor;
 
-	/**
-	 * @param shardingStrategy
-	 * @param similarityInstance
-	 * @param providers
-	 */
 	public DefaultMutableEntityIndexBinding(
 			IndexShardingStrategy shardingStrategy,
 			Similarity similarityInstance,

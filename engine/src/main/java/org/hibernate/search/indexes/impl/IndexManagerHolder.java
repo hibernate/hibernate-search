@@ -39,9 +39,9 @@ import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -69,23 +69,23 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  */
 public class IndexManagerHolder {
+	public static final String DYNAMIC_SHARDING = "dynamic";
 
 	private static final Log log = LoggerFactory.make();
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
-	public static final String DYNAMIC_SHARDING = "dynamic";
 	private static final String SHARD_IDENTITY_PROVIDER = SHARDING_STRATEGY + ".shard_identity_provider";
 
 	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
-	//I currently think it's easier to not hide sharding implementations in a custom
-	//IndexManager to make it easier to explicitly a)detect duplicates b)start-stop
-	//additional Managers as needed from a dynamic sharding implementation, without having
-	//to embed the sharding logic in a manager itself.
-	//so now we have a real 1:1 relation between Managers and indexes, and the signature for
-	//#getReader() will always return a single "naive" IndexReader.
-	//So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
-	//(for both fieldCaches and cached filters)
+	// I currently think it's easier to not hide sharding implementations in a custom
+	// IndexManager to make it easier to explicitly a)detect duplicates b)start-stop
+	// additional Managers as needed from a dynamic sharding implementation, without having
+	// to embed the sharding logic in a manager itself.
+	// so now we have a real 1:1 relation between Managers and indexes, and the signature for
+	// #getReader() will always return a single "naive" IndexReader.
+	// So we get better caching too, as the changed indexes change cache keys on a fine-grained basis
+	// (for both fieldCaches and cached filters)
 	public synchronized MutableEntityIndexBinding buildEntityIndexBinding(
 			XClass entity,
 			Class mappedClass,
@@ -107,7 +107,7 @@ public class IndexManagerHolder {
 			similarityInstance = ClassLoaderHelper.instanceFromName(
 					Similarity.class,
 					similarityClassName,
-					DirectoryProviderFactory.class,
+					DirectoryProviderFactory.class.getClassLoader(),
 					"Similarity class for index " + directoryProviderName
 			);
 		}
@@ -126,8 +126,10 @@ public class IndexManagerHolder {
 				Properties indexProp = indexProps[index];
 				IndexManager indexManager = indexManagersRegistry.get( providerName );
 				if ( indexManager == null ) {
-					indexManager = doGetOrCreateIndexManager( providerName, mappedClass, similarityInstance,
-							indexProp, cfg.getIndexManagerFactory(), context );
+					indexManager = getOrCreateIndexManager(
+							providerName, mappedClass, similarityInstance,
+							indexProp, cfg.getIndexManagerFactory(), context
+					);
 				}
 				else {
 					indexManager.addContainedEntity( mappedClass );
@@ -157,12 +159,14 @@ public class IndexManagerHolder {
 			}
 			shardingStrategy = ClassLoaderHelper.instanceFromName(
 					IndexShardingStrategy.class,
-					shardingStrategyName, DirectoryProviderFactory.class, "IndexShardingStrategy"
+					shardingStrategyName,
+					DirectoryProviderFactory.class.getClassLoader(),
+					"IndexShardingStrategy"
 			);
 		}
 		if ( shardingStrategy != null ) {
 			shardingStrategy.initialize(
-				new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers
+					new MaskedProperty( indexProps[0], SHARDING_STRATEGY ), providers
 			);
 		}
 
@@ -170,8 +174,10 @@ public class IndexManagerHolder {
 		String shardIdentityProviderName = indexProps[0].getProperty( SHARD_IDENTITY_PROVIDER );
 		if ( isDynamicSharding ) {
 			shardIdentifierProvider = ClassLoaderHelper.instanceFromName(
-						ShardIdentifierProvider.class,
-						shardIdentityProviderName, DirectoryProviderFactory.class, "ShardIdentifierProvider"
+					ShardIdentifierProvider.class,
+					shardIdentityProviderName,
+					DirectoryProviderFactory.class.getClassLoader(),
+					"ShardIdentifierProvider"
 			);
 			//TODO should we filter the properties? Would it be useful to get the indexBase / name to
 			//TODO implement a ls on the dir?
@@ -216,7 +222,12 @@ public class IndexManagerHolder {
 	 * Clients of this method should first optimistically check the indexManagersRegistry, which might already contain the needed IndexManager,
 	 * to avoid contention on this synchronized method during dynamic reconfiguration at runtime.
 	 */
-	private synchronized IndexManager doGetOrCreateIndexManager(String providerName, Class<?> mappedClass, Similarity similarityInstance, Properties indexProp, IndexManagerFactory indexManagerFactory, WorkerBuildContext context) {
+	private synchronized IndexManager getOrCreateIndexManager(String providerName,
+			Class<?> mappedClass,
+			Similarity similarityInstance,
+			Properties indexProp,
+			IndexManagerFactory indexManagerFactory,
+			WorkerBuildContext context) {
 		IndexManager indexManager = indexManagersRegistry.get( providerName );
 		if ( indexManager == null ) {
 			indexManager = createIndexManager( providerName, indexProp, context, indexManagerFactory );
@@ -229,13 +240,13 @@ public class IndexManagerHolder {
 		return indexManager;
 	}
 
-	public IndexManager getOrCreateLateIndexManager(String providerName, DynamicShardingEntityIndexBinding entityIndexBinder) {
+	public IndexManager getOrCreateLateIndexManager(String providerName, DynamicShardingEntityIndexBinding entityIndexBinding) {
 		IndexManager indexManager = indexManagersRegistry.get( providerName );
 		if ( indexManager != null ) {
-			indexManager.addContainedEntity( entityIndexBinder.getDocumentBuilder().getBeanClass() );
+			indexManager.addContainedEntity( entityIndexBinding.getDocumentBuilder().getBeanClass() );
 			return indexManager;
 		}
-		SearchFactoryImplementor searchFactory = entityIndexBinder.getSearchFactory();
+		SearchFactoryImplementor searchFactory = entityIndexBinding.getSearchFactory();
 		WorkerBuildContext context;
 		//known implementations of SearchFactory passed are MutableSearchFactory and ImmutableSearchFactory
 		if ( WorkerBuildContext.class.isAssignableFrom( searchFactory.getClass() ) ) {
@@ -244,11 +255,12 @@ public class IndexManagerHolder {
 		else {
 			throw log.assertionFailureCannotCastToWorkerBuilderContext( searchFactory.getClass() );
 		}
-		indexManager = doGetOrCreateIndexManager(
+		indexManager = getOrCreateIndexManager(
 				providerName,
-				entityIndexBinder.getDocumentBuilder().getBeanClass(),
-				entityIndexBinder.getSimilarity(), entityIndexBinder.getProperties(),
-				entityIndexBinder.getIndexManagerFactory(),
+				entityIndexBinding.getDocumentBuilder().getBeanClass(),
+				entityIndexBinding.getSimilarity(),
+				entityIndexBinding.getProperties(),
+				entityIndexBinding.getIndexManagerFactory(),
 				context
 		);
 		indexManager.setSearchFactory( searchFactory );
@@ -282,12 +294,13 @@ public class IndexManagerHolder {
 
 	/**
 	 * Specifies a custom similarity on an index
+	 *
 	 * @param newSimilarity
 	 * @param manager
 	 */
 	private void setSimilarity(Similarity newSimilarity, IndexManager manager) {
 		Similarity similarity = manager.getSimilarity();
-		if ( similarity != null && ! similarity.getClass().equals( newSimilarity.getClass() ) ) {
+		if ( similarity != null && !similarity.getClass().equals( newSimilarity.getClass() ) ) {
 			throw new SearchException(
 					"Multiple entities are sharing the same index but are declaring an " +
 							"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
@@ -317,6 +330,7 @@ public class IndexManagerHolder {
 
 	/**
 	 * Extracts the index name used for the entity from it's annotations
+	 *
 	 * @return the index name
 	 */
 	private static String getDirectoryProviderName(XClass clazz, SearchConfiguration cfg) {
@@ -396,6 +410,7 @@ public class IndexManagerHolder {
 	/**
 	 * Useful for MutableSearchFactory, this haves all managed IndexManagers
 	 * switch over to the new SearchFactory.
+	 *
 	 * @param factory the new SearchFactory to set on each IndexManager.
 	 */
 	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
@@ -416,6 +431,7 @@ public class IndexManagerHolder {
 
 	/**
 	 * @param targetIndexName the name of the IndexManager to look up
+	 *
 	 * @return the IndexManager, or null if it doesn't exist
 	 */
 	public IndexManager getIndexManager(String targetIndexName) {

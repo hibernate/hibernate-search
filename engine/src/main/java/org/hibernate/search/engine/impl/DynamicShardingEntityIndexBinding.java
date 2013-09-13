@@ -20,9 +20,13 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.Set;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Similarity;
-import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -33,11 +37,6 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -55,11 +54,6 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 	private final EntityIndexingInterceptor entityIndexingInterceptor;
 	private IndexManagerFactory indexManagerFactory;
 
-	/**
-	 * @param shardingStrategy
-	 * @param similarityInstance
-	 * @param providers
-	 */
 	public DynamicShardingEntityIndexBinding(
 			ShardIdentifierProvider shardIdentityProvider,
 			Similarity similarityInstance,
@@ -160,7 +154,10 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 		@Override
 		public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 			String shard = shardIdentityProvider.getShardIdentifier( entity, id, idInString, document );
-			return indexManagerHolder.getOrCreateLateIndexManager( getProviderName( shard ), DynamicShardingEntityIndexBinding.this );
+			return indexManagerHolder.getOrCreateLateIndexManager(
+					getProviderName( shard ),
+					DynamicShardingEntityIndexBinding.this
+			);
 		}
 
 		@Override
@@ -172,7 +169,12 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 		private IndexManager[] getIndexManagersFromShards(String[] shards) {
 			ArrayList<IndexManager> managers = new ArrayList<IndexManager>( shards.length );
 			for ( String shard : shards ) {
-				managers.add( indexManagerHolder.getOrCreateLateIndexManager( getProviderName( shard ), DynamicShardingEntityIndexBinding.this ) );
+				managers.add(
+						indexManagerHolder.getOrCreateLateIndexManager(
+								getProviderName( shard ),
+								DynamicShardingEntityIndexBinding.this
+						)
+				);
 			}
 			return managers.toArray( new IndexManager[shards.length] );
 		}

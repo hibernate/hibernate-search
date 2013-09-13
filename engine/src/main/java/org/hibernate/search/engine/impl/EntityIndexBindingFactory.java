@@ -36,7 +36,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.util.Properties;
 
 /**
- * Build the expected {@link EntityIndexBinder} depending in the configuration
+ * Build the expected {@link EntityIndexBinding} depending in the configuration
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
