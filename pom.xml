@@ -149,7 +149,7 @@
         <jgroupsVersion>3.3.4.Final</jgroupsVersion>
         <hibernateVersion>4.2.5.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
-        <tikaVersion>1.1</tikaVersion>
+        <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>2.1.0</bytemanVersion>
         <jbossLoggingVersion>3.1.0.GA</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.0.3.Final</jbossLoggingProcessorVersion>
@@ -159,6 +159,7 @@
         <commonsIoVersion>1.4</commonsIoVersion>
         <commonsCodecVersion>1.5</commonsCodecVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
+        <commonsCompressVersion>1.5</commonsCompressVersion>
         <!-- Used in the hibernate-search-modules project -->
         <paranamerVersion>2.3</paranamerVersion>
     </properties>
@@ -246,6 +247,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commonsIoVersion}</version>
+            </dependency>
+             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commonsCompressVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
