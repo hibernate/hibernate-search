@@ -56,14 +56,14 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 			EntityIndexingInterceptor<? super T> entityIndexingInterceptor,
 			Properties properties,
 			IndexManagerFactory indexManagerFactory,
-			SearchFactoryImplementor searchFactory,
+			SearchFactoryImplementor searchFactoryImplementor,
 			IndexManagerHolder indexManagerHolder,
 			String rootDirectoryProviderName) {
 		this.shardIdentityProvider = shardIdentityProvider;
 		this.similarityInstance = similarityInstance;
 		this.entityIndexingInterceptor = entityIndexingInterceptor;
 		this.properties = properties;
-		this.searchFactory = searchFactory;
+		this.searchFactory = searchFactoryImplementor;
 		this.indexManagerFactory = indexManagerFactory;
 		this.indexManagerHolder = indexManagerHolder;
 		this.rootDirectoryProviderName = rootDirectoryProviderName;

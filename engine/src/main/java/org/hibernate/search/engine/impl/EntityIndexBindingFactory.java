@@ -36,7 +36,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.util.Properties;
 
 /**
- * Build the expected {@link EntityIndexBinding} depending in the configuration
+ * Build the expected {@link EntityIndexBinding} depending in the configuration.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
@@ -61,8 +61,13 @@ public class EntityIndexBindingFactory {
 		}
 		EntityIndexingInterceptor<? super T> safeInterceptor = (EntityIndexingInterceptor<? super T>) interceptor;
 		if ( isDynamicSharding ) {
-			return new DynamicShardingEntityIndexBinding<T>( shardIdentifierProvider, similarityInstance, safeInterceptor,
-					properties, indexManagerFactory, context.getUninitializedSearchFactory(), indexManagerHolder,
+			return new DynamicShardingEntityIndexBinding<T>( shardIdentifierProvider,
+					similarityInstance,
+					safeInterceptor,
+					properties,
+					indexManagerFactory,
+					context.getUninitializedSearchFactory(),
+					indexManagerHolder,
 					rootDirectoryProviderName );
 		}
 		else {

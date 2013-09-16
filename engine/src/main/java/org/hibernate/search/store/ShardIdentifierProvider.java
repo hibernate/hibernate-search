@@ -22,6 +22,7 @@ package org.hibernate.search.store;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.filter.FullTextFilterImplementor;
+import org.hibernate.search.spi.BuildContext;
 
 import java.io.Serializable;
 import java.util.Properties;
@@ -35,8 +36,11 @@ public interface ShardIdentifierProvider {
 
 	/**
 	 * Initialize the provider.
+	 *
+	 * @param properties The configuration properties
+	 * @param buildContext The buildContext
 	 */
-	void initialize(Properties properties);
+	void initialize(Properties properties, BuildContext buildContext);
 
 	/**
 	 * Returns the shard identifier upon addition.

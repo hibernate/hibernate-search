@@ -40,8 +40,11 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.FullTextFilterImplementor;
+import org.hibernate.search.indexes.serialization.spi.SerializationProviderService;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.TestConstants;
@@ -188,7 +191,9 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 		private ConcurrentHashMap<String, String> shards = new ConcurrentHashMap<String, String>();
 
 		@Override
-		public void initialize(Properties properties) {
+		public void initialize(Properties properties, BuildContext buildContext) {
+			ServiceManager serviceManager = buildContext.getServiceManager();
+			serviceManager.requestService( SerializationProviderService.class, buildContext );
 		}
 
 		@Override
