@@ -27,23 +27,26 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.store.FSDirectory;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.indexes.serialization.spi.SerializationProviderService;
+import org.hibernate.search.hcore.impl.HibernateSessionServiceProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
@@ -129,28 +132,26 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 
-		// closing and re-opening the session factory to simulate a restart of the "app"
-		closeSessionFactory();
-		openSessionFactory();
+		SearchFactoryImplementor newSearchFactory = getIndependentNewSearchFactory();
+		entityIndexBinding = newSearchFactory.getIndexBindings().get( Animal.class );
 
-		entityIndexBinding = getSearchFactoryImpl().getIndexBindings().get( Animal.class );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 	}
 
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		//is the default when multiple shards are set up
-		//cfg.setProperty( "hibernate.search.Animal.sharding_strategy", IdHashShardingStrategy.class );
+
 		cfg.setProperty( "hibernate.search.Animal.sharding_strategy.nbr_of_shards", "dynamic" );
 		cfg.setProperty(
 				"hibernate.search.Animal.sharding_strategy.shard_identity_provider",
-				AnimalShardProvider.class.getName()
+				AnimalShardIdentifierProvider.class.getName()
 		);
+
+		// use filesystem based directory provider to be able to assert against index
+		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+		File sub = getBaseIndexDir();
+		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 	}
 
 	@Override
@@ -187,13 +188,46 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 		session.clear();
 	}
 
-	public static class AnimalShardProvider implements ShardIdentifierProvider {
+	private SearchFactoryImplementor getIndependentNewSearchFactory() {
+		// build a new independent SessionFactory to verify that the shards are available at restart
+		Configuration config = new Configuration();
+
+		config.setProperty( "hibernate.search.Animal.sharding_strategy.nbr_of_shards", "dynamic" );
+		config.setProperty(
+				"hibernate.search.Animal.sharding_strategy.shard_identity_provider",
+				DynamicShardingTest.AnimalShardIdentifierProvider.class.getName()
+		);
+
+		// use filesystem based directory provider to be able to assert against index
+		config.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
+		File sub = getBaseIndexDir();
+		config.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+
+		config.addAnnotatedClass( Animal.class );
+
+		SessionFactory newSessionFactory = config.buildSessionFactory();
+		FullTextSession fullTextSession = Search.getFullTextSession( newSessionFactory.openSession() );
+		return (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+	}
+
+	public static class AnimalShardIdentifierProvider implements ShardIdentifierProvider {
 		private ConcurrentHashMap<String, String> shards = new ConcurrentHashMap<String, String>();
 
 		@Override
 		public void initialize(Properties properties, BuildContext buildContext) {
 			ServiceManager serviceManager = buildContext.getServiceManager();
-			serviceManager.requestService( SerializationProviderService.class, buildContext );
+			Session session = serviceManager.requestService( HibernateSessionServiceProvider.class, buildContext );
+
+			Criteria initialShardsCriteria = session.createCriteria( Animal.class );
+			initialShardsCriteria.setProjection( Projections.distinct( Property.forName( "type" ) ) );
+
+			@SuppressWarnings("unchecked")
+			List<String> initialTypes = (List<String>) initialShardsCriteria.list();
+			for ( String type : initialTypes ) {
+				shards.put( type, type );
+			}
+
+			session.close();
 		}
 
 		@Override

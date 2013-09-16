@@ -733,4 +733,18 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 186, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext. Actual class is %1$s")
 	SearchException assertionFailureCannotCastToWorkerBuilderContext(Class<?> type);
+
+	@Message(id = 187, value = "Multiple inconsistent similarities defined in the class hierarchy of %s")
+	SearchException getMultipleInconsistentSimilaritiesInClassHierarchyException(String className);
+
+	@Message(id = 188, value = "Inconsistent similarities defined via annotations (%s) and configuration (%s)")
+	SearchException getInconsistentSimilaritySettingBetweenAnnotationsAndConfigPropertiesException(String annotationBasedSimilarity, String configLevelSimilarity);
+
+	@Message(id = 189, value = "Multiple entities are sharing the same index but are declaring an " +
+			"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
+			"declare the same Similarity implementation. %s defines similarity %s and %s defines similarity %s")
+	SearchException getMultipleEntitiesShareIndexWithInconsistentSimilarityException(String class1, String similarity1, String class2, String similarity2);
+
+	@Message(id = 190, value = "Unable to start HibernateSessionServiceProvider. There is no session factory in the context. Are you sure you have Hibernate ORM enabled?")
+	SearchException getNoSessionFactoryInContextException();
 }
