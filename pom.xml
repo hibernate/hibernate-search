@@ -148,7 +148,7 @@
         <infinispanVersion>5.3.0.Final</infinispanVersion>
         <jgroupsVersion>3.3.4.Final</jgroupsVersion>
         <hibernateVersion>4.2.5.Final</hibernateVersion>
-        <hibernateCommonsAnnotationVersion>4.0.2.Final</hibernateCommonsAnnotationVersion>
+        <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.1</tikaVersion>
         <bytemanVersion>2.1.0</bytemanVersion>
         <jbossLoggingVersion>3.1.0.GA</jbossLoggingVersion>
