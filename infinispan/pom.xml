@@ -98,8 +98,16 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>*</artifactId>
                     <groupId>org.jboss.byteman</groupId>
+                    <artifactId>byteman-install</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.byteman</groupId>
+                    <artifactId>byteman</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.byteman</groupId>
+                    <artifactId>byteman-bmunit</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
