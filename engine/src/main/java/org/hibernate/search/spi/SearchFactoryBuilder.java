@@ -175,7 +175,7 @@ public class SearchFactoryBuilder {
 		}
 		//not really necessary today
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
-		for ( DocumentBuilderContainedEntity builder : documentBuildersContainedEntities.values() ) {
+		for ( DocumentBuilderContainedEntity<?> builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 		fillSimilarityMapping();
@@ -227,7 +227,7 @@ public class SearchFactoryBuilder {
 		}
 		//not really necessary today
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
-		for ( DocumentBuilderContainedEntity builder : documentBuildersContainedEntities.values() ) {
+		for ( DocumentBuilderContainedEntity<?> builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 		fillSimilarityMapping();
@@ -279,7 +279,7 @@ public class SearchFactoryBuilder {
 				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
 				entitySimilarity = entityIndexBinding.getDocumentBuilder().getSimilarity();
 				if ( entitySimilarity != null ) {
-					MutableEntityIndexBinding newMapping = buildTypeSafeMutableEntityBinder(
+					MutableEntityIndexBinding<?> newMapping = buildTypeSafeMutableEntityBinder(
 							entityIndexBinding,
 							entitySimilarity
 					);
@@ -327,7 +327,7 @@ public class SearchFactoryBuilder {
 		else {
 			filterCachingStrategy = ClassLoaderHelper.instanceFromName(
 					FilterCachingStrategy.class,
-					impl, ImmutableSearchFactory.class, "filterCachingStrategy"
+					impl, ImmutableSearchFactory.class.getClassLoader(), "filterCachingStrategy"
 			);
 		}
 		filterCachingStrategy.initialize( properties );
@@ -368,15 +368,15 @@ public class SearchFactoryBuilder {
 		final Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
-		final Map<XClass, Class> classMappings = initializeClassMappings( cfg, cfg.getReflectionManager() );
+		final Map<XClass, Class<?>> classMappings = initializeClassMappings( cfg, cfg.getReflectionManager() );
 
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
 		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
 
-		for ( Map.Entry<XClass, Class> mapping : classMappings.entrySet() ) {
+		for ( Map.Entry<XClass, Class<?>> mapping : classMappings.entrySet() ) {
 
 			XClass mappedXClass = mapping.getKey();
-			Class mappedClass = mapping.getValue();
+			Class<?> mappedClass = mapping.getValue();
 
 			if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
 
@@ -408,7 +408,7 @@ public class SearchFactoryBuilder {
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
 
-			Class mappedClass = classMappings.get( mappedXClass );
+			Class<?> mappedClass = classMappings.get( mappedXClass );
 			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
 			//interceptor might use non indexed state
 			if ( mappedEntity.getEntityIndexingInterceptor() != null ) {
@@ -441,12 +441,12 @@ public class SearchFactoryBuilder {
 	 * @param documentBuildersIndexedEntities
 	 * @param documentBuildersContainedEntities
 	 */
-	private void disableBlackListedTypesOptimization(Map<XClass, Class> classMappings,
+	private void disableBlackListedTypesOptimization(Map<XClass, Class<?>> classMappings,
 			Set<XClass> optimizationBlackListX,
 			Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities,
 			Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities) {
 		for ( XClass xClass : optimizationBlackListX ) {
-			Class type = classMappings.get( xClass );
+			Class<?> type = classMappings.get( xClass );
 			if ( type != null ) {
 				EntityIndexBinding entityIndexBinding = documentBuildersIndexedEntities.get( type );
 				if ( entityIndexBinding != null ) {
@@ -465,15 +465,15 @@ public class SearchFactoryBuilder {
 	/**
 	 * prepares XClasses from configuration
 	 */
-	private static Map<XClass, Class> initializeClassMappings(SearchConfiguration cfg, ReflectionManager reflectionManager) {
+	private static Map<XClass, Class<?>> initializeClassMappings(SearchConfiguration cfg, ReflectionManager reflectionManager) {
 		Iterator<Class<?>> iter = cfg.getClassMappings();
-		Map<XClass, Class> map = new HashMap<XClass, Class>();
+		Map<XClass, Class<?>> map = new HashMap<XClass, Class<?>>();
 		while ( iter.hasNext() ) {
 			Class<?> mappedClass = iter.next();
 			if ( mappedClass == null ) {
 				continue;
 			}
-			@SuppressWarnings("unchecked")
+
 			XClass mappedXClass = reflectionManager.toXClass( mappedClass );
 			if ( mappedXClass == null ) {
 				continue;
@@ -555,7 +555,7 @@ public class SearchFactoryBuilder {
 	}
 
 	private void initProgrammaticAnalyzers(ConfigContext context, ReflectionManager reflectionManager) {
-		final Map defaults = reflectionManager.getDefaults();
+		final Map<?, ?> defaults = reflectionManager.getDefaults();
 
 		if ( defaults != null ) {
 			AnalyzerDef[] defs = (AnalyzerDef[]) defaults.get( AnalyzerDefs.class );
@@ -568,7 +568,7 @@ public class SearchFactoryBuilder {
 	}
 
 	private void initProgrammaticallyDefinedFilterDef(ReflectionManager reflectionManager) {
-		@SuppressWarnings("unchecked") Map defaults = reflectionManager.getDefaults();
+		Map<?, ?> defaults = reflectionManager.getDefaults();
 		FullTextFilterDef[] filterDefs = (FullTextFilterDef[]) defaults.get( FullTextFilterDefs.class );
 		if ( filterDefs != null && filterDefs.length != 0 ) {
 			final Map<String, FilterDef> filterDefinitions = factoryState.getFilterDefinitions();
@@ -612,7 +612,7 @@ public class SearchFactoryBuilder {
 		else {
 			return ClassLoaderHelper.instanceFromName(
 					ErrorHandler.class, errorHandlerClassName,
-					ImmutableSearchFactory.class, "Error Handler"
+					ImmutableSearchFactory.class.getClassLoader(), "Error Handler"
 			);
 		}
 	}

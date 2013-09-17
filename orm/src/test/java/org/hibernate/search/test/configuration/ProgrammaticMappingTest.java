@@ -659,14 +659,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery = session.createFullTextQuery( luceneQuery, MemberLevelTestPoI.class );
-		List results = hibQuery.list();
+		List<?> results = hibQuery.list();
 		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery2 = session.createFullTextQuery( luceneQuery2, MemberLevelTestPoI.class );
-		List results2 = hibQuery2.list();
+		List<?> results2 = hibQuery2.list();
 		assertEquals( 1, results2.size() );
 
 		List<?> testPoIs = session.createQuery( "from " + MemberLevelTestPoI.class.getName() ).list();
