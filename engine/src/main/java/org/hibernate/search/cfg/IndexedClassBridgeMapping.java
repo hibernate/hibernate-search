@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
@@ -65,15 +64,15 @@ public class IndexedClassBridgeMapping {
 		return this;
 	}
 
-   public IndexedClassBridgeMapping analyze(Analyze analyze) {
-      this.classBridge.put( "analyze", analyze );
-      return this;
-   }
+	public IndexedClassBridgeMapping analyze(Analyze analyze) {
+		this.classBridge.put( "analyze", analyze );
+		return this;
+	}
 
-   public IndexedClassBridgeMapping norms(Norms norms) {
-      this.classBridge.put( "norms", norms );
-      return this;
-   }
+	public IndexedClassBridgeMapping norms(Norms norms) {
+		this.classBridge.put( "norms", norms );
+		return this;
+	}
 
 	public IndexedClassBridgeMapping termVector(TermVector termVector) {
 		this.classBridge.put( "termVector", termVector );
