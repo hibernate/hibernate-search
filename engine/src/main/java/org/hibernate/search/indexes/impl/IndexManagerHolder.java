@@ -98,23 +98,23 @@ public class IndexManagerHolder {
 
 		final boolean isDynamicSharding = isShardingDynamic( indexProperties[0] );
 
-		Similarity similarityInstance = createSimilarity( directoryProviderName, indexProperties[0] );
+		Similarity similarity = createSimilarity( directoryProviderName, indexProperties[0] );
 
-		IndexManager[] providers = createIndexManagers(
+		IndexManager[] indexManagers = createIndexManagers(
 				mappedClass,
 				cfg,
 				context,
 				directoryProviderName,
 				indexProperties,
 				isDynamicSharding,
-				similarityInstance
+				similarity
 		);
 
 		IndexShardingStrategy shardingStrategy = createIndexShardingStrategy(
 				mappedClass,
 				indexProperties,
 				isDynamicSharding,
-				providers
+				indexManagers
 		);
 
 		ShardIdentifierProvider shardIdentifierProvider = createShardIdentifierProvider(
@@ -127,10 +127,10 @@ public class IndexManagerHolder {
 
 		return EntityIndexBindingFactory.buildEntityIndexBinder(
 				entity.getClass(),
-				providers,
+				indexManagers,
 				shardingStrategy,
 				shardIdentifierProvider,
-				similarityInstance,
+				similarity,
 				interceptor,
 				isDynamicSharding,
 				indexProperties[0],
@@ -141,7 +141,7 @@ public class IndexManagerHolder {
 		);
 	}
 
-	public IndexManager getOrCreateLateIndexManager(String providerName, DynamicShardingEntityIndexBinding entityIndexBinding) {
+	public IndexManager getOrCreateIndexManager(String providerName, DynamicShardingEntityIndexBinding entityIndexBinding) {
 		IndexManager indexManager = indexManagersRegistry.get( providerName );
 		if ( indexManager != null ) {
 			indexManager.addContainedEntity( entityIndexBinding.getDocumentBuilder().getBeanClass() );
@@ -156,7 +156,7 @@ public class IndexManagerHolder {
 		else {
 			throw log.assertionFailureCannotCastToWorkerBuilderContext( searchFactory.getClass() );
 		}
-		indexManager = getOrCreateIndexManager(
+		indexManager = createIndexManager(
 				providerName,
 				entityIndexBinding.getDocumentBuilder().getBeanClass(),
 				entityIndexBinding.getSimilarity(),
@@ -380,19 +380,19 @@ public class IndexManagerHolder {
 	}
 
 	private Similarity createSimilarity(String directoryProviderName, Properties indexProperty) {
-		//define the Similarity implementation:
+		// define the Similarity implementation:
 		// warning: it can also be set by an annotation at class level
 		String similarityClassName = indexProperty.getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
-		Similarity similarityInstance = null;
+		Similarity similarity = null;
 		if ( similarityClassName != null ) {
-			similarityInstance = ClassLoaderHelper.instanceFromName(
+			similarity = ClassLoaderHelper.instanceFromName(
 					Similarity.class,
 					similarityClassName,
 					DirectoryProviderFactory.class.getClassLoader(),
 					"Similarity class for index " + directoryProviderName
 			);
 		}
-		return similarityInstance;
+		return similarity;
 	}
 
 	private IndexShardingStrategy createIndexShardingStrategy(Class mappedClass, Properties[] indexProps, boolean dynamicSharding, IndexManager[] providers) {
@@ -430,14 +430,20 @@ public class IndexManagerHolder {
 		return shardingStrategy;
 	}
 
-	private IndexManager[] createIndexManagers(Class mappedClass, SearchConfiguration cfg, WorkerBuildContext context, String directoryProviderName, Properties[] indexProps, boolean dynamicSharding, Similarity similarityInstance) {
-		IndexManager[] providers;
+	private IndexManager[] createIndexManagers(Class mappedClass,
+			SearchConfiguration cfg,
+			WorkerBuildContext context,
+			String directoryProviderName,
+			Properties[] indexProps,
+			boolean dynamicSharding,
+			Similarity similarity) {
+		IndexManager[] indexManagers;
 		if ( dynamicSharding ) {
-			providers = new IndexManager[0];
+			indexManagers = new IndexManager[0];
 		}
 		else {
 			int nbrOfProviders = indexProps.length;
-			providers = new IndexManager[nbrOfProviders];
+			indexManagers = new IndexManager[nbrOfProviders];
 			for ( int index = 0; index < nbrOfProviders; index++ ) {
 				String providerName = nbrOfProviders > 1 ?
 						directoryProviderName + "." + index :
@@ -445,36 +451,36 @@ public class IndexManagerHolder {
 				Properties indexProp = indexProps[index];
 				IndexManager indexManager = indexManagersRegistry.get( providerName );
 				if ( indexManager == null ) {
-					indexManager = getOrCreateIndexManager(
-							providerName, mappedClass, similarityInstance,
+					indexManager = createIndexManager(
+							providerName, mappedClass, similarity,
 							indexProp, cfg.getIndexManagerFactory(), context
 					);
 				}
 				else {
 					indexManager.addContainedEntity( mappedClass );
 				}
-				providers[index] = indexManager;
+				indexManagers[index] = indexManager;
 			}
 		}
-		return providers;
+		return indexManagers;
 	}
 
 	/**
 	 * Clients of this method should first optimistically check the indexManagersRegistry, which might already contain the needed IndexManager,
 	 * to avoid contention on this synchronized method during dynamic reconfiguration at runtime.
 	 */
-	private synchronized IndexManager getOrCreateIndexManager(String providerName,
+	private synchronized IndexManager createIndexManager(String providerName,
 			Class<?> mappedClass,
-			Similarity similarityInstance,
-			Properties indexProp,
+			Similarity similarity,
+			Properties indexProperties,
 			IndexManagerFactory indexManagerFactory,
 			WorkerBuildContext context) {
 		IndexManager indexManager = indexManagersRegistry.get( providerName );
 		if ( indexManager == null ) {
-			indexManager = createIndexManager( providerName, indexProp, context, indexManagerFactory );
+			indexManager = createIndexManager( providerName, indexProperties, context, indexManagerFactory );
 			indexManagersRegistry.put( providerName, indexManager );
-			if ( similarityInstance != null ) {
-				setSimilarity( similarityInstance, indexManager );
+			if ( similarity != null ) {
+				setSimilarity( similarity, indexManager );
 			}
 		}
 		indexManager.addContainedEntity( mappedClass );

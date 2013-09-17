@@ -43,9 +43,9 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class CommonPropertiesParse {
+public class PropertiesParseHelper {
 
-	private CommonPropertiesParse() {
+	private PropertiesParseHelper() {
 		// no need to create instances
 	}
 
@@ -71,7 +71,7 @@ public class CommonPropertiesParse {
 	}
 
 	/**
-	 * @param indexName
+	 * @param indexName the index name (used for logging)
 	 * @param indexProps MaskedProperties for this IndexManager
 	 * @return the maximum queue length to be used on the backends of this index
 	 */
@@ -98,7 +98,10 @@ public class CommonPropertiesParse {
 		MaskedProperty optimizerCfg = new MaskedProperty(indexProps, "optimizer" );
 		String customImplementation = optimizerCfg.getProperty( "implementation" );
 		if ( customImplementation != null && (! "default".equalsIgnoreCase( customImplementation ) ) ) {
-			return ClassLoaderHelper.instanceFromName( OptimizerStrategy.class, customImplementation, callback.getClass(), "Optimizer Strategy" );
+			return ClassLoaderHelper.instanceFromName( OptimizerStrategy.class,
+					customImplementation,
+					callback.getClass().getClassLoader(),
+					"Optimizer Strategy" );
 		}
 		else {
 			boolean incremental = optimizerCfg.containsKey( "operation_limit.max" )
@@ -127,20 +130,12 @@ public class CommonPropertiesParse {
 	 * in a global scope it will take priority on local transaction parameters.
 	 * </p>
 	 *
-	 * @param context the build context.
-	 * @param directoryProperties The properties extracted from the configuration.
-	 * @param provider The directory provider for which to configure the indexing parameters.
+	 * @param properties The properties extracted from the configuration.
 	 */
-	public static LuceneIndexingParameters extractIndexingPerformanceOptions(Properties indexProps) {
-		LuceneIndexingParameters indexingParams = new LuceneIndexingParameters( indexProps );
-		return indexingParams;
+	public static LuceneIndexingParameters extractIndexingPerformanceOptions(Properties properties) {
+		return new LuceneIndexingParameters( properties );
 	}
 
-	/**
-	 * @param directoryBasedIndexManager
-	 * @param cfg
-	 * @return
-	 */
 	public static DirectoryBasedReaderProvider createDirectoryBasedReaderProvider(DirectoryBasedIndexManager indexManager, Properties cfg) {
 		Properties props = new MaskedProperty( cfg, Environment.READER_PREFIX );
 		String impl = props.getProperty( "strategy" );
@@ -157,7 +152,7 @@ public class CommonPropertiesParse {
 		else {
 			readerProvider = ClassLoaderHelper.instanceFromName(
 					DirectoryBasedReaderProvider.class, impl,
-					CommonPropertiesParse.class, "readerProvider"
+					PropertiesParseHelper.class.getClassLoader(), "readerProvider"
 			);
 		}
 		readerProvider.initialize( indexManager, props );

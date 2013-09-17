@@ -59,7 +59,7 @@ public class UselessShardingStrategy implements IndexShardingStrategy {
 	}
 
 	@Override
-	public void initialize(Properties properties, IndexManager[] providers) {
+	public void initialize(Properties properties, IndexManager[] indexManagers) {
 		Enumeration<?> propertyNames = properties.propertyNames();
 		int counter;
 		counter = checkEnumeration( propertyNames );

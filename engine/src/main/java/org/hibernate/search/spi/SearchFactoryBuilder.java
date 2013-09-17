@@ -173,6 +173,7 @@ public class SearchFactoryBuilder {
 			//Today it seems only safe when a class outside the hierarchy is incrementally added.
 			entityIndexBinding.postInitialize( indexedClasses );
 		}
+
 		//not really necessary today
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		for ( DocumentBuilderContainedEntity<?> builder : documentBuildersContainedEntities.values() ) {
@@ -225,7 +226,8 @@ public class SearchFactoryBuilder {
 		for ( EntityIndexBinding entityIndexBinding : documentBuildersIndexedEntities.values() ) {
 			entityIndexBinding.postInitialize( indexedClasses );
 		}
-		//not really necessary today
+
+		// not really necessary today
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		for ( DocumentBuilderContainedEntity<?> builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
@@ -233,7 +235,7 @@ public class SearchFactoryBuilder {
 		fillSimilarityMapping();
 
 		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities, cfg.getProperties() );
-		//build worker and back end components
+		// build worker and back end components
 		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg.getProperties() ) );
 		factoryState.setCacheBitResultsSize(
@@ -279,12 +281,10 @@ public class SearchFactoryBuilder {
 				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
 				entitySimilarity = entityIndexBinding.getDocumentBuilder().getSimilarity();
 				if ( entitySimilarity != null ) {
-
-					MutableEntityIndexBinding newMapping = EntityIndexBindingFactory.copyEntityIndexBindingReplacingSimilarity(
+					entityIndexBinding = EntityIndexBindingFactory.copyEntityIndexBindingReplacingSimilarity(
 							entityIndexBinding,
 							entitySimilarity
 					);
-					entityIndexBinding = newMapping;
 					documentBuildersIndexedEntities.put( clazz, entityIndexBinding );
 				}
 			}
@@ -317,7 +317,9 @@ public class SearchFactoryBuilder {
 		else {
 			filterCachingStrategy = ClassLoaderHelper.instanceFromName(
 					FilterCachingStrategy.class,
-					impl, ImmutableSearchFactory.class.getClassLoader(), "filterCachingStrategy"
+					impl,
+					ImmutableSearchFactory.class.getClassLoader(),
+					"filterCachingStrategy"
 			);
 		}
 		filterCachingStrategy.initialize( properties );

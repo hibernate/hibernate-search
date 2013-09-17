@@ -42,7 +42,7 @@ public interface IndexShardingStrategy {
 	 * provides access to sharding properties (under the suffix sharding_strategy)
 	 * and provide access to all the IndexManager for a given index
 	 */
-	void initialize(Properties properties, IndexManager[] providers);
+	void initialize(Properties properties, IndexManager[] indexManagers);
 
 	/**
 	 * Ask for all shards (eg to query or optimize)

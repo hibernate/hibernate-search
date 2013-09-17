@@ -23,17 +23,16 @@
  */
 package org.hibernate.search.test.configuration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Properties;
 
 import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Sanne Grinovero
@@ -63,27 +62,20 @@ public class MaskedPropertiesTest {
 		Properties transactionInShard2 = new MaskedProperty( shard2, "transaction", transaction );
 		Properties newStyleTransaction = new MaskedProperty( transaction, "indexwriter", transaction );
 		Properties newStyleTransactionInShard2 = new MaskedProperty(
-				transactionInShard2, "indexwriter", transactionInShard2 );
+				transactionInShard2, "indexwriter", transactionInShard2
+		);
 
-		assertEquals( "7" , newStyleTransaction.getProperty( "max_field_length" ) );
-		assertEquals( "7" , newStyleTransactionInShard2.getProperty( "max_field_length" ) );
-		assertEquals( "5" , transaction.getProperty( "max_merge_docs" ) );
-
-		Enumeration<?> propertyNames = newStyleTransaction.propertyNames();
-		int count = 0;
-		while ( propertyNames.hasMoreElements() ) {
-			count++;
-			System.out.println( propertyNames.nextElement() );
-		}
+		assertEquals( "7", newStyleTransaction.getProperty( "max_field_length" ) );
+		assertEquals( "7", newStyleTransactionInShard2.getProperty( "max_field_length" ) );
+		assertEquals( "5", transaction.getProperty( "max_merge_docs" ) );
 	}
 
 	@Test
 	public void testSerializability() throws IOException, ClassNotFoundException {
-		Properties cfg = new Properties();
-		cfg.setProperty( "base.key", "value" );
-		MaskedProperty originalProps = new MaskedProperty( cfg, "base" );
-		MaskedProperty theCopy = (MaskedProperty)
-			SerializationTestHelper.duplicateBySerialization( originalProps );
+		Properties properties = new Properties();
+		properties.setProperty( "base.key", "value" );
+		MaskedProperty originalProps = new MaskedProperty( properties, "base" );
+		MaskedProperty theCopy = SerializationTestHelper.duplicateBySerialization( originalProps );
 		//this is also testing the logger (transient) has been restored:
 		assertEquals( "value", theCopy.getProperty( "key" ) );
 	}
@@ -105,7 +97,11 @@ public class MaskedPropertiesTest {
 		assertFalse( masked.keySet().contains( "hidden.long.dotted.prop2" ) );
 		assertFalse( masked.keySet().contains( "long.dotted.prop2" ) );
 
-		Properties maskedAgain = new MaskedProperty( masked, "long.dotted", masked ); //falling back to same instance for **
+		Properties maskedAgain = new MaskedProperty(
+				masked,
+				"long.dotted",
+				masked
+		); //falling back to same instance for **
 		assertTrue( maskedAgain.keySet().contains( "prop1" ) );
 		assertTrue( maskedAgain.keySet().contains( "long.dotted.prop1" ) ); //**: prop 1 should be visible in both ways
 		assertTrue( maskedAgain.keySet().contains( "default.long.dotted.prop3" ) );

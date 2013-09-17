@@ -40,35 +40,35 @@ import org.hibernate.search.store.ShardIdentifierProvider;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 class DynamicShardingStrategy implements IndexShardingStrategy {
-	private final ShardIdentifierProvider shardIdentityProvider;
+	private final ShardIdentifierProvider shardIdentifierProvider;
 	private final IndexManagerHolder indexManagerHolder;
 	private final String rootDirectoryProviderName;
 	private final DynamicShardingEntityIndexBinding entityIndexBinding;
 
-	DynamicShardingStrategy(ShardIdentifierProvider shardIdentityProvider,
+	DynamicShardingStrategy(ShardIdentifierProvider shardIdentifierProvider,
 			IndexManagerHolder indexManagerHolder,
 			DynamicShardingEntityIndexBinding entityIndexBinding,
 			String rootDirectoryProviderName) {
-		this.shardIdentityProvider = shardIdentityProvider;
+		this.shardIdentifierProvider = shardIdentifierProvider;
 		this.indexManagerHolder = indexManagerHolder;
 		this.entityIndexBinding = entityIndexBinding;
 		this.rootDirectoryProviderName = rootDirectoryProviderName;
 	}
 
 	@Override
-	public void initialize(Properties properties, IndexManager[] providers) {
+	public void initialize(Properties properties, IndexManager[] indexManagers) {
 	}
 
 	@Override
 	public IndexManager[] getIndexManagersForAllShards() {
-		String[] shards = shardIdentityProvider.getAllShardIdentifiers();
+		String[] shards = shardIdentifierProvider.getAllShardIdentifiers();
 		return getIndexManagersFromShards( shards );
 	}
 
 	@Override
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-		String shard = shardIdentityProvider.getShardIdentifier( entity, id, idInString, document );
-		return indexManagerHolder.getOrCreateLateIndexManager(
+		String shard = shardIdentifierProvider.getShardIdentifier( entity, id, idInString, document );
+		return indexManagerHolder.getOrCreateIndexManager(
 				getProviderName( shard ),
 				entityIndexBinding
 		);
@@ -76,13 +76,13 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 
 	@Override
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		String[] shards = shardIdentityProvider.getShardIdentifiers( entity, id, idInString );
+		String[] shards = shardIdentifierProvider.getShardIdentifiers( entity, id, idInString );
 		return getIndexManagersFromShards( shards );
 	}
 
 	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-		String[] shards = shardIdentityProvider.getShardIdentifiersForQuery( fullTextFilters );
+		String[] shards = shardIdentifierProvider.getShardIdentifiersForQuery( fullTextFilters );
 		return getIndexManagersFromShards( shards );
 	}
 
@@ -90,7 +90,7 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 		ArrayList<IndexManager> managers = new ArrayList<IndexManager>( shards.length );
 		for ( String shard : shards ) {
 			managers.add(
-					indexManagerHolder.getOrCreateLateIndexManager(
+					indexManagerHolder.getOrCreateIndexManager(
 							getProviderName( shard ),
 							entityIndexBinding
 					)

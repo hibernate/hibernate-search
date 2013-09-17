@@ -64,6 +64,7 @@ public class SimilarityTest extends SearchTestCase {
 	public void testClassAndGlobalSimilarity() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
+
 		Trash trash = new Trash();
 		trash.setName( "Green trash" );
 		s.persist( trash );
@@ -76,8 +77,8 @@ public class SimilarityTest extends SearchTestCase {
 		can = new Can();
 		can.setName( "Green Green Green can" );
 		s.persist( can );
-		tx.commit();
 
+		tx.commit();
 		s.clear();
 
 		tx = s.beginTransaction();
