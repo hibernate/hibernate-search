@@ -35,7 +35,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
-
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -44,6 +43,10 @@ import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.cfg.EntityDescriptor;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.DelegateNamedAnalyzer;
@@ -100,7 +103,13 @@ public final class ConfigContext {
 	private final String nullToken;
 	private final boolean implicitProvidedId;
 
+	private final SearchMapping searchMapping;
+
 	public ConfigContext(SearchConfiguration cfg) {
+		this( cfg, null );
+	}
+
+	public ConfigContext(SearchConfiguration cfg, SearchMapping searchMapping) {
 		luceneMatchVersion = getLuceneMatchVersion( cfg );
 		defaultAnalyzer = initAnalyzer( cfg );
 		defaultSimilarity = initSimilarity( cfg );
@@ -108,6 +117,7 @@ public final class ConfigContext {
 		jpaPresent = isPresent( "javax.persistence.Id" );
 		nullToken = initNullToken( cfg );
 		implicitProvidedId = cfg.isIdProvidedImplicit();
+		this.searchMapping = searchMapping;
 	}
 
 	/**
@@ -349,5 +359,25 @@ public final class ConfigContext {
 	 */
 	public boolean isProvidedIdImplicit() {
 		return implicitProvidedId;
+	}
+
+	/**
+	 * Returns class bridge instances configured via the programmatic API, if any. The returned map's values are
+	 * {@code @ClassBridge} annotations representing the corresponding analyzer etc. configuration.
+	 *
+	 * @param type the type for which to return the configured class bridge instances
+	 * @return a map with class bridge instances and their configuration; May be empty but never {@code null}
+	 */
+	public Map<FieldBridge, ClassBridge> getClassBridgeInstances(Class<?> type) {
+		Map<FieldBridge, ClassBridge> classBridgeInstances = null;
+
+		if ( searchMapping != null ) {
+			EntityDescriptor entityDescriptor = searchMapping.getEntityDescriptor( type );
+			if ( entityDescriptor != null ) {
+				classBridgeInstances = entityDescriptor.getClassBridgeConfigurations();
+			}
+		}
+
+		return classBridgeInstances != null ? classBridgeInstances : Collections.<FieldBridge, ClassBridge>emptyMap();
 	}
 }

@@ -38,6 +38,7 @@ import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
@@ -269,13 +270,6 @@ public final class BridgeFactory {
 					else {
 						throw LOG.noFieldBridgeInterfaceImplementedByClassBridge( impl.getName() );
 					}
-					if ( cb.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
-						Map<String, String> params = new HashMap<String, String>( cb.params().length );
-						for ( Parameter param : cb.params() ) {
-							params.put( param.name(), param.value() );
-						}
-						( (ParameterizedBridge) instance ).setParameterValues( params );
-					}
 				}
 				catch (Exception e) {
 					throw LOG.cannotInstantiateClassBridgeOfType( impl.getName(), clazz.getName(), e );
@@ -287,6 +281,23 @@ public final class BridgeFactory {
 		}
 
 		return bridge;
+	}
+
+	/**
+	 * Injects any parameters configured via the given {@code ClassBridge} annotation into the given object, in case
+	 * this is a {@link ParameterizedBridge}.
+	 *
+	 * @param classBridgeConfiguration the parameter source
+	 * @param classBridge the object to inject the parameters into
+	 */
+	public static void injectParameters(ClassBridge classBridgeConfiguration, Object classBridge) {
+		if ( classBridgeConfiguration.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( classBridge.getClass() ) ) {
+			Map<String, String> params = new HashMap<String, String>( classBridgeConfiguration.params().length );
+			for ( Parameter param : classBridgeConfiguration.params() ) {
+				params.put( param.name(), param.value() );
+			}
+			( (ParameterizedBridge) classBridge ).setParameterValues( params );
+		}
 	}
 
 	/**
@@ -407,7 +418,6 @@ public final class BridgeFactory {
 			bridge = builtInBridges.get( returnType.getName() );
 			if ( bridge == null && returnType.isEnum() ) {
 				//we return one enum type bridge instance per property as it is customized per ReturnType
-				@SuppressWarnings("unchecked")
 				final EnumBridge enumBridge = new EnumBridge();
 				populateReturnType( reflectionManager.toClass( member.getType() ), EnumBridge.class, enumBridge );
 				bridge = new TwoWayString2FieldBridgeAdaptor( enumBridge );
@@ -570,14 +580,13 @@ public final class BridgeFactory {
 		return doExtractType( bridgeAnn, member.getName(), reflectionManager.toClass( member.getType() ) );
 	}
 
-
 	private static FieldBridge doExtractType(
 			org.hibernate.search.annotations.FieldBridge bridgeAnn,
 			String appliedOnName,
 			Class<?> appliedOnType) {
 		assert bridgeAnn != null : "@FieldBridge instance cannot be null";
 		FieldBridge bridge;
-		Class impl = bridgeAnn.impl();
+		Class<?> impl = bridgeAnn.impl();
 		if ( impl == void.class ) {
 			throw LOG.noImplementationClassInFieldBridge( appliedOnName );
 		}
@@ -797,7 +806,7 @@ public final class BridgeFactory {
 	 */
 	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge,
 													XClass appliedOnType,
-													ReflectionManager reflectionManager) {
+													ReflectionManager reflectionManager) throws SearchException {
 		FieldBridge fb = extractType( fieldBridge, appliedOnType, reflectionManager );
 		if ( fb instanceof TwoWayFieldBridge ) {
 			return (TwoWayFieldBridge) fb;

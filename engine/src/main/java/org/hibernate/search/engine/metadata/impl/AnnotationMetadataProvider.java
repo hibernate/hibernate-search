@@ -24,6 +24,8 @@
 
 package org.hibernate.search.engine.metadata.impl;
 
+import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,6 +34,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -84,8 +87,6 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
 
 /**
  * A metadata provider which extracts the required information from annotations.
@@ -335,6 +336,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		for ( XClass currentClass : hierarchy ) {
 			parseContext.setCurrentClass( currentClass );
 			initializeClassLevelAnnotations( typeMetadataBuilder, isRoot, prefix, configContext, parseContext );
+			initializeClassBridgeInstances( typeMetadataBuilder, isRoot, prefix, configContext, currentClass );
 		}
 
 		// if optimizations are enabled, we allow for state in indexed embedded objects which are not
@@ -443,11 +445,42 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 	}
 
+	/**
+	 * Initializes metadata contributed by class bridge instances set up through the programmatic config API.
+	 */
+	private void initializeClassBridgeInstances(TypeMetadata.Builder typeMetadataBuilder,
+			boolean isRoot,
+			String prefix,
+			ConfigContext configContext,
+			XClass clazz) {
+
+		Map<FieldBridge, ClassBridge> classBridgeInstances = configContext.getClassBridgeInstances( reflectionManager.toClass( clazz ) );
+
+		for ( Entry<FieldBridge, ClassBridge> classBridge : classBridgeInstances.entrySet() ) {
+			FieldBridge instance = classBridge.getKey();
+			ClassBridge configuration = classBridge.getValue();
+
+			bindClassBridgeAnnotation( prefix, typeMetadataBuilder, configuration, instance, clazz, configContext );
+		}
+	}
+
 	private void bindClassBridgeAnnotation(String prefix,
 			TypeMetadata.Builder typeMetadataBuilder,
 			ClassBridge classBridgeAnnotation,
 			XClass clazz,
 			ConfigContext configContext) {
+		FieldBridge fieldBridge = BridgeFactory.extractType( classBridgeAnnotation, clazz );
+		bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, fieldBridge, clazz, configContext );
+	}
+
+	private void bindClassBridgeAnnotation(String prefix,
+			TypeMetadata.Builder typeMetadataBuilder,
+			ClassBridge classBridgeAnnotation,
+			FieldBridge fieldBridge,
+			XClass clazz,
+			ConfigContext configContext) {
+
+		BridgeFactory.injectParameters( classBridgeAnnotation, fieldBridge );
 
 		String fieldName = prefix + classBridgeAnnotation.name();
 		Store store = classBridgeAnnotation.store();
@@ -457,7 +490,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				classBridgeAnnotation.norms()
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( classBridgeAnnotation.termVector() );
-		FieldBridge fieldBridge = BridgeFactory.extractType( classBridgeAnnotation, clazz );
 
 		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
 				.boost( classBridgeAnnotation.boost().value() )

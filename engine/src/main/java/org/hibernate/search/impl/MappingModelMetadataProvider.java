@@ -269,8 +269,8 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	}
 
 	private static class MappingModelAnnotationReader implements AnnotationReader {
-		private AnnotationReader delegate;
-		private SearchMapping mapping;
+		private final AnnotationReader delegate;
+		private final SearchMapping mapping;
 		private transient Annotation[] annotationsArray;
 		private transient Map<Class<? extends Annotation>, Annotation> annotations;
 		private Class<?> entityType;
@@ -648,6 +648,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				annotations.put( DynamicBoost.class, createAnnotation( dynamicBoostAnn ) );
 			}
 
+			configureClassBridgeInstances( entity );
 		}
 
 		private ClassBridge[] createClassBridgesDefArray(Set<Map<String, Object>> classBridgeDefs) {
@@ -659,6 +660,24 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			}
 
 			return classBridgeDefArray;
+		}
+
+		/**
+		 * Configures the class bridge instances of this descriptors if such exist. The map based configuration is
+		 * transformed into an equivalent {@code ClassBridge} instance and written back to the given descriptor.
+		 *
+		 * @param entity the entity for which to configure the class bridge instances
+		 */
+		private void configureClassBridgeInstances(EntityDescriptor entity) {
+			Map<org.hibernate.search.bridge.FieldBridge, Map<String, Object>> classBridges = entity.getClassBridgeInstanceDefs();
+
+			for ( Entry<org.hibernate.search.bridge.FieldBridge, Map<String, Object>> classBridgeInstanceDef : classBridges.entrySet() ) {
+				Map<String, Object> configuration = classBridgeInstanceDef.getValue();
+				org.hibernate.search.bridge.FieldBridge instance = classBridgeInstanceDef.getKey();
+
+				ClassBridge classBridgeAnnotation = createClassBridge( configuration );
+				entity.addClassBridgeInstanceConfiguration( instance, classBridgeAnnotation );
+			}
 		}
 
 		private Spatial[] createSpatialsArray(Set<Map<String, Object>> spatials) {
@@ -686,6 +705,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 					annotation.setValue( entry.getKey(), entry.getValue() );
 				}
 			}
+
 			return (ClassBridge) createAnnotation( annotation );
 		}
 

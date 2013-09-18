@@ -33,6 +33,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.bridge.FieldBridge;
 
 public class ClassBridgeMapping {
 
@@ -41,14 +42,28 @@ public class ClassBridgeMapping {
 	private final Map<String, Object> classBridge;
 
 	public ClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity, Class<?> impl) {
-		this.mapping = mapping;
-		this.entity = entity;
-		this.classBridge = new HashMap<String, Object>();
+		this( mapping, entity );
+
 		entity.addClassBridgeDef( classBridge );
+
 		if ( impl != null ) {
 			this.classBridge.put( "impl", impl );
 		}
+	}
 
+	public ClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity, FieldBridge instance) {
+		this( mapping, entity );
+
+		entity.addClassBridgeInstanceDef( instance, classBridge );
+
+		// the given bridge instance is actually used, a class object is still required to instantiate the annotation
+		this.classBridge.put( "impl", void.class );
+	}
+
+	private ClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity) {
+		this.mapping = mapping;
+		this.entity = entity;
+		this.classBridge = new HashMap<String, Object>();
 	}
 
 	public ClassBridgeMapping name(String name) {
@@ -111,6 +126,18 @@ public class ClassBridgeMapping {
 
 	public ClassBridgeMapping classBridge(Class<?> impl) {
 		return new ClassBridgeMapping( mapping, entity, impl );
+	}
+
+	/**
+	 * Registers the given class bridge for the currently configured entity type. Any subsequent analyzer, parameter
+	 * etc. configurations apply to this class bridge.
+	 *
+	 * @param instance a class bridge instance
+	 * @return a new {@link ClassBridgeMapping} following the method chaining pattern
+	 * @experimental This method is considered experimental and it may be altered or removed in future releases
+	 */
+	public ClassBridgeMapping classBridgeInstance(FieldBridge instance) {
+		return new ClassBridgeMapping( mapping, entity, instance );
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {

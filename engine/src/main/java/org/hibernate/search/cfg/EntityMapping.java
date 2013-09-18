@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.BoostStrategy;
 
 /**
@@ -36,8 +37,8 @@ import org.hibernate.search.engine.BoostStrategy;
  */
 public class EntityMapping {
 
-	private SearchMapping mapping;
-	private EntityDescriptor entity;
+	private final SearchMapping mapping;
+	private final EntityDescriptor entity;
 
 	public EntityMapping(Class<?> entityType, SearchMapping mapping) {
 		this.mapping = mapping;
@@ -100,4 +101,15 @@ public class EntityMapping {
 		return new ClassBridgeMapping( mapping, entity, impl );
 	}
 
+	/**
+	 * Registers the given class bridge for the currently configured entity type. Any subsequent analyzer, parameter
+	 * etc. configurations apply to this class bridge.
+	 *
+	 * @param instance a class bridge instance
+	 * @return a new {@link ClassBridgeMapping} following the method chaining pattern
+	 * @experimental This method is considered experimental and it may be altered or removed in future releases
+	 */
+	public ClassBridgeMapping classBridgeInstance(FieldBridge classBridge) {
+		return new ClassBridgeMapping( mapping, entity, classBridge );
+	}
 }

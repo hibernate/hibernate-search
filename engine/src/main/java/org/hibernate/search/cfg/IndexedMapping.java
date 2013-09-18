@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.solr.analysis.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.FieldCacheType;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 
@@ -93,6 +94,18 @@ public class IndexedMapping {
 
 	public IndexedClassBridgeMapping classBridge(Class<?> impl) {
 		return new IndexedClassBridgeMapping( mapping, entity, impl, this );
+	}
+
+	/**
+	 * Registers the given class bridge for the currently configured entity type. Any subsequent analyzer, parameter
+	 * etc. configurations apply to this class bridge.
+	 *
+	 * @param instance a class bridge instance
+	 * @return a new {@link ClassBridgeMapping} following the method chaining pattern
+	 * @experimental This method is considered experimental and it may be altered or removed in future releases
+	 */
+	public IndexedClassBridgeMapping classBridgeInstance(FieldBridge instance) {
+		return new IndexedClassBridgeMapping( mapping, entity, instance, this );
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {

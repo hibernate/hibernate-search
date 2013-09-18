@@ -39,7 +39,6 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -660,14 +659,14 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery = session.createFullTextQuery( luceneQuery, MemberLevelTestPoI.class );
-		List results = hibQuery.list();
+		List<?> results = hibQuery.list();
 		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery2 = session.createFullTextQuery( luceneQuery2, MemberLevelTestPoI.class );
-		List results2 = hibQuery2.list();
+		List<?> results2 = hibQuery2.list();
 		assertEquals( 1, results2.size() );
 
 		List<?> testPoIs = session.createQuery( "from " + MemberLevelTestPoI.class.getName() ).list();
@@ -757,6 +756,37 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		tx.commit();
 
 		session.close();
+	}
+
+	public void testClassBridgeInstanceMapping() throws Exception {
+		OrderLine orderLine = new OrderLine();
+		orderLine.setName( "Sequoia" );
+
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		Transaction tx = s.beginTransaction();
+		s.persist( orderLine );
+		tx.commit();
+
+		s.clear();
+
+		tx = s.beginTransaction();
+
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+		org.apache.lucene.search.Query luceneQuery = parser.parse( "orderLineName:Sequoia" );
+		FullTextQuery query = s.createFullTextQuery( luceneQuery );
+		assertEquals( "Bridge not used", 1, query.getResultSize() );
+
+		luceneQuery = parser.parse( "orderLineName_ngram:quo" );
+		query = s.createFullTextQuery( luceneQuery );
+		assertEquals( "Analyzer configuration not applied", 1, query.getResultSize() );
+
+		luceneQuery = parser.parse( "orderLineNameViaParam:Sequoia" );
+		query = s.createFullTextQuery( luceneQuery );
+		assertEquals( "Parameter configuration not applied", 1, query.getResultSize() );
+
+		s.delete( query.list().get( 0 ) );
+		tx.commit();
+		s.close();
 	}
 
 	private float getScore(Query query) {
@@ -861,7 +891,8 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 				DynamicBoostedDescLibrary.class,
 				MemberLevelTestPoI.class,
 				ClassLevelTestPoI.class,
-				LatLongAnnTestPoi.class
+				LatLongAnnTestPoi.class,
+				OrderLine.class
 		};
 	}
 }

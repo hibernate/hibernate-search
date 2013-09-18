@@ -30,6 +30,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.bridge.FieldBridge;
 
 public class IndexedClassBridgeMapping {
 
@@ -39,14 +40,29 @@ public class IndexedClassBridgeMapping {
 	private final IndexedMapping indexedMapping;
 
 	public IndexedClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity, Class<?> impl, IndexedMapping indexedMapping) {
+		this( mapping, entity, indexedMapping );
+
+		entity.addClassBridgeDef( classBridge );
+
+		if ( impl != null ) {
+			this.classBridge.put( "impl", impl );
+		}
+	}
+
+	public IndexedClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity, FieldBridge instance, IndexedMapping indexedMapping) {
+		this( mapping, entity, indexedMapping );
+
+		entity.addClassBridgeInstanceDef( instance, classBridge );
+
+		// the given bridge instance is actually used, a class object is still required to instantiate the annotation
+		this.classBridge.put( "impl", void.class );
+	}
+
+	private IndexedClassBridgeMapping(SearchMapping mapping, EntityDescriptor entity, IndexedMapping indexedMapping) {
 		this.mapping = mapping;
 		this.entity = entity;
 		this.indexedMapping = indexedMapping;
 		this.classBridge = new HashMap<String, Object>();
-		entity.addClassBridgeDef( classBridge );
-		if ( impl != null ) {
-			this.classBridge.put( "impl", impl );
-		}
 	}
 
 	public IndexedClassBridgeMapping name(String name) {
@@ -109,6 +125,18 @@ public class IndexedClassBridgeMapping {
 
 	public IndexedClassBridgeMapping classBridge(Class<?> impl) {
 		return new IndexedClassBridgeMapping( mapping, entity, impl, indexedMapping );
+	}
+
+	/**
+	 * Registers the given class bridge for the currently configured entity type. Any subsequent analyzer, parameter
+	 * etc. configurations apply to this class bridge.
+	 *
+	 * @param instance a class bridge instance
+	 * @return a new {@link ClassBridgeMapping} following the method chaining pattern
+	 * @experimental This method is considered experimental and it may be altered or removed in future releases
+	 */
+	public IndexedClassBridgeMapping classBridgeInstance(FieldBridge instance) {
+		return new IndexedClassBridgeMapping( mapping, entity, instance, indexedMapping );
 	}
 
 	public FullTextFilterDefMapping fullTextFilterDef(String name, Class<?> impl) {
