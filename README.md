@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 4.4.0.Alpha1 02-08-2013*
+*Version: 4.4.0.Alpha2 18-09-2013*
 
 ## Description
 
@@ -30,7 +30,7 @@ Include the following to your dependency list:
     <dependency>
      <groupId>org.hibernate</groupId>
      <artifactId>hibernate-search</artifactId>
-     <version>4.4.0.Alpha1</version>
+     <version>4.4.0.Alpha2</version>
     </dependency>
 
 ### Sourceforge Bundle
@@ -82,3 +82,4 @@ If you want to contribute, you find all you need to know in [Contributing to Hib
 ## License
 
 This software and its documentation are distributed under the terms of the FSF Lesser Gnu Public License (see lgpl.txt).
+

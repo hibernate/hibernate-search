@@ -1,6 +1,35 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.0.Alpha2 (18-09-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1386] - NoClassDefFoundError when using Hibernate ORM 4.3.0
+    * [HSEARCH-1390] - Avoid force unlock operations on unlocked directories
+    * [HSEARCH-1393] - new getIndexBindingForEntity(Class) implementation doesn't deal with non-indexed entities
+    * [HSEARCH-1406] - Some unnecessary jars are added in the packaged JBoss Modules
+    * [HSEARCH-1412] - IndexedClassBridgeMapping is missing norms and analyze methods
+
+** Improvement
+    * [HSEARCH-1384] - Add the ability to set the number of different root types indexed in parallel
+    * [HSEARCH-1388] - Upgrade to JGroups 3.3.4.Final and refresh default configuration files
+    * [HSEARCH-1389] - Avoid context switching on single-task indexing transactions
+    * [HSEARCH-1391] - ErrorContextBuilder should build error placeholders lazily
+    * [HSEARCH-1405] - Remove dependency to org.xerial.snappy
+    * [HSEARCH-1407] - Update Apache Avro to version 1.7.5
+    * [HSEARCH-1410] - Upgrade Hibernate Commons Annotations to 4.0.4.Final
+    * [HSEARCH-1411] - Upgrade Apache Tika to 1.4
+
+** New Feature
+    * [HSEARCH-1396] - A FieldBridge should be able to easily acquire services/resources
+
+** Task
+    * [HSEARCH-1387] - Add @Override annotation on the methods inherited from interfaces
+    * [HSEARCH-1399] - MassIndexer service registration should not depend on ORM services registry
+    * [HSEARCH-1408] - Upgrade to Hibernate ORM 4.2.5.Final
+
+
 Version 4.4.0.Alpha1 (02-08-2013)
 ------------------------
 
