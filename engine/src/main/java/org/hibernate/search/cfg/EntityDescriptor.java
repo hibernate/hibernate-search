@@ -30,6 +30,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.bridge.FieldBridge;
 
@@ -131,7 +132,11 @@ public class EntityDescriptor {
 	}
 
 	public void addClassBridgeInstanceDef(FieldBridge classBridge, Map<String, Object> properties) {
-		classBridgeInstanceDefs.put( classBridge, properties );
+		Map<String, Object> previous = classBridgeInstanceDefs.put( classBridge, properties );
+
+		if ( previous != null ) {
+			throw new SearchException( "The same field bridge instance must not be passed more than once." );
+		}
 	}
 
 	public Set<Map<String, Object>> getClassBridgeDefs() {
