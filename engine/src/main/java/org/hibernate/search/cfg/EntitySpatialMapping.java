@@ -28,9 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.solr.analysis.TokenizerFactory;
-
 import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.bridge.FieldBridge;
 
 /**
  * @author Nicolas Helleringer
@@ -103,4 +103,15 @@ public class EntitySpatialMapping {
 		return new ClassBridgeMapping( mapping, entity, impl );
 	}
 
+	/**
+	 * Registers the given class bridge for the currently configured entity type. Any subsequent analyzer, parameter
+	 * etc. configurations apply to this class bridge.
+	 *
+	 * @param instance a class bridge instance
+	 * @return a new {@link ClassBridgeMapping} following the method chaining pattern
+	 * @experimental This method is considered experimental and it may be altered or removed in future releases
+	 */
+	public ClassBridgeMapping classBridgeInstance(FieldBridge instance) {
+		return new ClassBridgeMapping( mapping, entity, instance );
+	}
 }

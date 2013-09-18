@@ -269,13 +269,6 @@ public final class BridgeFactory {
 					else {
 						throw LOG.noFieldBridgeInterfaceImplementedByClassBridge( impl.getName() );
 					}
-					if ( cb.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
-						Map<String, String> params = new HashMap<String, String>( cb.params().length );
-						for ( Parameter param : cb.params() ) {
-							params.put( param.name(), param.value() );
-						}
-						( (ParameterizedBridge) instance ).setParameterValues( params );
-					}
 				}
 				catch (Exception e) {
 					throw LOG.cannotInstantiateClassBridgeOfType( impl.getName(), clazz.getName(), e );
@@ -287,6 +280,23 @@ public final class BridgeFactory {
 		}
 
 		return bridge;
+	}
+
+	/**
+	 * Injects any parameters configured via the given {@code ClassBridge} annotation into the given object, in case
+	 * this is a {@link ParameterizedBridge}.
+	 *
+	 * @param classBridgeConfiguration the parameter source
+	 * @param classBridge the object to inject the parameters into
+	 */
+	public static void injectParameters(ClassBridge classBridgeConfiguration, Object classBridge) {
+		if ( classBridgeConfiguration.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( classBridge.getClass() ) ) {
+			Map<String, String> params = new HashMap<String, String>( classBridgeConfiguration.params().length );
+			for ( Parameter param : classBridgeConfiguration.params() ) {
+				params.put( param.name(), param.value() );
+			}
+			( (ParameterizedBridge) classBridge ).setParameterValues( params );
+		}
 	}
 
 	/**

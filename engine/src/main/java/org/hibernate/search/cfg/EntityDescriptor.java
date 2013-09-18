@@ -26,22 +26,41 @@ package org.hibernate.search.cfg;
 import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.bridge.FieldBridge;
 
 /**
  * @author Emmanuel Bernard
  */
 public class EntityDescriptor {
 	private Map<String, Object> indexed;
-	private Map<PropertyKey, PropertyDescriptor> properties = new HashMap<PropertyKey, PropertyDescriptor>();
+	private final Map<PropertyKey, PropertyDescriptor> properties = new HashMap<PropertyKey, PropertyDescriptor>();
 	private Map<String, Object> similarity;
 	private Map<String, Object> boost;
 	private Map<String, Object> analyzerDiscriminator;
-	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
+	private final Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
 	private Map<String, Object> providedId;
-	private Set<Map<String, Object>> classBridges = new HashSet<Map<String, Object>>();
-	private Set<Map<String, Object>> spatials = new HashSet<Map<String, Object>>();
+
+	/**
+	 * Configured class bridges. Each bridge is represented by a map with {@code @ClassBridge} annotation member values
+	 * keyed by annotation member name.
+	 */
+	private final Set<Map<String, Object>> classBridges = new HashSet<Map<String, Object>>();
+
+	/**
+	 * Class bridge instances and their configuration
+	 */
+	private final Map<FieldBridge, Map<String, Object>> classBridgeInstanceDefs = new IdentityHashMap<FieldBridge, Map<String,Object>>();
+
+	/**
+	 * Class bridge instances and their configuration in form of a {@code ClassBridge} annotation
+	 */
+	private final Map<FieldBridge, ClassBridge> classBridgeConfigurations = new IdentityHashMap<FieldBridge, ClassBridge>();
+	private final Set<Map<String, Object>> spatials = new HashSet<Map<String, Object>>();
 	private Map<String, Object> dynamicBoost;
 	private Map<String, Object> cacheInMemory;
 
@@ -111,8 +130,24 @@ public class EntityDescriptor {
 		classBridges.add( classBridge );
 	}
 
+	public void addClassBridgeInstanceDef(FieldBridge classBridge, Map<String, Object> properties) {
+		classBridgeInstanceDefs.put( classBridge, properties );
+	}
+
 	public Set<Map<String, Object>> getClassBridgeDefs() {
 		return classBridges;
+	}
+
+	public Map<FieldBridge, Map<String, Object>> getClassBridgeInstanceDefs() {
+		return classBridgeInstanceDefs;
+	}
+
+	public void addClassBridgeInstanceConfiguration(FieldBridge classBridge, ClassBridge configuration) {
+		classBridgeConfigurations.put( classBridge, configuration );
+	}
+
+	public Map<FieldBridge, ClassBridge> getClassBridgeConfigurations() {
+		return classBridgeConfigurations;
 	}
 
 	public void addSpatial(Map<String,Object> spatial) {

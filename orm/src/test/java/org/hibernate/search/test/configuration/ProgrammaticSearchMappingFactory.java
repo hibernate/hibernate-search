@@ -31,7 +31,6 @@ import org.apache.solr.analysis.LowerCaseFilterFactory;
 import org.apache.solr.analysis.NGramFilterFactory;
 import org.apache.solr.analysis.SnowballPorterFilterFactory;
 import org.apache.solr.analysis.StandardTokenizerFactory;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FilterCacheModeType;
@@ -172,6 +171,13 @@ public class ProgrammaticSearchMappingFactory {
 						.latitude().name( "location" )
 					.property( "longitude", ElementType.FIELD )
 						.longitude().name( "location" )
+				.entity( OrderLine.class ).indexed()
+					.classBridgeInstance( new OrderLineClassBridge( "orderLineName" ) )
+					.classBridgeInstance( new OrderLineClassBridge( null ) )
+						.name( "orderLineName_ngram" )
+						.analyzer( "ngram" )
+					.classBridgeInstance( new OrderLineClassBridge( null ) )
+						.param( "fieldName", "orderLineNameViaParam" )
 		;
 
 		return mapping;
