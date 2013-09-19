@@ -165,7 +165,6 @@
         <commonsIoVersion>2.1</commonsIoVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
         <paranamerVersion>2.3</paranamerVersion>
-        <snappyVersion>1.0.4.1</snappyVersion>
             <!-- Declared only in the modules. They are not Maven dependencies. -->
         <luceneRegexVersion>3.0.3</luceneRegexVersion>
         <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
