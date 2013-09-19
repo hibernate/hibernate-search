@@ -143,8 +143,6 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.6.2</luceneVersion>
-        <luceneRegexVersion>3.0.3</luceneRegexVersion>
-        <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
         <infinispanVersion>5.3.0.Final</infinispanVersion>
         <jgroupsVersion>3.3.4.Final</jgroupsVersion>
         <hibernateVersion>4.2.5.Final</hibernateVersion>
@@ -156,12 +154,20 @@
         <narayanaVersion>4.17.4.Final</narayanaVersion>
         <avroVersion>1.7.5</avroVersion>
         <jacksonAslVersion>1.9.2</jacksonAslVersion>
-        <commonsIoVersion>1.4</commonsIoVersion>
-        <commonsCodecVersion>1.5</commonsCodecVersion>
-        <commonsLangVersion>2.6</commonsLangVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
-        <!-- Used in the hibernate-search-modules project -->
+        <jbossTransactionApiVersion>1.0.1.Final</jbossTransactionApiVersion>
+        <commonsCodecVersion>1.6</commonsCodecVersion>
+        <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
+        <activeMQVersion>5.8.0</activeMQVersion>
+
+        <!-- Used only in the modules definitions of the hibernate-search-modules project. -->
+            <!-- Versions should be kept in sync with the dependencies resolved by Maven. -->
+        <commonsIoVersion>2.1</commonsIoVersion>
+        <commonsLangVersion>2.6</commonsLangVersion>
         <paranamerVersion>2.3</paranamerVersion>
+            <!-- Declared only in the modules. They are not Maven dependencies. -->
+        <luceneRegexVersion>3.0.3</luceneRegexVersion>
+        <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
     </properties>
 
     <dependencyManagement>
@@ -207,6 +213,11 @@
                 <version>${tikaVersion}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${tikaVersion}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
                 <version>${avroVersion}</version>
@@ -238,20 +249,20 @@
                 <artifactId>hibernate-search-analyzers</artifactId>
                 <version>${project.version}</version>
             </dependency>
+             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commonsCompressVersion}</version>
+            </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${commonsCodecVersion}</version>
             </dependency>
             <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commonsIoVersion}</version>
-            </dependency>
-             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-compress</artifactId>
-                <version>${commonsCompressVersion}</version>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commonsLoggingVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
@@ -261,14 +272,8 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-core</artifactId>
-                <version>5.3.0</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>activemq-broker</artifactId>
+                <version>${activeMQVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -344,11 +349,6 @@
                 <artifactId>fest-assert</artifactId>
                 <version>1.4</version>
             </dependency>
-            <dependency>
-                <groupId>javassist</groupId>
-                <artifactId>javassist</artifactId>
-                <version>3.12.1.GA</version>
-            </dependency>
             <!--
             We need to keep the slf4j dependencies listed here even though we are not using slf4j anymore.
             Listing them within dependencyManagement will ensure that ${slf4jVersion} is used as slf4j version
@@ -364,10 +364,6 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4jVersion}</version>
             </dependency>
-            <!--
-            Defining log4j here, but due to a bug in Shrinkwrap we still need to define the version explicitly
-            in the sub modules. See HSEARCH-970
-            -->
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -574,6 +570,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>org.jboss.spec.javax.transaction</groupId>
+                <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                <version>${jbossTransactionApiVersion}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -638,10 +639,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.3.1</version>
                 <executions>
                     <execution>
-                        <id>enforce-java</id>
+                        <id>enforce-rules</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
@@ -656,6 +656,7 @@
                         <requireMavenVersion>
                             <version>3.0.4</version>
                         </requireMavenVersion>
+                        <DependencyConvergence/>
                     </rules>
                 </configuration>
             </plugin>
@@ -815,6 +816,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-help-plugin</artifactId>
                     <version>2.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

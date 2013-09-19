@@ -39,6 +39,12 @@
     <description>Hibernate Search integration tests for JBoss AS</description>
 
     <properties>
+        <!--
+        we disable the enforcer plugin for this module as it is not possible to maintain the dependency convergence
+        here due to dependency conflicts in JBoss AS dependencies.
+        -->
+        <enforcer.skip>true</enforcer.skip>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.jboss.as>7.2.0.Alpha1-redhat-4</version.jboss.as>
         <version.arquillian>1.0.3.Final</version.arquillian>
