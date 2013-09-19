@@ -24,7 +24,6 @@
 package org.hibernate.search.bridge.builtin.impl;
 
 import org.apache.lucene.document.Document;
-
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
@@ -56,4 +55,8 @@ public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge {
 		return stringBridge.objectToString( object );
 	}
 
+	@Override
+	public String toString() {
+		return "String2FieldBridgeAdaptor [stringBridge=" + stringBridge + "]";
+	}
 }
