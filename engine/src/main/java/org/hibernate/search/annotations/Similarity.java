@@ -32,10 +32,12 @@ import java.lang.annotation.Target;
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.TYPE )
 @Documented
+@Deprecated
 /**
  * Specifies a similarity implementation to use for a given class
  *
  * @author Nick Vincent
+ * @deprecated deprecated as of Search 4.4. Will be removed in Search 5. As replacement use properties configuration
  */
 public @interface Similarity {
 
