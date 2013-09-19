@@ -93,8 +93,6 @@ class IndexWriterHolder {
 			writerConfig.setSimilarity( similarity );
 		}
 		writerConfig.setOpenMode( OpenMode.APPEND ); //More efficient to open
-		//TODO remove this awful need to set a reference back again to the indexManager:
-		indexManager.setIndexWriterConfig( writerConfig );
 	}
 
 	/**

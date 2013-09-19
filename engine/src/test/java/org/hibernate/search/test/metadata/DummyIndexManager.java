@@ -69,7 +69,7 @@ class DummyIndexManager implements IndexManager {
 	}
 
 	@Override
-	public void initialize(String indexName, Properties properties, WorkerBuildContext context) {
+	public void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context) {
 		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
 	}
 
@@ -85,11 +85,6 @@ class DummyIndexManager implements IndexManager {
 
 	@Override
 	public Similarity getSimilarity() {
-		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
-	}
-
-	@Override
-	public void setSimilarity(Similarity newSimilarity) {
 		throw new UnsupportedOperationException( "Not supported in dummy index manager" );
 	}
 

@@ -33,7 +33,6 @@ import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -124,11 +123,6 @@ public class TypeMetadata {
 	private final Set<ContainedInMetadata> containedInMetadata;
 
 	/**
-	 * The similarity defined this this type. {@code null} is not explicitly set.
-	 */
-	private final Similarity similarity;
-
-	/**
 	 * The scoped analyzer for this entity
 	 */
 	private final ScopedAnalyzer scopedAnalyzer;
@@ -166,7 +160,6 @@ public class TypeMetadata {
 		this.discriminatorGetter = builder.discriminatorGetter;
 		this.classBoostStrategy = builder.classBoostStrategy;
 		this.stateInspectionOptimizationsEnabled = builder.stateInspectionOptimizationsEnabled;
-		this.similarity = builder.similarity;
 		this.idPropertyMetadata = builder.idPropertyMetadata;
 		this.embeddedTypeMetadata = Collections.unmodifiableSet( builder.embeddedTypeMetadata );
 		this.containedInMetadata = Collections.unmodifiableSet( builder.containedInMetadata );
@@ -236,10 +229,6 @@ public class TypeMetadata {
 		return discriminatorGetter;
 	}
 
-	public Similarity getSimilarity() {
-		return similarity;
-	}
-
 	public boolean areStateInspectionOptimizationsEnabled() {
 		return stateInspectionOptimizationsEnabled;
 	}
@@ -291,7 +280,6 @@ public class TypeMetadata {
 		sb.append( ", embeddedTypeMetadata=" ).append( embeddedTypeMetadata );
 		sb.append( ", containedInMetadata=" ).append( containedInMetadata );
 		sb.append( ", optimizationBlackList=" ).append( optimizationBlackList );
-		sb.append( ", similarity=" ).append( similarity );
 		sb.append( ", stateInspectionOptimizationsEnabled=" ).append( stateInspectionOptimizationsEnabled );
 		sb.append( ", scopedAnalyzer=" ).append( scopedAnalyzer );
 		sb.append( ", collectionRoles=" ).append( collectionRoles );
@@ -370,7 +358,6 @@ public class TypeMetadata {
 		private Discriminator discriminator;
 		private XMember discriminatorGetter;
 		private boolean stateInspectionOptimizationsEnabled = true;
-		private Similarity similarity;
 		private Set<PropertyMetadata> propertyMetadataList = new HashSet<PropertyMetadata>();
 		private Set<DocumentFieldMetadata> classBridgeFields = new HashSet<DocumentFieldMetadata>();
 		private Set<EmbeddedTypeMetadata> embeddedTypeMetadata = new HashSet<EmbeddedTypeMetadata>();
@@ -393,17 +380,6 @@ public class TypeMetadata {
 
 		public Builder idProperty(PropertyMetadata propertyMetadata) {
 			this.idPropertyMetadata = propertyMetadata;
-			return this;
-		}
-
-		public Builder similarity(Similarity similarity) {
-			if ( this.similarity != null ) {
-				throw new SearchException(
-						"Multiple similarities defined in the same class hierarchy or on the index settings: "
-								+ indexedType.getName()
-				);
-			}
-			this.similarity = similarity;
 			return this;
 		}
 

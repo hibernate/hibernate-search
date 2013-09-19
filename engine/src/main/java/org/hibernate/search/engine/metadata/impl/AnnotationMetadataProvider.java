@@ -31,7 +31,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,7 +39,6 @@ import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -323,14 +321,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ConfigContext configContext,
 			boolean disableOptimizationsArg,
 			PathsContext pathsContext) {
-		List<XClass> hierarchy = new LinkedList<XClass>();
-		XClass next;
-		for ( XClass previousClass = parseContext.getCurrentClass(); previousClass != null; previousClass = next ) {
-			next = previousClass.getSuperclass();
-			if ( next != null ) {
-				hierarchy.add( 0, previousClass ); // append to head to create a list in top-down iteration order
-			}
-		}
+		List<XClass> hierarchy = ReflectionHelper.createXClassHierarchy( parseContext.getCurrentClass() );
 
 		// Iterate the class hierarchy top down. This allows to override the default analyzer for the properties if the class holds one
 		for ( XClass currentClass : hierarchy ) {
@@ -438,11 +429,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		checkForAnalyzerDiscriminator( clazz, typeMetadataBuilder, configContext );
-
-		// Get similarity
-		if ( isRoot ) {
-			checkForSimilarity( clazz, typeMetadataBuilder );
-		}
 	}
 
 	/**
@@ -1071,24 +1057,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			}
 		}
 		return null;
-	}
-
-	private void checkForSimilarity(XClass clazz, TypeMetadata.Builder typeMetadataBuilder) {
-		org.hibernate.search.annotations.Similarity similarityAnnotation = clazz.getAnnotation( org.hibernate.search.annotations.Similarity.class );
-		if ( similarityAnnotation == null ) {
-			return;
-		}
-
-		Class<?> similarityClass = similarityAnnotation.impl();
-		try {
-			typeMetadataBuilder.similarity( (Similarity) similarityClass.newInstance() );
-		}
-		catch (InstantiationException e) {
-			log.similarityInstantiationException( similarityClass.getName(), clazz.getName() );
-		}
-		catch (IllegalAccessException e) {
-			log.similarityInstantiationException( similarityClass.getName(), clazz.getName() );
-		}
 	}
 
 	private boolean isFieldInPath(Annotation fieldAnnotation,

@@ -26,7 +26,10 @@ package org.hibernate.search.util.impl;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
+import java.util.LinkedList;
+import java.util.List;
 
+import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.util.StringHelper;
 
@@ -93,5 +96,23 @@ public abstract class ReflectionHelper {
 			throw new IllegalStateException( "Could not get property value", e );
 		}
 		return value;
+	}
+
+	/**
+	 * Creates the class hierarchy for a given {@code XClass}.
+	 *
+	 * @param clazz the class for which to create the hierarchy
+	 * @return the list of classes in the hierarchy starting at {@code java.lang.Object}
+	 */
+	public static List<XClass> createXClassHierarchy(XClass clazz) {
+		List<XClass> hierarchy = new LinkedList<XClass>( );
+		XClass next;
+		for ( XClass previousClass = clazz; previousClass != null; previousClass = next ) {
+			next = previousClass.getSuperclass();
+			if ( next != null ) {
+				hierarchy.add( 0, previousClass ); // append to head to create a list in top-down iteration order
+			}
+		}
+		return hierarchy;
 	}
 }

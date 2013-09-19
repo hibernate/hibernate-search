@@ -25,55 +25,71 @@ package org.hibernate.search.test.similarity;
 
 import java.util.List;
 
-import org.hibernate.search.SearchException;
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.Search;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.Environment;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.index.Term;
+import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Emmanuel Bernard
  */
-public class SimilarityTest extends SearchTestCase {
+public class SimilarityTest extends SearchTestCaseJUnit4 {
 
-	public void testIndexLevelSimilarity() throws Exception {
-		Configuration config = new Configuration();
-		config.addAnnotatedClass( Can.class );
-		config.addAnnotatedClass( Trash.class );
-		config.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		config.setProperty( "hibernate.search.default.similarity", DummySimilarity.class.getName() );
-		try {
-			config.buildSessionFactory();
-			fail( "Session creation should have failed due to duplicate similarity definition" );
-		}
-		catch (SearchException e) { // the SearchException will be wrapped in a HibernateException
-			assertTrue(
-					e.getMessage().startsWith(
-							"Multiple similarities defined"
-					)
-			);
-		}
-	}
-
-	public void testClassAndGlobalSimilarity() throws Exception {
+	@Test
+	public void testClassLevelSimilarityOverridesDefaultSimilarity() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 
 		Trash trash = new Trash();
 		trash.setName( "Green trash" );
 		s.persist( trash );
+
 		trash = new Trash();
 		trash.setName( "Green Green Green trash" );
 		s.persist( trash );
+
+		tx.commit();
+		s.clear();
+
+		tx = s.beginTransaction();
+		TermQuery termQuery = new TermQuery( new Term( "name", "green" ) );
+		FullTextSession fullTextSession = Search.getFullTextSession( s );
+		List results = fullTextSession.createFullTextQuery( termQuery, Trash.class )
+				.setProjection( FullTextQuery.SCORE, FullTextQuery.THIS )
+				.list();
+		assertEquals( 2, results.size() );
+		assertEquals(
+				"Similarity not overridden at the class level",
+				( (Object[]) results.get( 0 ) )[0],
+				( (Object[]) results.get( 1 ) )[0]
+		);
+		assertEquals( "Similarity not overridden", 1.0f, ( (Object[]) results.get( 0 ) )[0] );
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void testConfiguredDefaultSimilarityGetsApplied() throws Exception {
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+
 		Can can = new Can();
 		can.setName( "Green can" );
 		s.persist( can );
+
 		can = new Can();
 		can.setName( "Green Green Green can" );
 		s.persist( can );
@@ -82,27 +98,24 @@ public class SimilarityTest extends SearchTestCase {
 		s.clear();
 
 		tx = s.beginTransaction();
-		TermQuery tq = new TermQuery( new Term("name", "green") );
-		FullTextSession fts = Search.getFullTextSession( s );
-		List results = fts.createFullTextQuery( tq, Trash.class ).setProjection( FullTextQuery.SCORE, FullTextQuery.THIS ).list();
+		TermQuery termQuery = new TermQuery( new Term( "name", "green" ) );
+		FullTextSession fullTextSession = Search.getFullTextSession( s );
+		List results = fullTextSession.createFullTextQuery( termQuery, Can.class )
+				.setProjection( FullTextQuery.SCORE, FullTextQuery.THIS )
+				.list();
 		assertEquals( 2, results.size() );
-		assertEquals( "Similarity not overridden at the class level", ( (Object[]) results.get( 0 ) )[0], ( (Object[]) results.get( 1 ) )[0]);
-		assertEquals( "Similarity not overridden", 1.0f, ( (Object[]) results.get( 0 ) )[0] );
-		for ( Object result : results ) {
-			s.delete( ( (Object[]) result )[1] );
-		}
-
-		results = fts.createFullTextQuery( tq, Can.class ).setProjection( FullTextQuery.SCORE, FullTextQuery.THIS ).list();
-		assertEquals( 2, results.size() );
-		assertEquals( "Similarity not overridden by the global setting", ( (Object[]) results.get( 0 ) )[0], ( (Object[]) results.get( 1 ) )[0]);
-		assertFalse( "Similarity not overridden by the global setting", new Float(1.0f).equals( ( (Object[]) results.get( 0 ) )[0] ) );
-		for ( Object result : results ) {
-			s.delete( ( (Object[]) result )[1] );
-		}
+		assertEquals(
+				"Similarity not overridden by the global setting",
+				( (Object[]) results.get( 0 ) )[0],
+				( (Object[]) results.get( 1 ) )[0]
+		);
+		assertFalse(
+				"Similarity not overridden by the global setting",
+				new Float( 1.0f ).equals( ( (Object[]) results.get( 0 ) )[0] )
+		);
 
 		tx.commit();
 		s.close();
-
 	}
 
 	@Override

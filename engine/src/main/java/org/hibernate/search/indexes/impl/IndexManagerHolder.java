@@ -21,6 +21,7 @@
 package org.hibernate.search.indexes.impl;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +40,7 @@ import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -52,6 +54,7 @@ import org.hibernate.search.store.impl.NotShardedStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -98,7 +101,7 @@ public class IndexManagerHolder {
 
 		final boolean isDynamicSharding = isShardingDynamic( indexProperties[0] );
 
-		Similarity similarity = createSimilarity( directoryProviderName, indexProperties[0] );
+		Similarity similarity = createSimilarity( directoryProviderName, cfg, indexProperties[0], entity );
 
 		IndexManager[] indexManagers = createIndexManagers(
 				mappedClass,
@@ -234,26 +237,12 @@ public class IndexManagerHolder {
 		return result;
 	}
 
-	/**
-	 * Specifies a custom similarity on an index
-	 *
-	 * @param newSimilarity
-	 * @param manager
-	 */
-	private void setSimilarity(Similarity newSimilarity, IndexManager manager) {
-		Similarity similarity = manager.getSimilarity();
-		if ( similarity != null && !similarity.getClass().equals( newSimilarity.getClass() ) ) {
-			throw new SearchException(
-					"Multiple entities are sharing the same index but are declaring an " +
-							"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
-							"declare the same Similarity implementation."
-			);
-		}
-		manager.setSimilarity( newSimilarity );
-	}
-
-	private IndexManager createIndexManager(String indexName, Properties indexProps, WorkerBuildContext context, IndexManagerFactory indexManagerFactory) {
-		String indexManagerImplementationName = indexProps.getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
+	private IndexManager createIndexManager(String indexName,
+			Similarity indexSimilarity,
+			IndexManagerFactory indexManagerFactory,
+			Properties properties,
+			WorkerBuildContext context) {
+		String indexManagerImplementationName = properties.getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
 		final IndexManager manager;
 		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
 			manager = indexManagerFactory.createDefaultIndexManager();
@@ -262,7 +251,7 @@ public class IndexManagerHolder {
 			manager = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName );
 		}
 		try {
-			manager.initialize( indexName, indexProps, context );
+			manager.initialize( indexName, properties, indexSimilarity, context );
 			return manager;
 		}
 		catch (Exception e) {
@@ -352,7 +341,7 @@ public class IndexManagerHolder {
 					DirectoryProviderFactory.class.getClassLoader(),
 					"ShardIdentifierProvider"
 			);
-			shardIdentifierProvider.initialize( new MaskedProperty( indexProperty, SHARDING_STRATEGY), context );
+			shardIdentifierProvider.initialize( new MaskedProperty( indexProperty, SHARDING_STRATEGY ), context );
 		}
 		return shardIdentifierProvider;
 	}
@@ -379,20 +368,63 @@ public class IndexManagerHolder {
 		return interceptor;
 	}
 
-	private Similarity createSimilarity(String directoryProviderName, Properties indexProperty) {
-		// define the Similarity implementation:
-		// warning: it can also be set by an annotation at class level
-		String similarityClassName = indexProperty.getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
-		Similarity similarity = null;
+	private Similarity createSimilarity(String directoryProviderName, SearchConfiguration cfg, Properties indexProperties, XClass clazz) {
+		// first check on class level
+		Similarity classLevelSimilarity = null;
+
+		// TODO - the processing of the @Similarity annotation is temporary here. The annotation should be removed in Search 5 (HF)
+		List<XClass> hierarchyClasses = ReflectionHelper.createXClassHierarchy( clazz );
+		Class<?> similarityClass = null;
+		for ( XClass hierarchyClass : hierarchyClasses ) {
+			org.hibernate.search.annotations.Similarity similarityAnnotation = hierarchyClass.getAnnotation( org.hibernate.search.annotations.Similarity.class );
+			if ( similarityAnnotation != null ) {
+				Class<?> tmpSimilarityClass = similarityAnnotation.impl();
+				if ( similarityClass != null && !similarityClass.equals( tmpSimilarityClass ) ) {
+					throw log.getMultipleInconsistentSimilaritiesInClassHierarchyException( clazz.getName() );
+				}
+				else {
+					similarityClass = tmpSimilarityClass;
+				}
+				classLevelSimilarity = ClassLoaderHelper.instanceFromClass(
+						Similarity.class,
+						similarityClass,
+						"Similarity class for index " + directoryProviderName
+				);
+			}
+		}
+
+		// now we check the config
+		Similarity configLevelSimilarity = null;
+		String similarityClassName = indexProperties.getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
 		if ( similarityClassName != null ) {
-			similarity = ClassLoaderHelper.instanceFromName(
+			configLevelSimilarity = ClassLoaderHelper.instanceFromName(
 					Similarity.class,
 					similarityClassName,
 					DirectoryProviderFactory.class.getClassLoader(),
 					"Similarity class for index " + directoryProviderName
 			);
 		}
-		return similarity;
+
+		if ( classLevelSimilarity != null && configLevelSimilarity != null ) {
+			throw log.getInconsistentSimilaritySettingBetweenAnnotationsAndConfigPropertiesException( classLevelSimilarity.getClass().getName(), configLevelSimilarity.getClass().getCanonicalName() );
+		}
+		else if ( classLevelSimilarity != null ) {
+			return classLevelSimilarity;
+		}
+		else if ( configLevelSimilarity != null ) {
+			return configLevelSimilarity;
+		}
+		else {
+			String defaultSimilarityClassName = cfg.getProperty( Environment.SIMILARITY_CLASS );
+			if ( StringHelper.isEmpty( defaultSimilarityClassName ) ) {
+				return Similarity.getDefault();
+			}
+			else {
+				return ClassLoaderHelper.instanceFromName(
+						Similarity.class, defaultSimilarityClassName, ConfigContext.class.getClassLoader(), "default similarity"
+				);
+			}
+		}
 	}
 
 	private IndexShardingStrategy createIndexShardingStrategy(Class mappedClass, Properties[] indexProps, boolean dynamicSharding, IndexManager[] providers) {
@@ -457,6 +489,12 @@ public class IndexManagerHolder {
 					);
 				}
 				else {
+					if ( !indexManager.getSimilarity().getClass().equals( similarity.getClass() ) ) {
+						throw log.getMultipleEntitiesShareIndexWithInconsistentSimilarityException( mappedClass.getName(),
+								similarity.getClass().getName(),
+								indexManager.getContainedTypes().iterator().next().getName(),
+								indexManager.getSimilarity().getClass().getName() );
+					}
 					indexManager.addContainedEntity( mappedClass );
 				}
 				indexManagers[index] = indexManager;
@@ -477,11 +515,14 @@ public class IndexManagerHolder {
 			WorkerBuildContext context) {
 		IndexManager indexManager = indexManagersRegistry.get( providerName );
 		if ( indexManager == null ) {
-			indexManager = createIndexManager( providerName, indexProperties, context, indexManagerFactory );
+			indexManager = createIndexManager(
+					providerName,
+					similarity,
+					indexManagerFactory,
+					indexProperties,
+					context
+			);
 			indexManagersRegistry.put( providerName, indexManager );
-			if ( similarity != null ) {
-				setSimilarity( similarity, indexManager );
-			}
 		}
 		indexManager.addContainedEntity( mappedClass );
 		return indexManager;
