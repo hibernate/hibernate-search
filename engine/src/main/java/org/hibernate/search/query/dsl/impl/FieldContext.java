@@ -24,6 +24,10 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+
 /**
  * @author Emmanuel Bernard
  */
@@ -32,6 +36,7 @@ public class FieldContext {
 	private boolean ignoreAnalyzer;
 	private final QueryCustomizer fieldCustomizer;
 	private boolean ignoreFieldBridge;
+	private FieldBridge fieldBridge;
 
 	public FieldContext(String field) {
 		this.field = field;
@@ -60,5 +65,25 @@ public class FieldContext {
 
 	public void setIgnoreFieldBridge(boolean ignoreFieldBridge) {
 		this.ignoreFieldBridge = ignoreFieldBridge;
+	}
+
+	public void setFieldBridge(FieldBridge fieldBridge) {
+		this.fieldBridge = fieldBridge;
+	}
+
+	public FieldBridge getFieldBridge() {
+		return fieldBridge;
+	}
+
+	public String objectToString(DocumentBuilderIndexedEntity<?> documentBuilder, Object value, ConversionContext conversionContext) {
+		if ( isIgnoreFieldBridge() ) {
+			return value == null ? null : value.toString();
+		}
+		else if ( fieldBridge != null ) {
+			return documentBuilder.objectToString( field, fieldBridge, value, conversionContext );
+		}
+		else {
+			return documentBuilder.objectToString( field, value, conversionContext );
+		}
 	}
 }

@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,42 +21,36 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.bridge.builtin.impl;
+package org.hibernate.search.test.query.dsl;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.StringBridge;
 
 /**
- * Bridge to use a StringBridge as a FieldBridge.
+ * Adds a custom field to be queried via explicitly passed field bridge.
  *
- * @author Emmanuel Bernard (C) 2011 Red Hat Inc.
- * @author Sanne Grinovero (C) 2011 Red Hat Inc.
+ * @author Gunnar Morling
  */
-public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge {
-	private final StringBridge stringBridge;
+public class MonthClassBridge implements FieldBridge {
 
-	public String2FieldBridgeAdaptor(StringBridge stringBridge) {
-		this.stringBridge = stringBridge;
-	}
+	public static final String FIELD_NAME_1 = "monthValueAsRomanNumberFromClassBridge1";
+	public static final String FIELD_NAME_2 = "monthValueAsRomanNumberFromClassBridge2";
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		String indexedString = stringBridge.objectToString( value );
-		if ( indexedString == null && luceneOptions.indexNullAs() != null ) {
-			indexedString = luceneOptions.indexNullAs();
-		}
-		luceneOptions.addFieldToDocument( name, indexedString, document );
-	}
+		Month month = (Month) value;
 
-	@Override
-	public String objectToString(Object object) {
-		return stringBridge.objectToString( object );
-	}
+		luceneOptions.addFieldToDocument(
+				FIELD_NAME_1,
+				new RomanNumberFieldBridge().objectToString( month.getMonthValue() ),
+				document
+		);
 
-	@Override
-	public String toString() {
-		return "String2FieldBridgeAdaptor [stringBridge=" + stringBridge + "]";
+		luceneOptions.addFieldToDocument(
+				FIELD_NAME_2,
+				new RomanNumberFieldBridge().objectToString( month.getMonthValue() ),
+				document
+		);
 	}
 }

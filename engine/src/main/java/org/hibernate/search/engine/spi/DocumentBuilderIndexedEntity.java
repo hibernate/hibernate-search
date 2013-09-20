@@ -682,28 +682,36 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
-		if ( fieldName.equals( idFieldMetaData.getName() ) ) {
-			return objectToString(
-					getIdBridge(),
-					idFieldMetaData.getName(),
-					value,
-					conversionContext
-			);
+		FieldBridge bridge = fieldName.equals( idFieldMetaData.getName() ) ?
+				getIdBridge() :
+				getBridge( getMetadata(), fieldName );
+
+		if ( bridge != null ) {
+			return objectToString( fieldName, bridge, value, conversionContext );
+		}
+
+		throw new SearchException( "Unable to find field " + fieldName + " in " + getBeanXClass() );
+	}
+
+	public String objectToString(String fieldName, FieldBridge bridge, Object value, ConversionContext conversionContext) {
+		if ( fieldName == null ) {
+			throw new AssertionFailure( "Field name should not be null" );
+		}
+		if ( bridge == null ) {
+			throw new AssertionFailure( "Field bridge should not be null" );
+		}
+
+		final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
+
+		if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
+			return objectToString( (TwoWayFieldBridge) bridge, fieldName, value, conversionContext );
+		}
+		else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
+			return objectToString( (StringBridge) bridge, fieldName, value, conversionContext );
 		}
 		else {
-			FieldBridge bridge = getBridge( getMetadata(), fieldName );
-			if ( bridge != null ) {
-				final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
-				if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return objectToString( (TwoWayFieldBridge) bridge, fieldName, value, conversionContext );
-				}
-				else if ( StringBridge.class.isAssignableFrom( bridgeClass ) ) {
-					return objectToString( (StringBridge) bridge, fieldName, value, conversionContext );
-				}
-				throw log.fieldBridgeNotTwoWay( bridgeClass, fieldName, getBeanXClass() );
-			}
+			throw log.fieldBridgeNotTwoWay( bridgeClass, fieldName, getBeanXClass() );
 		}
-		throw new SearchException( "Unable to find field " + fieldName + " in " + getBeanXClass() );
 	}
 
 	private FieldBridge getNullBridge(EmbeddedTypeMetadata embeddedTypeMetadata, String fieldName) {
