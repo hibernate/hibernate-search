@@ -25,12 +25,14 @@
 package org.hibernate.search.test.query.dsl;
 
 import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -45,6 +47,7 @@ import org.hibernate.search.annotations.Resolution;
  */
 @Entity
 @Indexed
+@ClassBridge(impl = MonthClassBridge.class)
 public class Month {
 
 	public Month() {

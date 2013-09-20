@@ -27,13 +27,14 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.query.dsl.TermTermination;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.query.dsl.TermMatchingContext;
+import org.hibernate.search.query.dsl.TermTermination;
 
 /**
 * @author Emmanuel Bernard
 */
-public class ConnectedTermMatchingContext implements TermMatchingContext {
+public class ConnectedTermMatchingContext implements TermMatchingContext, FieldBridgeCustomization<TermMatchingContext> {
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext termContext;
@@ -98,6 +99,14 @@ public class ConnectedTermMatchingContext implements TermMatchingContext {
 	public TermMatchingContext ignoreFieldBridge() {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.setIgnoreFieldBridge( true );
+		}
+		return this;
+	}
+
+	@Override
+	public TermMatchingContext withFieldBridge(FieldBridge fieldBridge) {
+		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
+			fieldContext.setFieldBridge( fieldBridge );
 		}
 		return this;
 	}
