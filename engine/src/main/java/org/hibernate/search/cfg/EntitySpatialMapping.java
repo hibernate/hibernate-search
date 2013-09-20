@@ -110,6 +110,8 @@ public class EntitySpatialMapping {
 	 * @param instance a class bridge instance
 	 * @return a new {@link ClassBridgeMapping} following the method chaining pattern
 	 * @experimental This method is considered experimental and it may be altered or removed in future releases
+	 * @throws org.hibernate.search.SearchException in case the same bridge instance is passed more than once for the
+	 * currently configured entity type
 	 */
 	public ClassBridgeMapping classBridgeInstance(FieldBridge instance) {
 		return new ClassBridgeMapping( mapping, entity, instance );
