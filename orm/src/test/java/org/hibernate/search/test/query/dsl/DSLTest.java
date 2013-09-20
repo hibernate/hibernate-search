@@ -48,9 +48,11 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Factory;
+import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
+import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.test.SearchTestCase;
@@ -97,6 +99,42 @@ public class DSLTest extends SearchTestCase {
 					.ignoreFieldBridge()
 				.matching( "2" )
 				.createQuery();
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+		transaction.commit();
+	}
+
+	public void testUseOfCustomFieldBridgeInstance() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		ConnectedTermMatchingContext termMatchingContext = (ConnectedTermMatchingContext) monthQb
+				.keyword()
+				.onField( MonthClassBridge.FIELD_NAME_1 );
+
+		Query query = termMatchingContext
+				.withFieldBridge( new String2FieldBridgeAdaptor( new RomanNumberFieldBridge() ) )
+				.matching( 2 )
+				.createQuery();
+
+		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
+		transaction.commit();
+	}
+
+	public void testUseOfMultipleCustomFieldBridgeInstances() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query  = ( (ConnectedTermMatchingContext) ( (ConnectedTermMatchingContext) monthQb
+				.keyword()
+				.onField( MonthClassBridge.FIELD_NAME_1 ) )
+					.withFieldBridge( new String2FieldBridgeAdaptor( new RomanNumberFieldBridge() ) )
+				.andField( MonthClassBridge.FIELD_NAME_2 ) )
+					.withFieldBridge( new String2FieldBridgeAdaptor( new RomanNumberFieldBridge() ) )
+					.matching( 2 )
+				.createQuery();
+
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 		transaction.commit();
 	}

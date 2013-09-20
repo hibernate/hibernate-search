@@ -36,7 +36,6 @@ import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
-
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
@@ -93,7 +92,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private Query createQuery(FieldContext fieldContext, ConversionContext conversionContext) {
 		final Query perFieldQuery;
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
-		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
+		FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
 		if ( fieldBridge instanceof NumericFieldBridge ) {
 			return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
 		}
@@ -144,7 +143,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		}
 		else {
 			// need to go via the appropriate bridge, because value is an object, eg boolean, and must be converted to a string first
-			return documentBuilder.objectToString( fieldContext.getField(), value, conversionContext );
+			return fieldContext.objectToString( documentBuilder, value, conversionContext );
 		}
 	}
 

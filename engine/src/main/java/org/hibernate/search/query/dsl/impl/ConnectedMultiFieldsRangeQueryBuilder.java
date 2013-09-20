@@ -98,7 +98,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 
-		FieldBridge fieldBridge = documentBuilder.getBridge( fieldContext.getField() );
+		FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
 
 		final Object fromObject = rangeContext.getFrom();
 		final Object toObject = rangeContext.getTo();
@@ -113,16 +113,12 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 			);
 		}
 		else {
-			final String fromString = fieldContext.isIgnoreFieldBridge() ?
-					fromObject == null ? null : fromObject.toString() :
-					documentBuilder.objectToString( fieldName, fromObject, conversionContext );
+			String fromString = fieldContext.objectToString( documentBuilder, fromObject, conversionContext );
 			final String lowerTerm = fromString == null ?
 					null :
 					Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
 
-			final String toString = fieldContext.isIgnoreFieldBridge() ?
-					toObject == null ? null : toObject.toString() :
-					documentBuilder.objectToString( fieldName, toObject, conversionContext );
+			String toString = fieldContext.objectToString( documentBuilder, toObject, conversionContext );
 			final String upperTerm = toString == null ?
 					null :
 					Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
