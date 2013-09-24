@@ -460,7 +460,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			FieldBridge instance = classBridge.getKey();
 			ClassBridge configuration = classBridge.getValue();
 
-			bindClassBridgeAnnotation( prefix, typeMetadataBuilder, configuration, instance, clazz, configContext );
+			bindClassBridgeAnnotation( prefix, typeMetadataBuilder, configuration, instance, configContext );
 		}
 	}
 
@@ -469,15 +469,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ClassBridge classBridgeAnnotation,
 			XClass clazz,
 			ConfigContext configContext) {
-		FieldBridge fieldBridge = BridgeFactory.extractType( classBridgeAnnotation, clazz );
-		bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, fieldBridge, clazz, configContext );
+		FieldBridge fieldBridge = BridgeFactory.extractType( classBridgeAnnotation, reflectionManager.toClass( clazz ) );
+		bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, fieldBridge, configContext );
 	}
 
 	private void bindClassBridgeAnnotation(String prefix,
 			TypeMetadata.Builder typeMetadataBuilder,
 			ClassBridge classBridgeAnnotation,
 			FieldBridge fieldBridge,
-			XClass clazz,
 			ConfigContext configContext) {
 
 		BridgeFactory.injectParameters( classBridgeAnnotation, fieldBridge );
