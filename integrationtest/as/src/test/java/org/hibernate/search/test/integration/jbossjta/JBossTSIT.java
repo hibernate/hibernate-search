@@ -48,7 +48,6 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
-import org.hibernate.search.test.integration.jbossjta.infra.JBossTSStandaloneTransactionManagerLookup;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;
 import org.hibernate.search.util.impl.FileHelper;
 
@@ -96,13 +95,10 @@ public class JBossTSIT {
 				.setValidationMode( ValidationMode.NONE )
 				.setTransactionType( PersistenceUnitTransactionType.JTA )
 				.addManagedClassNames( Tweet.class.getName() )
-				.addProperty(
-						"hibernate.transaction.manager_lookup_class",
-						JBossTSStandaloneTransactionManagerLookup.class.getName()
-				)
 				.addProperty( "hibernate.dialect", H2Dialect.class.getName() )
 				.addProperty( Environment.HBM2DDL_AUTO, "create-drop" )
 				.addProperty( Environment.SHOW_SQL, "true" )
+				.addProperty( Environment.JTA_PLATFORM, org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform.class.getName() )
 						//I don't pool connections by JTA transaction. Leave the work to Hibernate Core
 				.addProperty( Environment.RELEASE_CONNECTIONS, ConnectionReleaseMode.AFTER_TRANSACTION.toString() )
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
