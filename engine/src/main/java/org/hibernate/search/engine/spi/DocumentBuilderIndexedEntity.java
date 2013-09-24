@@ -36,7 +36,6 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -61,7 +60,6 @@ import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.spi.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
@@ -640,14 +638,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	public Set<org.hibernate.search.annotations.FieldCacheType> getFieldCacheOption() {
 		return fieldCacheUsage;
-	}
-
-	@Deprecated //with no replacement: too expensive to create the conversionContext each time this was needed
-	public Term getTerm(Serializable id) {
-		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
-		DocumentFieldMetadata fieldMetadata = idPropertyMetadata.getFieldMetadata( idFieldName );
-		String idFieldName = fieldMetadata.getName();
-		return new Term( idFieldName, objectToString( getIdBridge(), idFieldName, id, conversionContext ) );
 	}
 
 	public TwoWayFieldBridge getIdBridge() {
