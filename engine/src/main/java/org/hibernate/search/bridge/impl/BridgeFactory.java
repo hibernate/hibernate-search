@@ -245,40 +245,43 @@ public final class BridgeFactory {
 	 * This extracts and instantiates the implementation class from a {@code ClassBridge} annotation.
 	 *
 	 * @param cb the class bridge annotation
-	 * @param clazz the {@code XClass} on which the annotation is defined on
+	 * @param clazz the {@code Class} on which the annotation is defined on
 	 * @return Returns the specified {@code FieldBridge} instance
 	 */
-	public static FieldBridge extractType(ClassBridge cb, XClass clazz) {
+	public static FieldBridge extractType(ClassBridge cb, Class<?> clazz) {
 		FieldBridge bridge = null;
+		Class<?> bridgeType = null;
 
 		if ( cb != null ) {
-			Class<?> impl = cb.impl();
-			if ( impl != null ) {
+			bridgeType = cb.impl();
+			if ( bridgeType != null ) {
 				try {
-					Object instance = impl.newInstance();
-					if ( FieldBridge.class.isAssignableFrom( impl ) ) {
+					Object instance = bridgeType.newInstance();
+					if ( FieldBridge.class.isAssignableFrom( bridgeType ) ) {
 						bridge = (FieldBridge) instance;
 					}
-					else if ( org.hibernate.search.bridge.TwoWayStringBridge.class.isAssignableFrom( impl ) ) {
+					else if ( org.hibernate.search.bridge.TwoWayStringBridge.class.isAssignableFrom( bridgeType ) ) {
 						bridge = new TwoWayString2FieldBridgeAdaptor(
 								(org.hibernate.search.bridge.TwoWayStringBridge) instance
 						);
 					}
-					else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
+					else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( bridgeType ) ) {
 						bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
 					}
 					else {
-						throw LOG.noFieldBridgeInterfaceImplementedByClassBridge( impl.getName() );
+						throw LOG.noFieldBridgeInterfaceImplementedByClassBridge( bridgeType.getName() );
 					}
 				}
 				catch (Exception e) {
-					throw LOG.cannotInstantiateClassBridgeOfType( impl.getName(), clazz.getName(), e );
+					throw LOG.cannotInstantiateClassBridgeOfType( bridgeType.getName(), clazz.getName(), e );
 				}
 			}
 		}
 		if ( bridge == null ) {
 			throw LOG.unableToDetermineClassBridge( ClassBridge.class.getName() );
 		}
+
+		populateReturnType( clazz, bridgeType, bridge );
 
 		return bridge;
 	}
