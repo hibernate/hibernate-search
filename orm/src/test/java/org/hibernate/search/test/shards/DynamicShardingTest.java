@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.document.Document;
@@ -231,28 +232,23 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 		}
 
 		@Override
-		public String getShardIdentifier(Class<?> entity, Serializable id, String idInString, Document document) {
-			if ( entity.equals( Animal.class ) ) {
+		public String getShardIdentifier(Class<?> entityType, Serializable id, String idAsString, Document document) {
+			if ( entityType.equals( Animal.class ) ) {
 				String type = document.getFieldable( "type" ).stringValue();
 				shards.put( type, type );
 				return type;
 			}
-			throw new RuntimeException( "Animal expected but found " + entity );
+			throw new RuntimeException( "Animal expected but found " + entityType );
 		}
 
 		@Override
-		public String[] getShardIdentifiers(Class<?> entity, Serializable id, String idInString) {
+		public Set<String> getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters) {
 			return getAllShardIdentifiers();
 		}
 
 		@Override
-		public String[] getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-			return getAllShardIdentifiers();
-		}
-
-		@Override
-		public String[] getAllShardIdentifiers() {
-			return shards.keySet().toArray( new String[shards.size()] );
+		public Set<String> getAllShardIdentifiers() {
+			return shards.keySet();
 		}
 	}
 }

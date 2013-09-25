@@ -25,8 +25,9 @@
 package org.hibernate.search.engine.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.filter.FullTextFilterImplementor;
@@ -61,42 +62,42 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 
 	@Override
 	public IndexManager[] getIndexManagersForAllShards() {
-		String[] shards = shardIdentifierProvider.getAllShardIdentifiers();
-		return getIndexManagersFromShards( shards );
+		Set<String> allShardIdentifiers = shardIdentifierProvider.getAllShardIdentifiers();
+		return getIndexManagersFromShards( allShardIdentifiers );
 	}
 
 	@Override
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-		String shard = shardIdentifierProvider.getShardIdentifier( entity, id, idInString, document );
+		String shardIdentifier = shardIdentifierProvider.getShardIdentifier( entity, id, idInString, document );
 		return indexManagerHolder.getOrCreateIndexManager(
-				getProviderName( shard ),
+				getProviderName( shardIdentifier ),
 				entityIndexBinding
 		);
 	}
 
 	@Override
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		String[] shards = shardIdentifierProvider.getShardIdentifiers( entity, id, idInString );
-		return getIndexManagersFromShards( shards );
+		Set<String> shardIdentifiers = shardIdentifierProvider.getAllShardIdentifiers();
+		return getIndexManagersFromShards( shardIdentifiers );
 	}
 
 	@Override
 	public IndexManager[] getIndexManagersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-		String[] shards = shardIdentifierProvider.getShardIdentifiersForQuery( fullTextFilters );
+		Set<String> shards = shardIdentifierProvider.getShardIdentifiersForQuery( fullTextFilters );
 		return getIndexManagersFromShards( shards );
 	}
 
-	private IndexManager[] getIndexManagersFromShards(String[] shards) {
-		ArrayList<IndexManager> managers = new ArrayList<IndexManager>( shards.length );
-		for ( String shard : shards ) {
+	private IndexManager[] getIndexManagersFromShards(Set<String> shardIdentifiers) {
+		Set<IndexManager> managers = new HashSet<IndexManager>( shardIdentifiers.size() );
+		for ( String shardIdentifier : shardIdentifiers ) {
 			managers.add(
 					indexManagerHolder.getOrCreateIndexManager(
-							getProviderName( shard ),
+							getProviderName( shardIdentifier ),
 							entityIndexBinding
 					)
 			);
 		}
-		return managers.toArray( new IndexManager[shards.length] );
+		return managers.toArray( new IndexManager[shardIdentifiers.size()] );
 	}
 
 	private String getProviderName(String shard) {

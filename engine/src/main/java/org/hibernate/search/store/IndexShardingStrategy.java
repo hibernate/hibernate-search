@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.util.Properties;
 
 import org.apache.lucene.document.Document;
-
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 
@@ -35,7 +34,10 @@ import org.hibernate.search.indexes.spi.IndexManager;
  * Defines how a given virtual index shards data into different IndexManager(s).
  *
  * @author Emmanuel Bernard
+ * @deprecated Deprecated as of Hibernate Search 4.4. Might be removed in Search 5. Use {@link ShardIdentifierProvider}
+ *             instead.
  */
+@Deprecated
 public interface IndexShardingStrategy {
 
 	/**
@@ -57,6 +59,7 @@ public interface IndexShardingStrategy {
 	/**
 	 * return the IndexManager(s) where the given entity is stored and where the deletion operation needs to be applied
 	 * id and idInString could be null. If null, all the IndexManagers containing entity types should be returned
+	 *
 	 * @param entity the type of the deleted entity
 	 * @param id the id in object form
 	 * @param idInString the id as transformed by the used TwoWayStringBridge
