@@ -28,6 +28,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.store.ShardIdentifierProvider;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -64,6 +65,11 @@ public class DefaultMutableEntityIndexBinding<T> implements MutableEntityIndexBi
 	@Override
 	public IndexShardingStrategy getSelectionStrategy() {
 		return shardingStrategy;
+	}
+
+	@Override
+	public ShardIdentifierProvider getShardIdentifierProvider() {
+		return null;
 	}
 
 	@Override

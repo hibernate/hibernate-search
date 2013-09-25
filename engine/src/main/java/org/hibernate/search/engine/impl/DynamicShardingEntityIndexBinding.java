@@ -39,7 +39,7 @@ import org.hibernate.search.store.ShardIdentifierProvider;
  */
 public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexBinding<T> {
 
-	private final IndexShardingStrategy shardingStrategy;
+	private final DynamicShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
 	private final ShardIdentifierProvider shardIdentityProvider;
 	private final Properties properties;
@@ -88,6 +88,11 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 	@Override
 	public IndexShardingStrategy getSelectionStrategy() {
 		return shardingStrategy;
+	}
+
+	@Override
+	public ShardIdentifierProvider getShardIdentifierProvider() {
+		return shardingStrategy.getShardIdentifierProvider();
 	}
 
 	@Override

@@ -143,11 +143,7 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 
-		cfg.setProperty( "hibernate.search.Animal.sharding_strategy.nbr_of_shards", "dynamic" );
-		cfg.setProperty(
-				"hibernate.search.Animal.sharding_strategy.shard_identity_provider",
-				AnimalShardIdentifierProvider.class.getName()
-		);
+		cfg.setProperty( "hibernate.search.Animal.sharding_strategy", AnimalShardIdentifierProvider.class.getName() );
 
 		// use filesystem based directory provider to be able to assert against index
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
@@ -193,9 +189,8 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 		// build a new independent SessionFactory to verify that the shards are available at restart
 		Configuration config = new Configuration();
 
-		config.setProperty( "hibernate.search.Animal.sharding_strategy.nbr_of_shards", "dynamic" );
 		config.setProperty(
-				"hibernate.search.Animal.sharding_strategy.shard_identity_provider",
+				"hibernate.search.Animal.sharding_strategy",
 				DynamicShardingTest.AnimalShardIdentifierProvider.class.getName()
 		);
 

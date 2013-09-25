@@ -747,4 +747,17 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 190, value = "Unable to start HibernateSessionServiceProvider. There is no session factory in the context. Are you sure you have Hibernate ORM enabled?")
 	SearchException getNoSessionFactoryInContextException();
+
+	@Message(id = 191, value = "The number of shards must be >= 1. %s is an illegal value.")
+	SearchException getInvalidShardCountException(int value);
+
+	@Message(id = 192, value = "%s")
+	SearchException getInvalidIntegerValueException(String msg, @Cause Throwable throwable);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = 193, value = "Selected sharding strategy is IdHashShardingStrategy. However, there is only 1 shard configured. Have you set the 'nbr_of_shards' property?")
+	void idHashShardingWithSingleShard();
+
+	@Message(id = 194, value = "Unable to load configured class '%s' as 'sharding_strategy'")
+	SearchException getUnableToLoadShardingStrategyClassException(String className);
 }

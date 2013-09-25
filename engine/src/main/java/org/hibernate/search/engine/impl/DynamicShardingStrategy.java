@@ -43,17 +43,17 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 class DynamicShardingStrategy implements IndexShardingStrategy {
 	private final ShardIdentifierProvider shardIdentifierProvider;
 	private final IndexManagerHolder indexManagerHolder;
-	private final String rootDirectoryProviderName;
+	private final String rootIndexName;
 	private final DynamicShardingEntityIndexBinding entityIndexBinding;
 
 	DynamicShardingStrategy(ShardIdentifierProvider shardIdentifierProvider,
 			IndexManagerHolder indexManagerHolder,
 			DynamicShardingEntityIndexBinding entityIndexBinding,
-			String rootDirectoryProviderName) {
+			String rootIndexName) {
 		this.shardIdentifierProvider = shardIdentifierProvider;
 		this.indexManagerHolder = indexManagerHolder;
 		this.entityIndexBinding = entityIndexBinding;
-		this.rootDirectoryProviderName = rootDirectoryProviderName;
+		this.rootIndexName = rootIndexName;
 	}
 
 	@Override
@@ -87,6 +87,10 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 		return getIndexManagersFromShards( shards );
 	}
 
+	ShardIdentifierProvider getShardIdentifierProvider() {
+		return shardIdentifierProvider;
+	}
+
 	private IndexManager[] getIndexManagersFromShards(Set<String> shardIdentifiers) {
 		Set<IndexManager> managers = new HashSet<IndexManager>( shardIdentifiers.size() );
 		for ( String shardIdentifier : shardIdentifiers ) {
@@ -101,7 +105,7 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 	}
 
 	private String getProviderName(String shard) {
-		return rootDirectoryProviderName + "." + shard;
+		return rootIndexName + "." + shard;
 	}
 }
 

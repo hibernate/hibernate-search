@@ -33,6 +33,7 @@ import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.store.ShardIdentifierProvider;
 
 /**
  * @author Hardy Ferentschik
@@ -54,6 +55,11 @@ public class EntityIndexBindingWrapper implements EntityIndexBinder {
 	@Override
 	public IndexShardingStrategy getSelectionStrategy() {
 		return entityIndexBinding.getSelectionStrategy();
+	}
+
+	@Override
+	public ShardIdentifierProvider getShardIdentifierProvider() {
+		return null;
 	}
 
 	@Override

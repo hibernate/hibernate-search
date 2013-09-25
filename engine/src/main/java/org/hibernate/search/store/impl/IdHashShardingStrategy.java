@@ -31,6 +31,8 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This implementation use idInString as the hashKey.
@@ -38,10 +40,15 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Emmanuel Bernard
  */
 public class IdHashShardingStrategy implements IndexShardingStrategy {
+	private static final Log log = LoggerFactory.make();
 
 	private IndexManager[] indexManagers;
+
 	@Override
 	public void initialize(Properties properties, IndexManager[] indexManagers) {
+		if ( indexManagers.length == 1 ) {
+			log.idHashShardingWithSingleShard();
+		}
 		this.indexManagers = indexManagers;
 	}
 
