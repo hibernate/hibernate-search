@@ -73,19 +73,18 @@ finally {
     </example>
 
     <para>In this example the <classname>SearchFactory</classname> figures out
-    which indexes are needed to query this entity, for example by resolving a Sharding
-    strategy. Using the configured <classname>ReaderProvider</classname>
-    (described in <xref linkend="search-architecture-readerstrategy"/>) on each
-    index, it returns a compound <literal>IndexReader</literal> on top of all
-    involved indexes. Because this <classname>IndexReader</classname> is
-    shared amongst several clients, you must adhere to the following
-    rules:</para>
+    which indexes are needed to query this entity, for example by resolving a
+    Sharding strategy. Using the configured
+    <classname>ReaderProvider</classname> (described in <xref
+    linkend="search-architecture-readerstrategy"/>) on each index, it returns
+    a compound <literal>IndexReader</literal> on top of all involved indexes.
+    Because this <classname>IndexReader</classname> is shared amongst several
+    clients, you must adhere to the following rules:</para>
 
     <itemizedlist>
       <listitem>
         <para>Never call indexReader.close(), but always call
-        readerProvider.closeReader(reader), using a finally
-        block.</para>
+        readerProvider.closeReader(reader), using a finally block.</para>
       </listitem>
 
       <listitem>
@@ -563,8 +562,8 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     formula in more detail. Please refer to
     <classname>Similarity</classname>'s Javadocs for more information.</para>
 
-    <para>Hibernate Search provides three ways to modify Lucene's similarity
-    calculation.</para>
+    <para>Hibernate Search provides two ways to modify Lucene's similarity
+    calculation. </para>
 
     <para>First you can set the default similarity by specifying the fully
     specified classname of your <classname>Similarity</classname>
@@ -572,33 +571,28 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     <constant>hibernate.search.similarity</constant>. The default value is
     <classname>org.apache.lucene.search.DefaultSimilarity</classname>.</para>
 
-    <para>You can also override the similarity used for a specific index by
-    setting the <literal>similarity</literal> property</para>
+    <para>Secondly, you can override the similarity used for a specific index
+    by setting the <literal>similarity</literal> property for this index (see
+    <xref linkend="search-configuration-directory"/> for more information
+    about index configration):</para>
 
-    <programlisting>hibernate.search.default.similarity = my.custom.Similarity</programlisting>
+    <programlisting>hibernate.search.[default|&lt;indexname&gt;].similarity = my.custom.Similarity</programlisting>
 
-    <para>Finally you can override the default similarity on class level using
-    the <literal>@Similarity</literal> annotation. <programlisting>@Entity
-@Indexed
-<emphasis role="bold">@Similarity(impl = DummySimilarity.class)</emphasis>
-public class Book {
-...
-}           </programlisting> As an example, let's assume it is not important
-    how often a term appears in a document. Documents with a single occurrence
-    of the term should be scored the same as documents with multiple
-    occurrences. In this case your custom implementation of the method
-    <methodname>tf(float freq) </methodname> should return 1.0.</para>
+    <para>As an example, let's assume it is not important how often a term
+    appears in a document. Documents with a single occurrence of the term
+    should be scored the same as documents with multiple occurrences. In this
+    case your custom implementation of the method <methodname>tf(float freq)
+    </methodname> should return 1.0.</para>
 
-    <warning>
+    <note>
       <para>When two entities share the same index they must declare the same
-      <classname>Similarity</classname> implementation. Classes in the same
-      class hierarchy always share the index, so it's not allowed to override
-      the <classname>Similarity</classname> implementation in a
-      subtype.</para>
+      <classname>Similarity</classname> implementation. </para>
+    </note>
 
-      <para>Likewise, it does not make sense to define the similarity via the
-      index setting and the class-level setting as they would conflict. Such a
-      configuration will be rejected.</para>
-    </warning>
+    <note>
+      <para>The use of <classname>@Similarity</classname> which was used to
+      configure the similarity on a class level is deprecated since Hibernate
+      Search 4.4.</para>
+    </note>
   </section>
 </chapter>
