@@ -23,9 +23,11 @@
  */
 package org.hibernate.search.test.configuration.sharding;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -38,13 +40,16 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.impl.MutableSearchFactory;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
+import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.store.impl.NotShardedStrategy;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.BytemanHelper;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.TestForIssue;
@@ -235,6 +240,33 @@ public class ShardingConfigurationTest {
 		);
 	}
 
+	@Test
+	public void testConfiguringDynamicallyCreatedShardViaConfiguration() {
+		Map<String, String> shardingProperties = new HashMap<String, String>();
+		shardingProperties.put(
+				"hibernate.search.foo.sharding_strategy",
+				DummyShardIdentifierProvider.class.getName()
+		);
+
+		shardingProperties.put( "hibernate.search.foo.snafu.directory_provider", "filesystem" );
+		File indexDir = new File( TestConstants.getIndexDirectory( ShardingConfigurationTest.class ) );
+		shardingProperties.put( "hibernate.search.foo.snafu.indexBase", indexDir.getAbsolutePath() );
+
+		MutableSearchFactory searchFactory = getSearchFactory( shardingProperties );
+
+		EntityIndexBinding entityIndexBinding = searchFactory.getIndexBinding( Foo.class );
+		IndexManager indexManagers[] = entityIndexBinding.getIndexManagers();
+
+		assertTrue( "There should be two index managers", indexManagers.length == 1 );
+		assertTrue( "Unexpected index manager type", indexManagers[0] instanceof DirectoryBasedIndexManager );
+
+		DirectoryBasedIndexManager directoryBasedIndexManager = (DirectoryBasedIndexManager) indexManagers[0];
+		assertTrue(
+				"Unexpected directory provider type: " + directoryBasedIndexManager.getDirectoryProvider().getClass(),
+				directoryBasedIndexManager.getDirectoryProvider() instanceof FSDirectoryProvider
+		);
+	}
+
 	private MutableSearchFactory getSearchFactory(Map<String, String> shardingProperties) {
 		ManualConfiguration configuration = new ManualConfiguration();
 		configuration.addProperty( "hibernate.search.default.directory_provider", "ram" );
@@ -285,9 +317,11 @@ public class ShardingConfigurationTest {
 	}
 
 	public static class DummyShardIdentifierProvider implements ShardIdentifierProvider {
+		private Set<String> shards = new HashSet<String>();
 
 		@Override
 		public void initialize(Properties properties, BuildContext buildContext) {
+			shards.add( "snafu" );
 		}
 
 		@Override
@@ -297,12 +331,12 @@ public class ShardingConfigurationTest {
 
 		@Override
 		public Set<String> getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-			return null;
+			return shards;
 		}
 
 		@Override
 		public Set<String> getAllShardIdentifiers() {
-			return null;
+			return shards;
 		}
 	}
 }

@@ -76,6 +76,7 @@ public class IndexManagerHolder {
 	private static final Log log = LoggerFactory.make();
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
+	private static final String INDEX_SHARD_ID_SEPARATOR = ".";
 
 	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
@@ -140,8 +141,20 @@ public class IndexManagerHolder {
 		);
 	}
 
-	public IndexManager getOrCreateIndexManager(String indexManagerName, DynamicShardingEntityIndexBinding entityIndexBinding) {
-		IndexManager indexManager = indexManagersRegistry.get( indexManagerName );
+	public IndexManager getOrCreateIndexManager(String indexBaseName,
+			DynamicShardingEntityIndexBinding entityIndexBinding) {
+		return this.getOrCreateIndexManager( indexBaseName, null, entityIndexBinding );
+	}
+
+	public IndexManager getOrCreateIndexManager(String indexBaseName,
+			String shardName,
+			DynamicShardingEntityIndexBinding entityIndexBinding) {
+		String indexName = indexBaseName;
+		if ( shardName != null ) {
+			indexName += INDEX_SHARD_ID_SEPARATOR + shardName;
+		}
+
+		IndexManager indexManager = indexManagersRegistry.get( indexName );
 		if ( indexManager != null ) {
 			indexManager.addContainedEntity( entityIndexBinding.getDocumentBuilder().getBeanClass() );
 			return indexManager;
@@ -155,11 +168,17 @@ public class IndexManagerHolder {
 		else {
 			throw log.assertionFailureCannotCastToWorkerBuilderContext( searchFactory.getClass() );
 		}
+
+		Properties properties = entityIndexBinding.getProperties();
+		if ( shardName != null ) {
+			properties = new MaskedProperty( properties, shardName, properties );
+		}
+
 		indexManager = createIndexManager(
-				indexManagerName,
+				indexName,
 				entityIndexBinding.getDocumentBuilder().getBeanClass(),
 				entityIndexBinding.getSimilarity(),
-				entityIndexBinding.getProperties(),
+				properties,
 				entityIndexBinding.getIndexManagerFactory(),
 				context
 		);
@@ -468,7 +487,7 @@ public class IndexManagerHolder {
 		indexManagers = new IndexManager[nbrOfIndexManagers];
 		for ( int index = 0; index < nbrOfIndexManagers; index++ ) {
 			String indexManagerName = nbrOfIndexManagers > 1 ?
-					indexBaseName + "." + index :
+					indexBaseName + INDEX_SHARD_ID_SEPARATOR + index :
 					indexBaseName;
 			Properties indexProp = indexProperties[index];
 			IndexManager indexManager = indexManagersRegistry.get( indexManagerName );

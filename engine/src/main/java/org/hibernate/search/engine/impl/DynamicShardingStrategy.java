@@ -70,7 +70,8 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
 		String shardIdentifier = shardIdentifierProvider.getShardIdentifier( entity, id, idInString, document );
 		return indexManagerHolder.getOrCreateIndexManager(
-				getIndexName( shardIdentifier ),
+				rootIndexName,
+				shardIdentifier,
 				entityIndexBinding
 		);
 	}
@@ -96,16 +97,13 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 		for ( String shardIdentifier : shardIdentifiers ) {
 			managers.add(
 					indexManagerHolder.getOrCreateIndexManager(
-							getIndexName( shardIdentifier ),
+							rootIndexName,
+							shardIdentifier,
 							entityIndexBinding
 					)
 			);
 		}
 		return managers.toArray( new IndexManager[shardIdentifiers.size()] );
-	}
-
-	private String getIndexName(String shard) {
-		return rootIndexName + "." + shard;
 	}
 }
 
