@@ -210,9 +210,9 @@ finally {
    @Override
    public void initialize(Properties properties, BuildContext buildContext) {
       ServiceManager serviceManager = buildContext.getServiceManager();
-      Session session = serviceManager.requestService( HibernateSessionServiceProvider.class,
-                                                  buildContext );
-
+      SessionFactory sessionFactory = serviceManager.requestService(
+                                      HibernateSessionFactoryServiceProvider.class, buildContext );
+      Session session = sessionFactory.openSession();
       try {
          Criteria initialShardsCriteria = session.createCriteria( Animal.class );
          initialShardsCriteria.setProjection(
@@ -276,10 +276,10 @@ finally {
       linkend="example-custom-shard-identifier-provider"/> shows how to handle
       such a case. <classname>AnimalShardIdentifierProvider</classname> makes
       in its <methodname>initialize</methodname> implementation use of a
-      service called <classname>HibernateSessionServiceProvider</classname>
+      service called <classname>HibernateSessionFactoryServiceProvider</classname>
       (see also <xref linkend="section-services"/>) which is available within
       an ORM environment. It allows to request a Hibernate
-      <classname>Session</classname> instance which can be used to run a
+      <classname>SessionFactory</classname> instance which can be used to run a
       <classname>Criteria</classname> query in order to determine the initial
       set of shard identifers.</para>
 

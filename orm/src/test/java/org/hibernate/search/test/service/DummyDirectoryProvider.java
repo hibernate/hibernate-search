@@ -27,7 +27,7 @@ package org.hibernate.search.test.service;
 import java.util.Properties;
 
 import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.hcore.impl.HibernateSessionServiceProvider;
+import org.hibernate.search.hcore.impl.HibernateSessionFactoryServiceProvider;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
@@ -45,7 +45,7 @@ public class DummyDirectoryProvider extends RAMDirectoryProvider {
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		ServiceManager serviceManager = context.getServiceManager();
-		serviceManager.requestService( HibernateSessionServiceProvider.class, context );
+		serviceManager.requestService( HibernateSessionFactoryServiceProvider.class, context );
 	}
 
 	@Override

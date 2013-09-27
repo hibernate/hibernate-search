@@ -745,7 +745,7 @@ public interface Log extends BasicLogger {
 			"declare the same Similarity implementation. %s defines similarity %s and %s defines similarity %s")
 	SearchException getMultipleEntitiesShareIndexWithInconsistentSimilarityException(String class1, String similarity1, String class2, String similarity2);
 
-	@Message(id = 190, value = "Unable to start HibernateSessionServiceProvider. There is no session factory in the context. Are you sure you have Hibernate ORM enabled?")
+	@Message(id = 190, value = "Unable to start HibernateSessionFactoryServiceProvider. There is no session factory in the context. Are you sure you have Hibernate ORM enabled?")
 	SearchException getNoSessionFactoryInContextException();
 
 	@Message(id = 191, value = "The number of shards must be >= 1. %s is an illegal value.")

@@ -25,7 +25,6 @@ package org.hibernate.search.hcore.impl;
 
 import java.util.Properties;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import org.hibernate.search.spi.BuildContext;
@@ -34,11 +33,12 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * A Hibernate Search service provider which allows to request a Hibernate {@code Session} during bootstrapping.
+ * A Hibernate Search service provider which allows to request a Hibernate {@code SessionFactory} during bootstrapping.
  *
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
-public class HibernateSessionServiceProvider implements ServiceProvider<Session> {
+public class HibernateSessionFactoryServiceProvider implements ServiceProvider<SessionFactory> {
 	private static final Log log = LoggerFactory.make();
 
 	private volatile SessionFactory sessionFactory;
@@ -52,8 +52,8 @@ public class HibernateSessionServiceProvider implements ServiceProvider<Session>
 	}
 
 	@Override
-	public Session getService() {
-		return sessionFactory.openSession();
+	public SessionFactory getService() {
+		return sessionFactory;
 	}
 
 	@Override
