@@ -24,16 +24,13 @@
 package org.hibernate.search.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.search.Similarity;
 import org.apache.lucene.util.Version;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -88,15 +85,8 @@ public final class ConfigContext {
 	 */
 	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
 
-	/**
-	 * Set of field names used for faceting
-	 */
-	// todo - Check whether I have to take care about which class defines the name
-	private final Collection<String> facetFieldNames = new HashSet<String>();
-
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
-	private final Similarity defaultSimilarity;
 	private final boolean solrPresent;
 	private final boolean jpaPresent;
 	private final Version luceneMatchVersion;
@@ -112,7 +102,6 @@ public final class ConfigContext {
 	public ConfigContext(SearchConfiguration cfg, SearchMapping searchMapping) {
 		luceneMatchVersion = getLuceneMatchVersion( cfg );
 		defaultAnalyzer = initAnalyzer( cfg );
-		defaultSimilarity = initSimilarity( cfg );
 		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
 		jpaPresent = isPresent( "javax.persistence.Id" );
 		nullToken = initNullToken( cfg );
@@ -131,19 +120,6 @@ public final class ConfigContext {
 			return;
 		}
 		addAnalyzerDef( analyzerDef, buildAnnotationDefinitionPoint( annotatedElement ) );
-	}
-
-	/**
-	 * Add a facet field name.
-	 *
-	 * @param facetFieldName the name of the faceted field
-	 */
-	public void addFacetFieldName(String facetFieldName) {
-		facetFieldNames.add( facetFieldName );
-	}
-
-	public Collection<String> getFacetFieldNames() {
-		return facetFieldNames;
 	}
 
 	public void addGlobalAnalyzerDef(AnalyzerDef analyzerDef) {
@@ -168,10 +144,6 @@ public final class ConfigContext {
 		final DelegateNamedAnalyzer delegateNamedAnalyzer = new DelegateNamedAnalyzer( name );
 		lazyAnalyzers.add( delegateNamedAnalyzer );
 		return delegateNamedAnalyzer;
-	}
-
-	public List<DelegateNamedAnalyzer> getLazyAnalyzers() {
-		return lazyAnalyzers;
 	}
 
 	/**
@@ -199,28 +171,6 @@ public final class ConfigContext {
 		return ClassLoaderHelper.analyzerInstanceFromClass( analyzerClass, luceneMatchVersion );
 	}
 
-	/**
-	 * Initializes the Lucene similarity to use.
-	 *
-	 * @param cfg the search configuration.
-	 *
-	 * @return returns the default similarity class.
-	 */
-	private Similarity initSimilarity(SearchConfiguration cfg) {
-		String similarityClassName = cfg.getProperty( Environment.SIMILARITY_CLASS );
-		Similarity defaultSimilarity;
-		if ( StringHelper.isEmpty( similarityClassName ) ) {
-			defaultSimilarity = Similarity.getDefault();
-		}
-		else {
-			defaultSimilarity = ClassLoaderHelper.instanceFromName(
-					Similarity.class, similarityClassName, ConfigContext.class, "default similarity"
-			);
-		}
-		log.debugf( "Using default similarity implementation: %s", defaultSimilarity.getClass().getName() );
-		return defaultSimilarity;
-	}
-
 	private String initNullToken(SearchConfiguration cfg) {
 		String defaultNullIndexToken = cfg.getProperty( Environment.DEFAULT_NULL_TOKEN );
 		if ( StringHelper.isEmpty( defaultNullIndexToken ) ) {
@@ -235,10 +185,6 @@ public final class ConfigContext {
 
 	public Analyzer getDefaultAnalyzer() {
 		return defaultAnalyzer;
-	}
-
-	public Similarity getDefaultSimilarity() {
-		return defaultSimilarity;
 	}
 
 	public Version getLuceneMatchVersion() {

@@ -27,14 +27,12 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 
 /**
- * The ServiceManager is used to manage uniqueness of services
- * and runtime discovery of new implementation.
+ * The {@code ServiceManager} is used to manage uniqueness of services and runtime discovery of service implementations.
  * <p/>
- * Uniqueness is meant in the scope of the SearchFactory, as there is a single ServiceManager instance
- * in the SearchFactory.
+ * Uniqueness is meant in the scope of the {@code SearchFactory}, as there is a single {@code ServiceManager} instance
+ * per {@code SearchFactory}.
  * <p/>
- * Any service requested should be released using (@link #releaseService} when it's not needed anymore
- * to allow for a cleanup phase.
+ * Any service requested should be released using {@link #releaseService(Class)} when it's not needed anymore.
  */
 public interface ServiceManager {
 

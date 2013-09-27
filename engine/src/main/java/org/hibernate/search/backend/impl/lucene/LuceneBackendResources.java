@@ -24,11 +24,11 @@
 package org.hibernate.search.backend.impl.lucene;
 
 import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.indexes.impl.CommonPropertiesParse;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
@@ -67,7 +67,7 @@ public final class LuceneBackendResources {
 		this.errorHandler = context.getErrorHandler();
 		this.workspace = workspace;
 		this.visitor = new LuceneWorkVisitor( workspace );
-		this.maxQueueLength = CommonPropertiesParse.extractMaxQueueSize( indexName, props );
+		this.maxQueueLength = PropertiesParseHelper.extractMaxQueueSize( indexName, props );
 		this.queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
 		this.workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
 		ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();

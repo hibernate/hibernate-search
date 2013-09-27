@@ -73,8 +73,11 @@ public class UnorderedIdScanTest {
 	private static void tryCreatingDocumentBuilder(XClass mappedXClass, ReflectionManager reflectionManager) {
 		ManualConfiguration cfg = new ManualConfiguration();
 		ConfigContext context = new ConfigContext( cfg );
-		DocumentBuilderIndexedEntity docBuilder = new DocumentBuilderIndexedEntity( mappedXClass, context, null, reflectionManager,
-				new HashSet(), SimpleInitializer.INSTANCE );
+		new DocumentBuilderIndexedEntity( mappedXClass,
+				context,
+				reflectionManager,
+				new HashSet(),
+				SimpleInitializer.INSTANCE );
 	}
 
 	/**

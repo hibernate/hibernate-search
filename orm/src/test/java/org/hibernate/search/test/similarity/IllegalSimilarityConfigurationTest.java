@@ -23,11 +23,19 @@
  */
 package org.hibernate.search.test.similarity;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
+import org.hibernate.search.SearchException;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Similarity;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.junit.After;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Verifies that SearchFactory properly checks for illegal combinations
@@ -37,110 +45,141 @@ import org.junit.Test;
  * use the same Similarity implementation.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Hardy Ferentschik
  */
 public class IllegalSimilarityConfigurationTest {
+	FullTextSessionBuilder builder = null;
 
-	@Test
-	public void testValidConfiguration() {
-		boolean configurationIsLegal = true;
-		FullTextSessionBuilder builder = null;
-		try {
-			builder = new FullTextSessionBuilder()
-					.addAnnotatedClass( Can.class )
-					.addAnnotatedClass( Trash.class ).build();
+	@After
+	public void tearDown() {
+		if ( builder != null ) {
+			builder.close();
 		}
-		catch (Exception e) {
-			configurationIsLegal = false;
-		}
-		finally {
-			if ( builder != null ) {
-				builder.close();
-			}
-		}
-		assertTrue( "A valid configuration could not be started.", configurationIsLegal );
 	}
 
 	@Test
-	public void testInconsistentSimilarityInClassHierarchy() {
-		boolean configurationIsLegal = true;
-		FullTextSessionBuilder builder = null;
+	public void testValidConfiguration() {
+		try {
+			builder = new FullTextSessionBuilder()
+					.addAnnotatedClass( Can.class )
+					.addAnnotatedClass( Trash.class )
+					.build();
+		}
+		catch (SearchException e) {
+			fail( "A valid configuration could not be started." );
+		}
+	}
+
+	@Test
+	public void testInconsistentAnnotationAndExplicitIndexSimilarityThrowsException() {
 		try {
 			builder = new FullTextSessionBuilder()
 					.addAnnotatedClass( Trash.class )
-					.addAnnotatedClass( LittleTrash.class ).build();
+					.setProperty( "hibernate.search.garbageIndex.similarity", DummySimilarity2.class.getName() )
+					.build();
+			fail(
+					"Invalid Similarity declared, should have thrown an exception: entities similarity"
+							+ " defined as annotation and config value"
+			);
 		}
-		catch (Exception e) {
-			configurationIsLegal = false;
+		catch (SearchException e) {
+			assertTrue( "Unexpected message: " + e.getMessage() , e.getMessage().startsWith( "HSEARCH000188" ) );
 		}
-		finally {
-			if ( builder != null ) {
-				builder.close();
-			}
+	}
+
+	@Test
+	public void testInconsistentAnnotationAndIndexDefaultSimilarityThrowsException() {
+		try {
+			builder = new FullTextSessionBuilder()
+					.addAnnotatedClass( Trash.class )
+					.setProperty( "hibernate.search.default.similarity", DummySimilarity2.class.getName() )
+					.build();
+			fail(
+					"Invalid Similarity declared, should have thrown an exception: entities similarity"
+							+ " defined as annotation and config value"
+			);
 		}
-		assertFalse( "Invalid Similarity declared, should have thrown an exception: same similarity"
-				+ " must be used across class hierarchy", configurationIsLegal );
+		catch (SearchException e) {
+			assertTrue( "Unexpected message: " + e.getMessage() , e.getMessage().startsWith( "HSEARCH000188" ) );
+		}
 	}
 
 	@Test
 	public void testInconsistentSimilarityInClassSharingAnIndex() {
-		boolean configurationIsLegal = true;
-		FullTextSessionBuilder builder = null;
 		try {
 			builder = new FullTextSessionBuilder()
 					.addAnnotatedClass( Trash.class )
-					.addAnnotatedClass( Sink.class ).build();
+					.addAnnotatedClass( Sink.class )
+					.build();
+			fail(
+					"Invalid Similarity declared, should have thrown an exception: two entities"
+							+ " sharing the same index are using a different similarity"
+			);
 		}
-		catch (Exception e) {
-			configurationIsLegal = false;
+		catch (SearchException e) {
+			assertTrue( "Unexpected message: " + e.getMessage() , e.getMessage().startsWith( "HSEARCH000189" ) );
 		}
-		finally {
-			if ( builder != null ) {
-				builder.close();
-			}
-		}
-		assertFalse( "Invalid Similarity declared, should have thrown an exception: two entities"
-				+ "sharing the same index are using a different similarity", configurationIsLegal );
 	}
 
 	@Test
 	public void testImplicitSimilarityInheritanceIsValid() {
-		boolean configurationIsLegal = true;
-		FullTextSessionBuilder builder = null;
 		try {
 			builder = new FullTextSessionBuilder()
 					.addAnnotatedClass( Trash.class )
-					.addAnnotatedClass( ProperTrashExtension.class ).build();
+					.addAnnotatedClass( ProperTrashExtension.class )
+					.build();
 		}
-		catch (Exception e) {
-			configurationIsLegal = false;
+		catch (SearchException e) {
+			fail( "Valid configuration could not be built" );
 		}
-		finally {
-			if ( builder != null ) {
-				builder.close();
-			}
-		}
-		assertTrue( "Valid configuration could not be built", configurationIsLegal );
 	}
 
 	@Test
-	public void testInvalidToOverrideParentsSimilarity() {
-		boolean configurationIsLegal = true;
-		FullTextSessionBuilder builder = null;
+	public void testImplicitInconsistentSimilarityInClassHierarchy() {
+
 		try {
 			builder = new FullTextSessionBuilder()
 					.addAnnotatedClass( Can.class )
-					.addAnnotatedClass( SmallerCan.class ).build();
+					.addAnnotatedClass( SmallerCan.class )
+					.build();
+			fail(
+					"Invalid Similarity declared, should have thrown an exception: child entity"
+							+ " is overriding parent's Similarity"
+			);
 		}
-		catch (Exception e) {
-			configurationIsLegal = false;
+		catch (SearchException e) {
+			assertTrue( "Unexpected message: " + e.getMessage() , e.getMessage().startsWith( "HSEARCH000189" ) );
 		}
-		finally {
-			if ( builder != null ) {
-				builder.close();
-			}
-		}
-		assertFalse( "Invalid Similarity declared, should have thrown an exception: child entity"
-				+ " is overriding parent's Similarity", configurationIsLegal );
 	}
 
+	@Test
+	public void testExplicitInconsistentSimilarityInClassHierarchy() {
+		try {
+			builder = new FullTextSessionBuilder()
+					.addAnnotatedClass( Parent.class )
+					.addAnnotatedClass( Child.class )
+					.build();
+			fail(
+					"Invalid Similarity declared, should have thrown an exception: same similarity"
+							+ " must be used across class hierarchy"
+			);
+		}
+		catch (SearchException e) {
+			assertTrue( "Unexpected message: " + e.getMessage() , e.getMessage().startsWith( "HSEARCH000187" ) );
+		}
+	}
+
+	@Entity
+	@Similarity(impl = DummySimilarity2.class)
+	public class Parent {
+		@Id
+		@GeneratedValue
+		private Integer id;
+	}
+
+	@Entity
+	@Indexed
+	@Similarity(impl = DummySimilarity.class)
+	public class Child extends Parent {
+	}
 }

@@ -62,7 +62,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		// on "manual" indexing skip read-write check on index directory
-		boolean manual = context.getIndexingStrategy().equals( "manual" );
+		boolean manual = "manual".equals( context.getIndexingStrategy() );
 		File indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, !manual );
 		try {
 			indexName = indexDir.getCanonicalPath();

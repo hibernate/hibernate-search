@@ -51,6 +51,8 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		Version.touch();
 	}
 
+	public static final String SESSION_FACTORY_PROPERTY_KEY = "hibernate.search.hcore.session_factory";
+
 	private static final Log log = LoggerFactory.make();
 
 	private Configuration configuration;
@@ -67,6 +69,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	@Override
 	public void sessionFactoryCreated(SessionFactory factory) {
 		try {
+			configuration.getProperties().put( SESSION_FACTORY_PROPERTY_KEY, factory );
 			if ( searchFactoryImplementor == null ) {
 				searchFactoryImplementor = new SearchFactoryBuilder()
 						.configuration( new SearchConfigurationFromHibernateCore( configuration ) )

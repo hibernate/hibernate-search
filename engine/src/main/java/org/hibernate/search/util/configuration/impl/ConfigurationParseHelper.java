@@ -29,18 +29,27 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Helper class:
- * - to avoid managing NumberFormatException and similar code
- * - ensure consistent error messages across Configuration parsing problems
- * - locate resources
+ * <ul>
+ * <li>to avoid managing {@code NumberFormatException}s and similar</li>
+ * <li>to ensure consistent error messages across configuration parsing</li>
+ * <li>to locate resources</li>
+ * </ul>
  *
  * @author Sanne Grinovero
  * @author Steve Ebersole
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Hardy Ferentschik
  */
-public abstract class ConfigurationParseHelper {
+public class ConfigurationParseHelper {
+	private static final Log log = LoggerFactory.make();
+
+	private ConfigurationParseHelper() {
+	}
 
 	/**
 	 * Try to locate a local URL representing the incoming path. The first attempt
@@ -95,14 +104,16 @@ public abstract class ConfigurationParseHelper {
 	}
 
 	/**
-	 * Parses a String to get an int value.
+	 * Parses a string into an integer value.
 	 *
-	 * @param value A string containing an int value to parse
-	 * @param errorMsgOnParseFailure message being wrapped in a SearchException if value is null or not correct.
-	 * @return the parsed value
+	 * @param value a string containing an int value to parse
+	 * @param errorMsgOnParseFailure message being wrapped in a SearchException if value is {@code null} or not an integer
+	 *
+	 * @return the parsed integer value
+	 *
 	 * @throws SearchException both for null values and for Strings not containing a valid int.
 	 */
-	public static final int parseInt(String value, String errorMsgOnParseFailure) {
+	public static int parseInt(String value, String errorMsgOnParseFailure) {
 		if ( value == null ) {
 			throw new SearchException( errorMsgOnParseFailure );
 		}
@@ -111,7 +122,7 @@ public abstract class ConfigurationParseHelper {
 				return Integer.parseInt( value.trim() );
 			}
 			catch (NumberFormatException nfe) {
-				throw new SearchException( errorMsgOnParseFailure, nfe );
+				throw log.getInvalidIntegerValueException( errorMsgOnParseFailure, nfe );
 			}
 		}
 	}
@@ -124,7 +135,7 @@ public abstract class ConfigurationParseHelper {
 	 * @return the parsed value
 	 * @throws SearchException both for null values and for Strings not containing a valid int.
 	 */
-	public static final long parseLong(String value, String errorMsgOnParseFailure) {
+	public static long parseLong(String value, String errorMsgOnParseFailure) {
 		if ( value == null ) {
 			throw new SearchException( errorMsgOnParseFailure );
 		}
@@ -195,7 +206,7 @@ public abstract class ConfigurationParseHelper {
 	 * a standard error message is generated.
 	 * @param cfg
 	 * @param key
-	 * @param defValue
+	 * @param defaultValue
 	 * @return the converted long value.
 	 * @throws SearchException for invalid format.
 	 */

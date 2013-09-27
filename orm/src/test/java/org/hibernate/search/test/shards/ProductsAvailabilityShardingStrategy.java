@@ -38,10 +38,10 @@ public class ProductsAvailabilityShardingStrategy implements IndexShardingStrate
 	private IndexManager[] both;
 
 	@Override
-	public void initialize(Properties properties, IndexManager[] providers) {
-		availableProductsIndex = providers[0];
-		toOrderProductsIndex = providers[1];
-		both = providers;
+	public void initialize(Properties properties, IndexManager[] indexManagers) {
+		availableProductsIndex = indexManagers[0];
+		toOrderProductsIndex = indexManagers[1];
+		both = indexManagers;
 	}
 
 	@Override

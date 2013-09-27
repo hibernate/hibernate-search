@@ -43,13 +43,15 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * A wrapper to Properties, to restrict the availability of
- * values to only those which have a key beginning with some
- * masking String.
+ * A wrapper to {@link Properties}, to restrict the availability of values to only those which have a key
+ * beginning with a given masking string.
+ *
  * Supported methods to enumerate the list of properties are:
- *   - propertyNames()
- *   - keySet()
- *   - keys()
+ * <ul>
+ * <li>propertyNames()</li>
+ * <li>keySet()</li>
+ * <li>keys()</li>
+ * </ul>
  * Other methods including methods returning Entries and values are not supported
  *
  * @author Sanne Grinovero
@@ -81,6 +83,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 * all keys not starting with some [mask.].
 	 * If no value is found then a value is returned from propsFallBack,
 	 * without masking.
+	 *
 	 * @param propsToMask
 	 * @param mask
 	 * @param propsFallBack
@@ -115,7 +118,7 @@ public class MaskedProperty extends Properties implements Serializable {
 	 */
 	@Override
 	public synchronized boolean containsKey(Object key) {
-		if ( ! ( key instanceof String ) ) {
+		if ( !( key instanceof String ) ) {
 			throw new IllegalArgumentException( "key must be a String" );
 		}
 		return getProperty( key.toString() ) != null;
@@ -399,13 +402,13 @@ public class MaskedProperty extends Properties implements Serializable {
 				return false;
 			}
 		}
-		else if ( ! fallBack.equals( other.fallBack ) ) {
+		else if ( !fallBack.equals( other.fallBack ) ) {
 			return false;
 		}
-		if ( ! masked.equals( other.masked ) ) {
+		if ( !masked.equals( other.masked ) ) {
 			return false;
 		}
-		if ( ! radix.equals( other.radix ) ) {
+		if ( !radix.equals( other.radix ) ) {
 			return false;
 		}
 		return true;

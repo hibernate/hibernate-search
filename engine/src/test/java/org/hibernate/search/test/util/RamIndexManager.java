@@ -22,6 +22,7 @@ package org.hibernate.search.test.util;
 
 import java.util.Properties;
 
+import org.apache.lucene.search.DefaultSimilarity;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
@@ -46,7 +47,7 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		RamIndexManager ramIndexManager = new RamIndexManager();
 		Properties properties = new Properties();
 		properties.setProperty( "directory_provider", "ram" );
-		ramIndexManager.initialize( "testIndex", properties, new EmptyWorkerBuildContext() );
+		ramIndexManager.initialize( "testIndex", properties, new DefaultSimilarity(), new EmptyWorkerBuildContext() );
 		return ramIndexManager;
 	}
 

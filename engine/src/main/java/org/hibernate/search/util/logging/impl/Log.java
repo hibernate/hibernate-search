@@ -725,4 +725,39 @@ public interface Log extends BasicLogger {
 	@Message(id = 183, value = "Unable to index instance of type %s while batch indexing: %s")
 	String massIndexerUnableToIndexInstance(String clazz, String value);
 
+	@Message(id = 184, value = "Cannot define an entity with 0 shard on '%1$s'")
+	SearchException entityWithNoShard(Class<?> type);
+
+	@Message(id = 185, value = "Cannot set a sharding strategy when using dynamic sharding on '%1$s'")
+	SearchException illegalStrategyWhenUsingDynamicSharding(Class<?> type);
+
+	@Message(id = 186, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext. Actual class is %1$s")
+	SearchException assertionFailureCannotCastToWorkerBuilderContext(Class<?> type);
+
+	@Message(id = 187, value = "Multiple inconsistent similarities defined in the class hierarchy of %s")
+	SearchException getMultipleInconsistentSimilaritiesInClassHierarchyException(String className);
+
+	@Message(id = 188, value = "Inconsistent similarities defined via annotations (%s) and configuration (%s)")
+	SearchException getInconsistentSimilaritySettingBetweenAnnotationsAndConfigPropertiesException(String annotationBasedSimilarity, String configLevelSimilarity);
+
+	@Message(id = 189, value = "Multiple entities are sharing the same index but are declaring an " +
+			"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
+			"declare the same Similarity implementation. %s defines similarity %s and %s defines similarity %s")
+	SearchException getMultipleEntitiesShareIndexWithInconsistentSimilarityException(String class1, String similarity1, String class2, String similarity2);
+
+	@Message(id = 190, value = "Unable to start HibernateSessionFactoryServiceProvider. There is no session factory in the context. Are you sure you have Hibernate ORM enabled?")
+	SearchException getNoSessionFactoryInContextException();
+
+	@Message(id = 191, value = "The number of shards must be >= 1. %s is an illegal value.")
+	SearchException getInvalidShardCountException(int value);
+
+	@Message(id = 192, value = "%s")
+	SearchException getInvalidIntegerValueException(String msg, @Cause Throwable throwable);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = 193, value = "Selected sharding strategy is IdHashShardingStrategy. However, there is only 1 shard configured. Have you set the 'nbr_of_shards' property?")
+	void idHashShardingWithSingleShard();
+
+	@Message(id = 194, value = "Unable to load configured class '%s' as 'sharding_strategy'")
+	SearchException getUnableToLoadShardingStrategyClassException(String className);
 }

@@ -1,1 +1,2 @@
 org.hibernate.search.hcore.impl.MassIndexerFactoryProvider
+org.hibernate.search.hcore.impl.HibernateSessionFactoryServiceProvider

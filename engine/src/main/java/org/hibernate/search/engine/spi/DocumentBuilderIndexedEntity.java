@@ -36,7 +36,6 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -141,14 +140,13 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 *
 	 * @param clazz The class for which to build a <code>DocumentBuilderContainedEntity</code>
 	 * @param context Handle to default configuration settings
-	 * @param similarity the Similarity implementation set at the related index level
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
 	 * @param instanceInitializer helper class for class object graph navigation
 	 */
-	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context, Similarity similarity,
+	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context,
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {
-		super( clazz, context, similarity, reflectionManager, optimizationBlackList, instanceInitializer );
+		super( clazz, context, reflectionManager, optimizationBlackList, instanceInitializer );
 
 		idPropertyMetadata = providedIdMetadata( clazz, context, reflectionManager );
 		if ( idPropertyMetadata == null ) {

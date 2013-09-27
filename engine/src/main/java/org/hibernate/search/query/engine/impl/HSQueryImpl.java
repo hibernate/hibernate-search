@@ -155,7 +155,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>( classes );
 		final Class[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
 		this.indexedTargetedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( classesAsArray );
-		if ( targetedEntities != null && targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
+		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
 			String msg = "None of the specified entity types or any of their subclasses are indexed.";
 			throw new IllegalArgumentException( msg );
 		}
@@ -557,16 +557,16 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				);
 			}
 
-			for ( EntityIndexBinding indexBinder : builders.values() ) {
-				DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
-				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
+			for ( EntityIndexBinding entityIndexBinding : builders.values() ) {
+				DocumentBuilderIndexedEntity<?> builder = entityIndexBinding.getDocumentBuilder();
+				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateIndexManagers( targetedIndexes, indexBinder.getSelectionStrategy() );
+				populateIndexManagers( targetedIndexes, entityIndexBinding.getSelectionStrategy() );
 			}
 			classesAndSubclasses = null;
 		}
@@ -582,20 +582,20 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 
 			for ( Class clazz : involvedClasses ) {
-				EntityIndexBinding indexBinder = builders.get( clazz );
+				EntityIndexBinding entityIndexBinding = builders.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
-				if ( indexBinder == null ) {
+				if ( entityIndexBinding == null ) {
 					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
 				}
-				DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
+				DocumentBuilderIndexedEntity<?> builder = entityIndexBinding.getDocumentBuilder();
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();
 				}
-				searcherSimilarity = checkSimilarity( searcherSimilarity, builder );
+				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
 				useFieldCacheOnClassTypes = useFieldCacheOnClassTypes || builder.getFieldCacheOption()
 						.contains( FieldCacheType.CLASS );
-				populateIndexManagers( targetedIndexes, indexBinder.getSelectionStrategy() );
+				populateIndexManagers( targetedIndexes, entityIndexBinding.getSelectionStrategy() );
 			}
 			this.classesAndSubclasses = involvedClasses;
 		}
@@ -658,14 +658,14 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return new IndexSearcherWithPayload( is, false, false );
 	}
 
-	private Similarity checkSimilarity(Similarity similarity, DocumentBuilderIndexedEntity builder) {
+	private Similarity checkSimilarity(Similarity similarity, Similarity entitySimilarity) {
 		if ( similarity == null ) {
-			similarity = builder.getSimilarity();
+			similarity = entitySimilarity;
 		}
-		else if ( !similarity.getClass().equals( builder.getSimilarity().getClass() ) ) {
+		else if ( !similarity.getClass().equals( entitySimilarity.getClass() ) ) {
 			throw new SearchException(
 					"Cannot perform search on two entities with differing Similarity implementations (" + similarity.getClass()
-							.getName() + " & " + builder.getSimilarity().getClass().getName() + ")"
+							.getName() + " & " + entitySimilarity.getClass().getName() + ")"
 			);
 		}
 
