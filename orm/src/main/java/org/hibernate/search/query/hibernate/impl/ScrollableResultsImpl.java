@@ -39,7 +39,6 @@ import java.util.TimeZone;
 
 import org.hibernate.search.util.logging.impl.Log;
 
-import org.hibernate.HibernateException;
 import org.hibernate.ScrollableResults;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.SearchException;
@@ -235,7 +234,7 @@ public class ScrollableResultsImpl implements ScrollableResults {
 	}
 
 	@Override
-	public Object[] get() throws HibernateException {
+	public Object[] get() {
 		// don't throw an exception here just
 		// return 'null' this is similar to the
 		// RowSet spec in JDBC. It returns false

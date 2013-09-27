@@ -49,9 +49,13 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class DirectoryProviderFactory {
+public final class DirectoryProviderFactory {
 
 	private static final Map<String, String> defaultProviderClasses;
+
+	private DirectoryProviderFactory() {
+		//not allowed
+	}
 
 	static {
 		defaultProviderClasses = new HashMap<String, String>( 6 );

@@ -106,7 +106,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	}
 
 	@Override
-	public Session openSession() throws HibernateException {
+	public Session openSession() {
 		session = getSessionFactory().openSession();
 		return session;
 	}

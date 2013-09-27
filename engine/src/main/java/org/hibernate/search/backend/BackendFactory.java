@@ -42,7 +42,12 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class BackendFactory {
+public final class BackendFactory {
+
+	private BackendFactory() {
+		//not allowed
+	}
+
 	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties properties) {
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		return createBackend( backend, indexManager, context, properties );

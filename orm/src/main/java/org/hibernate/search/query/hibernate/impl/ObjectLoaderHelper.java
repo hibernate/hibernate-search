@@ -41,9 +41,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ObjectLoaderHelper {
+public final class ObjectLoaderHelper {
 
 	private static final Log log = LoggerFactory.make();
+
+	private ObjectLoaderHelper() {
+		//not allowed
+	}
 
 	public static Object load(EntityInfo entityInfo, Session session) {
 		Object maybeProxy = executeLoad( entityInfo, session );

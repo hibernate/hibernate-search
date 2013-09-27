@@ -36,10 +36,14 @@ import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
 /**
  * @author Hardy Ferentschik
  */
-public class DescriptorTestHelper {
+public final class DescriptorTestHelper {
 
 	public static final List<String> TEST_INDEX_NAMES = Arrays.asList(
 			"index-0", "index-0", "index-0" );
+
+	private DescriptorTestHelper() {
+		//not allowed
+	}
 
 	public static IndexedTypeDescriptor getTypeDescriptor(AnnotationMetadataProvider metadataProvider, Class<?> clazz) {
 		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( clazz );

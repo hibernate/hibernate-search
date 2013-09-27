@@ -31,7 +31,11 @@ import java.io.IOException;
 /**
  * @author Emmanuel Bernard
  */
-public class Generator {
+public final class Generator {
+
+	private Generator() {
+		//not allowed
+	}
 
 	public static void main(String[] args) {
 		StringBuilder generated = new StringBuilder( );

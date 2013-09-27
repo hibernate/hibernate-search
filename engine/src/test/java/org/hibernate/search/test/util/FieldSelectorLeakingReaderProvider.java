@@ -27,7 +27,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.document.MapFieldSelector;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexReader;
@@ -138,7 +137,7 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		}
 
 		@Override
-		public IndexReader clone(boolean openReadOnly) throws CorruptIndexException, IOException {
+		public IndexReader clone(boolean openReadOnly) throws IOException {
 			return delegate.clone( openReadOnly );
 		}
 
@@ -158,7 +157,7 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		}
 
 		@Override
-		public boolean isCurrent() throws CorruptIndexException, IOException {
+		public boolean isCurrent() throws IOException {
 			return delegate.isCurrent();
 		}
 
@@ -193,7 +192,7 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		}
 
 		@Override
-		public Document document(int n, FieldSelector fieldSelector) throws CorruptIndexException, IOException {
+		public Document document(int n, FieldSelector fieldSelector) throws IOException {
 			FieldSelectorLeakingReaderProvider.fieldSelector = fieldSelector;
 			return delegate.document( n, fieldSelector );
 		}
@@ -284,17 +283,17 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 		}
 
 		@Override
-		protected void doSetNorm(int doc, String field, byte value) throws CorruptIndexException, IOException {
+		protected void doSetNorm(int doc, String field, byte value) throws IOException {
 			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
 		}
 
 		@Override
-		protected void doDelete(int docNum) throws CorruptIndexException, IOException {
+		protected void doDelete(int docNum) throws IOException {
 			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
 		}
 
 		@Override
-		protected void doUndeleteAll() throws CorruptIndexException, IOException {
+		protected void doUndeleteAll() throws IOException {
 			throw new UnsupportedOperationException("delegate method is not visible - hope we don't need it");
 		}
 

@@ -35,7 +35,11 @@ import org.hibernate.search.bridge.builtin.LongNumericFieldBridge;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class ClassLoadingStrategySelector {
+public final class ClassLoadingStrategySelector {
+
+	private ClassLoadingStrategySelector() {
+		//not allowed
+	}
 
 	public static FieldCacheLoadingType guessAppropriateCollectorType(TwoWayFieldBridge fieldBridge) {
 		if ( fieldBridge instanceof NullEncodingTwoWayFieldBridge ) {

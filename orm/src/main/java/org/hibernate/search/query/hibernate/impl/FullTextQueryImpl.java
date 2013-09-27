@@ -35,7 +35,6 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -123,7 +122,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * Retrieve the object one by one (initialize it during the next() operation)
 	 */
 	@Override
-	public Iterator iterate() throws HibernateException {
+	public Iterator iterate() {
 		//implement an iterator which keep the id/class for each hit and get the object on demand
 		//cause I can't keep the searcher and hence the hit opened. I don't have any hook to know when the
 		//user stops using it
@@ -188,7 +187,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public ScrollableResults scroll() throws HibernateException {
+	public ScrollableResults scroll() {
 		//keep the searcher open until the resultset is closed
 
 		hSearchQuery.getTimeoutManager().start();
@@ -205,13 +204,13 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public ScrollableResults scroll(ScrollMode scrollMode) throws HibernateException {
+	public ScrollableResults scroll(ScrollMode scrollMode) {
 		//TODO think about this scrollmode
 		return scroll();
 	}
 
 	@Override
-	public List list() throws HibernateException {
+	public List list() {
 		hSearchQuery.getTimeoutManager().start();
 		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
 		Loader loader = getLoader();
@@ -316,7 +315,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	}
 
 	@Override
-	public int executeUpdate() throws HibernateException {
+	public int executeUpdate() {
 		throw new UnsupportedOperationException( "executeUpdate is not supported in Hibernate Search queries" );
 	}
 

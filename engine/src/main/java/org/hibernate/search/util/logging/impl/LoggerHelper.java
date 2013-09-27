@@ -30,8 +30,13 @@ import java.io.PrintStream;
 /**
  * @author Hardy Ferentschik
  */
-public class LoggerHelper {
+public final class LoggerHelper {
+
 	private static final Log log = LoggerFactory.make();
+
+	private LoggerHelper() {
+		//now allowed
+	}
 
 	public static PrintStream getLoggingPrintStream() {
 		return new PrintStream( new CustomByteArrayOutputStream(), true );

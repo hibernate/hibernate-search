@@ -38,7 +38,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class TestConstants {
+public final class TestConstants {
 
 	public static final Analyzer standardAnalyzer = new StandardAnalyzer( TestConstants.getTargetLuceneVersion() );
 	public static final Analyzer stopAnalyzer = new StopAnalyzer( TestConstants.getTargetLuceneVersion() );
@@ -46,6 +46,10 @@ public class TestConstants {
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static final Log log = LoggerFactory.make();
+
+	private TestConstants() {
+		//not allowed
+	}
 
 	public static Version getTargetLuceneVersion() {
 		return Version.LUCENE_CURRENT;

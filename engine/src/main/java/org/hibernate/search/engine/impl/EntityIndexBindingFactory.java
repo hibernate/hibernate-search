@@ -40,9 +40,13 @@ import java.util.Properties;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class EntityIndexBindingFactory {
+public final class EntityIndexBindingFactory {
 
 	private static final Log log = LoggerFactory.make();
+
+	private EntityIndexBindingFactory() {
+		// not allowed
+	}
 
 	@SuppressWarnings( "unchecked" )
 	public static <T,U> MutableEntityIndexBinding<T> buildEntityIndexBinder(Class<T> type, IndexManager[] providers,

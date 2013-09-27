@@ -41,7 +41,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Hardy Ferentschik
  */
-public class AnalyzerUtils {
+public final class AnalyzerUtils {
+
+	private AnalyzerUtils() {
+		//not allowed
+	}
 
 	public static final Log log = LoggerFactory.make();
 

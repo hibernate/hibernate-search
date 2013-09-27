@@ -26,7 +26,6 @@ import junit.framework.Assert;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.event.spi.LoadEvent;
 import org.hibernate.event.spi.LoadEventListener;
@@ -205,7 +204,7 @@ public class CollectionUpdateEventsSecondTest {
 	public static class LoadCountingListener implements LoadEventListener {
 		final AtomicInteger locationLoadEvents = new AtomicInteger();
 		@Override
-		public void onLoad(LoadEvent event, LoadType loadType) throws HibernateException {
+		public void onLoad(LoadEvent event, LoadType loadType) {
 			if ( Location.class.getName().equals( event.getEntityClassName() ) ) {
 				locationLoadEvents.incrementAndGet();
 			}

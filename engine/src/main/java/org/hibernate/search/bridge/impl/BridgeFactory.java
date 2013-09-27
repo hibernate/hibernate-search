@@ -38,7 +38,6 @@ import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
@@ -809,7 +808,7 @@ public final class BridgeFactory {
 	 */
 	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge,
 													XClass appliedOnType,
-													ReflectionManager reflectionManager) throws SearchException {
+													ReflectionManager reflectionManager) {
 		FieldBridge fb = extractType( fieldBridge, appliedOnType, reflectionManager );
 		if ( fb instanceof TwoWayFieldBridge ) {
 			return (TwoWayFieldBridge) fb;

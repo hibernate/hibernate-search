@@ -40,6 +40,11 @@ import java.lang.reflect.Proxy;
  */
 //FIXME remove when HSEARCH-1085 is fixed
 class AnnotationFactory {
+
+	private AnnotationFactory() {
+		//now allowed
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <T extends Annotation> T create(AnnotationDescriptor descriptor, ClassLoader classLoader) {
 		//TODO round 34ms to generate the proxy, hug! is Javassist Faster?
@@ -58,7 +63,7 @@ class AnnotationFactory {
 	}
 
 	private static <T extends Annotation> T getProxyInstance(Class<T> proxyClass, InvocationHandler handler) throws
-			SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
+			NoSuchMethodException, InstantiationException,
 			IllegalAccessException, InvocationTargetException {
 		Constructor<T> constructor = proxyClass.getConstructor( new Class[]{InvocationHandler.class} );
 		return constructor.newInstance( new Object[]{handler} );

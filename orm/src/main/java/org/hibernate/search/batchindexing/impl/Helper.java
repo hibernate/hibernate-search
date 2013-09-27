@@ -31,7 +31,11 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 /**
  * @author Emmanuel Bernard
  */
-class Helper {
+final class Helper {
+
+	private Helper() {
+		//not allowed
+	}
 
 	/**
 	 * if the transaction object is a JoinableCMTTransaction, call markForJoined()

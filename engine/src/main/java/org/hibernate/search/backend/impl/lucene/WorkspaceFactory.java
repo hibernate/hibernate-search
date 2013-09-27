@@ -31,9 +31,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-class WorkspaceFactory {
+final class WorkspaceFactory {
 
 	private static final Log log = LoggerFactory.make();
+
+	private WorkspaceFactory() {
+		//not allowed
+	}
 
 	static AbstractWorkspaceImpl createWorkspace(DirectoryBasedIndexManager indexManager,
 			WorkerBuildContext context, Properties cfg) {

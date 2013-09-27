@@ -28,6 +28,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author Steve Ebersole
  */
-public class SkipLog {
+public final class SkipLog {
+
 	public static final Logger LOG = LoggerFactory.getLogger( "org.hibernate.search.test.SKIPPED" );
+
+	private SkipLog() {
+		//not allowed
+	}
+
 }
