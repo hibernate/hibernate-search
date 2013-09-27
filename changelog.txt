@@ -1,6 +1,26 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.0.Beta1 (27-09-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1400] - AppliedOnTypeAwareBridge is not applied to class bridges
+
+** Deprecation
+    * [HSEARCH-1414] - Deprecate usage of @Similarity annotation
+
+** Improvement
+    * [HSEARCH-1392] - Assorted fixes to the pom files for 4.4.0
+
+** New Feature
+    * [HSEARCH-472] - Support for dynamic sharding
+    * [HSEARCH-1409] - Provide non-public extension to query DSL for passing field bridges
+
+** Task
+    * [HSEARCH-1415] - Remove deprecated method DocumentBuilderIndexedEntity#getTerm
+
+
 Version 4.4.0.Alpha2 (18-09-2013)
 ------------------------
 
