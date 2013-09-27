@@ -178,12 +178,12 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 	private AnalyzerDef createAnalyzerDef(Map<String, Object> analyzerDef) {
 		AnnotationDescriptor analyzerDefAnnotation = new AnnotationDescriptor( AnalyzerDef.class );
 		for ( Map.Entry<String, Object> entry : analyzerDef.entrySet() ) {
-			if ( entry.getKey().equals( "tokenizer" ) ) {
+			if ( "tokenizer".equals( entry.getKey() ) ) {
 				AnnotationDescriptor tokenizerAnnotation = new AnnotationDescriptor( TokenizerDef.class );
 				@SuppressWarnings("unchecked")
 				Map<String, Object> tokenizer = (Map<String, Object>) entry.getValue();
 				for ( Map.Entry<String, Object> tokenizerEntry : tokenizer.entrySet() ) {
-					if ( tokenizerEntry.getKey().equals( "params" ) ) {
+					if ( "params".equals( tokenizerEntry.getKey() ) ) {
 						addParamsToAnnotation( tokenizerAnnotation, tokenizerEntry );
 					}
 					else {
@@ -192,7 +192,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 				analyzerDefAnnotation.setValue( "tokenizer", createAnnotation( tokenizerAnnotation ) );
 			}
-			else if ( entry.getKey().equals( "filters" ) ) {
+			else if ( "filters".equals( entry.getKey() ) ) {
 				@SuppressWarnings("unchecked") TokenFilterDef[] filtersArray = createFilters(
 						(List<Map<String, Object>>) entry.getValue()
 				);
@@ -216,7 +216,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		for ( Map<String, Object> filter : filters ) {
 			AnnotationDescriptor filterAnn = new AnnotationDescriptor( TokenFilterDef.class );
 			for ( Map.Entry<String, Object> filterEntry : filter.entrySet() ) {
-				if ( filterEntry.getKey().equals( "params" ) ) {
+				if ( "params".equals( filterEntry.getKey() ) ) {
 					addParamsToAnnotation( filterAnn, filterEntry );
 				}
 				else {
@@ -423,10 +423,10 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			for ( Map<String, Object> field : fields ) {
 				AnnotationDescriptor fieldAnnotation = new AnnotationDescriptor( org.hibernate.search.annotations.Field.class );
 				for ( Map.Entry<String, Object> entry : field.entrySet() ) {
-					if ( entry.getKey().equals( "analyzer" ) ) {
+					if ( "analyzer".equals( entry.getKey() ) ) {
 						addAnalyzerAnnotationTo( fieldAnnotation, entry );
 					}
-					else if ( entry.getKey().equals( "boost" ) ) {
+					else if ( "boost".equals( entry.getKey() ) ) {
 						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
 						@SuppressWarnings("unchecked")
 						Map<String, Object> boost = (Map<String, Object>) entry.getValue();
@@ -435,12 +435,12 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 						}
 						fieldAnnotation.setValue( "boost", createAnnotation( boostAnnotation ) );
 					}
-					else if ( entry.getKey().equals( "bridge" ) ) {
+					else if ( "bridge".equals( entry.getKey() ) ) {
 						AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
 						@SuppressWarnings("unchecked")
 						Map<String, Object> bridge = (Map<String, Object>) entry.getValue();
 						for ( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
-							if ( bridgeEntry.getKey().equals( "params" ) ) {
+							if ( "params".equals( bridgeEntry.getKey() ) ) {
 								addParamsToAnnotation( bridgeAnnotation, bridgeEntry );
 							}
 							else {
@@ -459,7 +459,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			if ( spatial != null && spatial.size() > 0 ) {
 				AnnotationDescriptor spatialAnnotation = new AnnotationDescriptor( Spatial.class );
 				for ( Map.Entry<String, Object> entry : spatial.entrySet() ) {
-					if ( entry.getKey().equals( "boost" ) ) {
+					if ( "boost".equals( entry.getKey() ) ) {
 						AnnotationDescriptor boostAnnotation = new AnnotationDescriptor( Boost.class );
 						@SuppressWarnings("unchecked")
 						Map<String, Object> boost = (Map<String, Object>) entry.getValue();
@@ -695,10 +695,10 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor annotation = new AnnotationDescriptor( ClassBridge.class );
 			Set<Entry<String, Object>> entrySet = classBridgeDef.entrySet();
 			for ( Entry<String, Object> entry : entrySet ) {
-				if ( entry.getKey().equals( "analyzer" ) ) {
+				if ( "analyzer".equals( entry.getKey() ) ) {
 					addAnalyzerAnnotationTo( annotation, entry );
 				}
-				else if ( entry.getKey().equals( "params" ) ) {
+				else if ( "params".equals( entry.getKey() ) ) {
 					addParamsToAnnotation( annotation, entry );
 				}
 				else {
@@ -722,12 +722,12 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 			AnnotationDescriptor annotation = new AnnotationDescriptor( ProvidedId.class );
 			Set<Entry<String, Object>> entrySet = entity.getProvidedId().entrySet();
 			for ( Entry<String, Object> entry : entrySet ) {
-				if ( entry.getKey().equals( "bridge" ) ) {
+				if ( "bridge".equals( entry.getKey() ) ) {
 					AnnotationDescriptor bridgeAnnotation = new AnnotationDescriptor( FieldBridge.class );
 					@SuppressWarnings("unchecked")
 					Map<String, Object> bridge = (Map<String, Object>) entry.getValue();
 					for ( Map.Entry<String, Object> bridgeEntry : bridge.entrySet() ) {
-						if ( bridgeEntry.getKey().equals( "params" ) ) {
+						if ( "params".equals( bridgeEntry.getKey() ) ) {
 							addParamsToAnnotation( bridgeAnnotation, bridgeEntry );
 						}
 						else {

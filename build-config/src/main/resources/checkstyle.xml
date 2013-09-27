@@ -104,8 +104,12 @@
         <module name="DefaultComesLast" />
         <module name="WhitespaceAround" />
         <module name="TypecastParenPad" />
+        <module name="CovariantEquals" />
+        <module name="EqualsAvoidNull" />
+
         <!-- <module name="DeclarationOrder" /> -->
         <module name="RedundantModifier"/>
+        <module name="MissingOverride"/>
 
         <module name="MethodParamPad">
             <property name="option" value="nospace" />
