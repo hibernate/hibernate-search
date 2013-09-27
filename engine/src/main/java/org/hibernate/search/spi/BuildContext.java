@@ -29,33 +29,42 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 
 /**
- * Build context that can be used by some services at initialization
+ * Build context that can be used by some services at initialization.
  *
  * @author Emmanuel Bernard
  */
 public interface BuildContext {
 	/**
-	 * Returns the SessionFactoryImplementor instance. Do not use until after the initialize and/or start method is
+	 * Returns the {@code SessionFactoryImplementor} instance. Do not use until after the initialize and/or start method is
 	 * fully executed.
-	 * Implementations should not cache values provided by the SessionFactoryImplementor but rather access them
-	 * each time: when the configuration is dynamically updated, new changes are available through the
-	 * SearchFactoryImplementor
-	 * For example, prefer
-	 * <code>
-	 * void method() {
+	 *
+	 * Implementations should not cache values provided by the {@code SessionFactoryImplementor}, but rather access them
+	 * each time, because the configuration can be dynamically updated and new changes made available.
+	 *
+	 * For example, prefer:
+	 * <pre>
+	 * {@code void method() {
 	 *   int size = sfi.getDirectoryProviders().size();
 	 * }
-	 * </code>
-	 * to
-	 * <code>
-	 * void method() {
-	 *   int size = directoryProviders.size();
 	 * }
-	 * </code>
+	 * </pre>
+	 * over
+	 * <pre>
+	 * {@code void method() {
+	 * int size = directoryProviders.size();
+	 * }
+	 * }
+	 * </pre>
 	 * where directoryProviders is a class variable.
 	 */
 	SearchFactoryImplementor getUninitializedSearchFactory();
 
+	/**
+	 * Returns the configured indexing strategy (<i>event</i> vs <i>manual</i>).
+	 *
+	 * @return hte configured indexing strategy
+	 * @see org.hibernate.search.Environment#INDEXING_STRATEGY
+	 */
 	String getIndexingStrategy();
 
 	/**
@@ -64,10 +73,12 @@ public interface BuildContext {
 	 * (@link #releaseService}
 	 * or the service will not be released
 	 *
-	 * @deprecated use {@link #getServiceManager()} instead
 	 * @param provider of the service
 	 * @param <T> class of the service
+	 *
 	 * @return the service instance
+	 *
+	 * @deprecated use {@link #getServiceManager()} instead
 	 */
 	@Deprecated
 	<T> T requestService(Class<? extends ServiceProvider<T>> provider);
@@ -76,29 +87,31 @@ public interface BuildContext {
 	 * Release a service from duty. Each call to (@link #requestService} should be coupled with
 	 * a call to (@link #releaseService} when the service is no longer needed.
 	 *
-	 * @deprecated use {@link #getServiceManager()} instead
 	 * @param provider of the service
+	 *
+	 * @deprecated use {@link #getServiceManager()} instead
 	 */
 	@Deprecated
 	void releaseService(Class<? extends ServiceProvider<?>> provider);
 
 	/**
-	 * Access the ServiceManager. Service users should keep a reference to the
-	 * ServiceManager to allow for cleanup, but should never keep a reference to the
-	 * BuildContext.
+	 * Access the {@code ServiceManager}.
+	 *
+	 * Clients should keep a reference to the {@code ServiceManager} to allow for cleanup, but should not keep a reference
+	 * to the {@code BuildContext}.
 	 */
 	ServiceManager getServiceManager();
 
 	/**
-	 * @return a reference to the IndexManagerHolder, storing all IndexManager instances.
+	 * @return a reference to the {@code IndexManagerHolder}, storing all {@code IndexManager} instances.
 	 */
 	IndexManagerHolder getAllIndexesManager();
 
 	/**
-	 * For backends processing work asynchronously, they should catch all eventual errors in the ErrorHandler
-	 * to avoid losing information about the lost updates.
+	 * Back-ends processing work asynchronously should catch all eventual errors in the {@code ErrorHandler}
+	 * to avoid losing information about the failing index updates.
 	 *
-	 * @return the configured ErrorHandler
+	 * @return the configured {@code ErrorHandler}
 	 */
 	ErrorHandler getErrorHandler();
 }

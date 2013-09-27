@@ -23,9 +23,6 @@
  */
 package org.hibernate.search.test.service;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
@@ -34,6 +31,10 @@ import org.hibernate.search.test.util.ManualConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
@@ -49,7 +50,10 @@ public class ServiceProviderTest {
 		MyServiceProvider.resetActive();
 		assertFalse( MyServiceProvider.isActive() );
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
-		configuration.addProperty( "hibernate.search.default.directory_provider", ServiceDirectoryProvider.class.getName() )
+		configuration.addProperty(
+				"hibernate.search.default.directory_provider",
+				ServiceDirectoryProvider.class.getName()
+		)
 				.addClass( Telephone.class );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		assertTrue( MyServiceProvider.isActive() );
@@ -62,7 +66,10 @@ public class ServiceProviderTest {
 		MyServiceProvider.resetActive();
 		assertFalse( MyServiceProvider.isActive() );
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
-		configuration.addProperty( "hibernate.search.default.directory_provider", ServiceDirectoryProvider.class.getName() )
+		configuration.addProperty(
+				"hibernate.search.default.directory_provider",
+				ServiceDirectoryProvider.class.getName()
+		)
 				.addClass( Telephone.class );
 
 		exceptions.expect( SearchException.class );
@@ -85,9 +92,12 @@ public class ServiceProviderTest {
 		assertFalse( ProvidedServiceProvider.isActive() );
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
 		configuration
-				.addProperty( "hibernate.search.default.directory_provider", ProvidedServiceDirectoryProvider.class.getName() )
+				.addProperty(
+						"hibernate.search.default.directory_provider",
+						ProvidedServiceDirectoryProvider.class.getName()
+				)
 				.addClass( Telephone.class )
-				.getProvidedServices().put( ProvidedServiceProvider.class, new ProvidedService(true) );
+				.getProvidedServices().put( ProvidedServiceProvider.class, new ProvidedService( true ) );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		assertFalse( ProvidedServiceProvider.isActive() );
 		sf.close();
@@ -97,15 +107,37 @@ public class ServiceProviderTest {
 	@Test
 	public void testServiceNotFound() throws Exception {
 		final ManualConfiguration configuration = new HibernateManualConfiguration();
-		configuration.addProperty( "hibernate.search.default.directory_provider", NoServiceDirectoryProvider.class.getName() )
+		configuration.addProperty(
+				"hibernate.search.default.directory_provider",
+				NoServiceDirectoryProvider.class.getName()
+		)
 				.addClass( Telephone.class );
 		boolean exception = false;
 		try {
-			SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+			new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		}
 		catch (SearchException e) {
 			exception = true;
 		}
 		assertTrue( "Service not found should raise a SearchException", exception );
+	}
+
+	@Test
+	public void testRequestingHibernateSessionServiceFailsWithoutORM() throws Exception {
+		final ManualConfiguration configuration = new HibernateManualConfiguration();
+		configuration.addProperty(
+				"hibernate.search.default.directory_provider",
+				DummyDirectoryProvider.class.getName()
+		).addClass( Telephone.class );
+
+		try {
+			new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+			fail( "Startup should have failed due to illegal service request" );
+		}
+		catch (SearchException e) {
+			// the exception of interest is wrapped
+			Throwable expectedThrowable = e.getCause().getCause();
+			assertTrue( "Unexpected message: " + expectedThrowable.getMessage(), expectedThrowable.getMessage().startsWith( "HSEARCH000190" ) );
+		}
 	}
 }

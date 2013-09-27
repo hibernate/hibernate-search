@@ -83,17 +83,17 @@ public interface IndexManager {
 	void performStreamOperation(LuceneWork singleOperation, IndexingMonitor monitor, boolean forceAsync);
 
 	/**
-	 * Initialize the IndexManager before its use.
+	 * Initialize this {@code IndexManager} before its use.
 	 *
-	 * @param indexName The unique name of the index (manager). Can be used to retrieve a {@code IndexManager} instance
+	 * @param indexName the unique name of the index (manager). Can be used to retrieve a {@code IndexManager} instance
 	 * via the search factory and {@link org.hibernate.search.indexes.impl.IndexManagerHolder}.
-	 * @param properties The configuration properties
+	 * @param properties the configuration properties
 	 * @param context context information needed to initialize this index manager
 	 */
-	void initialize(String indexName, Properties properties, WorkerBuildContext context);
+	void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext context);
 
 	/**
-	 * Called when a <code>SearchFactory</code> is stopped. This method typically releases resources.
+	 * Called when a {@code SearchFactory} is stopped. This method typically releases resources.
 	 */
 	void destroy();
 
@@ -109,13 +109,6 @@ public interface IndexManager {
 	Similarity getSimilarity();
 
 	/**
-	 * Not intended to be a mutable option, but the Similarity might be defined later in the boot lifecycle.
-	 *
-	 * @param newSimilarity the new similarity value
-	 */
-	void setSimilarity(Similarity newSimilarity);
-
-	/**
 	 * @param name the name of the analyzer to retrieve.
 	 *
 	 * @return Returns the {@code Analyzer} with the given name (see also {@link org.hibernate.search.annotations.AnalyzerDef})
@@ -124,7 +117,7 @@ public interface IndexManager {
 	Analyzer getAnalyzer(String name);
 
 	/**
-	 * Connects this IndexManager to a new SearchFactory.
+	 * Connects this {@code IndexManager} to a new {@code SearchFactory}.
 	 *
 	 * @param boundSearchFactory the existing search factory to which to associate this index manager with
 	 */

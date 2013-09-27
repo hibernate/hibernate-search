@@ -31,12 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.BoostStrategy;
@@ -68,7 +66,6 @@ public abstract class AbstractDocumentBuilder<T> {
 	private final XClass beanXClass;
 	private final Class<?> beanClass;
 	private final TypeMetadata typeMetadata;
-	private final Similarity similarity; //there is only 1 similarity per class hierarchy, and only 1 per index
 	private final InstanceInitializer instanceInitializer;
 
 	private boolean isRoot;
@@ -81,14 +78,12 @@ public abstract class AbstractDocumentBuilder<T> {
 	 *
 	 * @param xClass The class for which to build a document builder
 	 * @param configContext Handle to default configuration settings
-	 * @param similarity The index level similarity
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList keeps track of types on which we need to disable collection events optimizations
 	 * @param instanceInitializer a {@link org.hibernate.search.spi.InstanceInitializer} object.
 	 */
 	public AbstractDocumentBuilder(XClass xClass,
 			ConfigContext configContext,
-			Similarity similarity,
 			ReflectionManager reflectionManager,
 			Set<XClass> optimizationBlackList,
 			InstanceInitializer instanceInitializer) {
@@ -105,22 +100,6 @@ public abstract class AbstractDocumentBuilder<T> {
 		this.typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( xClass ) );
 
 		optimizationBlackList.addAll( typeMetadata.getOptimizationBlackList() );
-
-		// set the default similarity in case that after processing all classes there is still no similarity set
-		if ( typeMetadata.getSimilarity() == null && similarity == null ) {
-			this.similarity = configContext.getDefaultSimilarity();
-		}
-		else if ( typeMetadata.getSimilarity() != null && similarity != null ) {
-			throw new SearchException(
-					"Multiple similarities defined in the same class hierarchy or on the index settings: " + beanClass.getName()
-			);
-		}
-		else if ( typeMetadata.getSimilarity() == null ) {
-			this.similarity = similarity;
-		}
-		else {
-			this.similarity = typeMetadata.getSimilarity();
-		}
 	}
 
 	public abstract void addWorkToQueue(Class<T> entityClass,
@@ -160,10 +139,6 @@ public abstract class AbstractDocumentBuilder<T> {
 
 	public TypeMetadata getMetadata() {
 		return typeMetadata;
-	}
-
-	public Similarity getSimilarity() {
-		return similarity;
 	}
 
 	public ScopedAnalyzer getAnalyzer() {

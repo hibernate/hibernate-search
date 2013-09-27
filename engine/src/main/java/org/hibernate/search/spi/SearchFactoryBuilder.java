@@ -33,12 +33,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.lucene.search.Similarity;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -85,8 +83,6 @@ import org.hibernate.search.impl.MutableSearchFactoryState;
 import org.hibernate.search.impl.ReflectionReplacingSearchConfiguration;
 import org.hibernate.search.impl.SearchMappingBuilder;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
-import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
@@ -173,12 +169,12 @@ public class SearchFactoryBuilder {
 			//Today it seems only safe when a class outside the hierarchy is incrementally added.
 			entityIndexBinding.postInitialize( indexedClasses );
 		}
+
 		//not really necessary today
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		for ( DocumentBuilderContainedEntity<?> builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
-		fillSimilarityMapping();
 
 		//update backend
 		//TODO make sure the old IndexManagers and backends are disposed - not currently a problem as we only support adding entities incrementally
@@ -225,15 +221,15 @@ public class SearchFactoryBuilder {
 		for ( EntityIndexBinding entityIndexBinding : documentBuildersIndexedEntities.values() ) {
 			entityIndexBinding.postInitialize( indexedClasses );
 		}
-		//not really necessary today
+
+		// not really necessary today
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		for ( DocumentBuilderContainedEntity<?> builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
-		fillSimilarityMapping();
 
 		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities, cfg.getProperties() );
-		//build worker and back end components
+		// build worker and back end components
 		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg.getProperties() ) );
 		factoryState.setCacheBitResultsSize(
@@ -268,56 +264,6 @@ public class SearchFactoryBuilder {
 		}
 	}
 
-	private void fillSimilarityMapping() {
-		//TODO cleanup: this logic to select the Similarity is too complex, should likely be done in a previous phase
-		final Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
-		for ( Entry<Class<?>, EntityIndexBinding> entry : documentBuildersIndexedEntities.entrySet() ) {
-			Class<?> clazz = entry.getKey();
-			EntityIndexBinding entityIndexBinding = entry.getValue();
-			Similarity entitySimilarity = entityIndexBinding.getSimilarity();
-			if ( entitySimilarity == null ) {
-				//might have been read from annotations, fill the missing information in the EntityIndexBinder:
-				entitySimilarity = entityIndexBinding.getDocumentBuilder().getSimilarity();
-				if ( entitySimilarity != null ) {
-					MutableEntityIndexBinding<?> newMapping = buildTypeSafeMutableEntityBinder(
-							entityIndexBinding,
-							entitySimilarity
-					);
-					entityIndexBinding = newMapping;
-					documentBuildersIndexedEntities.put( clazz, entityIndexBinding );
-				}
-			}
-			IndexManager[] indexManagers = entityIndexBinding.getIndexManagers();
-			for ( IndexManager indexManager : indexManagers ) {
-				Similarity indexSimilarity = indexManager.getSimilarity();
-				if ( entitySimilarity != null && indexSimilarity == null ) {
-					indexManager.setSimilarity( entitySimilarity );
-				}
-				else if ( entitySimilarity != null && ! entitySimilarity.getClass().equals( indexSimilarity.getClass() ) ) {
-					throw new SearchException(
-							"Multiple entities are sharing the same index but are declaring an " +
-									"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
-									"declare the same Similarity implementation."
-					);
-				}
-			}
-		}
-	}
-
-	@SuppressWarnings( "unchecked" )
-	private <T> MutableEntityIndexBinding<T> buildTypeSafeMutableEntityBinder(EntityIndexBinding entityMapping, Similarity entitySimilarity) {
-		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) entityMapping.getEntityIndexingInterceptor();
-		MutableEntityIndexBinding<T> newMapping = new MutableEntityIndexBinding<T>(
-				entityMapping.getSelectionStrategy(),
-				entitySimilarity,
-				entityMapping.getIndexManagers(),
-				interceptor
-		);
-		DocumentBuilderIndexedEntity<T> documentBuilder = (DocumentBuilderIndexedEntity<T>) entityMapping.getDocumentBuilder();
-		newMapping.setDocumentBuilderIndexedEntity( documentBuilder );
-		return newMapping;
-	}
-
 	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {
 		FilterCachingStrategy filterCachingStrategy;
 		String impl = properties.getProperty( Environment.FILTER_CACHING_STRATEGY );
@@ -327,7 +273,9 @@ public class SearchFactoryBuilder {
 		else {
 			filterCachingStrategy = ClassLoaderHelper.instanceFromName(
 					FilterCachingStrategy.class,
-					impl, ImmutableSearchFactory.class.getClassLoader(), "filterCachingStrategy"
+					impl,
+					ImmutableSearchFactory.class.getClassLoader(),
+					"filterCachingStrategy"
 			);
 		}
 		filterCachingStrategy.initialize( properties );
@@ -407,28 +355,28 @@ public class SearchFactoryBuilder {
 
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
+			Class mappedClass = classMappings.get( mappedXClass );
+			MutableEntityIndexBinding entityIndexBinding = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
 
-			Class<?> mappedClass = classMappings.get( mappedXClass );
-			MutableEntityIndexBinding mappedEntity = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
-			//interceptor might use non indexed state
-			if ( mappedEntity.getEntityIndexingInterceptor() != null ) {
+			// interceptor might use non indexed state
+			if ( entityIndexBinding.getEntityIndexingInterceptor() != null ) {
 				optimizationBlackListedTypes.add( mappedXClass );
 			}
+
 			// Create all DocumentBuilderIndexedEntity
-			//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
-			//XClass unfortunately is not (yet) genericized: TODO?
+			// FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
+			// XClass unfortunately is not (yet) genericized: TODO ?
 			final DocumentBuilderIndexedEntity<?> documentBuilder =
 					new DocumentBuilderIndexedEntity(
 							mappedXClass,
 							context,
-							mappedEntity.getSimilarity(),
 							cfg.getReflectionManager(),
 							optimizationBlackListedTypes,
 							cfg.getInstanceInitializer()
 					);
-			mappedEntity.setDocumentBuilderIndexedEntity( documentBuilder );
+			entityIndexBinding.setDocumentBuilderIndexedEntity( documentBuilder );
 
-			documentBuildersIndexedEntities.put( mappedClass, mappedEntity );
+			documentBuildersIndexedEntities.put( mappedClass, entityIndexBinding );
 		}
 
 		disableBlackListedTypesOptimization( classMappings, optimizationBlackListedTypes, documentBuildersIndexedEntities, documentBuildersContainedEntities );

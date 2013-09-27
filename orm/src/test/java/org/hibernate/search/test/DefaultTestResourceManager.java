@@ -63,7 +63,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private final Class<?>[] annotatedClasses;
 	private final File baseIndexDir;
 
-	private final Configuration cfg;
+	private Configuration cfg;
 	private SessionFactory sessionFactory;
 	private Session session;
 	private SearchFactoryImplementor searchFactory;
@@ -171,6 +171,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	@Override
 	public void forceConfigurationRebuild() {
 		this.needsConfigurationRebuild = true;
+		this.cfg = new Configuration();
 	}
 
 	@Override

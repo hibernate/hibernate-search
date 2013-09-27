@@ -27,6 +27,7 @@ import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.store.ShardIdentifierProvider;
 
 /**
  * Specifies the relation and options from an indexed entity to its index(es).
@@ -45,6 +46,11 @@ public interface EntityIndexBinding {
 	 * @return the sharding strategy
 	 */
 	IndexShardingStrategy getSelectionStrategy();
+
+	/**
+	 * @return the shard identifier provider. Can be {@code null} depending on selected {@code IndexShardingStrategy}.
+	 */
+	ShardIdentifierProvider getShardIdentifierProvider();
 
 	/**
 	 * @return the document builder for this binding

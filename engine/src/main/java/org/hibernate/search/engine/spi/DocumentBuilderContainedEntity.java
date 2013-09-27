@@ -59,7 +59,7 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 			ReflectionManager reflectionManager,
 			Set<XClass> optimizationBlackList,
 			InstanceInitializer instanceInitializer) {
-		super( xClass, context, null, reflectionManager, optimizationBlackList, instanceInitializer );
+		super( xClass, context, reflectionManager, optimizationBlackList, instanceInitializer );
 
 		//done after init:
 		if ( getTypeMetadata().getContainedInMetadata().isEmpty() ) {
