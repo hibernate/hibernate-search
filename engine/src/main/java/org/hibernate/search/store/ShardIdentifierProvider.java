@@ -30,14 +30,19 @@ import org.hibernate.search.spi.BuildContext;
 
 /**
  * Provides shard identifiers when dynamic sharding is used.
+ * Careful: except the {@link ShardIdentifierProvider#initialize(Properties, BuildContext)} method
+ * which is invoked only once at startup, all other methods could be invoked in parallel by independent threads.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
  */
 public interface ShardIdentifierProvider {
 
 	/**
 	 * Initialize this provider.
+	 * <br/>
+	 * This method is invoked only once per instance and before any other method is invoked.
 	 *
 	 * @param properties The configuration properties
 	 * @param buildContext The build context available during bootstrapping
@@ -49,6 +54,10 @@ public interface ShardIdentifierProvider {
 	 * <br/>
 	 * Note: Implementations will usually inspect a specific fieldable of the document in order to determine the shard
 	 * identifier, for example a customer id or a language code.
+	 * <br/>
+	 * Concurrency: this method could be invoked concurrently. That means you could have multiple invocations of
+	 * {@link #getShardIdentifier(Class, Serializable, String, Document)}, {@link #getShardIdentifiersForQuery(FullTextFilterImplementor[])},
+	 * {@link #getAllShardIdentifiers()}.
 	 *
 	 * @param entityType the type of the entity
 	 * @param id the id of the entity
@@ -63,6 +72,10 @@ public interface ShardIdentifierProvider {
 	 * Returns the set of shard identifiers for a query given the applied filters.
 	 *
 	 * The method allows to limit the shards a given query targets depending on the selected filters.
+	 * <br/>
+	 * Concurrency: this method could be invoked concurrently. That means you could have multiple invocations of
+	 * {@link #getShardIdentifier(Class, Serializable, String, Document)}, {@link #getShardIdentifiersForQuery(FullTextFilterImplementor[])},
+	 * {@link #getAllShardIdentifiers()}.
 	 *
 	 * @param fullTextFilters the filters which are applied to the current query
 	 *
@@ -74,6 +87,10 @@ public interface ShardIdentifierProvider {
 	 * Returns the list of all currently known shard identifiers.
 	 * <br/>
 	 * Note: The list can vary between calls!
+	 * <br/>
+	 * Concurrency: this method could be invoked concurrently. That means you could have multiple invocations of
+	 * {@link #getShardIdentifier(Class, Serializable, String, Document)}, {@link #getShardIdentifiersForQuery(FullTextFilterImplementor[])},
+	 * {@link #getAllShardIdentifiers()}.
 	 *
 	 * @return the list of all currently known shard identifiers.
 	 */
