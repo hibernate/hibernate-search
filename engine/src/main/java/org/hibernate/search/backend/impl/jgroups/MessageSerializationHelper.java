@@ -31,9 +31,13 @@ import org.hibernate.search.SearchException;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class MessageSerializationHelper {
+public final class MessageSerializationHelper {
 
 	private static final Charset STRING_ENCODING = Charset.forName( "UTF-8" );
+
+	private MessageSerializationHelper() {
+		//not allowed
+	}
 
 	/**
 	 * Byte encodes a String as a prefix for an existing byte buffer

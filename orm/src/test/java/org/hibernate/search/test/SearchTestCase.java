@@ -32,7 +32,6 @@ import java.lang.reflect.Modifier;
 import junit.framework.TestCase;
 import org.apache.lucene.store.Directory;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -101,7 +100,7 @@ public abstract class SearchTestCase extends TestCase implements TestResourceMan
 	}
 
 	@Override
-	public final Session openSession() throws HibernateException {
+	public final Session openSession() {
 		return getTestResourceManager().openSession();
 	}
 

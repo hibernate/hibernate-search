@@ -63,10 +63,14 @@ import java.util.Random;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class BenchWithGeonames {
+public final class BenchWithGeonames {
 
-	private static String hibernateConfigurationFile = "/org/hibernate/search/test/spatial/hibernate.cfg.xml";
-	private static String geonamesDataFile = "FR.txt";
+	private BenchWithGeonames() {
+		//not allowed
+	}
+
+	private static final String hibernateConfigurationFile = "/org/hibernate/search/test/spatial/hibernate.cfg.xml";
+	private static final String geonamesDataFile = "FR.txt";
 
 	public static void main(String args[]) {
 		LoadGeonames();

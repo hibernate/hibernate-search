@@ -31,12 +31,16 @@ import org.hibernate.Session;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class OptimisticLockingCompatibilityHelper {
+public final class OptimisticLockingCompatibilityHelper {
 
 	//This is the new class name, and is extended by the deprecated one so it is compatible with both types
 	private static final String parentOptimisticLockExceptionClassName = "org.hibernate.dialect.lock.OptimisticEntityLockException";
 	private static final String deprecatedOptimisticLockExceptionClassName = "org.hibernate.OptimisticLockException";
 	private static final Class optimisticLockExceptionClass = determineCompatibleOptimisticLockExceptionClass();
+
+	private OptimisticLockingCompatibilityHelper() {
+		//not allowed
+	}
 
 	/**
 	 * Looks for the new Hibernate class name, or falls back to the older one.

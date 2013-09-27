@@ -38,7 +38,11 @@ import java.util.TreeMap;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public class CollectionHelper {
+public final class CollectionHelper {
+
+	private CollectionHelper() {
+		//now allowed
+	}
 
 	public static <K, V> HashMap<K, V> newHashMap() {
 		return new HashMap<K, V>();
@@ -60,5 +64,3 @@ public class CollectionHelper {
 		return new HashSet<T>( Arrays.asList( ts ) );
 	}
 }
-
-

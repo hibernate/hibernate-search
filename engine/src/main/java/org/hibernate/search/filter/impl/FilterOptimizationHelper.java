@@ -37,7 +37,11 @@ import org.apache.lucene.util.OpenBitSet;
  *
  * @author Sanne Grinovero
  */
-public class FilterOptimizationHelper {
+public final class FilterOptimizationHelper {
+
+	private FilterOptimizationHelper() {
+		//not allowed
+	}
 
 	/**
 	 * Returns a new list of DocIdSet, applying binary AND

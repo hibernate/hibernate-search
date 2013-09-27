@@ -30,7 +30,12 @@ import org.jboss.logging.Logger;
  *
  * @author Hardy Ferentschik
  */
-public class LoggerFactory {
+public final class LoggerFactory {
+
+	private LoggerFactory() {
+		//now allowed
+	}
+
 	public static Log make() {
 		Throwable t = new Throwable();
 		StackTraceElement directCaller = t.getStackTrace()[1];

@@ -35,8 +35,14 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SerializationHelper {
+public final class SerializationHelper {
+
 	private static Log log = LoggerFactory.make();
+
+	private SerializationHelper() {
+		//not allowed
+	}
+
 	public static byte[] toByteArray(Serializable instance) {
 		//no need to close ByteArrayOutputStream
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

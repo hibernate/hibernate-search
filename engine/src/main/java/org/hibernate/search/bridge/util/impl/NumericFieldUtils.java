@@ -30,7 +30,11 @@ import org.hibernate.search.SearchException;
  *
  * @author Gustavo Fernandes
  */
-public class NumericFieldUtils {
+public final class NumericFieldUtils {
+
+	private NumericFieldUtils() {
+		//not allowed
+	}
 
 	public static Query createNumericRangeQuery(String fieldName, Object from, Object to,
 												boolean includeLower, boolean includeUpper) {

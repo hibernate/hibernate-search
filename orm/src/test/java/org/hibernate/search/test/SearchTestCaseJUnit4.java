@@ -27,7 +27,6 @@ import java.io.File;
 
 import org.apache.lucene.store.Directory;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -92,7 +91,7 @@ public abstract class SearchTestCaseJUnit4 implements TestResourceManager {
 	}
 
 	@Override
-	public final Session openSession() throws HibernateException {
+	public final Session openSession() {
 		return getTestResourceManager().openSession();
 	}
 

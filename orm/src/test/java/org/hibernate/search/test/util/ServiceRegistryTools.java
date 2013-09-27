@@ -33,9 +33,13 @@ import org.hibernate.service.ServiceRegistryBuilder;
  * in the testsuite only, so rather than bothering with backwards compatibility in ORM
  * we can workaround the problem with some reflection.
  */
-public class ServiceRegistryTools {
+public final class ServiceRegistryTools {
 
 	private static final Method builderMethod = identifyCorrectBuilderMethod();
+
+	private ServiceRegistryTools() {
+		//not allowed
+	}
 
 	public static ServiceRegistry build(ServiceRegistryBuilder registryBuilder) {
 		try {

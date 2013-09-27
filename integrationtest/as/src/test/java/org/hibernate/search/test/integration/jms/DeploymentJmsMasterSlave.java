@@ -47,7 +47,11 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
-public class DeploymentJmsMasterSlave {
+public final class DeploymentJmsMasterSlave {
+
+	private DeploymentJmsMasterSlave() {
+		//not allowed
+	}
 
 	public static Archive<?> createMaster(String deploymentName, int refreshPeriod, File tmpDir) throws Exception {
 		return baseArchive( deploymentName, masterPersistenceXml( deploymentName, refreshPeriod, tmpDir ) )

@@ -40,7 +40,11 @@ import org.infinispan.remoting.transport.Address;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class ClusterTestHelper {
+public final class ClusterTestHelper {
+
+	private ClusterTestHelper() {
+		//not allowed
+	}
 
 	/**
 	 * Create a clustered Hibernate Search instance.

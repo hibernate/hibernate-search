@@ -299,7 +299,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 	//needs to implement custom readObject to restore the transient fields
 
 	private void readObject(ObjectInputStream is)
-			throws IOException, ClassNotFoundException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+			throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
 		is.defaultReadObject();
 		Class<FullTextIndexEventListener> cl = FullTextIndexEventListener.class;
 		Field f = cl.getDeclaredField( "flushSynch" );

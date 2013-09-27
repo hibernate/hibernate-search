@@ -39,12 +39,16 @@ import org.hibernate.search.util.logging.impl.Log;
  *
  * @author Sanne Grinovero
  */
-public class Executors {
+public final class Executors {
 
 	public static final int QUEUE_MAX_LENGTH = 1000;
 	private static final String THREAD_GROUP_PREFIX = "Hibernate Search: ";
 
 	private static final Log log = LoggerFactory.make();
+
+	private Executors() {
+		//now allowed
+	}
 
 	/**
 	 * Creates a new fixed size ThreadPoolExecutor.

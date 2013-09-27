@@ -43,7 +43,12 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 /**
  * @author Emmanuel Bernard
  */
-class Helper {
+final class Helper {
+
+	private Helper() {
+		//not allowed
+	}
+
 	/**
 	 * return the analyzed value for a given field. If several terms are created, an exception is raised.
 	 */

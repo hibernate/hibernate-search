@@ -34,7 +34,6 @@ import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Filter;
 import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
 import org.hibernate.IdentifierLoadAccess;
 import org.hibernate.Interceptor;
 import org.hibernate.LobHelper;
@@ -50,7 +49,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.SimpleNaturalIdLoadAccess;
 import org.hibernate.Transaction;
 import org.hibernate.TypeHelper;
-import org.hibernate.UnknownProfileException;
 import org.hibernate.Session;
 import org.hibernate.cache.spi.CacheKey;
 import org.hibernate.collection.spi.PersistentCollection;
@@ -243,12 +241,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public Transaction beginTransaction() throws HibernateException {
+	public Transaction beginTransaction() {
 		return session.beginTransaction();
 	}
 
 	@Override
-	public void cancelQuery() throws HibernateException {
+	public void cancelQuery() {
 		session.cancelQuery();
 	}
 
@@ -259,7 +257,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public Connection close() throws HibernateException {
+	public Connection close() {
 		return session.close();
 	}
 
@@ -289,27 +287,27 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public Query createFilter(Object collection, String queryString) throws HibernateException {
+	public Query createFilter(Object collection, String queryString) {
 		return session.createFilter( collection, queryString );
 	}
 
 	@Override
-	public Query createQuery(String queryString) throws HibernateException {
+	public Query createQuery(String queryString) {
 		return session.createQuery( queryString );
 	}
 
 	@Override
-	public SQLQuery createSQLQuery(String queryString) throws HibernateException {
+	public SQLQuery createSQLQuery(String queryString) {
 		return session.createSQLQuery( queryString );
 	}
 
 	@Override
-	public void delete(String entityName, Object object) throws HibernateException {
+	public void delete(String entityName, Object object) {
 		session.delete( entityName, object );
 	}
 
 	@Override
-	public void delete(Object object) throws HibernateException {
+	public void delete(Object object) {
 		session.delete( object );
 	}
 
@@ -319,7 +317,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public Connection disconnect() throws HibernateException {
+	public Connection disconnect() {
 		return session.disconnect();
 	}
 
@@ -329,7 +327,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public void evict(Object object) throws HibernateException {
+	public void evict(Object object) {
 		session.evict( object );
 	}
 
@@ -339,37 +337,37 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public void flush() throws HibernateException {
+	public void flush() {
 		session.flush();
 	}
 
 	@Override
-	public Object get(Class clazz, Serializable id) throws HibernateException {
+	public Object get(Class clazz, Serializable id) {
 		return session.get( clazz, id );
 	}
 
 	@Override
-	public Object get(Class clazz, Serializable id, LockMode lockMode) throws HibernateException {
+	public Object get(Class clazz, Serializable id, LockMode lockMode) {
 		return session.get( clazz, id, lockMode );
 	}
 
 	@Override
-	public Object get(Class clazz, Serializable id, LockOptions lockOptions) throws HibernateException {
+	public Object get(Class clazz, Serializable id, LockOptions lockOptions) {
 		return session.get( clazz, id, lockOptions );
 	}
 
 	@Override
-	public Object get(String entityName, Serializable id) throws HibernateException {
+	public Object get(String entityName, Serializable id) {
 		return session.get( entityName, id );
 	}
 
 	@Override
-	public Object get(String entityName, Serializable id, LockMode lockMode) throws HibernateException {
+	public Object get(String entityName, Serializable id, LockMode lockMode) {
 		return session.get( entityName, id, lockMode );
 	}
 
 	@Override
-	public Object get(String entityName, Serializable id, LockOptions lockOptions) throws HibernateException {
+	public Object get(String entityName, Serializable id, LockOptions lockOptions) {
 		return session.get( entityName, id, lockOptions );
 	}
 
@@ -379,7 +377,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public LockMode getCurrentLockMode(Object object) throws HibernateException {
+	public LockMode getCurrentLockMode(Object object) {
 		return session.getCurrentLockMode( object );
 	}
 
@@ -424,18 +422,17 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public void initializeCollection(PersistentCollection collection, boolean writing) throws HibernateException {
+	public void initializeCollection(PersistentCollection collection, boolean writing) {
 		sessionImplementor.initializeCollection( collection, writing );
 	}
 
 	@Override
-	public Object internalLoad(String entityName, Serializable id, boolean eager, boolean nullable)
-			throws HibernateException {
+	public Object internalLoad(String entityName, Serializable id, boolean eager, boolean nullable) {
 		return sessionImplementor.internalLoad( entityName, id, eager, nullable );
 	}
 
 	@Override
-	public Object immediateLoad(String entityName, Serializable id) throws HibernateException {
+	public Object immediateLoad(String entityName, Serializable id) {
 		return sessionImplementor.immediateLoad( entityName, id );
 	}
 
@@ -450,17 +447,17 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public List list(String query, QueryParameters queryParameters) throws HibernateException {
+	public List list(String query, QueryParameters queryParameters) {
 		return sessionImplementor.list( query, queryParameters );
 	}
 
 	@Override
-	public Iterator iterate(String query, QueryParameters queryParameters) throws HibernateException {
+	public Iterator iterate(String query, QueryParameters queryParameters) {
 		return sessionImplementor.iterate( query, queryParameters );
 	}
 
 	@Override
-	public ScrollableResults scroll(String query, QueryParameters queryParameters) throws HibernateException {
+	public ScrollableResults scroll(String query, QueryParameters queryParameters) {
 		return sessionImplementor.scroll( query, queryParameters );
 	}
 
@@ -475,24 +472,22 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public List listFilter(Object collection, String filter, QueryParameters queryParameters)
-			throws HibernateException {
+	public List listFilter(Object collection, String filter, QueryParameters queryParameters) {
 		return sessionImplementor.listFilter( collection, filter, queryParameters );
 	}
 
 	@Override
-	public Iterator iterateFilter(Object collection, String filter, QueryParameters queryParameters)
-			throws HibernateException {
+	public Iterator iterateFilter(Object collection, String filter, QueryParameters queryParameters) {
 		return sessionImplementor.iterateFilter( collection, filter, queryParameters );
 	}
 
 	@Override
-	public EntityPersister getEntityPersister(String entityName, Object object) throws HibernateException {
+	public EntityPersister getEntityPersister(String entityName, Object object) {
 		return sessionImplementor.getEntityPersister( entityName, object );
 	}
 
 	@Override
-	public Object getEntityUsingInterceptor(EntityKey key) throws HibernateException {
+	public Object getEntityUsingInterceptor(EntityKey key) {
 		return sessionImplementor.getEntityUsingInterceptor( key );
 	}
 
@@ -507,34 +502,32 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public String guessEntityName(Object entity) throws HibernateException {
+	public String guessEntityName(Object entity) {
 		return sessionImplementor.guessEntityName( entity );
 	}
 
 	@Override
-	public Object instantiate(String entityName, Serializable id) throws HibernateException {
+	public Object instantiate(String entityName, Serializable id) {
 		return sessionImplementor.instantiate( entityName, id );
 	}
 
 	@Override
-	public List listCustomQuery(CustomQuery customQuery, QueryParameters queryParameters) throws HibernateException {
+	public List listCustomQuery(CustomQuery customQuery, QueryParameters queryParameters) {
 		return sessionImplementor.listCustomQuery( customQuery, queryParameters );
 	}
 
 	@Override
-	public ScrollableResults scrollCustomQuery(CustomQuery customQuery, QueryParameters queryParameters)
-			throws HibernateException {
+	public ScrollableResults scrollCustomQuery(CustomQuery customQuery, QueryParameters queryParameters) {
 		return sessionImplementor.scrollCustomQuery( customQuery, queryParameters );
 	}
 
 	@Override
-	public List list(NativeSQLQuerySpecification spec, QueryParameters queryParameters) throws HibernateException {
+	public List list(NativeSQLQuerySpecification spec, QueryParameters queryParameters) {
 		return sessionImplementor.list( spec, queryParameters );
 	}
 
 	@Override
-	public ScrollableResults scroll(NativeSQLQuerySpecification spec, QueryParameters queryParameters)
-			throws HibernateException {
+	public ScrollableResults scroll(NativeSQLQuerySpecification spec, QueryParameters queryParameters) {
 		return sessionImplementor.scroll( spec, queryParameters );
 	}
 
@@ -564,28 +557,27 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public int executeUpdate(String query, QueryParameters queryParameters) throws HibernateException {
+	public int executeUpdate(String query, QueryParameters queryParameters) {
 		return sessionImplementor.executeUpdate( query, queryParameters );
 	}
 
 	@Override
-	public int executeNativeUpdate(NativeSQLQuerySpecification specification, QueryParameters queryParameters)
-			throws HibernateException {
+	public int executeNativeUpdate(NativeSQLQuerySpecification specification, QueryParameters queryParameters) {
 		return sessionImplementor.executeNativeUpdate( specification, queryParameters );
 	}
 
 	@Override
-	public NonFlushedChanges getNonFlushedChanges() throws HibernateException {
+	public NonFlushedChanges getNonFlushedChanges() {
 		return sessionImplementor.getNonFlushedChanges();
 	}
 
 	@Override
-	public void applyNonFlushedChanges(NonFlushedChanges nonFlushedChanges) throws HibernateException {
+	public void applyNonFlushedChanges(NonFlushedChanges nonFlushedChanges) {
 		sessionImplementor.applyNonFlushedChanges( nonFlushedChanges );
 	}
 
 	@Override
-	public String getEntityName(Object object) throws HibernateException {
+	public String getEntityName(Object object) {
 		return session.getEntityName( object );
 	}
 
@@ -595,12 +587,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
-	public Serializable getIdentifier(Object object) throws HibernateException {
+	public Serializable getIdentifier(Object object) {
 		return session.getIdentifier( object );
 	}
 
 	@Override
-	public Query getNamedQuery(String queryName) throws HibernateException {
+	public Query getNamedQuery(String queryName) {
 		return session.getNamedQuery( queryName );
 	}
 
@@ -665,7 +657,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.isConnected();
 	}
 
-	public boolean isDirty() throws HibernateException {
+	public boolean isDirty() {
 		return session.isDirty();
 	}
 
@@ -677,35 +669,35 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.isOpen();
 	}
 
-	public Object load(String entityName, Serializable id) throws HibernateException {
+	public Object load(String entityName, Serializable id) {
 		return session.load( entityName, id );
 	}
 
-	public Object load(String entityName, Serializable id, LockMode lockMode) throws HibernateException {
+	public Object load(String entityName, Serializable id, LockMode lockMode) {
 		return session.load( entityName, id, lockMode );
 	}
 
-	public Object load(String entityName, Serializable id, LockOptions lockOptions) throws HibernateException {
+	public Object load(String entityName, Serializable id, LockOptions lockOptions) {
 		return session.load( entityName, id, lockOptions );
 	}
 
-	public void load(Object object, Serializable id) throws HibernateException {
+	public void load(Object object, Serializable id) {
 		session.load( object, id );
 	}
 
-	public Object load(Class theClass, Serializable id) throws HibernateException {
+	public Object load(Class theClass, Serializable id) {
 		return session.load( theClass, id );
 	}
 
-	public Object load(Class theClass, Serializable id, LockMode lockMode) throws HibernateException {
+	public Object load(Class theClass, Serializable id, LockMode lockMode) {
 		return session.load( theClass, id, lockMode );
 	}
 
-	public Object load(Class theClass, Serializable id, LockOptions lockOptions) throws HibernateException {
+	public Object load(Class theClass, Serializable id, LockOptions lockOptions) {
 		return session.load( theClass, id, lockOptions );
 	}
 
-	public void lock(String entityName, Object object, LockMode lockMode) throws HibernateException {
+	public void lock(String entityName, Object object, LockMode lockMode) {
 		session.lock( entityName, object, lockMode );
 	}
 
@@ -713,73 +705,73 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		return session.buildLockRequest( lockOptions );
 	}
 
-	public void lock(Object object, LockMode lockMode) throws HibernateException {
+	public void lock(Object object, LockMode lockMode) {
 		session.lock( object, lockMode );
 	}
 
-	public Object merge(String entityName, Object object) throws HibernateException {
+	public Object merge(String entityName, Object object) {
 		return session.merge( entityName, object );
 	}
 
-	public Object merge(Object object) throws HibernateException {
+	public Object merge(Object object) {
 		return session.merge( object );
 	}
 
-	public void persist(String entityName, Object object) throws HibernateException {
+	public void persist(String entityName, Object object) {
 		session.persist( entityName, object );
 	}
 
-	public void persist(Object object) throws HibernateException {
+	public void persist(Object object) {
 		session.persist( object );
 	}
 
-	public void reconnect(Connection connection) throws HibernateException {
+	public void reconnect(Connection connection) {
 		session.reconnect( connection );
 	}
 
-	public void refresh(Object object) throws HibernateException {
+	public void refresh(Object object) {
 		session.refresh( object );
 	}
 
 	@Override
-	public void refresh(String entityName, Object object) throws HibernateException {
+	public void refresh(String entityName, Object object) {
 		session.refresh( entityName, object );
 	}
 
-	public void refresh(Object object, LockMode lockMode) throws HibernateException {
+	public void refresh(Object object, LockMode lockMode) {
 		session.refresh( object, lockMode );
 	}
 
-	public void refresh(Object object, LockOptions lockOptions) throws HibernateException {
+	public void refresh(Object object, LockOptions lockOptions) {
 		session.refresh( object, lockOptions );
 	}
 
 	@Override
-	public void refresh(String entityName, Object object, LockOptions lockOptions) throws HibernateException {
+	public void refresh(String entityName, Object object, LockOptions lockOptions) {
 		session.refresh( entityName, object, lockOptions );
 	}
 
-	public void replicate(String entityName, Object object, ReplicationMode replicationMode) throws HibernateException {
+	public void replicate(String entityName, Object object, ReplicationMode replicationMode) {
 		session.replicate( entityName, object, replicationMode );
 	}
 
-	public void replicate(Object object, ReplicationMode replicationMode) throws HibernateException {
+	public void replicate(Object object, ReplicationMode replicationMode) {
 		session.replicate( object, replicationMode );
 	}
 
-	public Serializable save(String entityName, Object object) throws HibernateException {
+	public Serializable save(String entityName, Object object) {
 		return session.save( entityName, object );
 	}
 
-	public Serializable save(Object object) throws HibernateException {
+	public Serializable save(Object object) {
 		return session.save( object );
 	}
 
-	public void saveOrUpdate(String entityName, Object object) throws HibernateException {
+	public void saveOrUpdate(String entityName, Object object) {
 		session.saveOrUpdate( entityName, object );
 	}
 
-	public void saveOrUpdate(Object object) throws HibernateException {
+	public void saveOrUpdate(Object object) {
 		session.saveOrUpdate( object );
 	}
 
@@ -804,32 +796,32 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		session.setReadOnly( entity, readOnly );
 	}
 
-	public void doWork(org.hibernate.jdbc.Work work) throws HibernateException {
+	public void doWork(org.hibernate.jdbc.Work work) {
 		session.doWork( work );
 	}
 
 	@Override
-	public <T> T doReturningWork(ReturningWork<T> work) throws HibernateException {
+	public <T> T doReturningWork(ReturningWork<T> work) {
 		return session.doReturningWork( work );
 	}
 
-	public void update(String entityName, Object object) throws HibernateException {
+	public void update(String entityName, Object object) {
 		session.update( entityName, object );
 	}
 
-	public void update(Object object) throws HibernateException {
+	public void update(Object object) {
 		session.update( object );
 	}
 
-	public boolean isFetchProfileEnabled(String name) throws UnknownProfileException {
+	public boolean isFetchProfileEnabled(String name) {
 		return session.isFetchProfileEnabled( name );
 	}
 
-	public void enableFetchProfile(String name) throws UnknownProfileException {
+	public void enableFetchProfile(String name) {
 		session.enableFetchProfile( name );
 	}
 
-	public void disableFetchProfile(String name) throws UnknownProfileException {
+	public void disableFetchProfile(String name) {
 		session.disableFetchProfile( name );
 	}
 

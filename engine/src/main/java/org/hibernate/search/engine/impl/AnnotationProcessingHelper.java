@@ -54,6 +54,10 @@ import java.lang.annotation.Annotation;
  */
 public final class AnnotationProcessingHelper {
 
+	private AnnotationProcessingHelper() {
+		//not allowed
+	}
+
 	/**
 	 * Using the passed field (or class bridge) settings determines the Lucene {@link org.apache.lucene.document.Field.Index}
 	 *

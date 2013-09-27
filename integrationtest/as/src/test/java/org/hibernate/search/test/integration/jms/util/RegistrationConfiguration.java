@@ -33,11 +33,15 @@ import org.slf4j.LoggerFactory;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class RegistrationConfiguration {
+public final class RegistrationConfiguration {
 
 	private static final Logger log = LoggerFactory.getLogger( RegistrationConfiguration.class );
 	public static final String DESTINATION_QUEUE = "queue/hsearch";
 	private static final int MAX_ATTEMPTS = 3;
+
+	private RegistrationConfiguration() {
+		//not allowed
+	}
 
 	public static File createTempDir() {
 		int attempts = 0;

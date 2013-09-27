@@ -104,6 +104,9 @@
         <module name="DefaultComesLast" />
         <module name="WhitespaceAround" />
         <module name="TypecastParenPad" />
+        <module name="RedundantThrows" />
+        <module name="HideUtilityClassConstructor"/>
+        <module name="MutableException"/>
         <module name="CovariantEquals" />
         <module name="EqualsAvoidNull" />
 
