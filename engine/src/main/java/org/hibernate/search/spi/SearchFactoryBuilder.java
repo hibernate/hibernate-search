@@ -554,7 +554,7 @@ public class SearchFactoryBuilder {
 		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
 			return new LogErrorHandler();
 		}
-		else if ( errorHandlerClassName.trim().equals( "log" ) ) {
+		else if ( "log".equals( errorHandlerClassName.trim() ) ) {
 			return new LogErrorHandler();
 		}
 		else {

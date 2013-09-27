@@ -64,9 +64,8 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 		}
 		catch (SearchException e) {
 			assertTrue(
-					e.getMessage().equals(
-							"Multiple analyzer definitions with the same name: my-analyzer"
-					)
+					"Multiple analyzer definitions with the same name: my-analyzer"
+					.equals( e.getMessage() )
 			);
 		}
 	}
@@ -81,7 +80,8 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 		}
 		catch (SearchException e) {
 			assertTrue(
-					e	.getMessage().equals( "Multiple analyzer definitions with the same name: english" )
+					"Multiple analyzer definitions with the same name: english"
+					.equals( e.getMessage() )
 			);
 		}
 	}

@@ -57,7 +57,7 @@ class Helper {
 
 	private static void doMarkforJoined(Transaction transaction)
 			throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		if ( transaction.getClass().getName().equals( "org.hibernate.ejb.transaction.JoinableCMTTransaction" ) ) {
+		if ( "org.hibernate.ejb.transaction.JoinableCMTTransaction".equals( transaction.getClass().getName() ) ) {
 			Class<?> joinableCMTTransaction = ClassLoaderHelper.classForName(
 					"org.hibernate.ejb.transaction.JoinableCMTTransaction",
 					Helper.class.getClassLoader()

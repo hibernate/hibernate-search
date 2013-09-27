@@ -33,7 +33,7 @@ public class StudentsSizeBridge implements TwoWayStringBridge {
 
 	@Override
 	public Object stringToObject(String stringValue) {
-		if ( null == stringValue || stringValue.equals( "" ) ) {
+		if ( null == stringValue || "".equals( stringValue ) ) {
 			return 0;
 		}
 		return Integer.parseInt( stringValue );
