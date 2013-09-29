@@ -145,8 +145,8 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	 * @return the ChannelContainer to manage the JGroups JChannel
 	 */
 	private static ChannelContainer buildChannel(Properties props) {
-		final String clusterName = props.getProperty( JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
-
+		final String clusterName = ConfigurationParseHelper.getString(
+				props, JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
 		if ( props != null ) {
 			final Object channelObject = props.get( JGroupsChannelProvider.CHANNEL_INJECT );
 			if ( channelObject != null ) {
