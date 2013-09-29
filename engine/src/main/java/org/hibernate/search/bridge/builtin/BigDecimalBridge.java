@@ -25,7 +25,7 @@ package org.hibernate.search.bridge.builtin;
 
 import java.math.BigDecimal;
 
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 
 /**
  * Map a BigDecimal element

@@ -159,6 +159,13 @@
             <property name="message" value="Stop using the AssertionFailure from commons-annotations." />
         </module>
 
+        <!-- Slowly migrating away from Hibernate Commons Annotations -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="import org\.hibernate\.annotations\.common\.AssertionFailure;" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="Stop using the StringHelper from commons-annotations: use org.hibernate.search.util.StringHelper" />
+        </module>
+
         <!-- Required to get SuppressionCommentFilter to work -->
         <module name="FileContentsHolder" />
 

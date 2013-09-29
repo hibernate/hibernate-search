@@ -22,7 +22,7 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
