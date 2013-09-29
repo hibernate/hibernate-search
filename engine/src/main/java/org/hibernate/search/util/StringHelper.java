@@ -35,19 +35,20 @@ public final class StringHelper {
 	private StringHelper() { /* static methods only - hide constructor */
 	}
 
-	public static boolean isNotEmpty(String string) {
+	public static boolean isNotEmpty(final String string) {
 		return string != null && string.length() > 0;
 	}
 
-	public static boolean isEmpty(String string) {
+	public static boolean isEmpty(final String string) {
 		return string == null || string.length() == 0;
 	}
 
-	public static String qualify(String prefix, String name) {
+	public static String qualify(final String prefix, final String name) {
 		if ( name == null || prefix == null ) {
 			throw new NullPointerException();
 		}
-		return new StringBuffer( prefix.length() + name.length() + 1 )
+
+		return new StringBuilder( prefix.length() + name.length() + 1 )
 				.append( prefix )
 				.append( '.' )
 				.append( name )
