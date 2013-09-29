@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;

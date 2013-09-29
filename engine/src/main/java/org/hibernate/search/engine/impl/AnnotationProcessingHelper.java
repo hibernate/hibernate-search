@@ -27,7 +27,7 @@ package org.hibernate.search.engine.impl;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
 
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.search.SearchException;
