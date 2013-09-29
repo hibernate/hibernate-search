@@ -137,6 +137,14 @@
             <property name="ignoreStrings" value="true" />
         </module>
 
+        <!-- WARN, ERROR and INFO Logging severity levels should be used exclusively via the methods which allow i18 -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="log\.((error)|(warn)|(info))\(" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="'log.error()', warn() and info() should never be used. [not required for tests]" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
         <!-- Slowly migrating away from Hibernate Commons Annotations -->
         <module name="RegexpSinglelineJava">
             <property name="format" value="import org\.hibernate\.annotations\.common\.AssertionFailure;" />
@@ -152,6 +160,8 @@
         </module>
 
     </module>
+
+    <module name="org.hibernate.checkstyle.filters.ExcludeTestPackages" />
 
     <!-- We are not using NewLineAtEndOfFile because the new line chars change
         on different operating systems and that rule allows only one type. This rule
