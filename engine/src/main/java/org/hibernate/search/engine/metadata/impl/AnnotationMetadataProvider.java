@@ -57,7 +57,6 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Latitude;
@@ -110,7 +109,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		XClass xClass = reflectionManager.toXClass( clazz );
 		TypeMetadata.Builder typeMetadataBuilder = new TypeMetadata.Builder( clazz, configContext )
 				.boost( getBoost( xClass ) )
-				.boostStrategy( getDynamicBoost( xClass ) )
+				.boostStrategy( AnnotationProcessingHelper.getDynamicBoost( xClass ) )
 				.analyzer( configContext.getDefaultAnalyzer() );
 
 		ParseContext parseContext = new ParseContext();
@@ -290,28 +289,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			boost = boostAnnotation.value();
 		}
 		return boost;
-	}
-
-	private BoostStrategy getDynamicBoost(XClass element) {
-		if ( element == null ) {
-			return null;
-		}
-		DynamicBoost boostAnnotation = element.getAnnotation( DynamicBoost.class );
-		if ( boostAnnotation == null ) {
-			return DefaultBoostStrategy.INSTANCE;
-		}
-
-		Class<? extends BoostStrategy> boostStrategyClass = boostAnnotation.impl();
-		BoostStrategy strategy;
-		try {
-			strategy = boostStrategyClass.newInstance();
-		}
-		catch (Exception e) {
-			throw new SearchException(
-					"Unable to instantiate boost strategy implementation: " + boostStrategyClass.getName()
-			);
-		}
-		return strategy;
 	}
 
 	private void initializeClass(TypeMetadata.Builder typeMetadataBuilder,
