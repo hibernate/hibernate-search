@@ -31,7 +31,7 @@ import java.util.List;
 
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 
 /**
  * @author Emmanuel Bernard

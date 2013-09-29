@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.impl;
 
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
