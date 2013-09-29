@@ -145,6 +145,13 @@
             <property name="ignoreComments" value="true" />
         </module>
 
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="System\.(out)|(err)\.print(ln)?\(" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="Not allowed to print to System.out: if you're damn sure you want it, disable Checkstyle on this line. [not required for tests]" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
         <!-- Slowly migrating away from Hibernate Commons Annotations -->
         <module name="RegexpSinglelineJava">
             <property name="format" value="import org\.hibernate\.annotations\.common\.AssertionFailure;" />
@@ -191,5 +198,7 @@
         <property name="format" value="\s+$" />
         <property name="message" value="White spaces at the end of line" />
     </module>
+
+    <module name="SuppressionCommentFilter" />
 
 </module>

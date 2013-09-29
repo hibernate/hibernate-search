@@ -91,8 +91,10 @@ public final class AnalyzerUtils {
 
 			if ( increment > 0 ) {
 				position = position + increment;
+				// CHECKSTYLE:OFF : usage of System.out represents a checkstyle violation.
 				System.out.println();
 				System.out.print( position + ": " );
+				// CHECKSTYLE:ON
 			}
 
 			log.debug( "[" + getTermText( token ) + "] " );
