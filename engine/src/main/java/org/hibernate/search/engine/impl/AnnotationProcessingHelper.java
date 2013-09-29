@@ -26,8 +26,8 @@ package org.hibernate.search.engine.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
@@ -113,23 +113,16 @@ public final class AnnotationProcessingHelper {
 		return computedBoost;
 	}
 
-	public static BoostStrategy getDynamicBoost(XProperty member) {
-		DynamicBoost boostAnnotation = member.getAnnotation( DynamicBoost.class );
+	public static BoostStrategy getDynamicBoost(final XAnnotatedElement element) {
+		if ( element == null ) {
+			return DefaultBoostStrategy.INSTANCE;
+		}
+		DynamicBoost boostAnnotation = element.getAnnotation( DynamicBoost.class );
 		if ( boostAnnotation == null ) {
 			return DefaultBoostStrategy.INSTANCE;
 		}
-
 		Class<? extends BoostStrategy> boostStrategyClass = boostAnnotation.impl();
-		BoostStrategy strategy;
-		try {
-			strategy = boostStrategyClass.newInstance();
-		}
-		catch (Exception e) {
-			throw new SearchException(
-					"Unable to instantiate boost strategy implementation: " + boostStrategyClass.getName()
-			);
-		}
-		return strategy;
+		return ClassLoaderHelper.instanceFromClass( BoostStrategy.class, boostStrategyClass, "boost strategy" );
 	}
 
 	public static Field.TermVector getTermVector(TermVector vector) {
