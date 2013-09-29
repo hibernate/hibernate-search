@@ -971,15 +971,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		Class<? extends Discriminator> discriminatorClass = discriminatorAnnotation.impl();
-		Discriminator discriminator;
-		try {
-			discriminator = discriminatorClass.newInstance();
-		}
-		catch (Exception e) {
-			throw new SearchException(
-					"Unable to instantiate analyzer discriminator implementation: " + discriminatorClass.getName()
-			);
-		}
+		Discriminator discriminator = ClassLoaderHelper.instanceFromClass( Discriminator.class, discriminatorClass, "analyzer discriminator implementation" );
 
 		if ( annotatedElement instanceof XMember ) {
 			typeMetadataBuilder.analyzerDiscriminator( discriminator, (XMember) annotatedElement );
