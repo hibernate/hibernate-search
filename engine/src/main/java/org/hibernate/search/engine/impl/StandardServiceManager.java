@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.ServiceManager;

@@ -41,7 +41,7 @@ import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.SearchException;

@@ -26,7 +26,7 @@ package org.hibernate.search.backend.impl;
 import java.util.Properties;
 import javax.transaction.Synchronization;
 
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
