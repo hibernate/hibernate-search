@@ -145,6 +145,16 @@
             <property name="ignoreComments" value="true" />
         </module>
 
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="System\.(out)|(err)\.print(ln)?\(" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="Not allowed to print to System.out: if you're damn sure you want it, disable Checkstyle on this line. [not required for tests]" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <!-- Required to get SuppressionCommentFilter to work -->
+        <module name="FileContentsHolder" />
+
     </module>
 
     <module name="org.hibernate.checkstyle.filters.ExcludeTestPackages" />
@@ -167,5 +177,7 @@
         <property name="format" value="\s+$" />
         <property name="message" value="White spaces at the end of line" />
     </module>
+
+    <module name="SuppressionCommentFilter" />
 
 </module>
