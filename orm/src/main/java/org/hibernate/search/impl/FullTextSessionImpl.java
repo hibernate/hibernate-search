@@ -56,6 +56,8 @@ import org.hibernate.engine.jdbc.spi.JdbcConnectionAccess;
 import org.hibernate.engine.query.spi.sql.NativeSQLQuerySpecification;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.NamedQueryDefinition;
+import org.hibernate.engine.spi.NamedSQLQueryDefinition;
 import org.hibernate.engine.spi.NonFlushedChanges;
 import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.QueryParameters;
@@ -67,6 +69,7 @@ import org.hibernate.event.spi.EventSource;
 import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.loader.custom.CustomQuery;
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.procedure.ProcedureCall;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextSharedSessionBuilder;
@@ -866,6 +869,36 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	@Override
 	public SimpleNaturalIdLoadAccess bySimpleNaturalId(Class entityClass) {
 		return session.bySimpleNaturalId( entityClass );
+	}
+
+	@Override
+	public ProcedureCall createStoredProcedureCall(String procedureName) {
+		return session.createStoredProcedureCall( procedureName );
+	}
+
+	@Override
+	public ProcedureCall createStoredProcedureCall(String procedureName, Class... resultClasses) {
+		return session.createStoredProcedureCall( procedureName, resultClasses );
+	}
+
+	@Override
+	public ProcedureCall createStoredProcedureCall(String procedureName, String... resultSetMappings) {
+		return session.createStoredProcedureCall( procedureName, resultSetMappings );
+	}
+
+	@Override
+	public ProcedureCall getNamedProcedureCall(String name) {
+		return session.getNamedProcedureCall( name );
+	}
+
+	@Override
+	public Query createQuery(NamedQueryDefinition namedQueryDefinition) {
+		return sessionImplementor.createQuery( namedQueryDefinition );
+	}
+
+	@Override
+	public SQLQuery createSQLQuery(NamedSQLQueryDefinition namedQueryDefinition) {
+		return sessionImplementor.createSQLQuery( namedQueryDefinition );
 	}
 
 }
