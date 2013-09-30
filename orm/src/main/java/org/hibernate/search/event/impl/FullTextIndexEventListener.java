@@ -218,10 +218,12 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 			disabled = true;
 		}
 
-		log.debug( "Hibernate Search event listeners " + ( disabled ? "activated" : "deactivated" ) );
+		log.debug( "Hibernate Search event listeners " + ( disabled ? "deactivated" : "activated" ) );
 
-		skipDirtyChecks = !searchFactoryImplementor.isDirtyChecksEnabled();
-		log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
+		if ( ! disabled ) {
+			skipDirtyChecks = !searchFactoryImplementor.isDirtyChecksEnabled();
+			log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
+		}
 	}
 
 	/**

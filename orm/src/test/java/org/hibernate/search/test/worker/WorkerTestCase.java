@@ -32,7 +32,6 @@ import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -41,6 +40,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.TestConstants;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Emmanuel Bernard
@@ -48,6 +48,7 @@ import org.junit.Assert;
  */
 public class WorkerTestCase extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testConcurrency() throws Exception {
 		final AtomicBoolean allFine = new AtomicBoolean( true );
 		int nThreads = 15;
