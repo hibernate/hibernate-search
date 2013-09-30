@@ -99,6 +99,15 @@ public interface FullTextSession extends Session {
 	void flushToIndexes();
 
 	/**
+	 * Clears all indexing operations from the queue associated to the current transaction.
+	 * If invoked at the end of a transaction but before the commit, it will avoid this transaction to make any change to the indexes.
+	 * Using this method will very likely bring your index out of synch with the database, or keep it in synch if the {@link Session#clear()}
+	 * was used.
+	 * @since 4.4
+	 */
+	void clearIndexingQueue();
+
+	/**
 	 * Creates a MassIndexer to rebuild the indexes of some
 	 * or all indexed entity types.
 	 * Instances cannot be reused.

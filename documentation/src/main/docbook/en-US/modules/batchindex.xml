@@ -75,9 +75,37 @@ tx.commit(); //index only updated at commit time</programlisting>
   </section>
 
   <section>
+    <title>Preventing automatic changes to the index</title>
+
+    <para>Hibernate Search strives to keep the index in synch with changes
+    that you're applying to your entities via normal Hibernate ORM operations,
+    but ultimately you are in control of what needs to happen. In particular
+    if during a specific transaction you do not want to have changes applied to
+    the index, you can reset the scheduled operations from the current
+    <classname>Session</classname> by invoking
+    <methodname>FullTextSession.clearIndexingQueue()</methodname> just
+    before the commit: that will cancel all indexing operations, but
+    still apply all changes on the database.</para>
+
+    <tip>
+        <para>When invoking <methodname>Session.clear()</methodname> the
+        queued indexing operations are not reset. This will likely change
+        in future but until then it is likely that you might want to
+        invoke <methodname>FullTextSession.clearIndexingQueue()</methodname>
+        each time you invoke <methodname>Session.clear()</methodname>.</para>
+      </tip>
+
+    <para>This method is most suited to disable the index writes only
+    on very specific cases: remember you can also disable indexing
+    globally (as described in <xref linkend="configuration-automatic-indexing"/>)
+    or define consistent rules on your entities (see also
+    <xref linkend="search-mapping-indexinginterceptor"/>).</para>
+  </section>
+
+  <section>
     <title>Deleting instances from the index</title>
 
-    <para>It is equally possible to remove an entity or all entities of a
+    <para>It is possible to remove an entity or all entities of a
     given type from a Lucene index without the need to physically remove them
     from the database. This operation is named purging and is also done
     through the <classname>FullTextSession</classname>.</para>
@@ -176,8 +204,8 @@ tx.commit(); //index changes are applied at commit time    </programlisting>
       efficiency Hibernate Search batches index operations and executes them
       at commit time. If you expect to index a lot of data you need to be
       careful about memory consumption since all documents are kept in a queue
-      until the transaction commit. You can potentially face an
-      <classname>OutOfMemoryException</classname> if you don't empty the queue
+      until the transaction is committed. You can potentially face an
+      <classname>OutOfMemoryException</classname> if you don't flush the queue
       periodically: to do this you can use
       <methodname>fullTextSession.flushToIndexes()</methodname>. Every time
       <methodname>fullTextSession.flushToIndexes()</methodname> is called (or
@@ -236,7 +264,7 @@ transaction.commit();</programlisting>
       <warning>
         <para>During the progress of a MassIndexer the content of the index is
         undefined! If a query is performed while the MassIndexer is working
-        most likely some results will be missing.</para>
+        some results might be missing.</para>
       </warning>
 
       <example>

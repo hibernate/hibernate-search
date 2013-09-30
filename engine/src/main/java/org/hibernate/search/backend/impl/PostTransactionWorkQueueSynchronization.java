@@ -126,4 +126,8 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 		queueingProcessor.prepareWorks( subQueue );
 		queueingProcessor.performWorks( subQueue );
 	}
+
+	public void clearWorks() {
+		queue.clear();
+	}
 }

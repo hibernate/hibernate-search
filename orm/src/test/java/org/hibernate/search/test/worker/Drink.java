@@ -30,6 +30,7 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 
 /**
  * @author Emmanuel Bernard
@@ -42,7 +43,7 @@ public class Drink {
 	@DocumentId
 	private Integer id;
 
-	@Field
+	@Field(store = Store.YES)
 	private String name;
 
 	public Integer getId() {

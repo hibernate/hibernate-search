@@ -139,6 +139,10 @@ public class WorkerScopeConfigurationTest {
 		@Override
 		public void flushWorks(TransactionContext transactionContext) {
 		}
+
+		@Override
+		public void clear(TransactionContext transactionContext) {
+		}
 	}
 
 	public static final class CustomWorkerExpectingFooAndBar implements Worker {
@@ -161,6 +165,10 @@ public class WorkerScopeConfigurationTest {
 
 		@Override
 		public void flushWorks(TransactionContext transactionContext) {
+		}
+
+		@Override
+		public void clear(TransactionContext transactionContext) {
 		}
 	}
 }
