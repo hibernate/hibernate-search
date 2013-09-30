@@ -24,7 +24,7 @@
 package org.hibernate.search.util.impl;
 
 import org.hibernate.search.annotations.FilterCacheModeType;
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 
 /**
  * @author Emmanuel Bernard

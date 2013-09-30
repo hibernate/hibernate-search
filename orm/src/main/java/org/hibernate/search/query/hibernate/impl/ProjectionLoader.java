@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;

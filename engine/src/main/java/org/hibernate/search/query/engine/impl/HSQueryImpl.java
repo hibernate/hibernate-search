@@ -40,8 +40,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
-
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.SearchException;
@@ -67,6 +66,7 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -877,18 +877,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return wrapperKey;
 	}
 
-	private Object createFilterInstance(FullTextFilterImpl fullTextFilter,
-										FilterDef def) {
-		Object instance;
-		try {
-			instance = def.getImpl().newInstance();
-		}
-		catch (InstantiationException e) {
-			throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
-		}
-		catch (IllegalAccessException e) {
-			throw new SearchException( "Unable to create @FullTextFilterDef: " + def.getImpl(), e );
-		}
+	private Object createFilterInstance(FullTextFilterImpl fullTextFilter, FilterDef def) {
+		final Object instance = ClassLoaderHelper.instanceFromClass( Object.class, def.getImpl(), "@FullTextFilterDef" );
 		for ( Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet() ) {
 			def.invoke( entry.getKey(), instance, entry.getValue() );
 		}

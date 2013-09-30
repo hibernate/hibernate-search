@@ -29,7 +29,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.document.NumericField;
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;

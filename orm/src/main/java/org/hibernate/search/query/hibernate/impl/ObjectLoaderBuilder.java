@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.SearchException;

@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.CorruptIndexException;
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;

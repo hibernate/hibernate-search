@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.backend.impl.jgroups;
 
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.View;

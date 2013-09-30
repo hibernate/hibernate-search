@@ -25,7 +25,7 @@ package org.hibernate.search.bridge.builtin;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 
 public class DateResolutionUtil {
 

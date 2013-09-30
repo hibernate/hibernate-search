@@ -27,7 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -262,8 +262,13 @@ public class ConfigurationParseHelper {
 	 * Get the string property or defaults if not present
 	 */
 	public static final String getString(Properties cfg, String key, String defaultValue) {
-		String propValue = cfg.getProperty( key );
-		return propValue == null ? defaultValue : propValue;
+		if ( cfg == null ) {
+			return defaultValue;
+		}
+		else {
+			String propValue = cfg.getProperty( key );
+			return propValue == null ? defaultValue : propValue;
+		}
 	}
 
 }

@@ -39,13 +39,13 @@ import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.hibernate.annotations.common.AssertionFailure;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.Analyze;
@@ -57,7 +57,6 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.DynamicBoost;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Latitude;
@@ -110,7 +109,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		XClass xClass = reflectionManager.toXClass( clazz );
 		TypeMetadata.Builder typeMetadataBuilder = new TypeMetadata.Builder( clazz, configContext )
 				.boost( getBoost( xClass ) )
-				.boostStrategy( getDynamicBoost( xClass ) )
+				.boostStrategy( AnnotationProcessingHelper.getDynamicBoost( xClass ) )
 				.analyzer( configContext.getDefaultAnalyzer() );
 
 		ParseContext parseContext = new ParseContext();
@@ -290,28 +289,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			boost = boostAnnotation.value();
 		}
 		return boost;
-	}
-
-	private BoostStrategy getDynamicBoost(XClass element) {
-		if ( element == null ) {
-			return null;
-		}
-		DynamicBoost boostAnnotation = element.getAnnotation( DynamicBoost.class );
-		if ( boostAnnotation == null ) {
-			return DefaultBoostStrategy.INSTANCE;
-		}
-
-		Class<? extends BoostStrategy> boostStrategyClass = boostAnnotation.impl();
-		BoostStrategy strategy;
-		try {
-			strategy = boostStrategyClass.newInstance();
-		}
-		catch (Exception e) {
-			throw new SearchException(
-					"Unable to instantiate boost strategy implementation: " + boostStrategyClass.getName()
-			);
-		}
-		return strategy;
 	}
 
 	private void initializeClass(TypeMetadata.Builder typeMetadataBuilder,
@@ -994,15 +971,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		Class<? extends Discriminator> discriminatorClass = discriminatorAnnotation.impl();
-		Discriminator discriminator;
-		try {
-			discriminator = discriminatorClass.newInstance();
-		}
-		catch (Exception e) {
-			throw new SearchException(
-					"Unable to instantiate analyzer discriminator implementation: " + discriminatorClass.getName()
-			);
-		}
+		Discriminator discriminator = ClassLoaderHelper.instanceFromClass( Discriminator.class, discriminatorClass, "analyzer discriminator implementation" );
 
 		if ( annotatedElement instanceof XMember ) {
 			typeMetadataBuilder.analyzerDiscriminator( discriminator, (XMember) annotatedElement );

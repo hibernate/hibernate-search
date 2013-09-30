@@ -137,7 +137,48 @@
             <property name="ignoreStrings" value="true" />
         </module>
 
+        <!-- WARN, ERROR and INFO Logging severity levels should be used exclusively via the methods which allow i18 -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="log\.((error)|(warn)|(info))\(" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="'log.error()', warn() and info() should never be used. [not required for tests]" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="System\.(out)|(err)\.print(ln)?\(" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="Not allowed to print to System.out: if you're damn sure you want it, disable Checkstyle on this line. [not required for tests]" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <!-- Slowly migrating away from Hibernate Commons Annotations -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="import org\.hibernate\.annotations\.common\.AssertionFailure;" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="Stop using the AssertionFailure from commons-annotations." />
+        </module>
+
+        <!-- Slowly migrating away from Hibernate Commons Annotations -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="import org\.hibernate\.annotations\.common\.AssertionFailure;" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="Stop using the StringHelper from commons-annotations: use org.hibernate.search.util.StringHelper" />
+        </module>
+
+        <!-- Nobody should be using StringBuffer anymore -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value=" StringBuffer" />
+            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
+            <property name="message" value="Nobody should be using StringBuffer anymore" />
+        </module>
+
+        <!-- Required to get SuppressionCommentFilter to work -->
+        <module name="FileContentsHolder" />
+
     </module>
+
+    <module name="org.hibernate.checkstyle.filters.ExcludeTestPackages" />
 
     <!-- We are not using NewLineAtEndOfFile because the new line chars change
         on different operating systems and that rule allows only one type. This rule
@@ -157,5 +198,7 @@
         <property name="format" value="\s+$" />
         <property name="message" value="White spaces at the end of line" />
     </module>
+
+    <module name="SuppressionCommentFilter" />
 
 </module>

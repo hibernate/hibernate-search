@@ -23,7 +23,7 @@ package org.hibernate.search.backend;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.jgroups.AutoNodeSelector;

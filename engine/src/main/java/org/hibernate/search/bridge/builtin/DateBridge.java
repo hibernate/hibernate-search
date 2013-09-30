@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.apache.lucene.document.DateTools;
 
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.ParameterizedBridge;

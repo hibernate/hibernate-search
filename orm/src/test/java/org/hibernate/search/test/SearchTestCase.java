@@ -35,7 +35,7 @@ import org.apache.lucene.store.Directory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.search.SearchFactory;

@@ -21,40 +21,35 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.bridge.builtin;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-
-import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.SearchException;
+package org.hibernate.search.util;
 
 /**
- * Bridge for <code>URL</code>s.
- *
- * @author Emmanuel Bernard
+ * Inspired from {@link org.hibernate.util.StringHelper}, but removing
+ * most methods as they are not needed for Hibernate Search.
+ * Feel free to re-introduce methods as needed.
  */
-public class UrlBridge implements TwoWayStringBridge {
-	@Override
-	public Object stringToObject(String stringValue) {
-		if ( StringHelper.isEmpty( stringValue ) ) {
-			return null;
-		}
-		else {
-			try {
-				return new URL( stringValue );
-			}
-			catch (MalformedURLException e) {
-				throw new SearchException( "Unable to build URL: " + stringValue, e );
-			}
-		}
+public final class StringHelper {
+
+	private StringHelper() { /* static methods only - hide constructor */
 	}
 
-	@Override
-	public String objectToString(Object object) {
-		return object == null ?
-				null :
-				object.toString();
+	public static boolean isNotEmpty(final String string) {
+		return string != null && string.length() > 0;
 	}
+
+	public static boolean isEmpty(final String string) {
+		return string == null || string.length() == 0;
+	}
+
+	public static String qualify(final String prefix, final String name) {
+		if ( name == null || prefix == null ) {
+			throw new NullPointerException();
+		}
+		return new StringBuilder( prefix.length() + name.length() + 1 )
+				.append( prefix )
+				.append( '.' )
+				.append( name )
+				.toString();
+	}
+
 }

@@ -26,7 +26,7 @@ package org.hibernate.search.hcore.impl;
 import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
 
-import org.hibernate.annotations.common.util.StringHelper;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.Version;
