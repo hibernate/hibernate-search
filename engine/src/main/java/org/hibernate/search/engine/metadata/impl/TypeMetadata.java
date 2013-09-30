@@ -55,6 +55,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class TypeMetadata {
 	private static final Log log = LoggerFactory.make();
+	private static final String COMPONENT_PATH_SEPARATOR = ".";
 
 	/**
 	 * The type for this metadata
@@ -210,7 +211,12 @@ public class TypeMetadata {
 	}
 
 	public boolean containsCollectionRole(String role) {
-		return collectionRoles.contains( role );
+		for ( String knownRolls : collectionRoles ) {
+			if ( isSubRole( knownRolls, role ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean areClassBridgesUsed() {
@@ -285,6 +291,16 @@ public class TypeMetadata {
 		sb.append( ", collectionRoles=" ).append( collectionRoles );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	private boolean isSubRole(String subRole, String role) {
+		if ( role.equals( subRole ) ) {
+			return true; // direct match
+		}
+		if ( role.startsWith( subRole + COMPONENT_PATH_SEPARATOR ) ) {
+			return true; // role == subRole.<something>
+		}
+		return false;
 	}
 
 	private boolean determineWhetherDocumentIdPropertyIsTheSameAsJpaIdProperty(XProperty jpaIdProperty) {
@@ -488,6 +504,11 @@ public class TypeMetadata {
 
 		public TypeMetadata build() {
 			return new TypeMetadata( this );
+		}
+
+		@Override
+		public String toString() {
+			return "TypeMetadata.Builder{indexedType=" + indexedType + "}";
 		}
 	}
 }
