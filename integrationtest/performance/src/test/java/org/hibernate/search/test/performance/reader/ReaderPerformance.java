@@ -32,10 +32,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.LockObtainFailedException;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.test.SearchTestCase;
@@ -74,16 +72,14 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		FileHelper.delete( getBaseIndexDir() );
 	}
 
-	public final void testPerformance()
-			throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
+	public final void testPerformance() throws InterruptedException, IOException {
 		buildBigIndex();
 		for ( int i = 0; i < WARM_UP_CYCLES; i++ ) {
 			timeMs();
 		}
 	}
 
-	private void buildBigIndex()
-			throws InterruptedException, CorruptIndexException, LockObtainFailedException, IOException {
+	private void buildBigIndex() throws InterruptedException, IOException {
 		System.out.println( "Going to create fake index..." );
 		FSDirectory directory = FSDirectory.open( new File( getBaseIndexDir(), Detective.class.getCanonicalName() ) );
 		IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
