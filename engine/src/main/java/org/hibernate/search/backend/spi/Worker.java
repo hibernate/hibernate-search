@@ -57,4 +57,11 @@ public interface Worker {
 	 * @param transactionContext the current transaction (context).
 	 */
 	void flushWorks(TransactionContext transactionContext);
+
+	/**
+	 * Clears any pending work from the work queue, without applying it.
+	 *
+	 * @param transactionContext
+	 */
+	void clear(TransactionContext transactionContext);
 }

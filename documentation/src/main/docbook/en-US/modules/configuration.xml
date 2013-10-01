@@ -48,7 +48,7 @@
       indexed.</para>
     </section>
 
-    <section>
+    <section id="configuration-automatic-indexing">
       <title>Automatic indexing</title>
 
       <para>By default, every time an object is inserted, updated or deleted

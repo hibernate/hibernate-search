@@ -143,6 +143,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		searchFactoryImplementor.getWorker().flushWorks( transactionContext );
 	}
 
+	@Override
+	public void clearIndexingQueue() {
+		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
+		searchFactoryImplementor.getWorker().clear( transactionContext );
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -252,7 +258,7 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 
 	@Override
 	public void clear() {
-		//FIXME should session clear work with the lucene queue
+		//FIXME should session clear work with the lucene queue: see HSEARCH-1270
 		session.clear();
 	}
 

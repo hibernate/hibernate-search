@@ -24,6 +24,7 @@
 package org.hibernate.search.jpa;
 
 import java.io.Serializable;
+
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.MassIndexer;
@@ -91,6 +92,15 @@ public interface FullTextEntityManager extends EntityManager {
 	 * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
 	 */
 	void flushToIndexes();
+
+	/**
+	 * Clears all indexing operations from the queue associated to the current transaction.
+	 * If invoked at the end of a transaction but before the commit, it will avoid this transaction to make any change to the indexes.
+	 * Using this method will very likely bring your index out of synch with the database, or keep it in synch if the {@link EntityManager#clear()}
+	 * was used.
+	 * @since 4.4
+	 */
+	void clearIndexingQueue();
 
 	/**
 	 * Creates a MassIndexer to rebuild the indexes of some

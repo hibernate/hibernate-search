@@ -24,7 +24,6 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.Properties;
-import javax.transaction.Synchronization;
 
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.backend.spi.Work;
@@ -51,6 +50,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * the work is done in a separate thread (threads are pooled)
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class TransactionalWorker implements Worker {
 
@@ -60,7 +60,9 @@ public class TransactionalWorker implements Worker {
 
 	//this is being used from different threads, but doesn't need a
 	//synchronized map since for a given transaction, we have not concurrent access
-	protected final WeakIdentityHashMap<Object, Synchronization> synchronizationPerTransaction = new WeakIdentityHashMap<Object, Synchronization>();
+	protected final WeakIdentityHashMap<Object, PostTransactionWorkQueueSynchronization> synchronizationPerTransaction
+		= new WeakIdentityHashMap<Object, PostTransactionWorkQueueSynchronization>();
+
 	private QueueingProcessor queueingProcessor;
 	private SearchFactoryImplementor factory;
 	private InstanceInitializer instanceInitializer;
@@ -82,8 +84,7 @@ public class TransactionalWorker implements Worker {
 		}
 		if ( transactionContext.isTransactionInProgress() ) {
 			Object transactionIdentifier = transactionContext.getTransactionIdentifier();
-			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
-					synchronizationPerTransaction.get( transactionIdentifier );
+			PostTransactionWorkQueueSynchronization txSync = synchronizationPerTransaction.get( transactionIdentifier );
 			if ( txSync == null || txSync.isConsumed() ) {
 				txSync = new PostTransactionWorkQueueSynchronization(
 						queueingProcessor, synchronizationPerTransaction, factory
@@ -173,15 +174,44 @@ public class TransactionalWorker implements Worker {
 	public void close() {
 	}
 
+	/**
+	 * Flushes the work queue for the given transactionContext, even though it might not have been committed yet.
+	 * Might get the index in an inconsistent state compared to the database, but is often useful to keep the
+	 * memory consumption of the queue under control.
+	 */
 	@Override
 	public void flushWorks(TransactionContext transactionContext) {
-		if ( transactionContext.isTransactionInProgress() ) {
-			Object transaction = transactionContext.getTransactionIdentifier();
-			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
-					synchronizationPerTransaction.get( transaction );
-			if ( txSync != null && !txSync.isConsumed() ) {
-				txSync.flushWorks();
-			}
+		PostTransactionWorkQueueSynchronization txSync = getTransactionSynchronizationIfValid( transactionContext );
+		if ( txSync != null ) {
+			txSync.flushWorks();
 		}
 	}
+
+	/**
+	 * Clears the pending work queue for a given transaction. Meant to be used if the user also cleared the Session.
+	 */
+	@Override
+	public void clear(TransactionContext transactionContext) {
+		PostTransactionWorkQueueSynchronization txSync = getTransactionSynchronizationIfValid( transactionContext );
+		if ( txSync != null ) {
+			txSync.clearWorks();
+		}
+	}
+
+	/**
+	 * @param transactionContext
+	 * @return the registered Transaction Synchronization, provided the transactionContext is not null, is in progress,
+	 *  and the synchronization is not consumed. Returns null otherwise.
+	 */
+	private PostTransactionWorkQueueSynchronization getTransactionSynchronizationIfValid(TransactionContext transactionContext) {
+		if ( transactionContext != null && transactionContext.isTransactionInProgress() ) {
+			Object transactionId = transactionContext.getTransactionIdentifier();
+			PostTransactionWorkQueueSynchronization txSync = synchronizationPerTransaction.get( transactionId );
+			if ( txSync != null && ! txSync.isConsumed() ) {
+				return txSync;
+			}
+		}
+		return null;
+	}
+
 }
