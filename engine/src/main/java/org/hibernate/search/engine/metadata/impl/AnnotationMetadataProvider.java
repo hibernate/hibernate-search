@@ -303,8 +303,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		// Iterate the class hierarchy top down. This allows to override the default analyzer for the properties if the class holds one
 		for ( XClass currentClass : hierarchy ) {
 			parseContext.setCurrentClass( currentClass );
-			initializeClassLevelAnnotations( typeMetadataBuilder, isRoot, prefix, configContext, parseContext );
-			initializeClassBridgeInstances( typeMetadataBuilder, isRoot, prefix, configContext, currentClass );
+			initializeClassLevelAnnotations( typeMetadataBuilder, prefix, configContext, parseContext );
+			initializeClassBridgeInstances( typeMetadataBuilder, prefix, configContext, currentClass );
 		}
 
 		// if optimizations are enabled, we allow for state in indexed embedded objects which are not
@@ -353,13 +353,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	 * Check and initialize class level annotations.
 	 *
 	 * @param typeMetadataBuilder The meta data holder.
-	 * @param isRoot Flag indicating if the specified class is a root entity, meaning the start of a chain of indexed
-	 * entities.
 	 * @param prefix The current prefix used for the <code>Document</code> field names.
 	 * @param configContext Handle to default configuration settings.
 	 */
 	private void initializeClassLevelAnnotations(TypeMetadata.Builder typeMetadataBuilder,
-			boolean isRoot,
 			String prefix,
 			ConfigContext configContext,
 			ParseContext parseContext) {
@@ -412,7 +409,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	 * Initializes metadata contributed by class bridge instances set up through the programmatic config API.
 	 */
 	private void initializeClassBridgeInstances(TypeMetadata.Builder typeMetadataBuilder,
-			boolean isRoot,
 			String prefix,
 			ConfigContext configContext,
 			XClass clazz) {
@@ -879,7 +875,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private boolean isPropertyTransient(XProperty member, ConfigContext context) {
-		if ( context.isJpaPresent() == false ) {
+		if ( !context.isJpaPresent() ) {
 			return false;
 		}
 		else {
@@ -1355,7 +1351,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					"State inspection optimization disabled as entity %s uses class bridges",
 					typeMetadataBuilder.getIndexedType().getName()
 			);
-			return false; // can't know what a class bridge is going to look at -> reindex // TODO nice new feature to have?
+			return false; // can't know what a class bridge is going to look at -> reindex
 		}
 		BoostStrategy boostStrategy = typeMetadataBuilder.getClassBoostStrategy();
 		if ( boostStrategy != null && !( boostStrategy instanceof DefaultBoostStrategy ) ) {
@@ -1363,7 +1359,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					"State inspection optimization disabled as DynamicBoost is enabled on entity %s",
 					typeMetadataBuilder.getIndexedType().getName()
 			);
-			return false; // as with class bridge: might be affected by any field // TODO nice new feature to have?
+			return false; // as with class bridge: might be affected by any field
 		}
 		return true;
 	}
