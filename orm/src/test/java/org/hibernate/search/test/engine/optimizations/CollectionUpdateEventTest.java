@@ -29,13 +29,14 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.cfg.EntityMapping;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * HSEARCH-679 - verify that updates to collections that are not indexed do not trigger indexing.
+ * Verify that updates to collections that are not indexed do not trigger indexing.
  * Updating a collection in an entity which is not indexed, but has some other property marked
  * as containedIn, should generally not trigger indexing of the containedIn objects, unless
  * we can't tell for sure the index state is not going to be affected.
@@ -43,6 +44,7 @@ import static org.junit.Assert.assertTrue;
  * @author Sanne Grinovero
  * @author Tom Waterhouse
  */
+@TestForIssue( jiraKey = "HSEARCH-679")
 public class CollectionUpdateEventTest {
 
 	/**
