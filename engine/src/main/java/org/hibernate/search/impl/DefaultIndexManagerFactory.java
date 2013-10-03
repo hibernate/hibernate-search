@@ -71,7 +71,9 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory {
 	 * @return the same name, or a fully qualified class name to use instead
 	 */
 	protected String aliasToFQN(final String implName) {
-		// TODO Add the Infinispan implementor here
+		if ( "infinispan".equals( implName ) ) {
+			return "org.hibernate.search.infinispan.impl.indexmanager.InfinispanIndexManager";
+		}
 		return implName;
 	}
 
