@@ -29,9 +29,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -45,8 +44,7 @@ public class WorkQueue {
 	private WorkPlan plan;
 
 	private List<LuceneWork> sealedQueue;
-	//flag indicating if the sealed data has been provided meaning that it should no longer be modified
-	private boolean usedSealedData;
+
 	//flag indicating if data has been sealed and not modified since
 	private boolean sealedAndUnchanged;
 
@@ -62,22 +60,14 @@ public class WorkQueue {
 		this.plan = plan;
 	}
 
-	public boolean isSealedAndUnchanged() {
-		return sealedAndUnchanged;
-	}
-
 	public void add(Work work) {
-		if ( usedSealedData ) {
-			//something is wrong fail with exception
-			throw new AssertionFailure( "Attempting to add a work in a used sealed queue" );
-		}
 		this.sealedAndUnchanged = false;
 		plan.addWork( work );
 	}
 
 	public WorkQueue splitQueue() {
 		if ( log.isTraceEnabled() ) {
-			log.tracef( "Splitting workqueue with %d works", plan.size() );
+			log.tracef( "Splitting work queue with %d works", plan.size() );
 		}
 		WorkQueue subQueue = new WorkQueue( searchFactoryImplementor, plan );
 		this.plan = new WorkPlan( searchFactoryImplementor );
@@ -87,7 +77,7 @@ public class WorkQueue {
 
 	public List<LuceneWork> getSealedQueue() {
 		if ( sealedQueue == null ) {
-			throw new AssertionFailure("Access a Sealed WorkQueue which has not been sealed");
+			throw new AssertionFailure( "Access a WorkQueue which has not been sealed" );
 		}
 		this.sealedAndUnchanged = false;
 		return sealedQueue;
@@ -111,7 +101,7 @@ public class WorkQueue {
 
 	public void clear() {
 		if ( log.isTraceEnabled() ) {
-			log.trace( "Clearing current workqueue" );
+			log.trace( "Clearing current work queue" );
 		}
 		plan.clear();
 		this.sealedAndUnchanged = false;
@@ -123,8 +113,9 @@ public class WorkQueue {
 	/**
 	 * Returns an estimate of the to be performed operations
 	 *
-	 * @see org.hibernate.search.engine.impl.WorkPlan#size()
 	 * @return the approximate size
+	 *
+	 * @see org.hibernate.search.engine.impl.WorkPlan#size()
 	 */
 	public int size() {
 		return plan.size();
@@ -135,7 +126,7 @@ public class WorkQueue {
 	 * storing the list of lucene operations to be performed in the sealedQueue.
 	 */
 	public void prepareWorkPlan() {
-		if ( ! sealedAndUnchanged ) {
+		if ( !sealedAndUnchanged ) {
 			plan.processContainedInAndPrepareExecution();
 			List<LuceneWork> luceneWorkPlan = plan.getPlannedLuceneWork();
 			setSealedQueue( luceneWorkPlan );
