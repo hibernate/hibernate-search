@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.engine.indexapi;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -33,13 +34,14 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test the PURGE and PURGE_ALL functionality.
+ * Test {@link FullTextSession#purge(Class, java.io.Serializable)} and  {@link FullTextSession#purgeAll(Class)}.
  *
  * @author John Griffin
  * @author Hardy Ferentschik
@@ -54,30 +56,27 @@ public class PurgeTest extends SearchTestCaseJUnit4 {
 
 	@Test
 	public void testPurgeById() throws Exception {
-		assertNumberOfEntitiesForTypes( 2, Clock.class );
-		assertNumberOfEntitiesForTypes( 2, Book.class );
+		assertNumberOfIndexedEntitiesForTypes( 2, Clock.class );
+		assertNumberOfIndexedEntitiesForTypes( 2, Book.class );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 
-		Criteria criteria = fullTextSession.createCriteria( Clock.class );
-		criteria.setMaxResults( 1 );
-		@SuppressWarnings("unchecked")
-		List<Clock> clocks = (List<Clock>) criteria.list();
+		Clock clock = getSingleInstanceOfType( fullTextSession, Clock.class );
 		// purge a single clock instance from the index
-		fullTextSession.purge( Clock.class, clocks.get( 0 ).getId() );
+		fullTextSession.purge( Clock.class, clock.getId() );
 
 		tx.commit();
 		fullTextSession.close();
 
-		assertNumberOfEntitiesForTypes( 1, Clock.class ); // only a single clock instance got purged
-		assertNumberOfEntitiesForTypes( 2, Book.class );
+		assertNumberOfIndexedEntitiesForTypes( 1, Clock.class ); // only a single clock instance got purged
+		assertNumberOfIndexedEntitiesForTypes( 2, Book.class );
 	}
 
 	@Test
 	public void testPurgeAll() throws Exception {
-		assertNumberOfEntitiesForTypes( 2, Clock.class );
-		assertNumberOfEntitiesForTypes( 2, Book.class );
+		assertNumberOfIndexedEntitiesForTypes( 2, Clock.class );
+		assertNumberOfIndexedEntitiesForTypes( 2, Book.class );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
@@ -88,8 +87,8 @@ public class PurgeTest extends SearchTestCaseJUnit4 {
 		tx.commit();
 		fullTextSession.close();
 
-		assertNumberOfEntitiesForTypes( 0, Clock.class );
-		assertNumberOfEntitiesForTypes( 2, Book.class );
+		assertNumberOfIndexedEntitiesForTypes( 0, Clock.class );
+		assertNumberOfIndexedEntitiesForTypes( 2, Book.class );
 
 		fullTextSession = Search.getFullTextSession( openSession() );
 		tx = fullTextSession.beginTransaction();
@@ -100,8 +99,65 @@ public class PurgeTest extends SearchTestCaseJUnit4 {
 		tx.commit();
 		fullTextSession.close();
 
-		assertNumberOfEntitiesForTypes( 0, Clock.class );
-		assertNumberOfEntitiesForTypes( 0, Book.class );
+		assertNumberOfIndexedEntitiesForTypes( 0, Clock.class );
+		assertNumberOfIndexedEntitiesForTypes( 0, Book.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1271")
+	public void testPurgeEntityWithContainedIn() throws Exception {
+		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
+		assertNumberOfIndexedEntitiesForTypes( 4, Leave.class );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Leave leave = getSingleInstanceOfType( fullTextSession, Leave.class );
+		// purge a single leave
+		fullTextSession.purge( Leave.class, leave.getId() );
+
+		tx.commit();
+		fullTextSession.close();
+
+		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
+		assertNumberOfIndexedEntitiesForTypes( 3, Leave.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1271")
+	public void testPurgeAllWithContainedIn() throws Exception {
+		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
+		assertNumberOfIndexedEntitiesForTypes( 4, Leave.class );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		// purge all leaves
+		fullTextSession.purgeAll( Leave.class );
+
+		tx.commit();
+		fullTextSession.close();
+
+		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
+		assertNumberOfIndexedEntitiesForTypes( 0, Leave.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1271")
+	public void testPurgeWithNullAsIdDeletesAllIndexedDocuments() throws Exception {
+		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
+		assertNumberOfIndexedEntitiesForTypes( 4, Leave.class );
+
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		fullTextSession.purge( Leave.class, null );
+
+		tx.commit();
+		fullTextSession.close();
+
+		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
+		assertNumberOfIndexedEntitiesForTypes( 0, Leave.class );
 	}
 
 	@Override
@@ -110,17 +166,26 @@ public class PurgeTest extends SearchTestCaseJUnit4 {
 				Book.class,
 				Clock.class,
 				Author.class,
+				Leave.class,
+				Tree.class
 		};
 	}
 
-	private void assertNumberOfEntitiesForTypes(int expectedCount, Class<?>... types) {
+	@SuppressWarnings("unchecked")
+	private <T> T getSingleInstanceOfType(FullTextSession fullTextSession, Class<T> type) {
+		Criteria criteria = fullTextSession.createCriteria( type );
+		criteria.setMaxResults( 1 );
+		return ( (List<T>) criteria.list() ).get( 0 );
+	}
+
+	private void assertNumberOfIndexedEntitiesForTypes(int expectedCount, Class<?>... types) {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 
 		org.hibernate.Query query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), types );
 		@SuppressWarnings("unchecked")
 		List<Object> results = (List<Object>) query.list();
-		assertEquals( "incorrect test record", expectedCount, results.size() );
+		assertEquals( "Incorrect document count for type: " + Arrays.toString( types ), expectedCount, results.size() );
 
 		tx.commit();
 	}
@@ -144,6 +209,13 @@ public class PurgeTest extends SearchTestCaseJUnit4 {
 		fullTextSession.save( book );
 		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
 		fullTextSession.save( book );
+
+		// create and index a tree
+		Tree tree = new Tree( "birch" );
+		for ( int i = 0; i < 4; i++ ) {
+			tree.growNewLeave();
+		}
+		fullTextSession.save( tree );
 
 		tx.commit();
 		fullTextSession.close();
