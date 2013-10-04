@@ -29,6 +29,7 @@ import java.io.Serializable;
  * A unit of work. Only make sense inside the same session since it uses the scope principle.
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public class Work<T> {
 	private final T entity;
@@ -54,7 +55,7 @@ public class Work<T> {
 	}
 
 	private Work(T entity, Class<T> entityClass, Serializable id,
-				WorkType type, boolean identifierWasRolledBack) {
+			WorkType type, boolean identifierWasRolledBack) {
 		this.entity = entity;
 		this.entityClass = entityClass;
 		this.id = id;
@@ -80,5 +81,15 @@ public class Work<T> {
 
 	public boolean isIdentifierWasRolledBack() {
 		return identifierWasRolledBack;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "Work{" );
+		sb.append( "entityClass=" ).append( entityClass );
+		sb.append( ", id=" ).append( id );
+		sb.append( ", type=" ).append( type );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }
