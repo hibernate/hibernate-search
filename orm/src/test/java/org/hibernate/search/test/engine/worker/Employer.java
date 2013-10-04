@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.worker;
+package org.hibernate.search.test.engine.worker;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,8 +35,8 @@ import org.hibernate.search.annotations.Indexed;
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed(index = "employee")
-public class Employee {
+@Indexed(index = "employer")
+public class Employer {
 	@Id
 	@GeneratedValue
 	@DocumentId
