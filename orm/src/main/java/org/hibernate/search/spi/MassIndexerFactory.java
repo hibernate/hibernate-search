@@ -22,7 +22,7 @@ package org.hibernate.search.spi;
 
 import java.util.Properties;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 
@@ -30,6 +30,8 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
  * Contains methods that can be used to create a {@link MassIndexer}.
  *
  * @author Davide D'Alto <davide@hibernate.org>
+ *
+ * @since 4.3
  */
 public interface MassIndexerFactory {
 
@@ -52,7 +54,7 @@ public interface MassIndexerFactory {
 	 *            the classes of the entities that are going to be indexed
 	 * @return a new MassIndexer
 	 */
-	MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory,
+	MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
 			Class<?>... entities);
 
 }

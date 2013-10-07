@@ -22,7 +22,6 @@ package org.hibernate.search.impl;
 
 import java.util.Properties;
 
-import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -42,10 +41,10 @@ public class DefaultMassIndexerFactory implements MassIndexerFactory {
 	}
 
 	@Override
-	public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactory sessionFactory,
+	public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
 			Class<?>... entities) {
 		final Class<?>[] types = entities.length == 0 ? OBJECT_ARRAY : entities;
-		return new MassIndexerImpl( searchFactory, (SessionFactoryImplementor)sessionFactory, types );
+		return new MassIndexerImpl( searchFactory, sessionFactory, types );
 	}
 
 }
