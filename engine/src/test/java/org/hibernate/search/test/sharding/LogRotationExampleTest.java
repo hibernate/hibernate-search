@@ -45,7 +45,7 @@ import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.ShardIdentifierProvider;
+import org.hibernate.search.store.AdvancedShardIdentifierProvider;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.TestForIssue;
@@ -161,7 +161,7 @@ public class LogRotationExampleTest {
 	 * both addition and deletion can target a specific index, and a range
 	 * filter can make queries need to search only a subset of all indexes.
 	 */
-	public static final class LogMessageShardingStrategy implements ShardIdentifierProvider {
+	public static final class LogMessageShardingStrategy implements AdvancedShardIdentifierProvider {
 
 		private Set<String> hoursOfDay;
 
