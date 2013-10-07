@@ -339,9 +339,5 @@ public class ShardingConfigurationTest {
 			return shards;
 		}
 
-		@Override
-		public Set<String> getShardIdentifiersForDeletion(Class<?> entityType, Serializable id, String idAsString) {
-			return shards;
-		}
 	}
 }
