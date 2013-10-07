@@ -20,10 +20,12 @@
  */
 package org.hibernate.search.test.shards;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -33,12 +35,10 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.store.FSDirectory;
-
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
@@ -47,17 +47,14 @@ import org.hibernate.search.Search;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.hcore.impl.HibernateSessionFactoryServiceProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProvider;
+import org.hibernate.search.store.ShardIdentifierProviderTemplate;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.TestConstants;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -68,6 +65,7 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 	private Animal spider;
 	private Animal bear;
 
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -207,12 +205,20 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 		return (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 	}
 
-	public static class AnimalShardIdentifierProvider implements ShardIdentifierProvider {
-
-		private volatile Set<String> knownShards = Collections.emptySet();
+	public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate implements ShardIdentifierProvider {
 
 		@Override
-		public void initialize(Properties properties, BuildContext buildContext) {
+		public String getShardIdentifier(Class<?> entityType, Serializable id, String idAsString, Document document) {
+			if ( entityType.equals( Animal.class ) ) {
+				String type = document.getFieldable( "type" ).stringValue();
+				addShard( type );
+				return type;
+			}
+			throw new RuntimeException( "Animal expected but found " + entityType );
+		}
+
+		@Override
+		protected Set<String> loadInitialShardNames(Properties properties, BuildContext buildContext) {
 			ServiceManager serviceManager = buildContext.getServiceManager();
 			SessionFactory sessionFactory = serviceManager.requestService( HibernateSessionFactoryServiceProvider.class, buildContext );
 			Session session = sessionFactory.openSession();
@@ -221,40 +227,12 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 				initialShardsCriteria.setProjection( Projections.distinct( Property.forName( "type" ) ) );
 
 				@SuppressWarnings("unchecked")
-				List<String> initialTypes = (List<String>) initialShardsCriteria.list();
-				knownShards = Collections.unmodifiableSet( new HashSet<String>( initialTypes ) );
+				List<String> initialTypes = initialShardsCriteria.list();
+				return new HashSet<String>( initialTypes );
 			}
 			finally {
 				session.close();
 			}
-		}
-
-		private synchronized void addShard(String shardNames) {
-			HashSet<String> newCopy = new HashSet<String>( knownShards );
-			newCopy.add( shardNames );
-			knownShards = Collections.unmodifiableSet( newCopy );
-		}
-
-		@Override
-		public String getShardIdentifier(Class<?> entityType, Serializable id, String idAsString, Document document) {
-			if ( entityType.equals( Animal.class ) ) {
-				String type = document.getFieldable( "type" ).stringValue();
-				if ( ! knownShards.contains( type ) ) {
-					addShard( type );
-				}
-				return type;
-			}
-			throw new RuntimeException( "Animal expected but found " + entityType );
-		}
-
-		@Override
-		public Set<String> getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-			return getAllShardIdentifiers();
-		}
-
-		@Override
-		public Set<String> getAllShardIdentifiers() {
-			return knownShards;
 		}
 	}
 }
