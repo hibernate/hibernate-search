@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.store;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
@@ -31,6 +32,8 @@ import org.hibernate.search.spi.BuildContext;
 /**
  * Recommended parent class to create custom {@link ShardIdentifierProvider} implementations. Sub-classes must provide a
  * no-arg constructor.
+ *
+ * @experimental The exact method signatures are likely to change in future.
  *
  * @author Sanne Grinovero
  */
@@ -69,6 +72,16 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	 */
 	@Override
 	public Set<String> getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters) {
+		return getAllShardIdentifiers();
+	}
+
+	/**
+	 * Extension point for the case in which you are able to narrow down the shard selection
+	 * to a subset of all shards.
+	 * The default implementation returns all known shard identifiers.
+	 */
+	@Override
+	public Set<String> getShardIdentifiersForDeletion(Class<?> entityType, Serializable id, String idAsString) {
 		return getAllShardIdentifiers();
 	}
 
