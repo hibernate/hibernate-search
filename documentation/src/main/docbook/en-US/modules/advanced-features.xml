@@ -210,33 +210,35 @@ finally {
 
           <programlisting>public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate {
 
-    @Override
-    public String getShardIdentifier(Class&lt;?&gt; entityType, Serializable id, String idAsString, Document document) {
-        if ( entityType.equals( Animal.class ) ) {
-            String type = document.getFieldable( "type" ).stringValue();
-            addShard( type );
-            return type;
-        }
-        throw new RuntimeException( "Animal expected but found " + entityType );
+ @Override
+ public String getShardIdentifier(Class&lt;?&gt; entityType, Serializable id,
+         String idAsString, Document document) {
+    if ( entityType.equals(Animal.class) ) {
+       String type = document.getFieldable("type").stringValue();
+       addShard(type);
+       return type;
     }
+    throw new RuntimeException("Animal expected but found " + entityType);
+ }
 
-    @Override
-    protected Set&lt;String&gt; loadInitialShardNames(Properties properties, BuildContext buildContext) {
-        ServiceManager serviceManager = buildContext.getServiceManager();
-        SessionFactory sessionFactory = serviceManager.requestService( HibernateSessionFactoryServiceProvider.class, buildContext );
-        Session session = sessionFactory.openSession();
-        try {
-            Criteria initialShardsCriteria = session.createCriteria( Animal.class );
-            initialShardsCriteria.setProjection( Projections.distinct( Property.forName( "type" ) ) );
+ @Override
+ protected Set&lt;String&gt; loadInitialShardNames(Properties properties, BuildContext buildContext) {
+    ServiceManager serviceManager = buildContext.getServiceManager();
+    SessionFactory sessionFactory = serviceManager.requestService(
+        HibernateSessionFactoryServiceProvider.class, buildContext);
+    Session session = sessionFactory.openSession();
+    try {
+       Criteria initialShardsCriteria = session.createCriteria(Animal.class);
+       initialShardsCriteria.setProjection( Projections.distinct(Property.forName("type")));
 
-            @SuppressWarnings("unchecked")
-            List&lt;String&gt; initialTypes = initialShardsCriteria.list();
-            return new HashSet&lt;String&gt;( initialTypes );
-        }
-        finally {
-            session.close();
-        }
+       @SuppressWarnings("unchecked")
+       List&lt;String&gt; initialTypes = initialShardsCriteria.list();
+       return new HashSet&lt;String&gt;(initialTypes);
     }
+    finally {
+       session.close();
+    }
+ }
 }</programlisting>
         </example>The are several things happening in
       <classname>AnimalShardIdentifierProvider</classname>. First off its
