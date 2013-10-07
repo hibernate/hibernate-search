@@ -49,7 +49,6 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.hcore.impl.HibernateSessionFactoryServiceProvider;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.store.ShardIdentifierProviderTemplate;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.TestConstants;
@@ -205,7 +204,7 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 		return (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 	}
 
-	public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate implements ShardIdentifierProvider {
+	public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate {
 
 		@Override
 		public String getShardIdentifier(Class<?> entityType, Serializable id, String idAsString, Document document) {

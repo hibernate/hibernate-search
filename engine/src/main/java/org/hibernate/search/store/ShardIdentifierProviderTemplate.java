@@ -29,9 +29,8 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.spi.BuildContext;
 
 /**
- * Suggested parent class to create custom ShardIdentifierProvider implementations.
- *
- * The implementation must have a no-arg constructor.
+ * Recommended parent class to create custom {@link ShardIdentifierProvider} implementations. Sub-classes must provide a
+ * no-arg constructor.
  *
  * @author Sanne Grinovero
  */
@@ -65,7 +64,7 @@ public abstract class ShardIdentifierProviderTemplate implements ShardIdentifier
 	}
 
 	/**
-	 * Potentially suited to be overridden if you are able to narrow doen the shard
+	 * Potentially suited to be overridden if you are able to narrow down the shard
 	 * selection based on the active FullTextFilters.
 	 */
 	@Override

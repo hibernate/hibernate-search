@@ -29,9 +29,17 @@ import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.spi.BuildContext;
 
 /**
- * Provides shard identifiers when dynamic sharding is used.
- * Careful: except the {@link ShardIdentifierProvider#initialize(Properties, BuildContext)} method
- * which is invoked only once at startup, all other methods could be invoked in parallel by independent threads.
+ * Implementations provide the identifiers of those shards to be taken into account by the engine when working with
+ * specified entities or queries.
+ * <p>
+ * Implementation notes:
+ * <p>
+ * With exception of the {@link ShardIdentifierProvider#initialize(Properties, BuildContext)} method which is invoked
+ * only once at startup, all other methods could be invoked in parallel by independent threads; implementations must
+ * thus be thread-safe.
+ * <p>
+ * Instead of implementing this interface directly, implementations should be derived from
+ * {@link ShardIdentifierProviderTemplate} as new methods might be added to this interface in future releases.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik
