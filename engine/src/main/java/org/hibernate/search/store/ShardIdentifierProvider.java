@@ -32,6 +32,8 @@ import org.hibernate.search.spi.BuildContext;
  * Implementations provide the identifiers of those shards to be taken into account by the engine when working with
  * specified entities or queries.
  * <p>
+ * Optionally in some cases it might be useful to implement {@link AdvancedShardIdentifierProvider}
+ * <p>
  * Implementation notes:
  * <p>
  * With exception of the {@link ShardIdentifierProvider#initialize(Properties, BuildContext)} method which is invoked
@@ -40,6 +42,8 @@ import org.hibernate.search.spi.BuildContext;
  * <p>
  * Instead of implementing this interface directly, implementations should be derived from
  * {@link ShardIdentifierProviderTemplate} as new methods might be added to this interface in future releases.
+ *
+ * @see AdvancedShardIdentifierProvider
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik
@@ -100,7 +104,8 @@ public interface ShardIdentifierProvider {
 	 * {@link #getShardIdentifier(Class, Serializable, String, Document)}, {@link #getShardIdentifiersForQuery(FullTextFilterImplementor[])},
 	 * {@link #getAllShardIdentifiers()}.
 	 *
-	 * @return the list of all currently known shard identifiers.
+	 * @return the set of all currently known shard identifiers.
 	 */
 	Set<String> getAllShardIdentifiers();
+
 }

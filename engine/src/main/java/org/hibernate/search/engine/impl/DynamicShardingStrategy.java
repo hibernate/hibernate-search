@@ -33,24 +33,29 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.store.AdvancedShardIdentifierProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
+import org.hibernate.search.store.impl.ShardIdentifierWrapper;
 
 /**
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 class DynamicShardingStrategy implements IndexShardingStrategy {
-	private final ShardIdentifierProvider shardIdentifierProvider;
+
+	private final AdvancedShardIdentifierProvider shardIdentifierProvider;
 	private final IndexManagerHolder indexManagerHolder;
 	private final String rootIndexName;
 	private final DynamicShardingEntityIndexBinding entityIndexBinding;
+	private ShardIdentifierProvider originalShardIdentifierProvider;
 
 	DynamicShardingStrategy(ShardIdentifierProvider shardIdentifierProvider,
 			IndexManagerHolder indexManagerHolder,
 			DynamicShardingEntityIndexBinding entityIndexBinding,
 			String rootIndexName) {
-		this.shardIdentifierProvider = shardIdentifierProvider;
+		this.originalShardIdentifierProvider = shardIdentifierProvider;
+		this.shardIdentifierProvider = wrapIfNeeded( shardIdentifierProvider );
 		this.indexManagerHolder = indexManagerHolder;
 		this.entityIndexBinding = entityIndexBinding;
 		this.rootIndexName = rootIndexName;
@@ -78,7 +83,7 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 
 	@Override
 	public IndexManager[] getIndexManagersForDeletion(Class<?> entity, Serializable id, String idInString) {
-		Set<String> shardIdentifiers = shardIdentifierProvider.getAllShardIdentifiers();
+		Set<String> shardIdentifiers = shardIdentifierProvider.getShardIdentifiersForDeletion( entity, id, idInString );
 		return getIndexManagersFromShards( shardIdentifiers );
 	}
 
@@ -89,7 +94,7 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 	}
 
 	ShardIdentifierProvider getShardIdentifierProvider() {
-		return shardIdentifierProvider;
+		return originalShardIdentifierProvider;
 	}
 
 	private IndexManager[] getIndexManagersFromShards(Set<String> shardIdentifiers) {
@@ -105,6 +110,14 @@ class DynamicShardingStrategy implements IndexShardingStrategy {
 		}
 		return managers.toArray( new IndexManager[shardIdentifiers.size()] );
 	}
+
+	private static AdvancedShardIdentifierProvider wrapIfNeeded(final ShardIdentifierProvider idProvider) {
+		if ( idProvider instanceof AdvancedShardIdentifierProvider ) {
+			return (AdvancedShardIdentifierProvider) idProvider;
+		}
+		else {
+			return new ShardIdentifierWrapper( idProvider );
+		}
+	}
+
 }
-
-

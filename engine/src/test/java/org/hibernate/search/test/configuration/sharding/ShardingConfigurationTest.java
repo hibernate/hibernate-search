@@ -338,5 +338,6 @@ public class ShardingConfigurationTest {
 		public Set<String> getAllShardIdentifiers() {
 			return shards;
 		}
+
 	}
 }
