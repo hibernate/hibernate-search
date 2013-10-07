@@ -36,15 +36,19 @@
    <author>
       <firstname>Gustavo</firstname>
       <surname>Fernandes</surname>
-   </author>   
+   </author>
    <author>
       <firstname>Sanne</firstname>
       <surname>Grinovero</surname>
-   </author>  
-      <author>
+   </author>
+   <author>
       <firstname>Nabeel Ali</firstname>
       <surname>Memon</surname>
-   </author> 
+   </author>
+   <author>
+      <firstname>Gunnar</firstname>
+      <surname>Morling</surname>
+   </author>
 
     <!--
         #######################################################################

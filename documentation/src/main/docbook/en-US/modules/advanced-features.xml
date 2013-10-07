@@ -152,9 +152,9 @@ finally {
       </listitem>
 
       <listitem>
-        <para>Data is naturally segmented by customer, region, language or other
-        application parameter and the index should be split according to these
-        segments. This is a use case for dynamic sharding.</para>
+        <para>Data is naturally segmented by customer, region, language or
+        other application parameter and the index should be split according to
+        these segments. This is a use case for dynamic sharding.</para>
       </listitem>
     </itemizedlist>
 
@@ -195,101 +195,89 @@ finally {
     <section id="advanced-features-dynamic-sharding">
       <title>Dynamic sharding</title>
 
-      <para>Dynamic sharding allows you to manage the shards yourself and
-      even create new shards on the fly. To do so you need to implement
-      <classname>ShardIdentifierProvider</classname> and set the
+      <para>Dynamic sharding allows you to manage the shards yourself and even
+      create new shards on the fly. To do so you need to implement the
+      interface <classname>ShardIdentifierProvider</classname> and set the
       <constant>hibernate.search.[default|&lt;indexName&gt;].sharding_strategy</constant>
-      property to the fully quailfied class name of this instance. Let's look
-      at <xref linkend="example-custom-shard-identifier-provider"/> for an
+      property to the fully qualified name of this class. Note that instead of
+      implementing the interface directly, you should rather derive your
+      implementation from
+      <classname>ShardIdentifierProviderTemplate</classname> which provides a
+      basic implementation. Let's look at <xref
+      linkend="example-custom-shard-identifier-provider"/> for an
       example.<example id="example-custom-shard-identifier-provider">
           <title>Custom <classname>ShardidentiferProvider</classname></title>
 
-          <programlisting>public class AnimalShardIdentifierProvider implements ShardIdentifierProvider {
-   private volatile Set&lt;String&gt; knownShards = Collections.emptySet();
+          <programlisting>public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate {
 
-   @Override
-   public void initialize(Properties properties, BuildContext buildContext) {
-      ServiceManager serviceManager = buildContext.getServiceManager();
-      SessionFactory sessionFactory = serviceManager.requestService(
-                                      HibernateSessionFactoryServiceProvider.class, buildContext );
-      Session session = sessionFactory.openSession();
-      try {
-         Criteria initialShardsCriteria = session.createCriteria( Animal.class );
-         initialShardsCriteria.setProjection(
-                              Projections.distinct( Property.forName( "type" ) ) );
-
-         List&lt;String&gt; initialTypes = (List&lt;String&gt;) initialShardsCriteria.list();
-         knownShards = Collections.unmodifiableSet( new HashSet&lt;String&gt;( initialTypes ) );
-      }
-      finally {
-         session.close();
-      }
-   }
-
-   private synchronized void addShard(String shardNames) {
-      HashSet&lt;String&gt; newCopy = new HashSet&lt;String&gt;( knownShards );
-      newCopy.add( shardNames );
-      knownShards = Collections.unmodifiableSet( newCopy );
-   }
-
-   @Override
-   public String getShardIdentifier(Class&lt;?&gt; entityType, Serializable id,
-                 String idAsString, Document document) {
-      if ( entityType.equals( Animal.class ) ) {
-         String type = document.getFieldable( "type" ).stringValue();
-         if ( ! knownShards.contains( type ) ) {
+    @Override
+    public String getShardIdentifier(Class&lt;?&gt; entityType, Serializable id, String idAsString, Document document) {
+        if ( entityType.equals( Animal.class ) ) {
+            String type = document.getFieldable( "type" ).stringValue();
             addShard( type );
-         }
-         return type;
-      }
-      throw new RuntimeException( "Animal expected but found " + entityType );
-   }
+            return type;
+        }
+        throw new RuntimeException( "Animal expected but found " + entityType );
+    }
 
-   @Override
-   public Set&lt;String&gt; getShardIdentifiersForQuery(FullTextFilterImplementor[] fullTextFilters) {
-      return getAllShardIdentifiers();
-   }
+    @Override
+    protected Set&lt;String&gt; loadInitialShardNames(Properties properties, BuildContext buildContext) {
+        ServiceManager serviceManager = buildContext.getServiceManager();
+        SessionFactory sessionFactory = serviceManager.requestService( HibernateSessionFactoryServiceProvider.class, buildContext );
+        Session session = sessionFactory.openSession();
+        try {
+            Criteria initialShardsCriteria = session.createCriteria( Animal.class );
+            initialShardsCriteria.setProjection( Projections.distinct( Property.forName( "type" ) ) );
 
-   @Override
-   public Set&lt;String&gt; getAllShardIdentifiers() {
-      return knownShards;
-   }
+            @SuppressWarnings("unchecked")
+            List&lt;String&gt; initialTypes = initialShardsCriteria.list();
+            return new HashSet&lt;String&gt;( initialTypes );
+        }
+        finally {
+            session.close();
+        }
+    }
 }</programlisting>
         </example>The are several things happening in
       <classname>AnimalShardIdentifierProvider</classname>. First off its
       purpose is to create one shard per animal type (e.g. mammal, insect,
       etc.). It does so by inspecting the class type and the Lucene document
-      passed to <methodname>getShardIdentifier</methodname> method. It
+      passed to the <methodname>getShardIdentifier()</methodname> method. It
       extracts the <constant>type</constant> field from the document and uses
-      it as shard name. <methodname>getShardIdentifer</methodname> is called
-      for every addition to the index and a new shard will be created with
-      every new animal type encountered.</para>
+      it as shard name. <methodname>getShardIdentifier()</methodname> is
+      called for every addition to the index and a new shard will be created
+      with every new animal type encountered. The base class
+      <classname>ShardIdentifierProviderTemplate</classname> maintains a set
+      with all known shards to which any identifier must be added by calling
+      <methodname>addShard()</methodname>.</para>
 
       <para>It is important to know that Hibernate Search cannot know which
-      shards already exists when the application starts. It is the
-      reponsibility of the <classname>ShardIdentifierProvider</classname> to
-      create the initial set of shard identifiers during the
-      <methodname>initialize</methodname> call. How this is done will depend
-      on the use case. However, a common case in combination with Hibernate
-      ORM, is that the initial shard set is defined by the the distinct values
-      of a given database column. <xref
+      shards already exist when the application starts. When using
+      <classname>ShardIdentifierProviderTemplate</classname> as base class of
+      a <classname>ShardIdentifierProvider</classname> implementation, the
+      initial set of shard identifiers must be returned by the
+      <methodname>loadInitialShardNames()</methodname> method. How this is
+      done will depend on the use case. However, a common case in combination
+      with Hibernate ORM is that the initial shard set is defined by the the
+      distinct values of a given database column. <xref
       linkend="example-custom-shard-identifier-provider"/> shows how to handle
       such a case. <classname>AnimalShardIdentifierProvider</classname> makes
-      in its <methodname>initialize</methodname> implementation use of a
-      service called <classname>HibernateSessionFactoryServiceProvider</classname>
-      (see also <xref linkend="section-services"/>) which is available within
-      an ORM environment. It allows to request a Hibernate
-      <classname>SessionFactory</classname> instance which can be used to run a
-      <classname>Criteria</classname> query in order to determine the initial
-      set of shard identifers.</para>
+      in its <methodname>loadInitialShardNames()</methodname> implementation
+      use of a service called
+      <classname>HibernateSessionFactoryServiceProvider</classname> (see also
+      <xref linkend="section-services"/>) which is available within an ORM
+      environment. It allows to request a Hibernate
+      <classname>SessionFactory</classname> instance which can be used to run
+      a <classname>Criteria</classname> query in order to determine the
+      initial set of shard identifers.</para>
 
       <para>Last but not least, the
       <classname>ShardIdentifierProvider</classname> also allows for
       optimizing searches by selecting which shard to run a query against. By
       activating a filter (see <xref linkend="query-filter-shard"/>), a
       sharding strategy can select a subset of the shards used to answer a
-      query (<classname>getShardIdentifiersForQuery</classname>) and thus
-      speed up the query execution.</para>
+      query (<classname>getShardIdentifiersForQuery()</classname>, not shown
+      in the example) and thus speed up the query execution.</para>
     </section>
   </section>
 
