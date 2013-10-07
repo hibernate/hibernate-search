@@ -20,9 +20,14 @@
  */
 package org.hibernate.search.test.configuration;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import static org.junit.Assert.assertEquals;
 
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.ExclusiveIndexWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
@@ -45,10 +50,13 @@ public class ExclusiveIndexTest {
 	public void verifyIndexExclusivity() {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		FullTextSession ftSession = builder
-			.setProperty( "hibernate.search.org.hibernate.search.test.configuration.BlogEntry.exclusive_index_use", "true" )
+			.setProperty(
+					"hibernate.search.org.hibernate.search.test.configuration.BlogEntry.exclusive_index_use",
+					"true"
+			)
 			.setProperty( "hibernate.search.Book.exclusive_index_use", "false" )
 			.addAnnotatedClass( BlogEntry.class )
-			.addAnnotatedClass( org.hibernate.search.test.perf.Boat.class )
+			.addAnnotatedClass( Foo.class )
 			.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
 			.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
 			.openFullTextSession();
@@ -60,7 +68,7 @@ public class ExclusiveIndexTest {
 		//explicitly disabled (this entity defined a short index name):
 		assertExclusiveIsEnabled( allIndexesManager, "Book", false );
 		//using default:
-		assertExclusiveIsEnabled( allIndexesManager, "org.hibernate.search.test.perf.Boat", true );
+		assertExclusiveIsEnabled( allIndexesManager, Foo.class.getName(), true );
 		builder.close();
 	}
 
@@ -78,4 +86,12 @@ public class ExclusiveIndexTest {
 		}
 	}
 
+	@Indexed
+	@Entity
+	@Table(name = "Foo")
+	public static class Foo {
+
+		@Id
+		private int id;
+	}
 }

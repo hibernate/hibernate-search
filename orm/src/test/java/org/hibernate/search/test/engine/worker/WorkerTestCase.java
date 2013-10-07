@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.worker;
+package org.hibernate.search.test.engine.worker;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

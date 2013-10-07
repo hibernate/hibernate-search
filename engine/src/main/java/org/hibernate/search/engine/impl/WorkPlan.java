@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -133,6 +134,7 @@ public class WorkPlan {
 	public void processContainedInAndPrepareExecution() {
 		PerClassWork[] worksFromEvents = new PerClassWork[byClass.size()];
 		worksFromEvents = byClass.values().toArray( worksFromEvents );
+
 		// We need to iterate on a "frozen snapshot" of the byClass values
 		// because of HSEARCH-647. This method is not recursive, invoked
 		// only after the current unit of work is complete, and all additional
@@ -175,9 +177,9 @@ public class WorkPlan {
 		 * on the same entities.
 		 * This map uses as key what we originally received as {@link Work#getId()} if the type
 		 * is annotated with @ProvidedId, otherwise it uses the value pointed to by
-		 * {@link org.hibernate.search.annotations.DocumentId} or as last attempt {@link javax.persistence.Id}.
+		 * {@link org.hibernate.search.annotations.DocumentId} or as last attempt {@code javax.persistence.Id}.
 		 */
-		private final HashMap<Serializable, PerEntityWork<T>> entityById = new HashMap<Serializable, PerEntityWork<T>>();
+		private final Map<Serializable, PerEntityWork<T>> entityById = new HashMap<Serializable, PerEntityWork<T>>();
 
 		/**
 		 * When a PurgeAll operation is send on the type, we can remove all previously scheduled work
@@ -279,13 +281,11 @@ public class WorkPlan {
 		}
 
 		/**
-		 * Starts processing the ContainedIn annotation for all instances stored in
-		 * byEntityId. Must be performed when no more work is being collected by the event
-		 * system, though this same process might recursively add more work to the plan.
-		 * Also we switch from a map being keyed by the provided Work Id to a map using as
-		 * key the id we will use as DocumentId (which is the same in case the entity is
-		 * using @ProvidedId, or otherwise what is marked as @DocumentId or if this is missing
-		 * whatever is marked as @Id.
+		 * Starts processing the {@code ContainedIn} annotation for all instances stored in
+		 * {@link #entityById}.
+		 *
+		 * This processing must be performed when no more work is being collected by the event
+		 * system. The processing might recursively add more work to the plan.
 		 */
 		public void processContainedInAndPrepareExecution() {
 			Entry<String, PerEntityWork<T>>[] entityInstancesFrozenView = new Entry[entityById.size()];
@@ -517,7 +517,7 @@ public class WorkPlan {
 		 * @see org.hibernate.search.annotations.ContainedIn
 		 */
 		public void processContainedIn(AbstractDocumentBuilder<T> entityBuilder, WorkPlan workplan) {
-			if ( !containedInProcessed ) {
+			if ( entity != null && !containedInProcessed ) {
 				containedInProcessed = true;
 				if ( add || delete ) {
 					entityBuilder.appendContainedInWorkForInstance( entity, workplan, null );

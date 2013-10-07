@@ -21,53 +21,65 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.indexingStrategy;
+package org.hibernate.search.test.configuration.indexingStrategy;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.Session;
+
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.test.AlternateDocument;
-import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.Environment;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public class ManualIndexingStrategyTest extends SearchTestCase {
+public class ManualIndexingStrategyTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testMultipleEntitiesPerIndex() throws Exception {
-
-		Session s = getSessionFactory().openSession();
-		s.getTransaction().begin();
-		Document document =
-				new Document( "Hibernate in Action", "Object/relational mapping with Hibernate", "blah blah blah" );
-		s.persist( document );
-		s.flush();
-		s.persist(
-				new AlternateDocument(
-						document.getId(),
-						"Hibernate in Action",
-						"Object/relational mapping with Hibernate",
-						"blah blah blah"
-				)
+		indexTestEntity();
+		assertEquals(
+				"Due to manual indexing being enabled no automatic indexing should have occurred",
+				0,
+				getDocumentNbr()
 		);
-		s.getTransaction().commit();
-		s.close();
+	}
 
-		assertEquals( 0, getDocumentNbr() );
+	@Override
+	protected Class<?>[] getAnnotatedClasses() {
+		return new Class[] { TestEntity.class };
+	}
 
-		s = getSessionFactory().openSession();
-		s.getTransaction().begin();
-		s.delete( s.get( AlternateDocument.class, document.getId() ) );
-		s.delete( s.createCriteria( Document.class ).uniqueResult() );
-		s.getTransaction().commit();
-		s.close();
+	@Override
+	protected void configure(Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( Environment.INDEXING_STRATEGY, "manual" );
+	}
+
+	private void indexTestEntity() {
+		Session session = getSessionFactory().openSession();
+		session.getTransaction().begin();
+
+		session.persist( new TestEntity() );
+
+		session.getTransaction().commit();
+		session.close();
 	}
 
 	private int getDocumentNbr() throws Exception {
-		IndexReader reader = IndexReader.open( getDirectory( Document.class ), false );
+		// we directly access the index to verify the document count
+		IndexReader reader = IndexReader.open( getDirectory( TestEntity.class ) );
 		try {
 			return reader.numDocs();
 		}
@@ -76,18 +88,13 @@ public class ManualIndexingStrategyTest extends SearchTestCase {
 		}
 	}
 
-	@Override
-	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] {
-				Document.class,
-				AlternateDocument.class
-		};
-	}
+	@Indexed
+	@Entity
+	@Table(name = "TestEntity")
+	public static class TestEntity {
 
-
-	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.INDEXING_STRATEGY, "manual" );
+		@Id
+		@GeneratedValue
+		private int id;
 	}
 }

@@ -21,43 +21,20 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.worker;
+package org.hibernate.search.test.engine.worker;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.search.Environment;
 
 /**
  * @author Emmanuel Bernard
  */
-@Entity
-@Indexed(index = "consumable")
-public class Food {
-	@Id
-	@GeneratedValue
-	@DocumentId
-	private Integer id;
+public class SyncWorkerTest extends WorkerTestCase {
 
-	@Field
-	private String name;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	protected void configure(Configuration cfg) {
+		super.configure( cfg );
+		cfg.setProperty( Environment.WORKER_SCOPE, "transaction" );
+		cfg.setProperty( "hibernate.search.default.worker.execution", "sync" );
 	}
 }

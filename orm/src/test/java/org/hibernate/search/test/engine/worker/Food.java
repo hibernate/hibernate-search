@@ -21,37 +21,43 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.spi;
+package org.hibernate.search.test.engine.worker;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 /**
- * Enumeration of the different types of Lucene work. This enumeration is used to specify the type
- * of index operation to be executed.
- *
  * @author Emmanuel Bernard
- * @author Hardy Ferentschik
- * @author John Griffin
  */
-public enum WorkType {
-	ADD,
+@Entity
+@Indexed(index = "consumable")
+public class Food {
+	@Id
+	@GeneratedValue
+	@DocumentId
+	private Integer id;
 
-	UPDATE,
+	@Field
+	private String name;
 
-	DELETE,
+	public Integer getId() {
+		return id;
+	}
 
-	COLLECTION,
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-	/**
-	 * Used to remove a specific instance of a class from an index.
-	 */
-	PURGE,
+	public String getName() {
+		return name;
+	}
 
-	/**
-	 * Used to remove all instances of a class from an index.
-	 */
-	PURGE_ALL,
-
-	/**
-	 * This type is used for batch indexing.
-	 */
-	INDEX
+	public void setName(String name) {
+		this.name = name;
+	}
 }

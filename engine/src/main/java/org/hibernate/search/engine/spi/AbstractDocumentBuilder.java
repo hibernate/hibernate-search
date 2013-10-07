@@ -273,6 +273,10 @@ public abstract class AbstractDocumentBuilder<T> {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "DocumentBuilder for {" + beanClass.getName() + "}";
+	}
 
 	/**
 	 * A {@code XMember } instance treats a map as a collection as well in which case the map values are returned as

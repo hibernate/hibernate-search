@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.worker;
+package org.hibernate.search.test.engine.worker;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -35,21 +35,21 @@ import org.hibernate.search.annotations.Indexed;
  * @author Emmanuel Bernard
  */
 @Entity
-@Indexed(index = "consumable")
-public class Drink {
+@Indexed(index = "employer")
+public class Employer {
 	@Id
 	@GeneratedValue
 	@DocumentId
-	private Integer id;
+	private long id;
 
 	@Field
 	private String name;
 
-	public Integer getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

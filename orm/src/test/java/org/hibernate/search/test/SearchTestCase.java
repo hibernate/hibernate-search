@@ -40,7 +40,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.test.fwk.SkipLog;
 import org.hibernate.testing.FailureExpected;
 import org.hibernate.testing.SkipForDialect;
 

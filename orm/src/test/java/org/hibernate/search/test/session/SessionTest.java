@@ -109,7 +109,7 @@ public class SessionTest extends SearchTestCase {
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		// for this test we explcitly set the auto commit mode since we are not explcitly starting a transaction
+		// for this test we explicitly set the auto commit mode since we are not explicitly starting a transaction
 		// which could be a problem in some databases.
 		cfg.setProperty( "hibernate.connection.autocommit", "true" );
 		//needed for testThreadBoundSessionWrappingOutOfTransaction

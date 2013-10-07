@@ -20,7 +20,12 @@
  */
 package org.hibernate.search.test.configuration;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -29,7 +34,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Verifies the configured IndexManager implementation is used for each index
+ * Verifies the configured IndexManager implementation is used for each index .
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -40,10 +45,12 @@ public class IndexManagerOverrideTest {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		FullTextSession ftSession = builder
 			.setProperty( "hibernate.search.Book.indexmanager", "near-real-time" )
-			.setProperty( "hibernate.search.org.hibernate.search.test.perf.Boat.indexmanager",
-					"org.hibernate.search.test.util.RamIndexManager" )
+			.setProperty(
+					"hibernate.search." + Foo.class.getName() + ".indexmanager",
+					"org.hibernate.search.test.util.RamIndexManager"
+			)
 			.addAnnotatedClass( BlogEntry.class )
-			.addAnnotatedClass( org.hibernate.search.test.perf.Boat.class )
+			.addAnnotatedClass( Foo.class )
 			.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
 			.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
 			.openFullTextSession();
@@ -60,7 +67,7 @@ public class IndexManagerOverrideTest {
 				org.hibernate.search.indexes.impl.NRTIndexManager.class );
 
 		//Uses a fully qualified name to load an implementation
-		checkIndexManagerType( allIndexesManager, "org.hibernate.search.test.perf.Boat",
+		checkIndexManagerType( allIndexesManager, Foo.class.getName(),
 				org.hibernate.search.test.util.RamIndexManager.class );
 
 		builder.close();
@@ -71,4 +78,12 @@ public class IndexManagerOverrideTest {
 		Assert.assertEquals( expectedType, indexManager.getClass() );
 	}
 
+	@Indexed
+	@Entity
+	@Table(name = "Foo")
+	public static class Foo {
+
+		@Id
+		private int id;
+	}
 }
