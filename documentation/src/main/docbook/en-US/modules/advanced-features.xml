@@ -202,8 +202,8 @@ finally {
       property to the fully qualified name of this class. Note that instead of
       implementing the interface directly, you should rather derive your
       implementation from
-      <classname>ShardIdentifierProviderTemplate</classname> which provides a
-      basic implementation. Let's look at <xref
+      <classname>org.hibernate.search.store.ShardIdentifierProviderTemplate</classname>
+      which provides a basic implementation. Let's look at <xref
       linkend="example-custom-shard-identifier-provider"/> for an
       example.<example id="example-custom-shard-identifier-provider">
           <title>Custom <classname>ShardidentiferProvider</classname></title>
@@ -251,7 +251,7 @@ finally {
       with all known shards to which any identifier must be added by calling
       <methodname>addShard()</methodname>.</para>
 
-      <para>It is important to know that Hibernate Search cannot know which
+      <para>It is important to understand that Hibernate Search cannot know which
       shards already exist when the application starts. When using
       <classname>ShardIdentifierProviderTemplate</classname> as base class of
       a <classname>ShardIdentifierProvider</classname> implementation, the
