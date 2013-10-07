@@ -152,9 +152,9 @@ finally {
       </listitem>
 
       <listitem>
-        <para>Data is naturally segmented by customer, region, language or other
-        application parameter and the index should be split according to these
-        segments. This is a use case for dynamic sharding.</para>
+        <para>Data is naturally segmented by customer, region, language or
+        other application parameter and the index should be split according to
+        these segments. This is a use case for dynamic sharding.</para>
       </listitem>
     </itemizedlist>
 
@@ -195,8 +195,8 @@ finally {
     <section id="advanced-features-dynamic-sharding">
       <title>Dynamic sharding</title>
 
-      <para>Dynamic sharding allows you to manage the shards yourself and
-      even create new shards on the fly. To do so you need to implement
+      <para>Dynamic sharding allows you to manage the shards yourself and even
+      create new shards on the fly. To do so you need to implement
       <classname>ShardIdentifierProvider</classname> and set the
       <constant>hibernate.search.[default|&lt;indexName&gt;].sharding_strategy</constant>
       property to the fully quailfied class name of this instance. Let's look
@@ -276,12 +276,13 @@ finally {
       linkend="example-custom-shard-identifier-provider"/> shows how to handle
       such a case. <classname>AnimalShardIdentifierProvider</classname> makes
       in its <methodname>initialize</methodname> implementation use of a
-      service called <classname>HibernateSessionFactoryServiceProvider</classname>
-      (see also <xref linkend="section-services"/>) which is available within
-      an ORM environment. It allows to request a Hibernate
-      <classname>SessionFactory</classname> instance which can be used to run a
-      <classname>Criteria</classname> query in order to determine the initial
-      set of shard identifers.</para>
+      service called
+      <classname>HibernateSessionFactoryServiceProvider</classname> (see also
+      <xref linkend="section-services"/>) which is available within an ORM
+      environment. It allows to request a Hibernate
+      <classname>SessionFactory</classname> instance which can be used to run
+      a <classname>Criteria</classname> query in order to determine the
+      initial set of shard identifers.</para>
 
       <para>Last but not least, the
       <classname>ShardIdentifierProvider</classname> also allows for
