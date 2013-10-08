@@ -1839,8 +1839,8 @@ FacetingRequest labelFacetingRequest = builder.facet()
 
         <note>
           <para>At the moment there are several preconditions an indexed field
-          has to meet in order categorize (facet) on it. The indexed property
-          must be of type <classname>String</classname>,
+          has to meet in order to categorize (facet) on it. The indexed
+          property must be of type <classname>String</classname>,
           <classname>Date</classname> or a subtype of
           <classname>Number</classname> and <constant>null</constant> values
           should be avoided. Furthermore the property has to be indexed with
@@ -1867,8 +1867,8 @@ private int price;
         <para>The creation of a range faceting request is quite similar. We
         also start with a name for the request and the field to facet on. Then
         we have to specify ranges for the field values. A range faceting
-        request can be seen in <xref linkend="example-range-faceting"/>. There
-        three different price ranges are specified.
+        request can be seen in <xref linkend="example-range-faceting"/>.
+        There, three different price ranges are specified.
         <methodname>below</methodname> and <methodname>above</methodname> can
         only be specified once, but you can specify as many
         <methodname>from</methodname> - <methodname>to</methodname> ranges as
@@ -1892,6 +1892,32 @@ FacetingRequest priceFacetingRequest = builder.facet()
     .above(1500).excludeLimit()
     .createFacetingRequest();</programlisting>
         </example>
+      </section>
+
+      <section>
+        <title>Setting the facet sort order</title>
+
+        <para>The result of applying a faceting request is a list of
+        <classname>Facet</classname> instances as seen in <xref
+        linkend="example-applying-faceting"/>. The order within the list is
+        given by the <classname>FacetSortOrder</classname> parameter specified
+        via <methodname>orderedBy</methodname> when creating the faceting
+        request. The default value is
+        <constant>FacetSortOrder.COUNT_DESC</constant>, meaning facets are
+        ordered by their count in descending order (highest count first).
+        Other values are <constant>COUNT_ASC</constant>,
+        <constant>FIELD_VALUE</constant> and
+        <constant>RANGE_DEFINITION_ORDER</constant>.
+        <constant>COUNT_ASC</constant> returns the facets in ascending count
+        order whereas <constant>FIELD_VALUE</constant> will return them in
+        alphabetical order of the facet/category value (see <xref
+        linkend="section-interpreting-facet-result"/>).
+        <constant>RANGE_DEFINITION_ORDER</constant> only applies for range
+        faceting request and returns the facets in the same order in which the
+        ranges are defined. For <xref linkend="example-range-faceting"/> this
+        would mean the facet for the range of below 1000 would be returned
+        first, followed by the facet for the range 1001 to 1500 and finally
+        the facet for above 1500.</para>
       </section>
     </section>
 
@@ -1928,7 +1954,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
       query. You do that via
       <methodname>facetManager.enableFaceting(&lt;facetName&gt;)</methodname>.
       You can enable as many faceting requests as you like, then you execute
-      the query and and retrieve the facet results for a given request via
+      the query and retrieve the facet results for a given request via
       <methodname>facetManager.getFacets(&lt;facetname&gt;)</methodname>. For
       each request you will get a list of <classname>Facet</classname>
       instances. Facet requests stay active and get applied to the fulltext
@@ -1954,7 +1980,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
 
         <programlisting language="JAVA" role="JAVA">public interface Facet {
     /**
-     * @return the faceting name this {@code Facet}    belongs to.
+     * @return the faceting name this {@code Facet} belongs to.
      *
      * @see org.hibernate.search.query.facet.FacetingRequest#getFacetingName()
      */
@@ -1981,8 +2007,8 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
     int getCount();
 
     /**
-     * @return a Lucene {@link Query} which can be applied just targeted all documents
-     *         matching the value of this facet.
+     * @return a Lucene {@link Query} which which can be executed to retrieve all
+     *         documents matching the value of this facet.
      */
     Query getFacetQuery();
 }
