@@ -60,8 +60,8 @@ public interface Facet {
 	int getCount();
 
 	/**
-	 * @return a Lucene {@link Query} which can be applied just targeted all documents
-	 *         matching the value of this facet.
+	 * @return a Lucene {@link Query} which which can be executed to retrieve all
+	 *         documents matching the value of this facet.
 	 */
 	Query getFacetQuery();
 }
