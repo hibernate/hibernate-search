@@ -281,6 +281,13 @@ finally {
       query (<classname>getShardIdentifiersForQuery()</classname>, not shown
       in the example) and thus speed up the query execution.</para>
     </section>
+    <important>
+        <para>This <classname>ShardIdentifierProvider</classname> is considered
+        experimental. We might need to apply some changes to the defined method
+        signatures to accomodate for unforeseen use cases. Please provide
+        feedback if you have ideas, or just to let us know how you're using
+        this API.</para>
+    </important>
   </section>
 
   <section id="section-sharing-indexes">
