@@ -200,6 +200,11 @@ public class LogRotationExampleTest {
 			return hoursOfDay;
 		}
 
+		@Override
+		public Set<String> getShardIdentifiersForDeletion(Class<?> entityType, Serializable id, String idAsString) {
+			return Collections.singleton( fromIdToHour( (Long) id ) );
+		}
+
 	}
 
 	@Indexed( index = "logs" )

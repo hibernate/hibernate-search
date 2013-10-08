@@ -67,7 +67,7 @@ public interface ShardIdentifierProvider {
 	 * <br/>
 	 * Concurrency: this method could be invoked concurrently. That means you could have multiple invocations of
 	 * {@link #getShardIdentifier(Class, Serializable, String, Document)}, {@link #getShardIdentifiersForQuery(FullTextFilterImplementor[])},
-	 * {@link #getAllShardIdentifiers()}.
+	 * {@link #getAllShardIdentifiers()}, {@link #getShardIdentifiersForDeletion(Class, Serializable, String)}.
 	 *
 	 * @param entityType the type of the entity
 	 * @param id the id of the entity
@@ -85,7 +85,7 @@ public interface ShardIdentifierProvider {
 	 * <br/>
 	 * Concurrency: this method could be invoked concurrently. That means you could have multiple invocations of
 	 * {@link #getShardIdentifier(Class, Serializable, String, Document)}, {@link #getShardIdentifiersForQuery(FullTextFilterImplementor[])},
-	 * {@link #getAllShardIdentifiers()}.
+	 * {@link #getAllShardIdentifiers()}, {@link #getShardIdentifiersForDeletion(Class, Serializable, String)}.
 	 *
 	 * @param fullTextFilters the filters which are applied to the current query
 	 *
@@ -100,9 +100,28 @@ public interface ShardIdentifierProvider {
 	 * <br/>
 	 * Concurrency: this method could be invoked concurrently. That means you could have multiple invocations of
 	 * {@link #getShardIdentifier(Class, Serializable, String, Document)}, {@link #getShardIdentifiersForQuery(FullTextFilterImplementor[])},
-	 * {@link #getAllShardIdentifiers()}.
+	 * {@link #getAllShardIdentifiers()}, {@link #getShardIdentifiersForDeletion(Class, Serializable, String)}.
 	 *
 	 * @return the set of all currently known shard identifiers.
 	 */
 	Set<String> getAllShardIdentifiers();
+
+	/**
+	 * Determine the shard identifiers of indexes which might contain an entity identified solely by its id.
+	 * This is needed for purge and delete operations, as no more context is available in such cases.
+	 * <br/>
+	 * This method is made available as some strategies might be able to provide a deterministic answer, but in
+	 * most cases you can safely return the same set as returned by {@link #getAllShardIdentifiers()}.
+	 * <br/>
+	 * Concurrency: this method could be invoked concurrently. That means you could have multiple invocations of
+	 * {@link #getShardIdentifier(Class, Serializable, String, Document)}, {@link #getShardIdentifiersForQuery(FullTextFilterImplementor[])},
+	 * {@link #getAllShardIdentifiers()}, {@link #getShardIdentifiersForDeletion(Class, Serializable, String)}.
+	 *
+	 * @param entityType the type of the entity
+	 * @param id the id of the entity
+	 * @param idAsString the entity id transformed as string via the appropriate document id bridge
+	 *
+	 * @return the set of shards which might contain the document, narrowing down from the given parameters.
+	 */
+	Set<String> getShardIdentifiersForDeletion(Class<?> entityType, Serializable id, String idAsString);
 }
