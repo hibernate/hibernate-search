@@ -1,6 +1,28 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.0.CR1 (08-10-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1271] - FullTextSession purge fails on entities annoted with @ContainedIn
+    * [HSEARCH-1358] - Index not updated on Embedded ElementCollection (with FieldBridge)
+    * [HSEARCH-1423] - Log message about event listeners being enabled is wrong
+    * [HSEARCH-1424] - WorkerTestCase was (erroneously) disabled
+
+** Improvement
+    * [HSEARCH-1427] - Provide base class with default implementation of ShardIdentifierProvider
+    * [HSEARCH-1428] - Specify session factory type more precisely in MassIndexerFactory#createMassIndexer()
+
+** Task
+    * [HSEARCH-1418] - Checkstyle enable: EqualsAvoidNull, RedundantThrows, HideUtilityClassConstructor
+    * [HSEARCH-1419] - Introduce checkstyle rules to verify logged methods are i18 friendly
+    * [HSEARCH-1420] - More Checkstyle rules to can usage of legacy code
+    * [HSEARCH-1421] - BoostStrategy, FilterDef and Discriminator instance creation not using the user friendly helpers
+    * [HSEARCH-1422] - Redundant null check in JGroupsChannel initialization
+    * [HSEARCH-1430] - Document ShardIdentifierProvider is experimental
+
+
 Version 4.4.0.Beta1 (27-09-2013)
 ------------------------
 
