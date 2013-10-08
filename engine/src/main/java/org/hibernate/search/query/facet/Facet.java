@@ -33,28 +33,35 @@ import org.apache.lucene.search.Query;
  */
 public interface Facet {
 	/**
-	 * @return the faceting name this {@code Facet}	belongs to. See {@link org.hibernate.search.query.facet.FacetingRequest#getFacetingName()}.
+	 * @return the faceting name this {@code Facet}	belongs to.
+	 *
+	 * @see org.hibernate.search.query.facet.FacetingRequest#getFacetingName()
 	 */
 	String getFacetingName();
 
 	/**
-	 * @return the {@code Document} field name this facet was created for
+	 * Return the {@code Document} field name this facet is targeting.
+	 * The field needs to be indexed with {@code Analyze.NO}.
+	 *
+	 * @return the {@code Document} field name this facet is targeting.
 	 */
 	String getFieldName();
 
 	/**
-	 * @return the value of this facet. In case of a discrete facet it is the actual {@code Document} field value. In case of
-	 *         a range query the value is a string representation of the range
+	 * @return the value of this facet. In case of a discrete facet it is the actual
+	 *         {@code Document} field value. In case of a range query the value is a
+	 *         string representation of the range.
 	 */
 	String getValue();
 
 	/**
-	 * @return the faceting count
+	 * @return the facet count.
 	 */
 	int getCount();
 
 	/**
-	 * @return a Lucene {@link Query} which can be applied just targeted all documents matching the value of this facet
+	 * @return a Lucene {@link Query} which can be applied just targeted all documents
+	 *         matching the value of this facet.
 	 */
 	Query getFacetQuery();
 }
