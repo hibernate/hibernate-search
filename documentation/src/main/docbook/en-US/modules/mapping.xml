@@ -118,13 +118,14 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para><literal>index</literal>: describe whether the property
-            is indexed or not. The different values are <literal>Index.NO</literal>
-            (no indexing, ie cannot be found by a query), <literal>Index.YES</literal>
-            (the element gets indexed and is searchable). The default value is
-            <literal>Index.YES</literal>. <literal>Index.NO</literal> can be
-            useful for cases where a property is not required to be
-            searchable, but should be available for projection.</para>
+            <para><literal>index</literal>: describe whether the property is
+            indexed or not. The different values are
+            <literal>Index.NO</literal> (no indexing, ie cannot be found by a
+            query), <literal>Index.YES</literal> (the element gets indexed and
+            is searchable). The default value is <literal>Index.YES</literal>.
+            <literal>Index.NO</literal> can be useful for cases where a
+            property is not required to be searchable, but should be available
+            for projection.</para>
 
             <tip>
               <para><literal>Index.NO</literal> in combination with
@@ -136,8 +137,8 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para><literal>analyze</literal>: determines whether the property is analyzed
-            (<literal>Analyze.YES</literal>) or not
+            <para><literal>analyze</literal>: determines whether the property
+            is analyzed (<literal>Analyze.YES</literal>) or not
             (<literal>Analyze.NO</literal>). The default value is
             <literal>Analyze.YES</literal>.<tip>
                 <para>Whether or not you want to analyze a property depends on
@@ -151,8 +152,9 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para><literal>norms</literal>: describes whether index time boosting information
-            should be stored (<literal>Norms.YES</literal>) or not
+            <para><literal>norms</literal>: describes whether index time
+            boosting information should be stored
+            (<literal>Norms.YES</literal>) or not
             (<literal>Norms.NO</literal>). Not storing it can save a
             considerable amount of memory, but there won't be any index time
             boosting information available. The default value is
@@ -160,10 +162,10 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para><literal>termVector</literal>: describes collections of term-frequency pairs.
-            This attribute enables the storing of the term vectors within the
-            documents during indexing. The default value is
-            <literal>TermVector.NO</literal>.</para>
+            <para><literal>termVector</literal>: describes collections of
+            term-frequency pairs. This attribute enables the storing of the
+            term vectors within the documents during indexing. The default
+            value is <literal>TermVector.NO</literal>.</para>
 
             <para>The different values of this attribute are:</para>
 
@@ -1666,9 +1668,9 @@ List result = fullTextQuery.list(); //return a list of managed objects
             <para>Numbers are converted into their string representation. Note
             that numbers cannot be compared by Lucene (ie used in ranged
             queries) out of the box: they have to be padded <note>
-                <para>Using a Range query has drawbacks; an
-                alternative approach is to use a Filter query which will
-                filter the result query to the appropriate range.</para>
+                <para>Using a Range query has drawbacks; an alternative
+                approach is to use a Filter query which will filter the result
+                query to the appropriate range.</para>
 
                 <para>Hibernate Search will support a padding mechanism</para>
               </note></para>
@@ -1775,10 +1777,10 @@ public class Meeting {
       <classname>TikaMetadataProcessor</classname> implementation classes can
       both be specified as parameters on the TikaBridge annotation.</para>
 
-        <example id="example-tika-mapping">
-          <title>Example mapping with Apache Tika</title>
+      <example id="example-tika-mapping">
+        <title>Example mapping with Apache Tika</title>
 
-      <programlisting language="JAVA" role="JAVA">@Entity
+        <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
 public class Song {
     @Id
@@ -1791,7 +1793,8 @@ public class Song {
 
     [...]
 }</programlisting>
-<programlisting language="JAVA" role="JAVA">QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
+
+        <programlisting language="JAVA" role="JAVA">QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
     .buildQueryBuilder()
     .forEntity( Song.class )
     .get();
@@ -1801,17 +1804,19 @@ Query query = queryBuilder.keyword()
     .matching( "Apes" )
     .createQuery();
 List result = fullTextSession.createFullTextQuery( query ).list();</programlisting>
-</example>
+      </example>
 
-    <para>In the <xref linkend="example-tika-mapping"/> the property
-    <methodname>mp3FileName</methodname> represents a path to an MP3 file;
-    the headers of this file will be indexed and so the performed query will be
-    able to match the MP3 metadata.</para>
+      <para>In the <xref linkend="example-tika-mapping"/> the property
+      <methodname>mp3FileName</methodname> represents a path to an MP3 file;
+      the headers of this file will be indexed and so the performed query will
+      be able to match the MP3 metadata.</para>
 
-    <warning><para>TikaBridge does not implement TwoWayFieldBridge: queries built using the
-    DSL (as in the <xref linkend="example-tika-mapping"/>) need to explicitly enable the option
-    <methodname>ignoreFieldBridge()</methodname>.</para></warning>
-
+      <warning>
+        <para>TikaBridge does not implement TwoWayFieldBridge: queries built
+        using the DSL (as in the <xref linkend="example-tika-mapping"/>) need
+        to explicitly enable the option
+        <methodname>ignoreFieldBridge()</methodname>.</para>
+      </warning>
     </section>
 
     <section>
@@ -2343,10 +2348,11 @@ public class Blog {
       indexed property which would be ignored by this optimization.</para>
     </note>
 
-    <warning><para>An <classname>EntityIndexingInterceptor</classname> can
-    never override an explicit indexing operation such as
-    <methodname>index(T)</methodname>, <methodname>purge(T, id)</methodname>
-    or <methodname>purgeAll(class)</methodname>.</para>
+    <warning>
+      <para>An <classname>EntityIndexingInterceptor</classname> can never
+      override an explicit indexing operation such as
+      <methodname>index(T)</methodname>, <methodname>purge(T, id)</methodname>
+      or <methodname>purgeAll(class)</methodname>.</para>
     </warning>
   </section>
 
@@ -2824,12 +2830,13 @@ public class Address {
  ......
 }</programlisting>
       </example>
+
       <note>
-        <para>When using a programmatic mapping for a given type X, you
-        can only refer to fields defined on X. Fields or methods inherited
-        from a super type are not configurable. In case you need to configure
-        a super class property, you need to either override the property in X
-        or create a programmatic mapping for the super class. This mimics the
+        <para>When using a programmatic mapping for a given type X, you can
+        only refer to fields defined on X. Fields or methods inherited from a
+        super type are not configurable. In case you need to configure a super
+        class property, you need to either override the property in X or
+        create a programmatic mapping for the super class. This mimics the
         usage of annotations where you cannot annotate a field or method of a
         super class either, unless it is redefined in the given type.</para>
       </note>
