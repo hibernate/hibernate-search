@@ -55,16 +55,16 @@
     <section id="basic-mapping">
       <title>Basic mapping</title>
 
-      <para>Lets start with the most commonly used annotations for mapping an
+      <para>Lets start with the most commonly used annotations when mapping an
       entity.</para>
 
       <section id="indexed-annotation">
         <title>@Indexed</title>
 
-        <para>Foremost we must declare a persistent class as indexable. This
-        is done by annotating the class with <literal>@Indexed</literal> (all
-        entities not annotated with <literal>@Indexed</literal> will be
-        ignored by the indexing process):</para>
+        <para>Foremost you must declare a persistent class as indexable by
+        annotating the class with <literal>@Indexed.</literal> All entities
+        not annotated with <literal>@Indexed</literal> will be ignored by the
+        indexing process.</para>
 
         <example>
           <title>Making a class indexable with
@@ -77,12 +77,14 @@ public class Essay {
 }</programlisting>
         </example>
 
-        <para>You can optionially specify the <literal>index</literal>
-        attribute of the @Indexed annotation to change the default name of the
-        index. For more information see <xref
+        <para>You can optionally specify the
+        <literal><methodname>Indexed.index</methodname></literal> attribute to
+        change the default name of the index. For more information regarding
+        index naming see <xref
         linkend="search-configuration-directory"/>.</para>
 
-        <para>You can also set the interceptor used upon indexing, see <xref
+        <para>You can also specify an optional indexing interceptor. For more
+        information see <xref
         linkend="search-mapping-indexinginterceptor"/>.</para>
       </section>
 
@@ -93,8 +95,8 @@ public class Essay {
         ability to describe how it will be indexed. The default (no annotation
         present) means that the property is ignored by the indexing process.
         <literal>@Field</literal> does declare a property as indexed and
-        allows to configure several aspects of the indexing process by setting
-        one or more of the following attributes:</para>
+        allows you to configure several aspects of the indexing process by
+        setting one or more of the following attributes:</para>
 
         <itemizedlist>
           <listitem>
@@ -113,19 +115,19 @@ public class Essay {
             does consume more CPU), or avoid any storage
             <literal>Store.NO</literal> (this is the default value). When a
             property is stored, you can retrieve its original value from the
-            Lucene Document. This is not related to whether the element is
-            indexed or not.</para>
+            Lucene Document. Storing the property has no impact though on
+            whether the value is searchable or not.</para>
           </listitem>
 
           <listitem>
             <para><literal>index</literal>: describe whether the property is
             indexed or not. The different values are
-            <literal>Index.NO</literal> (no indexing, ie cannot be found by a
-            query), <literal>Index.YES</literal> (the element gets indexed and
-            is searchable). The default value is <literal>Index.YES</literal>.
-            <literal>Index.NO</literal> can be useful for cases where a
-            property is not required to be searchable, but should be available
-            for projection.</para>
+            <literal>Index.NO</literal> (no indexing, i.e. cannot be found by
+            a query), <literal>Index.YES</literal> (the element gets indexed
+            and is searchable). The default value is
+            <literal>Index.YES</literal>. <literal>Index.NO</literal> can be
+            useful for cases where a property is not required to be
+            searchable, but should be available for projection.</para>
 
             <tip>
               <para><literal>Index.NO</literal> in combination with
@@ -146,8 +148,8 @@ public class Essay {
                 it contains. It make sense to analyze a text field, but
                 probably not a date field.</para>
               </tip><tip>
-                <para>Fields used for sorting <emphasis>must not</emphasis> be
-                analyzed.</para>
+                <para>Fields used for sorting or faceting <emphasis>must
+                not</emphasis> be analyzed.</para>
               </tip></para>
           </listitem>
 
@@ -155,9 +157,9 @@ public class Essay {
             <para><literal>norms</literal>: describes whether index time
             boosting information should be stored
             (<literal>Norms.YES</literal>) or not
-            (<literal>Norms.NO</literal>). Not storing it can save a
-            considerable amount of memory, but there won't be any index time
-            boosting information available. The default value is
+            (<literal>Norms.NO</literal>). Not storing the norms can save a
+            considerable amount of memory, but index time boosting will not be
+            available in this case. The default value is
             <literal>Norms.YES</literal>.</para>
           </listitem>
 
@@ -226,26 +228,25 @@ public class Essay {
           </listitem>
 
           <listitem>
-            <para><literal>indexNullAs</literal>: Per default null values are
-            ignored and not indexed. However, using
-            <parameter>indexNullAs</parameter> you can specify a string which
-            will be inserted as token for the <constant>null</constant> value.
-            Per default this value is set to
-            <constant>Field.DO_NOT_INDEX_NULL</constant> indicating that
-            <constant>null</constant> values should not be indexed. You can
-            set this value to <constant>Field.DEFAULT_NULL_TOKEN </constant>to
-            indicate that a default <constant>null</constant> token should be
-            used. This default <constant>null</constant> token can be
-            specified in the configuration using
+            <para><literal>indexNullAs</literal>: Per default
+            <constant>null</constant> values are ignored and not indexed.
+            However, using <parameter>indexNullAs</parameter> you can specify
+            a string which will be inserted as token for the
+            <constant>null</constant> value. Per default this value is set to
+            <constant>org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL</constant>
+            indicating that <constant>null</constant> values should not be
+            indexed. You can set this value to <constant>DEFAULT_NULL_TOKEN
+            </constant>to indicate that a default <constant>null</constant>
+            token should be used. This default <constant>null</constant> token
+            can be specified in the configuration using
             <literal>hibernate.search.default_null_token</literal>. If this
-            property is not set and you specify
-            <constant>Field.DEFAULT_NULL_TOKEN</constant> the string "_null_"
-            will be used as default. <note>
-                <para>When the <parameter>indexNullAs</parameter> parameter is
-                used it is important to use the same token in the search query
-                (see <xref linkend="search-query"/>) to search for
-                <constant>null</constant> values. It is also advisable to use
-                this feature only with un-analyzed fields
+            property is not set the string "_null_" will be used as default.
+            <note>
+                <para>When <parameter>indexNullAs</parameter> is used, it is
+                important to use the chosen <constant>null</constant> token in
+                search queries (see <xref linkend="search-query"/>) in order
+                to find <constant>null</constant> values. It is also advisable
+                to use this feature only with un-analyzed fields
                 (<literal><literal>analyze=</literal>Analyze.NO</literal>).</para>
               </note><warning>
                 <para>When implementing a custom
@@ -262,18 +263,20 @@ public class Essay {
       <section id="numeric-field-annotation">
         <title>@NumericField</title>
 
-        <para>There is a companion annotation to <classname>@Field</classname>
-        called <classname>@NumericField</classname> that can be specified in
-        the same scope as <classname>@Field</classname> or
-        <classname>@DocumentId</classname>. It can be specified for Integer,
-        Long, Float and Double properties. At index time the value will be
-        indexed using a <ulink url="http://en.wikipedia.org/wiki/Trie">Trie
-        structure</ulink>. When a property is indexed as numeric field, it
-        enables efficient range query and sorting, orders of magnitude faster
-        than doing the same query on standard <classname>@Field
-        </classname>properties. The <classname>@NumericField</classname>
-        annotation accept the following parameters: <informaltable
-            align="left" width="">
+        <para>There exists also a companion annotation to
+        <classname>@Field,</classname> called
+        <classname>@NumericField.</classname> It can be specified in the same
+        scope as <classname>@Field</classname> or
+        <classname>@DocumentId</classname>, but only on
+        <classname>Integer</classname>, <classname>Long</classname>,
+        <classname>Float</classname> or <classname>Double</classname>
+        properties. When used, the annoated property will be indexed using a
+        <ulink url="http://en.wikipedia.org/wiki/Trie">Trie structure</ulink>.
+        This enables efficient range queries and sorting, resulting in query
+        response times being orders of magnitude faster than the same query
+        with plain <classname>@Field</classname>. The
+        <classname>@NumericField</classname> annotation accepts the following
+        parameters: <informaltable align="left" width="">
             <tgroup cols="2">
               <thead>
                 <row>
@@ -304,24 +307,18 @@ public class Essay {
                 </row>
               </tbody>
             </tgroup>
-          </informaltable> <classname>@NumericField</classname> supports only
-        <classname>Double</classname>, <classname>Long</classname>,
-        <classname>Integer</classname> and <classname>Float</classname>. It is
-        not possible to take any advantage from a similar functionality in
-        Lucene for the other numeric types, so remaining types should use the
-        string encoding via the default or custom
-        <classname>TwoWayFieldBridge</classname>.</para>
-
-        <para>It is possible to use a custom
-        <classname>NumericFieldBridge</classname> assuming you can deal with
-        the approximation during type transformation:</para>
+          </informaltable>Lucene supports the numeric types: Double, Long,
+        Integer and Float. Other numeric types should use the default string
+        encoding (via <classname>@Field</classname>), unless the application
+        can deal with a potential loss in precision, in which case a custom
+        <classname>NumericFieldBridge</classname> can be used. See <xref
+        linkend="example-custom-numericfieldbridge"/>.</para>
 
         <example id="example-custom-numericfieldbridge">
-          <title>Defining a custom
-          <classname>NumericFieldBridge</classname></title>
+          <title>Defining a custom <classname>NumericFieldBridge for
+          BigDecimal</classname></title>
 
-          <programlisting language="JAVA" role="JAVA">
-public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
+          <programlisting language="JAVA" role="JAVA">public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
    private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
 
    @Override
@@ -342,6 +339,49 @@ public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
 
 }
 </programlisting>
+        </example>
+
+        <para>You would use this custom bridge like seen in <xref
+        linkend="example-useof-custom-numericfieldbridge"/>. In this case
+        three annotations are used - <classname>@Field</classname>,
+        <classname>@NumericField</classname> and
+        <classname>@FieldBridge</classname>. <classname>@Field</classname> is
+        required to mark the property for being indexed (a standalone
+        <classname>@NumericField</classname> is never allowed).
+        <classname>@NumericField</classname> might be ommited in this specific
+        case, because the used <classname>@FieldBridge</classname> annotation
+        refers already to a <classname>NumericFieldBridge</classname>
+        instance. However, the use of <classname>@NumericField</classname> is
+        recommended to make the use of the property as numeric value
+        explicit.</para>
+
+        <example id="example-useof-custom-numericfieldbridge">
+          <title>Use of BigDecimalNumericFieldBridge</title>
+
+          <programlisting language="JAVA" role="JAVA">@Entity
+@Indexed
+public static class Item {
+    @Id
+    @GeneratedValue
+    private int id;
+
+    @Field
+    @NumericField
+    @FieldBridge(impl = BigDecimalNumericFieldBridge.class)
+    private BigDecimal price;
+
+    public int getId() {
+        return id;
+    }
+
+    public BigDecimal getPrice() {
+       return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+}</programlisting>
         </example>
       </section>
 

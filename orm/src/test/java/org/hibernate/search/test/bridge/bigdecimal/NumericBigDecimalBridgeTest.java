@@ -82,7 +82,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestCase {
 				.must( queryBuilder.range().onField( "price" ).below( 20000l ).createQuery() )
 				.createQuery();
 
-
+		@SuppressWarnings( "unchecked" )
 		List<Item> resultList = (List<Item>) fullTextSession.createFullTextQuery( rootQuery, Item.class ).list();
 		assertNotNull( resultList );
 		assertTrue( resultList.size() == 1 );
