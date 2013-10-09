@@ -1796,7 +1796,7 @@ public class Cd {
 
         <para>In the case of a discrete faceting request you start with giving
         the request a unique name. This name will later be used to retrieve
-        the facet vaues (see <xref
+        the facet values (see <xref
         linkend="section-interpreting-facet-result"/>). Then you need to
         specify on which index field you want to categorize on and which
         faceting options to apply. An example for a discrete faceting request
@@ -2007,7 +2007,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
     int getCount();
 
     /**
-     * @return a Lucene {@link Query} which which can be executed to retrieve all
+     * @return a Lucene {@link Query} which can be executed to retrieve all
      *         documents matching the value of this facet.
      */
     Query getFacetQuery();
@@ -2017,7 +2017,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
 
       <para><methodname>getFacetingName()</methodname> and
       <methodname>getFieldName()</methodname> are returning the facet request
-      name and the targeted document field name as specifed by the underlying
+      name and the targeted document field name as specified by the underlying
       <classname>FacetRequest</classname>. For <xref
       linkend="example-discrete-faceting"/> that would be
       <constant>labelFacetRequest</constant> and <constant>label</constant>
