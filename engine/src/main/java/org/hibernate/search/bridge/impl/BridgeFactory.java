@@ -568,11 +568,7 @@ public final class BridgeFactory {
 	}
 
 	private static boolean isMap(XMember member) {
-		if ( member.isCollection() ) {
-			return Map.class.equals( member.getCollectionClass() );
-		}
-
-		return false;
+		return member.isCollection() && Map.class.equals( member.getCollectionClass() );
 	}
 
 	private static FieldBridge doExtractType(
@@ -804,7 +800,7 @@ public final class BridgeFactory {
 	 * @param appliedOnType the type the bridge is applied on
 	 * @param reflectionManager The reflection manager instance
 	 * @return a TwoWayFieldBridge instance if the Field Bridge is an instance of a TwoWayFieldBridge.
-	 * @throws SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge.
+	 * @throws org.hibernate.search.SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge.
 	 */
 	public static TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge,
 													XClass appliedOnType,
