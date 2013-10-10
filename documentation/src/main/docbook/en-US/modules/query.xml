@@ -1891,32 +1891,32 @@ FacetingRequest priceFacetingRequest = builder.facet()
     .createFacetingRequest();</programlisting>
         </example>
       </section>
+    </section>
 
-      <section>
-        <title>Setting the facet sort order</title>
+    <section id="section-sorting-faceting-request">
+      <title>Setting the facet sort order</title>
 
-        <para>The result of applying a faceting request is a list of
-        <classname>Facet</classname> instances as seen in <xref
-        linkend="example-applying-faceting"/>. The order within the list is
-        given by the <classname>FacetSortOrder</classname> parameter specified
-        via <methodname>orderedBy</methodname> when creating the faceting
-        request. The default value is
-        <constant>FacetSortOrder.COUNT_DESC</constant>, meaning facets are
-        ordered by their count in descending order (highest count first).
-        Other values are <constant>COUNT_ASC</constant>,
-        <constant>FIELD_VALUE</constant> and
-        <constant>RANGE_DEFINITION_ORDER</constant>.
-        <constant>COUNT_ASC</constant> returns the facets in ascending count
-        order whereas <constant>FIELD_VALUE</constant> will return them in
-        alphabetical order of the facet/category value (see <xref
-        linkend="section-interpreting-facet-result"/>).
-        <constant>RANGE_DEFINITION_ORDER</constant> only applies for range
-        faceting request and returns the facets in the same order in which the
-        ranges are defined. For <xref linkend="example-range-faceting"/> this
-        would mean the facet for the range of below 1000 would be returned
-        first, followed by the facet for the range 1001 to 1500 and finally
-        the facet for above 1500.</para>
-      </section>
+      <para>The result of applying a faceting request is a list of
+      <classname>Facet</classname> instances as seen in <xref
+      linkend="example-applying-faceting"/>. The order within the list is
+      given by the <classname>FacetSortOrder</classname> parameter specified
+      via <methodname>orderedBy</methodname> when creating the faceting
+      request. The default value is
+      <constant>FacetSortOrder.COUNT_DESC</constant>, meaning facets are
+      ordered by their count in descending order (highest count first).
+      Other values are <constant>COUNT_ASC</constant>,
+      <constant>FIELD_VALUE</constant> and
+      <constant>RANGE_DEFINITION_ORDER</constant>.
+      <constant>COUNT_ASC</constant> returns the facets in ascending count
+      order whereas <constant>FIELD_VALUE</constant> will return them in
+      alphabetical order of the facet/category value (see <xref
+      linkend="section-interpreting-facet-result"/>).
+      <constant>RANGE_DEFINITION_ORDER</constant> only applies for range
+      faceting request and returns the facets in the same order in which the
+      ranges are defined. For <xref linkend="example-range-faceting"/> this
+      would mean the facet for the range of below 1000 would be returned
+      first, followed by the facet for the range 1001 to 1500 and finally
+      the facet for above 1500.</para>
     </section>
 
     <section id="section-applying-faceting-request">
