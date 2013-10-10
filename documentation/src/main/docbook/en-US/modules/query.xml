@@ -1796,7 +1796,7 @@ public class Cd {
 
         <para>In the case of a discrete faceting request you start with giving
         the request a unique name. This name will later be used to retrieve
-        the facet vaues (see <xref
+        the facet values (see <xref
         linkend="section-interpreting-facet-result"/>). Then you need to
         specify on which index field you want to categorize on and which
         faceting options to apply. An example for a discrete faceting request
@@ -1824,37 +1824,35 @@ FacetingRequest labelFacetingRequest = builder.facet()
         discrete value for the indexed field <constant>label</constant>. The
         <classname>Facet</classname> instance will record the actual field
         value including how often this particular field value occurs within
-        the original query results. <methodname>orderedBy</methodname>,
+        the original query results. Parameters <methodname>orderedBy</methodname>,
         <methodname>includeZeroCounts</methodname> and
-        <methodname>maxFacetCount</methodname> are optional parameters which
-        can be applied on any faceting request.
-        <methodname>orderedBy</methodname> allows to specify in which order
-        the created facets will be returned. The default is
+        <methodname>maxFacetCount</methodname> are optional and can be applied
+        on any faceting request.
+        Parameter <methodname>orderedBy</methodname> allows to specify in which
+        order the created facets will be returned. The default is
         <constant>FacetSortOrder.COUNT_DESC</constant>, but you can also sort
-        on the field value. <methodname>includeZeroCount</methodname>
+        on the field value. Parameter <methodname>includeZeroCount</methodname>
         determines whether facets with a count of 0 will be included in the
-        result (per default they are) and
-        <methodname>maxFacetCount</methodname> allows to limit the maximum
-        amount of facets returned.</para>
+        result (by default they are) and <methodname>maxFacetCount</methodname>
+        allows to limit the maximum amount of facets returned.</para>
 
         <note>
-          <para>At the moment there are several preconditions an indexed field
-          has to meet in order to categorize (facet) on it. The indexed
+          <para>There are several preconditions an indexed field has to meet
+          in order to categorize (facet) on it. The indexed
           property must be of type <classname>String</classname>,
           <classname>Date</classname> or a subtype of
-          <classname>Number</classname> and <constant>null</constant> values
-          should be avoided. Furthermore the property has to be indexed with
-          <constant>Analyze.NO</constant> and in case of discrete faceting on
-          a numeric property <classname>@NumericField</classname> cannot be
-          used. In the latter case it is recommended to index the property
-          twice and use the appropriate field depending on the use
-          case:<programlisting>...
+          <classname>Number</classname>; also <constant>null</constant> values
+          should be avoided. Finally the property has to be indexed with
+          <constant>Analyze.NO</constant> and you can not use it in combination
+          with <classname>@NumericField</classname>. When you need these other
+          options we suggest to index the property twice and use the appropriate
+          field depending on the use case: <programlisting>...
 @Fields({
-  @Field(name="price"),
-  @Field(name="price_facet", analyze=Analyze.NO)
+  @Field( name="price" ),
+  @Field( name="price_facet", analyze=Analyze.NO )
 })
 @NumericFields({
-  @NumericField(forField="price")
+  @NumericField( forField="price" )
 })
 private int price;
 ...</programlisting></para>
@@ -1864,8 +1862,8 @@ private int price;
       <section id="range-faceting-request">
         <title>Creating a range faceting request</title>
 
-        <para>The creation of a range faceting request is quite similar. We
-        also start with a name for the request and the field to facet on. Then
+        <para>The creation of a range faceting request is similar. We also
+        start with a name for the request and the field to facet on. Then
         we have to specify ranges for the field values. A range faceting
         request can be seen in <xref linkend="example-range-faceting"/>.
         There, three different price ranges are specified.
@@ -1950,7 +1948,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
 ...</programlisting>
       </example>
 
-      <para>You need to enable the faceting request prior to executing the
+      <para>You need to enable the faceting request before you execute the
       query. You do that via
       <methodname>facetManager.enableFaceting(&lt;facetName&gt;)</methodname>.
       You can enable as many faceting requests as you like, then you execute
@@ -1959,7 +1957,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
       each request you will get a list of <classname>Facet</classname>
       instances. Facet requests stay active and get applied to the fulltext
       query until they are either explicitly disabled via
-      <methodname>disableFaceting(&lt;facetName&gt;)</methodname> or the whole
+      <methodname>disableFaceting(&lt;facetName&gt;)</methodname> or the
       query is discarded.</para>
     </section>
 
@@ -1971,7 +1969,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
       facet/category value. In the CD example (<xref
       linkend="example-discrete-faceting"/>) where we want to categorize on
       the Cd labels, there would for example be a <classname>Facet</classname>
-      for each of the big record labels Universal, Sony and Warner. <xref
+      for each of the record labels Universal, Sony and Warner. <xref
       linkend="example-facet-api"/> shows the API of
       <classname>Facet</classname>.</para>
 
@@ -2024,7 +2022,7 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
       respectively. The interesting information is provided by
       <methodname>getValue()</methodname> and
       <methodname>getCount()</methodname>. The former is the actual
-      facet/category value. For example a concrete record label like
+      facet/category value, for example a concrete record label like
       Universal. The latter returns the count for this value. To stick with
       the example again, the count value tells you how many Cds are released
       under the Universal label. Last but not least,
