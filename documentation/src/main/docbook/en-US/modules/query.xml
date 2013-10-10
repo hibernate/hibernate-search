@@ -2086,12 +2086,12 @@ assertTrue(cds.size() == 2);</programlisting>
     <itemizedlist>
       <listitem>
         <para>the Lucene query itself: read the literature on this
-        subject</para>
+        subject.</para>
       </listitem>
 
       <listitem>
-        <para>the number of object loaded: use pagination and / or index
-        projection (if needed)</para>
+        <para>the number of loaded objects: use pagination and / or index
+        projection (if needed).</para>
       </listitem>
 
       <listitem>
