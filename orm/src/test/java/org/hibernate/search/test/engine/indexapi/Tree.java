@@ -51,26 +51,26 @@ public class Tree {
 
 	@OneToMany(mappedBy = "tree", cascade = CascadeType.ALL)
 	@IndexedEmbedded
-	private Set<Leave> leaves;
+	private Set<Leaf> leaves;
 
 	Tree() {
 	}
 
 	public Tree(String species) {
 		this.species = species;
-		this.leaves = new HashSet<Leave>();
+		this.leaves = new HashSet<Leaf>();
 	}
 
 	public String getSpecies() {
 		return species;
 	}
 
-	public Set<Leave> getLeaves() {
+	public Set<Leaf> getLeaves() {
 		return leaves;
 	}
 
 	public void growNewLeave() {
-		leaves.add( new Leave() );
+		leaves.add( new Leaf() );
 	}
 }
 

@@ -107,57 +107,57 @@ public class PurgeTest extends SearchTestCaseJUnit4 {
 	@TestForIssue(jiraKey = "HSEARCH-1271")
 	public void testPurgeEntityWithContainedIn() throws Exception {
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
-		assertNumberOfIndexedEntitiesForTypes( 4, Leave.class );
+		assertNumberOfIndexedEntitiesForTypes( 4, Leaf.class );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 
-		Leave leave = getSingleInstanceOfType( fullTextSession, Leave.class );
+		Leaf leave = getSingleInstanceOfType( fullTextSession, Leaf.class );
 		// purge a single leave
-		fullTextSession.purge( Leave.class, leave.getId() );
+		fullTextSession.purge( Leaf.class, leave.getId() );
 
 		tx.commit();
 		fullTextSession.close();
 
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
-		assertNumberOfIndexedEntitiesForTypes( 3, Leave.class );
+		assertNumberOfIndexedEntitiesForTypes( 3, Leaf.class );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1271")
 	public void testPurgeAllWithContainedIn() throws Exception {
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
-		assertNumberOfIndexedEntitiesForTypes( 4, Leave.class );
+		assertNumberOfIndexedEntitiesForTypes( 4, Leaf.class );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 
 		// purge all leaves
-		fullTextSession.purgeAll( Leave.class );
+		fullTextSession.purgeAll( Leaf.class );
 
 		tx.commit();
 		fullTextSession.close();
 
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
-		assertNumberOfIndexedEntitiesForTypes( 0, Leave.class );
+		assertNumberOfIndexedEntitiesForTypes( 0, Leaf.class );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1271")
 	public void testPurgeWithNullAsIdDeletesAllIndexedDocuments() throws Exception {
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
-		assertNumberOfIndexedEntitiesForTypes( 4, Leave.class );
+		assertNumberOfIndexedEntitiesForTypes( 4, Leaf.class );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
 
-		fullTextSession.purge( Leave.class, null );
+		fullTextSession.purge( Leaf.class, null );
 
 		tx.commit();
 		fullTextSession.close();
 
 		assertNumberOfIndexedEntitiesForTypes( 1, Tree.class );
-		assertNumberOfIndexedEntitiesForTypes( 0, Leave.class );
+		assertNumberOfIndexedEntitiesForTypes( 0, Leaf.class );
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class PurgeTest extends SearchTestCaseJUnit4 {
 				Book.class,
 				Clock.class,
 				Author.class,
-				Leave.class,
+				Leaf.class,
 				Tree.class
 		};
 	}
