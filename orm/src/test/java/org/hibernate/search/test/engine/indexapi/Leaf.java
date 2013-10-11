@@ -37,7 +37,8 @@ import org.hibernate.search.annotations.Indexed;
  */
 @Entity
 @Indexed
-public class Leave {
+public class Leaf {
+
 	@Id
 	@GeneratedValue
 	private int id;
