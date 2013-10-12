@@ -24,8 +24,8 @@
   -->
 <infinispan
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="urn:infinispan:config:5.3 http://www.infinispan.org/schemas/infinispan-config-5.3.xsd"
-      xmlns="urn:infinispan:config:5.3">
+      xsi:schemaLocation="urn:infinispan:config:6.0 http://www.infinispan.org/schemas/infinispan-config-6.0.xsd"
+      xmlns="urn:infinispan:config:6.0">
 
   <global>
     <globalJmxStatistics enabled="false" />
@@ -47,27 +47,27 @@
   </default>
 
   <namedCache name="LuceneIndexesMetadata">
-    <loaders
-      passivation="false" shared="false" preload="true">
-      <loader
-        class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" purgeOnStartup="false">
-        <properties>
-          <property name="location" value="${project.build.directory}" />
-        </properties>
-      </loader>
-    </loaders>
+    <persistence passivation="false">
+       <singleFile
+         fetchPersistentState="true"
+         purgeOnStartup="false"
+         shared="true"
+         ignoreModifications="false"
+         location="${project.build.directory}">
+       </singleFile>
+     </persistence>
   </namedCache>
 
   <namedCache name="LuceneIndexesData">
-    <loaders
-      passivation="false" shared="false" preload="true">
-      <loader
-        class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" purgeOnStartup="false">
-        <properties>
-          <property name="location" value="${project.build.directory}" />
-        </properties>
-      </loader>
-    </loaders>
+    <persistence passivation="false">
+       <singleFile
+         fetchPersistentState="true"
+         purgeOnStartup="false"
+         shared="true"
+         ignoreModifications="false"
+         location="${project.build.directory}">
+       </singleFile>
+     </persistence>
   </namedCache>
 
   <namedCache name="LuceneIndexesLocking">
