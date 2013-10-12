@@ -45,7 +45,7 @@ public class Truck {
 	@NumericField
 	private Integer horsePower;
 
-	private Truck() {
+	public Truck() {
 	}
 
 	public Truck(Integer horsePower) {

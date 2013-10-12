@@ -52,7 +52,7 @@ public class AttributeValue {
 	@Field(store = Store.YES)
 	private String value;
 
-	private AttributeValue() {
+	public AttributeValue() {
 	}
 
 	public AttributeValue(Attribute attribute, String value) {

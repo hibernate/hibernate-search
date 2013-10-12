@@ -50,7 +50,7 @@ public class Fruit {
 	@NumericField
 	private Double price;
 
-	private Fruit() {
+	public Fruit() {
 	}
 
 	public Fruit(String name, Double price) {

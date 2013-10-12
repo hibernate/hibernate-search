@@ -286,6 +286,9 @@ public class SortTest extends SearchTestCase {
 			this.num2 = num2;
 		}
 
+		public NumberHolder() {
+		}
+
 		public int getSum() {
 			return num1 + num2;
 		}
@@ -299,10 +302,6 @@ public class SortTest extends SearchTestCase {
 			sb.append( ", num2=" ).append( num2 );
 			sb.append( '}' );
 			return sb.toString();
-		}
-
-		@SuppressWarnings("unused")
-		private NumberHolder() {
 		}
 	}
 

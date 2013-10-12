@@ -47,6 +47,9 @@ public class ParentOfBirthEvent {
 		this.event = event;
 	}
 
+	public ParentOfBirthEvent() {
+	}
+
 	@Id
 	@DocumentId
 	@GeneratedValue

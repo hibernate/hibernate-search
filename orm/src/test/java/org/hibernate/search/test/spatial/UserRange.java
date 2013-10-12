@@ -48,6 +48,9 @@ public class UserRange {
 		this.homeLongitude = homeLongitude;
 	}
 
+	public UserRange() {
+	}
+
 	public Double getHomeLatitude() {
 		return homeLatitude;
 	}

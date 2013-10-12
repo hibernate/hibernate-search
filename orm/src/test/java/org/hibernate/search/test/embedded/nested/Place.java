@@ -56,7 +56,7 @@ public class Place {
 	@ManyToMany(cascade = { CascadeType.ALL }, mappedBy = "placesVisited")
 	private Set<Person> visitedBy;
 
-	private Place() {
+	public Place() {
 		this.visitedBy = new HashSet<Person>();
 	}
 

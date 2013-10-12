@@ -51,6 +51,9 @@ public class User {
 		this.homeLongitude = homeLongitude;
 	}
 
+	public User() {
+	}
+
 	public Double getHomeLatitude() {
 		return homeLatitude;
 	}

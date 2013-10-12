@@ -65,7 +65,7 @@ public class Cd {
 	@DateBridge(resolution = Resolution.YEAR)
 	private Date releaseYear;
 
-	private Cd() {
+	public Cd() {
 	}
 
 	public Cd(String name, int price, String releaseYear) {

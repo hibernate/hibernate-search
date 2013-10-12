@@ -47,6 +47,9 @@ public class GetterUser {
 		this.homeLongitude = homeLongitude;
 	}
 
+	public GetterUser() {
+	}
+
 	@Latitude(of = "home")
 	public Double getHomeLatitude() {
 		return homeLatitude;
