@@ -142,9 +142,13 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 	@Entity(name = "Driver")
 	@Indexed
 	public static class Driver {
+
 		public Driver(String firstName, String lastName) {
 			this.firstName = firstName;
 			this.lastName = lastName;
+		}
+
+		public Driver() {
 		}
 
 		@Id @GeneratedValue @DocumentId
@@ -171,9 +175,13 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 	@Entity(name = "Truck")
 	@Indexed
 	public static class Truck {
+
 		public Truck(String numberPlate) {
 			super();
 			this.numberPlate = numberPlate;
+		}
+
+		public Truck() {
 		}
 
 		@Id @GeneratedValue @DocumentId
@@ -199,6 +207,9 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
 			super();
 			this.description = description;
 			this.quantity = quantity;
+		}
+
+		public Item() {
 		}
 
 		@Id @GeneratedValue @DocumentId

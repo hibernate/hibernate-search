@@ -54,7 +54,7 @@ public class Attribute {
 	@IndexedEmbedded
 	private List<AttributeValue> values;
 
-	private Attribute() {
+	public Attribute() {
 		values = new ArrayList<AttributeValue>();
 	}
 

@@ -61,6 +61,9 @@ public class UserEx {
 		this.workLongitude = workLongitude;
 	}
 
+	public UserEx() {
+	}
+
 	public Double getHomeLatitude() {
 		return homeLatitude;
 	}

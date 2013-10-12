@@ -50,7 +50,7 @@ public class Person {
 	@ManyToMany(cascade = { CascadeType.ALL })
 	private List<Place> placesVisited;
 
-	private Person() {
+	public Person() {
 		placesVisited = new ArrayList<Place>( 0 );
 	}
 

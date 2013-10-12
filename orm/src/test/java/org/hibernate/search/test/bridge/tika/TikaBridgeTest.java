@@ -233,6 +233,8 @@ public class TikaBridgeTest extends SearchTestCase {
 		public Song(String mp3FileName) {
 			this.mp3FileName = mp3FileName;
 		}
+		public Song() {
+		}
 
 		public String getMp3FileName() {
 			return mp3FileName;

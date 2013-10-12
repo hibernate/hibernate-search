@@ -52,7 +52,7 @@ public class Car {
 	@Field(analyze = Analyze.NO)
 	private int cubicCapacity;
 
-	private Car() {
+	public Car() {
 	}
 
 	public Car(String make, String color, int cubicCapacity) {

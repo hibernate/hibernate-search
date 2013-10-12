@@ -58,7 +58,7 @@ public class Address {
 		this.city = city;
 	}
 
-	private Address() {
+	public Address() {
 		places = new HashSet<Place>();
 	}
 

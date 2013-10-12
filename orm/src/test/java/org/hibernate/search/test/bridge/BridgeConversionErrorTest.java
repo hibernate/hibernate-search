@@ -188,6 +188,9 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 			this.name = name;
 		}
 
+		public SimpleEntity() {
+		}
+
 		public void setEmbedded(EmbeddedEntity embedded) {
 			this.embedded = embedded;
 		}
@@ -206,6 +209,9 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 
 		public EmbeddedEntity(String name) {
 			this.name = name;
+		}
+
+		public EmbeddedEntity() {
 		}
 
 		@IndexedEmbedded
@@ -230,6 +236,9 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 
 		public EmbeddedEmbeddedEntity(String name) {
 			this.name = name;
+		}
+
+		public EmbeddedEmbeddedEntity() {
 		}
 	}
 }
