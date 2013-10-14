@@ -72,10 +72,8 @@
           <row>
             <entry>Hibernate Core</entry>
 
-            <entry>These instructions have been tested against Hibernate 4.1.
-            You will need
-            <literal>hibernate-core-&hibernateVersion;.jar</literal> and its
-            transitive dependencies (either from the <ulink
+            <entry>You will need <literal>hibernate-core-&hibernateVersion;.jar</literal>
+            and its transitive dependencies (either from the <ulink
             url="http://sourceforge.net/projects/hibernate/files/hibernate3/">distribution
             bundle</ulink> or the maven repository).</entry>
           </row>
@@ -91,7 +89,8 @@
             has also its own set of annotations (<emphasis>@Indexed,
             @DocumentId, @Field,...</emphasis>) for which there exists so far
             no XML based alternative; a better option is the <xref
-            linkend="hsearch-mapping-programmaticapi"/>.</para></entry>
+            linkend="hsearch-mapping-programmaticapi"/>.</para>
+            </entry>
           </row>
         </tbody>
       </tgroup>
