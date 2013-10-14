@@ -293,15 +293,6 @@ transaction.commit();</programlisting>
       your data: it might increase performance if the main entity is relating
       to enum-like data included in the index.</para>
 
-      <tip>
-        <para>The "sweet spot" of number of threads to achieve best
-        performance is highly dependent on your overall architecture, database
-        design and even data values. To find out the best number of threads
-        for your application it is recommended to use a profiler: all internal
-        thread groups have meaningful names to be easily identified with most
-        tools.</para>
-      </tip>
-
       <note>
         <para>The MassIndexer was designed for speed and is unaware of
         transactions, so there is no need to begin one or committing. Also
@@ -311,10 +302,69 @@ transaction.commit();</programlisting>
         anyway.</para>
       </note>
 
+      <section id="search-batchindexing-threadsandconnections">
+      <title>MassIndexer using threads and JDBC connections</title>
+      <para>The MassIndexer was designed to finish the reindexing task as
+      quickly as possible, but this requires a bit of care in its configuration
+      to behave fairly with your server resources.</para>
+      <para>There is a simple formula to understand how the different options
+      applied to the MassIndexer affect the number of used worker threads
+      and connections: each thread will require a JDBC connection.</para>
+      <para><programlisting>threads = typesToIndexInParallel * (threadsToLoadObjects + threadsForSubsequentFetching + 1);
+required JDBC connections = threads;</programlisting></para>
+      <para>Let's see some suggestions for a roughly sane tuning starting point:</para>
+      <orderedlist>
+        <listitem>
+          <para>Option <literal>typesToIndexInParallel</literal> should probably be a low value, like 1 or 2, depending how
+          much of your CPUs have spare cycles and how slow a database round trip will be.</para>
+        </listitem>
+        <listitem>
+          <para>Before tuning a parallel run, experiment with options to tune your primary indexed entities in isolation.</para>
+        </listitem>
+        <listitem>
+          <para>Making <literal>threadsToLoadObjects</literal> higher increases the preloading rate for the picked root entity
+          from the database, but also increases memory usage and the pressure on the threads working on subsequent fetching.</para>
+        </listitem>
+        <listitem>
+          <para>Option <literal>threadsForSubsequentFetching</literal> should generally be higher than <literal>threadsToLoadObjects</literal>
+          as it needs to perform more work in parallel: loading all the values for relations marked <classname>@IndexedEmbedded</classname>
+          or other lazily loaded relations needed by your custom <classname>FieldBridge</classname>s.
+          You could try a lower value if the root entity doesn't have any such relation.</para>
+        </listitem>
+        <listitem>
+          <para>Increasing parallelism usually helps as the bottleneck usually is the latency to the database connection,
+          but make sure your database can handle all the multiple requests.</para>
+        </listitem>
+        <listitem>
+          <para>This advice might not apply to you: always measure the effects! We're providing this as a means to help you
+          understand how these options are related.</para>
+        </listitem>
+      </orderedlist>
+
+      <warning>
+        <para>Running the MassIndexer with many threads will require many
+        connections to the database. If you don't have a sufficiently large
+        connection pool, the MassIndexer itself could deadlock or your other
+        applications (or your same application) could starve being unable to serve
+        other requests: make sure you size your connection pool accordingly
+        to the options as explained in the above paragraph.</para>
+      </warning>
+      <tip>
+        <para>The "sweet spot" of number of threads to achieve best
+        performance is highly dependent on your overall architecture, database
+        design and even data values. To find out the best number of threads
+        for your application it is recommended to use a profiler: all internal
+        thread groups have meaningful names to be easily identified with most
+        tools.</para>
+      </tip>
+      </section>
+
       <section id="search-batchindex-custommassindexer">
-        <title>Custom</title>
-        <para>It is possible to use a custom implementation of the <classname>MassIndexer</classname> instead of using the one shipped with Hibernate Search.
-        The steps to follow are:</para>
+        <title>Using a custom MassIndexer implementation</title>
+        <para>The provided MassIndexer is quite general purpose, and while we believe
+        it's a robust approach, you might be able to squeeze some better performance
+        by writing a custom implementation. To run your own <classname>MassIndexer</classname>
+        instead of using the one shipped with Hibernate Search you have to:</para>
 
         <orderedlist>
           <listitem>
