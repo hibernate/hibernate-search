@@ -52,7 +52,7 @@
     for a single entity becomes too big and indexing operations are slowing
     down the application. In this case a single entity is indexed into
     multiple indexes each with its own index manager (see <xref
-    linkend="search-configuration-directory-sharding" />). The latter, index
+    linkend="advanced-features-sharding" />). The latter, index
     sharing, is the ability to index multiple entities into the same Lucene
     index (see <xref linkend="section-sharing-indexes" />).</para>
 
@@ -114,7 +114,8 @@
       </tip></para>
 
     <note>
-       Hibernate Search works perfectly fine in the Hibernate / EntityManager long conversation pattern aka. atomic conversation
+    <para>Hibernate Search works perfectly fine in the Hibernate / EntityManager
+    long conversation pattern aka. atomic conversation</para>
     </note>
   </section>
 

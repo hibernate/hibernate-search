@@ -2421,7 +2421,7 @@ public class Blog {
       <example>
         <title>Providing your own id</title>
 
-        <programlisting language="JAVA" role="JAVA">@ProvidedId (bridge = org.my.own.package.MyCustomBridge)
+        <programlisting language="JAVA" role="JAVA">@ProvidedId(bridge = org.my.own.package.MyCustomBridge)
 @Indexed
 public class MyClass{
     @Field

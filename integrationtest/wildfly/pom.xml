@@ -216,7 +216,7 @@
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-search-modules</artifactId>
                                     <version>${project.version}</version>
-                                    <classifier>jbossas-72-dist</classifier>
+                                    <classifier>wildfly-8-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-${version.wildfly}/modules</outputDirectory>
