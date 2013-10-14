@@ -1810,7 +1810,7 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
     retrieve a so called <classname>IndexedTypeDescriptor</classname>for a
     gven type. This descriptor allows you determine whether the type is
     indexed at all and, if so, whether the index is for example sharded or not
-    (see <xref linkend="search-configuration-directory-sharding"/>). It also
+    (see <xref linkend="advanced-features-sharding"/>). It also
     allows you to determine the static boost of the type (see <xref
     linkend="section-boost-annotation"/>) as well as its dynamic boost
     strategy (see <xref linkend="section-dynamic-boost"/>). Most importantly,
