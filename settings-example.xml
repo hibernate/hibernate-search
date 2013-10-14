@@ -287,47 +287,6 @@ under the License.
                 </pluginRepository>
             </pluginRepositories>
         </profile>
-
-        <!-- Include early access of application server and other products -->
-        <profile>
-            <id>redhat-earlyaccess-repository</id>
-            <repositories>
-                <repository>
-                    <id>redhat-earlyaccess-repository-group</id>
-                    <name>Red Hat early access repository</name>
-                    <url>http://maven.repository.redhat.com/earlyaccess/all/</url>
-                    <layout>default</layout>
-                    <releases>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
-        </profile>
-
-        <profile>
-            <id>jboss-deprecated-repository</id>
-            <repositories>
-                <repository>
-                    <id>jboss-deprecated-repository</id>
-                    <name>JBoss Deprecated Maven Repository</name>
-                    <url>https://repository.jboss.org/nexus/content/repositories/deprecated/</url>
-                    <layout>default</layout>
-                    <releases>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <enabled>false</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
-        </profile>
         <!-- jboss.org config end -->
 
     </profiles>
@@ -335,7 +294,6 @@ under the License.
     <!-- jboss.org config start -->
     <activeProfiles>
         <activeProfile>jboss-public-repository</activeProfile>
-        <activeProfile>redhat-earlyaccess-repository</activeProfile>
     </activeProfiles>
     <!-- jboss.org config end -->
 

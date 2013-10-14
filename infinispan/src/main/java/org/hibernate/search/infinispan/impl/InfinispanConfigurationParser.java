@@ -27,12 +27,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.infinispan.commons.util.FileLookup;
+import org.infinispan.commons.util.FileLookupFactory;
+import org.infinispan.commons.util.Util;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
-import org.infinispan.util.FileLookup;
-import org.infinispan.util.FileLookupFactory;
-import org.infinispan.util.Util;
 
 /**
  * The Infinispan configuration is ClassLoader sensitive, this wrapper around
