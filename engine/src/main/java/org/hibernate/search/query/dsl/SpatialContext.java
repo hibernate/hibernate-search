@@ -21,7 +21,7 @@
 package org.hibernate.search.query.dsl;
 
 /**
- * @experimental This API might change in minor versions
+ * @hsearch.experimental This API might change in minor versions
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */

@@ -45,7 +45,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * are used to make changes to each index, so order of Work processing is not guaranteed.
  *
  * @author Sanne Grinovero
- * @experimental First {@code BatchBackend}
+ * @hsearch.experimental First {@code BatchBackend}
  */
 public class DefaultBatchBackend implements BatchBackend {
 
