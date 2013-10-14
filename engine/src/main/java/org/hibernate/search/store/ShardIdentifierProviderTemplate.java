@@ -32,7 +32,7 @@ import org.hibernate.search.spi.BuildContext;
  * Recommended parent class to create custom {@link ShardIdentifierProvider} implementations. Sub-classes must provide a
  * no-arg constructor.
  *
- * @experimental The exact method signatures are likely to change in future.
+ * @hsearch.experimental The exact method signatures are likely to change in future.
  *
  * @author Sanne Grinovero
  */

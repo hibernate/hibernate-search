@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  * Mark the property hosting the latitude of a specific spatial coordinate.
  * The property must be of type {@code Double} (or its native version).
  *
- * @experimental Spatial support is still considered experimental
+ * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer (nicolas.helleringer@novacodex.net)
  */
 @Retention(RetentionPolicy.RUNTIME)

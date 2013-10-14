@@ -41,7 +41,7 @@ import org.hibernate.search.spi.BuildContext;
  * Instead of implementing this interface directly, implementations should be derived from
  * {@link ShardIdentifierProviderTemplate} as new methods might be added to this interface in future releases.
  *
- * @experimental The exact method signatures are likely to change in future.
+ * @hsearch.experimental The exact method signatures are likely to change in future.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik

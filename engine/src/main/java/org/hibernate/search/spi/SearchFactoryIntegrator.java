@@ -43,7 +43,7 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
  * - today allow addition of new indexed classes.
  *
  * @author Emmanuel Bernard
- * @experimental
+ * @hsearch.experimental
  */
 public interface SearchFactoryIntegrator extends SearchFactory {
 

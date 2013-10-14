@@ -66,7 +66,7 @@ import java.lang.annotation.Target;
   * }
   * </pre>
  *
- * @experimental Spatial support is still considered experimental
+ * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer (nicolas.helleringer@novacodex.net)
  */
 @Retention(RetentionPolicy.RUNTIME)

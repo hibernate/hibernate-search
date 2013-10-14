@@ -30,7 +30,7 @@ package org.hibernate.search.indexes.interceptor;
  * the explicit indexing control API such <code>org.hibernate.search.FullTextSession.index(T)</code>
  * or <code>purge</code>, <purgeAll>.
  *
- * @experimental: {@link IndexingOverride} might be updated
+ * @hsearch.experimental: {@link IndexingOverride} might be updated
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */

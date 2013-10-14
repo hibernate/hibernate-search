@@ -54,7 +54,7 @@ public interface ProjectionConstants {
 	 * <p/>
 	 * Expert: Lucene document id can change overtime between 2 different IndexReader opening.
 	 *
-	 * @experimental If you use this constant/feature, please speak up in the forum
+	 * @hsearch.experimental If you use this constant/feature, please speak up in the forum
 	 */
 	String DOCUMENT_ID = "__HSearch_DocumentId";
 

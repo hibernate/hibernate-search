@@ -93,9 +93,9 @@
                     </sourcepath>
                     <tags>
                         <tag>
-                            <name>experimental</name>
+                            <name>hsearch.experimental</name>
                             <placement>a</placement>
-                            <head>Experimental</head>
+                            <head>Experimental:</head>
                         </tag>
                     </tags>
                     <docfilessubdirs>true</docfilessubdirs>
