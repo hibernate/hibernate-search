@@ -27,7 +27,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>4.4.0.Final</version>
+    <version>4.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>
@@ -58,7 +58,7 @@
         <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-search</url>
-      <tag>4.4.0.Final</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <organization>

@@ -20,7 +20,7 @@
     <parent>
         <artifactId>hibernate-search-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.4.0.Final</version>
+        <version>4.4.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
