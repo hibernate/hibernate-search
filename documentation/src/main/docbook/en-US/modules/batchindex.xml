@@ -315,7 +315,7 @@ required JDBC connections = threads;</programlisting></para>
       <para>Let's see some suggestions for a roughly sane tuning starting point:</para>
       <orderedlist>
         <listitem>
-          <para>Option <literal>typesToIndexInParallel</literal> should probably be a low value, like 1 or 2, depending how
+          <para>Option <literal>typesToIndexInParallel</literal> should probably be a low value, like 1 or 2, depending on how
           much of your CPUs have spare cycles and how slow a database round trip will be.</para>
         </listitem>
         <listitem>
