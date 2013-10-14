@@ -600,6 +600,6 @@ public class Book {
     required for more fine-grained indexing. More advanced topics cover
     clustering (<xref linkend="jms-backend"/>, <xref
     linkend="infinispan-directories"/>) and large index handling (<xref
-    linkend="search-configuration-directory-sharding"/>).</para>
+    linkend="advanced-features-sharding"/>).</para>
   </section>
 </chapter>
