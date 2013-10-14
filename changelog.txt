@@ -1,6 +1,25 @@
 Hibernate Search Changelog
 ==========================
 
+
+Version 4.4.0.Final (14-10-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1340] - Add proper documentation for facet sort ordering
+    * [HSEARCH-1431] - PurgeTest uses reserved MySQL keywords
+
+** Improvement
+    * [HSEARCH-1341] - Clarify relationship between @NumericField and NumericFieldBridge in the documentation
+    * [HSEARCH-1342] - Add section on how to read facet data from the API after a query
+    * [HSEARCH-1395] - Improve MassIndexer documentation around threadsToLoadObjects and threadsForSubsequentFetching
+
+** Task
+    * [HSEARCH-1432] - Upgrade to Hibernate ORM 4.2.6.Final
+    * [HSEARCH-1433] - Minor upgrade to other components: JGroups, Logger, Narayana
+    * [HSEARCH-1434] - All test entities should have a public no-args constructor
+
+
 Version 4.4.0.CR1 (08-10-2013)
 ------------------------
 
