@@ -114,7 +114,8 @@
       </tip></para>
 
     <note>
-       Hibernate Search works perfectly fine in the Hibernate / EntityManager long conversation pattern aka. atomic conversation
+    <para>Hibernate Search works perfectly fine in the Hibernate / EntityManager
+    long conversation pattern aka. atomic conversation</para>
     </note>
   </section>
 
