@@ -45,7 +45,7 @@
         <module>testing</module>
         <module>infinispan</module>
         <module>modules</module>
-        <module>integrationtest/as</module>
+        <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/wildfly</module>
     </modules>
