@@ -312,9 +312,11 @@ transaction.commit();</programlisting>
       </note>
 
       <section id="search-batchindex-custommassindexer">
-        <title>Custom</title>
-        <para>It is possible to use a custom implementation of the <classname>MassIndexer</classname> instead of using the one shipped with Hibernate Search.
-        The steps to follow are:</para>
+        <title>Using a custom MassIndexer implementation</title>
+        <para>The provided MassIndexer is quite general purpose, and while we believe
+        it's a robust approach, you might be able to squeeze some better performance
+        by writing a custom implementation. To run your own <classname>MassIndexer</classname>
+        instead of using the one shipped with Hibernate Search you have to:</para>
 
         <orderedlist>
           <listitem>
