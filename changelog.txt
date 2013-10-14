@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.5.0.Alpha1 (14-10-2013)
+------------------------
+
+** Task
+    * [HSEARCH-1370] - Create integration tests with WildFly
+    * [HSEARCH-1373] - Update Hibernate ORM to 4.3
+    * [HSEARCH-1435] - Update to Infinispan 6.0.0.CR2
+    * [HSEARCH-1436] - Change build to use JDK7 but keep Java6 compatibility
+
 
 Version 4.4.0.Final (14-10-2013)
 ------------------------
