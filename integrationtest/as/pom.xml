@@ -33,6 +33,8 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
+    <!-- Requires access to MEAD repository at: http://download.lab.bos.redhat.com/brewroot/repos/jb-eap-6-rhel-6-build/latest/maven -->
+
     <artifactId>hibernate-search-integrationtest-as</artifactId>
 
     <name>Hibernate Search JBoss Integration Tests</name>
@@ -46,26 +48,31 @@
         <enforcer.skip>true</enforcer.skip>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.jboss.as>7.2.0.Alpha1-redhat-4</version.jboss.as>
-        <version.arquillian>1.0.3.Final</version.arquillian>
-        <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
+        <version.jboss.as>7.3.0.Final-redhat-8</version.jboss.as>
+        <version.arquillian>1.1.0.Final</version.arquillian>
+
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- We override the version of ShrinkWrap Maven Resolver from Arquillian BOM -->
             <dependency>
-                <groupId>org.jboss.shrinkwrap.resolver</groupId>
-                <artifactId>shrinkwrap-resolver-bom</artifactId>
-                <version>${version.shrinkwrapResolver}</version>
+                <groupId>org.jboss.bom</groupId>
+                <artifactId>jboss-javaee-6.0-with-tools</artifactId>
+                <version>1.0.4.Final-redhat-12</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- Imports compatible versions for each Arquillian module -->
             <dependency>
-                <groupId>org.jboss.arquillian</groupId>
-                <artifactId>arquillian-bom</artifactId>
-                <version>${version.arquillian}</version>
+                <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+                <artifactId>shrinkwrap-descriptors-bom</artifactId>
+                <version>2.0.0-alpha-3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.bom</groupId>
+                <artifactId>jboss-wfk-arquillian</artifactId>
+                <version>1.0.4.Final-redhat-12</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -116,14 +123,24 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-arquillian-container-managed</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-arquillian-container-managed</artifactId>
-            <version>7.2.0.Final</version>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-depchain</artifactId>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+            <artifactId>shrinkwrap-descriptors-api-javaee</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -209,7 +226,7 @@
                                     <classifier>jbossas-72-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/jboss-eap-6.1/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/jboss-eap-6.2/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -228,7 +245,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/jboss-eap-6.1</outputDirectory>
+                            <outputDirectory>${basedir}/target/jboss-eap-6.2</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
