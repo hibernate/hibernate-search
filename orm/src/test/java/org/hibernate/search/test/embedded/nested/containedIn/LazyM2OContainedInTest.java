@@ -83,6 +83,7 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	/* Disabled until we can rely on the fix for HHH-8611. Tracked as HSEARCH-1438
 	//HSEARCH-386
 	public void testContainedInAndLazy() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
@@ -142,7 +143,7 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 		tx.commit();
 
 		fts.close();
-	}
+	}*/
 
 	@Override
 	protected void configure(Configuration cfg) {

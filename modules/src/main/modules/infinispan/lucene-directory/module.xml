@@ -29,6 +29,7 @@
     <dependencies>
         <module name="org.apache.lucene" slot="${luceneVersion}" />
         <module name="org.infinispan" />
+        <module name="org.infinispan.commons"/>
         <module name="org.jboss.logging" />
     </dependencies>
 </module>
