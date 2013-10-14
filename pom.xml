@@ -46,6 +46,7 @@
         <module>infinispan</module>
         <module>modules</module>
         <module>integrationtest/spring</module>
+        <module>integrationtest/wildfly</module>
     </modules>
 
     <issueManagement>
