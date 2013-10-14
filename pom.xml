@@ -47,6 +47,7 @@
         <module>modules</module>
         <module>integrationtest/as</module>
         <module>integrationtest/spring</module>
+        <module>integrationtest/wildfly</module>
     </modules>
 
     <issueManagement>

@@ -2,7 +2,7 @@
  * Hibernate, Relational Persistence for Idiomatic Java
  *
  * JBoss, Home of Professional Open Source
- * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.integration.jbossas7;
+package org.hibernate.search.test.integration.wildfly;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,9 +29,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.test.integration.jbossas7.controller.MemberRegistration;
-import org.hibernate.search.test.integration.jbossas7.model.Member;
-import org.hibernate.search.test.integration.jbossas7.util.Resources;
+import junit.framework.Assert;
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.Token;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
+import org.hibernate.search.test.integration.wildfly.model.Member;
+import org.hibernate.search.test.integration.wildfly.model.SolrMember;
+import org.hibernate.search.test.integration.wildfly.util.Resources;
+import org.hibernate.search.util.AnalyzerUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -47,19 +54,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test the hibernate search module in JBoss AS.
+ * Test the Solr JBoss AS module.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-public class ModuleMemberRegistrationIT {
+public class SolrModuleMemberRegistrationIT {
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		WebArchive archive = ShrinkWrap
-				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
-				.addClasses( Member.class, MemberRegistration.class, Resources.class )
+				.create( WebArchive.class, SolrModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
+				.addClasses( Member.class, SolrMember.class, MemberRegistration.class, Resources.class, AnalyzerUtils.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.add( manifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
@@ -68,7 +75,7 @@ public class ModuleMemberRegistrationIT {
 
 	private static Asset manifest() {
 		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", "org.hibernate.search.orm services" )
+				.attribute( "Dependencies", "org.hibernate.search.orm services, org.apache.solr:3.6.2" )
 				.exportAsString();
 		return new StringAsset( manifest );
 	}
@@ -92,24 +99,27 @@ public class ModuleMemberRegistrationIT {
 	@Inject
 	MemberRegistration memberRegistration;
 
+	@Inject
+	FullTextEntityManager em;
+
 	@Test
 	public void testRegister() throws Exception {
-		Member newMember = memberRegistration.getNewMember();
+		Member newMember = new SolrMember();
 		newMember.setName( "Davide D'Alto" );
 		newMember.setEmail( "davide@mailinator.com" );
 		newMember.setPhoneNumber( "2125551234" );
-		memberRegistration.register();
+		memberRegistration.register( newMember );
 
 		assertNotNull( newMember.getId() );
 	}
 
 	@Test
 	public void testNewMemberSearch() throws Exception {
-		Member newMember = memberRegistration.getNewMember();
+		Member newMember = new SolrMember();
 		newMember.setName( "Peter O'Tall" );
 		newMember.setEmail( "peter@mailinator.com" );
 		newMember.setPhoneNumber( "4643646643" );
-		memberRegistration.register();
+		memberRegistration.register( newMember );
 
 		List<Member> search = memberRegistration.search( "Peter" );
 
@@ -124,4 +134,21 @@ public class ModuleMemberRegistrationIT {
 		assertNotNull( "Search should never return null", search );
 		assertTrue( "Search results should be empty", search.isEmpty() );
 	}
+
+	@Test
+	public void testCustomAnalyzerExists() throws Exception {
+		Analyzer analyzer = em.getSearchFactory().getAnalyzer( "customanalyzer" );
+		String text = "This iS just FOOBAR's";
+		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
+		assertTokensEqual( tokens, new String[] { "this", "is", "just", "foobar's" } );
+	}
+
+	private static void assertTokensEqual(Token[] tokens, String[] strings) {
+		Assert.assertEquals( strings.length, tokens.length );
+
+		for ( int i = 0; i < tokens.length; i++ ) {
+			Assert.assertEquals( "index " + i, strings[i], AnalyzerUtils.getTermText( tokens[i] ) );
+		}
+	}
+
 }

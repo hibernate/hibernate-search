@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.integration.jbossas7.model;
+package org.hibernate.search.test.integration.wildfly.model;
 
 import static javax.persistence.InheritanceType.TABLE_PER_CLASS;
 

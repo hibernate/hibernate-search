@@ -21,9 +21,10 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.integration.jbossas7;
+package org.hibernate.search.test.integration.wildfly;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -43,9 +44,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.hibernate.search.Version;
-import org.hibernate.search.test.integration.jbossas7.controller.MemberRegistration;
-import org.hibernate.search.test.integration.jbossas7.model.Member;
-import org.hibernate.search.test.integration.jbossas7.util.Resources;
+import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
+import org.hibernate.search.test.integration.wildfly.model.Member;
+import org.hibernate.search.test.integration.wildfly.util.Resources;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

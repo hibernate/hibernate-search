@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.integration.jbossas7.controller;
+package org.hibernate.search.test.integration.wildfly.controller;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import javax.inject.Named;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.test.integration.jbossas7.model.Member;
+import org.hibernate.search.test.integration.wildfly.model.Member;
 
 @Stateful
 @Model

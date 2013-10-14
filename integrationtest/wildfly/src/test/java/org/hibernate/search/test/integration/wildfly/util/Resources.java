@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.integration.jbossas7.util;
+package org.hibernate.search.test.integration.wildfly.util;
 
 import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
