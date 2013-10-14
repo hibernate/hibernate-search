@@ -119,7 +119,7 @@
                         </group>
                     </groups>
                     <bottom>
-                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
+                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a>  All Rights Reserved]]></bottom>
                 </configuration>
                 <executions>
                     <execution>
