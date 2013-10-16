@@ -1828,8 +1828,8 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
     <title>Hibernate Search as a WildFly module</title>
 
     <para>Provided you're deploying on WildFly 8 there is an additional way
-    to add the search dependencies to your application which introduced many
-    practical benefits.</para>
+    to add the Hibernate Search dependencies to your application which introduces
+    many practical benefits.</para>
 
     <para>In WildFly class loading is based on modules. Each module defines
     explicit dependencies on other modules. Modules allow to share the same
@@ -1916,7 +1916,7 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
     <tip>
       <para>Modular classloading is a feature of JBoss EAP as well, but if you are using
       JBoss EAP, you're reading the wrong version of the user guide! JBoss EAP subscriptions
-      include official support for Hibernate Search (as part of the WFK) and comes with
+      include official support for Hibernate Search (as part of the WFK) and come with
       a different edition of this guide specifically tailored for EAP users.</para>
     </tip>
   </section>
