@@ -769,6 +769,10 @@
                     <version>2.16</version>
                     <configuration>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <systemPropertyVariables>
+                            <!-- See test org.hibernate.search.test.util.EnvironmentTest in module orm -->
+                            <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
+                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
                 <plugin>
