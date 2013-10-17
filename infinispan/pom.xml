@@ -148,15 +148,14 @@
                     <threadCount>1</threadCount>
                     <reuseForks>true</reuseForks>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <!-- MaxPermSize is needed for profiling sessions,
-                         java.net.preferIPv4Stack and jgroups.bind_addr are needed for JGroups -->
-                    <argLine>-Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -XX:MaxPermSize=256m</argLine>
-                    <systemProperties>
-                        <property>
-                            <name>com.sun.management.jmxremote</name>
-                            <value>true</value>
-                        </property>
-                    </systemProperties>
+                    <!-- MaxPermSize is needed for profiling sessions -->
+                    <argLine>-XX:MaxPermSize=256m</argLine>
+                    <systemPropertyVariables>
+                        <!-- java.net.preferIPv4Stack and jgroups.bind_addr are needed for JGroups -->
+                        <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+                        <jgroups.bind_addr>127.0.0.1</jgroups.bind_addr>
+                        <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
