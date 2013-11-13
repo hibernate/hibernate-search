@@ -569,7 +569,7 @@ public class SearchFactoryBuilder {
 	 * Implementation of the Hibernate Search SPI WritableBuildContext and WorkerBuildContext
 	 * The data is provided by the SearchFactoryState object associated to SearchFactoryBuilder.
 	 */
-	private class BuildContext implements WritableBuildContext, WorkerBuildContext {
+	private class BuildContext implements WorkerBuildContext {
 		private final SearchFactoryState factoryState = SearchFactoryBuilder.this.factoryState;
 
 		@Override
