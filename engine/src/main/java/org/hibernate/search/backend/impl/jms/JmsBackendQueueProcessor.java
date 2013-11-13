@@ -55,7 +55,6 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 	private String jmsQueueName;
 	protected static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
 	private Queue jmsQueue;
-	private QueueConnectionFactory factory;
 	private String indexName;
 	private SearchFactoryImplementor searchFactory;
 	private QueueConnection connection;
@@ -75,7 +74,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
 		this.searchFactory = context.getUninitializedSearchFactory();
-		this.factory = initializeJMSQueueConnectionFactory( props );
+		QueueConnectionFactory factory = initializeJMSQueueConnectionFactory( props );
 		this.jmsQueue = initializeJMSQueue( factory, props );
 		this.connection = initializeJMSConnection( factory, props );
 	}
@@ -101,7 +100,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
-		//TODO review this integration with the old Runnable-style execution
+
 		Runnable operation = new JmsBackendQueueTask( indexName, workList, indexManager, this );
 		operation.run();
 	}
@@ -158,7 +157,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 
 	/**
 	 * Initialises the JMS QueueConnection to be used for sending Lucene work operations to the master node.
-	 * This is invoked after {@link #initializeJMSQueue(Properties)}.
+	 * This is invoked after {@link #initializeJMSQueue(QueueConnectionFactory, Properties)}.
 	 *
 	 * @return the initialized {@link javax.jms.QueueConnection}
 	 * @param factory a {@link javax.jms.QueueConnectionFactory} object.
