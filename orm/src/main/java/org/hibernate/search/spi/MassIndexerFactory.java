@@ -30,31 +30,27 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
  * Contains methods that can be used to create a {@link MassIndexer}.
  *
  * @author Davide D'Alto <davide@hibernate.org>
- *
  * @since 4.3
  */
 public interface MassIndexerFactory {
+	String MASS_INDEXER_FACTORY_CLASSNAME = "hibernate.search.massindexer.factoryclass";
 
 	/**
 	 * Called after the creation of the factory, can be used to read configuration parameters.
 	 *
-	 * @param properties
-	 *            configuration properties
+	 * @param properties configuration properties
 	 */
 	void initialize(Properties properties);
 
 	/**
 	 * Create an instance of a {@link MassIndexer}.
 	 *
-	 * @param searchFactory
-	 *            the Hibernate Search factory
-	 * @param sessionFactory
-	 *            the {@link org.hibernate.Session} factory
-	 * @param entities
-	 *            the classes of the entities that are going to be indexed
+	 * @param searchFactory the Hibernate Search factory
+	 * @param sessionFactory the {@link org.hibernate.Session} factory
+	 * @param entities the classes of the entities that are going to be indexed
+	 *
 	 * @return a new MassIndexer
 	 */
 	MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
 			Class<?>... entities);
-
 }

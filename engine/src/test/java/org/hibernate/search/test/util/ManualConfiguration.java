@@ -23,20 +23,20 @@
  */
 package org.hibernate.search.test.util;
 
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
-import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.cfg.spi.SearchConfigurationBase;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfigurationBase;
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.impl.SimpleInitializer;
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
 
 /**
  * Manually defines the configuration
@@ -46,9 +46,9 @@ import org.hibernate.search.spi.ServiceProvider;
  */
 public class ManualConfiguration extends SearchConfigurationBase implements SearchConfiguration {
 
-	private final Map<String,Class<?>> classes;
+	private final Map<String, Class<?>> classes;
 	private final Properties properties;
-	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
+	private final HashMap<Class<? extends Service>, Object> providedServices;
 	private final InstanceInitializer initializer;
 	private SearchMapping programmaticMapping;
 	private boolean transactionsExpected = true;
@@ -62,12 +62,12 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 
 	public ManualConfiguration(InstanceInitializer init) {
 		initializer = init;
-		classes = new HashMap<String,Class<?>>();
-		properties = new Properties( );
-		providedServices = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
+		classes = new HashMap<String, Class<?>>();
+		properties = new Properties();
+		providedServices = new HashMap<Class<? extends Service>, Object>();
 	}
 
-	public ManualConfiguration addProperty(String key , String value) {
+	public ManualConfiguration addProperty(String key, String value) {
 		properties.setProperty( key, value );
 		return this;
 	}
@@ -113,7 +113,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	}
 
 	@Override
-	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+	public Map<Class<? extends Service>, Object> getProvidedServices() {
 		return providedServices;
 	}
 

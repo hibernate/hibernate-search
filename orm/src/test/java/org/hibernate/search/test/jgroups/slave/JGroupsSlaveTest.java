@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import junit.framework.Assert;
 
+import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.MessageDispatcher;
@@ -35,9 +36,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
-import org.hibernate.search.backend.impl.jgroups.MessageListenerToRequestHandlerAdapter;
+import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
+import org.hibernate.search.backend.jgroups.impl.MessageListenerToRequestHandlerAdapter;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -164,8 +164,8 @@ public class JGroupsSlaveTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
 		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" );
 		cfg.setProperty( "hibernate.search.default." + JGroupsBackendQueueProcessor.MESSAGE_TIMEOUT_MS, "100" );
-		cfg.setProperty( JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
+		cfg.setProperty( DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( DispatchMessageSender.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}
 
 }

@@ -54,9 +54,9 @@ public class JGroupsMasterMessageListener implements Receiver {
 	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final BuildContext context;
-	private final NodeSelectorStrategyHolder selector;
+	private final NodeSelectorService selector;
 
-	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorStrategyHolder masterNodeSelector) {
+	public JGroupsMasterMessageListener(BuildContext context, NodeSelectorService masterNodeSelector) {
 		this.context = context;
 		this.selector = masterNodeSelector;
 	}

@@ -29,6 +29,7 @@ import org.hibernate.search.backend.LuceneWork;
  * to the other nodes.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Hardy Ferentschik
  */
 public interface LuceneWorkSerializer {
 
@@ -46,5 +47,4 @@ public interface LuceneWorkSerializer {
 	 * @return a short label of this implementation and optionally version
 	 */
 	String describeSerializer();
-
 }

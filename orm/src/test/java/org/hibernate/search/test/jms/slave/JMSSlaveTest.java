@@ -38,7 +38,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.impl.jms.JmsBackendQueueProcessor;
+import org.hibernate.search.backend.jms.impl.JmsBackendQueueProcessor;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jms.master.JMSMasterTest;
 
@@ -189,7 +189,6 @@ public class JMSSlaveTest extends SearchTestCase {
 		props.setProperty( "connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
 		props.setProperty( "queue.queue/searchtest", "searchQueue" );
 
-		Context ctx = new javax.naming.InitialContext( props );
-		return ctx;
+		return new javax.naming.InitialContext( props );
 	}
 }

@@ -666,4 +666,16 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 194, value = "Unable to load configured class '%s' as 'sharding_strategy'")
 	SearchException getUnableToLoadShardingStrategyClassException(String className);
+
+	@Message(id = 195, value = "Multiple service implementations detected for service '%1$s': '%2$s'")
+	SearchException getMultipleServiceImplementationsException(String service, String foundServices);
+
+	@Message(id = 196, value = "No service implementations for service '%1$s' can be found")
+	SearchException getNoServiceImplementationFoundException(String service);
+
+	@Message(id = 197, value = "Unable to create JGroups backend. Are you sure you have the JGroups dependencies on the classpath?")
+	SearchException getUnableToCreateJGroupsBackendException(@Cause Throwable throwable);
+
+	@Message(id = 198, value = "Unexpected status '%s' for service '%s'. Check for circular dependencies or unreleased resources in your services.")
+	SearchException getUnexpectedServiceStatusException(String status, String service);
 }

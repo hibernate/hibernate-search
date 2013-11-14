@@ -34,9 +34,6 @@ public class BackendQueueProcessorTest {
 	public void testCheckingForNullWork() {
 		checkBackendBehaviour( new LuceneBackendQueueProcessor() );
 		checkBackendBehaviour( new BlackHoleBackendQueueProcessor() );
-// HSEARCH-1365
-//		checkBackendBehaviour( new JGroupsBackendQueueProcessor( new SlaveNodeSelector() ) );
-//		checkBackendBehaviour( new JndiJMSBackendQueueProcessor() );
 	}
 
 	private void checkBackendBehaviour(BackendQueueProcessor backend) {

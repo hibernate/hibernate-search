@@ -30,7 +30,7 @@ import org.jgroups.ReceiverAdapter;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.jgroups.MessageSerializationHelper;
+import org.hibernate.search.backend.jgroups.impl.MessageSerializationHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 

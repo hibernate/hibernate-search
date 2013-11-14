@@ -41,7 +41,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -68,7 +68,6 @@ import org.hibernate.search.query.engine.impl.HSQueryImpl;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
@@ -190,7 +189,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			this.allIndexesManager.stop();
 			this.timingSource.stop();
 
-			serviceManager.stopServices();
+			serviceManager.releaseAllServices();
 
 			for ( Analyzer an : this.analyzers.values() ) {
 				an.close();
@@ -334,16 +333,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public FilterDef getFilterDefinition(String name) {
 		return filterDefinitions.get( name );
-	}
-
-	@Override
-	public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
-		return serviceManager.requestService( provider, this );
-	}
-
-	@Override
-	public void releaseService(Class<? extends ServiceProvider<?>> provider) {
-		serviceManager.releaseService( provider );
 	}
 
 	@Override

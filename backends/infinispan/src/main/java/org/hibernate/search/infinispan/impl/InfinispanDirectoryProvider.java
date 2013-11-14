@@ -25,13 +25,13 @@ package org.hibernate.search.infinispan.impl;
 
 import java.util.Properties;
 
+import org.hibernate.search.infinispan.CacheManagerService;
 import org.infinispan.Cache;
 import org.infinispan.lucene.InfinispanDirectory;
 import org.infinispan.manager.EmbeddedCacheManager;
 
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.infinispan.CacheManagerServiceProvider;
 import org.hibernate.search.infinispan.InfinispanIntegration;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -49,20 +49,20 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	/**
-	 * Use {@link InfinispanIntegration.DEFAULT_LOCKING_CACHENAME} instead.
+	/**               .
+	 * Use {@link InfinispanIntegration#DEFAULT_LOCKING_CACHENAME} instead.
 	 */
 	@Deprecated
 	public static final String DEFAULT_LOCKING_CACHENAME = InfinispanIntegration.DEFAULT_LOCKING_CACHENAME;
 
 	/**
-	 * Use {@link InfinispanIntegration.DEFAULT_INDEXESDATA_CACHENAME} instead.
+	 * Use {@link InfinispanIntegration#DEFAULT_INDEXESDATA_CACHENAME} instead.
 	 */
 	@Deprecated
 	public static final String DEFAULT_INDEXESDATA_CACHENAME = InfinispanIntegration.DEFAULT_INDEXESDATA_CACHENAME;
 
 	/**
-	 * Use {@link InfinispanIntegration.DEFAULT_LOCKING_CACHENAME} instead.
+	 * Use {@link InfinispanIntegration#DEFAULT_LOCKING_CACHENAME} instead.
 	 */
 	@Deprecated
 	public static final String DEFAULT_INDEXESMETADATA_CACHENAME = InfinispanIntegration.DEFAULT_LOCKING_CACHENAME;
@@ -83,7 +83,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.directoryProviderName = directoryProviderName;
 		this.serviceManager = context.getServiceManager();
-		this.cacheManager = serviceManager.requestService( CacheManagerServiceProvider.class, context );
+		this.cacheManager = serviceManager.requestService( CacheManagerService.class ).getEmbeddedCacheManager();
 		metadataCacheName = InfinispanIntegration.getMetadataCacheName( properties );
 		dataCacheName = InfinispanIntegration.getDataCacheName( properties );
 		lockingCacheName = InfinispanIntegration.getLockingCacheName( properties );
@@ -107,7 +107,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	@Override
 	public void stop() {
 		directory.close();
-		serviceManager.releaseService( CacheManagerServiceProvider.class );
+		serviceManager.releaseService( CacheManagerService.class );
 		log.debug( "Stopped InfinispanDirectory" );
 	}
 
@@ -119,5 +119,4 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	public EmbeddedCacheManager getCacheManager() {
 		return cacheManager;
 	}
-
 }
