@@ -20,10 +20,10 @@
  */
 package org.hibernate.search.backend;
 
+import java.lang.reflect.Constructor;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
@@ -31,55 +31,90 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Hardy Ferentschik
  */
 public final class BackendFactory {
+	private static final Log log = LoggerFactory.make();
+
+	// TODO - Consider using service mechanism instead of reflection to instantiate backends
+	// need to allow multiple service impl first and provide a way for selecting one (HF)
+	private static final String JMS_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.jms.impl.JndiJMSBackendQueueProcessor";
+	private static final String JGROUPS_BACKEND_QUEUE_PROCESSOR = "org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor";
+	private static final String JGROUPS_MASTER_SELECTOR = "org.hibernate.search.backend.jgroups.impl.MasterNodeSelector";
+	private static final String JGROUPS_SLAVE_SELECTOR = "org.hibernate.search.backend.jgroups.impl.SlaveNodeSelector";
+	private static final String JGROUPS_AUTO_SELECTOR = "org.hibernate.search.backend.jgroups.impl.AutoNodeSelector";
+	private static final String JGROUPS_SELECTOR_BASE_TYPE = "org.hibernate.search.backend.jgroups.impl.NodeSelectorStrategy";
+
 
 	private BackendFactory() {
 		//not allowed
 	}
 
-	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties properties) {
+	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager,
+			WorkerBuildContext context,
+			Properties properties) {
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
 		return createBackend( backend, indexManager, context, properties );
 	}
 
-	public static BackendQueueProcessor createBackend(String backend, DirectoryBasedIndexManager indexManager, WorkerBuildContext context,
+	public static BackendQueueProcessor createBackend(String backend,
+			DirectoryBasedIndexManager indexManager,
+			WorkerBuildContext context,
 			Properties properties) {
-
 		final BackendQueueProcessor backendQueueProcessor;
 
 		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = new LuceneBackendQueueProcessor();
 		}
 		else if ( "jms".equalsIgnoreCase( backend ) ) {
-// HSEARCH-1365
-//			backendQueueProcessor = new JndiJMSBackendQueueProcessor();
-			backendQueueProcessor = null;
+			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
+					BackendQueueProcessor.class,
+					JMS_BACKEND_QUEUE_PROCESSOR,
+					BackendFactory.class.getClassLoader(),
+					"JMS backend "
+			);
 		}
 		else if ( "blackhole".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = new BlackHoleBackendQueueProcessor();
 		}
 		else if ( "jgroupsMaster".equals( backend ) ) {
-//			backendQueueProcessor = new JGroupsBackendQueueProcessor( new MasterNodeSelector() );
-			backendQueueProcessor = null;
+			backendQueueProcessor = createJGroupsQueueProcessor( JGROUPS_MASTER_SELECTOR );
 		}
 		else if ( "jgroupsSlave".equals( backend ) ) {
-//			backendQueueProcessor = new JGroupsBackendQueueProcessor( new SlaveNodeSelector() );
-			backendQueueProcessor = null;
+			backendQueueProcessor = createJGroupsQueueProcessor( JGROUPS_SLAVE_SELECTOR );
 		}
 		else if ( "jgroups".equals( backend ) ) {
-//			backendQueueProcessor = new JGroupsBackendQueueProcessor( new AutoNodeSelector( indexManager.getIndexName() ) );
-			backendQueueProcessor = null;
+			Class<?> selectorClass = ClassLoaderHelper.classForName(
+					JGROUPS_AUTO_SELECTOR,
+					BackendFactory.class.getClassLoader(),
+					"JGroups node selector "
+			);
+
+			Constructor constructor;
+			Object autoNodeSelector;
+			try {
+				constructor = selectorClass.getConstructor( String.class );
+				autoNodeSelector = constructor.newInstance( indexManager.getIndexName() );
+			}
+			catch (Exception e) {
+				throw log.getUnableToCreateJGroupsBackendException( e );
+			}
+			backendQueueProcessor = createJGroupsQueueProcessor( autoNodeSelector );
 		}
 		else {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
 					BackendQueueProcessor.class,
-					backend, BackendFactory.class, "processor"
+					backend,
+					BackendFactory.class.getClassLoader(),
+					"processor"
 			);
 		}
 		backendQueueProcessor.initialize( properties, context, indexManager );
@@ -101,6 +136,7 @@ public final class BackendFactory {
 	 *
 	 * @param properties Might optionally contain configuration options for the ExecutorService
 	 * @param indexManagerName The indexManager going to be linked to this ExecutorService
+	 *
 	 * @return null if the work needs execution in sync
 	 */
 	public static ExecutorService buildWorkersExecutor(Properties properties, String indexManagerName) {
@@ -123,4 +159,39 @@ public final class BackendFactory {
 		return ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE );
 	}
 
+	private static BackendQueueProcessor createJGroupsQueueProcessor(String selectorClass) {
+		return createJGroupsQueueProcessor(
+				ClassLoaderHelper.instanceFromName(
+						Object.class,
+						selectorClass,
+						BackendFactory.class.getClassLoader(),
+						"JGroups node selector"
+				)
+		);
+	}
+
+	private static BackendQueueProcessor createJGroupsQueueProcessor(Object selectorInstance) {
+		BackendQueueProcessor backendQueueProcessor;
+		Class<?> processorClass = ClassLoaderHelper.classForName(
+				JGROUPS_BACKEND_QUEUE_PROCESSOR,
+				BackendFactory.class.getClassLoader(),
+				"JGroups backend "
+		);
+
+		Class<?> selectorClass = ClassLoaderHelper.classForName(
+				JGROUPS_SELECTOR_BASE_TYPE,
+				BackendFactory.class.getClassLoader(),
+				"JGroups node selector "
+		);
+
+		Constructor constructor;
+		try {
+			constructor = processorClass.getConstructor( selectorClass );
+			backendQueueProcessor = (BackendQueueProcessor) constructor.newInstance( selectorInstance );
+		}
+		catch (Exception e) {
+			throw log.getUnableToCreateJGroupsBackendException( e );
+		}
+		return backendQueueProcessor;
+	}
 }

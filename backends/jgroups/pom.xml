@@ -42,7 +42,11 @@
             <artifactId>jgroups</artifactId>
             <optional>true</optional>
         </dependency>
-
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-avro-serialization</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>

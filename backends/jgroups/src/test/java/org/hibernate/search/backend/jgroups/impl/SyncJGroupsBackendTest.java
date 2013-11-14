@@ -38,7 +38,6 @@ import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.TestForIssue;
 import org.jgroups.TimeoutException;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -68,18 +67,16 @@ public class SyncJGroupsBackendTest {
 		.withProperty( "hibernate.search.books.worker.execution", "async" )
 		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
 		.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
-		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
+		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
 		;
 
 	@Rule
 	public SearchFactoryHolder masterNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", JGroupsReceivingMockBackend.class.getName() )
-		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
+		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
 		;
 
-	// TODO HSEARCH-1365
 	@Test
-	@Ignore
 	public void testSynchAsConfigured() {
 		JGroupsBackendQueueProcessor dvdsBackend = extractJGroupsBackend( "dvds" );
 		Assert.assertTrue( "dvds index was configured with a syncronous JGroups backend", dvdsBackend.blocksForACK() );

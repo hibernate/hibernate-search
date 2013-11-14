@@ -23,20 +23,20 @@ package org.hibernate.search.test.util;
 import java.util.Properties;
 
 import org.apache.lucene.search.DefaultSimilarity;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
  * At this point mainly used for tests
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class RamIndexManager extends DirectoryBasedIndexManager {
@@ -61,17 +61,6 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		@Override
 		public String getIndexingStrategy() {
 			return null;
-		}
-
-		@Override
-		@Deprecated
-		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
-			return null;
-		}
-
-		@Override
-		@Deprecated
-		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
 		}
 
 		@Override
@@ -102,19 +91,22 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		@Override
 		public ServiceManager getServiceManager() {
 			return new ServiceManager() {
+
 				@Override
-				public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass,
-						BuildContext context) {
+				public <S extends Service> S requestService(Class<S> serviceRole) {
 					return null;
 				}
+
 				@Override
-				public void releaseService(Class<? extends ServiceProvider<?>> serviceProviderClass) {
+				public <S extends Service> void releaseService(Class<S> serviceRole) {
 				}
+
 				@Override
-				public void stopServices() {
+				public void releaseAllServices() {
 				}
 			};
 		}
 	}
-
 }
+
+

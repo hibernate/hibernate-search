@@ -32,7 +32,7 @@ import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -94,7 +94,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	private final NodeSelectorStrategy selectionStrategy;
 
-	protected MessageSender messageSender;
+	protected MessageSenderService messageSenderService;
 	protected String indexName;
 	protected DirectoryBasedIndexManager indexManager;
 
@@ -114,10 +114,10 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		this.indexName = indexManager.getIndexName();
 		assertLegacyOptionsNotUsed( props, indexName );
 		serviceManager = context.getServiceManager();
-		this.messageSender = serviceManager.requestService( JGroupsChannelProvider.class, context );
-		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
+		this.messageSenderService = serviceManager.requestService( MessageSenderService.class );
+		NodeSelectorService masterNodeSelector = serviceManager.requestService( NodeSelectorService.class );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
-		selectionStrategy.viewAccepted( messageSender.getView() ); // set current view?
+		selectionStrategy.viewAccepted( messageSenderService.getView() ); // set current view?
 
 		final boolean sync = BackendFactory.isConfiguredAsSync( props );
 		final Properties jgroupsProperties = new MaskedProperty( props, JGROUPS_CONFIGURATION_SPACE );
@@ -134,13 +134,13 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void close() {
-		serviceManager.releaseService( MasterSelectorServiceProvider.class );
-		serviceManager.releaseService( JGroupsChannelProvider.class );
+		serviceManager.releaseService( NodeSelectorService.class );
+		serviceManager.releaseService( MessageSenderService.class );
 		delegatedBackend.close();
 	}
 
-	MessageSender getMessageSender() {
-		return messageSender;
+	MessageSenderService getMessageSenderService() {
+		return messageSenderService;
 	}
 
 	/**
@@ -149,8 +149,8 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	 * @return Address
 	 */
 	public Address getAddress() {
-		if ( address == null && messageSender != null ) {
-			address = messageSender.getAddress();
+		if ( address == null && messageSenderService != null ) {
+			address = messageSenderService.getAddress();
 		}
 		return address;
 	}

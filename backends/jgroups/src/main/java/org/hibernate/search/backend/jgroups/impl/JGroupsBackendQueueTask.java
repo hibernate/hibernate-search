@@ -53,7 +53,7 @@ public class JGroupsBackendQueueTask {
 	private final long messageTimeout;
 
 	public JGroupsBackendQueueTask(JGroupsBackendQueueProcessor factory, IndexManager indexManager,
-			NodeSelectorStrategyHolder masterNodeSelector, boolean blockForACK, long messageTimeout) {
+			NodeSelectorService masterNodeSelector, boolean blockForACK, long messageTimeout) {
 		this.factory = factory;
 		this.indexManager = indexManager;
 		this.blockForACK = blockForACK;
@@ -93,7 +93,7 @@ public class JGroupsBackendQueueTask {
 
 		try {
 			Message message = masterNodeSelector.createMessage( data );
-			factory.getMessageSender().send( message, blockForACK, messageTimeout );
+			factory.getMessageSenderService().send( message, blockForACK, messageTimeout );
 			if ( trace ) {
 				log.tracef( "Lucene works have been sent from slave %s to master node.", factory.getAddress() );
 			}

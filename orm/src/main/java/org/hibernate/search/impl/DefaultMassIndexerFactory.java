@@ -31,6 +31,7 @@ import org.hibernate.search.spi.MassIndexerFactory;
  * The {@link MassIndexer} implementation used when none is specified in the configuration.
  *
  * @author Davide D'Alto <davide@hibernate.org>
+ * @author Hardy Ferentschik
  */
 public class DefaultMassIndexerFactory implements MassIndexerFactory {
 
@@ -41,10 +42,10 @@ public class DefaultMassIndexerFactory implements MassIndexerFactory {
 	}
 
 	@Override
-	public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
+	public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory,
+			SessionFactoryImplementor sessionFactory,
 			Class<?>... entities) {
 		final Class<?>[] types = entities.length == 0 ? OBJECT_ARRAY : entities;
 		return new MassIndexerImpl( searchFactory, sessionFactory, types );
 	}
-
 }
