@@ -26,10 +26,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-avro-serialization</artifactId>
+    <artifactId>hibernate-search-jgroups-backend</artifactId>
 
-    <name>Hibernate Search Avro Serialization</name>
-    <description>Implementation of the Hibernate Search serialization protocol for remote indexing using Avro</description>
+    <name>Hibernate Search JGroups Backend</name>
+    <description>Hibernate Search JGroup based backend</description>
 
     <dependencies>
         <dependency>
@@ -38,18 +38,15 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
+            <groupId>org.jgroups</groupId>
+            <artifactId>jgroups</artifactId>
+            <optional>true</optional>
         </dependency>
+
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-assert</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

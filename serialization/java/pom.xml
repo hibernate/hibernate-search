@@ -28,7 +28,7 @@
 
     <artifactId>hibernate-search-java-serialization</artifactId>
 
-    <name>Hibernate Search Java Default Serialization Support</name>
+    <name>Hibernate Search Java Default Serialization</name>
     <description>Implementation of the Hibernate Search serialization protocol for remote indexing using Java default serialization</description>
 
     <dependencies>

@@ -42,10 +42,12 @@
         <module>engine</module>
         <module>serialization/java</module>
         <module>serialization/avro</module>
+        <module>backends/jgroups</module>
+        <module>backends/jms</module>
+        <module>backends/infinispan</module>
         <module>orm</module>
         <module>analyzers</module>
         <module>testing</module>
-        <module>infinispan</module>
         <module>modules</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
@@ -1229,7 +1231,7 @@
             </properties>
         </profile>
 
-        <!-- The SQLServer2008 R2 (MS JDBC) test envionment -->
+        <!-- The SQLServer2008 R2 (MS JDBC) test environment -->
         <profile>
             <id>mssql2008R2</id>
             <dependencies>

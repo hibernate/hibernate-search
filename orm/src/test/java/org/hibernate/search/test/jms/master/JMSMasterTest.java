@@ -55,7 +55,6 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.jms.JmsBackendQueueTask;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
@@ -118,7 +117,7 @@ public class JMSMasterTest extends SearchTestCase {
 		ObjectMessage message = getQueueSession().createObjectMessage();
 		final String indexName = org.hibernate.search.test.jms.master.TShirt.class.getName();
 		message.setStringProperty(
-				JmsBackendQueueTask.INDEX_NAME_JMS_PROPERTY,
+				Environment.INDEX_NAME_JMS_PROPERTY,
 				indexName );
 		IndexManager indexManager = getSearchFactoryImpl().getIndexManagerHolder().getIndexManager( indexName );
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );

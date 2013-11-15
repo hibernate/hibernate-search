@@ -26,10 +26,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-avro-serialization</artifactId>
+    <artifactId>hibernate-search-jms-backend</artifactId>
 
-    <name>Hibernate Search Avro Serialization</name>
-    <description>Implementation of the Hibernate Search serialization protocol for remote indexing using Avro</description>
+    <name>Hibernate Search JMS Backend</name>
+    <description>Hibernate Search JGroup based backend</description>
 
     <dependencies>
         <dependency>
@@ -38,8 +38,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -48,20 +49,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-assert</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-testing</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-engine</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>simple-jndi</groupId>
+            <artifactId>simple-jndi</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
