@@ -460,7 +460,7 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
       have a single centralized one shared by each node.</para>
 
       <para>See the <ulink
-      url="https://docs.jboss.org/author/display/ISPN/Home"> Infinispan
+      url="http://infinispan.org/documentation/"> Infinispan
       documentation</ulink> for all Infinispan configuration options.</para>
 
       <section>
@@ -489,7 +489,7 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
         <literal>infinispan-lucene-directory.jar</literal> and
         <literal>infinispan-core.jar</literal> to your application classpath.
         These last two jars are distributed by <ulink
-        url="http://www.jboss.org/infinispan/downloads">Infinispan</ulink>.</para>
+        url="http://infinispan.org/download/">Infinispan</ulink>.</para>
       </section>
 
       <section>
