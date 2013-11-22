@@ -35,7 +35,7 @@ import org.hibernate.search.test.util.ManualConfiguration;
 import org.junit.Test;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.jgroups.util.Util.assertFalse;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
