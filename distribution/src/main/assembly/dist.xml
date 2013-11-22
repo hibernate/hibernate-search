@@ -59,7 +59,7 @@
                 <include>org.apache.lucene:lucene-core</include>
                 <include>org.hibernate.common:hibernate-commons-annotations</include>
                 <include>org.jboss.logging:jboss-logging</include>
-                <include>org.apache.avro:avro</include>
+
 
                 <!-- hibernate-search-orm -->
                 <include>org.hibernate:hibernate-core</include>
@@ -69,16 +69,11 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional</outputDirectory>
+            <outputDirectory>dist/lib/optional/jpa</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <!-- hibernate-search-engine-->
-                <include>org.hibernate:hibernate-search-analyzers</include>
-                <include>org.apache.lucene:lucene-analyzers</include>
-
-                <!-- hibernate-search-orm-->
                 <include>org.hibernate:hibernate-entitymanager</include>
             </includes>
             <excludes>
@@ -89,13 +84,59 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/clustering</outputDirectory>
+            <outputDirectory>dist/lib/optional/analyzers</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <!-- hibernate-search-engine-->
+                <include>org.hibernate:hibernate-search-analyzers</include>
+                <include>org.apache.lucene:lucene-analyzers</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/optional/tika</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.apache.tika:tika-parsers</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/clustering/infinispan</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
                 <include>org.hibernate:hibernate-search-infinispan</include>
                 <include>org.infinispan:infinispan-lucene-directory</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/clustering/jgroups</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-jgroups-backend</include>
+                <include>org.hibernate:hibernate-search-avro-serialization</include>
+                <include>org.apache.avro:avro</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/clustering/jms</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-jms-backend</include>
+                <include>org.hibernate:hibernate-search-avro-serialization</include>
+                <include>org.apache.avro:avro</include>
             </includes>
         </dependencySet>
 
