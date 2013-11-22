@@ -39,7 +39,7 @@ public interface PropertyDescriptor extends FieldContributor {
 	 *
 	 * @return {@code true} if the property is the document id, {@code false} otherwise
 	 *
-	 * @see {@link org.hibernate.search.annotations.DocumentId}
+	 * @see org.hibernate.search.annotations.DocumentId
 	 */
 	boolean isId();
 }

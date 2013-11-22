@@ -40,7 +40,7 @@ public class BackendQueueProcessorTest {
 		try {
 			backend.applyWork( null, null );
 		}
-		catch (IllegalArgumentException e2) {
+		catch (IllegalArgumentException e) {
 			// this is ok, we just want to avoid other exceptions or NPEs
 		}
 	}

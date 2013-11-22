@@ -307,10 +307,13 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	}
 
 	/**
-	 * In rare cases the Lucene FieldCache might fail to return a value, at this point we already extracted
-	 * the Document so we need to repeat the process to extract the missing field only.
-	 * @param scoreDocIndex
-	 * @return
+	 * In rare cases the Lucene {@code FieldCache} might fail to return a value, at this point we already extracted
+	 * the {@code Document} so we need to repeat the process to extract the missing field only.
+	 *
+	 * @param scoreDocIndex the document index
+	 *
+	 * @return the index class name stored in the {@code ProjectionConstants.OBJECT_CLASS} field.
+	 *
 	 * @throws IOException
 	 */
 	private String forceClassNameExtraction(int scoreDocIndex) throws IOException {

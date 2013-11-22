@@ -56,7 +56,6 @@ public class StandardServiceManager implements ServiceManager {
 	private final BuildContext buildContext;
 	private AggregatedClassLoader aggregatedClassLoader;
 
-	private final ConcurrentHashMap<Class<? extends Service>, ServiceLoader<?>> serviceLoaders;
 	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices;
 	private final Map<Class<? extends Service>, Object> providedServices;
 
@@ -70,7 +69,6 @@ public class StandardServiceManager implements ServiceManager {
 				Thread.currentThread().getContextClassLoader(),
 				this.getClass().getClassLoader()
 		);
-		this.serviceLoaders = new ConcurrentHashMap<Class<? extends Service>, ServiceLoader<?>>();
 		this.cachedServices = new ConcurrentHashMap<Class<?>, ServiceWrapper<?>>();
 	}
 
@@ -113,7 +111,6 @@ public class StandardServiceManager implements ServiceManager {
 
 	@Override
 	public void releaseAllServices() {
-		clearServiceLoaders();
 		for ( ServiceWrapper wrapper : cachedServices.values() ) {
 			wrapper.ensureStopped();
 		}
@@ -121,30 +118,12 @@ public class StandardServiceManager implements ServiceManager {
 
 	@SuppressWarnings("unchecked")
 	private <S extends Service> Set<S> loadJavaServices(Class<S> serviceContract) {
-		ServiceLoader<S> serviceLoader;
-		if ( serviceLoaders.containsKey( serviceContract ) ) {
-			serviceLoader = (ServiceLoader<S>) serviceLoaders.get( serviceContract );
-		}
-		else {
-			serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
-			ServiceLoader previousServiceLoader = serviceLoaders.putIfAbsent( serviceContract, serviceLoader );
-			if ( previousServiceLoader != null ) {
-				serviceLoader = previousServiceLoader;
-			}
-		}
-
+		ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
 		final Set<S> services = new LinkedHashSet<S>();
 		for ( S service : serviceLoader ) {
 			services.add( service );
 		}
 		return services;
-	}
-
-	private void clearServiceLoaders() {
-		for ( ServiceLoader serviceLoader : serviceLoaders.values() ) {
-			serviceLoader.reload(); // clear service loader providers
-		}
-		serviceLoaders.clear();
 	}
 
 	private <S extends Service> ServiceWrapper<S> createAndCacheWrapper(Class<S> serviceRole) {
