@@ -152,20 +152,6 @@
             <property name="ignoreComments" value="true" />
         </module>
 
-        <!-- Slowly migrating away from Hibernate Commons Annotations -->
-        <module name="RegexpSinglelineJava">
-            <property name="format" value="import org\.hibernate\.annotations\.common\.AssertionFailure;" />
-            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
-            <property name="message" value="Stop using the AssertionFailure from commons-annotations." />
-        </module>
-
-        <!-- Slowly migrating away from Hibernate Commons Annotations -->
-        <module name="RegexpSinglelineJava">
-            <property name="format" value="import org\.hibernate\.annotations\.common\.AssertionFailure;" />
-            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
-            <property name="message" value="Stop using the StringHelper from commons-annotations: use org.hibernate.search.util.StringHelper" />
-        </module>
-
         <!-- Nobody should be using StringBuffer anymore -->
         <module name="RegexpSinglelineJava">
             <property name="format" value=" StringBuffer" />
@@ -175,6 +161,23 @@
 
         <!-- Required to get SuppressionCommentFilter to work -->
         <module name="FileContentsHolder" />
+
+        <!--  Avoid some import statements -->
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="java.awt, sun"/>
+        </module>
+        <module name="org.hibernate.checkstyle.checks.regexp.IllegalImport">
+            <property name="illegalClassnames" value="org.jgroups.util.Util.assertTrue, org.jgroups.util.Util.assertFalse, org.jgroups.util.Util.assertNotNull" />
+            <property name="message" value="Stop using the Util class from JGroups for assertions which should use JUnit!" />
+        </module>
+        <module name="org.hibernate.checkstyle.checks.regexp.IllegalImport">
+            <property name="illegalClassnames" value="org.hibernate.annotations.common.util.StringHelper" />
+            <property name="message" value="Stop using the StringHelper from commons-annotations: use org.hibernate.search.util.StringHelper." />
+        </module>
+        <module name="org.hibernate.checkstyle.checks.regexp.IllegalImport">
+            <property name="illegalClassnames" value="org.hibernate.annotations.common.AssertionFailure" />
+            <property name="message" value="Stop using the AssertionFailure from commons-annotations." />
+        </module>
 
     </module>
 
