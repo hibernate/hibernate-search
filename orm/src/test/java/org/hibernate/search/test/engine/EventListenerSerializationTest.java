@@ -29,7 +29,7 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.junit.Test;
 
-import static org.jgroups.util.Util.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
 /**
