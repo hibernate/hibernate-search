@@ -28,7 +28,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
-import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.engine.service.spi.Service;
 
 /**
  * IFF this class compiles we're good. The idea is that implementors
@@ -80,7 +80,7 @@ public class SearchConfigurationContractTester extends SearchConfigurationBase i
 	}
 
 	@Override
-	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+	public Map<Class<? extends Service>, Object> getProvidedServices() {
 		return null;
 	}
 

@@ -35,7 +35,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
@@ -53,7 +53,6 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
-import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
@@ -149,16 +148,6 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	public String getIndexingStrategy() {
 		return delegate.getIndexingStrategy();
-	}
-
-	@Override
-	public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
-		return delegate.getServiceManager().requestService( provider, this );
-	}
-
-	@Override
-	public void releaseService(Class<? extends ServiceProvider<?>> provider) {
-		delegate.getServiceManager().releaseService( provider );
 	}
 
 	public void close() {

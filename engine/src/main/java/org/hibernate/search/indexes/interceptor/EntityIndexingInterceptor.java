@@ -30,7 +30,7 @@ package org.hibernate.search.indexes.interceptor;
  * the explicit indexing control API such <code>org.hibernate.search.FullTextSession.index(T)</code>
  * or <code>purge</code>, <purgeAll>.
  *
- * @experimental: {@link IndexingOverride} might be updated
+ * @experimental {@link IndexingOverride} might be updated
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
@@ -70,11 +70,11 @@ public interface EntityIndexingInterceptor<T> {
 
 	/**
 	 * A CollectionUpdate event is fired on collections included in an indexed entity, for example when using
-	 * {@link IndexedEmbedded} This event is triggered on each indexed domain instance T contained in such a collection;
+	 * {@link org.hibernate.search.annotations.IndexedEmbedded} This event is triggered on each indexed domain instance T contained in such a collection;
 	 * this is generally similar to a {@link #onUpdate(Object)} event.
 	 *
-	 * @param entity
-	 *            The entity instance
+	 * @param entity The entity instance
+	 *
 	 * @return Return {@link IndexingOverride#APPLY_DEFAULT} to have the instance removed and re-added to the index as
 	 *         normal; return a different value to override the behaviour.
 	 */

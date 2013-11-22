@@ -20,35 +20,24 @@
  */
 package org.hibernate.search.indexes.serialization.spi;
 
+import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.engine.service.spi.Startable;
+
 /**
- * Serialization provider
- *
- * Providers are encouraged to offer a backward and forward compatible protocol.
- *
- * //FIXME should these two bytes be processed by Hibernate Search and not the protocol implementation
- * ie we would pass the result of this?
- *
- * Before the actual serialized flux, two bytes are reserved:
- * - majorVersion
- * - minorVersion
- *
- * A major version increase implies an incompatible protocol change.
- * Messages of a majorVersion > current version should be refused.
- *
- * A minor version increase implies a compatible protocol change.
- * Messages of a minorVersion > current version are parsed but new
- * operation will be ignored or rejected. Question: only ignored?
- *
- * If message's major version is < current version, the
- * implementation is strongly encouraged to parse and process them.
- * It is mandatory if only message's minor version is < current version.
- *
- * Implementors are encouraged to implement a descriptive <code>toString()</code>
+ * Provides access to a serializer and deserializer to send the necessary work load for remote backends over the wire.
+ * <p>
+ * Note: Providers are encouraged to offer a backward and forward compatible protocol.
+ * </p>
+ * <p>
+ * Implementors are encouraged to implement a descriptive {@code toString()}
  * method for logging purposes.
+ * </p>
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Hardy Ferentschik
  */
-public interface SerializationProvider {
+public interface SerializationProvider extends Service, Startable {
 	Serializer getSerializer();
+
 	Deserializer getDeserializer();
 }

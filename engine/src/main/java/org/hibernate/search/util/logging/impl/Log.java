@@ -32,7 +32,6 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.errors.EmptyQueryException;
@@ -42,9 +41,6 @@ import org.jboss.logging.LogMessage;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
-import org.jgroups.Address;
-import org.jgroups.SuspectedException;
-import org.jgroups.TimeoutException;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
@@ -553,8 +549,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
 	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
 
-	@Message(id = 129, value = "Object injected for JGroups channel in " + JGroupsChannelProvider.CHANNEL_INJECT + " is of an unexpected type %1$s (expecting org.jgroups.JChannel)")
-	SearchException jGroupsChannelInjectionError(@Cause Exception e, Class<?> actualType);
+	@Message(id = 129, value = "Object injected for JGroups channel in %1$s is of an unexpected type %2$s (expecting org.jgroups.JChannel)")
+	SearchException jGroupsChannelInjectionError(String channelInject, @Cause Exception e, Class<?> actualType);
 
 	@Message(id = 130, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
 			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
@@ -606,8 +602,8 @@ public interface Log extends BasicLogger {
 			"against the Analyzer applied on this field.")
 	EmptyQueryException queryWithNoTermsAfterAnalysis(String field, String searchTerm);
 
-	@Message(id = 147, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '" + JGroupsChannelProvider.MUX_ID + "'.")
-	SearchException missingJGroupsMuxId();
+	@Message(id = 147, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '%s'.")
+	SearchException missingJGroupsMuxId(String muxId);
 
 	@Message(id = 148, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
 	SearchException jGroupsMuxIdAlreadyTaken(short n);
@@ -693,13 +689,13 @@ public interface Log extends BasicLogger {
 	void jgroupsBlockWaitingForAck(String indexName, boolean block);
 
 	@Message(id = 173, value = "Remote JGroups peer '%1$s' is suspected to have left '")
-	SuspectedException jgroupsSuspectingPeer(Address sender);
+	String jgroupsSuspectingPeer(String sender);
 
 	@Message(id = 174, value = "Timeout sending synchronous message to JGroups peer '%1$s''")
-	TimeoutException jgroupsRpcTimeout(Address sender);
+	String jgroupsRpcTimeout(String sender);
 
 	@Message(id = 175, value = "Exception reported from remote JGroups node '%1$s' : '%2$s'")
-	SearchException jgroupsRemoteException(Address sender, Throwable exception, @Cause Throwable cause);
+	SearchException jgroupsRemoteException(String sender, Throwable exception, @Cause Throwable cause);
 
 	@Message(id = 176, value = "Document could not be parsed")
 	SearchException unableToParseDocument(@Cause Throwable cause);
@@ -760,4 +756,16 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 194, value = "Unable to load configured class '%s' as 'sharding_strategy'")
 	SearchException getUnableToLoadShardingStrategyClassException(String className);
+
+	@Message(id = 195, value = "Multiple service implementations detected for service '%1$s': '%2$s'")
+	SearchException getMultipleServiceImplementationsException(String service, String foundServices);
+
+	@Message(id = 196, value = "No service implementations for service '%1$s' can be found")
+	SearchException getNoServiceImplementationFoundException(String service);
+
+	@Message(id = 197, value = "Unable to create JGroups backend. Are you sure you have the JGroups dependencies on the classpath?")
+	SearchException getUnableToCreateJGroupsBackendException(@Cause Throwable throwable);
+
+	@Message(id = 198, value = "Unexpected status '%s' for service '%s'. Check for circular dependencies or unreleased resources in your services.")
+	SearchException getUnexpectedServiceStatusException(String status, String service);
 }

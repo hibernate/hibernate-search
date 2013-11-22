@@ -31,8 +31,8 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
 
 /**
  * Wraps another SearchConfiguration to override it's ReflectionManager
@@ -50,8 +50,8 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 	 * instance, with the exception of {@link #getReflectionManager()} which will return the constructor
 	 * defined ReflectionManager.
 	 *
-	 * @param reflectionManager
-	 * @param cfg
+	 * @param reflectionManager the current reflection manager
+	 * @param cfg the search configuration
 	 */
 	public ReflectionReplacingSearchConfiguration(ReflectionManager reflectionManager, SearchConfiguration cfg) {
 		this.reflectionManager = reflectionManager;
@@ -89,7 +89,7 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 	}
 
 	@Override
-	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+	public Map<Class<? extends Service>, Object> getProvidedServices() {
 		return cfg.getProvidedServices();
 	}
 

@@ -1,0 +1,198 @@
+/*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
+ * JBoss, Home of Professional Open Source
+ * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
+ * as indicated by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ */
+package org.hibernate.search.test.engine.service;
+
+import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.impl.StandardServiceManager;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.test.util.SearchFactoryHolder;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.matchers.JUnitMatchers;
+import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Tests for the standard implementation of the {@code ServiceManager} interface.
+ *
+ * @author Hardy Ferentschik
+ */
+public class StandardServiceManagerTest {
+
+	@Rule
+	public SearchFactoryHolder searchFactoryHolder = new SearchFactoryHolder();
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+	private ServiceManager serviceManagerUnderTest;
+
+	@Before
+	public void setUp() {
+		serviceManagerUnderTest = new StandardServiceManager(
+				new ManualConfiguration(),
+				new DummyBuildContext()
+		);
+	}
+
+	@Test
+	public void testUnavailableServiceThrowsException() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000196" ) );
+
+		serviceManagerUnderTest.requestService( NonExistentService.class );
+	}
+
+	@Test
+	public void testNullParameterForRequestServiceThrowsException() {
+		thrown.expect( IllegalArgumentException.class );
+		serviceManagerUnderTest.requestService( null );
+	}
+
+	@Test
+	public void testNullParameterForReleaseServiceThrowsException() {
+		thrown.expect( IllegalArgumentException.class );
+		serviceManagerUnderTest.releaseService( null );
+	}
+
+	@Test
+	public void testMultipleServiceImplementationsThrowsException() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000195" ) );
+
+		serviceManagerUnderTest.requestService( ServiceWithMultipleImplementations.class );
+	}
+
+	@Test
+	public void testRetrieveService() {
+		SimpleService simpleService = serviceManagerUnderTest.requestService( SimpleService.class );
+		assertNotNull( "The service should be created", simpleService );
+		assertTrue( simpleService instanceof SimpleServiceImpl );
+	}
+
+	@Test
+	public void testStartServiceIsPerformed() {
+		StartableService service = serviceManagerUnderTest.requestService( StartableService.class );
+		assertNotNull( "The service should be created", service );
+		assertTrue( service instanceof StartableServiceImpl );
+		assertTrue( "Service should have been started", ( (StartableServiceImpl) service ).isStarted() );
+	}
+
+	@Test
+	public void testStopServiceIsPerformed() {
+		StoppableService service = serviceManagerUnderTest.requestService( StoppableService.class );
+
+		assertNotNull( "The service should be created", service );
+		assertTrue( service instanceof StoppableServiceImpl );
+
+		serviceManagerUnderTest.releaseService( StoppableService.class );
+		assertTrue( "Service should have been stopped", ( (StoppableServiceImpl) service ).isStopped() );
+	}
+
+	@Test
+	public void testServiceInstanceIsCached() {
+		SimpleService simpleService1 = serviceManagerUnderTest.requestService( SimpleService.class );
+		assertNotNull( "The service should be created", simpleService1 );
+
+		SimpleService simpleService2 = serviceManagerUnderTest.requestService( SimpleService.class );
+		assertNotNull( "The service should be created", simpleService2 );
+
+		assertTrue( "The same service instance should have been returned", simpleService1 == simpleService2 );
+	}
+
+	@Test
+	public void testReleaseAll() {
+		SimpleService simpleService1 = serviceManagerUnderTest.requestService( SimpleService.class );
+		assertNotNull( "The service should be created", simpleService1 );
+
+		serviceManagerUnderTest.releaseAllServices();
+
+		SimpleService simpleService2 = serviceManagerUnderTest.requestService( SimpleService.class );
+		assertNotNull( "The service should be created", simpleService2 );
+
+		assertTrue( "A new service instance should have been created", simpleService1 != simpleService2 );
+	}
+
+	@Test
+	public void providedServicesHavePrecedence() {
+		ManualConfiguration configuration = new ManualConfiguration();
+		configuration.getProvidedServices().put( SimpleService.class, new ProgrammaticallyConfiguredSimpleService() );
+
+		serviceManagerUnderTest = new StandardServiceManager(
+				configuration,
+				new DummyBuildContext()
+		);
+
+		SimpleService simpleService = serviceManagerUnderTest.requestService( SimpleService.class );
+		assertNotNull( "The service should be created", simpleService );
+		assertTrue(
+				"Wrong service type: " + simpleService.getClass(),
+				simpleService instanceof ProgrammaticallyConfiguredSimpleService
+		);
+	}
+
+	@Test
+	public void testCircularServiceDependencyThrowsException() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000198" ) );
+
+		serviceManagerUnderTest.requestService( FooService.class );
+	}
+
+	// actual impl is not relevant for testing the service manager
+	// build context is passed through to services which might need it for initialization
+	private class DummyBuildContext implements BuildContext {
+
+		@Override
+		public SearchFactoryImplementor getUninitializedSearchFactory() {
+			return null;
+		}
+
+		@Override
+		public String getIndexingStrategy() {
+			return null;
+		}
+
+		@Override
+		public ServiceManager getServiceManager() {
+			// return the service manager under test for circularity test
+			return serviceManagerUnderTest;
+		}
+
+		@Override
+		public IndexManagerHolder getAllIndexesManager() {
+			return null;
+		}
+
+		@Override
+		public ErrorHandler getErrorHandler() {
+			return null;
+		}
+	}
+}
