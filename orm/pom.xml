@@ -55,18 +55,18 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-avro-serialization</artifactId>
+            <artifactId>hibernate-search-serialization-avro</artifactId>
             <scope>provided</scope>
         </dependency>
         <!-- HSEARCH-1365 Needed for tests, test should probably move -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-jgroups-backend</artifactId>
+            <artifactId>hibernate-search-backend-jgroups</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-jms-backend</artifactId>
+            <artifactId>hibernate-search-backend-jms</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -187,10 +187,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <threadCount>1</threadCount>
-                    <reuseForks>true</reuseForks>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <runOrder>alphabetical</runOrder>
                     <systemPropertyVariables>
                         <!-- java.net.preferIPv4Stack and jgroups.bind_addr are needed for JGroups -->
                         <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>

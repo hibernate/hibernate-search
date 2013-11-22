@@ -2,7 +2,7 @@
 <!--
  * Hibernate, Relational Persistence for Idiomatic Java
  * 
- * Copyright (c) 2009, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -145,9 +145,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <threadCount>1</threadCount>
-                    <reuseForks>true</reuseForks>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <!-- MaxPermSize is needed for profiling sessions -->
                     <argLine>-XX:MaxPermSize=256m</argLine>
                     <systemPropertyVariables>

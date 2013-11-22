@@ -70,7 +70,7 @@ public class DefaultCacheManagerService implements CacheManagerService {
 	private EmbeddedCacheManager cacheManager;
 
 	/**
-	 * JNDI retrieved cache managers are not started by us, so avoid attempting
+	 * JNDI retrieved cachemanagers are not started by us, so avoid attempting
 	 * to close them.
 	 */
 	private volatile boolean manageCacheManager = false;

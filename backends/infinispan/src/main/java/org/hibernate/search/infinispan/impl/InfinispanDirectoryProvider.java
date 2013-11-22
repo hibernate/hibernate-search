@@ -49,7 +49,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
-	/**               .
+	/**
 	 * Use {@link InfinispanIntegration#DEFAULT_LOCKING_CACHENAME} instead.
 	 */
 	@Deprecated

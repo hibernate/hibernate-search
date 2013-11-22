@@ -26,7 +26,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-search-java-serialization</artifactId>
+    <artifactId>hibernate-search-serialization-java</artifactId>
 
     <name>Hibernate Search Java Default Serialization</name>
     <description>Implementation of the Hibernate Search serialization protocol for remote indexing using Java default serialization</description>
@@ -72,11 +72,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <forkMode>once</forkMode>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <runOrder>alphabetical</runOrder>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

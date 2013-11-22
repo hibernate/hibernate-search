@@ -45,7 +45,7 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-avro-serialization</artifactId>
+            <artifactId>hibernate-search-serialization-avro</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

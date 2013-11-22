@@ -122,8 +122,8 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.hibernate:hibernate-search-jgroups-backend</include>
-                <include>org.hibernate:hibernate-search-avro-serialization</include>
+                <include>org.hibernate:hibernate-search-backend-jgroups</include>
+                <include>org.hibernate:hibernate-search-serialization-avro</include>
                 <include>org.apache.avro:avro</include>
             </includes>
         </dependencySet>
@@ -134,8 +134,8 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.hibernate:hibernate-search-jms-backend</include>
-                <include>org.hibernate:hibernate-search-avro-serialization</include>
+                <include>org.hibernate:hibernate-search-backend-jms</include>
+                <include>org.hibernate:hibernate-search-serialization-avro</include>
                 <include>org.apache.avro:avro</include>
             </includes>
         </dependencySet>
