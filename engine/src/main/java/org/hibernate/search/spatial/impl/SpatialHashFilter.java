@@ -32,41 +32,41 @@ import java.util.List;
 
 /**
  * Lucene Filter for filtering documents which have been indexed with Hibernate Search Spatial SpatialFieldBridge
- * Use denormalized Quad Tree Cell Ids to return a sub set of documents near the center
+ * Use denormalized spatial hash cell ids to return a sub set of documents near the center
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByHash
  * @see org.hibernate.search.spatial.Coordinates
  */
-public final class QuadTreeFilter extends Filter {
+public final class SpatialHashFilter extends Filter {
 
-	private final List<String> quadTreeCellsIds;
+	private final List<String> spatialHashCellsIds;
 	private final String fieldName;
 
-	public QuadTreeFilter(List<String> quadTreeCellsIds, String fieldName) {
-		this.quadTreeCellsIds = quadTreeCellsIds;
+	public SpatialHashFilter(List<String> spatialHashCellsIds, String fieldName) {
+		this.spatialHashCellsIds = spatialHashCellsIds;
 		this.fieldName = fieldName;
 	}
 
 	/**
-	 * Returns Doc Ids by searching the index for document having the correct Qud Tree Cell Id at given qud tree level
+	 * Returns Doc Ids by searching the index for document having the correct spatial hash cell id at given grid level
 	 *
 	 * @param reader reader to the index
 	 */
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
-		if ( quadTreeCellsIds.size() == 0 ) {
+		if ( spatialHashCellsIds.size() == 0 ) {
 			return null;
 		}
 
 		OpenBitSet matchedDocumentsIds = new OpenBitSet( reader.maxDoc() );
 		Boolean found = false;
-		for ( int i = 0; i < quadTreeCellsIds.size(); i++ ) {
-			Term quadTreeCellTerm = new Term( fieldName, quadTreeCellsIds.get( i ) );
-			TermDocs quadTreeCellsDocs = reader.termDocs( quadTreeCellTerm );
-			if ( quadTreeCellsDocs != null ) {
-				while ( quadTreeCellsDocs.next() ) {
-					matchedDocumentsIds.fastSet( quadTreeCellsDocs.doc() );
+		for ( int i = 0; i < spatialHashCellsIds.size(); i++ ) {
+			Term spatialHashCellTerm = new Term( fieldName, spatialHashCellsIds.get( i ) );
+			TermDocs spatialHashCellsDocs = reader.termDocs( spatialHashCellTerm );
+			if ( spatialHashCellsDocs != null ) {
+				while ( spatialHashCellsDocs.next() ) {
+					matchedDocumentsIds.fastSet( spatialHashCellsDocs.doc() );
 					found = true;
 				}
 			}
@@ -83,8 +83,8 @@ public final class QuadTreeFilter extends Filter {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append( "QuadTreeFilter" );
-		sb.append( "{quadTreeCellsIds=" ).append( quadTreeCellsIds );
+		sb.append( "SpatialHashFilter" );
+		sb.append( "{spatialHashCellsIds=" ).append( spatialHashCellsIds );
 		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();

@@ -30,32 +30,32 @@ import org.hibernate.search.spatial.impl.Point;
 import java.util.Map;
 
 /**
- * Hibernate Search field bridge, binding a Coordinates to Quad Tree field in the index
+ * Hibernate Search field bridge, binding a Coordinates to a spatial hash field in the index
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class SpatialFieldBridgeByQuadTree extends SpatialFieldBridge implements ParameterizedBridge {
+public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements ParameterizedBridge {
 
-	public static final int DEFAULT_TOP_QUAD_TREE_LEVEL = 0;
-	public static final int DEFAULT_BOTTOM_QUAD_TREE_LEVEL = 16;
+	public static final int DEFAULT_TOP_SPATIAL_HASH_LEVEL = 0;
+	public static final int DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL = 16;
 
-	private int topQuadTreeLevel = DEFAULT_TOP_QUAD_TREE_LEVEL;
-	private int bottomQuadTreeLevel = DEFAULT_BOTTOM_QUAD_TREE_LEVEL;
+	private int topSpatialHashLevel = DEFAULT_TOP_SPATIAL_HASH_LEVEL;
+	private int bottomSpatialHashLevel = DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL;
 
-	private boolean quadTreeIndex = true;
+	private boolean spatialHashIndex = true;
 	private boolean numericFieldsIndex = true;
 
-	public SpatialFieldBridgeByQuadTree() {
+	public SpatialFieldBridgeByHash() {
 	}
 
-	public SpatialFieldBridgeByQuadTree(int topQuadTreeLevel, int bottomQuadTreeLevel) {
-		this.topQuadTreeLevel = topQuadTreeLevel;
-		this.bottomQuadTreeLevel = bottomQuadTreeLevel;
+	public SpatialFieldBridgeByHash(int topSpatialHashLevel, int bottomSpatialHashLevel) {
+		this.topSpatialHashLevel = topSpatialHashLevel;
+		this.bottomSpatialHashLevel = bottomSpatialHashLevel;
 	}
 
-	public SpatialFieldBridgeByQuadTree(int topQuadTreeLevel, int bottomQuadTreeLevel, String latitudeField, String longitudeField) {
-		this.topQuadTreeLevel = topQuadTreeLevel;
-		this.bottomQuadTreeLevel = bottomQuadTreeLevel;
+	public SpatialFieldBridgeByHash(int topSpatialHashLevel, int bottomSpatialHashLevel, String latitudeField, String longitudeField) {
+		this.topSpatialHashLevel = topSpatialHashLevel;
+		this.bottomSpatialHashLevel = bottomSpatialHashLevel;
 		this.latitudeField = latitudeField;
 		this.longitudeField = longitudeField;
 	}
@@ -77,11 +77,11 @@ public class SpatialFieldBridgeByQuadTree extends SpatialFieldBridge implements 
 
 			if ( ( latitude != null ) && ( longitude != null ) ) {
 
-				if ( quadTreeIndex ) {
+				if ( spatialHashIndex ) {
 					Point point = Point.fromDegrees( latitude, longitude );
 
-					for ( int i = topQuadTreeLevel; i <= bottomQuadTreeLevel; i++ ) {
-						luceneOptions.addFieldToDocument( SpatialHelper.formatFieldName( i, name ), SpatialHelper.getQuadTreeCellId( point, i ), document );
+					for ( int i = topSpatialHashLevel; i <= bottomSpatialHashLevel; i++ ) {
+						luceneOptions.addFieldToDocument( SpatialHelper.formatFieldName( i, name ), SpatialHelper.getSpatialHashCellId( point, i ), document );
 					}
 				}
 
@@ -103,23 +103,23 @@ public class SpatialFieldBridgeByQuadTree extends SpatialFieldBridge implements 
 	}
 
 	/**
-	 * Override method for default min and max quad tree level
+	 * Override method for default min and max spatial hash level
 	 *
-	 * @param parameters Map containing the topQuadTreeLevel and bottomQuadTreeLevel values
+	 * @param parameters Map containing the topSpatialHashLevel and bottomSpatialHashLevel values
 	 */
 	@Override
 	public void setParameterValues(final Map parameters) {
-		Object topQuadTreeLevel = parameters.get( "topQuadTreeLevel" );
-		if ( topQuadTreeLevel instanceof Integer ) {
-			this.topQuadTreeLevel = (Integer) topQuadTreeLevel;
+		Object topSpatialHashLevel = parameters.get( "topSpatialHashLevel" );
+		if ( topSpatialHashLevel instanceof Integer ) {
+			this.topSpatialHashLevel = (Integer) topSpatialHashLevel;
 		}
-		Object bottomQuadTreeLevel = parameters.get( "bottomQuadTreeLevel" );
-		if ( bottomQuadTreeLevel instanceof Integer ) {
-			this.bottomQuadTreeLevel = (Integer) bottomQuadTreeLevel;
+		Object bottomSpatialHashLevel = parameters.get( "bottomSpatialHashLevel" );
+		if ( bottomSpatialHashLevel instanceof Integer ) {
+			this.bottomSpatialHashLevel = (Integer) bottomSpatialHashLevel;
 		}
-		Object quadTreeIndex = parameters.get( "quadTreeIndex" );
-		if ( quadTreeIndex instanceof Boolean ) {
-			this.quadTreeIndex = (Boolean) quadTreeIndex;
+		Object spatialHashIndex = parameters.get( "spatialHashIndex" );
+		if ( spatialHashIndex instanceof Boolean ) {
+			this.spatialHashIndex = (Boolean) spatialHashIndex;
 		}
 		Object numericFieldsIndex = parameters.get( "numericFieldsIndex" );
 		if ( numericFieldsIndex instanceof Boolean ) {

@@ -79,7 +79,7 @@
       </listitem>
 
       <listitem>
-        <para>in Quad-Tree labels for two stage spatial queries</para>
+        <para>in spatial hashes labels for two stage spatial queries</para>
       </listitem>
     </itemizedlist>
 
@@ -160,15 +160,15 @@ public class Hotel {
     </example>
   </section>
 
-    <section id="spatial-indexing-quadtree">
-      <title>Indexing coordinates in a Grid with Quad Trees</title>
+    <section id="spatial-indexing-spatialHash">
+      <title>Indexing coordinates in a grid with spatial hashes</title>
 
     <para>When setting <classname>@Spatial</classname>.<methodname>spatialMode</methodname>
-    to <classname>SpatialMode</classname>.<methodname>GRID</methodname>
+    to <classname>SpatialMode</classname>.<methodname>HASH</methodname>
     the coordinates are encoded in several fields representing different
     zoom levels. Each box for each level is labelled so coordinates are assigned
-    matching labels for each zoom level. This results in a tree encoding of
-    labels called <literal>quad tree</literal>.</para>
+    matching labels for each zoom level. This results in a grid encoding of
+    labels called <literal>spatial hashes</literal>.</para>
 
       <para>Pros :</para>
 
@@ -197,7 +197,7 @@ public class Hotel {
       <listitem>
         <para>add the <classname>@Spatial</classname> annotation on the
         entity with the <classname>SpatialMode</classname> set to GRID :
-        <code>@Spatial(spatialMode = SpatialMode.GRID)</code></para>
+        <code>@Spatial(spatialMode = SpatialMode.HASH)</code></para>
       </listitem>
 
       <listitem>
@@ -209,9 +209,9 @@ public class Hotel {
     </itemizedlist>
 
     <example>
-      <title>Indexing coordinates in a Grid using Quad Trees</title>
+      <title>Indexing coordinates in a grid using spatial hashes</title>
 
-      <programlisting language="JAVA" role="JAVA">@Spatial(spatialMode = SpatialMode.GRID)
+      <programlisting language="JAVA" role="JAVA">@Spatial(spatialMode = SpatialMode.HASH)
 @Indexed
 @Entity
 public class Hotel {
@@ -287,7 +287,7 @@ public class Event {
   double latitude;
   double longitude;
 
-  @Spatial(spatialMode = SpatialMode.GRID)
+  @Spatial(spatialMode = SpatialMode.HASH)
   public Coordinates getLocation() {
     return new Coordinates() {
       @Override
@@ -503,7 +503,7 @@ hibQuery.setSort(distanceSort);</programlisting>
 
 @Spatials({
   @Spatial,
-  @Spatial(name="work",  spatialMode = SpatialMode.GRID)
+  @Spatial(name="work",  spatialMode = SpatialMode.HASH)
 })
 @Entity
 @Indexed
@@ -556,10 +556,10 @@ List results = hibQuery.list();</programlisting>
   </section>
 
   <section id="spatial-behind-curtain">
-    <title>Insight: implementation details of Quad Tree indexing</title>
+    <title>Insight: implementation details of spatial hashes indexing</title>
 
     <para>The present chapter is meant to provide a technical insight in
-    quad-tree (grid) indexing: how coordinates are mapped to the index and
+    spatial hashes (grid) indexing: how coordinates are mapped to the index and
     how queries are implemented.</para>
 
     <section>
@@ -571,8 +571,10 @@ List results = hibQuery.list();</programlisting>
       index fields stored in the Lucene index.</para>
 
       <para>Principle of the spatial index: the spatial index used in
-      Hibernate Search is a QuadTree (<ulink
-      url="http://en.wikipedia.org/wiki/Quadtree">http://en.wikipedia.org/wiki/Quadtree</ulink>).</para>
+      Hibernate Search is a grid based spatial index (<ulink
+      url="http://en.wikipedia.org/wiki/Grid_(spatial_index)#Grid-based_spatial_indexing">
+      http://en.wikipedia.org/wiki/Grid_(spatial_index)#Grid-based_spatial_indexing</ulink>)
+      where grid ids are hashes derived from latitude and longitude.</para>
 
       <para>To make computation in a flat coordinates system the latitude and
       longitude field values will be projected with a sinusoidal projection
@@ -626,11 +628,11 @@ List results = hibQuery.list();</programlisting>
       projection to [-90,+90],]-180,+180]).</para>
 
       <para>We store in the Lucene document corresponding to the entity to
-      index one field for each level of the quad tree. The field is named: [spatial
-      index fields name]_HSSI_[n]. [spatial index fields name] is given either
+      index one field for each level of the spatial hashes grid. The field is named:
+      [spatial index fields name]_HSSI_[n]. [spatial index fields name] is given either
       by the parameter at class level annotation or derived from the name of
       the spatial annoted method of he entitiy, HSSI stands for Hibernate
-      Search Spatial Index and n is the level of the quad tree.</para>
+      Search Spatial Index and n is the level of the spatial hashes grid.</para>
 
       <para>We also store the latitude and longitude as a Numeric field under
       [spatial index fields name]_HSSI_Latitude and [spatial index fields
@@ -652,13 +654,13 @@ List results = hibQuery.list();</programlisting>
       filtering.</para>
 
       <section>
-        <title>Step 1: compute the best quad tree level for the search
+        <title>Step 1: compute the best spatial hashes grid level for the search
         discus</title>
 
-        <para>For a given search radius there is an optimal quad tree level where
+        <para>For a given search radius there is an optimal hashes grid level where
         the number of boxes to retrieve hall be minimal without bringing back
         to many documents (level 0 has only 1 box but retrieve all documents).
-        The optimal quad tree level is the maximum level where the width of each box
+        The optimal hashes grid level is the maximum level where the width of each box
         is larger than the search area. Near the equator line where
         projection deformation is minimal, this will lead to the retrieval of
         at most 4 boxes. Towards the poles where the deformation is more
@@ -677,16 +679,16 @@ List results = hibQuery.list();</programlisting>
         projected space anymore).</para>
 
         <para>This is done by
-        org.hibernate.search.spatial.impl.SpatialHelper.getQuadTreeCellsIds(Point
-        center, double radius, int quadTreeLevel)</para>
+        org.hibernate.search.spatial.impl.SpatialHelper.getSpatialHashCellsIds(Point
+        center, double radius, int spatialHashLevel)</para>
 
         <para>It will calculate the bounding box of the search discus and then
         call
-        org.hibernate.search.spatial.impl.SpatialHelper.getQuadTreeCellsIds(Point
-        lowerLeft, Point upperRight, int quadTreeLevel) that will do the actual
+        org.hibernate.search.spatial.impl.SpatialHelper.getSpatialHashCellsIds(Point
+        lowerLeft, Point upperRight, int spatialHashLevel) that will do the actual
         computation. If the bounding box crosses the meridian line it will cut
-        the search in two and make two calls to <literal>getQuadTreeCellsIds(Point
-        lowerLeft, Point upperRight, int quadTreeLevel)</literal> with left and
+        the search in two and make two calls to <literal>getSpatialHashCellsIds(Point
+        lowerLeft, Point upperRight, int spatialHashLevel)</literal> with left and
         right parts of the box.</para>
 
         <para>There are some geo related hacks (search radius too large,
@@ -696,8 +698,8 @@ List results = hibQuery.list();</programlisting>
         http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates for
         reference on those subjects).</para>
 
-        <para>The SpatialHelper.getQuadTreeCellsIds(Point lowerLeft, Point
-        upperRight, int quadTreeLevel) project the defining points of the bounding
+        <para>The SpatialHelper.getSpatialHashCellsIds(Point lowerLeft, Point
+        upperRight, int spatialHashLevel) project the defining points of the bounding
         box and compute the boxes they belong to. It returns all the box Ids
         between the lower left to the upper right corners, thus covering the
         area.</para>
@@ -710,7 +712,7 @@ List results = hibQuery.list();</programlisting>
         having a [spatial index fields name]_HSSI_[n] (n the level found at
         Step 1) field valued with one of the ids of Step 2.</para>
 
-        <para>See also the implementation of <classname>org.hibernate.search.spatial.impl.QuadTreeFilter
+        <para>See also the implementation of <classname>org.hibernate.search.spatial.impl.SpatialHashFilter
         </classname>.</para>
 
         <para>This Query will return all documents in the boxes covering the

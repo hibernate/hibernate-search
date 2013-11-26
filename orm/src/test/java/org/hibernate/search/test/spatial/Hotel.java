@@ -38,7 +38,7 @@ import javax.persistence.Id;
  */
 @Entity
 @Indexed
-@Spatial(name = "hotel_location", spatialMode = SpatialMode.GRID)
+@Spatial(name = "hotel_location", spatialMode = SpatialMode.HASH)
 public class Hotel implements Coordinates {
 	@Id
 	Integer id;

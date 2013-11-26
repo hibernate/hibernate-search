@@ -29,11 +29,11 @@ import java.util.List;
 import org.hibernate.search.spatial.impl.Point;
 
 /**
- * Hibernate Search spatial: helper class to compute quad tree indexes, ids, and optimal level for search
+ * Hibernate Search spatial: helper class to compute spatial hashes indexes, ids, and optimal level for search
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class QuadTreeHelperTest {
+public class SpatialHashHelperTest {
 
 	@Test
 	public void getCellIndexTest() {
@@ -49,39 +49,39 @@ public class QuadTreeHelperTest {
 	}
 
 	@Test
-	public void getQuadTreeCellIdTest() {
+	public void getSpatialHashCellIdTest() {
 		Point point = Point.fromDegrees( 45, 4 );
 
-		String cellId = SpatialHelper.getQuadTreeCellId( point, 5 );
+		String cellId = SpatialHelper.getSpatialHashCellId( point, 5 );
 		Assert.assertEquals( "0|8", cellId );
 
-		String cellId2 = SpatialHelper.getQuadTreeCellId( point, 7 );
+		String cellId2 = SpatialHelper.getSpatialHashCellId( point, 7 );
 		Assert.assertEquals( "1|32", cellId2 );
 
-		String cellId3 = SpatialHelper.getQuadTreeCellId( point, 14 );
+		String cellId3 = SpatialHelper.getSpatialHashCellId( point, 14 );
 		Assert.assertEquals( "128|4096", cellId3 );
 
 		Point point2 = Point.fromDegrees( -12, -179 );
 
-		String cellId4 = SpatialHelper.getQuadTreeCellId( point2, 5 );
+		String cellId4 = SpatialHelper.getSpatialHashCellId( point2, 5 );
 		Assert.assertEquals( "-16|-3", cellId4 );
 
-		String cellId5 = SpatialHelper.getQuadTreeCellId( point2, 7 );
+		String cellId5 = SpatialHelper.getSpatialHashCellId( point2, 7 );
 		Assert.assertEquals( "-63|-9", cellId5 );
 
-		String cellId6 = SpatialHelper.getQuadTreeCellId( point2, 14 );
+		String cellId6 = SpatialHelper.getSpatialHashCellId( point2, 14 );
 		Assert.assertEquals( "-7969|-1093", cellId6 );
 	}
 
 	@Test
-	public void findBestQuadTreeLevelForSearchRangeTest() {
-		int bestQuadTreeLevel = SpatialHelper.findBestQuadTreeLevelForSearchRange( 50 );
+	public void findBestSpatialHashLevelForSearchRangeTest() {
+		int bestSpatialHashLevel = SpatialHelper.findBestSpatialHashLevelForSearchRange( 50 );
 
-		Assert.assertEquals( 9, bestQuadTreeLevel );
+		Assert.assertEquals( 9, bestSpatialHashLevel );
 
-		int bestQuadTreeLevel2 = SpatialHelper.findBestQuadTreeLevelForSearchRange( 1 );
+		int bestSpatialHashLevel2 = SpatialHelper.findBestSpatialHashLevelForSearchRange( 1 );
 
-		Assert.assertEquals( 15, bestQuadTreeLevel2 );
+		Assert.assertEquals( 15, bestSpatialHashLevel2 );
 	}
 
 	@Test
@@ -112,9 +112,9 @@ public class QuadTreeHelperTest {
 	}
 
 	public boolean projectedBoundingBoxCellsIdsInclusionTest( Point center, Double radius) {
-		Integer quadTreeLevel = SpatialHelper.findBestQuadTreeLevelForSearchRange( radius );
+		Integer spatialHashLevel = SpatialHelper.findBestSpatialHashLevelForSearchRange( radius );
 
-		List<String> cellsIds = SpatialHelper.getQuadTreeCellsIds( center, radius, quadTreeLevel );
+		List<String> cellsIds = SpatialHelper.getSpatialHashCellsIds( center, radius, spatialHashLevel );
 
 		Point edge = null;
 
@@ -123,7 +123,7 @@ public class QuadTreeHelperTest {
 		for ( int heading = 0; heading < 360; heading++ ) {
 			edge = center.computeDestination( radius, heading );
 
-			String cellId = SpatialHelper.getQuadTreeCellId( edge, quadTreeLevel );
+			String cellId = SpatialHelper.getSpatialHashCellId( edge, spatialHashLevel );
 
 			validated &= cellsIds.contains( cellId );
 		}

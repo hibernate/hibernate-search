@@ -79,7 +79,7 @@ import org.hibernate.search.bridge.builtin.impl.BuiltinNumericIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinNumericMapBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
-import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
+import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -359,12 +359,12 @@ public final class BridgeFactory {
 	public static FieldBridge buildSpatialBridge(Spatial spatial, String latitudeField, String longitudeField) {
 		FieldBridge bridge = null;
 		if ( spatial != null ) {
-			if ( spatial.spatialMode() == SpatialMode.GRID ) {
+			if ( spatial.spatialMode() == SpatialMode.HASH ) {
 				if ( latitudeField != null && longitudeField != null ) {
-					bridge = new SpatialFieldBridgeByQuadTree( spatial.topQuadTreeLevel(), spatial.bottomQuadTreeLevel(), latitudeField, longitudeField );
+					bridge = new SpatialFieldBridgeByHash( spatial.topSpatialHashLevel(), spatial.bottomSpatialHashLevel(), latitudeField, longitudeField );
 				}
 				else {
-					bridge = new SpatialFieldBridgeByQuadTree( spatial.topQuadTreeLevel(), spatial.bottomQuadTreeLevel() );
+					bridge = new SpatialFieldBridgeByHash( spatial.topSpatialHashLevel(), spatial.bottomSpatialHashLevel() );
 				}
 			}
 			else {
