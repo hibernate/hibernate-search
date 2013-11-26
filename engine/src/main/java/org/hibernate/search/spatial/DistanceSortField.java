@@ -29,7 +29,7 @@ import org.hibernate.search.spatial.impl.Point;
  * Lucene SortField for sorting documents which have been indexed with Hibernate Search spatial
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByHash
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
  * @see org.hibernate.search.spatial.Coordinates
  */

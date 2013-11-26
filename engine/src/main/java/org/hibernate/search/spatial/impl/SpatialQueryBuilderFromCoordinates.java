@@ -30,12 +30,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 
 import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
+import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 
 import java.util.List;
 
 /**
- * The SpatialQueryBuilder holds builder methods for Quad Tree, Distance and Spatial (Quad Tree+Distance) filters
+ * The SpatialQueryBuilder holds builder methods for Hash, Distance and Spatial (Hash+Distance) filters
  * and queries
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
@@ -44,7 +44,7 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 
 	/**
 	 * Returns a Lucene filter which rely on Hibernate Search Spatial
-	 * quad tree indexation to filter document at radius
+	 * spatial hash indexation to filter document at radius
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
@@ -54,13 +54,13 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 	 * @see org.hibernate.search.spatial.Coordinates
 	 * @see org.apache.lucene.search.Filter
 	 */
-	public static Filter buildQuadTreeFilter(Coordinates center, double radius, String fieldName) {
-		int bestQuadTreeLevel = SpatialHelper.findBestQuadTreeLevelForSearchRange( 2.0d * radius );
-		if ( bestQuadTreeLevel > SpatialFieldBridgeByQuadTree.DEFAULT_BOTTOM_QUAD_TREE_LEVEL ) {
-			bestQuadTreeLevel = SpatialFieldBridgeByQuadTree.DEFAULT_BOTTOM_QUAD_TREE_LEVEL;
+	public static Filter buildSpatialHashFilter(Coordinates center, double radius, String fieldName) {
+		int bestSpatialHashLevel = SpatialHelper.findBestSpatialHashLevelForSearchRange( 2.0d * radius );
+		if ( bestSpatialHashLevel > SpatialFieldBridgeByHash.DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL ) {
+			bestSpatialHashLevel = SpatialFieldBridgeByHash.DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL;
 		}
-		List<String> quadTreeCellsIds = SpatialHelper.getQuadTreeCellsIds( center, radius, bestQuadTreeLevel );
-		return new QuadTreeFilter( quadTreeCellsIds, SpatialHelper.formatFieldName( bestQuadTreeLevel, fieldName ) );
+		List<String> spatialHashCellsIds = SpatialHelper.getSpatialHashCellsIds( center, radius, bestSpatialHashLevel );
+		return new SpatialHashFilter( spatialHashCellsIds, SpatialHelper.formatFieldName( bestSpatialHashLevel, fieldName ) );
 	}
 
 	/**
@@ -104,8 +104,8 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 
 	/**
 	 * Returns a Lucene Query which rely on Hibernate Search Spatial
-	 * quad tree indexation to filter document at radius by wrapping a
-	 * QuadTreeFilter
+	 * spatial hash indexation to filter document at radius by wrapping a
+	 * SpatialHashFilter
 	 *
 	 * @param center center of the search discus
 	 * @param radius distance max to center in km
@@ -114,8 +114,8 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 	 * @see org.apache.lucene.search.Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildQuadTreeQuery(Coordinates center, double radius, String fieldName) {
-		return new FilteredQuery( new MatchAllDocsQuery(), buildQuadTreeFilter( center, radius, fieldName ) );
+	public static Query buildSpatialHashQuery(Coordinates center, double radius, String fieldName) {
+		return new FilteredQuery( new MatchAllDocsQuery(), buildSpatialHashFilter( center, radius, fieldName ) );
 	}
 
 	/**
@@ -136,7 +136,7 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 
 	/**
 	 * Returns a Lucene Query which relies on Hibernate Search Spatial
-	 * quad tree indexation to filter documents at radius and filter its results
+	 * spatial hash indexation to filter documents at radius and filter its results
 	 * by a fine DistanceFilter
 	 *
 	 * @param center center of the search discus
@@ -146,10 +146,10 @@ public abstract class SpatialQueryBuilderFromCoordinates {
 	 * @see Query
 	 * @see org.hibernate.search.spatial.Coordinates
 	 */
-	public static Query buildSpatialQueryByQuadTree(Coordinates center, double radius, String fieldName) {
+	public static Query buildSpatialQueryByHash(Coordinates center, double radius, String fieldName) {
 		return new FilteredQuery( new MatchAllDocsQuery(),
 				buildDistanceFilter(
-						buildQuadTreeFilter( center, radius, fieldName ),
+						buildSpatialHashFilter( center, radius, fieldName ),
 						center,
 						radius,
 						fieldName

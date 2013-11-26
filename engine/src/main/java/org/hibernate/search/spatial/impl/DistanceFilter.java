@@ -36,7 +36,7 @@ import org.hibernate.search.spatial.Coordinates;
  * Use double lat,long field in the index from a Coordinates field declaration
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByHash
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
  * @see org.hibernate.search.spatial.Coordinates
  */

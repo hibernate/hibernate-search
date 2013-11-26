@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.annotations;
 
-import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
+import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -34,9 +34,9 @@ import java.lang.annotation.Target;
  * Spatial coordinates can be indexed as latitude / longitude fields and queried
  * via range queries. This is known as the {@code SpatialMode.RANGE} approach.
  *
- * Otherwise, they can be indexed using a quad-tree index. This is known as the
- * @code SpatialMode.GRID} approach. The size of the grid can be adjusted with {@code topGridLevel}
- * and {@code bottomGridLevel}.
+ * Otherwise, they can be indexed using a spatial hash index. This is known as the
+ * @code SpatialMode.HASH} approach. The size of the grid can be adjusted with {@code topSpatialHashLevel}
+ * and {@code bottomSpatialHashLevel}.
  *
  * For more information on which model to use, read the Hibernate Search reference documentation.
  *
@@ -105,12 +105,12 @@ public @interface Spatial {
 	SpatialMode spatialMode() default SpatialMode.RANGE;
 
 	/**
-	 * @return top range quad tree level for spatial indexing
+	 * @return top range spatial hash level for spatial indexing
 	 */
-	int topQuadTreeLevel() default SpatialFieldBridgeByQuadTree.DEFAULT_TOP_QUAD_TREE_LEVEL;
+	int topSpatialHashLevel() default SpatialFieldBridgeByHash.DEFAULT_TOP_SPATIAL_HASH_LEVEL;
 
 	/**
-	 * @return bottom quad tree level for spatial indexing
+	 * @return bottom spatial hash level for spatial indexing
 	 */
-	int bottomQuadTreeLevel() default SpatialFieldBridgeByQuadTree.DEFAULT_BOTTOM_QUAD_TREE_LEVEL;
+	int bottomSpatialHashLevel() default SpatialFieldBridgeByHash.DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL;
 }

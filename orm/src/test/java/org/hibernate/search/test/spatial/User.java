@@ -30,7 +30,7 @@ import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 
-@Spatial(name = "home", spatialMode = SpatialMode.GRID)
+@Spatial(name = "home", spatialMode = SpatialMode.HASH)
 @Entity
 @Indexed
 @Table(name = "people")// User is a reserved name in most databases

@@ -54,9 +54,9 @@ import java.util.Random;
  *
  * - pure distance post filtering
  * - double numeric range
- * - quad tree
+ * - spatial hash
  * - double range + distance
- * - quad tree + distance
+ * - spatial hash + distance
  *
  * To test you must download <a href="http://download.geonames.org/export/dump/FR.zip">FR GeoBames file</a>
  * and extract it at the root directory of Hibernate Search
@@ -159,12 +159,12 @@ public final class BenchWithGeonames {
 			session.beginTransaction();
 			fullTextSession = Search.getFullTextSession( session );
 
-			long quadTreeTotalDuration = 0;
+			long spatialHashTotalDuration = 0;
 			long spatialTotalDuration = 0;
 			long doubleRangeTotalDuration = 0;
 			long distanceDoubleRangeTotalDuration = 0;
 
-			long quadTreeDocsFetched = 0;
+			long spatialHashDocsFetched = 0;
 			long spatialDocsFetched = 0;
 			long doubleRangeDocsFetched = 0;
 			long distanceDoubleRangeDocsFetched = 0;
@@ -172,7 +172,7 @@ public final class BenchWithGeonames {
 			org.apache.lucene.search.Query luceneQuery;
 			long startTime, endTime, duration;
 			FullTextQuery hibQuery;
-			List quadTreeResults, rangeResults;
+			List spatialHashResults, rangeResults;
 			final QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 			org.apache.lucene.search.Query query;
 			final Integer iterations = 2000;
@@ -255,24 +255,24 @@ public final class BenchWithGeonames {
 				rangeResults = hibQuery.list();
 				session.clear();
 
-				luceneQuery = SpatialQueryBuilderFromCoordinates.buildQuadTreeQuery( center, radius, "location" );
+				luceneQuery = SpatialQueryBuilderFromCoordinates.buildSpatialHashQuery( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
 
 				try {
-					quadTreeDocsFetched += hibQuery.getResultSize();
+					spatialHashDocsFetched += hibQuery.getResultSize();
 				}
 				finally {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
 				if ( i > warmUp ) {
-					quadTreeTotalDuration += duration;
+					spatialHashTotalDuration += duration;
 				}
 				session.clear();
 
-				luceneQuery = SpatialQueryBuilderFromCoordinates.buildSpatialQueryByQuadTree( center, radius, "location" );
+				luceneQuery = SpatialQueryBuilderFromCoordinates.buildSpatialQueryByHash( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
@@ -287,10 +287,10 @@ public final class BenchWithGeonames {
 				if ( i > warmUp ) {
 					spatialTotalDuration += duration;
 				}
-				quadTreeResults = hibQuery.list();
+				spatialHashResults = hibQuery.list();
 				session.clear();
 
-				if ( rangeResults.size() != quadTreeResults.size() ) {
+				if ( rangeResults.size() != spatialHashResults.size() ) {
 					luceneQuery = SpatialQueryBuilderFromCoordinates.buildDistanceQuery( center, radius, "location" );
 					hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 					hibQuery.setProjection( "id", "name" );
@@ -304,19 +304,19 @@ public final class BenchWithGeonames {
 									Double.toString( radius )
 					);
 					System.out.println( "Range results : " + rangeResults );
-					System.out.println( "Quad Tree results : " + quadTreeResults );
+					System.out.println( "Spatial Hash results : " + spatialHashResults );
 					System.out.println( "Pure distance results : " + hibQuery.getResultSize());
 
 					List<Integer> rangeIds = new ArrayList<Integer>();
 					for ( int index = 0; index < rangeResults.size(); index++ ) {
 						rangeIds.add( (Integer) ( (Object[]) rangeResults.get( index ) )[0] );
 					}
-					List<Integer> quadTreeIds = new ArrayList<Integer>();
-					for ( int index = 0; index < quadTreeResults.size(); index++ ) {
-						quadTreeIds.add( (Integer) ( (Object[]) quadTreeResults.get( index ) )[0] );
+					List<Integer> spatialHashIds = new ArrayList<Integer>();
+					for ( int index = 0; index < spatialHashResults.size(); index++ ) {
+						spatialHashIds.add( (Integer) ( (Object[]) spatialHashResults.get( index ) )[0] );
 					}
 
-					rangeIds.removeAll( quadTreeIds );
+					rangeIds.removeAll( spatialHashIds );
 
 					System.out.println( "Missing Ids : " + rangeIds );
 				}
@@ -328,13 +328,13 @@ public final class BenchWithGeonames {
 
 			System.out
 					.println(
-							"Mean time with Quad Tree : " + Double.toString(
-									(double) quadTreeTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
-							) + " ms. Average number of docs fetched : " + Double.toString( quadTreeDocsFetched / ((iterations - warmUp) * 1.0d) )
+							"Mean time with Spatial Hash : " + Double.toString(
+									(double) spatialHashTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
+							) + " ms. Average number of docs fetched : " + Double.toString( spatialHashDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
-							"Mean time with Quad Tree + Distance filter : " + Double.toString(
+							"Mean time with Spatial Hash + Distance filter : " + Double.toString(
 									(double) spatialTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
 							) + " ms. Average number of docs fetched : " + Double.toString( spatialDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
@@ -389,7 +389,7 @@ public final class BenchWithGeonames {
 			Point center = Point.fromDegrees( 46, 4 );
 			double radius = 50.0d;
 
-			luceneQuery = SpatialQueryBuilderFromCoordinates.buildSpatialQueryByQuadTree( center, radius, "location" );
+			luceneQuery = SpatialQueryBuilderFromCoordinates.buildSpatialQueryByHash( center, radius, "location" );
 			hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 			hibQuery.setProjection( "id", "name", "type" );
 

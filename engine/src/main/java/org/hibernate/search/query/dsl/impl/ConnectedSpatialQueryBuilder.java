@@ -25,7 +25,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.SpatialTermination;
-import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
+import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromCoordinates;
 import org.hibernate.search.util.logging.impl.Log;
@@ -58,12 +58,12 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 		//FIXME that will have to change probably but today, if someone uses latitude / longitude
 		//      we use boolean style spatial queries
-		//      and on coordinates field, use quad tree query
+		//      and on coordinates field, use spatial hash query
 		// FIXME in the future we will likely react to some state stored in SpatialFieldBridge (for the indexing strategy)
 		String coordinatesField = spatialContext.getCoordinatesField();
 		FieldBridge fieldBridge = documentBuilder.getBridge( coordinatesField );
-		if ( fieldBridge instanceof SpatialFieldBridgeByQuadTree ) {
-			return SpatialQueryBuilderFromCoordinates.buildSpatialQueryByQuadTree(
+		if ( fieldBridge instanceof SpatialFieldBridgeByHash ) {
+			return SpatialQueryBuilderFromCoordinates.buildSpatialQueryByHash(
 					spatialContext.getCoordinates(),
 					spatialContext.getRadiusDistance(), // always in KM so far, no need to convert
 					coordinatesField );

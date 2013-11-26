@@ -712,8 +712,8 @@ public class DSLTest extends SearchTestCase {
 
 		List<?> results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 
-		assertEquals( "test quad tree based spatial query", 1, results.size() );
-		assertEquals( "test quad tree based spatial query", "Bozo", ( (POI) results.get( 0 ) ).getName() );
+		assertEquals( "test spatial hash based spatial query", 1, results.size() );
+		assertEquals( "test spatial hash based spatial query", "Bozo", ( (POI) results.get( 0 ) ).getName() );
 
 		query = builder
 				.spatial()
@@ -723,8 +723,8 @@ public class DSLTest extends SearchTestCase {
 					.createQuery();
 		results = fullTextSession.createFullTextQuery( query, POI.class ).list();
 
-		assertEquals( "test quad tree based spatial query", 1, results.size() );
-		assertEquals( "test quad tree based spatial query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
+		assertEquals( "test spatial hash based spatial query", 1, results.size() );
+		assertEquals( "test spatial hash based spatial query", "Tour Eiffel", ( (POI) results.get( 0 ) ).getName() );
 
 		transaction.commit();
 	}

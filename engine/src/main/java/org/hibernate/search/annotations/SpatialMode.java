@@ -34,7 +34,7 @@ public enum SpatialMode {
 	 */
 	RANGE,
 	/**
-	 * Grid mode : Quad Tree index query + distance filer
+	 * Hash mode : Spatial hash index query + distance filer
 	 */
-	GRID
+	HASH
 }

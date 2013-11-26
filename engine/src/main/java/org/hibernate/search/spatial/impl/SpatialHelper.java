@@ -30,7 +30,7 @@ import org.hibernate.search.spatial.Coordinates;
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  * @author Mathieu Perez <mathieu.perez@novacodex.net>
- * @see org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree
+ * @see org.hibernate.search.spatial.SpatialFieldBridgeByHash
  * @see org.hibernate.search.spatial.SpatialFieldBridgeByRange
  */
 public abstract class SpatialHelper {
@@ -47,90 +47,90 @@ public abstract class SpatialHelper {
 	 *
 	 * @param coordinate position to compute the Index for
 	 * @param range range of the axis (-pi,pi)/(-90,90) => 2*pi/180 e.g
-	 * @param quadTreeLevel Hox many time the range has been split in two
+	 * @param spatialHashLevel Hox many time the range has been split in two
 	 * @return the cell index on the axis
 	 */
-	public static int getCellIndex(double coordinate, double range, int quadTreeLevel) {
-		return (int) Math.floor( Math.pow( 2, quadTreeLevel ) * coordinate / range );
+	public static int getCellIndex(double coordinate, double range, int spatialHashLevel) {
+		return (int) Math.floor( Math.pow( 2, spatialHashLevel ) * coordinate / range );
 	}
 
 	/**
-	 * Generate a Quad Tree Cell Id (with both Cell Index on both dimension in it) for a position
+	 * Generate a spatial hash cell id (with both cell index on both dimension in it) for a position
 	 *
-	 * @param point position to compute the Quad Tree Cell Id for
-	 * @param quadTreeLevel Hox many time the dimensions have been split in two
-	 * @return the cell id for the point at the given quad tree level
+	 * @param point position to compute the spatial hash cell id for
+	 * @param spatialHashLevel Hox many time the dimensions have been split in two
+	 * @return the cell id for the point at the given spatial hash level
 	 */
-	public static String getQuadTreeCellId(Point point, int quadTreeLevel) {
+	public static String getSpatialHashCellId(Point point, int spatialHashLevel) {
 		double[] indexablesCoordinates = projectToIndexSpace( point );
 		int longitudeCellIndex = getCellIndex(
 				indexablesCoordinates[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 		int latitudeCellIndex = getCellIndex(
 				indexablesCoordinates[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
-		return formatQuadTreeCellId( longitudeCellIndex, latitudeCellIndex );
+		return formatSpatialHashCellId( longitudeCellIndex, latitudeCellIndex );
 	}
 
 	/**
-	 * Generate a Quad Tree Cell Ids List covered by a bounding box
+	 * Generate a spatial hash cell ids list covered by a bounding box
 	 *
 	 * @param lowerLeft lower left corner of the bounding box
 	 * @param upperRight upper right corner of the bounding box
-	 * @param quadTreeLevel quad tree level of the wanted cell ids
+	 * @param spatialHashLevel spatial hash level of the wanted cell ids
 	 * @return List of ids of the cells containing the point
 	 */
-	public static List<String> getQuadTreeCellsIds(Point lowerLeft, Point upperRight, int quadTreeLevel) {
+	public static List<String> getSpatialHashCellsIds(Point lowerLeft, Point upperRight, int spatialHashLevel) {
 		double[] projectedLowerLeft = projectToIndexSpace( lowerLeft );
 		int lowerLeftXIndex = getCellIndex(
 				projectedLowerLeft[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 		int lowerLeftYIndex = getCellIndex(
 				projectedLowerLeft[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 
 		double[] projectedUpperRight = projectToIndexSpace( upperRight );
 		int upperRightXIndex = getCellIndex(
 				projectedUpperRight[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 		int upperRightYIndex = getCellIndex(
 				projectedUpperRight[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 
 		double[] projectedLowerRight = projectToIndexSpace( Point.fromDegrees( lowerLeft.getLatitude(), upperRight.getLongitude() ) );
 		int lowerRightXIndex = getCellIndex(
 				projectedLowerRight[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 		int lowerRightYIndex = getCellIndex(
 				projectedLowerRight[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 
 		double[] projectedUpperLeft = projectToIndexSpace( Point.fromDegrees( upperRight.getLatitude(), lowerLeft.getLongitude() ) );
 		int upperLeftXIndex = getCellIndex(
 				projectedUpperLeft[0],
 				GeometricConstants.PROJECTED_LONGITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 		int upperLeftYIndex = getCellIndex(
 				projectedUpperLeft[1],
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
-				quadTreeLevel
+				spatialHashLevel
 		);
 
 		final int startX = Math.min( Math.min( Math.min( lowerLeftXIndex, upperLeftXIndex ), upperRightXIndex ), lowerRightXIndex );
@@ -139,25 +139,25 @@ public abstract class SpatialHelper {
 		final int startY = Math.min( Math.min( Math.min( lowerLeftYIndex, upperLeftYIndex ), upperRightYIndex ), lowerRightYIndex );
 		final int endY = Math.max( Math.max( Math.max( lowerLeftYIndex, upperLeftYIndex ), upperRightYIndex ), lowerRightYIndex );
 
-		List<String> quadTreeCellsIds = new ArrayList<String>( ( endX + 1 - startX ) * ( endY + 1 - startY ) );
+		List<String> spatialHashCellsIds = new ArrayList<String>( ( endX + 1 - startX ) * ( endY + 1 - startY ) );
 		for ( int xIndex = startX; xIndex <= endX; xIndex++ ) {
 			for ( int yIndex = startY; yIndex <= endY; yIndex++ ) {
-				quadTreeCellsIds.add( formatQuadTreeCellId( xIndex, yIndex ) );
+				spatialHashCellsIds.add( formatSpatialHashCellId( xIndex, yIndex ) );
 			}
 		}
 
-		return quadTreeCellsIds;
+		return spatialHashCellsIds;
 	}
 
 	/**
-	 * Generate a Quad Tree Cell Ids List for the bounding box of a circular search area
+	 * Generate a spatial hash cell ids list for the bounding box of a circular search area
 	 *
 	 * @param center center of the search area
 	 * @param radius radius of the search area
-	 * @param quadTreeLevel Quad Tree level of the wanted cell ids
+	 * @param spatialHashLevel spatial hash level of the wanted cell ids
 	 * @return List of the ids of the cells covering the bounding box of the given search discus
 	 */
-	public static List<String> getQuadTreeCellsIds(Coordinates center, double radius, int quadTreeLevel) {
+	public static List<String> getSpatialHashCellsIds(Coordinates center, double radius, int spatialHashLevel) {
 
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
@@ -167,42 +167,42 @@ public abstract class SpatialHelper {
 		double upperRightLongitude = boundingBox.getUpperRight().getLongitude();
 
 		if ( upperRightLongitude < lowerLeftLongitude ) { // Box cross the 180 meridian
-			final List<String> quadTreeCellsIds;
-			quadTreeCellsIds = getQuadTreeCellsIds(
+			final List<String> spatialHashCellsIds;
+			spatialHashCellsIds = getSpatialHashCellsIds(
 					Point.fromDegreesInclusive( lowerLeftLatitude, lowerLeftLongitude ),
 					Point.fromDegreesInclusive( upperRightLatitude, GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ),
-					quadTreeLevel
+					spatialHashLevel
 			);
-			quadTreeCellsIds.addAll(
-					getQuadTreeCellsIds(
+			spatialHashCellsIds.addAll(
+					getSpatialHashCellsIds(
 							Point.fromDegreesInclusive(
 									lowerLeftLatitude,
 									GeometricConstants.LONGITUDE_DEGREE_RANGE / 2
-								), Point.fromDegreesInclusive( upperRightLatitude, upperRightLongitude ), quadTreeLevel
+								), Point.fromDegreesInclusive( upperRightLatitude, upperRightLongitude ), spatialHashLevel
 					)
 			);
-			return quadTreeCellsIds;
+			return spatialHashCellsIds;
 		}
 		else {
-			return getQuadTreeCellsIds(
+			return getSpatialHashCellsIds(
 					Point.fromDegreesInclusive( lowerLeftLatitude, lowerLeftLongitude ),
 					Point.fromDegreesInclusive( upperRightLatitude, upperRightLongitude ),
-					quadTreeLevel
+					spatialHashLevel
 				);
 		}
 	}
 
 	/**
-	 * If point are searched at d distance from a point, a certain quad tree cell level will problem quad tree cell
-	 * that are big enough to contain the search area but the smallest possible. By returning this level we ensure
-	 * 4 Quad Tree Cell maximum will be needed to cover the search area (2 max on each axis because of search area
-	 * crossing fixed bonds of the quad tree cells)
+	 * If point are searched at d distance from a point, a certain spatial hash cell level will problem spatial hash
+	 * cell that are big enough to contain the search area but the smallest possible. By returning this level we ensure
+	 * 4 spatial hash cell maximum will be needed to cover the search area (2 max on each axis because of search area
+	 * crossing fixed bonds of the spatial hash cells)
 	 *
 	 * @param searchRange
-	 *            search range to be covered by the quad tree cells
-	 * @return Return the best Quad Tree level for a given search radius.
+	 *            search range to be covered by the spatial hash cells
+	 * @return Return the best spatial hash level for a given search radius.
 	 */
-	public static int findBestQuadTreeLevelForSearchRange(double searchRange) {
+	public static int findBestSpatialHashLevelForSearchRange(double searchRange) {
 
 		double iterations = GeometricConstants.EARTH_EQUATOR_CIRCUMFERENCE_KM / ( 2.0d * searchRange );
 
@@ -210,7 +210,7 @@ public abstract class SpatialHelper {
 	}
 
 	/**
-	 * Project a degree latitude/longitude point into a sinusoidal projection planar space for quad tree cell ids
+	 * Project a degree latitude/longitude point into a sinusoidal projection planar space for spatial hash cell ids
 	 * computation
 	 *
 	 * @param point
@@ -226,8 +226,8 @@ public abstract class SpatialHelper {
 		return projectedCoordinates;
 	}
 
-	public static String formatFieldName(final int quadTreeLevel, final String fieldName) {
-		return fieldName + "_HSSI_" + quadTreeLevel;
+	public static String formatFieldName(final int spatialHashLevel, final String fieldName) {
+		return fieldName + "_HSSI_" + spatialHashLevel;
 	}
 
 	public static String formatLatitude(final String fieldName) {
@@ -238,7 +238,7 @@ public abstract class SpatialHelper {
 		return fieldName + "_HSSI_Longitude";
 	}
 
-	public static String formatQuadTreeCellId(final int xIndex, final int yIndex) {
+	public static String formatSpatialHashCellId(final int xIndex, final int yIndex) {
 		return xIndex + "|" + yIndex;
 	}
 }

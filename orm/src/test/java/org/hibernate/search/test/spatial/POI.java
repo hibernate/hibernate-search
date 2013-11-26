@@ -27,7 +27,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.spatial.SpatialFieldBridgeByQuadTree;
+import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 import org.hibernate.search.spatial.Coordinates;
 
 import javax.persistence.Embedded;
@@ -60,7 +60,7 @@ public class POI {
 	double longitude;
 
 	@Field(store = Store.YES, index = Index.YES, analyze = Analyze.NO)
-	@FieldBridge(impl = SpatialFieldBridgeByQuadTree.class)
+	@FieldBridge(impl = SpatialFieldBridgeByHash.class)
 	@Embedded
 	public Coordinates getLocation() {
 		return new Coordinates() {

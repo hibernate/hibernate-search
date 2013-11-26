@@ -42,7 +42,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
 
 @Entity
-@Spatial(spatialMode = SpatialMode.GRID, name = "location")
+@Spatial(spatialMode = SpatialMode.HASH, name = "location")
 @Indexed(index = "ProductArticle")
 public class ProductArticle implements Coordinates {
 

@@ -61,7 +61,7 @@ public class Event {
 	@NumericField
 	double longitude;
 
-	@Spatial(spatialMode = SpatialMode.GRID)
+	@Spatial(spatialMode = SpatialMode.HASH)
 	public Coordinates getLocation() {
 		return new Coordinates() {
 			@Override

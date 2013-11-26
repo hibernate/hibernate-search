@@ -75,13 +75,13 @@ public class PropertySpatialMapping {
 		return this;
 	}
 
-	public PropertySpatialMapping topGridLevel(int topGridLevel) {
-		spatial.put( "topQuadTreeLevel", topGridLevel );
+	public PropertySpatialMapping topSpatialHashLevel(int topSpatialHashLevel) {
+		spatial.put( "topSpatialHashLevel", topSpatialHashLevel );
 		return this;
 	}
 
-	public PropertySpatialMapping bottomGridLevel(int bottomGridLevel) {
-		spatial.put( "bottomQuadTreeLevel", bottomGridLevel );
+	public PropertySpatialMapping bottomSpatialHashLevel(int bottomSpatialHashLevel) {
+		spatial.put( "bottomSpatialHashLevel", bottomSpatialHashLevel );
 		return this;
 	}
 

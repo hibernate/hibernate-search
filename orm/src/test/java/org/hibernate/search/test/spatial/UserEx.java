@@ -32,7 +32,7 @@ import org.hibernate.search.annotations.Spatials;
 
 @Spatials({
 	@Spatial,
-	@Spatial(name = "work", spatialMode = SpatialMode.GRID)
+	@Spatial(name = "work", spatialMode = SpatialMode.HASH)
 		})
 @Entity
 @Indexed
