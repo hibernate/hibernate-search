@@ -52,6 +52,7 @@
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/wildfly</module>
+        <module>integrationtest/performance</module>
     </modules>
 
     <issueManagement>
