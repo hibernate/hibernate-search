@@ -24,19 +24,19 @@
 package org.hibernate.search.backend.impl.jms;
 
 import java.util.List;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
+import org.hibernate.Session;
+
+import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
-
-import org.hibernate.Session;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -61,7 +61,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	 * &#64;PersistenceContext private Session session;<br>
 	 * <br>
 	 * protected Session getSession() {<br>
-	 *  &nbsp; &nbsp;return session<br>
+	 * &nbsp; &nbsp;return session<br>
 	 * }<br>
 	 * </code>
 	 * <p>
@@ -70,7 +70,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	 * &#64;PersistenceContext private EntityManager entityManager;<br>
 	 * <br>
 	 * protected Session getSession() {<br>
-	 *  &nbsp; &nbsp;return (Session) entityManager.getdelegate();<br>
+	 * &nbsp; &nbsp;return (Session) entityManager.getdelegate();<br>
 	 * }<br>
 	 * </code>
 	 */
@@ -98,7 +98,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		Session session = getSession();
 		SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
 		try {
-			indexName = objectMessage.getStringProperty( JmsBackendQueueTask.INDEX_NAME_JMS_PROPERTY );
+			indexName = objectMessage.getStringProperty( Environment.INDEX_NAME_JMS_PROPERTY );
 			indexManager = factory.getIndexManagerHolder().getIndexManager( indexName );
 			if ( indexManager == null ) {
 				log.messageReceivedForUndefinedIndex( indexName );
@@ -109,15 +109,12 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		}
 		catch (JMSException e) {
 			log.unableToRetrieveObjectFromMessage( message.getClass(), e );
-			return;
 		}
 		catch (ClassCastException e) {
 			log.illegalObjectRetrievedFromMessage( e );
-			return;
 		}
 		finally {
 			cleanSessionIfNeeded( session );
 		}
 	}
-
 }

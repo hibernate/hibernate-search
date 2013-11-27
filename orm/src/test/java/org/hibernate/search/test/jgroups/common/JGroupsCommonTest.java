@@ -36,7 +36,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jgroups.master.TShirt;
 import org.junit.Assert;
@@ -186,9 +186,9 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	 * @param cfg the configuration to isolate
 	 */
 	protected void applyJGroupsChannelConfiguration(Configuration cfg) {
-		cfg.setProperty( "hibernate.search.default." + JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( "hibernate.search.default." + DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
 		cfg.setProperty(
-				"hibernate.search.default." + JGroupsChannelProvider.CONFIGURATION_FILE,
+				"hibernate.search.default." + DispatchMessageSender.CONFIGURATION_FILE,
 				TESTING_JGROUPS_CONFIGURATION_FILE
 		);
 	}

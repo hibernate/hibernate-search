@@ -28,17 +28,15 @@ import java.util.List;
 import java.util.UUID;
 
 import junit.framework.Assert;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-import org.jgroups.JChannel;
-import org.jgroups.Message;
 
 import org.hibernate.Session;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -46,14 +44,16 @@ import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
-import org.hibernate.search.backend.impl.jgroups.MessageSerializationHelper;
+import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
+import org.hibernate.search.backend.jgroups.impl.MessageSerializationHelper;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.test.jms.master.TShirt;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.jgroups.JChannel;
+import org.jgroups.Message;
 
 /**
  * Tests that the Master node in a JGroups cluster can properly process messages received from channel.
@@ -69,7 +69,11 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
  */
 public class JGroupsMasterTest extends SearchTestCase {
 
-	private final QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+	private final QueryParser parser = new QueryParser(
+			TestConstants.getTargetLuceneVersion(),
+			"id",
+			TestConstants.stopAnalyzer
+	);
 
 	/**
 	 * Name of the JGroups channel used in test
@@ -201,8 +205,8 @@ public class JGroupsMasterTest extends SearchTestCase {
 		super.configure( cfg );
 		// JGroups configuration for master node
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
-		cfg.setProperty( JGroupsChannelProvider.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty( JGroupsChannelProvider.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
+		cfg.setProperty( DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
+		cfg.setProperty( DispatchMessageSender.CONFIGURATION_FILE, "testing-flush-loopback.xml" );
 	}
 
 	@Override

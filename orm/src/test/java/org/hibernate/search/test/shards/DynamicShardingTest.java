@@ -44,10 +44,10 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.hcore.impl.HibernateSessionFactoryServiceProvider;
+import org.hibernate.search.hcore.impl.HibernateSessionFactoryService;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProviderTemplate;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
@@ -219,7 +219,7 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 		@Override
 		protected Set<String> loadInitialShardNames(Properties properties, BuildContext buildContext) {
 			ServiceManager serviceManager = buildContext.getServiceManager();
-			SessionFactory sessionFactory = serviceManager.requestService( HibernateSessionFactoryServiceProvider.class, buildContext );
+			SessionFactory sessionFactory = serviceManager.requestService( HibernateSessionFactoryService.class ).getSessionFactory();
 			Session session = sessionFactory.openSession();
 			try {
 				Criteria initialShardsCriteria = session.createCriteria( Animal.class );

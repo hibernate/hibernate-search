@@ -20,16 +20,12 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hibernate.search.hcore.impl.MassIndexerFactoryProvider.MASS_INDEXER_FACTORY_CLASSNAME;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Properties;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
+
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
@@ -39,6 +35,11 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.MassIndexerFactory;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hibernate.search.spi.MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Davide D'Alto <davide@hibernate.org>
@@ -85,7 +86,8 @@ public class CustomMassIndexerFactoryTest extends SearchTestCaseJUnit4 {
 		}
 
 		@Override
-		public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
+		public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory,
+				SessionFactoryImplementor sessionFactory,
 				Class<?>... entities) {
 			return new NoopMassIndexer( configurationReadable );
 		}
