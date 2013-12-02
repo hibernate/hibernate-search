@@ -50,19 +50,19 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	private static final Log log = LoggerFactory.make( Log.class );
 
 	/**
-	 * Use {@link InfinispanIntegration.DEFAULT_LOCKING_CACHENAME} instead.
+	 * Use {@link InfinispanIntegration#DEFAULT_LOCKING_CACHENAME} instead.
 	 */
 	@Deprecated
 	public static final String DEFAULT_LOCKING_CACHENAME = InfinispanIntegration.DEFAULT_LOCKING_CACHENAME;
 
 	/**
-	 * Use {@link InfinispanIntegration.DEFAULT_INDEXESDATA_CACHENAME} instead.
+	 * Use {@link InfinispanIntegration#DEFAULT_INDEXESDATA_CACHENAME} instead.
 	 */
 	@Deprecated
 	public static final String DEFAULT_INDEXESDATA_CACHENAME = InfinispanIntegration.DEFAULT_INDEXESDATA_CACHENAME;
 
 	/**
-	 * Use {@link InfinispanIntegration.DEFAULT_LOCKING_CACHENAME} instead.
+	 * Use {@link InfinispanIntegration#DEFAULT_LOCKING_CACHENAME} instead.
 	 */
 	@Deprecated
 	public static final String DEFAULT_INDEXESMETADATA_CACHENAME = InfinispanIntegration.DEFAULT_LOCKING_CACHENAME;

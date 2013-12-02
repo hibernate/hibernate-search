@@ -46,9 +46,9 @@ public interface Workspace {
 	 * Used by OptimizeLuceneWork to start an optimization process of the index.
 	 *
 	 * @param writer the IndexWriter to use for optimization
-	 * @see OptimizeLuceneWork
-	 * @see SearchFactory#optimize()
-	 * @see SearchFactory#optimize(Class)
+	 * @see org.hibernate.search.backend.OptimizeLuceneWork
+	 * @see org.hibernate.search.SearchFactory#optimize()
+	 * @see org.hibernate.search.SearchFactory#optimize(Class)
 	 */
 	void performOptimization(IndexWriter writer);
 
