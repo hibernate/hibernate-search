@@ -1225,7 +1225,7 @@
             </properties>
         </profile>
 
-        <!-- The SQLServer2008 R2 (MS JDBC) test envionment -->
+        <!-- The SQLServer2008 R2 (MS JDBC) test environment -->
         <profile>
             <id>mssql2008R2</id>
             <dependencies>

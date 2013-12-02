@@ -59,7 +59,7 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
 public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSerializer {
 	private static Log log = LoggerFactory.make();
 
-	private SearchFactoryImplementor searchFactory;
+	private final SearchFactoryImplementor searchFactory;
 	private SerializationProvider provider;
 
 	public PluggableSerializationLuceneWorkSerializer(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
@@ -212,7 +212,7 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 					throw log.unknownFieldType( safeField.getClass() );
 				}
 			}
-			else if (fieldable instanceof Serializable) { //Today Fieldable is Serializable but for how long?
+			else if ( fieldable != null ) { //Today Fieldable is Serializable but for how long?
 				serializer.addFieldWithSerializableFieldable( toByteArray( fieldable ) );
 			}
 			else {
