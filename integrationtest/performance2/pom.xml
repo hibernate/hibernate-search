@@ -67,13 +67,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-search-orm</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-search-engine</artifactId>
+			<artifactId>hibernate-search-testing</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

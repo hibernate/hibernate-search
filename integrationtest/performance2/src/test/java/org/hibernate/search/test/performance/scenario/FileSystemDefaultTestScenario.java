@@ -25,6 +25,8 @@ package org.hibernate.search.test.performance.scenario;
 
 import java.util.Properties;
 
+import org.hibernate.search.test.TestConstants;
+
 /**
  * @author Tomas Hradec
  */
@@ -34,7 +36,7 @@ public class FileSystemDefaultTestScenario extends TestScenario {
 	public Properties getHibernateProperties() {
 		Properties properties = super.getHibernateProperties();
 		properties.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		properties.setProperty( "hibernate.search.default.indexBase", "target/filesystem-default" );
+		properties.setProperty( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( FileSystemDefaultTestScenario.class ) );
 		return properties;
 	}
 
