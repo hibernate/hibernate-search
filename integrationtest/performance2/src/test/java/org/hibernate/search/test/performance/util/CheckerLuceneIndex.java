@@ -47,6 +47,9 @@ import org.hibernate.search.test.performance.scenario.TestContext;
  */
 public class CheckerLuceneIndex {
 
+	private CheckerLuceneIndex() {
+	}
+
 	public static void printIndexReport(TestContext ctx, PrintStream out) {
 		if ( !CHECK_INDEX_STATE ) {
 			return;

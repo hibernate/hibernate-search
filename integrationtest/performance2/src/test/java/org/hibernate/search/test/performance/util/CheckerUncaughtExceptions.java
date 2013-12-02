@@ -37,6 +37,9 @@ public class CheckerUncaughtExceptions {
 
 	private static final List<Throwable> UNCAUGHT_EXCEPTIONS = new CopyOnWriteArrayList<Throwable>();
 
+	private CheckerUncaughtExceptions() {
+	}
+
 	public static void initUncaughtExceptionHandler() {
 		Thread.setDefaultUncaughtExceptionHandler( new UncaughtExceptionHandler() {
 			@Override

@@ -55,6 +55,9 @@ import org.hibernate.search.test.performance.util.CheckerUncaughtExceptions;
  */
 public class TestReporter {
 
+	private TestReporter() {
+	}
+
 	public static void printReport(TestContext ctx) {
 		PrintStream outStream = createOutputStream( ctx.scenario.getClass().getSimpleName() );
 		PrintWriter outWriter = new PrintWriter( outStream );

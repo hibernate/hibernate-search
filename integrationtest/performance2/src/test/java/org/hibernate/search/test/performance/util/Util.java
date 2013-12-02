@@ -36,6 +36,9 @@ public class Util {
 	private static final int GC_CYCLE = 3;
 	private static final int GC_TIMEOUT = 3 * 1000;
 
+	private Util() {
+	}
+
 	public static void runGarbageCollectorAndWait() {
 		try {
 			for ( int i = 0; i < GC_CYCLE; i++ ) {

@@ -30,6 +30,9 @@ import static org.hibernate.search.test.performance.util.Util.log;
  */
 public class TestScenarioFactory {
 
+	private TestScenarioFactory() {
+	}
+
 	public static TestScenario create() {
 		String scenarioClassName = System.getProperty( "scenario" );
 		if ( scenarioClassName == null ) {
