@@ -50,8 +50,8 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 	 * instance, with the exception of {@link #getReflectionManager()} which will return the constructor
 	 * defined ReflectionManager.
 	 *
-	 * @param reflectionManager
-	 * @param cfg
+	 * @param reflectionManager the current reflection manager
+	 * @param cfg the search configuration
 	 */
 	public ReflectionReplacingSearchConfiguration(ReflectionManager reflectionManager, SearchConfiguration cfg) {
 		this.reflectionManager = reflectionManager;

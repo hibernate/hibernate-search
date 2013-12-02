@@ -61,7 +61,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	 * &#64;PersistenceContext private Session session;<br>
 	 * <br>
 	 * protected Session getSession() {<br>
-	 *  &nbsp; &nbsp;return session<br>
+	 * &nbsp; &nbsp;return session<br>
 	 * }<br>
 	 * </code>
 	 * <p>
@@ -70,7 +70,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 	 * &#64;PersistenceContext private EntityManager entityManager;<br>
 	 * <br>
 	 * protected Session getSession() {<br>
-	 *  &nbsp; &nbsp;return (Session) entityManager.getdelegate();<br>
+	 * &nbsp; &nbsp;return (Session) entityManager.getdelegate();<br>
 	 * }<br>
 	 * </code>
 	 */

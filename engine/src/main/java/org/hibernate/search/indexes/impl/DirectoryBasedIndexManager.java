@@ -51,8 +51,8 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * This implementation of IndexManager is coupled to a
- * DirectoryProvider and a DirectoryBasedReaderProvider
+ * This implementation of {@code IndexManager} is coupled to a
+ * {@code DirectoryProvider} and a {@code DirectoryBasedReaderProvider}.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */

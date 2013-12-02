@@ -29,7 +29,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
  * Sends a single operation to the related backends, considering the sharding strategy.
- * This delegates to {@link org.hibernate.search.indexes.spi.IndexManager#performStreamOperation(LuceneWork, boolean)}
+ * This delegates to {@link org.hibernate.search.indexes.spi.IndexManager#performStreamOperation(LuceneWork, IndexingMonitor, boolean)}
  * so it's suited for streams of many LuceneWork operations which don't need strict ordering.
  *
  * @author Sanne Grinovero

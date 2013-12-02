@@ -105,7 +105,7 @@ public class EntityMapping {
 	 * Registers the given class bridge for the currently configured entity type. Any subsequent analyzer, parameter
 	 * etc. configurations apply to this class bridge.
 	 *
-	 * @param instance a class bridge instance
+	 * @param classBridge a class bridge instance
 	 * @return a new {@link ClassBridgeMapping} following the method chaining pattern
 	 * @experimental This method is considered experimental and it may be altered or removed in future releases
 	 * @throws org.hibernate.search.SearchException in case the same bridge instance is passed more than once for the
