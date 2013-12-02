@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 4.5.0.Alpha1 14-10-2013*
+*Version: 5.0.0-SNAPSHOT*
 
 ## Description
 
