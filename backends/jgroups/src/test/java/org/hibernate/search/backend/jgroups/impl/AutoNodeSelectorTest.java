@@ -18,9 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.backends.jgroups;
+package org.hibernate.search.backend.jgroups.impl;
 
-import org.hibernate.search.backend.impl.jgroups.AutoNodeSelector;
 import org.hibernate.search.test.util.TestForIssue;
 import org.jgroups.Address;
 import org.jgroups.Global;

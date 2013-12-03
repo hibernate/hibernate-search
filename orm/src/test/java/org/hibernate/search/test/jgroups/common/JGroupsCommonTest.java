@@ -36,7 +36,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
+import org.hibernate.search.backend.jgroups.impl.JGroupsChannelProvider;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jgroups.master.TShirt;
 import org.junit.Assert;

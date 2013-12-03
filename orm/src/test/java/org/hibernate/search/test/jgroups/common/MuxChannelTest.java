@@ -26,10 +26,11 @@ package org.hibernate.search.test.jgroups.common;
 import java.util.Random;
 
 import junit.framework.Assert;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
-import org.hibernate.search.backend.impl.jgroups.MessageSender;
+import org.hibernate.search.backend.jgroups.impl.JGroupsChannelProvider;
+import org.hibernate.search.backend.jgroups.impl.MessageSender;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.JChannel;

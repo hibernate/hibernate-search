@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.backends.jgroups;
+package org.hibernate.search.backend.jgroups.impl;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -26,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
-import org.hibernate.search.backend.impl.jgroups.MasterNodeSelector;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 
 

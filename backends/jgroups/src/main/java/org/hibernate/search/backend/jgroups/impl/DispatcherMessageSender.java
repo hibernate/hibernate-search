@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.backend.impl.jgroups;
+package org.hibernate.search.backend.jgroups.impl;
 
 import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

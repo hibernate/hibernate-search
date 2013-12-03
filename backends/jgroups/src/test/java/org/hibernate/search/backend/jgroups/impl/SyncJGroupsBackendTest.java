@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.backends.jgroups;
+package org.hibernate.search.backend.jgroups.impl;
 
 import java.io.Serializable;
 
@@ -29,8 +29,6 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
-import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;

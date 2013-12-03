@@ -18,14 +18,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.backends.jgroups;
+package org.hibernate.search.backend.jgroups.impl;
 
 import java.util.Arrays;
 
 import junit.framework.Assert;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.impl.jgroups.MessageSerializationHelper;
 import org.junit.Test;
 
 

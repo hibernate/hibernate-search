@@ -18,8 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.backend.impl.jgroups;
+package org.hibernate.search.backend.jgroups.impl;
 
+import org.hibernate.search.exception.AssertionFailure;
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.View;
@@ -27,31 +28,26 @@ import org.jgroups.View;
 
 /**
  * <p>This {@link org.hibernate.search.backend.impl.jgroups.NodeSelectorStrategy} is a static configuration for the local
- * node to avoid processing any indexing operations locally.
- * It is assumed that some other node in the cluster will process it; which
- * node exactly is unknown, so messages are broadcasted to the group.</p>
+ * node to always process index operations locally, and accept index operations
+ * from remote nodes configured as slaves.</p>
  *
- * <p>There is no guarantee of processing: if no master picks up the task,
- * the index update operation is skipped. This can be mitigated by making
- * sure at least one master is always online; if a persistent queue is
- * needed it's better to use the JMS backend.</p>
+ * <p>JGroups does not provide a persistent queue, if that level of reliability
+ * is needed, use the JMS backend.</p>
  *
- * <p>This implementation matches the {@literal jgroupsSlave} configuration property.</p>
+ * <p>This implementation matches the {@literal jgroupsMaster} configuration property.</p>
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class SlaveNodeSelector implements NodeSelectorStrategy {
-
-	private Address localAddress;
+public class MasterNodeSelector implements NodeSelectorStrategy {
 
 	@Override
 	public boolean isIndexOwnerLocal() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public void setLocalAddress(Address address) {
-		this.localAddress = address;
+		//not needed
 	}
 
 	@Override
@@ -61,7 +57,7 @@ public class SlaveNodeSelector implements NodeSelectorStrategy {
 
 	@Override
 	public Message createMessage(byte[] data) {
-		return new Message( null, localAddress, data );
+		throw new AssertionFailure( "A Master node should never create new Messages" );
 	}
 
 }

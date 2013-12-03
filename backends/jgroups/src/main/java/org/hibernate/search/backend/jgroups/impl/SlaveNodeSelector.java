@@ -18,9 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.backend.impl.jgroups;
-
-import java.util.List;
+package org.hibernate.search.backend.jgroups.impl;
 
 import org.jgroups.Address;
 import org.jgroups.Message;
@@ -28,55 +26,37 @@ import org.jgroups.View;
 
 
 /**
- * <p>This {@link org.hibernate.search.backend.impl.jgroups.NodeSelectorStrategy} picks a single master across all nodes participating
- * in the JGroups cluster deterministically: this way all nodes in the group will
- * have an agreement on which node is going to be the master.</p>
+ * <p>This {@link org.hibernate.search.backend.impl.jgroups.NodeSelectorStrategy} is a static configuration for the local
+ * node to avoid processing any indexing operations locally.
+ * It is assumed that some other node in the cluster will process it; which
+ * node exactly is unknown, so messages are broadcasted to the group.</p>
  *
- * <p>Advantage: if the master node fails, a new node is elected.</p>
- * <p>Limitation: make sure all nodes in the group are having the same application running
- * and use the same configuration, or the master might ignore incoming messages.</p>
+ * <p>There is no guarantee of processing: if no master picks up the task,
+ * the index update operation is skipped. This can be mitigated by making
+ * sure at least one master is always online; if a persistent queue is
+ * needed it's better to use the JMS backend.</p>
+ *
+ * <p>This implementation matches the {@literal jgroupsSlave} configuration property.</p>
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class AutoNodeSelector implements NodeSelectorStrategy {
+public class SlaveNodeSelector implements NodeSelectorStrategy {
 
-	private final String indexName;
-	private volatile Address localAddress;
-	private volatile Address masterAddress;
-
-	/**
-	 * @param indexName
-	 */
-	public AutoNodeSelector(String indexName) {
-		this.indexName = indexName;
-	}
+	private Address localAddress;
 
 	@Override
 	public boolean isIndexOwnerLocal() {
-		return localAddress == null || localAddress.equals( masterAddress );
+		return false;
 	}
 
 	@Override
 	public void setLocalAddress(Address address) {
-		localAddress = address;
+		this.localAddress = address;
 	}
 
 	@Override
 	public void viewAccepted(View view) {
-		List<Address> members = view.getMembers();
-		if ( members.size() == 1 ) {
-			masterAddress = members.get( 0 );
-		}
-		else if ( members.size() == 2 ) {
-			// pick the non-coordinator
-			masterAddress = members.get( 1 );
-		}
-		else {
-			// exclude cluster coordinator (the first)
-			int selectionRange = members.size() - 1;
-			int selected = Math.abs( indexName.hashCode() % selectionRange ) + 1;
-			masterAddress = members.get( selected );
-		}
+		//nothing to do
 	}
 
 	@Override

@@ -30,14 +30,13 @@ import junit.framework.Assert;
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.MessageDispatcher;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.impl.jgroups.JGroupsBackendQueueProcessor;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
-import org.hibernate.search.backend.impl.jgroups.MessageListenerToRequestHandlerAdapter;
+import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
+import org.hibernate.search.backend.jgroups.impl.JGroupsChannelProvider;
+import org.hibernate.search.backend.jgroups.impl.MessageListenerToRequestHandlerAdapter;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;

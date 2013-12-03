@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.backend.impl.jgroups;
+package org.hibernate.search.backend.jgroups.impl;
 
 import java.net.URL;
 import java.util.Properties;
