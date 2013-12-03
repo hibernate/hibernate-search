@@ -768,7 +768,10 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.16</version>
                     <configuration>
+                        <threadCount>1</threadCount>
+                        <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <runOrder>alphabetical</runOrder>
                         <systemPropertyVariables>
                             <!-- See HSEARCH-1444 -->
                             <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
