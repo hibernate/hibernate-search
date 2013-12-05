@@ -50,6 +50,7 @@ public class CheckerLuceneIndex {
 	private CheckerLuceneIndex() {
 	}
 
+	@SuppressWarnings("deprecation") // performance tests can be run against older hsearch versions, where isn't getIndexManagerHolder yet
 	public static void printIndexReport(TestContext ctx, PrintStream out) {
 		if ( !CHECK_INDEX_STATE ) {
 			return;
@@ -61,7 +62,7 @@ public class CheckerLuceneIndex {
 		Session s = ctx.sf.openSession();
 		FullTextSession fts = Search.getFullTextSession( s );
 		SearchFactoryImplementor sfi = (SearchFactoryImplementor) fts.getSearchFactory();
-		Collection<IndexManager> indexManagers = sfi.getIndexManagerHolder().getIndexManagers();
+		Collection<IndexManager> indexManagers = sfi.getAllIndexesManager().getIndexManagers();
 
 		for ( IndexManager indexManager : indexManagers ) {
 			DirectoryBasedIndexManager directoryBasedIndexManager = (DirectoryBasedIndexManager) indexManager;
