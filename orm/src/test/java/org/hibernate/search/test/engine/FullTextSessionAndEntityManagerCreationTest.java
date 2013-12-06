@@ -42,7 +42,8 @@ public class FullTextSessionAndEntityManagerCreationTest {
 			fail( "A valid session must be passed" );
 		}
 		catch (IllegalArgumentException e) {
-			assertTrue( "Unexpected error code: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000178" ) );
+			assertTrue( "Unexpected error code: " + e.getMessage(),
+					e.getMessage().endsWith( "Unable to create a SessionDelegatorBaseImpl from a null sessionImplementor object" ) );
 		}
 	}
 
