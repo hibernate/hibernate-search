@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.1.Final (9-12-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1462] - Search should not use EntityKey constructor
+
+** Improvement
+    * [HSEARCH-1464] - Update branch 4.4 to depend on latest Hibernate ORM 4.2.8.Final
+
 
 Version 4.4.0.Final (14-10-2013)
 ------------------------
