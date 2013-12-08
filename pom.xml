@@ -145,7 +145,7 @@
         <luceneVersion>3.6.2</luceneVersion>
         <infinispanVersion>5.3.0.Final</infinispanVersion>
         <jgroupsVersion>3.3.5.Final</jgroupsVersion>
-        <hibernateVersion>4.2.6.Final</hibernateVersion>
+        <hibernateVersion>4.2.8.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>2.1.0</bytemanVersion>

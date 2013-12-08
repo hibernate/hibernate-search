@@ -24,6 +24,8 @@ import java.sql.Connection;
 
 import org.hibernate.ConnectionReleaseMode;
 import org.hibernate.Interceptor;
+import org.hibernate.SessionBuilder;
+import org.hibernate.SessionEventListener;
 import org.hibernate.SharedSessionBuilder;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextSharedSessionBuilder;
@@ -132,6 +134,18 @@ public class FullTextSharedSessionBuilderDelegator implements FullTextSharedSess
 	@Override
 	public FullTextSharedSessionBuilder tenantIdentifier(String tenantIdentifier) {
 		builder.tenantIdentifier( tenantIdentifier );
+		return this;
+	}
+
+	@Override
+	public SessionBuilder eventListeners(SessionEventListener... listeners) {
+		builder.eventListeners( listeners );
+		return this;
+	}
+
+	@Override
+	public SessionBuilder clearEventListeners() {
+		builder.clearEventListeners();
 		return this;
 	}
 }
