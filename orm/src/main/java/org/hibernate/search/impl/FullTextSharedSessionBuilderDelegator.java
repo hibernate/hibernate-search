@@ -143,8 +143,8 @@ public class FullTextSharedSessionBuilderDelegator implements FullTextSharedSess
 	}
 
 	@Override
-	public FullTextSharedSessionBuilder eventListeners(SessionEventListener... arg0) {
-		builder.eventListeners( arg0 );
+	public FullTextSharedSessionBuilder eventListeners(SessionEventListener... listeners) {
+		builder.eventListeners( listeners );
 		return this;
 	}
 }
