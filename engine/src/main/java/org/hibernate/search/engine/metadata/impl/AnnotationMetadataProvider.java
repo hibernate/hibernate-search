@@ -1070,7 +1070,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			if ( potentialLevel < 0 ) {
 				potentialLevel = Integer.MAX_VALUE;
 			}
-			parseContext.setMaxLevel( potentialLevel );
+			if ( potentialLevel < oldMaxLevel ) {
+				parseContext.setMaxLevel( potentialLevel );
+			}
 			parseContext.incrementLevel();
 
 			XClass elementClass;
@@ -1409,8 +1411,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return maxLevel;
 		}
 
-		public void setMaxLevel(int potentialLevel) {
-			this.maxLevel = potentialLevel > this.maxLevel ? this.maxLevel : potentialLevel;
+		public void setMaxLevel(int newMaxLevel) {
+			this.maxLevel = newMaxLevel;
 		}
 
 		public int getLevel() {
