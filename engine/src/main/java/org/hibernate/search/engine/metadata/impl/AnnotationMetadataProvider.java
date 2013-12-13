@@ -1058,128 +1058,130 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			PathsContext pathsContext,
 			ParseContext parseContext) {
 		IndexedEmbedded indexedEmbeddedAnnotation = member.getAnnotation( IndexedEmbedded.class );
-		if ( indexedEmbeddedAnnotation != null ) {
-			//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
-			typeMetadataBuilder.addCollectionRole(
-					StringHelper.qualify(
-							parseContext.getCurrentClass().getName(), member.getName()
-					)
+		if ( indexedEmbeddedAnnotation == null ) {
+			return;
+		}
+
+		//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
+		typeMetadataBuilder.addCollectionRole(
+				StringHelper.qualify(
+						parseContext.getCurrentClass().getName(), member.getName()
+				)
+		);
+		int oldMaxLevel = parseContext.getMaxLevel();
+		int potentialLevel = depth( indexedEmbeddedAnnotation ) + parseContext.getLevel();
+		// This is really catching a possible int overflow. depth() can return Integer.MAX_VALUE, which then can
+		// overflow in case level > 0. Really this code should be rewritten (HF)
+		if ( potentialLevel < 0 ) {
+			potentialLevel = Integer.MAX_VALUE;
+		}
+		// HSEARCH-1442 recreating the behavior prior to PropertiesMetadata refactoring
+		// not sure whether this is algorithmically correct though. @IndexedEmbedded processing should be refactored (HF)
+		if ( potentialLevel < oldMaxLevel ) {
+			parseContext.setMaxLevel( potentialLevel );
+		}
+		parseContext.incrementLevel();
+
+		XClass elementClass;
+		if ( void.class == indexedEmbeddedAnnotation.targetElement() ) {
+			elementClass = member.getElementClass();
+		}
+		else {
+			elementClass = reflectionManager.toXClass( indexedEmbeddedAnnotation.targetElement() );
+		}
+
+		if ( parseContext.getMaxLevel() == Integer.MAX_VALUE //infinite
+				&& parseContext.hasBeenProcessed( elementClass ) ) {
+			throw new SearchException(
+					"Circular reference. Duplicate use of "
+							+ elementClass.getName()
+							+ " in root entity " + typeMetadataBuilder.getClass().getName()
+							+ "#" + buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member )
 			);
-			int oldMaxLevel = parseContext.getMaxLevel();
-			int potentialLevel = depth( indexedEmbeddedAnnotation ) + parseContext.getLevel();
-			// This is really catching a possible int overflow. depth() can return Integer.MAX_VALUE, which then can
-			// overflow in case level > 0. Really this code should be rewritten (HF)
-			if ( potentialLevel < 0 ) {
-				potentialLevel = Integer.MAX_VALUE;
-			}
-			// HSEARCH-1442 recreating the behavior prior to PropertiesMetadata refactoring
-			// not sure whether this is algorithmically correct though. @IndexedEmbedded processing should be refactored (HF)
-			if ( potentialLevel < oldMaxLevel ) {
-				parseContext.setMaxLevel( potentialLevel );
-			}
-			parseContext.incrementLevel();
+		}
 
-			XClass elementClass;
-			if ( void.class == indexedEmbeddedAnnotation.targetElement() ) {
-				elementClass = member.getElementClass();
-			}
-			else {
-				elementClass = reflectionManager.toXClass( indexedEmbeddedAnnotation.targetElement() );
-			}
+		String localPrefix = buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member );
+		PathsContext updatedPathsContext = updatePaths( localPrefix, pathsContext, indexedEmbeddedAnnotation );
 
-			if ( parseContext.getMaxLevel() == Integer.MAX_VALUE //infinite
-					&& parseContext.hasBeenProcessed( elementClass ) ) {
-				throw new SearchException(
-						"Circular reference. Duplicate use of "
-								+ elementClass.getName()
-								+ " in root entity " + typeMetadataBuilder.getClass().getName()
-								+ "#" + buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member )
-				);
-			}
+		boolean pathsCreatedAtThisLevel = false;
+		if ( pathsContext == null && updatedPathsContext != null ) {
+			//after this level if not all paths are traversed, then the paths
+			//either don't exist in the object graph, or aren't indexed paths
+			pathsCreatedAtThisLevel = true;
+		}
 
-			String localPrefix = buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member );
-			PathsContext updatedPathsContext = updatePaths( localPrefix, pathsContext, indexedEmbeddedAnnotation );
+		if ( !parseContext.isMaxLevelReached() || isInPath(
+				localPrefix,
+				updatedPathsContext,
+				indexedEmbeddedAnnotation
+		) ) {
+			parseContext.processingClass( elementClass ); //push
 
-			boolean pathsCreatedAtThisLevel = false;
-			if ( pathsContext == null && updatedPathsContext != null ) {
-				//after this level if not all paths are traversed, then the paths
-				//either don't exist in the object graph, or aren't indexed paths
-				pathsCreatedAtThisLevel = true;
-			}
-
-			if ( !parseContext.isMaxLevelReached() || isInPath(
-					localPrefix,
-					updatedPathsContext,
-					indexedEmbeddedAnnotation
-			) ) {
-				parseContext.processingClass( elementClass ); //push
-
-				EmbeddedTypeMetadata.Builder embeddedTypeMetadataBuilder =
-						new EmbeddedTypeMetadata.Builder(
-								reflectionManager.toClass( elementClass ),
-								member,
-								configContext,
-								typeMetadataBuilder.getScopedAnalyzer()
-						);
-
-				embeddedTypeMetadataBuilder.boost( AnnotationProcessingHelper.getBoost( member, null ) );
-				//property > entity analyzer
-				Analyzer analyzer = AnnotationProcessingHelper.
-						getAnalyzer(
-								member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
-								configContext
-						);
-				if ( analyzer == null ) {
-					analyzer = typeMetadataBuilder.getAnalyzer();
-				}
-				embeddedTypeMetadataBuilder.analyzer( analyzer );
-
-				if ( disableOptimizations ) {
-					typeMetadataBuilder.blacklistForOptimization( elementClass );
-				}
-
-				XClass previousClass = parseContext.getCurrentClass();
-				parseContext.setCurrentClass( elementClass );
-				initializeClass(
-						embeddedTypeMetadataBuilder,
-						false,
-						localPrefix,
-						parseContext,
-						configContext,
-						disableOptimizations,
-						updatedPathsContext
-				);
-				parseContext.setCurrentClass( previousClass );
-
-				final String indexNullAs = embeddedNullToken( configContext, indexedEmbeddedAnnotation );
-				if ( indexNullAs != null ) {
-					EmbeddedTypeMetadata.Container container = embeddedTypeMetadataBuilder.getEmbeddedContainerType();
-					FieldBridge fieldBridge = guessNullEmbeddedBridge( member, container, indexNullAs );
-					embeddedTypeMetadataBuilder.indexNullToken(
-							indexNullAs,
-							embeddedNullField( localPrefix ),
-							fieldBridge
+			EmbeddedTypeMetadata.Builder embeddedTypeMetadataBuilder =
+					new EmbeddedTypeMetadata.Builder(
+							reflectionManager.toClass( elementClass ),
+							member,
+							configContext,
+							typeMetadataBuilder.getScopedAnalyzer()
 					);
-				}
 
-				EmbeddedTypeMetadata embeddedTypeMetadata = embeddedTypeMetadataBuilder.build();
-				for ( XClass xClass : embeddedTypeMetadata.getOptimizationBlackList() ) {
-					typeMetadataBuilder.blacklistForOptimization( xClass );
-				}
-				typeMetadataBuilder.addEmbeddedType( embeddedTypeMetadata );
-
-				parseContext.removeProcessedClass( elementClass ); //pop
+			embeddedTypeMetadataBuilder.boost( AnnotationProcessingHelper.getBoost( member, null ) );
+			//property > entity analyzer
+			Analyzer analyzer = AnnotationProcessingHelper.
+					getAnalyzer(
+							member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
+							configContext
+					);
+			if ( analyzer == null ) {
+				analyzer = typeMetadataBuilder.getAnalyzer();
 			}
-			else if ( log.isTraceEnabled() ) {
-				log.tracef( "depth reached, ignoring %s", localPrefix );
+			embeddedTypeMetadataBuilder.analyzer( analyzer );
+
+			if ( disableOptimizations ) {
+				typeMetadataBuilder.blacklistForOptimization( elementClass );
 			}
 
-			parseContext.decrementLevel();
-			parseContext.setMaxLevel( oldMaxLevel ); //set back the the old max level
+			XClass previousClass = parseContext.getCurrentClass();
+			parseContext.setCurrentClass( elementClass );
+			initializeClass(
+					embeddedTypeMetadataBuilder,
+					false,
+					localPrefix,
+					parseContext,
+					configContext,
+					disableOptimizations,
+					updatedPathsContext
+			);
+			parseContext.setCurrentClass( previousClass );
 
-			if ( pathsCreatedAtThisLevel ) {
-				validateAllPathsEncountered( member, updatedPathsContext );
+			final String indexNullAs = embeddedNullToken( configContext, indexedEmbeddedAnnotation );
+			if ( indexNullAs != null ) {
+				EmbeddedTypeMetadata.Container container = embeddedTypeMetadataBuilder.getEmbeddedContainerType();
+				FieldBridge fieldBridge = guessNullEmbeddedBridge( member, container, indexNullAs );
+				embeddedTypeMetadataBuilder.indexNullToken(
+						indexNullAs,
+						embeddedNullField( localPrefix ),
+						fieldBridge
+				);
 			}
+
+			EmbeddedTypeMetadata embeddedTypeMetadata = embeddedTypeMetadataBuilder.build();
+			for ( XClass xClass : embeddedTypeMetadata.getOptimizationBlackList() ) {
+				typeMetadataBuilder.blacklistForOptimization( xClass );
+			}
+			typeMetadataBuilder.addEmbeddedType( embeddedTypeMetadata );
+
+			parseContext.removeProcessedClass( elementClass ); //pop
+		}
+		else if ( log.isTraceEnabled() ) {
+			log.tracef( "depth reached, ignoring %s", localPrefix );
+		}
+
+		parseContext.decrementLevel();
+		parseContext.setMaxLevel( oldMaxLevel ); //set back the the old max level
+
+		if ( pathsCreatedAtThisLevel ) {
+			validateAllPathsEncountered( member, updatedPathsContext );
 		}
 	}
 
