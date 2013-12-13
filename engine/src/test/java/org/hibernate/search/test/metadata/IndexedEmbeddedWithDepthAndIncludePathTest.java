@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -20,7 +20,8 @@
  */
 package org.hibernate.search.test.metadata;
 
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
@@ -29,11 +30,11 @@ import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.TestForIssue;
-import org.junit.Before;
-import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 @TestForIssue(jiraKey = "HSEARCH-1442")
-public class DepthAndIncludePathIndexedEmbeddedEntityTest {
+public class IndexedEmbeddedWithDepthAndIncludePathTest {
 
 	private AnnotationMetadataProvider metadataProvider;
 
@@ -46,15 +47,15 @@ public class DepthAndIncludePathIndexedEmbeddedEntityTest {
 	@Test
 	public void testDepthIsProperlyHandled() {
 		TypeMetadata rootTypeMetadata = metadataProvider
-				.getTypeMetadataFor( DepthAndIncludePathIndexedEmbeddedEntity.class );
-		
+				.getTypeMetadataFor( IndexedEmbeddedTestEntity.class );
+
 		EmbeddedTypeMetadata embeddedWithDepthTypeMetadata = null;
 		for ( EmbeddedTypeMetadata typeMetadata : rootTypeMetadata.getEmbeddedTypeMetadata() ) {
 			if ( "indexedEmbeddedWithDepth".equals( typeMetadata.getEmbeddedFieldName() ) ) {
 				embeddedWithDepthTypeMetadata = typeMetadata;
 			}
 		}
-		
+
 		assertNotNull( embeddedWithDepthTypeMetadata );
 		assertNotNull( embeddedWithDepthTypeMetadata.getPropertyMetadataForProperty( "name" ) );
 	}

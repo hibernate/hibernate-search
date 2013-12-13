@@ -1,6 +1,6 @@
-/* 
+/*
  * Hibernate, Relational Persistence for Idiomatic Java
- * 
+ *
  * JBoss, Home of Professional Open Source
  * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
@@ -27,19 +27,19 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 @Indexed
-public class DepthAndIncludePathIndexedEmbeddedEntity {
-	
+public class IndexedEmbeddedTestEntity {
+
 	@DocumentId
 	private Long id;
 
 	@Field(analyze = Analyze.NO)
 	private String name;
-	
+
 	@IndexedEmbedded(includePaths = "name")
-	private DepthAndIncludePathIndexedEmbeddedEntity indexedEmbeddedWithIncludePath;
+	private IndexedEmbeddedTestEntity indexedEmbeddedWithIncludePath;
 
 	@IndexedEmbedded(depth = 1)
-	private DepthAndIncludePathIndexedEmbeddedEntity indexedEmbeddedWithDepth;
+	private IndexedEmbeddedTestEntity indexedEmbeddedWithDepth;
 
 	public Long getId() {
 		return id;
@@ -57,19 +57,19 @@ public class DepthAndIncludePathIndexedEmbeddedEntity {
 		this.name = name;
 	}
 
-	public DepthAndIncludePathIndexedEmbeddedEntity getIndexedEmbeddedWithIncludePath() {
+	public IndexedEmbeddedTestEntity getIndexedEmbeddedWithIncludePath() {
 		return indexedEmbeddedWithIncludePath;
 	}
 
-	public void setIndexedEmbeddedWithIncludePath(DepthAndIncludePathIndexedEmbeddedEntity indexedEmbeddedWithIncludePath) {
+	public void setIndexedEmbeddedWithIncludePath(IndexedEmbeddedTestEntity indexedEmbeddedWithIncludePath) {
 		this.indexedEmbeddedWithIncludePath = indexedEmbeddedWithIncludePath;
 	}
 
-	public DepthAndIncludePathIndexedEmbeddedEntity getIndexedEmbeddedWithDepth() {
+	public IndexedEmbeddedTestEntity getIndexedEmbeddedWithDepth() {
 		return indexedEmbeddedWithDepth;
 	}
 
-	public void setIndexedEmbeddedWithDepth(DepthAndIncludePathIndexedEmbeddedEntity indexedEmbeddedWithDepth) {
+	public void setIndexedEmbeddedWithDepth(IndexedEmbeddedTestEntity indexedEmbeddedWithDepth) {
 		this.indexedEmbeddedWithDepth = indexedEmbeddedWithDepth;
 	}
 
