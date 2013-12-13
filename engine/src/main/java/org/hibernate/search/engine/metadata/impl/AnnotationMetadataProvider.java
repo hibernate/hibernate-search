@@ -1067,9 +1067,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			);
 			int oldMaxLevel = parseContext.getMaxLevel();
 			int potentialLevel = depth( indexedEmbeddedAnnotation ) + parseContext.getLevel();
+			// This is really catching a possible int overflow. depth() can return Integer.MAX_VALUE, which then can
+			// overflow in case level > 0. Really this code should be rewritten (HF)
 			if ( potentialLevel < 0 ) {
 				potentialLevel = Integer.MAX_VALUE;
 			}
+			// HSEARCH-1442 recreating the behavior prior to PropertiesMetadata refactoring
+			// not sure whether this is algorithmically correct though. @IndexedEmbedded processing should be refactored (HF)
 			if ( potentialLevel < oldMaxLevel ) {
 				parseContext.setMaxLevel( potentialLevel );
 			}
