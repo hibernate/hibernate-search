@@ -1,6 +1,6 @@
 # Hibernate Search
 
-*Version: 4.4.1.Final 9-12-2013*
+*Version: 4.4.2.Final 16-12-2013*
 
 ## Description
 
@@ -30,7 +30,7 @@ Include the following to your dependency list:
     <dependency>
      <groupId>org.hibernate</groupId>
      <artifactId>hibernate-search</artifactId>
-     <version>4.4.1.Final</version>
+     <version>4.4.2.Final</version>
     </dependency>
 
 ### Sourceforge Bundle
@@ -62,13 +62,13 @@ module directory.
 
 ### Contributing
     
-If you want to contribute, you find all you need to know in [Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
+If you want to contribute, you find all you need to know in [Contribute to Hibernate Search](http://hibernate.org/search/contribute/)
 
 ## Contact
 
 ### Latest Documentation:
 
-* [http://search.hibernate.org](http://www.hibernate.org/subprojects/search/docs)
+* [http://search.hibernate.org](http://hibernate.org/search/documentation/)
 
 ### Bug Reports:
 

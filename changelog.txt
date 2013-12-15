@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.2.Final (16-12-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1442] - IndexedEmbedded field not found
+
+** Task
+    * [HSEARCH-1466] - Enforce consistent order of test execution
+
+
 Version 4.4.1.Final (9-12-2013)
 ------------------------
 
