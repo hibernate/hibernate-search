@@ -1,6 +1,25 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.5.0.Alpha2 (16-12-2013)
+------------------------
+
+** Bug
+    * [HSEARCH-1442] - IndexedEmbedded field not found
+    * [HSEARCH-1462] - Search should not use EntityKey constructor
+
+** Improvement
+    * [HSEARCH-1441] - Documentation needs a refresh
+
+** Task
+    * [HSEARCH-1438] - Re-enable LazyM2OContainedInTest disabled after regression in ORM
+    * [HSEARCH-1444] - Disable usage of shadow services from ORM in our testsuite
+    * [HSEARCH-1454] - Upgrade to Infinispan 6.0.0.Final and JGroups 3.4.1.Final
+    * [HSEARCH-1458] - Disallow mistaken import statements, like using JGroups helpers instead of JUnit
+    * [HSEARCH-1463] - Upgrade to Hibernate ORM 4.3.0.CR2
+    * [HSEARCH-1466] - Enforce consistent order of test execution
+
+
 Version 4.5.0.Alpha1 (14-10-2013)
 ------------------------
 
