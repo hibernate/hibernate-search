@@ -84,7 +84,6 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 	}
 
 	//HSEARCH-386
-	/* Disabled until we can rely on the fix for HHH-8611. Tracked as HSEARCH-1438
 	public void testContainedInAndLazy() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Entity1ForUnindexed ent1_0 = new Entity1ForUnindexed();
@@ -144,7 +143,6 @@ public class LazyM2OContainedInTest extends SearchTestCase {
 
 		fts.close();
 	}
-	*/
 
 	@Override
 	protected void configure(Configuration cfg) {
