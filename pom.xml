@@ -40,6 +40,10 @@
         <module>build-config</module>
         <module>legacy</module>
         <module>engine</module>
+        <module>serialization/java</module>
+        <module>serialization/avro</module>
+        <module>backends/jgroups</module>
+        <module>backends/jms</module>
         <module>orm</module>
         <module>analyzers</module>
         <module>testing</module>
@@ -254,6 +258,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>${commonsCompressVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-serialization-avro</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>

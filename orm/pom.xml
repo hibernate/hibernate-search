@@ -52,6 +52,22 @@
             <artifactId>hibernate-search-analyzers</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-serialization-avro</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- HSEARCH-1365 Needed for tests, test should probably move -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-backend-jgroups</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-backend-jms</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
             <scope>test</scope>
