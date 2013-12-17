@@ -34,7 +34,6 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.infinispan.impl.InfinispanConfigurationParser;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.JNDIHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -49,7 +48,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
  *
  * @author Sanne Grinovero
  */
-public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCacheManager> {
+public class CacheManagerServiceProvider implements CacheManagerService {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -134,7 +133,7 @@ public class CacheManagerServiceProvider implements ServiceProvider<EmbeddedCach
 	}
 
 	@Override
-	public EmbeddedCacheManager getService() {
+	public EmbeddedCacheManager getEmbeddedCacheManager() {
 		return cacheManager;
 	}
 
