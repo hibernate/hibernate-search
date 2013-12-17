@@ -24,8 +24,8 @@ import junit.framework.Assert;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.jgroups.impl.JGroupsChannelProvider;
-import org.hibernate.search.backend.jgroups.impl.MessageSender;
+import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
+import org.hibernate.search.backend.jgroups.impl.MessageSenderService;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.JChannel;
@@ -45,7 +45,7 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 	@Test
 	public void testInjectionHappened() throws Exception {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		MessageSender sender = searchFactory.getServiceManager().requestService( MessageSender.class );
+		MessageSenderService sender = searchFactory.getServiceManager().requestService( MessageSenderService.class );
 		Assert.assertTrue( masterChannel.getAddress().equals( sender.getAddress() ) );
 	}
 
@@ -76,7 +76,7 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 		//master jgroups configuration
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsMaster" );
-		cfg.getProperties().put( JGroupsChannelProvider.CHANNEL_INJECT, masterChannel );
+		cfg.getProperties().put( DispatchMessageSender.CHANNEL_INJECT, masterChannel );
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 		//slave jgroups configuration
 		super.commonConfigure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, "jgroupsSlave" );
-		cfg.getProperties().put( JGroupsChannelProvider.CHANNEL_INJECT, slaveChannel );
+		cfg.getProperties().put( DispatchMessageSender.CHANNEL_INJECT, slaveChannel );
 	}
 
 	private static JChannel createChannel() throws Exception {

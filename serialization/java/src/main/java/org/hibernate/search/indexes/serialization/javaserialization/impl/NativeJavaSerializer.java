@@ -37,7 +37,7 @@ import org.hibernate.search.indexes.serialization.spi.Serializer;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class JavaSerializationSerializer implements Serializer {
+public class NativeJavaSerializer implements Serializer {
 	private Serializable id;
 	private Set<Operation> ops;
 	private Set<SerializableFieldable> serialFields;

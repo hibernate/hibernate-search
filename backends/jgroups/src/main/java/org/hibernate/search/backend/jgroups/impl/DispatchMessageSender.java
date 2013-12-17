@@ -54,7 +54,7 @@ import org.jgroups.util.RspList;
  * @author Ales Justin
  * @author Hardy Ferentschik
  */
-public final class JGroupsChannelProvider implements MessageSender {
+public final class DispatchMessageSender implements MessageSenderService {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -118,7 +118,7 @@ public final class JGroupsChannelProvider implements MessageSender {
 		channelContainer = buildChannel( props );
 		channelContainer.start();
 
-		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( NodeSelectorStrategyHolder.class );
+		NodeSelectorService masterNodeSelector = serviceManager.requestService( NodeSelectorService.class );
 		JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener( context, masterNodeSelector );
 
 		JChannel channel = channelContainer.getChannel();
@@ -127,7 +127,7 @@ public final class JGroupsChannelProvider implements MessageSender {
 		if ( handler instanceof Muxer ) {
 			Short muxId = (Short) props.get( MUX_ID );
 			if ( muxId == null ) {
-				throw log.missingJGroupsMuxId( JGroupsChannelProvider.MUX_ID );
+				throw log.missingJGroupsMuxId( DispatchMessageSender.MUX_ID );
 			}
 			@SuppressWarnings("unchecked")
 			Muxer<UpHandler> muxer = (Muxer<UpHandler>) handler;
@@ -157,7 +157,7 @@ public final class JGroupsChannelProvider implements MessageSender {
 
 	@Override
 	public void stop() {
-		serviceManager.releaseService( NodeSelectorStrategyHolder.class );
+		serviceManager.releaseService( NodeSelectorService.class );
 		serviceManager = null;
 		dispatcher.stop();
 		try {
@@ -181,19 +181,19 @@ public final class JGroupsChannelProvider implements MessageSender {
 	 */
 	private static ChannelContainer buildChannel(Properties props) {
 		final String clusterName = ConfigurationParseHelper.getString(
-				props, JGroupsChannelProvider.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
+				props, DispatchMessageSender.CLUSTER_NAME, DEFAULT_CLUSTER_NAME );
 		if ( props != null ) {
-			final Object channelObject = props.get( JGroupsChannelProvider.CHANNEL_INJECT );
+			final Object channelObject = props.get( DispatchMessageSender.CHANNEL_INJECT );
 			if ( channelObject != null ) {
 				try {
 					return new InjectedChannelContainer( (org.jgroups.JChannel) channelObject );
 				}
 				catch (ClassCastException e) {
-					throw log.jGroupsChannelInjectionError( JGroupsChannelProvider.CHANNEL_INJECT, e, channelObject.getClass() );
+					throw log.jGroupsChannelInjectionError( DispatchMessageSender.CHANNEL_INJECT, e, channelObject.getClass() );
 				}
 			}
 
-			final String cfg = props.getProperty( JGroupsChannelProvider.CONFIGURATION_FILE );
+			final String cfg = props.getProperty( DispatchMessageSender.CONFIGURATION_FILE );
 			if ( cfg != null ) {
 				try {
 					log.startingJGroupsChannel( cfg );
@@ -207,7 +207,7 @@ public final class JGroupsChannelProvider implements MessageSender {
 
 		log.jGroupsConfigurationNotFoundInProperties( props );
 		try {
-			URL fileUrl = ConfigurationParseHelper.locateConfig( JGroupsChannelProvider.DEFAULT_JGROUPS_CONFIGURATION_FILE );
+			URL fileUrl = ConfigurationParseHelper.locateConfig( DispatchMessageSender.DEFAULT_JGROUPS_CONFIGURATION_FILE );
 			if ( fileUrl != null ) {
 				log.startingJGroupsChannel( fileUrl );
 				return new ManagedChannelContainer( new JChannel( fileUrl ), clusterName );

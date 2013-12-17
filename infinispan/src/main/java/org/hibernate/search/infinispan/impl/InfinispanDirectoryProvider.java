@@ -31,7 +31,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.infinispan.CacheManagerServiceProvider;
+import org.hibernate.search.infinispan.CacheManagerService;
 import org.hibernate.search.infinispan.InfinispanIntegration;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;

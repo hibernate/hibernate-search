@@ -53,7 +53,7 @@ public class JGroupsBackendQueueTask {
 	private final long messageTimeout;
 
 	public JGroupsBackendQueueTask(JGroupsBackendQueueProcessor factory, IndexManager indexManager,
-			NodeSelectorStrategyHolder masterNodeSelector, boolean blockForACK, long messageTimeout) {
+			NodeSelectorService masterNodeSelector, boolean blockForACK, long messageTimeout) {
 		this.factory = factory;
 		this.indexManager = indexManager;
 		this.blockForACK = blockForACK;

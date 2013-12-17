@@ -48,7 +48,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
  *
  * @author Sanne Grinovero
  */
-public class CacheManagerServiceProvider implements CacheManagerService {
+public class DefaultCacheManagerService implements CacheManagerService {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -91,7 +91,7 @@ public class CacheManagerServiceProvider implements CacheManagerService {
 					DEFAULT_INFINISPAN_CONFIGURATION_RESOURCENAME
 			);
 			try {
-				InfinispanConfigurationParser ispnConfiguration = new InfinispanConfigurationParser( CacheManagerServiceProvider.class.getClassLoader() );
+				InfinispanConfigurationParser ispnConfiguration = new InfinispanConfigurationParser( DefaultCacheManagerService.class.getClassLoader() );
 				ConfigurationBuilderHolder configurationBuilderHolder = ispnConfiguration.parseFile( cfgName );
 				cacheManager = new DefaultCacheManager( configurationBuilderHolder, true );
 				manageCacheManager = true;

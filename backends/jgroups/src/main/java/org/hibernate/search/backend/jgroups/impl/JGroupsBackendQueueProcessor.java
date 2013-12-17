@@ -94,7 +94,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	private final NodeSelectorStrategy selectionStrategy;
 
-	protected MessageSender messageSender;
+	protected MessageSenderService messageSender;
 	protected String indexName;
 	protected DirectoryBasedIndexManager indexManager;
 
@@ -114,8 +114,8 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		this.indexName = indexManager.getIndexName();
 		assertLegacyOptionsNotUsed( props, indexName );
 		serviceManager = context.getServiceManager();
-		this.messageSender = serviceManager.requestService( MessageSender.class );
-		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( NodeSelectorStrategyHolder.class );
+		this.messageSender = serviceManager.requestService( MessageSenderService.class );
+		NodeSelectorService masterNodeSelector = serviceManager.requestService( NodeSelectorService.class );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
 		selectionStrategy.viewAccepted( messageSender.getView() ); // set current view?
 
@@ -134,12 +134,12 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void close() {
-		serviceManager.releaseService( NodeSelectorStrategyHolder.class );
-		serviceManager.releaseService( MessageSender.class );
+		serviceManager.releaseService( NodeSelectorService.class );
+		serviceManager.releaseService( MessageSenderService.class );
 		delegatedBackend.close();
 	}
 
-	MessageSender getMessageSenderService() {
+	MessageSenderService getMessageSenderService() {
 		return messageSender;
 	}
 

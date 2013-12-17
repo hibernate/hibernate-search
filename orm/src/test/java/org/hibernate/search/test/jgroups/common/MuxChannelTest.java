@@ -29,8 +29,8 @@ import junit.framework.Assert;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.jgroups.impl.JGroupsChannelProvider;
-import org.hibernate.search.backend.jgroups.impl.MessageSender;
+import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
+import org.hibernate.search.backend.jgroups.impl.MessageSenderService;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.JChannel;
@@ -50,7 +50,7 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 	@Test
 	public void testMuxDispatcher() throws Exception {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		MessageSender sender = searchFactory.getServiceManager().requestService( MessageSender.class );
+		MessageSenderService sender = searchFactory.getServiceManager().requestService( MessageSenderService.class );
 		Assert.assertNotNull( sender );
 		String className = sender.getClass().getName();
 		Assert.assertTrue( "Wrong sender instance: " + className, className.contains( "DispatchMessageSender" ) );
@@ -83,8 +83,8 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, getMasterBackend() );
-		cfg.getProperties().put( JGroupsChannelProvider.CHANNEL_INJECT, channels[0] );
-		cfg.getProperties().put( JGroupsChannelProvider.MUX_ID, muxId );
+		cfg.getProperties().put( DispatchMessageSender.CHANNEL_INJECT, channels[0] );
+		cfg.getProperties().put( DispatchMessageSender.MUX_ID, muxId );
 	}
 
 	protected abstract String getMasterBackend();
@@ -93,8 +93,8 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 	protected void commonConfigure(Configuration cfg) {
 		super.commonConfigure( cfg );
 		cfg.setProperty( "hibernate.search.default." + Environment.WORKER_BACKEND, getSlaveBackend() );
-		cfg.getProperties().put( JGroupsChannelProvider.CHANNEL_INJECT, channels[1] );
-		cfg.getProperties().put( JGroupsChannelProvider.MUX_ID, muxId );
+		cfg.getProperties().put( DispatchMessageSender.CHANNEL_INJECT, channels[1] );
+		cfg.getProperties().put( DispatchMessageSender.MUX_ID, muxId );
 	}
 
 	protected abstract String getSlaveBackend();

@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class HibernateSessionFactoryServiceProvider implements HibernateSessionFactoryService {
+public class DefaultHibernateSessionFactoryService implements HibernateSessionFactoryService {
 	private static final Log log = LoggerFactory.make();
 
 	private volatile SessionFactory sessionFactory;

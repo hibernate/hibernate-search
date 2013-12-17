@@ -40,6 +40,6 @@ public class NativeJavaSerializationProviderTest {
 		);
 
 		SerializationProvider serializationProvider = serviceManager.requestService( SerializationProvider.class );
-		assertTrue( "Wrong serialization provider", serializationProvider instanceof JavaSerializationSerializationProvider );
+		assertTrue( "Wrong serialization provider", serializationProvider instanceof NativeJavaSerializationProvider );
 	}
 }

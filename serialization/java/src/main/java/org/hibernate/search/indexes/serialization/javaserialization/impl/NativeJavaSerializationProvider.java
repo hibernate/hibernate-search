@@ -31,7 +31,7 @@ import org.hibernate.search.spi.BuildContext;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik
  */
-public class JavaSerializationSerializationProvider implements SerializationProvider {
+public class NativeJavaSerializationProvider implements SerializationProvider {
 	private Serializer serializer;
 
 	@Override
@@ -51,6 +51,6 @@ public class JavaSerializationSerializationProvider implements SerializationProv
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
-		serializer = new JavaSerializationSerializer();
+		serializer = new NativeJavaSerializer();
 	}
 }

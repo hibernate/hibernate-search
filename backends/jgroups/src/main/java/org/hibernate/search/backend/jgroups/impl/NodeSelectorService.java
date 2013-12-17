@@ -34,7 +34,7 @@ import org.jgroups.View;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public interface NodeSelectorStrategyHolder extends Service {
+public interface NodeSelectorService extends Service {
 	NodeSelectorStrategy getMasterNodeSelector(String indexName);
 
 	void setNodeSelectorStrategy(String indexName, NodeSelectorStrategy selector);

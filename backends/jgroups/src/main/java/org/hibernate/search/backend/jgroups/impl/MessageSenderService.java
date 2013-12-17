@@ -38,7 +38,7 @@ import org.jgroups.View;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public interface MessageSender extends Service, Startable, Stoppable {
+public interface MessageSenderService extends Service, Startable, Stoppable {
 	/**
 	 * Send message.
 	 *
