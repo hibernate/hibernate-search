@@ -24,6 +24,7 @@
 
 package org.hibernate.search.query.dsl.impl;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -43,16 +44,14 @@ class FacetBuildingContext<T> {
 	/**
 	 * The list of types which are supported for range faceting
 	 */
-	private static final List<Class<?>> allowedRangeTypes = newArrayList( 6 );
-
-	static {
-		allowedRangeTypes.add( String.class );
-		allowedRangeTypes.add( Integer.class );
-		allowedRangeTypes.add( Long.class );
-		allowedRangeTypes.add( Double.class );
-		allowedRangeTypes.add( Float.class );
-		allowedRangeTypes.add( Date.class );
-	}
+	private static final List<Class<?>> allowedRangeTypes = Arrays.<Class<?>>asList(
+			String.class,
+			Integer.class,
+			Long.class,
+			Double.class,
+			Float.class,
+			Date.class
+		);
 
 	private final SearchFactoryImplementor factory;
 	private final Class<?> entityType;

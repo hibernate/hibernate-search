@@ -25,7 +25,6 @@
 package org.hibernate.search.util.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,7 +67,9 @@ public final class CollectionHelper {
 	}
 
 	public static <T> Set<T> asSet(T... ts) {
-		return new HashSet<T>( Arrays.asList( ts ) );
+		HashSet<T> set = new HashSet<T>( ts.length );
+		Collections.addAll( set, ts );
+		return set;
 	}
 
 	public static <T> List<T> toImmutableList(final Collection<T> c) {
