@@ -177,7 +177,7 @@ public class FacetManagerImpl implements FacetManager {
 	}
 
 	class FacetSelectionImpl implements FacetSelection {
-		private final List<Facet> facetList = newArrayList();
+		private final List<Facet> facetList = newArrayList( 8 );
 
 		public List<Facet> getFacetList() {
 			return facetList;
