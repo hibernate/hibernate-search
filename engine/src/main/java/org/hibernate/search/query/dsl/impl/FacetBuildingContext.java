@@ -43,7 +43,7 @@ class FacetBuildingContext<T> {
 	/**
 	 * The list of types which are supported for range faceting
 	 */
-	private static final List<Class<?>> allowedRangeTypes = newArrayList();
+	private static final List<Class<?>> allowedRangeTypes = newArrayList( 6 );
 
 	static {
 		allowedRangeTypes.add( String.class );
