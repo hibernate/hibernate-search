@@ -142,7 +142,7 @@ public class FacetCollector extends Collector {
 			}
 		}
 		else {
-			List<Map.Entry<String, IntegerWrapper>> countEntryList = newArrayList();
+			List<Map.Entry<String, IntegerWrapper>> countEntryList = newArrayList( counter.getCounts().size() );
 			for ( Entry<String, IntegerWrapper> stringIntegerEntry : counter.getCounts().entrySet() ) {
 				countEntryList.add( stringIntegerEntry );
 			}
@@ -155,7 +155,7 @@ public class FacetCollector extends Collector {
 	}
 
 	private List<Facet> createRangeFacetList(Collection<Entry<String, IntegerWrapper>> countEntryList, FacetingRequestImpl request, int count) {
-		List<Facet> facetList = newArrayList();
+		List<Facet> facetList = newArrayList( countEntryList.size() );
 		int includedFacetCount = 0;
 		for ( Map.Entry<String, IntegerWrapper> countEntry : countEntryList ) {
 			Facet facet = request.createFacet( countEntry.getKey(), countEntry.getValue().getCount() );

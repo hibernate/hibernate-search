@@ -109,7 +109,7 @@ public class WebShopTest extends AbstractFacetTest {
 	@Override
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
-		List<Car> allCars = newArrayList();
+		List<Car> allCars = newArrayList( 10 );
 		for ( String make : makes ) {
 			for ( String color : colors ) {
 				for ( int cc : ccs ) {
@@ -138,7 +138,7 @@ public class WebShopTest extends AbstractFacetTest {
 		private FullTextQuery currentFullTextQuery;
 		private Map<String, List<FacetMenuItem>> menuItems;
 		private String queryString;
-		private List<Facet> selectedFacets = newArrayList();
+		private List<Facet> selectedFacets = newArrayList( 10 );
 
 		public SearchService(SessionFactory factory) {
 			this.factory = factory;
@@ -201,7 +201,7 @@ public class WebShopTest extends AbstractFacetTest {
 
 		public Map<String, List<FacetMenuItem>> getMenuItems() {
 			menuItems = newHashMap();
-			List<FacetMenuItem> items = newArrayList();
+			List<FacetMenuItem> items = newArrayList( 10 );
 
 			int i = 0;
 			for ( Facet facet : currentFullTextQuery.getFacetManager().getFacets( colorFacetName ) ) {
@@ -210,7 +210,7 @@ public class WebShopTest extends AbstractFacetTest {
 			}
 			menuItems.put( colorFacetName, items );
 
-			items = newArrayList();
+			items = newArrayList( 10 );
 			i = 0;
 			for ( Facet facet : currentFullTextQuery.getFacetManager().getFacets( cubicCapacityFacetName ) ) {
 				items.add( new FacetMenuItem( facet, selectedFacets.contains( facet ), i++ ) );

@@ -43,7 +43,7 @@ class FacetBuildingContext<T> {
 	/**
 	 * The list of types which are supported for range faceting
 	 */
-	private static final List<Class<?>> allowedRangeTypes = newArrayList();
+	private static final List<Class<?>> allowedRangeTypes = newArrayList( 6 );
 
 	static {
 		allowedRangeTypes.add( String.class );
@@ -62,7 +62,7 @@ class FacetBuildingContext<T> {
 	private FacetSortOrder sort = FacetSortOrder.COUNT_DESC;
 	private boolean includeZeroCount = true;
 	private boolean isRangeQuery = false;
-	private List<FacetRange<T>> rangeList = newArrayList();
+	private List<FacetRange<T>> rangeList = newArrayList( 8 );
 	private T rangeStart;
 	private boolean includeRangeStart = true;
 	private T rangeEnd;
