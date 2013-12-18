@@ -812,6 +812,8 @@
                     <version>2.4.2</version>
                     <configuration>
                         <preparationGoals>clean install</preparationGoals>
+                        <localCheckout>true</localCheckout>
+                        <arguments>-DskipTests</arguments>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                         <tagNameFormat>@{project.version}</tagNameFormat>
