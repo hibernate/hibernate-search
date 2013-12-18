@@ -142,8 +142,8 @@ public class FacetCollector extends Collector {
 			}
 		}
 		else {
-			List<Map.Entry<String, Integer>> countEntryList = newArrayList();
-			for ( Entry<String, Integer> stringIntegerEntry : counter.getCounts().entrySet() ) {
+			List<Map.Entry<String, IntegerWrapper>> countEntryList = newArrayList();
+			for ( Entry<String, IntegerWrapper> stringIntegerEntry : counter.getCounts().entrySet() ) {
 				countEntryList.add( stringIntegerEntry );
 			}
 			int facetCount = facetRequest.getMaxNumberOfFacets() > 0 ?
@@ -154,11 +154,11 @@ public class FacetCollector extends Collector {
 		return facetList;
 	}
 
-	private List<Facet> createRangeFacetList(Collection<Entry<String, Integer>> countEntryList, FacetingRequestImpl request, int count) {
+	private List<Facet> createRangeFacetList(Collection<Entry<String, IntegerWrapper>> countEntryList, FacetingRequestImpl request, int count) {
 		List<Facet> facetList = newArrayList();
 		int includedFacetCount = 0;
-		for ( Map.Entry<String, Integer> countEntry : countEntryList ) {
-			Facet facet = request.createFacet( countEntry.getKey(), countEntry.getValue() );
+		for ( Map.Entry<String, IntegerWrapper> countEntry : countEntryList ) {
+			Facet facet = request.createFacet( countEntry.getKey(), countEntry.getValue().getCount() );
 			if ( !request.hasZeroCountsIncluded() && facet.getCount() == 0 ) {
 				continue;
 			}
@@ -215,7 +215,7 @@ public class FacetCollector extends Collector {
 		}
 	}
 
-	public static class FacetEntryComparator implements Comparator<Entry<String, Integer>>, Serializable {
+	public static class FacetEntryComparator implements Comparator<Entry<String, IntegerWrapper>>, Serializable {
 		private final FacetSortOrder sortOder;
 
 		public FacetEntryComparator(FacetSortOrder sortOrder) {
@@ -223,12 +223,12 @@ public class FacetCollector extends Collector {
 		}
 
 		@Override
-		public int compare(Entry<String, Integer> entry1, Entry<String, Integer> entry2) {
+		public int compare(Entry<String, IntegerWrapper> entry1, Entry<String, IntegerWrapper> entry2) {
 			if ( FacetSortOrder.COUNT_ASC.equals( sortOder ) ) {
-				return entry1.getValue() - entry2.getValue();
+				return entry1.getValue().getCount() - entry2.getValue().getCount();
 			}
 			else if ( FacetSortOrder.COUNT_DESC.equals( sortOder ) ) {
-				return entry2.getValue() - entry1.getValue();
+				return entry2.getValue().getCount() - entry1.getValue().getCount();
 			}
 			else {
 				return entry1.getKey().compareTo( entry2.getKey() );
@@ -245,25 +245,25 @@ public class FacetCollector extends Collector {
 	}
 
 	public abstract static class FacetCounter {
-		private Map<String, Integer> counts = newHashMap();
+		private Map<String, IntegerWrapper> counts = newHashMap();
 
-		Map<String, Integer> getCounts() {
+		Map<String, IntegerWrapper> getCounts() {
 			return counts;
 		}
 
 		void initCount(String value) {
 			if ( !counts.containsKey( value ) ) {
-				counts.put( value, 0 );
+				counts.put( value, new IntegerWrapper() );
 			}
 		}
 
 		void incrementCount(String value) {
-			if ( !counts.containsKey( value ) ) {
-				counts.put( value, 1 );
+			IntegerWrapper integerWrapper = counts.get( value );
+			if ( integerWrapper == null ) {
+				integerWrapper = new IntegerWrapper();
+				counts.put( value, integerWrapper );
 			}
-			else {
-				counts.put( value, counts.get( value ) + 1 );
-			}
+			integerWrapper.incrementCount();
 		}
 
 		abstract void countValue(Object value);
@@ -296,4 +296,22 @@ public class FacetCollector extends Collector {
 			}
 		}
 	}
+
+	/**
+	 * Replacement of Integer which is mutable,
+	 * so that we can avoid creating many objects
+	 * while counting hits for each facet.
+	 */
+	private static final class IntegerWrapper {
+		int count = 0;
+
+		public int getCount() {
+			return count;
+		}
+
+		public void incrementCount() {
+			this.count++;
+		}
+	}
+
 }
