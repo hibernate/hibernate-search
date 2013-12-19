@@ -30,6 +30,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
+import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -98,7 +99,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		Session session = getSession();
 		SearchFactoryImplementor factory = ContextHelper.getSearchFactory( session );
 		try {
-			indexName = objectMessage.getStringProperty( JmsBackendQueueTask.INDEX_NAME_JMS_PROPERTY );
+			indexName = objectMessage.getStringProperty( Environment.INDEX_NAME_JMS_PROPERTY );
 			indexManager = factory.getIndexManagerHolder().getIndexManager( indexName );
 			if ( indexManager == null ) {
 				log.messageReceivedForUndefinedIndex( indexName );

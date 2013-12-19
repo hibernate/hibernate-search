@@ -32,6 +32,7 @@ import javax.jms.QueueConnection;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 
+import org.hibernate.search.Environment;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -47,8 +48,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class JmsBackendQueueTask implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
-
-	public static final String INDEX_NAME_JMS_PROPERTY = "HSearchIndexName";
 
 	private final Collection<LuceneWork> queue;
 	private final JmsBackendQueueProcessor processor;
@@ -86,7 +85,7 @@ public class JmsBackendQueueTask implements Runnable {
 			session = connection.createQueueSession( false, QueueSession.AUTO_ACKNOWLEDGE );
 			ObjectMessage message = session.createObjectMessage();
 			message.setObject( data );
-			message.setStringProperty( INDEX_NAME_JMS_PROPERTY, indexName );
+			message.setStringProperty( Environment.INDEX_NAME_JMS_PROPERTY, indexName );
 
 			sender = session.createSender( processor.getJmsQueue() );
 			sender.send( message );
