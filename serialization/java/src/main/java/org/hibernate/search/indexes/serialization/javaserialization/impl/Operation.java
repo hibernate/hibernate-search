@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
+import java.io.Serializable;
 
 /**
  * A message is made of:
@@ -28,5 +29,5 @@ package org.hibernate.search.indexes.serialization.javaserialization.impl;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface Operation {
+public interface Operation extends Serializable {
 }
