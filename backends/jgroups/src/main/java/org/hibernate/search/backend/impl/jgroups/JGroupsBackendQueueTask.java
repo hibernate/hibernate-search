@@ -26,12 +26,12 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.jgroups.Message;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -43,7 +43,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class JGroupsBackendQueueTask {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final JGroupsBackendQueueProcessor factory;
 	private final String indexName;

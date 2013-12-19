@@ -24,7 +24,7 @@
 
 package org.hibernate.search.backend.impl.jgroups;
 
-import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
 import org.jgroups.Channel;
@@ -45,7 +45,7 @@ import org.jgroups.util.RspList;
  */
 final class DispatcherMessageSender implements MessageSender {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final MessageDispatcher dispatcher;
 	private final Channel channel;

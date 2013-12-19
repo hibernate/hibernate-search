@@ -31,13 +31,13 @@ import java.util.concurrent.locks.Lock;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.Address;
 
@@ -90,7 +90,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	 */
 	public static final int DEFAULT_MESSAGE_TIMEOUT = 20000;
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final NodeSelectorStrategy selectionStrategy;
 

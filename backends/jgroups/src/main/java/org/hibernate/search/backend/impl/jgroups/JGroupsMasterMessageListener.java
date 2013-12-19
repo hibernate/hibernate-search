@@ -34,9 +34,9 @@ import org.jgroups.View;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
@@ -52,7 +52,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class JGroupsMasterMessageListener implements Receiver {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( Log.class );
+
 	private final BuildContext context;
 	private final NodeSelectorStrategyHolder selector;
 

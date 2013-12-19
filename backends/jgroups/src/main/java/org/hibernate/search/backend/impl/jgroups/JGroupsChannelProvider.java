@@ -26,11 +26,11 @@ package org.hibernate.search.backend.impl.jgroups;
 import java.net.URL;
 import java.util.Properties;
 
+import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.JChannel;
 import org.jgroups.MessageListener;
@@ -49,7 +49,7 @@ import org.jgroups.blocks.mux.Muxer;
  */
 public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( Log.class );
 
 	public static final String JGROUPS_PREFIX = "hibernate.search.services.jgroups.";
 	public static final String CONFIGURATION_FILE = JGROUPS_PREFIX + "configurationFile";
@@ -82,7 +82,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 		if ( handler instanceof Muxer ) {
 			Short muxId = (Short) props.get( MUX_ID );
 			if ( muxId == null ) {
-				throw log.missingJGroupsMuxId();
+				throw log.missingJGroupsMuxId( JGroupsChannelProvider.MUX_ID );
 			}
 			@SuppressWarnings("unchecked")
 			Muxer<UpHandler> muxer = (Muxer<UpHandler>) handler;
@@ -154,7 +154,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 					return new InjectedChannelContainer( (org.jgroups.JChannel) channelObject );
 				}
 				catch (ClassCastException e) {
-					throw log.jGroupsChannelInjectionError( e, channelObject.getClass() );
+					throw log.jGroupsChannelInjectionError( JGroupsChannelProvider.CHANNEL_INJECT, e, channelObject.getClass() );
 				}
 			}
 

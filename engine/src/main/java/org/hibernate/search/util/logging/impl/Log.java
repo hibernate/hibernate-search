@@ -26,13 +26,11 @@ package org.hibernate.search.util.logging.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 
 import org.apache.lucene.index.CorruptIndexException;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.impl.jgroups.JGroupsChannelProvider;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.errors.EmptyQueryException;
@@ -42,11 +40,7 @@ import org.jboss.logging.LogMessage;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
-import org.jgroups.Address;
-import org.jgroups.SuspectedException;
-import org.jgroups.TimeoutException;
 
-import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.TRACE;
@@ -60,6 +54,8 @@ import static org.jboss.logging.Logger.Level.WARN;
  */
 @MessageLogger(projectCode = "HSEARCH")
 public interface Log extends BasicLogger {
+
+	int JGROUPS_BACKEND_MESSAGES_START_ID = 200000;
 
 	@LogMessage(level = WARN)
 	@Message(id = 1, value = "initialized \"blackhole\" backend. Index changes will be prepared but discarded!")
@@ -77,50 +73,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = ERROR)
 	@Message(id = 4, value = "Exception attempting to instantiate Similarity '%1$s' set for %2$s")
 	void similarityInstantiationException(String similarityName, String beanXClassName);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = 5, value = "Starting JGroups ChannelProvider")
-	void jGroupsStartingChannelProvider();
-
-	@LogMessage(level = INFO)
-	@Message(id = 6, value = "Connected to cluster [ %1$s ]. The local Address is %2$s")
-	void jGroupsConnectedToCluster(String clusterName, Object address);
-
-	@LogMessage(level = WARN)
-	@Message(id = 7,
-			value = "FLUSH is not present in your JGroups stack! FLUSH is needed to ensure messages are not dropped while new nodes join the cluster. Will proceed, but inconsistencies may arise!")
-	void jGroupsFlushNotPresentInStack();
-
-	@Message(id = 8, value = "Error while trying to create a channel using config file: %1$s")
-	SearchException jGroupsChannelCreationUsingFileError(String configuration, @Cause Throwable e);
-
-	@Message(id = 9, value = "Error while trying to create a channel using config XML: %1$s")
-	SearchException jGroupsChannelCreationUsingXmlError(String configuration, @Cause Throwable e);
-
-	@Message(id = 10, value = "Error while trying to create a channel using config string: %1$s")
-	SearchException jGroupsChannelCreationFromStringError(String configuration, @Cause Throwable e);
-
-	@LogMessage(level = INFO)
-	@Message(id = 11,
-			value = "Unable to use any JGroups configuration mechanisms provided in properties %1$s. Using default JGroups configuration file!")
-	void jGroupsConfigurationNotFoundInProperties(Properties props);
-
-	@LogMessage(level = WARN)
-	@Message(id = 12,
-			value = "Default JGroups configuration file was not found. Attempt to start JGroups channel with default configuration!")
-	void jGroupsDefaultConfigurationFileNotFound();
-
-	@LogMessage(level = INFO)
-	@Message(id = 13, value = "Disconnecting and closing JGroups Channel to cluster '%1$s'")
-	void jGroupsDisconnectingAndClosingChannel(String clusterName);
-
-	@LogMessage(level = ERROR)
-	@Message(id = 14, value = "Problem closing channel; setting it to null")
-	void jGroupsClosingChannelError(@Cause Exception toLog);
-
-	@LogMessage(level = INFO)
-	@Message(id = 15, value = "Received new cluster view: %1$s")
-	void jGroupsReceivedNewClusterView(Object view);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 16, value = "Incorrect message type: %1$s")
@@ -270,10 +222,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 50, value = "It appears changes are being pushed to the index out of a transaction. " +
 			"Register the IndexWorkFlushEventListener listener on flush to correctly manage Collections!")
 	void pushedChangesOutOfTransaction();
-
-	@LogMessage(level = WARN)
-	@Message(id = 51, value = "Received null or empty Lucene works list in message.")
-	void receivedEmptyLuceneWorksInMessage();
 
 	@LogMessage(level = WARN)
 	@Message(id = 52, value = "Going to force release of the IndexWriter lock")
@@ -528,15 +476,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 120, value = "There are multiple properties indexed against the same field name '%1$s', but with different indexing settings. The behaviour is undefined.")
 	void inconsistentFieldConfiguration(String fieldName);
 
-	@Message(id = 121, value = "Unable to connect to: [%1$s] JGroups channel")
-	SearchException unableConnectingToJGroupsCluster(String clusterName, @Cause Throwable e);
-
-	@Message(id = 122, value = "Unable to start JGroups channel")
-	SearchException unableToStartJGroupsChannel(@Cause Throwable e);
-
-	@Message(id = 123, value = "Unable to send Lucene update work via JGroups cluster")
-	SearchException unableToSendWorkViaJGroups(@Cause Throwable e);
-
 	@LogMessage(level = WARN)
 	@Message(id = 124, value = "The option 'threadsForIndexWriter' of the MassIndexer is deprecated and is being ignored! Control the size of worker.thread_pool.size for each index instead.")
 	void massIndexerIndexWriterThreadsIgnored();
@@ -552,13 +491,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = TRACE)
 	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
 	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
-
-	@Message(id = 129, value = "Object injected for JGroups channel in " + JGroupsChannelProvider.CHANNEL_INJECT + " is of an unexpected type %1$s (expecting org.jgroups.JChannel)")
-	SearchException jGroupsChannelInjectionError(@Cause Exception e, Class<?> actualType);
-
-	@Message(id = 130, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
-			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
-	SearchException legacyJGroupsConfigurationDefined(String indexName);
 
 	@Message(id = 131, value = "The field used for the spatial query is not using SpatialFieldBridge: %1$s.%2$s")
 	SearchException targetedFieldNotSpatial(String className, String fieldName);
@@ -605,12 +537,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 146, value = "The query string '%2$s' applied on field '%1$s' has no meaningfull tokens to be matched. Validate the query input " +
 			"against the Analyzer applied on this field.")
 	EmptyQueryException queryWithNoTermsAfterAnalysis(String field, String searchTerm);
-
-	@Message(id = 147, value = "Configured JGroups channel is a Muxer! MuxId option is required: define '" + JGroupsChannelProvider.MUX_ID + "'.")
-	SearchException missingJGroupsMuxId();
-
-	@Message(id = 148, value = "MuxId '%1$d' configured on the JGroups was already taken. Can't register handler!")
-	SearchException jGroupsMuxIdAlreadyTaken(short n);
 
 	@Message(id = 149, value = "Unable to determine ClassBridge for %1$s")
 	SearchException unableToDetermineClassBridge(String className);
@@ -679,27 +605,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 169, value = "FieldBridge '%1$s' does not have a objectToString method: field '%2$s' in '%3$s'" +
 			" The FieldBridge must be a TwoWayFieldBridge or you have to enable the ignoreFieldBridge option when defining a Query")
 	SearchException fieldBridgeNotTwoWay(Class<? extends FieldBridge> bridgeClass, String fieldName, XClass beanXClass);
-
-	@LogMessage(level = Level.DEBUG)
-	@Message(id = 170, value = "Starting JGroups channel using configuration '%1$s'")
-	void startingJGroupsChannel(Object cfg);
-
-	@LogMessage(level = Level.DEBUG)
-	@Message(id = 171, value = "Using JGroups channel having configuration '%1$s'")
-	void jgroupsFullConfiguration(String printProtocolSpecAsXML);
-
-	@LogMessage(level = Level.DEBUG)
-	@Message(id = 172, value = "JGroups backend configured for index '%1$s' using block_for_ack '%2$s'")
-	void jgroupsBlockWaitingForAck(String indexName, boolean block);
-
-	@Message(id = 173, value = "Remote JGroups peer '%1$s' is suspected to have left '")
-	SuspectedException jgroupsSuspectingPeer(Address sender);
-
-	@Message(id = 174, value = "Timeout sending synchronous message to JGroups peer '%1$s''")
-	TimeoutException jgroupsRpcTimeout(Address sender);
-
-	@Message(id = 175, value = "Exception reported from remote JGroups node '%1$s' : '%2$s'")
-	SearchException jgroupsRemoteException(Address sender, Throwable exception, @Cause Throwable cause);
 
 	@Message(id = 176, value = "Document could not be parsed")
 	SearchException unableToParseDocument(@Cause Throwable cause);
