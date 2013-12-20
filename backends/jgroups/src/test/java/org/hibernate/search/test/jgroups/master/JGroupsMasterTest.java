@@ -52,7 +52,6 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
-import org.hibernate.search.test.jms.master.TShirt;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
 /**
@@ -124,7 +123,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 	}
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
-		final String indexManagerName = "org.hibernate.search.test.jms.master.TShirt";
+		final String indexManagerName = "org.hibernate.search.test.jgroups.master.TShirt";
 		IndexManager indexManager = getSearchFactoryImpl().getIndexManagerHolder().getIndexManager( indexManagerName );
 		//send message to all listeners
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
@@ -170,7 +169,6 @@ public class JGroupsMasterTest extends SearchTestCase {
 		Session s = openSession();
 		s.getTransaction().begin();
 		TShirt ts = new TShirt();
-		ts.setId( 1 );
 		ts.setLogo( "JBoss balls" );
 		ts.setSize( "large" );
 		ts.setLength( 23.2d );
