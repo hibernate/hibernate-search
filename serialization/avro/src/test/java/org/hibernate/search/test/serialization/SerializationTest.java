@@ -59,7 +59,7 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
-import org.hibernate.search.indexes.serialization.impl.PluggableSerializationLuceneWorkSerializer;
+import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
@@ -85,7 +85,7 @@ public class SerializationTest {
 
 	@Test
 	public void testAvroSerialization() throws Exception {
-		LuceneWorkSerializer converter = new PluggableSerializationLuceneWorkSerializer(
+		LuceneWorkSerializer converter = new LuceneWorkSerializerImpl(
 				new AvroSerializationProvider(),
 				searchFactoryHolder.getSearchFactory()
 		);
@@ -157,7 +157,7 @@ public class SerializationTest {
 	 */
 	public void testAvroSerializationPerf() throws Exception {
 		final int loop = 10; //TODO do 10000 or 100000
-		LuceneWorkSerializer converter = new PluggableSerializationLuceneWorkSerializer(
+		LuceneWorkSerializer converter = new LuceneWorkSerializerImpl(
 				new AvroSerializationProvider(),
 				searchFactoryHolder.getSearchFactory()
 		);

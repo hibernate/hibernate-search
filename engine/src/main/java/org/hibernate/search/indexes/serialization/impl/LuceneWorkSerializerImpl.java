@@ -54,13 +54,13 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSerializer {
+public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 	private static Log log = LoggerFactory.make();
 
 	private final SearchFactoryImplementor searchFactory;
 	private SerializationProvider provider;
 
-	public PluggableSerializationLuceneWorkSerializer(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
+	public LuceneWorkSerializerImpl(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
 		this.provider = provider;
 		this.searchFactory = searchFactory;
 	}
