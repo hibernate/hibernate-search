@@ -20,8 +20,8 @@
  */
 package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
-import org.hibernate.search.engine.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.junit.Test;

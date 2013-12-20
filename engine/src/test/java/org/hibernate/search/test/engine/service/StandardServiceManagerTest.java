@@ -21,8 +21,8 @@
 package org.hibernate.search.test.engine.service;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
