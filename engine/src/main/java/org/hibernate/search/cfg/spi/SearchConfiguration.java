@@ -30,7 +30,7 @@ import java.util.Properties;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.engine.service.spi.Service;
 
 /**
  * Provides configuration to Hibernate Search
@@ -89,23 +89,14 @@ public interface SearchConfiguration {
 	SearchMapping getProgrammaticMapping();
 
 	/**
-	 * Provide service instances.
+	 * Return the provided services.
 	 *
-	 * Return the provided services (provider and instance at stake)
-	 * These services are passed untouched by Hibernate Search via the
-	 * {@link org.hibernate.search.spi.BuildContext#requestService(Class)} API
-	 *
-	 * Note that the lifecycle methods:
-	 * <ul>
-	 * <li> {@link org.hibernate.search.spi.ServiceProvider#start(java.util.Properties, org.hibernate.search.spi.BuildContext)}  </li>
-	 * <li> {@link org.hibernate.search.spi.ServiceProvider#stop()}  </li>
-	 * </ul>
-	 * of the provider are *not* called.
-	 *
-	 * For services using the same ServiceProvider class, provided services have priority
+	 * These services are passed untouched by Hibernate Search. Provided services have priority
 	 * over managed services (ie the ones using the service locator pattern).
+	 *
+	 * @return a map of service roles to service instances
 	 */
-	Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices();
+	Map<Class<? extends Service>, Object> getProvidedServices();
 
 	/**
 	 * By default Hibernate Search expects to execute in the context of a transaction,

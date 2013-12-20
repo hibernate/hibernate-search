@@ -62,11 +62,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.jms</groupId>
-            <artifactId>jms</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-engine</artifactId>
             <version>${project.version}</version>
@@ -99,11 +94,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>simple-jndi</groupId>
             <artifactId>simple-jndi</artifactId>
             <scope>test</scope>
@@ -126,11 +116,6 @@
         <dependency>
             <groupId>org.jboss.byteman</groupId>
             <artifactId>byteman-install</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jgroups</groupId>
-            <artifactId>jgroups</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

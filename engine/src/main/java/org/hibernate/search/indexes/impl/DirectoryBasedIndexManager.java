@@ -34,12 +34,12 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.engine.ServiceManager;
-import org.hibernate.search.engine.impl.EmptyBuildContext;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
-import org.hibernate.search.indexes.serialization.spi.SerializerService;
+import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
@@ -68,6 +68,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private LuceneIndexingParameters indexingParameters;
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
 	private LuceneWorkSerializer serializer;
+	private SerializationProvider serializationProvider;
 	private SearchFactoryImplementor boundSearchFactory = null;
 	private DirectoryBasedReaderProvider readers = null;
 	private ServiceManager serviceManager;
@@ -87,8 +88,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		readers.stop();
 		backend.close();
 		directoryProvider.stop();
-		if ( serializer != null ) {
-			serviceManager.releaseService( SerializerService.class );
+		if ( serializationProvider != null ) {
+			serviceManager.releaseService( SerializationProvider.class );
 		}
 	}
 
@@ -157,8 +158,8 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	@Override
 	public LuceneWorkSerializer getSerializer() {
 		if ( serializer == null ) {
-			EmptyBuildContext buildContext = new EmptyBuildContext( serviceManager, boundSearchFactory );
-			serializer = serviceManager.requestService( SerializerService.class, buildContext );
+			serializationProvider = serviceManager.requestService( SerializationProvider.class );
+			serializer = new LuceneWorkSerializerImpl( serializationProvider, boundSearchFactory );
 			log.indexManagerUsesSerializationService( this.indexName, this.serializer.describeSerializer() );
 		}
 		return serializer;

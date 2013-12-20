@@ -34,8 +34,8 @@
 
     <artifactId>hibernate-search</artifactId>
 
-    <name>Hibernate Search</name>
-    <description>Hibernate Search</description>
+    <name>Hibernate Search [Deprecated Module]</name>
+    <description>Hibernate Search [Deprecated Module]</description>
 
     <dependencies>
         <!-- For backwards compatibility: the dependency to be used is now hibernate-search-orm  -->

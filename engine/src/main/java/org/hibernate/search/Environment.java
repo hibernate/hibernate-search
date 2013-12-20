@@ -217,6 +217,11 @@ public final class Environment {
 	 */
 	public static final String INDEX_MANAGER_IMPL_NAME = "indexmanager";
 
+	/**
+	 * Name of the JMS message property containing the index name to which to apply remote work.
+	 */
+	public static final String INDEX_NAME_JMS_PROPERTY = "HSearchIndexName";
+
 	private Environment() {
 	}
 

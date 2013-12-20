@@ -44,6 +44,11 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-serialization-avro</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-infinispan</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -58,11 +58,11 @@ import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
-import org.hibernate.search.engine.impl.StandardServiceManager;
+import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -199,14 +199,13 @@ public class SearchFactoryBuilder {
 	}
 
 	private SearchFactoryImplementor buildNewSearchFactory() {
-		createCleanFactoryState( cfg );
+		BuildContext buildContext = new BuildContext();
+		createCleanFactoryState( cfg, buildContext );
 
 		final ReflectionManager reflectionManager = getReflectionManager( cfg );
 		if ( reflectionManager != cfg.getReflectionManager() ) {
 			cfg = new ReflectionReplacingSearchConfiguration( reflectionManager, cfg );
 		}
-
-		BuildContext buildContext = new BuildContext();
 
 		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping( cfg );
 		applySearchMappingToMetadata( reflectionManager, mapping );
@@ -282,7 +281,7 @@ public class SearchFactoryBuilder {
 		return filterCachingStrategy;
 	}
 
-	private void createCleanFactoryState(SearchConfiguration cfg) {
+	private void createCleanFactoryState(SearchConfiguration cfg, BuildContext buildContext) {
 		if ( rootFactory == null ) {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
@@ -291,7 +290,7 @@ public class SearchFactoryBuilder {
 			factoryState.setFilterDefinitions( new ConcurrentHashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
-			factoryState.setServiceManager( new StandardServiceManager( cfg ) );
+			factoryState.setServiceManager( new StandardServiceManager( cfg, buildContext ) );
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
 			factoryState.setErrorHandler( createErrorHandler( cfg ) );
 			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
@@ -580,18 +579,6 @@ public class SearchFactoryBuilder {
 		@Override
 		public String getIndexingStrategy() {
 			return factoryState.getIndexingStrategy();
-		}
-
-		@Override
-		@Deprecated
-		public <T> T requestService(Class<? extends ServiceProvider<T>> provider) {
-			return factoryState.getServiceManager().requestService( provider, this );
-		}
-
-		@Override
-		@Deprecated
-		public void releaseService(Class<? extends ServiceProvider<?>> provider) {
-			factoryState.getServiceManager().releaseService( provider );
 		}
 
 		@Override

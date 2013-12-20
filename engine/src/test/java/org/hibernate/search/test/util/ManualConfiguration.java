@@ -36,7 +36,7 @@ import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.engine.service.spi.Service;
 
 /**
  * Manually defines the configuration
@@ -48,7 +48,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 
 	private final Map<String,Class<?>> classes;
 	private final Properties properties;
-	private final HashMap<Class<? extends ServiceProvider<?>>, Object> providedServices;
+	private final HashMap<Class<? extends Service>, Object> providedServices;
 	private final InstanceInitializer initializer;
 	private SearchMapping programmaticMapping;
 	private boolean transactionsExpected = true;
@@ -64,7 +64,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 		initializer = init;
 		classes = new HashMap<String,Class<?>>();
 		properties = new Properties( );
-		providedServices = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
+		providedServices = new HashMap<Class<? extends Service>, Object>();
 	}
 
 	public ManualConfiguration addProperty(String key , String value) {
@@ -113,7 +113,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	}
 
 	@Override
-	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+	public Map<Class<? extends Service>, Object> getProvidedServices() {
 		return providedServices;
 	}
 
