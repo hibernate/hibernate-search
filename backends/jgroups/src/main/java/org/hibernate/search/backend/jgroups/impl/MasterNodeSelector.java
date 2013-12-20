@@ -27,7 +27,7 @@ import org.jgroups.View;
 
 
 /**
- * <p>This {@link org.hibernate.search.backend.impl.jgroups.NodeSelectorStrategy} is a static configuration for the local
+ * <p>This {@link NodeSelectorStrategy} is a static configuration for the local
  * node to always process index operations locally, and accept index operations
  * from remote nodes configured as slaves.</p>
  *

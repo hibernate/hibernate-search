@@ -28,7 +28,7 @@ import org.jgroups.View;
 
 
 /**
- * <p>This {@link org.hibernate.search.backend.impl.jgroups.NodeSelectorStrategy} picks a single master across all nodes participating
+ * <p>This {@link NodeSelectorStrategy} picks a single master across all nodes participating
  * in the JGroups cluster deterministically: this way all nodes in the group will
  * have an agreement on which node is going to be the master.</p>
  *
