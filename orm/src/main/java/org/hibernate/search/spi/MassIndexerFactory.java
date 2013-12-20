@@ -34,6 +34,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
  * @since 4.3
  */
 public interface MassIndexerFactory {
+	String MASS_INDEXER_FACTORY_CLASSNAME = "hibernate.search.massindexer.factoryclass";
 
 	/**
 	 * Called after the creation of the factory, can be used to read configuration parameters.

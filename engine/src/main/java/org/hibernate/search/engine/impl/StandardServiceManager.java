@@ -23,151 +23,150 @@
  */
 package org.hibernate.search.engine.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.spi.ServiceProvider;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.impl.AggregatedClassLoader;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * Default implementation of the {@code ServiceManager} interface.
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  */
 public class StandardServiceManager implements ServiceManager {
-	private static final String SERVICES_FILE = "META-INF/services/" + ServiceProvider.class.getName();
 	private static final Log log = LoggerFactory.make();
 
-	//barrier protected by the Hibernate Search instantiation
-	private final HashSet<Class<?>> availableProviders = new HashSet<Class<?>>();
-	private final ConcurrentHashMap<Class<?>, ServiceProviderWrapper<?>> managedProviders = new ConcurrentHashMap<Class<?>, ServiceProviderWrapper<?>>();
-	private final Map<Class<? extends ServiceProvider<?>>, Object> providedProviders = new HashMap<Class<? extends ServiceProvider<?>>, Object>();
 	private final Properties properties;
+	private final BuildContext buildContext;
+	private AggregatedClassLoader aggregatedClassLoader;
 
-	public StandardServiceManager(SearchConfiguration cfg) {
+	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices = new ConcurrentHashMap<Class<?>, ServiceWrapper<?>>();
+	private final Map<Class<? extends Service>, Object> providedServices;
+
+	public StandardServiceManager(SearchConfiguration cfg, BuildContext buildContext) {
 		this.properties = cfg.getProperties();
-		this.providedProviders.putAll( cfg.getProvidedServices() );
-		listAndInstantiateServiceProviders();
-	}
+		this.providedServices = Collections.unmodifiableMap( cfg.getProvidedServices() );
+		this.buildContext = buildContext;
 
-	private void listAndInstantiateServiceProviders() {
-		//get list of services available
-		final Enumeration<URL> resources = ClassLoaderHelper.getResources( SERVICES_FILE, StandardServiceManager.class );
-		String name;
-		try {
-			while ( resources.hasMoreElements() ) {
-				URL url = resources.nextElement();
-				InputStream stream = url.openStream();
-				try {
-					BufferedReader reader = new BufferedReader( new InputStreamReader( stream ), 100 );
-					name = reader.readLine();
-					while ( name != null ) {
-						name = name.trim();
-						if ( !name.startsWith( "#" ) ) {
-							final Class<?> serviceProviderClass =
-									ClassLoaderHelper.classForName( name, StandardServiceManager.class.getClassLoader(), "service provider" );
-							availableProviders.add( serviceProviderClass );
-						}
-						name = reader.readLine();
-					}
-				}
-				finally {
-					stream.close();
-				}
-			}
-		}
-		catch (IOException e) {
-			throw new SearchException( "Unable to read " + SERVICES_FILE, e );
-		}
+		this.aggregatedClassLoader = new AggregatedClassLoader(
+				Thread.currentThread().getContextClassLoader(),
+				this.getClass().getClassLoader()
+		);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T requestService(Class<? extends ServiceProvider<T>> serviceProviderClass, BuildContext context) {
-		//provided services have priority over managed services
-		if ( providedProviders.containsKey( serviceProviderClass ) ) {
-			//we use containsKey as the service itself might be null
-			//TODO be safer and throw a cleaner exception
-			return (T) providedProviders.get( serviceProviderClass );
+	public <S extends Service> S requestService(Class<S> serviceRole) {
+		if ( serviceRole == null ) {
+			throw new IllegalArgumentException( "'null' is not a valid service role" );
 		}
 
-		ServiceProviderWrapper<T> wrapper = (ServiceProviderWrapper<T>) managedProviders.get( serviceProviderClass );
-		if ( wrapper == null ) {
-			if ( availableProviders.contains( serviceProviderClass ) ) {
-				ServiceProvider<T> serviceProvider = ClassLoaderHelper.instanceFromClass(
-						ServiceProvider.class,
-						serviceProviderClass,
-						"service provider"
-				);
-				wrapper = new ServiceProviderWrapper<T>( serviceProvider, context, serviceProviderClass );
-				managedProviders.putIfAbsent( serviceProviderClass, wrapper );
-			}
-			else {
-				throw new SearchException( "Unable to find service related to " + serviceProviderClass );
-			}
+		// provided services have priority over managed services
+		if ( providedServices.containsKey( serviceRole ) ) {
+			return (S) providedServices.get( serviceRole );
 		}
-		wrapper = (ServiceProviderWrapper<T>) managedProviders.get( serviceProviderClass );
+
+		ServiceWrapper<S> wrapper = (ServiceWrapper<S>) cachedServices.get( serviceRole );
+		if ( wrapper == null ) {
+			wrapper = createAndCacheWrapper( serviceRole );
+		}
 		wrapper.startVirtual();
 		return wrapper.getService();
 	}
 
 	@Override
-	public void releaseService(Class<? extends ServiceProvider<?>> serviceProviderClass) {
+	public <S extends Service> void releaseService(Class<S> serviceRole) {
+		if ( serviceRole == null ) {
+			throw new IllegalArgumentException( "'null' is not a valid service role" );
+		}
+
 		//provided services have priority over managed services
-		if ( providedProviders.containsKey( serviceProviderClass ) ) {
+		if ( providedServices.containsKey( providedServices ) ) {
 			return;
 		}
 
-		final ServiceProviderWrapper wrapper = managedProviders.get( serviceProviderClass );
-		if ( wrapper == null ) {
-			throw new AssertionFailure( "Unable to find service related to " + serviceProviderClass);
+		ServiceWrapper wrapper = cachedServices.get( serviceRole );
+		if ( wrapper != null ) {
+			wrapper.stopVirtual();
 		}
-
-		wrapper.stopVirtual();
 	}
 
 	@Override
-	public void stopServices() {
-		for ( ServiceProviderWrapper wrapper : managedProviders.values() ) {
+	public void releaseAllServices() {
+		for ( ServiceWrapper wrapper : cachedServices.values() ) {
 			wrapper.ensureStopped();
 		}
 	}
 
-	private class ServiceProviderWrapper<S> {
+	@SuppressWarnings("unchecked")
+	private <S extends Service> Set<S> loadJavaServices(Class<S> serviceContract) {
+		ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
+		final HashSet<S> services = new LinkedHashSet<S>();
+		for ( S service : serviceLoader ) {
+			services.add( service );
+		}
+		return services;
+	}
 
-		private final ServiceProvider<S> serviceProvider;
+	private <S extends Service> ServiceWrapper<S> createAndCacheWrapper(Class<S> serviceRole) {
+		ServiceWrapper<S> wrapper;
+		Set<S> services = loadJavaServices( serviceRole );
+
+		if ( services.size() == 0 ) {
+			throw log.getNoServiceImplementationFoundException( serviceRole.toString() );
+		}
+		else if ( services.size() > 1 ) {
+			throw log.getMultipleServiceImplementationsException(
+					serviceRole.toString(),
+					StringHelper.join( services, "," )
+			);
+		}
+		wrapper = new ServiceWrapper<S>( services.iterator().next(), serviceRole, buildContext );
+		@SuppressWarnings("unchecked")
+		ServiceWrapper<S> previousWrapper = (ServiceWrapper<S>) cachedServices.putIfAbsent( serviceRole, wrapper );
+		if ( previousWrapper != null ) {
+			wrapper = previousWrapper;
+		}
+		return wrapper;
+	}
+
+	private class ServiceWrapper<S> {
+
+		private final S service;
 		private final BuildContext context;
-		private final Class<? extends ServiceProvider<S>> serviceProviderClass;
+		private final Class<S> serviceClass;
 
 		private int userCounter = 0;
 		private ServiceStatus status = ServiceStatus.STOPPED;
 
-		ServiceProviderWrapper(ServiceProvider<S> serviceProvider, BuildContext context, Class<? extends ServiceProvider<S>> serviceProviderClass) {
-			this.serviceProvider = serviceProvider;
+		ServiceWrapper(S service, Class<S> serviceClass, BuildContext context) {
+			this.service = service;
 			this.context = context;
-			this.serviceProviderClass = serviceProviderClass;
+			this.serviceClass = serviceClass;
 		}
 
 		synchronized S getService() {
 			if ( status != ServiceStatus.RUNNING ) {
 				stateExpectedFailure();
 			}
-			return serviceProvider.getService();
+			return service;
 		}
 
 		synchronized void startVirtual() {
@@ -177,9 +176,7 @@ public class StandardServiceManager implements ServiceManager {
 				if ( status != ServiceStatus.STOPPED ) {
 					stateExpectedFailure();
 				}
-				status = ServiceStatus.STARTING;
-				serviceProvider.start( properties, context );
-				status = ServiceStatus.RUNNING;
+				startService( service );
 			}
 			if ( status != ServiceStatus.RUNNING ) {
 				//Could happen on circular dependencies
@@ -193,10 +190,7 @@ public class StandardServiceManager implements ServiceManager {
 				if ( status != ServiceStatus.RUNNING ) {
 					stateExpectedFailure();
 				}
-				status = ServiceStatus.STOPPING;
-				forceStop();
-				status = ServiceStatus.STOPPED;
-				managedProviders.remove( serviceProviderClass );
+				stopAndRemoveFromCache();
 			}
 			else if ( status != ServiceStatus.RUNNING ) {
 				//Could happen on circular dependencies
@@ -206,23 +200,37 @@ public class StandardServiceManager implements ServiceManager {
 
 		synchronized void ensureStopped() {
 			if ( status != ServiceStatus.STOPPED ) {
-				log.serviceProviderNotReleased( serviceProviderClass );
-				forceStop();
+				log.serviceProviderNotReleased( serviceClass );
+				stopAndRemoveFromCache();
 			}
 		}
 
-		private void forceStop() {
+		private void stopAndRemoveFromCache() {
+			status = ServiceStatus.STOPPING;
 			try {
-				serviceProvider.stop();
+				if ( service instanceof Stoppable ) {
+					( (Stoppable) service ).stop();
+				}
 			}
 			catch (Exception e) {
-				log.stopServiceFailed( serviceProviderClass, e );
+				log.stopServiceFailed( serviceClass, e );
 			}
+			finally {
+				status = ServiceStatus.STOPPED;
+				cachedServices.remove( serviceClass );
+			}
+		}
+
+		private void startService(final S service) {
+			status = ServiceStatus.STARTING;
+			if ( service instanceof Startable ) {
+				( (Startable) service ).start( properties, context );
+			}
+			status = ServiceStatus.RUNNING;
 		}
 
 		private void stateExpectedFailure() {
-			throw new AssertionFailure( "Unexpected status '" + status + "' for serviceProvider '" + serviceProvider + "'." +
-					" Check for circular dependencies or unreleased resources in your services." );
+			throw log.getUnexpectedServiceStatusException( status.name(), service.toString() );
 		}
 	}
 

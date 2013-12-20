@@ -37,7 +37,7 @@ import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 
 /**
@@ -90,7 +90,7 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	}
 
 	@Override
-	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+	public Map<Class<? extends Service>, Object> getProvidedServices() {
 		return Collections.emptyMap();
 	}
 

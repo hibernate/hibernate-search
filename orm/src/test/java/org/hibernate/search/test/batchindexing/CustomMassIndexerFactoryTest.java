@@ -21,7 +21,7 @@
 package org.hibernate.search.test.batchindexing;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hibernate.search.hcore.impl.MassIndexerFactoryProvider.MASS_INDEXER_FACTORY_CLASSNAME;
+import static org.hibernate.search.spi.MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 

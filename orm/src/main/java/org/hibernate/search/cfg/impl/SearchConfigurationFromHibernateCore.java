@@ -35,9 +35,9 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
 
 /**
  * Search configuration implementation wrapping an Hibernate Core configuration
@@ -100,7 +100,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	}
 
 	@Override
-	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+	public Map<Class<? extends Service>, Object> getProvidedServices() {
 		return Collections.emptyMap();
 	}
 

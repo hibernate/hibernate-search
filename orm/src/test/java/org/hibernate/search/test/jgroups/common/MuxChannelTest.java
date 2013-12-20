@@ -50,10 +50,10 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 	@Test
 	public void testMuxDispatcher() throws Exception {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		MessageSender sender = searchFactory.getServiceManager().requestService( JGroupsChannelProvider.class, null );
+		MessageSender sender = searchFactory.getServiceManager().requestService( MessageSender.class );
 		Assert.assertNotNull( sender );
 		String className = sender.getClass().getName();
-		Assert.assertTrue( "Wrong sender instance: " + className, className.contains( "DispatcherMessageSender" ) );
+		Assert.assertTrue( "Wrong sender instance: " + className, className.contains( "DispatchMessageSender" ) );
 	}
 
 	@Override

@@ -24,6 +24,9 @@
 
 package org.hibernate.search.backend.jgroups.impl;
 
+import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.engine.service.spi.Stoppable;
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.View;
@@ -31,15 +34,11 @@ import org.jgroups.View;
 /**
  * Abstract away message submission.
  *
+ * Even though an internal contract we use the service mechanism to get life cycle management.
+ *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public interface MessageSender {
-
-	/**
-	 * Stop sender.
-	 */
-	void stop();
-
+public interface MessageSender extends Service, Startable, Stoppable {
 	/**
 	 * Send message.
 	 *

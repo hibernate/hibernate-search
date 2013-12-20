@@ -45,7 +45,7 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 	@Test
 	public void testInjectionHappened() throws Exception {
 		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
-		MessageSender sender = searchFactory.getServiceManager().requestService( JGroupsChannelProvider.class, null );
+		MessageSender sender = searchFactory.getServiceManager().requestService( MessageSender.class );
 		Assert.assertTrue( masterChannel.getAddress().equals( sender.getAddress() ) );
 	}
 

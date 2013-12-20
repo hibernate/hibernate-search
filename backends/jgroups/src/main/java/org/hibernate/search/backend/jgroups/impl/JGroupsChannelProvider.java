@@ -27,27 +27,34 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.hibernate.search.backend.jgroups.logging.impl.Log;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.spi.ServiceProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.jgroups.Address;
 import org.jgroups.JChannel;
+import org.jgroups.Message;
 import org.jgroups.MessageListener;
 import org.jgroups.UpHandler;
+import org.jgroups.View;
 import org.jgroups.blocks.MessageDispatcher;
+import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.mux.MuxMessageDispatcher;
 import org.jgroups.blocks.mux.Muxer;
+import org.jgroups.util.Rsp;
+import org.jgroups.util.RspList;
 
 /**
- * Service to initialize a JGroups Channel. This needs to be centralized to
- * allow sharing of channels across different index managers.
+ * We use the MessageDispatcher instead of the JChannel to be able to use blocking
+ * operations (optionally) without having to rely on the RSVP protocol
+ * being configured on the stack.
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  * @author Ales Justin
+ * @author Hardy Ferentschik
  */
-public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
+public final class JGroupsChannelProvider implements MessageSender {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -62,8 +69,46 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	private static final String DEFAULT_CLUSTER_NAME = "Hibernate Search Cluster";
 
 	private ChannelContainer channelContainer;
-	private MessageSender sender;
 	private ServiceManager serviceManager;
+	private MessageDispatcher dispatcher;
+
+	@Override
+	public Address getAddress() {
+		return channelContainer.getChannel().getAddress();
+	}
+
+	@Override
+	public View getView() {
+		return channelContainer.getChannel().getView();
+	}
+
+	@Override
+	public void send(final Message message, final boolean synchronous, final long timeout) throws Exception {
+		final RequestOptions options = synchronous ? RequestOptions.SYNC() : RequestOptions.ASYNC();
+		options.setExclusionList( dispatcher.getChannel().getAddress() );
+		options.setTimeout( timeout );
+		RspList<Object> rspList = dispatcher.castMessage( null, message, options );
+		//JGroups won't throw these automatically as it would with a JChannel usage,
+		//so we provide the same semantics by throwing the JGroups specific exceptions
+		//as appropriate
+		if ( synchronous ) {
+			for ( Rsp rsp : rspList.values() ) {
+				if ( !rsp.wasReceived() ) {
+					if ( rsp.wasSuspected() ) {
+						throw log.jgroupsSuspectingPeer( rsp.getSender() );
+					}
+					else {
+						throw log.jgroupsRpcTimeout( rsp.getSender() );
+					}
+				}
+				else {
+					if ( rsp.hasException() ) {
+						throw log.jgroupsRemoteException( rsp.getSender(), rsp.getException(), rsp.getException() );
+					}
+				}
+			}
+		}
+	}
 
 	@Override
 	public void start(Properties props, BuildContext context) {
@@ -73,7 +118,7 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 		channelContainer = buildChannel( props );
 		channelContainer.start();
 
-		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
+		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( NodeSelectorStrategyHolder.class );
 		JGroupsMasterMessageListener listener = new JGroupsMasterMessageListener( context, masterNodeSelector );
 
 		JChannel channel = channelContainer.getChannel();
@@ -93,13 +138,11 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 			ClassLoader cl = (ClassLoader) props.get( CLASSLOADER );
 			MessageListener wrapper = ( cl != null ) ? new ClassloaderMessageListener( listener, cl ) : listener;
 			MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( wrapper );
-			MessageDispatcher dispatcher = new MuxMessageDispatcher( muxId, channel, wrapper, listener, adapter );
-			sender = new DispatcherMessageSender( dispatcher );
+			dispatcher = new MuxMessageDispatcher( muxId, channel, wrapper, listener, adapter );
 		}
 		else {
 			MessageListenerToRequestHandlerAdapter adapter = new MessageListenerToRequestHandlerAdapter( listener );
-			MessageDispatcher standardDispatcher = new MessageDispatcher( channel, listener, listener, adapter );
-			sender = new DispatcherMessageSender( standardDispatcher );
+			dispatcher = new MessageDispatcher( channel, listener, listener, adapter );
 		}
 
 		masterNodeSelector.setLocalAddress( channel.getAddress() );
@@ -113,19 +156,11 @@ public class JGroupsChannelProvider implements ServiceProvider<MessageSender> {
 	}
 
 	@Override
-	public MessageSender getService() {
-		return sender;
-	}
-
-	@Override
 	public void stop() {
-		serviceManager.releaseService( MasterSelectorServiceProvider.class );
+		serviceManager.releaseService( NodeSelectorStrategyHolder.class );
 		serviceManager = null;
+		dispatcher.stop();
 		try {
-			if ( sender != null ) {
-				sender.stop();
-				sender = null;
-			}
 			if ( channelContainer != null ) {
 				channelContainer.close();
 				channelContainer = null;

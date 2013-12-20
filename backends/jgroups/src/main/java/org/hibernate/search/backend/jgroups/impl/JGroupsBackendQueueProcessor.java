@@ -33,7 +33,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.logging.impl.Log;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -114,8 +114,8 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 		this.indexName = indexManager.getIndexName();
 		assertLegacyOptionsNotUsed( props, indexName );
 		serviceManager = context.getServiceManager();
-		this.messageSender = serviceManager.requestService( JGroupsChannelProvider.class, context );
-		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( MasterSelectorServiceProvider.class, context );
+		this.messageSender = serviceManager.requestService( MessageSender.class );
+		NodeSelectorStrategyHolder masterNodeSelector = serviceManager.requestService( NodeSelectorStrategyHolder.class );
 		masterNodeSelector.setNodeSelectorStrategy( indexName, selectionStrategy );
 		selectionStrategy.viewAccepted( messageSender.getView() ); // set current view?
 
@@ -134,12 +134,12 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 
 	@Override
 	public void close() {
-		serviceManager.releaseService( MasterSelectorServiceProvider.class );
-		serviceManager.releaseService( JGroupsChannelProvider.class );
+		serviceManager.releaseService( NodeSelectorStrategyHolder.class );
+		serviceManager.releaseService( MessageSender.class );
 		delegatedBackend.close();
 	}
 
-	MessageSender getMessageSender() {
+	MessageSender getMessageSenderService() {
 		return messageSender;
 	}
 

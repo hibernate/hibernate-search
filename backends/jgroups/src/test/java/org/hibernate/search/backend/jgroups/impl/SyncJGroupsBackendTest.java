@@ -38,7 +38,6 @@ import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.TestForIssue;
 import org.jgroups.TimeoutException;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -77,9 +76,7 @@ public class SyncJGroupsBackendTest {
 		.withProperty( JGroupsChannelProvider.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
 		;
 
-	// TODO HSEARCH-1365
 	@Test
-	@Ignore
 	public void testSynchAsConfigured() {
 		JGroupsBackendQueueProcessor dvdsBackend = extractJGroupsBackend( "dvds" );
 		Assert.assertTrue( "dvds index was configured with a syncronous JGroups backend", dvdsBackend.blocksForACK() );

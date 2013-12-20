@@ -24,6 +24,7 @@
 package org.hibernate.search.impl;
 
 import java.io.Serializable;
+import java.util.Properties;
 import java.util.Set;
 
 import org.hibernate.engine.query.spi.ParameterMetadata;
@@ -39,11 +40,10 @@ import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.hcore.impl.MassIndexerFactoryProvider;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.spi.MassIndexerFactory;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -172,12 +172,8 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
-		//We shouldn't expose the ServiceManager in phases other than startup or teardown, that's why the cast is required.
-		//Exceptionally, this very specific case is fine. TODO: cleanup this mess.
-		MutableSearchFactory msf = (MutableSearchFactory) getSearchFactoryImplementor();
-		ServiceManager serviceManager = msf.getServiceManager();
-		MassIndexerFactory service = serviceManager.requestService( MassIndexerFactoryProvider.class, null );
-		return service.createMassIndexer( getSearchFactoryImplementor(), getFactory(), types );
+		MassIndexerFactory massIndexerFactory = createMassIndexerFactory();
+		return massIndexerFactory.createMassIndexer( getSearchFactoryImplementor(), getFactory(), types );
 	}
 
 	@Override
@@ -195,6 +191,25 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 	@Override
 	public FullTextSharedSessionBuilder sessionWithOptions() {
 		return new FullTextSharedSessionBuilderDelegator( super.sessionWithOptions() );
+	}
+
+	private MassIndexerFactory createMassIndexerFactory() {
+		MassIndexerFactory factory;
+		Properties properties = getSearchFactoryImplementor().getConfigurationProperties();
+		String factoryClassName = properties.getProperty( MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME );
+
+		if ( factoryClassName != null ) {
+			factory = ClassLoaderHelper.instanceFromName(
+					MassIndexerFactory.class, factoryClassName, getClass()
+					.getClassLoader(), "Mass indexer factory"
+			);
+
+		}
+		else {
+			factory = new DefaultMassIndexerFactory();
+		}
+		factory.initialize( properties );
+		return factory;
 	}
 
 }

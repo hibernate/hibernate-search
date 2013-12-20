@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import junit.framework.Assert;
 
+import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.MessageDispatcher;
@@ -34,7 +35,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.jgroups.impl.JGroupsChannelProvider;
 import org.hibernate.search.backend.jgroups.impl.MessageListenerToRequestHandlerAdapter;
 import org.hibernate.search.test.SearchTestCase;

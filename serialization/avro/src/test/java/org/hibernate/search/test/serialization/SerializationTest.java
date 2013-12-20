@@ -57,15 +57,20 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.engine.impl.StandardServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
+import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
+import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -83,10 +88,25 @@ public class SerializationTest {
 	@Rule
 	public SearchFactoryHolder searchFactoryHolder = new SearchFactoryHolder( RemoteEntity.class );
 
+	private SerializationProvider serializationProvider;
+
+	@Before
+	public void setUp() {
+		ServiceManager serviceManager = new StandardServiceManager(
+				new ManualConfiguration(),
+				null
+		);
+
+		serializationProvider = serviceManager.requestService( SerializationProvider.class );
+		assertTrue( "Wrong serialization provider", serializationProvider instanceof AvroSerializationProvider );
+	}
+
 	@Test
 	public void testAvroSerialization() throws Exception {
+
+
 		LuceneWorkSerializer converter = new LuceneWorkSerializerImpl(
-				new AvroSerializationProvider(),
+				serializationProvider,
 				searchFactoryHolder.getSearchFactory()
 		);
 		List<LuceneWork> works = buildWorks();
@@ -158,7 +178,7 @@ public class SerializationTest {
 	public void testAvroSerializationPerf() throws Exception {
 		final int loop = 10; //TODO do 10000 or 100000
 		LuceneWorkSerializer converter = new LuceneWorkSerializerImpl(
-				new AvroSerializationProvider(),
+				serializationProvider,
 				searchFactoryHolder.getSearchFactory()
 		);
 		List<LuceneWork> works = buildWorks();

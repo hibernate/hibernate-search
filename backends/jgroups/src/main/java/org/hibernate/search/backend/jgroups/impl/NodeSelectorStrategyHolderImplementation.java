@@ -33,7 +33,7 @@ import org.jgroups.View;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-final class NodeSelectorStrategyHolderImplementation implements NodeSelectorStrategyHolder {
+public final class NodeSelectorStrategyHolderImplementation implements NodeSelectorStrategyHolder {
 
 	private final ConcurrentHashMap<String,NodeSelectorStrategy> register = new ConcurrentHashMap<String,NodeSelectorStrategy>( 16, 0.75f, 2 );
 	private Address address;

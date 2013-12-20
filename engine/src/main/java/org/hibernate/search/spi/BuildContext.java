@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.spi;
 
-import org.hibernate.search.engine.ServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -32,6 +32,7 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
  * Build context that can be used by some services at initialization.
  *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public interface BuildContext {
 	/**
@@ -66,33 +67,6 @@ public interface BuildContext {
 	 * @see org.hibernate.search.Environment#INDEXING_STRATEGY
 	 */
 	String getIndexingStrategy();
-
-	/**
-	 * Declare the use of a service.
-	 * All callers of this method must call
-	 * (@link #releaseService}
-	 * or the service will not be released
-	 *
-	 * @param provider of the service
-	 * @param <T> class of the service
-	 *
-	 * @return the service instance
-	 *
-	 * @deprecated use {@link #getServiceManager()} instead
-	 */
-	@Deprecated
-	<T> T requestService(Class<? extends ServiceProvider<T>> provider);
-
-	/**
-	 * Release a service from duty. Each call to (@link #requestService} should be coupled with
-	 * a call to (@link #releaseService} when the service is no longer needed.
-	 *
-	 * @param provider of the service
-	 *
-	 * @deprecated use {@link #getServiceManager()} instead
-	 */
-	@Deprecated
-	void releaseService(Class<? extends ServiceProvider<?>> provider);
 
 	/**
 	 * Access the {@code ServiceManager}.

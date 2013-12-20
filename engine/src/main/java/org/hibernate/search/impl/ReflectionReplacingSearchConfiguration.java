@@ -32,7 +32,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.ServiceProvider;
+import org.hibernate.search.engine.service.spi.Service;
 
 /**
  * Wraps another SearchConfiguration to override it's ReflectionManager
@@ -89,7 +89,7 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 	}
 
 	@Override
-	public Map<Class<? extends ServiceProvider<?>>, Object> getProvidedServices() {
+	public Map<Class<? extends Service>, Object> getProvidedServices() {
 		return cfg.getProvidedServices();
 	}
 

@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.backend.jgroups.impl;
 
+import org.hibernate.search.engine.service.spi.Service;
 import org.jgroups.Address;
 import org.jgroups.View;
 
@@ -33,8 +34,7 @@ import org.jgroups.View;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public interface NodeSelectorStrategyHolder {
-
+public interface NodeSelectorStrategyHolder extends Service {
 	NodeSelectorStrategy getMasterNodeSelector(String indexName);
 
 	void setNodeSelectorStrategy(String indexName, NodeSelectorStrategy selector);

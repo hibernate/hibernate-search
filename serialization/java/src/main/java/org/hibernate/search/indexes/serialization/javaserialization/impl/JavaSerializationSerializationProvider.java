@@ -20,17 +20,23 @@
  */
 package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
+import java.util.Properties;
+
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
+import org.hibernate.search.spi.BuildContext;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Hardy Ferentschik
  */
 public class JavaSerializationSerializationProvider implements SerializationProvider {
+	private Serializer serializer;
+
 	@Override
 	public Serializer getSerializer() {
-		return new JavaSerializationSerializer();
+		return serializer;
 	}
 
 	@Override
@@ -41,5 +47,10 @@ public class JavaSerializationSerializationProvider implements SerializationProv
 	@Override
 	public String toString() {
 		return "Simple Java based SerializationProvider";
+	}
+
+	@Override
+	public void start(Properties properties, BuildContext context) {
+		serializer = new JavaSerializationSerializer();
 	}
 }

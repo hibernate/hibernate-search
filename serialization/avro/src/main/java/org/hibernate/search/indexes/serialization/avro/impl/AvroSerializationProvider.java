@@ -22,19 +22,42 @@ package org.hibernate.search.indexes.serialization.avro.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.avro.Protocol;
 
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * parsing code inspired by http://www.infoq.com/articles/ApacheAvro
+ * Avro based implementation of {@code SerializationProvider}.
+ * <p>
+ * Parsing code inspired by http://www.infoq.com/articles/ApacheAvro
  * from Boris Lublinsky
+ * </p>
+ * <p>
+ * Before the actual serialized flux, two bytes are reserved:
+ * <ul>
+ * <li>majorVersion</li>
+ * <li>minorVersion</li>
+ * </ul>
+ *
+ * A major version increase implies an incompatible protocol change.
+ * Messages of a {@code majorVersion > current version} should be refused.
+ *
+ * A minor version increase implies a compatible protocol change.
+ * Messages of a {@code minorVersion > current version} are parsed, but new
+ * operation will be ignored or rejected.
+ *
+ * If message's {@code major version is < current version}, then the
+ * implementation is strongly encouraged to parse and process them.
+ * It is mandatory if only message's {@code code minor version is < current version}.
+ * </p>
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
@@ -51,6 +74,10 @@ public class AvroSerializationProvider implements SerializationProvider {
 	public static byte MAJOR_VERSION = (byte) ( -128 + 1 );
 	public static byte MINOR_VERSION = (byte) ( -128 + 0 );
 
+	private Serializer serializer;
+	private Deserializer deserializer;
+
+
 	public static int getMajorVersion() {
 		return MAJOR_VERSION + 128; //rebase to 0
 	}
@@ -60,13 +87,19 @@ public class AvroSerializationProvider implements SerializationProvider {
 	}
 
 	@Override
+	public void start(Properties properties, BuildContext context) {
+		serializer = new AvroSerializer( protocol );
+		deserializer = new AvroDeserializer( protocol );
+	}
+
+	@Override
 	public Serializer getSerializer() {
-		return new AvroSerializer( protocol );
+		return serializer;
 	}
 
 	@Override
 	public Deserializer getDeserializer() {
-		return new AvroDeserializer( protocol );
+		return deserializer;
 	}
 
 	public AvroSerializationProvider() {
