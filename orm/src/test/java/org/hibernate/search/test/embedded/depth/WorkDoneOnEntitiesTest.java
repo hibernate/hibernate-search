@@ -30,7 +30,7 @@ import junit.framework.Assert;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.util.ReaderUtil;
+import org.apache.lucene.index.ReaderUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;

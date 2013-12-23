@@ -24,7 +24,7 @@
 package org.hibernate.search.test.analyzer.solr;
 
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.solr.analysis.BaseTokenFilterFactory;
+//org.apache.solr.analysis.BaseTokenFilterFactory was removed in Lucene 4 with no alternative replacement
 
 /**
  * @author Hardy Ferentschik

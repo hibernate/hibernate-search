@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+//TermAttribute was removed in Lucene 4 with no alternative replacement
 
 /**
  * A filter which will actually insert spaces. Most filters/tokenizers remove them, but for testing it is

@@ -42,8 +42,8 @@ import javax.naming.NamingException;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.NumericField;
-import org.apache.lucene.queryParser.QueryParser;
+//NumericField was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;

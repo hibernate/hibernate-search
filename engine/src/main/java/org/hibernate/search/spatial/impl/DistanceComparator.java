@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.FieldComparator;
-import org.apache.lucene.util.collections.IntToDoubleMap;
+import org.apache.lucene.facet.collections.IntToDoubleMap;
 
 public final class DistanceComparator extends FieldComparator<Double> {
 

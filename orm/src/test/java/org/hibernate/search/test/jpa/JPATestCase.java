@@ -33,7 +33,7 @@ import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.util.Version;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;

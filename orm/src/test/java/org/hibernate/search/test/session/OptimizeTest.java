@@ -25,8 +25,8 @@ package org.hibernate.search.test.session;
 
 import java.io.File;
 
-import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;

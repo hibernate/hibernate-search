@@ -102,7 +102,7 @@ List result = fullTextQuery.list(); //return a list of managed objects
 
     <programlisting language="JAVA" role="JAVA">
 SearchFactory searchFactory = fullTextSession.getSearchFactory();
-org.apache.lucene.queryParser.QueryParser parser = 
+org.apache.lucene.queryparser.classic.QueryParser parser = 
     new QueryParser("title", searchFactory.getAnalyzer(Myth.class));
 try {
     org.apache.lucene.search.Query luceneQuery = parser.parse("history:storm^3");

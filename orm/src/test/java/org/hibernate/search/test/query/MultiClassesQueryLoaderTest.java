@@ -36,7 +36,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 
 /**

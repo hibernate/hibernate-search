@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.document.Fieldable;
+//Fieldable was removed in Lucene 4 with no alternative replacement
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;

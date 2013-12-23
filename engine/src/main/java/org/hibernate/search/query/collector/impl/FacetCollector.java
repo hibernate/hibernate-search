@@ -35,7 +35,7 @@ import java.util.Map.Entry;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermEnum;
+//TermEnum was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Scorer;
 

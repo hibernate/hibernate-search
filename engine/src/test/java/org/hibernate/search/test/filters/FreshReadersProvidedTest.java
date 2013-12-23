@@ -29,13 +29,13 @@ import junit.framework.Assert;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.index.TermEnum;
+//TermDocs was removed in Lucene 4 with no alternative replacement
+//TermEnum was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.OpenBitSet;
-import org.apache.lucene.util.ReaderUtil;
+import org.apache.lucene.index.ReaderUtil;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

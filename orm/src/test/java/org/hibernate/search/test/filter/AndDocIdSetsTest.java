@@ -41,7 +41,7 @@ import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
 import org.apache.lucene.util.OpenBitSet;
-import org.apache.lucene.util.SortedVIntList;
+//SortedVIntList was removed in Lucene 4 with no alternative replacement
 import org.hibernate.search.filter.impl.AndDocIdSet;
 import org.junit.Test;
 

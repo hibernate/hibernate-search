@@ -27,7 +27,7 @@ import java.util.zip.DataFormatException;
 
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
+//Fieldable was removed in Lucene 4 with no alternative replacement
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;

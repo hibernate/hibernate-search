@@ -522,7 +522,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     <title>Customizing Lucene's scoring formula</title>
 
     <para>Lucene allows the user to customize its scoring formula by extending
-    <classname>org.apache.lucene.search.Similarity</classname>. The abstract
+    <classname>org.apache.lucene.search.similarities.Similarity</classname>. The abstract
     methods defined in this class match the factors of the following formula
     calculating the score of query q for document d:</para>
 
@@ -594,7 +594,7 @@ hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pro
     specified classname of your <classname>Similarity</classname>
     implementation using the property
     <constant>hibernate.search.similarity</constant>. The default value is
-    <classname>org.apache.lucene.search.DefaultSimilarity</classname>.</para>
+    <classname>org.apache.lucene.search.similarities.DefaultSimilarity</classname>.</para>
 
     <para>Secondly, you can override the similarity used for a specific index
     by setting the <literal>similarity</literal> property for this index (see

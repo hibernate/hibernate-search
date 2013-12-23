@@ -102,7 +102,7 @@ public final class ConfigContext {
 	public ConfigContext(SearchConfiguration cfg, SearchMapping searchMapping) {
 		luceneMatchVersion = getLuceneMatchVersion( cfg );
 		defaultAnalyzer = initAnalyzer( cfg );
-		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerFactory" );
+		solrPresent = isPresent( "org.apache.lucene.analysis.util.TokenizerFactory" );
 		jpaPresent = isPresent( "javax.persistence.Id" );
 		nullToken = initNullToken( cfg );
 		implicitProvidedId = cfg.isIdProvidedImplicit();

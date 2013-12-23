@@ -26,7 +26,7 @@ package org.hibernate.search.test.bridge;
 
 import java.util.List;
 
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;

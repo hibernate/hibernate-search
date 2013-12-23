@@ -25,7 +25,7 @@ package org.hibernate.search.test.engine;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
