@@ -24,18 +24,18 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.FieldSelectorResult;
-import org.apache.lucene.document.MapFieldSelector;
+//FieldSelector was removed in Lucene 4 with no alternative replacement
+//FieldSelectorResult was removed in Lucene 4 with no alternative replacement
+//MapFieldSelector was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.index.FieldInfos;
 import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.index.TermEnum;
-import org.apache.lucene.index.TermFreqVector;
-import org.apache.lucene.index.TermPositions;
-import org.apache.lucene.index.TermVectorMapper;
+//TermDocs was removed in Lucene 4 with no alternative replacement
+//TermEnum was removed in Lucene 4 with no alternative replacement
+//TermFreqVector was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.DocsAndPositionsEnum;
+//TermVectorMapper was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.impl.NotSharedReaderProvider;

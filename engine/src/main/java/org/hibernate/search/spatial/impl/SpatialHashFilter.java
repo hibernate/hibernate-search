@@ -22,7 +22,7 @@ package org.hibernate.search.spatial.impl;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
+//TermDocs was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.OpenBitSet;

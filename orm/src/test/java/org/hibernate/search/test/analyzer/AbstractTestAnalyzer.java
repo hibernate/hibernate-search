@@ -28,7 +28,7 @@ import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+//TermAttribute was removed in Lucene 4 with no alternative replacement
 
 /**
  * @author Emmanuel Bernard

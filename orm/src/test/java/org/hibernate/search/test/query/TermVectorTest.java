@@ -24,8 +24,8 @@
 package org.hibernate.search.test.query;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.TermPositionVector;
-import org.apache.lucene.index.TermVectorOffsetInfo;
+//org.apache.lucene.index.TermPositionVector was removed in Lucene 4 with no alternative replacement
+//org.apache.lucene.index.TermVectorOffsetInfo was removed in Lucene 4 with no alternative replacement
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;

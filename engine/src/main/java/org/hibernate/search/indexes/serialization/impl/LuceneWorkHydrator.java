@@ -35,9 +35,9 @@ import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.document.NumericField;
-import org.apache.lucene.index.Payload;
+//Fieldable was removed in Lucene 4 with no alternative replacement
+//NumericField was removed in Lucene 4 with no alternative replacement
+//Payload was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.AttributeSource;

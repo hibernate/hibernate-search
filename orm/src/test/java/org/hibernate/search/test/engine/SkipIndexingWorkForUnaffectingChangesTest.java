@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.test.engine;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;

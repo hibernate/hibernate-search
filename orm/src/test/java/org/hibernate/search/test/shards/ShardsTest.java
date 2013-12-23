@@ -26,11 +26,11 @@ package org.hibernate.search.test.shards;
 import java.io.File;
 import java.util.List;
 
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.queryParser.QueryParser;
+//TermDocs was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.Session;

@@ -24,7 +24,7 @@
 package org.hibernate.search.test.similarity;
 
 import org.apache.lucene.index.FieldInvertState;
-import org.apache.lucene.search.Similarity;
+import org.apache.lucene.search.similarities.Similarity;
 
 /**
  * @author Emmanuel Bernard

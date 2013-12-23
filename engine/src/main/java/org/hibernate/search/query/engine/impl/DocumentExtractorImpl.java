@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.FieldSelectorResult;
-import org.apache.lucene.document.MapFieldSelector;
+//FieldSelector was removed in Lucene 4 with no alternative replacement
+//FieldSelectorResult was removed in Lucene 4 with no alternative replacement
+//MapFieldSelector was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.ProjectionConstants;

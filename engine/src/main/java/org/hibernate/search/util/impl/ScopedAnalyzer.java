@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.document.Fieldable;
+//Fieldable was removed in Lucene 4 with no alternative replacement
 
 /**
  * A <code>ScopedAnalyzer</code> is a wrapper class containing all analyzers for a given class.

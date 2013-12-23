@@ -26,7 +26,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.Scorer;
-import org.apache.lucene.util.collections.IntToDoubleMap;
+import org.apache.lucene.facet.collections.IntToDoubleMap;
 import org.hibernate.search.spatial.Coordinates;
 
 public class DistanceCollector extends Collector {

@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.indexes.serialization.spi;
 
-import org.apache.lucene.document.NumericField;
+//NumericField was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 
 /**

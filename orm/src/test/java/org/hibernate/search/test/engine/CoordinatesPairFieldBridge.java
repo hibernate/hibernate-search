@@ -24,7 +24,7 @@
 package org.hibernate.search.test.engine;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
+//Fieldable was removed in Lucene 4 with no alternative replacement
 
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;

@@ -30,8 +30,8 @@ import java.util.zip.DataFormatException;
 
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.document.NumericField;
+//Fieldable was removed in Lucene 4 with no alternative replacement
+//NumericField was removed in Lucene 4 with no alternative replacement
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;

@@ -28,7 +28,7 @@ import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.document.Fieldable;
+//Fieldable was removed in Lucene 4 with no alternative replacement
 
 /**
  * Delegate to a named analyzer. Delegated Analyzers are lazily configured.

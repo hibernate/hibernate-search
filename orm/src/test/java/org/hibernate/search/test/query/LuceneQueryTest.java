@@ -26,7 +26,7 @@ package org.hibernate.search.test.query;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;

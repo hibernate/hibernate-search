@@ -25,8 +25,8 @@ package org.hibernate.search.test.bridge;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.document.Document;
 import org.hibernate.Transaction;

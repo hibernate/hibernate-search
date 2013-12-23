@@ -24,9 +24,9 @@
 
 package org.hibernate.search.test.configuration;
 
-import org.apache.solr.analysis.LowerCaseFilterFactory;
-import org.apache.solr.analysis.StandardTokenizerFactory;
-import org.apache.solr.analysis.StopFilterFactory;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.apache.lucene.analysis.core.StopFilterFactory;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
