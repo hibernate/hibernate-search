@@ -147,7 +147,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4jVersion>1.6.1</slf4jVersion>
-        <luceneVersion>3.6.2</luceneVersion>
+        <luceneVersion>4.6.0</luceneVersion>
         <infinispanVersion>6.0.1.Final</infinispanVersion>
         <jgroupsVersion>3.4.2.Final</jgroupsVersion>
         <hibernateVersion>4.3.0.Final</hibernateVersion>
@@ -313,11 +313,6 @@
                         <artifactId>xapool</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-analyzers</artifactId>
-                <version>${luceneVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.jms</groupId>
