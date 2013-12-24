@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.impl;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,7 +99,7 @@ final class SolrAnalyzerBuilder {
 		return new TokenizerChain( charFilters, tokenFactory, filters );
 	}
 
-	private static void injectResourceLoader(Object processor, ResourceLoader defaultResourceLoader, Map<String, String> mapOfParameters) {
+	private static void injectResourceLoader(Object processor, ResourceLoader defaultResourceLoader, Map<String, String> mapOfParameters) throws IOException {
 		if ( processor instanceof ResourceLoaderAware ) {
 			String charset = mapOfParameters.get( Environment.RESOURCE_CHARSET );
 			final ResourceLoader localResourceLoader;
