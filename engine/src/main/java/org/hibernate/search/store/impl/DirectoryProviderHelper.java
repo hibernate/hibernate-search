@@ -30,7 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -152,7 +152,7 @@ public final class DirectoryProviderHelper {
 		Version version = Environment.DEFAULT_LUCENE_MATCH_VERSION;
 		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
 		try {
-			if ( ! IndexReader.indexExists( directory ) ) {
+			if ( ! DirectoryReader.indexExists( directory ) ) {
 				IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE );
 				IndexWriter iw = new IndexWriter( directory, iwriterConfig );
 				iw.close();
