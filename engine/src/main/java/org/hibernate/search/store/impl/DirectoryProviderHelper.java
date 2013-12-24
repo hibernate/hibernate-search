@@ -187,23 +187,13 @@ public final class DirectoryProviderHelper {
 			if ( indexDir == null ) {
 				throw new SearchException( "To use \"simple\" as a LockFactory strategy an indexBase path must be set" );
 			}
-			try {
-				return new SimpleFSLockFactory( indexDir );
-			}
-			catch (IOException e) {
-				throw new SearchException( "Could not initialize SimpleFSLockFactory", e );
-			}
+			return new SimpleFSLockFactory( indexDir );
 		}
 		else if ( "native".equals( lockFactoryName ) ) {
 			if ( indexDir == null ) {
 				throw new SearchException( "To use \"native\" as a LockFactory strategy an indexBase path must be set" );
 			}
-			try {
-				return new NativeFSLockFactory( indexDir );
-			}
-			catch (IOException e) {
-				throw new SearchException( "Could not initialize NativeFSLockFactory", e );
-			}
+			return new NativeFSLockFactory( indexDir );
 		}
 		else if ( "single".equals( lockFactoryName ) ) {
 			return new SingleInstanceLockFactory();
