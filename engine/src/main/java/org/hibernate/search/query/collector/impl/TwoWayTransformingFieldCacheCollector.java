@@ -21,7 +21,7 @@ package org.hibernate.search.query.collector.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;

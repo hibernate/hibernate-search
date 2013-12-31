@@ -33,12 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
-//TermEnum was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Scorer;
-
+import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
@@ -94,12 +95,12 @@ public class FacetCollector extends Collector {
 	}
 
 	@Override
-	public void setNextReader(IndexReader reader, int docBase) throws IOException {
+	public void setNextReader(AtomicReaderContext context) throws IOException {
 		if ( !initialised ) {
-			initialiseCollector( reader );
+			initialiseCollector( context );
 		}
-		initialiseFieldCaches( reader );
-		nextInChainCollector.setNextReader( reader, docBase );
+		initialiseFieldCaches( context );
+		nextInChainCollector.setNextReader( context );
 	}
 
 	@Override
@@ -171,16 +172,16 @@ public class FacetCollector extends Collector {
 		return facetList;
 	}
 
-	private void initialiseCollector(IndexReader reader) throws IOException {
+	private void initialiseCollector(AtomicReaderContext context) throws IOException {
 		// we only need to initialise the counts in case we have to include 0 counts as well
 		if ( facetRequest.hasZeroCountsIncluded() && facetRequest instanceof DiscreteFacetRequest ) {
-			initFacetCounts( reader );
+			initFacetCounts( context );
 		}
 		initialised = true;
 	}
 
-	private void initialiseFieldCaches(IndexReader reader) throws IOException {
-		fieldLoader.loadNewCacheValues( reader );
+	private void initialiseFieldCaches(AtomicReaderContext context) throws IOException {
+		fieldLoader.loadNewCacheValues( context );
 	}
 
 	private <N extends Number> FacetCounter createFacetCounter(FacetingRequestImpl request) {
@@ -197,21 +198,21 @@ public class FacetCollector extends Collector {
 		}
 	}
 
-	private void initFacetCounts(IndexReader reader) throws IOException {
+	private void initFacetCounts(AtomicReaderContext context) throws IOException {
 		String fieldName = facetRequest.getFieldName();
 		// term are enumerated by field name and within field names by term value
-		TermEnum terms = reader.terms( new Term( fieldName, "" ) );
-		try {
-			while ( fieldName.equals( terms.term().field() ) ) {
-				String fieldValue = terms.term().text();
-				facetCounts.initCount( fieldValue );
-				if ( !terms.next() ) {
-					break;
-				}
-			}
+		final AtomicReader atomicReader = context.reader();
+		final Terms terms = atomicReader.terms( fieldName );
+		if ( terms == null ) {
+			//if the Reader has no fields at all,
+			//undefined field or no matches
+			return;
 		}
-		finally {
-			terms.close();
+		final TermsEnum iterator = terms.iterator( null ); //we have no TermsEnum to reuse
+		BytesRef byteRef = null;
+		while ( ( byteRef = iterator.next() ) != null ) {
+			final String fieldValue = byteRef.utf8ToString();
+			facetCounts.initCount( fieldValue );
 		}
 	}
 
