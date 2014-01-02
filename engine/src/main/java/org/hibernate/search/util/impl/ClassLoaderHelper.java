@@ -290,6 +290,18 @@ public class ClassLoaderHelper {
 		return clazzDef;
 	}
 
+	public static <T> Class<? extends T> classForName(Class<T> targetSuperType, String classNameToLoad, ClassLoader classLoader, String componentDescription) {
+		final Class<?> clazzDef = classForName( classNameToLoad, classLoader, componentDescription );
+		try {
+			return clazzDef.asSubclass( targetSuperType );
+		}
+		catch (ClassCastException cce) {
+			throw new SearchException(
+					"Unable to load class for " + componentDescription + ". Configured implementation " + classNameToLoad +
+					" is not assignable to type " + targetSuperType );
+		}
+	}
+
 	/**
 	 * Perform resolution of a class name.
 	 * <p/>
