@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -233,7 +234,12 @@ public final class ConfigContext {
 		// unless necessary
 		// the current mechanism (check Solr class presence and call SolrAnalyzerBuilder if needed
 		// seems to be sufficient on Apple VM (derived from Sun's
-		return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion );
+		try {
+			return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion );
+		}
+		catch (IOException e) {
+			throw new SearchException( "Could not initializer Analyzer definitition" + analyzerDef, e );
+		}
 	}
 
 	public boolean isJpaPresent() {

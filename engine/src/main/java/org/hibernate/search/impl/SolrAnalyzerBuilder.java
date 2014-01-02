@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -65,13 +65,13 @@ final class SolrAnalyzerBuilder {
 	 * @param analyzerDef The <code>AnalyzerDef</code> annotation as found in the annotated domain class.
 	 * @param luceneMatchVersion The lucene version (required since Lucene 3.x)
 	 * @return a Lucene <code>Analyzer</code>
+	 * @throws IOException
 	 */
-	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) {
+	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) throws IOException {
 		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader();
 		TokenizerDef token = analyzerDef.tokenizer();
-		TokenizerFactory tokenFactory = instanceFromClass( TokenizerFactory.class, token.factory(), "Tokenizer factory" );
 		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( token.params(), luceneMatchVersion );
-		tokenFactory.init( tokenMapsOfParameters );
+		TokenizerFactory tokenFactory = instanceFromClass( TokenizerFactory.class, token.factory(), "Tokenizer factory", tokenMapsOfParameters );
 		injectResourceLoader( tokenFactory, defaultResourceLoader, tokenMapsOfParameters );
 
 		final int length = analyzerDef.filters().length;
@@ -80,18 +80,14 @@ final class SolrAnalyzerBuilder {
 		CharFilterFactory[] charFilters = new CharFilterFactory[charLength];
 		for ( int index = 0; index < length; index++ ) {
 			TokenFilterDef filterDef = analyzerDef.filters()[index];
-			filters[index] = instanceFromClass( TokenFilterFactory.class, filterDef.factory(), "Token filter factory" );
 			final Map<String, String> mapOfParameters = getMapOfParameters( filterDef.params(), luceneMatchVersion );
-			filters[index].init( mapOfParameters );
+			filters[index] = instanceFromClass( TokenFilterFactory.class, filterDef.factory(), "Token filter factory", mapOfParameters );
 			injectResourceLoader( filters[index], defaultResourceLoader, mapOfParameters );
 		}
 		for ( int index = 0; index < charFilters.length; index++ ) {
 			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
-			charFilters[index] = instanceFromClass( CharFilterFactory.class, charFilterDef.factory(), "Character filter factory" );
-			final Map<String, String> mapOfParameters = getMapOfParameters(
-					charFilterDef.params(), luceneMatchVersion
-			);
-			charFilters[index].init( mapOfParameters );
+			final Map<String, String> mapOfParameters = getMapOfParameters( charFilterDef.params(), luceneMatchVersion );
+			charFilters[index] = instanceFromClass( CharFilterFactory.class, charFilterDef.factory(), "Character filter factory", mapOfParameters );
 			injectResourceLoader( charFilters[index], defaultResourceLoader, mapOfParameters );
 		}
 		return new TokenizerChain( charFilters, tokenFactory, filters );
