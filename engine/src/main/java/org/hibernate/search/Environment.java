@@ -179,7 +179,9 @@ public final class Environment {
 
 	/**
 	 * Tokenizer or filter parameter describing the charset used to load associated resources if needed.
+	 * @deprecated No longer applied. Will be removed!
 	 */
+	@Deprecated
 	public static final String RESOURCE_CHARSET = "resource_charset";
 
 	/**

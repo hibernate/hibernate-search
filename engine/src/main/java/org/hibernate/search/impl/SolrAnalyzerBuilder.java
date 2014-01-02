@@ -36,8 +36,6 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.solr.analysis.TokenizerChain;
 import org.apache.lucene.analysis.util.TokenizerFactory;
-
-import org.hibernate.search.Environment;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
@@ -101,15 +99,7 @@ final class SolrAnalyzerBuilder {
 
 	private static void injectResourceLoader(Object processor, ResourceLoader defaultResourceLoader, Map<String, String> mapOfParameters) throws IOException {
 		if ( processor instanceof ResourceLoaderAware ) {
-			String charset = mapOfParameters.get( Environment.RESOURCE_CHARSET );
-			final ResourceLoader localResourceLoader;
-			if ( charset != null ) {
-				localResourceLoader = new HibernateSearchResourceLoader( charset );
-			}
-			else {
-				localResourceLoader = defaultResourceLoader;
-			}
-			( (ResourceLoaderAware) processor ).inform( localResourceLoader );
+			( (ResourceLoaderAware) processor ).inform( defaultResourceLoader );
 		}
 	}
 
