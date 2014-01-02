@@ -21,9 +21,8 @@ package org.hibernate.search.query.collector.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.Collector;
-
 import org.hibernate.search.query.fieldcache.impl.FieldLoadingStrategy;
 
 /**
@@ -55,14 +54,15 @@ final class BigArrayFieldCacheCollectorImpl extends FieldCacheCollector {
 	}
 
 	@Override
-	public void setNextReader(IndexReader reader, int docBase) throws IOException {
-		this.currentDocBase = docBase;
-		this.cacheLoadingStrategy.loadNewCacheValues( reader );
-		this.delegate.setNextReader( reader, docBase );
+	public void setNextReader(AtomicReaderContext context) throws IOException {
+		this.currentDocBase = context.docBase;
+		this.cacheLoadingStrategy.loadNewCacheValues( context );
+		this.delegate.setNextReader( context );
 	}
 
 	@Override
 	public Object getValue(int docId) {
 		return valuePerDocumentId[docId];
 	}
+
 }
