@@ -26,6 +26,7 @@ import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.FieldCache;
+import org.apache.lucene.search.FieldCache.Doubles;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredDocIdSet;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -106,8 +107,8 @@ public final class DistanceFilter extends Filter {
 	@Override
 	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
 		final AtomicReader atomicReader = context.reader();
-		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, getLatitudeField(), false );
-		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, getLongitudeField(), false );
+		final Doubles latitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, getLatitudeField(), false );
+		final Doubles longitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, getLongitudeField(), false );
 
 		DocIdSet docs = previousFilter.getDocIdSet( context, acceptDocs );
 
@@ -119,7 +120,7 @@ public final class DistanceFilter extends Filter {
 			@Override
 			protected boolean match(int documentIndex) {
 
-				if ( center.getDistanceTo( latitudeValues[documentIndex], longitudeValues[documentIndex] ) <= radius ) {
+				if ( center.getDistanceTo( latitudeValues.get( documentIndex ), longitudeValues.get( documentIndex ) ) <= radius ) {
 					return true;
 				}
 				else {
