@@ -105,6 +105,10 @@ public enum IndexWriterSetting implements Serializable {
 	 */
 	MERGE_CALIBRATE_BY_DELETES( "merge_calibrate_by_deletes" ) {
 		@Override
+		public Integer parseVal(String value) {
+			return MERGE_CALIBRATE_BY_DELETES.parseBoolean( value );
+		}
+		@Override
 		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
 			boolean calibrateByDeletes = intToBoolean( value );
 			logByteSizeMergePolicy.setCalibrateSizeByDeletes( calibrateByDeletes );
