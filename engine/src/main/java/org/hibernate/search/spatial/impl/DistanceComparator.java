@@ -25,6 +25,7 @@ import java.io.IOException;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.FieldCache;
+import org.apache.lucene.search.FieldCache.Doubles;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.facet.collections.IntToDoubleMap;
 
@@ -72,12 +73,14 @@ public final class DistanceComparator extends FieldComparator<Double> {
 	@Override
 	public DistanceComparator setNextReader(final AtomicReaderContext newContext) throws IOException {
 		final AtomicReader atomicReader = newContext.reader();
-		final double[] unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
-		final double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
+		final Doubles unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
+		final Doubles unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
 		this.docBase = newContext.docBase;
-		for ( int i = 0; i < unbasedLatitudeValues.length; i++ ) {
-			latitudeValues.put( this.docBase + i, unbasedLatitudeValues[i] );
-			longitudeValues.put( this.docBase + i, unbasedLongitudeValues[i] );
+		final int numDocs = atomicReader.numDocs();
+		for ( int i = 0; i < numDocs; i++ ) {
+			//TODO avoid fully copying this structure
+			latitudeValues.put( this.docBase + i, unbasedLatitudeValues.get( i ) );
+			longitudeValues.put( this.docBase + i, unbasedLongitudeValues.get( i ) );
 		}
 		return this;
 	}
