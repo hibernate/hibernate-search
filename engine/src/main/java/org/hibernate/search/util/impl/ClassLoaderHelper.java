@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -147,7 +148,6 @@ public class ClassLoaderHelper {
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * missing proper constructor, wrong type, security errors.
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription) {
 		checkClassType( classToLoad, componentDescription );
 		checkHasNoArgConstructor( classToLoad, componentDescription );
@@ -167,6 +167,11 @@ public class ClassLoaderHelper {
 							". Verify it has a no-args public constructor and is not abstract.", e
 			);
 		}
+		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad, componentDescription );
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T verifySuperTypeCompatibility(Class<T> targetSuperType, Object instance, Class<?> classToLoad, String componentDescription) {
 		if ( !targetSuperType.isInstance( instance ) ) {
 			// have a proper error message according to interface implementation or subclassing
 			if ( targetSuperType.isInterface() ) {
@@ -185,6 +190,39 @@ public class ClassLoaderHelper {
 		else {
 			return (T) instance;
 		}
+	}
+
+	/**
+	 * Creates an instance of target class having a Map of strings as constructor parameter.
+	 * Most of the Analyzer SPIs provided by Lucene have such a constructor.
+	 *
+	 * @param <T> the type of targetSuperType: defines the return type
+	 * @param targetSuperType the created instance will be checked to be assignable to this type
+	 * @param classToLoad the class to be instantiated
+	 * @param componentDescription a role name/description to contextualize error messages
+	 * @param constructorParameter a Map to be passed to the constructor. The loaded type must have such a constructor.
+	 * @return a new instance of classToLoad
+	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
+	 * missing proper constructor, wrong type, security errors.
+	 */
+	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription,
+			Map<String, String> constructorParameter) {
+		checkClassType( classToLoad, componentDescription );
+		Constructor<?> singleMapConstructor = getSingleMapConstructor( classToLoad, componentDescription );
+		if ( constructorParameter == null ) {
+			constructorParameter = Collections.emptyMap();
+		}
+		final Object instance;
+		try {
+			instance = singleMapConstructor.newInstance( constructorParameter );
+		}
+		catch (Exception e) {
+			throw new SearchException(
+					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
+							". Class or constructor is not accessible, or not accepting the expected Map argument to its constructor.", e
+			);
+		}
+		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad, componentDescription );
 	}
 
 	public static Analyzer analyzerInstanceFromClass(Class<?> classToInstantiate, Version luceneMatchVersion) {
@@ -272,6 +310,24 @@ public class ClassLoaderHelper {
 			throw new SearchException(
 					classToLoad.getName() + " defined for component " + componentDescription
 							+ " is missing a no-arguments constructor"
+			);
+		}
+	}
+
+	private static Constructor<?> getSingleMapConstructor(Class<?> classToLoad, String componentDescription) {
+		try {
+			return classToLoad.getConstructor( Map.class );
+		}
+		catch (SecurityException e) {
+			throw new SearchException(
+					classToLoad.getName() + " defined for component " + componentDescription
+							+ " could not be instantiated because of a security manager error", e
+			);
+		}
+		catch (NoSuchMethodException e) {
+			throw new SearchException(
+					classToLoad.getName() + " defined for component " + componentDescription
+							+ " is missing an appropriate constructor: expected a constructor with a single parameter of type Map"
 			);
 		}
 	}
