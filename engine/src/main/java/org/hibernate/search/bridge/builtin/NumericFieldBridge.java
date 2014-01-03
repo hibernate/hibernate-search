@@ -28,6 +28,7 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 
 /**
  * Stateless field bridges for the 4 different Numeric Field types
@@ -43,6 +44,7 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 		}
 	},
 	FLOAT_FIELD_BRIDGE {
+		@Override
 		public FieldCacheLoadingType getFieldCacheLoadingType() {
 			return FieldCacheLoadingType.FLOAT;
 		}
@@ -91,5 +93,7 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 	protected final void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
 		luceneOptions.addNumericFieldToDocument( name, value, document );
 	}
+
+	public abstract FieldCacheLoadingType getFieldCacheLoadingType();
 
 }
