@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,14 +23,12 @@
  */
 package org.hibernate.search.util.impl;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-//Fieldable was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.analysis.AnalyzerWrapper;
 
 /**
  * A <code>ScopedAnalyzer</code> is a wrapper class containing all analyzers for a given class.
@@ -40,15 +38,25 @@ import org.apache.lucene.analysis.TokenStream;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public final class ScopedAnalyzer extends Analyzer {
+public final class ScopedAnalyzer extends AnalyzerWrapper {
 
 	private Analyzer globalAnalyzer;
-	private Map<String, Analyzer> scopedAnalyzers = new HashMap<String, Analyzer>();
+	private final Map<String, Analyzer> scopedAnalyzers = new HashMap<String, Analyzer>();
 
+	/**
+	 * @deprecated let's try to make at least the default analyzer mandatory
+	 */
+	@Deprecated
 	public ScopedAnalyzer() {
+		this( null );
 	}
 
-	private ScopedAnalyzer( Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
+	public ScopedAnalyzer(Analyzer globalAnalyzer) {
+		this( globalAnalyzer, Collections.<String, Analyzer>emptyMap() );
+	}
+
+	private ScopedAnalyzer(Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
+		super( PER_FIELD_REUSE_STRATEGY );
 		this.globalAnalyzer = globalAnalyzer;
 		for ( Map.Entry<String, Analyzer> entry : scopedAnalyzers.entrySet() ) {
 			addScopedAnalyzer( entry.getKey(), entry.getValue() );
@@ -64,31 +72,14 @@ public final class ScopedAnalyzer extends Analyzer {
 	}
 
 	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		return getAnalyzer( fieldName ).tokenStream( fieldName, reader );
-	}
-
-	@Override
-	public TokenStream reusableTokenStream(String fieldName, Reader reader) throws IOException {
-		return getAnalyzer( fieldName ).reusableTokenStream( fieldName, reader );
-	}
-
-	@Override
-	public int getPositionIncrementGap( String fieldName ) {
-		return getAnalyzer( fieldName ).getPositionIncrementGap( fieldName );
-	}
-
-	@Override
-	public int getOffsetGap(Fieldable field) {
-		return getAnalyzer( field.name() ).getOffsetGap( field );
-	}
-
-	private Analyzer getAnalyzer( String fieldName ) {
-		Analyzer analyzer = scopedAnalyzers.get( fieldName );
+	protected Analyzer getWrappedAnalyzer(String fieldName) {
+		final Analyzer analyzer = scopedAnalyzers.get( fieldName );
 		if ( analyzer == null ) {
-			analyzer = globalAnalyzer;
+			return globalAnalyzer;
 		}
-		return analyzer;
+		else {
+			return analyzer;
+		}
 	}
 
 	@Override
@@ -96,4 +87,5 @@ public final class ScopedAnalyzer extends Analyzer {
 		ScopedAnalyzer clone = new ScopedAnalyzer( globalAnalyzer, scopedAnalyzers );
 		return clone;
 	}
+
 }
