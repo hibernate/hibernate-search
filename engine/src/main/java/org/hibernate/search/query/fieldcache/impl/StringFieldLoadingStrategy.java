@@ -21,6 +21,8 @@ package org.hibernate.search.query.fieldcache.impl;
 
 import java.io.IOException;
 
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.FieldCache;
 
@@ -41,7 +43,8 @@ public final class StringFieldLoadingStrategy implements FieldLoadingStrategy {
 	}
 
 	@Override
-	public void loadNewCacheValues(IndexReader reader) throws IOException {
+	public void loadNewCacheValues(AtomicReaderContext context) throws IOException {
+		final AtomicReader reader = context.reader();
 		currentCache = FieldCache.DEFAULT.getStrings( reader, fieldName );
 	}
 
