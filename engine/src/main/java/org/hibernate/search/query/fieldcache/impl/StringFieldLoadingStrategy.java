@@ -1,6 +1,8 @@
 /*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
  * JBoss, Home of Professional Open Source
- * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2011-2014 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -23,8 +25,9 @@ import java.io.IOException;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.search.FieldCache;
+import org.apache.lucene.util.BytesRef;
 
 /**
  * We need a collection of similar implementations, one per each FieldCache.DEFAULT.accessmethod
@@ -35,8 +38,9 @@ import org.apache.lucene.search.FieldCache;
  * @see FieldLoadingStrategy
  */
 public final class StringFieldLoadingStrategy implements FieldLoadingStrategy {
+
 	private final String fieldName;
-	private String[] currentCache;
+	private BinaryDocValues currentCache;
 
 	public StringFieldLoadingStrategy(String fieldName) {
 		this.fieldName = fieldName;
@@ -45,11 +49,14 @@ public final class StringFieldLoadingStrategy implements FieldLoadingStrategy {
 	@Override
 	public void loadNewCacheValues(AtomicReaderContext context) throws IOException {
 		final AtomicReader reader = context.reader();
-		currentCache = FieldCache.DEFAULT.getStrings( reader, fieldName );
+		currentCache = FieldCache.DEFAULT.getTerms( reader, fieldName, false );
 	}
 
 	@Override
 	public String collect(int relativeDocId) {
-		return currentCache[relativeDocId];
+		final BytesRef term = new BytesRef();
+		currentCache.get( relativeDocId, term );
+		return term.utf8ToString();
 	}
+
 }

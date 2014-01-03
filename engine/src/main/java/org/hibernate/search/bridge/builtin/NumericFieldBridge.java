@@ -28,6 +28,7 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 
 /**
  * Stateless field bridges for the 4 different Numeric Field types
@@ -41,11 +42,19 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 		protected void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
 			luceneOptions.addIntFieldToDocument( name, value.intValue(), document );
 		}
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.INT;
+		}
 	},
 	FLOAT_FIELD_BRIDGE {
 		@Override
 		protected void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
 			luceneOptions.addFloatFieldToDocument( name, value.floatValue(), document );
+		}
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.FLOAT;
 		}
 	},
 	DOUBLE_FIELD_BRIDGE {
@@ -53,11 +62,19 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 		protected void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
 			luceneOptions.addDoubleFieldToDocument( name, value.doubleValue(), document );
 		}
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.DOUBLE;
+		}
 	},
 	LONG_FIELD_BRIDGE {
 		@Override
 		protected void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
 			luceneOptions.addLongFieldToDocument( name, value.longValue(), document );
+		}
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.LONG;
 		}
 	};
 
@@ -90,5 +107,7 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 	}
 
 	protected abstract void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document);
+
+	public abstract FieldCacheLoadingType getFieldCacheLoadingType();
 
 }
