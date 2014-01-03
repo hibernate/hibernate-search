@@ -1,46 +1,95 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * JBoss, Home of Professional Open Source
- * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
- * as indicated by the @authors tag. All rights reserved.
- * See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
  *
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
  */
 package org.hibernate.search.bridge.builtin;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
 /**
- * Bridge to index numeric values using a Trie structure (multiple terms representing different precisions)
+ * Stateless field bridges for the 4 different Numeric Field types
  *
- * @author Gustavo Fernandes
+ * @author Sanne Grinovero
  */
-public abstract class NumericFieldBridge implements TwoWayFieldBridge {
+public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
+
+	INT_FIELD_BRIDGE {
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.INT;
+		}
+	},
+	FLOAT_FIELD_BRIDGE {
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.FLOAT;
+		}
+	},
+	DOUBLE_FIELD_BRIDGE {
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.DOUBLE;
+		}
+	},
+	LONG_FIELD_BRIDGE {
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.LONG;
+		}
+	};
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		if ( value != null ) {
-			luceneOptions.addNumericFieldToDocument( name, value, document );
+		if ( value == null ) {
+			if ( luceneOptions.indexNullAs() != null ) {
+				luceneOptions.addFieldToDocument( name, luceneOptions.indexNullAs(), document );
+			}
+		}
+		else {
+			applyToLuceneOptions( luceneOptions, name, (Number)value, document );
 		}
 	}
 
 	@Override
-	public String objectToString(Object object) {
+	public final String objectToString(final Object object) {
 		return object.toString();
+	}
+
+	@Override
+	public final Object get(final String name, final Document document) {
+		final IndexableField field = document.getField( name );
+		if ( field != null ) {
+			return field.numericValue();
+		}
+		else {
+			return null;
+		}
+	}
+
+	protected final void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
+		luceneOptions.addNumericFieldToDocument( name, value, document );
 	}
 
 }
