@@ -23,8 +23,7 @@ package org.hibernate.search.indexes.serialization.spi;
 import java.util.List;
 import java.util.Map;
 
-//Fieldable was removed in Lucene 4 with no alternative replacement
-
+import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.LuceneWork;
 
 /**
@@ -63,7 +62,7 @@ public interface Serializer {
 
 	byte[] serialize();
 
-	void fields(List<Fieldable> fields);
+	void fields(List<IndexableField> fields);
 
 	void addIntNumericField(int value, LuceneNumericFieldContext context);
 
@@ -83,5 +82,6 @@ public interface Serializer {
 
 	void addFieldWithSerializableFieldable(byte[] fieldable);
 
-	void addDocument(float boost);
+	void addDocument();
+
 }
