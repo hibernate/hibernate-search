@@ -61,21 +61,20 @@ public class LuceneOptionsImpl implements LuceneOptions {
 
 	private final boolean storeCompressed;
 	private final boolean storeUncompressed;
+	private boolean documentBoostApplied = false; //needs to be applied only once
+	private final float fieldLevelBoost;
+	private final float documentLevelBoost;
 	private final Index indexMode;
 	private final TermVector termVector;
-	private final float boost;
 	private final Store storeType;
 	private final int precisionStep;
 	private final String indexNullAs;
 
-	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata) {
-		this( fieldMetadata, fieldMetadata.getBoost() );
-	}
-
-	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float boost) {
+	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float fieldLevelBoost, float documentLevelBoost) {
+		this.documentLevelBoost = documentLevelBoost;
 		this.indexMode = fieldMetadata.getIndex();
 		this.termVector = fieldMetadata.getTermVector();
-		this.boost = boost;
+		this.fieldLevelBoost = fieldLevelBoost;
 		this.storeType = fieldMetadata.getStore();
 		this.storeCompressed = this.storeType.equals( Store.COMPRESS );
 		this.storeUncompressed = this.storeType.equals( Store.YES );
@@ -111,7 +110,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 
 	@Override
 	public float getBoost() {
-		return boost;
+		return fieldLevelBoost;
 	}
 
 	@Override
@@ -152,7 +151,16 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		 * ({@link IndexableFieldType#omitNorms()} returns true).
 		 */
 		if ( indexMode.isIndexed() && ! indexMode.omitNorms() ) {
-			field.setBoost( boost );
+			if ( documentBoostApplied == false ) {
+				documentBoostApplied = true;
+				//FIXME This isn't entirely accurate as in some cases the LuceneOptionsImpl
+				//is being reused for multiple fields: this needs to be significantly different,
+				//potentially dropping the LuceneOptionsImpl usage.
+				field.setBoost( fieldLevelBoost * documentLevelBoost );
+			}
+			else {
+				field.setBoost( fieldLevelBoost );
+			}
 		}
 	}
 

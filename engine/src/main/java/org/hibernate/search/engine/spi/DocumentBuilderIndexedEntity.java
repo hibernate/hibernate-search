@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexableField;
 //Fieldable was removed in Lucene 4 with no alternative replacement
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -97,7 +98,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				)
 						.boost( 1F )
 						.build();
-		NULL_EMBEDDED_MARKER_OPTIONS = new LuceneOptionsImpl( fieldMetadata );
+		NULL_EMBEDDED_MARKER_OPTIONS = new LuceneOptionsImpl( fieldMetadata, 1f, 1f );
 	}
 
 	/**
@@ -365,7 +366,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		Document doc = new Document();
 		getInstanceInitializer().getClass( instance );
 		final Class<?> entityType = objectInitializer.getClass( instance );
-		doc.setBoost( getMetadata().getClassBoost( instance ) );
+		final float documentLevelBoost = getMetadata().getClassBoost( instance );
 
 		// add the class name of the entity to the document
 		Field classField =
@@ -381,7 +382,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		// now add the entity id to the document
 		DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
 
-		LuceneOptions luceneOptions = new LuceneOptionsImpl( idFieldMetaData );
+		LuceneOptions luceneOptions = new LuceneOptionsImpl( idFieldMetaData, idFieldMetaData.getBoost(), documentLevelBoost );
 		final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( getIdBridge() );
 		conversionContext.setClass( entityType );
 		conversionContext.pushProperty( idFieldMetaData.getName() );
@@ -402,7 +403,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				fieldToAnalyzerMap,
 				processedFieldNames,
 				conversionContext,
-				objectInitializer
+				objectInitializer,
+				documentLevelBoost
 		);
 		return doc;
 	}
@@ -413,7 +415,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			Map<String, String> fieldToAnalyzerMap,
 			Set<String> processedFieldNames,
 			ConversionContext conversionContext,
-			InstanceInitializer objectInitializer) {
+			InstanceInitializer objectInitializer,
+			final float documentBoost) {
 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
@@ -429,7 +432,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 						fieldName,
 						unproxiedInstance,
 						doc,
-						typeMetadata.getClassLuceneOptions( fieldMetadata )
+						typeMetadata.getClassLuceneOptions( fieldMetadata, documentBoost )
 				);
 			}
 			finally {
@@ -470,7 +473,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 							fieldName,
 							currentFieldValue,
 							doc,
-							typeMetadata.getFieldLuceneOptions( propertyMetadata, fieldMetadata, currentFieldValue )
+							typeMetadata.getFieldLuceneOptions( propertyMetadata, fieldMetadata, currentFieldValue, documentBoost )
 					);
 				}
 			}
@@ -508,7 +511,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									fieldToAnalyzerMap,
 									processedFieldNames,
 									conversionContext,
-									objectInitializer
+									objectInitializer,
+									documentBoost
 							);
 						}
 						break;
@@ -522,7 +526,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									fieldToAnalyzerMap,
 									processedFieldNames,
 									conversionContext,
-									objectInitializer
+									objectInitializer,
+									documentBoost
 							);
 						}
 						break;
@@ -536,7 +541,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 									fieldToAnalyzerMap,
 									processedFieldNames,
 									conversionContext,
-									objectInitializer
+									objectInitializer,
+									documentBoost
 							);
 						}
 						break;
@@ -548,7 +554,8 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 								fieldToAnalyzerMap,
 								processedFieldNames,
 								conversionContext,
-								objectInitializer
+								objectInitializer,
+								documentBoost
 						);
 						break;
 					default:
@@ -614,8 +621,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		// now we give the discriminator the opportunity to specify a analyzer per field level
-		for ( Object o : doc.getFields() ) {
-			Fieldable field = (Fieldable) o;
+		for ( IndexableField field : doc.getFields() ) {
 			if ( !processedFieldNames.contains( field.name() ) ) {
 				String analyzerName = discriminator.getAnalyzerDefinitionName( value, unproxiedInstance, field.name() );
 				if ( analyzerName != null ) {

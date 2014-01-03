@@ -246,16 +246,17 @@ public class TypeMetadata {
 		stateInspectionOptimizationsEnabled = false;
 	}
 
-	public LuceneOptions getClassLuceneOptions(DocumentFieldMetadata fieldMetadata) {
-		return new LuceneOptionsImpl( fieldMetadata );
+	public LuceneOptions getClassLuceneOptions(DocumentFieldMetadata fieldMetadata, float documentLevelBoost) {
+		return new LuceneOptionsImpl( fieldMetadata, 1f, documentLevelBoost );
 	}
 
 	public LuceneOptions getFieldLuceneOptions(PropertyMetadata propertyMetadata,
 			DocumentFieldMetadata fieldMetadata,
-			Object value) {
+			Object value, float documentBoost) {
 		return new LuceneOptionsImpl(
 				fieldMetadata,
-				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value )
+				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value ),
+				documentBoost
 		);
 	}
 
