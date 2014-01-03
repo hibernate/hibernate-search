@@ -44,6 +44,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.index.IndexableField;
 //Fieldable was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
@@ -198,7 +199,7 @@ public class AvroSerializer implements Serializer {
 	}
 
 	@Override
-	public void fields(List<Fieldable> fields) {
+	public void fields(List<IndexableField> fields) {
 		fieldables = new ArrayList<GenericRecord>( fields.size() );
 	}
 
@@ -365,9 +366,8 @@ public class AvroSerializer implements Serializer {
 	}
 
 	@Override
-	public void addDocument(float boost) {
+	public void addDocument() {
 		document = new GenericData.Record( protocol.getType( "Document" ) );
-		document.put( "boost", boost );
 		document.put( "fieldables", fieldables );
 	}
 

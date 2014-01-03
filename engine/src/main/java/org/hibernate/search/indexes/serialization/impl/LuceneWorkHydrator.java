@@ -34,7 +34,12 @@ import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
 //Fieldable was removed in Lucene 4 with no alternative replacement
 //NumericField was removed in Lucene 4 with no alternative replacement
 //Payload was removed in Lucene 4 with no alternative replacement
@@ -172,8 +177,9 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void defineDocument(float boost) {
-		getLuceneDocument().setBoost( boost );
+	public void defineDocument() {
+		//Document level boost is not available anymore: is this method still needed?
+		getLuceneDocument();
 	}
 
 	@Override
@@ -183,80 +189,48 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		NumericField numField = buildNumericField(
-				name,
-				precisionStep,
-				store,
-				indexed,
-				boost,
-				omitNorms,
-				omitTermFreqAndPositions
-		);
-		numField.setIntValue( value );
+		final FieldType type = buildFieldType( precisionStep, store, indexed, omitNorms, omitTermFreqAndPositions );
+		final IntField numField = new IntField( name, value, type );
+		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
 	public void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		NumericField numField = buildNumericField(
-				name,
-				precisionStep,
-				store,
-				indexed,
-				boost,
-				omitNorms,
-				omitTermFreqAndPositions
-		);
-		numField.setLongValue( value );
+		final FieldType type = buildFieldType( precisionStep, store, indexed, omitNorms, omitTermFreqAndPositions );
+		final LongField numField = new LongField( name, value, type );
+		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
 	public void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		NumericField numField = buildNumericField(
-				name,
-				precisionStep,
-				store,
-				indexed,
-				boost,
-				omitNorms,
-				omitTermFreqAndPositions
-		);
-		numField.setFloatValue( value );
-		getLuceneDocument().add( numField );
-	}
-
-	private NumericField buildNumericField(String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		NumericField numField = new NumericField(
-				name,
-				precisionStep,
-				getStore( store ),
-				indexed
-		);
+		final FieldType type = buildFieldType( precisionStep, store, indexed, omitNorms, omitTermFreqAndPositions );
+		final FloatField numField = new FloatField( name, value, type );
 		numField.setBoost( boost );
-		numField.setOmitNorms( omitNorms );
-		if ( omitTermFreqAndPositions ) {
-			numField.setIndexOptions( IndexOptions.DOCS_ONLY );
-		}
-		else {
-			numField.setIndexOptions( IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
-		}
-		return numField;
+		getLuceneDocument().add( numField );
 	}
 
 	@Override
 	public void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		NumericField numField = buildNumericField(
-				name,
-				precisionStep,
-				store,
-				indexed,
-				boost,
-				omitNorms,
-				omitTermFreqAndPositions
-		);
-		numField.setDoubleValue( value );
+		final FieldType type = buildFieldType( precisionStep, store, indexed, omitNorms, omitTermFreqAndPositions );
+		final DoubleField numField = new DoubleField( name, value, type );
+		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
+	}
+
+	/*
+	 * TODO FieldType has several more attributes currently ignored. This is temporarily meant to not break too much Lucene 3x code.
+	 * Also: if we move to a static index schema serializing the field attributes should be unnecessary.
+	 */
+	private FieldType buildFieldType(int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		final FieldType type = new FieldType();
+		type.setNumericPrecisionStep( precisionStep );
+		type.setStored( store == SerializableStore.YES );
+		type.setIndexOptions( omitTermFreqAndPositions ? IndexOptions.DOCS_AND_FREQS : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
+		type.setOmitNorms( omitNorms );
+		type.setIndexed( indexed );
+		return type;
 	}
 
 	@Override
