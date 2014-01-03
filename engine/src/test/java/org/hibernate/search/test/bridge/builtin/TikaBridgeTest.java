@@ -77,7 +77,7 @@ public class TikaBridgeTest {
 				new DocumentFieldMetadata.Builder( null, Store.YES, Field.Index.ANALYZED, Field.TermVector.NO )
 						.boost( 0F )
 						.build();
-		options = new LuceneOptionsImpl( fieldMetadata );
+		options = new LuceneOptionsImpl( fieldMetadata, 1f, 1f );
 
 		CustomTikaMetadataProcessor.invocationCount = 0;
 		CustomTikaParseContextProvider.invocationCount = 0;

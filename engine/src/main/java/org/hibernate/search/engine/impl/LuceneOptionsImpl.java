@@ -70,6 +70,11 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	private final int precisionStep;
 	private final String indexNullAs;
 
+	@Deprecated
+	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata) {
+		this( fieldMetadata, 1f, 1f );
+	}
+
 	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float fieldLevelBoost, float documentLevelBoost) {
 		this.documentLevelBoost = documentLevelBoost;
 		this.indexMode = fieldMetadata.getIndex();
