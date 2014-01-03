@@ -24,9 +24,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 //TermDocs was removed in Lucene 4 with no alternative replacement
@@ -34,6 +37,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.index.ReaderUtil;
 import org.hibernate.search.annotations.DocumentId;
@@ -44,6 +48,8 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.reader.impl.ManagedMultiReader;
+import org.hibernate.search.reader.impl.ReaderProviderHelper;
 import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.TestForIssue;
@@ -160,8 +166,7 @@ public class FreshReadersProvidedTest {
 		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
 		IndexReader currentIndexReader = searchFactory.getIndexReaderAccessor().open( Guest.class );
 		try {
-			List<IndexReader> allSubReaders = new ArrayList<IndexReader>();
-			ReaderUtil.gatherSubReaders( allSubReaders, currentIndexReader );
+			List<IndexReader> allSubReaders = ReaderProviderHelper.getSubIndexReaders( (ManagedMultiReader) currentIndexReader );
 			for ( IndexReader ir : allSubReaders ) {
 				Assert.assertTrue( filter.visitedReaders.contains( ir ) );
 			}

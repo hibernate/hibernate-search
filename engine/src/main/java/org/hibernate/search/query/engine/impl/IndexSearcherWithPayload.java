@@ -67,15 +67,13 @@ public class IndexSearcherWithPayload {
 	 * @param searchFactoryImplementor
 	 */
 	public void closeSearcher(Object query, SearchFactoryImplementor searchFactoryImplementor) {
-		Set<IndexReader> indexReaders = getIndexReaders( getSearcher() );
-		for ( IndexReader indexReader : indexReaders ) {
-			try {
-				MultiReaderFactory.closeReader( indexReader );
-			}
-			catch (SearchException e) {
-				//catch is inside the for loop to make sure we try to close all of them
-				log.unableToCloseSearcherDuringQuery( query.toString(), e );
-			}
+		final IndexReader indexReader = getSearcher().getIndexReader();
+		try {
+			MultiReaderFactory.closeReader( indexReader );
+		}
+		catch (SearchException e) {
+			log.unableToCloseSearcherDuringQuery( query.toString(), e );
 		}
 	}
+
 }
