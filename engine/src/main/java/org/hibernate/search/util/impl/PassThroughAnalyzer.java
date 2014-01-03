@@ -26,9 +26,7 @@ package org.hibernate.search.util.impl;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.util.CharTokenizer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.util.Version;
+import org.apache.lucene.analysis.core.KeywordTokenizer;
 
 /**
  * Analyzer that applies no operation whatsoever to the flux
@@ -38,57 +36,19 @@ import org.apache.lucene.util.Version;
  * reimplementing TokenStream to take the Reader and pass through the flux as a single token
  *
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public final class PassThroughAnalyzer extends Analyzer {
 
-	private final Version luceneVersion;
-
 	/**
 	 * Create a new PassThroughAnalyzer.
-	 *
-	 * @param luceneVersion
 	 */
-	public PassThroughAnalyzer(Version luceneVersion) {
-		this.luceneVersion = luceneVersion;
+	public PassThroughAnalyzer() {
 	}
 
 	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		if ( luceneVersion.onOrAfter( Version.LUCENE_31 ) ) {
-			return new PassThroughTokenizer( luceneVersion, reader );
-		}
-		else {
-			return new Pre31PassThroughTokenizer( luceneVersion, reader );
-		}
+	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+		return new TokenStreamComponents( new KeywordTokenizer( reader ) );
 	}
 
-	/**
-	 * To be used when Lucene's Version >= 3.1
-	 * @since 4.2
-	 */
-	private static class PassThroughTokenizer extends CharTokenizer {
-		public PassThroughTokenizer(Version luceneVersion, Reader input) {
-			super( luceneVersion, input );
-		}
-		@Override
-		protected boolean isTokenChar(int c) {
-			return true;
-		}
-	}
-
-	/**
-	 * To be used when Lucene's Version < 3.1
-	 * @since 4.2
-	 */
-	private static class Pre31PassThroughTokenizer extends CharTokenizer {
-		public Pre31PassThroughTokenizer(Version luceneVersion, Reader input) {
-			super( luceneVersion, input );
-		}
-
-		//@Override not really: will be removed in Lucene 4.0
-		@Override
-		protected boolean isTokenChar(char c) {
-			return true;
-		}
-	}
 }

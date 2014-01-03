@@ -33,7 +33,6 @@ import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.util.Version;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
@@ -391,8 +390,7 @@ public class TypeMetadata {
 		public Builder(Class<?> indexedType, ConfigContext configContext, ScopedAnalyzer scopedAnalyzer) {
 			this.indexedType = indexedType;
 			this.scopedAnalyzer = scopedAnalyzer;
-			Version luceneVersion = configContext.getLuceneMatchVersion();
-			this.passThroughAnalyzer = new PassThroughAnalyzer( luceneVersion );
+			this.passThroughAnalyzer = new PassThroughAnalyzer();
 		}
 
 		public Builder idProperty(PropertyMetadata propertyMetadata) {
