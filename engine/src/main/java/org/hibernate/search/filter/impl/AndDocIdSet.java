@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.OpenBitSet;
 
 import static java.lang.Math.max;
@@ -78,7 +79,7 @@ public class AndDocIdSet extends DocIdSet {
 			DocIdSetIterator docIdSetIterator = andedDocIdSets.get( i ).iterator();
 			if ( docIdSetIterator == null ) {
 				// the Lucene API permits to return null on any iterator for empty matches
-				return DocIdSet.EMPTY_DOCIDSET;
+				return EMPTY_DOCIDSET;
 			}
 			iterators[i] = docIdSetIterator;
 		}
@@ -94,7 +95,7 @@ public class AndDocIdSet extends DocIdSet {
 		int targetPosition = findFirstTargetPosition( iterators, result );
 
 		if ( targetPosition == DocIdSetIterator.NO_MORE_DOCS ) {
-			return DocIdSet.EMPTY_DOCIDSET;
+			return EMPTY_DOCIDSET;
 		}
 
 		// Each iterator can vote "ok" for the current target to
@@ -165,4 +166,23 @@ public class AndDocIdSet extends DocIdSet {
 
 		return targetPosition;
 	}
+
+	private static final DocIdSet EMPTY_DOCIDSET = new DocIdSet() {
+
+		@Override
+		public DocIdSetIterator iterator() {
+			return DocIdSetIterator.empty();
+		}
+
+		@Override
+		public boolean isCacheable() {
+			return true;
+		}
+
+		@Override
+		public Bits bits() {
+			return null;
+		}
+	};
+
 }
