@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -77,6 +78,8 @@ public class IndexManagerHolder {
 	private static final String SHARDING_STRATEGY = "sharding_strategy";
 	private static final String NBR_OF_SHARDS = SHARDING_STRATEGY + ".nbr_of_shards";
 	private static final String INDEX_SHARD_ID_SEPARATOR = ".";
+
+	private static final Similarity DEFAULT_SIMILARITY = new DefaultSimilarity();
 
 	private final Map<String, IndexManager> indexManagersRegistry = new ConcurrentHashMap<String, IndexManager>();
 
@@ -436,7 +439,7 @@ public class IndexManagerHolder {
 		else {
 			String defaultSimilarityClassName = cfg.getProperty( Environment.SIMILARITY_CLASS );
 			if ( StringHelper.isEmpty( defaultSimilarityClassName ) ) {
-				return Similarity.getDefault();
+				return DEFAULT_SIMILARITY;
 			}
 			else {
 				return ClassLoaderHelper.instanceFromName(
