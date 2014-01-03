@@ -89,7 +89,7 @@ final class Helper {
 					"pass String parameters" );
 		}
 		Reader reader = new StringReader(localText);
-		TokenStream stream = analyzer.reusableTokenStream( fieldName, reader);
+		TokenStream stream = analyzer.tokenStream( fieldName, reader);
 		CharTermAttribute attribute = stream.addAttribute( CharTermAttribute.class );
 		stream.reset();
 
