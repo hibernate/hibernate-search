@@ -24,6 +24,7 @@
 package org.hibernate.search.bridge.builtin.impl;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
 //Fieldable was removed in Lucene 4 with no alternative replacement
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
@@ -51,7 +52,7 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 
 	@Override
 	public Object get(String name, Document document) {
-		Fieldable field = document.getFieldable( name );
+		final IndexableField field = document.getField( name );
 		if ( field == null ) {
 			return stringBridge.stringToObject( null );
 		}
