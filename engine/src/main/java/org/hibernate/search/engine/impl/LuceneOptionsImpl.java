@@ -29,11 +29,11 @@ import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.TermVector;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
-import org.apache.lucene.index.IndexableFieldType;
-
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
@@ -48,6 +48,16 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
  * @author Gustavo Fernandes
  */
 public class LuceneOptionsImpl implements LuceneOptions {
+
+	private static final FieldType TYPE_COMPRESSED = new FieldType();
+	static {
+		TYPE_COMPRESSED.setIndexed( false );
+		TYPE_COMPRESSED.setTokenized( false );
+		TYPE_COMPRESSED.setOmitNorms( true );
+		TYPE_COMPRESSED.setIndexOptions( IndexOptions.DOCS_ONLY );
+		TYPE_COMPRESSED.setStored( true );
+		TYPE_COMPRESSED.freeze();
+	}
 
 	private final boolean storeCompressed;
 	private final boolean storeUncompressed;
@@ -87,17 +97,15 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	}
 
 	private void standardFieldAdd(String name, String indexedString, Document document) {
-		Field field = new Field(
-				name, true, indexedString, storeUncompressed ? Field.Store.YES : Field.Store.NO, indexMode, termVector
-		);
-		field.setBoost( boost );
+		Field field = new Field( name, indexedString, storeUncompressed ? Field.Store.YES : Field.Store.NO, indexMode, termVector );
+		setBoost( field );
 		document.add( field );
 	}
 
 	private void compressedFieldAdd(String name, String indexedString, Document document) {
 		byte[] compressedString = CompressionTools.compressString( indexedString );
 		// indexed is implicitly set to false when using byte[]
-		Field field = new Field( name, compressedString );
+		Field field = new Field( name, compressedString, TYPE_COMPRESSED );
 		document.add( field );
 	}
 
