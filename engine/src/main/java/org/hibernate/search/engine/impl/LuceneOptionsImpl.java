@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -25,15 +25,19 @@ package org.hibernate.search.engine.impl;
 
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.TermVector;
-//NumericField was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.index.IndexableFieldType;
+
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 
 /**
@@ -78,24 +82,6 @@ public class LuceneOptionsImpl implements LuceneOptions {
 			}
 			if ( storeCompressed ) {
 				compressedFieldAdd( name, indexedString, document );
-			}
-		}
-	}
-
-	@Override
-	public void addNumericFieldToDocument(String fieldName, Object value, Document document) {
-		if ( storeType == Store.COMPRESS ) {
-			throw new SearchException( "Error indexing field " + fieldName + ", @NumericField cannot be compressed" );
-		}
-		if ( value != null ) {
-			NumericField numericField = new NumericField(
-					fieldName, precisionStep, storeType != Store.NO ? Field.Store.YES : Field.Store.NO, true
-			);
-			NumericFieldUtils.setNumericValue( value, numericField );
-			numericField.setBoost( boost );
-
-			if ( numericField.getNumericValue() != null ) {
-				document.add( numericField );
 			}
 		}
 	}
@@ -149,4 +135,56 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	public TermVector getTermVector() {
 		return this.termVector;
 	}
+
+	private void setBoost(Field field) {
+		/**
+		 * MEMO from the Apache Lucene documentation:
+		 * It is illegal to return a boost other than 1.0f for a field that is not
+		 * indexed ({@link IndexableFieldType#indexed()} is false) or omits normalization values
+		 * ({@link IndexableFieldType#omitNorms()} returns true).
+		 */
+		if ( indexMode.isIndexed() && ! indexMode.omitNorms() ) {
+			field.setBoost( boost );
+		}
+	}
+
+	private void checkNotCompressed(final String fieldName) {
+		//TODO this sanity check should be done at bootstrap, not runtime
+		if ( storeType == Store.COMPRESS ) {
+			throw new SearchException( "Error indexing field " + fieldName + ", @NumericField cannot be compressed" );
+		}
+	}
+
+	@Override
+	public void addDoubleFieldToDocument(String fieldName, double doubleValue, Document document) {
+		checkNotCompressed( fieldName );
+		DoubleField field = new DoubleField( fieldName, doubleValue, storeType != Store.NO ? Field.Store.YES : Field.Store.NO );
+		setBoost( field );
+		document.add( field );
+	}
+
+	@Override
+	public void addFloatFieldToDocument(String fieldName, float floatValue, Document document) {
+		checkNotCompressed( fieldName );
+		FloatField field = new FloatField( fieldName, floatValue, storeType != Store.NO ? Field.Store.YES : Field.Store.NO );
+		setBoost( field );
+		document.add( field );
+	}
+
+	@Override
+	public void addIntFieldToDocument(String fieldName, int intValue, Document document) {
+		checkNotCompressed( fieldName );
+		IntField field = new IntField( fieldName, intValue, storeType != Store.NO ? Field.Store.YES : Field.Store.NO );
+		setBoost( field );
+		document.add( field );
+	}
+
+	@Override
+	public void addLongFieldToDocument(String fieldName, long longValue, Document document) {
+		checkNotCompressed( fieldName );
+		LongField field = new LongField( fieldName, longValue, storeType != Store.NO ? Field.Store.YES : Field.Store.NO );
+		setBoost( field );
+		document.add( field );
+	}
+
 }

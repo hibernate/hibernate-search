@@ -68,16 +68,6 @@ public interface LuceneOptions {
 	void addFieldToDocument(String fieldName, String indexedString, Document document);
 
 	/**
-	 * Add a new NumericField with the name {@code fieldName} to the Lucene Document {@code document}
-	 * using the value {@code numericValue}. If the value is not numeric then the field is not added to the document
-	 *
-	 * @param fieldName The name of the field
-	 * @param numericValue The numeric value, either an Int, Long, Float or Double
-	 * @param document the document to which to add the the new field
-	 */
-	void addNumericFieldToDocument(String fieldName, Object numericValue, Document document);
-
-	/**
 	 * Prefer the use of {@link #addFieldToDocument(String, String, org.apache.lucene.document.Document)}
 	 * over manually building your Field objects and adding them to the Document.
 	 *
@@ -137,4 +127,14 @@ public interface LuceneOptions {
 	 *         been specified.
 	 */
 	String indexNullAs();
+
+	/*
+	 * TODO discuss following methods
+	 */
+
+	void addDoubleFieldToDocument(String name, double value, Document document);
+	void addFloatFieldToDocument(String name, float floatValue, Document document);
+	void addIntFieldToDocument(String name, int intValue, Document document);
+	void addLongFieldToDocument(String name, long longValue, Document document);
+
 }

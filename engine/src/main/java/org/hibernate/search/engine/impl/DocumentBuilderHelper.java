@@ -30,6 +30,8 @@ import java.util.zip.DataFormatException;
 
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.util.BytesRef;
 //Fieldable was removed in Lucene 4 with no alternative replacement
 //NumericField was removed in Lucene 4 with no alternative replacement
 import org.hibernate.search.SearchException;
@@ -216,7 +218,7 @@ public final class DocumentBuilderHelper {
 			if ( result[index] == NOT_SET ) {
 				result[index] = null; // make sure we never return NOT_SET
 				if ( document != null ) {
-					Fieldable field = document.getFieldable( fields[index] );
+					IndexableField field = document.getField( fields[index] );
 					if ( field != null ) {
 						result[index] = extractObjectFromFieldable( field );
 					}
@@ -225,19 +227,31 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-	public static Object extractObjectFromFieldable(Fieldable field) {
-		if ( field instanceof NumericField ) {
-			return NumericField.class.cast( field ).getNumericValue();
+	/**
+	 * @deprecated we should know the projection rules from the metadata rather than guess from the field properties
+	 */
+	@Deprecated
+	public static Object extractObjectFromFieldable(IndexableField field) {
+		//TODO remove this guess work
+		final Number numericValue = field.numericValue();
+		if ( numericValue != null ) {
+			return numericValue;
 		}
 		else {
 			return extractStringFromFieldable( field );
 		}
 	}
 
-	public static String extractStringFromFieldable(Fieldable field) {
-		if ( field.isBinary() ) {
+	/**
+	 * @deprecated we should know the projection rules from the metadata rather than guess from the field properties
+	 */
+	@Deprecated
+	public static String extractStringFromFieldable(IndexableField field) {
+		final BytesRef binaryValue = field.binaryValue();
+		//TODO remove this guess work
+		if ( binaryValue != null ) {
 			try {
-				return CompressionTools.decompressString( field.getBinaryValue() );
+				return CompressionTools.decompressString( binaryValue );
 			}
 			catch (DataFormatException e) {
 				throw log.fieldLooksBinaryButDecompressionFailed( field.name() );

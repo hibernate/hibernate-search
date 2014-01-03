@@ -21,6 +21,7 @@
 package org.hibernate.search.bridge.builtin;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.bridge.LuceneOptions;
 
 /**
  * Long numeric field bridge, capable of decoding long values from Field
@@ -30,7 +31,11 @@ import org.apache.lucene.document.Document;
 public class LongNumericFieldBridge extends NumericFieldBridge {
 
 	@Override
-	public Object get(String name, Document document) {
-		return Long.valueOf( document.getFieldable( name ).stringValue() );
+	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+		if ( value != null ) {
+			//TODO avoid autoboxing if we can figure out a better way
+			luceneOptions.addLongFieldToDocument( name, ((Long)value).longValue(), document );
+		}
 	}
+
 }
