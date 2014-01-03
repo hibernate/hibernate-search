@@ -24,47 +24,27 @@
 package org.hibernate.search.reader.impl;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.spi.ReaderProvider;
-import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * @deprecated Most of these methods are no longer in use, with some trivial exceptions: this class will be removed soon!
+ *
  * @author Emmanuel Bernard
  */
+@Deprecated //TODO remove this or move to testing utilities
 public abstract class ReaderProviderHelper {
 
 	private static final Log log = LoggerFactory.make();
-
-	private static final Field subReadersField = getSubReadersField();
-
-	private static Field getSubReadersField() {
-		try {
-			Field field = MultiReader.class.getDeclaredField( "subReaders" );
-			ReflectionHelper.setAccessible( field );
-			return field;
-		}
-		catch (NoSuchFieldException e) {
-			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not available", e );
-		}
-	}
-
-	public static IndexReader[] getSubReadersFromMultiReader(MultiReader parentReader) {
-		try {
-			return (IndexReader[]) subReadersField.get( parentReader );
-		}
-		catch (IllegalAccessException e) {
-			throw new SearchException( "Incompatible version of Lucene: MultiReader.subReaders not accessible", e );
-		}
-	}
 
 	public static IndexReader buildMultiReader(int length, IndexReader[] readers, ReaderProvider[] managers) {
 		if ( length == 0 ) {
@@ -72,7 +52,7 @@ public abstract class ReaderProviderHelper {
 		}
 		else {
 			//everything should be the same so wrap in an MultiReader
-			return new CacheableMultiReader( readers, managers );
+			return new ManagedMultiReader( readers, managers );
 		}
 	}
 
@@ -114,6 +94,11 @@ public abstract class ReaderProviderHelper {
 		return readers;
 	}
 
+	public static List<IndexReader> getSubIndexReaders(ManagedMultiReader indexReader) {
+		ManagedMultiReader multiReader = (ManagedMultiReader) indexReader;
+		return Arrays.asList( multiReader.subReaders );
+	}
+
 	/**
 	 * Recursive method should identify all underlying readers for any nested structure of Lucene Searchable or IndexReader
 	 *
@@ -121,11 +106,17 @@ public abstract class ReaderProviderHelper {
 	 * @param obj	 The object to find the readers within
 	 */
 	private static void getIndexReadersInternal(Set<IndexReader> readers, Object obj) {
-		if ( obj instanceof IndexSearcher ) {
-			getIndexReadersInternal( readers, ( (IndexSearcher) obj ).getIndexReader() );
+		if ( obj instanceof ManagedMultiReader) {
+			ManagedMultiReader multiReader = (ManagedMultiReader) obj;
+			for ( IndexReader ir : multiReader.subReaders ) {
+				getIndexReadersInternal( readers, ir);
+			}
 		}
 		else if ( obj instanceof IndexReader ) {
 			readers.add( (IndexReader) obj );
+		}
+		else if ( obj instanceof IndexSearcher ) {
+			getIndexReadersInternal( readers, ( (IndexSearcher) obj ).getIndexReader() );
 		}
 	}
 
