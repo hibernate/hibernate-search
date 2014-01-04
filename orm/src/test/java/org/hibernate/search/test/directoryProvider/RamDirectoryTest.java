@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
+import java.util.List;
+
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -62,9 +64,10 @@ public class RamDirectoryTest extends SearchTestCase {
 		s = getSessionFactory().openSession();
 		s.getTransaction().begin();
 		TermQuery q = new TermQuery( new Term( "alt_title", "hibernate" ) );
+		List hibernateDocuments = Search.getFullTextSession( s ).createFullTextQuery( q, Document.class ).list();
 		assertEquals(
 				"does not properly filter", 0,
-				Search.getFullTextSession( s ).createFullTextQuery( q, Document.class ).list().size()
+				hibernateDocuments.size()
 		);
 		assertEquals(
 				"does not properly filter", 1,
