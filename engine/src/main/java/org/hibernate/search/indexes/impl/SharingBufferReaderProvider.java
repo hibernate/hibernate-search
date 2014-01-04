@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.exception.AssertionFailure;
@@ -139,8 +140,8 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 	}
 
 	//overridable method for testability:
-	protected IndexReader readerFactory(final Directory directory) throws IOException {
-		return IndexReader.open( directory );
+	protected DirectoryReader readerFactory(final Directory directory) throws IOException {
+		return DirectoryReader.open( directory );
 	}
 
 	/**
@@ -148,7 +149,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 	 */
 	protected final class ReaderUsagePair {
 
-		public final IndexReader reader;
+		public final DirectoryReader reader;
 		/**
 		 * When reaching 0 (always test on change) the reader should be really
 		 * closed and then discarded.
@@ -158,7 +159,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 		 */
 		protected final AtomicInteger usageCounter = new AtomicInteger( 2 );
 
-		ReaderUsagePair(IndexReader r) {
+		ReaderUsagePair(DirectoryReader r) {
 			reader = r;
 		}
 
@@ -215,7 +216,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 		 * @throws IOException when the index initialization fails.
 		 */
 		public PerDirectoryLatestReader(Directory directory) throws IOException {
-			IndexReader reader = readerFactory( directory );
+			DirectoryReader reader = readerFactory( directory );
 			ReaderUsagePair initialPair = new ReaderUsagePair( reader );
 			initialPair.usageCounter.set( 1 ); //a token to mark as active (preventing real close).
 			lockOnReplaceCurrent.lock(); //no harm, just ensuring safe publishing.
@@ -231,12 +232,12 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 		 * @return the current IndexReader if it's in sync with underlying index, a new one otherwise.
 		 */
 		public IndexReader refreshAndGet() {
-			final IndexReader updatedReader;
+			final DirectoryReader updatedReader;
 			//it's important that we read this volatile before acquiring the lock:
 			final int preAcquireVersionId = refreshOperationId;
 			ReaderUsagePair toCloseReaderPair = null;
 			lockOnReplaceCurrent.lock();
-			final IndexReader beforeUpdateReader = current.reader;
+			final DirectoryReader beforeUpdateReader = current.reader;
 			try {
 				if ( refreshOperationId != preAcquireVersionId ) {
 					// We can take a good shortcut
@@ -248,7 +249,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 						//Guarded by the lockOnReplaceCurrent of current IndexReader
 						//technically the final value doesn't even matter, as long as we change it
 						refreshOperationId++;
-						updatedReader = IndexReader.openIfChanged( beforeUpdateReader );
+						updatedReader = DirectoryReader.openIfChanged( beforeUpdateReader );
 					}
 					catch (IOException e) {
 						throw new SearchException( "Unable to reopen IndexReader", e );
