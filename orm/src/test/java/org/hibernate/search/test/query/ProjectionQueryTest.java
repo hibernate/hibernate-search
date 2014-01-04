@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.query;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
@@ -526,7 +527,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 	}
 
-	public void testProjectionUnmappedFieldValues() throws ParseException {
+	public void testProjectionUnmappedFieldValues() throws ParseException, IOException {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		s.persist( new CalendarDay().setDayFromItalianString( "01/04/2011" ) );
