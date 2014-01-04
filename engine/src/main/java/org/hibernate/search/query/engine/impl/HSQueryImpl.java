@@ -35,7 +35,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.search.Sort;
@@ -262,7 +262,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 
 	@Override
 	public List<EntityInfo> queryEntityInfos() {
-		IndexSearcherWithPayload searcher = buildSearcher();
+		LazyQueryState searcher = buildSearcher();
 		if ( searcher == null ) {
 			return Collections.emptyList();
 		}
@@ -294,7 +294,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		}
 	}
 
-	private DocumentExtractor buildDocumentExtractor(IndexSearcherWithPayload searcher, QueryHits queryHits, int first, int max) {
+	private DocumentExtractor buildDocumentExtractor(LazyQueryState searcher, QueryHits queryHits, int first, int max) {
 		return new DocumentExtractorImpl(
 				queryHits,
 				searchFactoryImplementor,
@@ -321,7 +321,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	public DocumentExtractor queryDocumentExtractor() {
 		//keep the searcher open until the resultset is closed
 		//find the directories
-		IndexSearcherWithPayload openSearcher = buildSearcher();
+		LazyQueryState openSearcher = buildSearcher();
 		//FIXME: handle null searcher
 		try {
 			QueryHits queryHits = getQueryHits( openSearcher, calculateTopDocsRetrievalSize() );
@@ -341,7 +341,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			//the timeoutManager does not need to be stopped nor reset as a start does indeed reset
 			getTimeoutManager().start();
 			//get result size without object initialization
-			IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor, false );
+			LazyQueryState searcher = buildSearcher( searchFactoryImplementor, false );
 			if ( searcher == null ) {
 				resultSize = 0;
 			}
@@ -365,7 +365,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	public Explanation explain(int documentId) {
 		//don't use TimeoutManager here as explain is a dev tool when things are weird... or slow :)
 		Explanation explanation = null;
-		IndexSearcherWithPayload searcher = buildSearcher( searchFactoryImplementor, true );
+		LazyQueryState searcher = buildSearcher( searchFactoryImplementor, true );
 		if ( searcher == null ) {
 			throw new SearchException(
 					"Unable to build explanation for document id:"
@@ -375,7 +375,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		try {
 			org.apache.lucene.search.Query filteredQuery = filterQueryByClasses( luceneQuery );
 			buildFilters();
-			explanation = searcher.getSearcher().explain( filteredQuery, documentId );
+			explanation = searcher.explain( filteredQuery, documentId );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to query Lucene index and build explanation", e );
@@ -410,11 +410,11 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		filterDefinitions.remove( name );
 	}
 
-	private void closeSearcher(IndexSearcherWithPayload searcherWithPayload) {
+	private void closeSearcher(LazyQueryState searcherWithPayload) {
 		if ( searcherWithPayload == null ) {
 			return;
 		}
-		searcherWithPayload.closeSearcher( luceneQuery, searchFactoryImplementor );
+		searcherWithPayload.close();
 	}
 
 	/**
@@ -435,8 +435,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *
 	 * @throws IOException in case there is an error executing the lucene search.
 	 */
-	private QueryHits getQueryHits(IndexSearcherWithPayload searcher, Integer n) throws IOException {
-		org.apache.lucene.search.Query filteredQuery = filterQueryByClasses( luceneQuery );
+	private QueryHits getQueryHits(LazyQueryState searcher, Integer n) throws IOException {
 		buildFilters();
 		QueryHits queryHits;
 
@@ -449,7 +448,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		if ( n == null ) { // try to make sure that we get the right amount of top docs
 			queryHits = new QueryHits(
 					searcher,
-					filteredQuery,
 					filter,
 					sort,
 					getTimeoutManagerImpl(),
@@ -464,7 +462,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		else if ( 0 == n) {
 			queryHits = new QueryHits(
 					searcher,
-					filteredQuery,
 					filter,
 					null,
 					0,
@@ -480,7 +477,6 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		else {
 			queryHits = new QueryHits(
 					searcher,
-					filteredQuery,
 					filter,
 					sort,
 					n,
@@ -497,7 +493,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 
 		if ( stats ) {
 			searchFactoryImplementor.getStatisticsImplementor()
-					.searchExecuted( filteredQuery.toString(), System.nanoTime() - startTime );
+					.searchExecuted( searcher.describeQuery(), System.nanoTime() - startTime );
 		}
 		facetManager.setFacetResults( queryHits.getFacets() );
 		return queryHits;
@@ -531,7 +527,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return firstResult;
 	}
 
-	private IndexSearcherWithPayload buildSearcher() {
+	private LazyQueryState buildSearcher() {
 		return buildSearcher( searchFactoryImplementor, null );
 	}
 
@@ -544,7 +540,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @return the <code>IndexSearcher</code> for this query (can be <code>null</code>.
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
-	private IndexSearcherWithPayload buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
+	private LazyQueryState buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
 		Map<Class<?>, EntityIndexBinding> builders = searchFactoryImplementor.getIndexBindings();
 		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
@@ -632,18 +628,17 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		final IndexManager[] indexManagers = targetedIndexes.toArray(
 				new IndexManager[targetedIndexes.size()]
 		);
-		IndexSearcher is = new IndexSearcher(
-				MultiReaderFactory.openReader( indexManagers )
-		);
-		is.setSimilarity( searcherSimilarity );
+		final IndexReader compoundReader = MultiReaderFactory.openReader( indexManagers );
+
+		final Query filteredQuery = filterQueryByClasses( luceneQuery );
 
 		//handle the sort and projection
 		final String[] projection = this.projectedFields;
 		if ( Boolean.TRUE.equals( forceScoring ) ) {
-			return new IndexSearcherWithPayload( is, true, true );
+			return new LazyQueryState( filteredQuery, compoundReader, searcherSimilarity, true, true );
 		}
 		else if ( Boolean.FALSE.equals( forceScoring ) ) {
-			return new IndexSearcherWithPayload( is, false, false );
+			return new LazyQueryState( filteredQuery, compoundReader, searcherSimilarity, false, false );
 		}
 		else if ( this.sort != null && projection != null ) {
 			boolean activate = false;
@@ -654,11 +649,11 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				}
 			}
 			if ( activate ) {
-				return new IndexSearcherWithPayload( is, true, false );
+				return new LazyQueryState( filteredQuery, compoundReader, searcherSimilarity, true, false );
 			}
 		}
 		//default
-		return new IndexSearcherWithPayload( is, false, false );
+		return new LazyQueryState( filteredQuery, compoundReader, searcherSimilarity, false, false );
 	}
 
 	private Similarity checkSimilarity(Similarity similarity, Similarity entitySimilarity) {
