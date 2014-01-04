@@ -30,9 +30,7 @@ import org.apache.lucene.document.Field;
 
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FieldType.NumericType;
-import org.apache.lucene.document.IntField;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.IndexableFieldType;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -184,7 +182,9 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 			}
 			else if (fieldable instanceof Field) {
 				Field safeField = (Field) fieldable;
-				if ( safeField.isBinary() ) {
+				//FIXME it seems like in new Field implementation it's possible to have multiple data types at the same time. Investigate?
+				//The following sequence of else/ifs would not be appropriate.
+				if ( safeField.binaryValue() != null ) {
 					serializer.addFieldWithBinaryData( new LuceneFieldContext( safeField ) );
 				}
 				else if ( safeField.stringValue() != null ) {
