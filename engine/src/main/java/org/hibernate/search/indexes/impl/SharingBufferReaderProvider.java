@@ -75,7 +75,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 	private String indexName;
 
 	@Override
-	public IndexReader openIndexReader() {
+	public DirectoryReader openIndexReader() {
 		log.debugf( "Opening IndexReader for directoryProvider %s", indexName );
 		Directory directory = directoryProvider.getDirectory();
 		PerDirectoryLatestReader directoryLatestReader = currentReaders.get( directory );
@@ -231,7 +231,7 @@ public class SharingBufferReaderProvider implements DirectoryBasedReaderProvider
 		 *
 		 * @return the current IndexReader if it's in sync with underlying index, a new one otherwise.
 		 */
-		public IndexReader refreshAndGet() {
+		public DirectoryReader refreshAndGet() {
 			final DirectoryReader updatedReader;
 			//it's important that we read this volatile before acquiring the lock:
 			final int preAcquireVersionId = refreshOperationId;

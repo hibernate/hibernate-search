@@ -23,6 +23,7 @@ package org.hibernate.search.indexes.impl;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.SearchException;
@@ -45,12 +46,12 @@ public class NotSharedReaderProvider implements DirectoryBasedReaderProvider {
 	private String indexName;
 
 	@Override
-	public IndexReader openIndexReader() {
+	public DirectoryReader openIndexReader() {
 		// #getDirectory must be invoked each time as the underlying directory might "dance" as in
 		// org.hibernate.search.store.impl.FSSlaveDirectoryProvider
 		Directory directory = directoryProvider.getDirectory();
 		try {
-			return IndexReader.open( directory );
+			return DirectoryReader.open( directory );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Could not open index \"" + indexName + "\"", e );
