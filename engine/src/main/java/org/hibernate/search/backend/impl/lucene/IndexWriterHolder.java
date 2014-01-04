@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -223,11 +223,11 @@ class IndexWriterHolder {
 	 * @param applyDeletes Applying deletes is expensive, say no if you can deal with stale hits during queries
 	 * @return a new NRT IndexReader if an IndexWriter is available, or <code>null</code> otherwise
 	 */
-	public IndexReader openNRTIndexReader(boolean applyDeletes) {
+	public DirectoryReader openNRTIndexReader(boolean applyDeletes) {
 		final IndexWriter indexWriter = writer.get();
 		try {
 			if ( indexWriter != null ) {
-				return IndexReader.open( indexWriter, applyDeletes );
+				return DirectoryReader.open( indexWriter, applyDeletes );
 			}
 			else {
 				return null;
@@ -246,9 +246,9 @@ class IndexWriterHolder {
 	/**
 	 * Opens an IndexReader from the DirectoryProvider (not using the IndexWriter)
 	 */
-	public IndexReader openDirectoryIndexReader() {
+	public DirectoryReader openDirectoryIndexReader() {
 		try {
-			return IndexReader.open( directoryProvider.getDirectory() );
+			return DirectoryReader.open( directoryProvider.getDirectory() );
 		}
 		// following exceptions should be propagated as the IndexReader is needed by
 		// the main thread
