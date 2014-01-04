@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-//FieldSelector was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
@@ -148,8 +148,15 @@ public class QueryHits {
 		return searcher.getSearcher().doc( docId( index ) );
 	}
 
-	public Document doc(int index, FieldSelector selector) throws IOException {
-		return searcher.getSearcher().doc( docId( index ), selector );
+	/**
+	 * This document loading strategy doesn't return anything as it's the responsibility
+	 * of the passed StoredFieldVisitor instance to collect the data it needs.
+	 * @param index
+	 * @param fieldVisitor
+	 * @throws IOException
+	 */
+	public void doc(int index, StoredFieldVisitor fieldVisitor) throws IOException {
+		searcher.getSearcher().doc( docId( index ), fieldVisitor );
 	}
 
 	public ScoreDoc scoreDoc(int index) throws IOException {
