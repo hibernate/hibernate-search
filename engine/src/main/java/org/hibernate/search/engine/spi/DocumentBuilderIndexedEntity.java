@@ -102,7 +102,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	}
 
 	/**
-	 * Flag indicating whether {@link org.apache.lucene.search.Searcher#doc(int, org.apache.lucene.document.FieldSelector)}
+	 * Flag indicating whether {@link org.apache.lucene.search.Searcher#visitDocument(int, org.apache.lucene.document.FieldSelector)}
 	 * can be used in order to retrieve documents. This is only safe to do if we know that
 	 * all involved bridges are implementing <code>TwoWayStringBridge</code>. See HSEARCH-213.
 	 */

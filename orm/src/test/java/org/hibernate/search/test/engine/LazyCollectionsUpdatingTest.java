@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.engine;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
@@ -103,7 +104,12 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		query.setProjection( "busLineName" );
 		assertEquals( 1, query.list().size() );
 		List results = query.list();
-		assertFieldSelectorEnabled( "busLineName" );
+		try {
+			assertFieldSelectorEnabled( "busLineName" );
+		}
+		catch (IOException e) {
+			fail( "unexpected exception " + e );
+		}
 		String resultName = (String) ( (Object[]) results.get( 0 ) )[0];
 		assertEquals( "Linea 64", resultName );
 		tx.commit();
