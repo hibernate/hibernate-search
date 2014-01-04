@@ -57,7 +57,10 @@ public interface LuceneWorksBuilder {
 
 	void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
+	@Deprecated//use addFieldWithBinaryData(String name, byte[] value, int offset, int length)
 	void addFieldWithBinaryData(String name, byte[] value, int offset, int length, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
+
+	void addFieldWithBinaryData(String name, byte[] value, int offset, int length);
 
 	void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
