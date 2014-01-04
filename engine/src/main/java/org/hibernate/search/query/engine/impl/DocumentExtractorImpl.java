@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.bridge.spi.ConversionContext;
@@ -67,14 +68,14 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
 	private final QueryHits queryHits;
-	private final IndexSearcherWithPayload searcher;
+	private final LazyQueryState searcher;
 	private ReusableDocumentStoredFieldVisitor fieldLoadingVisitor;
 	private boolean allowFieldSelection;
 	private boolean needId;
 	private final Map<String, Class> targetedClasses;
 	private int firstIndex;
 	private int maxIndex;
-	private Object query;
+	private Query query;
 	private final Class singleClassIfPossible; //null when not possible
 	private final FieldCacheCollector classTypeCollector; //null when not used
 	private final FieldCacheCollector idsCollector; //null when not used
@@ -85,8 +86,8 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 								String[] projection,
 								Set<String> idFieldNames,
 								boolean allowFieldSelection,
-								IndexSearcherWithPayload searcher,
-								Object query,
+								LazyQueryState searcher,
+								Query query,
 								int firstIndex,
 								int maxIndex,
 								Set<Class<?>> classesAndSubclasses) {
@@ -282,7 +283,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 
 	@Override
 	public void close() {
-		searcher.closeSearcher( query, searchFactoryImplementor );
+		searcher.close();
 	}
 
 	private Document extractDocument(int index) throws IOException {

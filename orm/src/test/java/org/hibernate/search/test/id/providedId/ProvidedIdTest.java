@@ -43,7 +43,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
-import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
+import org.hibernate.search.query.engine.impl.LazyQueryState;
 import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -109,9 +109,9 @@ public class ProvidedIdTest {
 		assertEquals( 3, hits.totalHits );
 
 		//follows an example of what Infinispan Query actually needs to resolve a search request:
-		IndexSearcherWithPayload lowLevelSearcher = new IndexSearcherWithPayload( searcher, false, false );
+		LazyQueryState lowLevelSearcher = new LazyQueryState( searcher, false, false );
 		QueryHits queryHits = new QueryHits(
-				lowLevelSearcher, luceneQuery, null, null,
+				lowLevelSearcher, null, null,
 				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, sf.getTimingSource() ),
 				null,
 				false,
