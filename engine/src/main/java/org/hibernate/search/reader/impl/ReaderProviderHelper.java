@@ -24,11 +24,13 @@
 package org.hibernate.search.reader.impl;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.hibernate.search.SearchException;
@@ -96,7 +98,16 @@ public abstract class ReaderProviderHelper {
 
 	public static List<IndexReader> getSubIndexReaders(ManagedMultiReader indexReader) {
 		ManagedMultiReader multiReader = (ManagedMultiReader) indexReader;
-		return Arrays.asList( multiReader.subReaders );
+		IndexReader[] directoryReaders = multiReader.subReaders;
+		ArrayList<IndexReader> segmentReaders = new ArrayList<IndexReader>( 20 );
+		for ( IndexReader ir : directoryReaders ) {
+			DirectoryReader dr = (DirectoryReader)ir;
+			List<AtomicReaderContext> leaves = dr.leaves();
+			for ( AtomicReaderContext atom : leaves ) {
+				segmentReaders.add( atom.reader() );
+			}
+		}
+		return segmentReaders;
 	}
 
 	/**
@@ -106,7 +117,7 @@ public abstract class ReaderProviderHelper {
 	 * @param obj	 The object to find the readers within
 	 */
 	private static void getIndexReadersInternal(Set<IndexReader> readers, Object obj) {
-		if ( obj instanceof ManagedMultiReader) {
+		if ( obj instanceof ManagedMultiReader ) {
 			ManagedMultiReader multiReader = (ManagedMultiReader) obj;
 			for ( IndexReader ir : multiReader.subReaders ) {
 				getIndexReadersInternal( readers, ir);

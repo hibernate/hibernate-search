@@ -24,22 +24,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
-//TermDocs was removed in Lucene 4 with no alternative replacement
-//TermEnum was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Bits;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.OpenBitSet;
-import org.apache.lucene.index.ReaderUtil;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -101,7 +99,7 @@ public class FreshReadersProvidedTest {
 		Assert.assertEquals( 1, queryEntityInfos.size() );
 		Assert.assertEquals( 13L, queryEntityInfos.get( 0 ).getId() );
 
-		RecordingFilter filter = new RecordingFilter();
+		RecordingFilter filter = new RecordingFilter( "name" );
 		List<EntityInfo> filteredQueryEntityInfos = searchFactory.createHSQuery()
 				.luceneQuery( queryAllGuests )
 				.targetedEntities( Arrays.asList( new Class<?>[]{ Guest.class } ) )
@@ -109,7 +107,7 @@ public class FreshReadersProvidedTest {
 				.queryEntityInfos();
 
 		checkFilterInspectedAllSegments( filter );
-		expectedTermsForFilter( filter, Guest.class.getName(), "thorin", "13", "oakenshield" );
+		expectedTermsForFilter( filter, "thorin", "oakenshield" );
 		Assert.assertEquals( 1, filteredQueryEntityInfos.size() );
 		Assert.assertEquals( 13L, filteredQueryEntityInfos.get( 0 ).getId() );
 
@@ -133,7 +131,7 @@ public class FreshReadersProvidedTest {
 		Assert.assertEquals( 13L, queryEntityInfosAgain.get( 0 ).getId() );
 		Assert.assertEquals( 7L, queryEntityInfosAgain.get( 1 ).getId() );
 
-		RecordingFilter secondFilter = new RecordingFilter();
+		RecordingFilter secondFilter = new RecordingFilter( "name" );
 		List<EntityInfo> secondFilteredQueryEntityInfos = searchFactory.createHSQuery()
 				.luceneQuery( queryAllGuests )
 				.targetedEntities( Arrays.asList( new Class<?>[]{ Guest.class } ) )
@@ -141,10 +139,7 @@ public class FreshReadersProvidedTest {
 				.queryEntityInfos();
 
 		checkFilterInspectedAllSegments( secondFilter );
-		expectedTermsForFilter( secondFilter,
-				Guest.class.getName(), "thorin", "13", "oakenshield",
-				Guest.class.getName(), "balin", "7"
-				);
+		expectedTermsForFilter( secondFilter, "thorin", "oakenshield", "balin" );
 
 		Assert.assertEquals( 2, secondFilteredQueryEntityInfos.size() );
 		Assert.assertEquals( 13L, secondFilteredQueryEntityInfos.get( 0 ).getId() );
@@ -187,26 +182,28 @@ public class FreshReadersProvidedTest {
 	 */
 	private static class RecordingFilter extends Filter {
 
-		List<IndexReader> visitedReaders = new ArrayList<IndexReader>();
-		List<String> seenTerms = new ArrayList<String>();
+		final List<IndexReader> visitedReaders = new ArrayList<IndexReader>();
+		final List<String> seenTerms = new ArrayList<String>();
+		final String fieldName;
+
+		public RecordingFilter(String fieldName) {
+			this.fieldName = fieldName;
+		}
 
 		@Override
-		public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+		public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+			final AtomicReader reader = context.reader();
 			this.visitedReaders.add( reader );
 			OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
-			TermEnum terms = reader.terms();
-			terms.next();
-			Term firstTerm = terms.term();
-			TermDocs termDocs = reader.termDocs();
-			if ( firstTerm != null ) {
-				seenTerms.add( firstTerm.text() );
-				termDocs.seek( firstTerm );
-				while ( termDocs.next() ) {
-					bitSet.set( termDocs.doc() );
-				}
-				while ( terms.next() ) {
-					seenTerms.add( terms.term().text() );
-				}
+			for ( int i = 0; i < reader.maxDoc(); i++ ) {
+				bitSet.fastSet( i );
+			}
+			Terms terms = reader.terms( fieldName );
+			TermsEnum iterator = terms.iterator( null );
+			BytesRef next = iterator.next();
+			while ( next != null ) {
+				seenTerms.add( next.utf8ToString() );
+				next = iterator.next();
 			}
 			return bitSet;
 		}
