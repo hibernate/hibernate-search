@@ -32,6 +32,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.store.FSDirectory;
@@ -159,7 +160,7 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 	private void assertNumberOfEntitiesInIndex(String indexName, int expectedCount) throws IOException {
 		FSDirectory fsDirectory = FSDirectory.open( new File( getBaseIndexDir(), indexName ) );
 		try {
-			IndexReader reader = IndexReader.open( fsDirectory );
+			IndexReader reader = DirectoryReader.open( fsDirectory );
 			try {
 				int actualCount = reader.numDocs();
 				assertEquals( "Unexpected document count", expectedCount, actualCount );
@@ -209,9 +210,9 @@ public class DynamicShardingTest extends SearchTestCaseJUnit4 {
 		@Override
 		public String getShardIdentifier(Class<?> entityType, Serializable id, String idAsString, Document document) {
 			if ( entityType.equals( Animal.class ) ) {
-				String type = document.getFieldable( "type" ).stringValue();
-				addShard( type );
-				return type;
+				final String typeValue = document.getField( "type" ).stringValue();
+				addShard( typeValue );
+				return typeValue;
 			}
 			throw new RuntimeException( "Animal expected but found " + entityType );
 		}
