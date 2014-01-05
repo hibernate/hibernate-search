@@ -23,13 +23,20 @@
  */
 package org.hibernate.search.test.analyzer.solr;
 
+import java.util.Map;
+
 import org.apache.lucene.analysis.TokenStream;
-//org.apache.solr.analysis.BaseTokenFilterFactory was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 /**
  * @author Hardy Ferentschik
  */
-public class InsertWhitespaceFilterFactory extends BaseTokenFilterFactory {
+public class InsertWhitespaceFilterFactory extends TokenFilterFactory {
+
+	protected InsertWhitespaceFilterFactory(Map<String, String> args) {
+		super( args );
+	}
+
 	@Override
 	public InsertWhitespaceFilter create(TokenStream input) {
 		return new InsertWhitespaceFilter( input );
