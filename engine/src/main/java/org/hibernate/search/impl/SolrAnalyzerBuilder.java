@@ -24,7 +24,6 @@
 package org.hibernate.search.impl;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -105,6 +104,6 @@ final class SolrAnalyzerBuilder {
 			mapOfParams.put( param.name(), param.value() );
 		}
 		mapOfParams.put( SOLR_LUCENE_VERSION_PARAM, luceneMatchVersion.toString() );
-		return Collections.unmodifiableMap( mapOfParams );
+		return mapOfParams;
 	}
 }

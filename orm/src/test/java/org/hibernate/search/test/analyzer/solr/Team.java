@@ -70,7 +70,6 @@ import org.hibernate.search.annotations.TokenizerDef;
 						@TokenFilterDef(factory = StopFilterFactory.class, params = {
 								@Parameter(name = "words",
 										value = "org/hibernate/search/test/analyzer/solr/stoplist.properties"),
-								@Parameter(name = "resource_charset", value = "UTF-8"),
 								@Parameter(name = "ignoreCase", value = "true")
 						}),
 						@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {

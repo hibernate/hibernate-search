@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -27,39 +27,55 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-//TermAttribute was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public abstract class AbstractTestAnalyzer extends Analyzer {
 
 	protected abstract String[] getTokens();
 
 	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		return new InternalTokenStream();
+	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+		Tokenizer tokenizer = new StreamWrappingTokenizer( reader, getTokens() );
+		return new TokenStreamComponents( tokenizer );
 	}
 
-	private class InternalTokenStream extends TokenStream {
-		private int position;
-		private TermAttribute termAttribute;
+	private static final class StreamWrappingTokenizer extends Tokenizer {
 
-		public InternalTokenStream() {
-			super();
-			termAttribute = addAttribute( TermAttribute.class );
+		private final OffsetAttribute offsetAttribute = addAttribute( OffsetAttribute.class );
+		private final CharTermAttribute termAttribute = addAttribute( CharTermAttribute.class );
+		private final String[] tokens;
+		private int position = 0;
+
+		public StreamWrappingTokenizer(Reader input, String[] tokens) {
+			super( input );
+			this.tokens = tokens;
 		}
 
 		@Override
 		public boolean incrementToken() throws IOException {
-			if ( position >= getTokens().length ) {
+			if ( position >= tokens.length ) {
 				return false;
 			}
 			else {
-				termAttribute.setTermBuffer( getTokens()[position++] );
+				clearAttributes();
+				final String token = tokens[position++];
+				termAttribute.append( token );
+				offsetAttribute.setOffset( 0, token.length() );
 				return true;
 			}
 		}
+
+		@Override
+		public void reset() throws IOException {
+			super.reset();
+			position = 0;
+		}
 	}
+
 }
