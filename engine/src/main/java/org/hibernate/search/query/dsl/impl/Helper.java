@@ -88,19 +88,22 @@ final class Helper {
 					"Alternatively, apply the ignoreFieldBridge() option to " +
 					"pass String parameters" );
 		}
-		Reader reader = new StringReader(localText);
-		TokenStream stream = analyzer.tokenStream( fieldName, reader);
-		CharTermAttribute attribute = stream.addAttribute( CharTermAttribute.class );
-		stream.reset();
-
-		while ( stream.incrementToken() ) {
-			if ( attribute.length() > 0 ) {
-				String term = new String( attribute.buffer(), 0, attribute.length() );
-				terms.add( term );
+		final Reader reader = new StringReader( localText );
+		final TokenStream stream = analyzer.tokenStream( fieldName, reader);
+		try {
+			CharTermAttribute attribute = stream.addAttribute( CharTermAttribute.class );
+			stream.reset();
+			while ( stream.incrementToken() ) {
+				if ( attribute.length() > 0 ) {
+					String term = new String( attribute.buffer(), 0, attribute.length() );
+					terms.add( term );
+				}
 			}
+			stream.end();
 		}
-		stream.end();
-		stream.close();
+		finally {
+			stream.close();
+		}
 		return terms;
 	}
 

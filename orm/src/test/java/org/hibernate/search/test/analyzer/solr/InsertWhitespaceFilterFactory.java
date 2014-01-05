@@ -33,7 +33,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  */
 public class InsertWhitespaceFilterFactory extends TokenFilterFactory {
 
-	protected InsertWhitespaceFilterFactory(Map<String, String> args) {
+	public InsertWhitespaceFilterFactory(Map<String, String> args) {
 		super( args );
 	}
 

@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
-//TermAttribute was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 /**
  * A filter which will actually insert spaces. Most filters/tokenizers remove them, but for testing it is
@@ -38,18 +38,23 @@ import org.apache.lucene.analysis.TokenStream;
  */
 public final class InsertWhitespaceFilter extends TokenFilter {
 
-	private TermAttribute termAtt;
+	private final CharTermAttribute termAtt = addAttribute( CharTermAttribute.class );
 
 	public InsertWhitespaceFilter(TokenStream in) {
 		super( in );
-		termAtt = addAttribute( TermAttribute.class );
 	}
 
 	@Override
 	public boolean incrementToken() throws IOException {
 		if ( input.incrementToken() ) {
-			String value = " " + termAtt.term() + " ";
-			termAtt.setTermBuffer( value );
+			final char[] termBuffer = termAtt.buffer();
+			final int termBufferLength = termAtt.length();
+			final char[] newBuffer = new char[termBufferLength + 2];
+			System.arraycopy( termBuffer, 0, newBuffer, 1, termBufferLength );
+			newBuffer[0] = ' ';
+			newBuffer[newBuffer.length - 1] = ' ';
+			termAtt.resizeBuffer( newBuffer.length );
+			termAtt.copyBuffer( newBuffer, 0, newBuffer.length );
 			return true;
 		}
 		else {
