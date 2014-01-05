@@ -24,19 +24,15 @@
 package org.hibernate.search.test.similarity;
 
 import org.apache.lucene.index.FieldInvertState;
-import org.apache.lucene.search.similarities.Similarity;
+import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.util.BytesRef;
 
 /**
  * @author Emmanuel Bernard
  */
-public class DummySimilarity2 extends Similarity {
+public class DummySimilarity2 extends DefaultSimilarity {
 
 	private float CONST = .5f;
-
-	@Override
-	public float computeNorm(String field, FieldInvertState state) {
-		return CONST;
-	}
 
 	@Override
 	public float queryNorm(float sumOfSquaredWeights) {
@@ -54,12 +50,22 @@ public class DummySimilarity2 extends Similarity {
 	}
 
 	@Override
-	public float idf(int docFreq, int numDocs) {
+	public float coord(int overlap, int maxOverlap) {
 		return CONST;
 	}
 
 	@Override
-	public float coord(int overlap, int maxOverlap) {
+	public float lengthNorm(FieldInvertState state) {
+		return CONST;
+	}
+
+	@Override
+	public float scorePayload(int doc, int start, int end, BytesRef payload) {
+		return CONST;
+	}
+
+	@Override
+	public float idf(long docFreq, long numDocs) {
 		return CONST;
 	}
 
