@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -210,7 +211,7 @@ public class ClassLoaderHelper {
 		checkClassType( classToLoad, componentDescription );
 		Constructor<?> singleMapConstructor = getSingleMapConstructor( classToLoad, componentDescription );
 		if ( constructorParameter == null ) {
-			constructorParameter = Collections.emptyMap();
+			constructorParameter = new HashMap<String,String>( 0 );//can't use the emptyMap singleton as it needs to be mutable
 		}
 		final Object instance;
 		try {
@@ -219,7 +220,7 @@ public class ClassLoaderHelper {
 		catch (Exception e) {
 			throw new SearchException(
 					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
-							". Class or constructor is not accessible, or not accepting the expected Map argument to its constructor.", e
+							". The implementation class did not recognize the applied parameters.", e
 			);
 		}
 		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad, componentDescription );
@@ -327,7 +328,7 @@ public class ClassLoaderHelper {
 		catch (NoSuchMethodException e) {
 			throw new SearchException(
 					classToLoad.getName() + " defined for component " + componentDescription
-							+ " is missing an appropriate constructor: expected a constructor with a single parameter of type Map"
+							+ " is missing an appropriate constructor: expected a public constructor with a single parameter of type Map"
 			);
 		}
 	}
