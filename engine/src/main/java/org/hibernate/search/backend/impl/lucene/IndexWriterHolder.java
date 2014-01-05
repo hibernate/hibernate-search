@@ -139,11 +139,12 @@ class IndexWriterHolder {
 	 * Also each new IndexWriter needs a new MergePolicy.
 	 */
 	private IndexWriter createNewIndexWriter() throws IOException {
+		final IndexWriterConfig indexWriterConfig = writerConfig.clone(); //Each writer config can be attached only once to an IndexWriter
 		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO make it possible to configure a different policy?
-		writerConfig.setMergePolicy( newMergePolicy );
+		indexWriterConfig.setMergePolicy( newMergePolicy );
 		MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler, this.indexName );
-		writerConfig.setMergeScheduler( mergeScheduler );
-		return new IndexWriter( directoryProvider.getDirectory(), writerConfig );
+		indexWriterConfig.setMergeScheduler( mergeScheduler );
+		return new IndexWriter( directoryProvider.getDirectory(), indexWriterConfig );
 	}
 
 	/**
