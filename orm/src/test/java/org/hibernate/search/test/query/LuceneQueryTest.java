@@ -376,7 +376,7 @@ public class LuceneQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
 
@@ -419,7 +419,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		hibQuery.setFetchSize( 3 );
 		hibQuery.setFirstResult( 1 );
 		hibQuery.setMaxResults( 3 );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();

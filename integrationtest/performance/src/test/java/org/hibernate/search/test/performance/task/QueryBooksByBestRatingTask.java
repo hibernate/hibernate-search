@@ -49,7 +49,7 @@ public class QueryBooksByBestRatingTask extends AbstractTask {
 				.createQuery();
 
 		fts.createFullTextQuery( q, Book.class )
-				.setSort( new Sort( new SortField( "rating", SortField.FLOAT, true ) ) )
+				.setSort( new Sort( new SortField( "rating", SortField.Type.FLOAT, true ) ) )
 				.setMaxResults( 100 )
 				.list();
 	}

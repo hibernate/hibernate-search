@@ -90,7 +90,7 @@ public class SortTest extends SearchTestCase {
 
 		Query query = queryParser.parse( "summary:lucene" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "id", SortField.STRING, false ) );
+		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING, false ) );
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -111,7 +111,7 @@ public class SortTest extends SearchTestCase {
 		// order by summary
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "summary_forSort", SortField.STRING ) ); //ASC
+		Sort sort = new Sort( new SortField( "summary_forSort", SortField.Type.STRING ) ); //ASC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -128,7 +128,7 @@ public class SortTest extends SearchTestCase {
 		// order by summary backwards
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "summary_forSort", SortField.STRING, true ) ); //DESC
+		Sort sort = new Sort( new SortField( "summary_forSort", SortField.Type.STRING, true ) ); //DESC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
@@ -145,7 +145,7 @@ public class SortTest extends SearchTestCase {
 		// order by date backwards
 		Query query = queryParser.parse( "summary:lucene OR summary:action" );
 		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
-		Sort sort = new Sort( new SortField( "publicationDate", SortField.STRING, true ) ); //DESC
+		Sort sort = new Sort( new SortField( "publicationDate", SortField.Type.STRING, true ) ); //DESC
 		hibQuery.setSort( sort );
 		List<Book> result = hibQuery.list();
 		assertNotNull( result );
