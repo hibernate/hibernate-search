@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.engine;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.persistence.CascadeType;
@@ -84,8 +83,7 @@ public class Location {
 
 	@Field
 	@NumericField
-	@FieldBridge(impl = BigDecimalNumericFieldBridge.class)
-	private BigDecimal visibleStars;
+	private Float visibleStars;
 
 	@Field(store = Store.YES)
 	@NumericField
@@ -112,7 +110,7 @@ public class Location {
 	}
 
 	public Location(int id, Long counter, double latitude, Double longitude,
-					Integer ranking, String description, Double multiple, Country country, BigDecimal visibleStars) {
+					Integer ranking, String description, Double multiple, Country country, Float visibleStars) {
 		this.id = id;
 		this.counter = counter;
 		this.longitude = longitude;

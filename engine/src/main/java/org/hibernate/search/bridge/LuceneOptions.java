@@ -137,4 +137,12 @@ public interface LuceneOptions {
 	void addIntFieldToDocument(String name, int intValue, Document document);
 	void addLongFieldToDocument(String name, long longValue, Document document);
 
+	/**
+	 * @deprecated This method will be removed soon! Use one of {@link #addDoubleFieldToDocument(String, double, Document)},
+	 * {@link #addFloatFieldToDocument(String, float, Document)}, {@link #addIntFieldToDocument(String, int, Document)},
+	 * {@link #addLongFieldToDocument(String, long, Document)}.
+	 */
+	@Deprecated
+	void addNumericFieldToDocument(String name, Number indexedValue, Document document);
+
 }

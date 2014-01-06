@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.test.engine;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -69,7 +68,7 @@ public class NumericFieldTest extends SearchTestCase {
 		assertEquals( "Query by integer range", 4, numericQueryFor( "ranking", 1, 2 ).size() );
 		assertEquals( "Query by long range", 3, numericQueryFor( "myCounter", 1L, 3L ).size() );
 		assertEquals( "Query by multi-fields", 2, numericQueryFor( "strMultiple", 0.7d, 0.9d ).size() );
-		assertEquals( "Query on custom bridge by range", 4, numericQueryFor( "visibleStars", -100L, 500L ).size() );
+		assertEquals( "Query on custom bridge by range", 4, numericQueryFor( "visibleStars", -100f, 5f ).size() );
 
 		// Range Queries different bounds
 		assertEquals( "Query by id excluding upper", 2, numericQueryFor( "overriddenFieldName", 1, 3, true, false ).size() );
@@ -87,7 +86,7 @@ public class NumericFieldTest extends SearchTestCase {
 		assertEquals( "Query integer exact", 3, doExactQuery( "longitude", -20d ).getId() );
 		assertEquals( "Query long exact", 4, doExactQuery( "myCounter", 4L ).getId() );
 		assertEquals( "Query multifield exact", 5, doExactQuery( "strMultiple", 0.1d ).getId() );
-		assertEquals( "Query on custom bridge exact", 3, doExactQuery( "visibleStars", 1000L ).getId() );
+		assertEquals( "Query on custom bridge exact", 3, doExactQuery( "visibleStars", 10f ).getId() );
 
 		tx.commit();
 		fullTextSession.clear();
@@ -180,15 +179,15 @@ public class NumericFieldTest extends SearchTestCase {
 
 	private void prepareData() {
 		Transaction tx = fullTextSession.beginTransaction();
-		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), BigDecimal.ONE );
+		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), Float.valueOf( 1f ) );
 		loc1.addPinPoints( new PinPoint( 1, 4, loc1 ), new PinPoint( 2, 5, loc1 ) );
 
-		Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), BigDecimal.ONE );
+		Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), Float.valueOf( 1f ) );
 		loc2.addPinPoints( new PinPoint( 3, 1, loc2 ), new PinPoint( 4, 2, loc2 ) );
 
-		Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), BigDecimal.TEN );
-		Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), BigDecimal.ONE );
-		Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), BigDecimal.ONE );
+		Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), Float.valueOf( 10f ) );
+		Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), Float.valueOf( 1f ) );
+		Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), Float.valueOf( 1f ) );
 
 		fullTextSession.save( loc1 );
 		fullTextSession.save( loc2 );

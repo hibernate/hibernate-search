@@ -208,4 +208,29 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		document.add( field );
 	}
 
+	/**
+	 * @deprecated See {@link LuceneOptions#addNumericFieldToDocument(String, Number, Document)}
+	 */
+	@Override @Deprecated
+	public void addNumericFieldToDocument(String fieldName, Number indexedValue, Document document) {
+		if ( indexedValue == null ) {
+			throw new IllegalArgumentException( "the indexedValue parameter shall not be null" );
+		}
+		if ( indexedValue instanceof Double ) {
+			addDoubleFieldToDocument( fieldName, ( (Double) indexedValue ).doubleValue(), document );
+		}
+		else if ( indexedValue instanceof Float ) {
+			addDoubleFieldToDocument( fieldName, ( (Float) indexedValue ).floatValue(), document );
+		}
+		else if ( indexedValue instanceof Integer ) {
+			addIntFieldToDocument( fieldName, ( (Integer) indexedValue ).intValue(), document );
+		}
+		else if ( indexedValue instanceof Float ) {
+			addLongFieldToDocument( fieldName, ( (Long) indexedValue ).longValue(), document );
+		}
+		else {
+			throw new IllegalArgumentException( "unsupported type of Number" );
+		}
+	}
+
 }
