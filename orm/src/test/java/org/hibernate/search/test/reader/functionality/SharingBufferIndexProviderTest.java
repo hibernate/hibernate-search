@@ -55,7 +55,7 @@ public class SharingBufferIndexProviderTest {
 
 	@Test
 	public void testStressingMock() throws InterruptedException {
-		readerProvider.initialize( null, null );
+		readerProvider.initialize();
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( 50 ); //much chaos
 		for ( int i = 0; i < SEARCHES_NUM; i++ ) {
 			executor.execute( makeTask( i ) );

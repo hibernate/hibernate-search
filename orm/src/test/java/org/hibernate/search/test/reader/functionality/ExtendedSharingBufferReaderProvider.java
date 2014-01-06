@@ -32,16 +32,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.lucene.document.Document;
-//FieldSelector was removed in Lucene 4 with no alternative replacement
-import org.apache.lucene.index.FieldInfos;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexCommit;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
-//TermDocs was removed in Lucene 4 with no alternative replacement
-//TermEnum was removed in Lucene 4 with no alternative replacement
-//TermFreqVector was removed in Lucene 4 with no alternative replacement
-import org.apache.lucene.index.DocsAndPositionsEnum;
-//TermVectorMapper was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
@@ -122,7 +117,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	}
 
 	@Override
-	protected IndexReader readerFactory(Directory directory) {
+	protected DirectoryReader readerFactory(Directory directory) {
 		TestManipulatorPerDP manipulatorPerDP = manipulators.get( directory );
 		if ( !manipulatorPerDP.isReaderCreated.compareAndSet( false, true ) ) {
 			throw new IllegalStateException( "IndexReader created twice" );
@@ -132,8 +127,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		}
 	}
 
-	@Override
-	public void initialize(DirectoryBasedIndexManager indexManager, Properties props) {
+	public void initialize() {
 		super.initialize( new MockDirectoryBasedIndexManager(), null );
 	}
 
@@ -181,13 +175,15 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		}
 	}
 
-	public class MockIndexReader extends IndexReader {
+	public class MockIndexReader extends DirectoryReader {
 
 		private final AtomicBoolean closed = new AtomicBoolean( false );
 		private final AtomicBoolean hasAlreadyBeenReOpened = new AtomicBoolean( false );
 		private final AtomicBoolean isIndexReaderCurrent;
 
 		MockIndexReader(AtomicBoolean isIndexReaderCurrent) {
+			//make the super constructor happy as the class is "locked down"
+			super( new RAMDirectory(), new AtomicReader[0] );
 			this.isIndexReaderCurrent = isIndexReaderCurrent;
 			if ( ! isIndexReaderCurrent.compareAndSet( false, true ) ) {
 				throw new IllegalStateException( "Unnecessarily reopened" );
@@ -211,9 +207,14 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		}
 
 		@Override
-		public synchronized IndexReader reopen() {
+		public boolean hasDeletions() {
+			return false;//just something to make MultiReader constructor happy
+		}
+
+		@Override
+		protected DirectoryReader doOpenIfChanged() throws IOException {
 			if ( isIndexReaderCurrent.get() ) {
-				return this;
+				return null;
 			}
 			else {
 				if ( hasAlreadyBeenReOpened.compareAndSet( false, true ) ) {
@@ -226,108 +227,28 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		}
 
 		@Override
-		protected void doDelete(int docNum) {
-			throw new UnsupportedOperationException();
+		protected DirectoryReader doOpenIfChanged(IndexCommit commit) throws IOException {
+			return doOpenIfChanged();
 		}
 
 		@Override
-		protected void doSetNorm(int doc, String field, byte value) {
-			throw new UnsupportedOperationException();
+		protected DirectoryReader doOpenIfChanged(IndexWriter writer, boolean applyAllDeletes) throws IOException {
+			return doOpenIfChanged();
 		}
 
 		@Override
-		protected void doUndeleteAll() {
-			throw new UnsupportedOperationException();
+		public long getVersion() {
+			return 0;
 		}
 
 		@Override
-		public int docFreq(Term t) {
-			throw new UnsupportedOperationException();
+		public boolean isCurrent() throws IOException {
+			return false;
 		}
 
 		@Override
-		public Document document(int n, FieldSelector fieldSelector) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public TermFreqVector getTermFreqVector(int docNumber, String field) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void getTermFreqVector(int docNumber, String field, TermVectorMapper mapper) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void getTermFreqVector(int docNumber, TermVectorMapper mapper) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public TermFreqVector[] getTermFreqVectors(int docNumber) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean hasDeletions() {
-			return false;//just something to make MultiReader constructor happy
-		}
-
-		@Override
-		public boolean isDeleted(int n) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public int maxDoc() {
-			return 10;//just something to make MultiReader constructor happy
-		}
-
-		@Override
-		public byte[] norms(String field) throws IOException {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void norms(String field, byte[] bytes, int offset) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public int numDocs() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public TermDocs termDocs() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public TermPositions termPositions() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public TermEnum terms() throws IOException {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public TermEnum terms(Term t) throws IOException {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		protected void doCommit(Map<String, String> commitUserData) {
-			// no-op
-		}
-
-		@Override
-		public FieldInfos getFieldInfos() {
-			throw new UnsupportedOperationException();
+		public IndexCommit getIndexCommit() throws IOException {
+			return null;
 		}
 
 	}
