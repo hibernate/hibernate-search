@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 //TermDocs was removed in Lucene 4 with no alternative replacement
@@ -61,7 +62,7 @@ public class FSDirectoryTest extends SearchTestCase {
 
 		Directory dir = FSDirectory.open( new File( getBaseIndexDir().toString(), "Documents" ) );
 		try {
-			IndexReader reader = IndexReader.open( dir );
+			IndexReader reader = DirectoryReader.open( dir );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
@@ -87,7 +88,7 @@ public class FSDirectoryTest extends SearchTestCase {
 			s.getTransaction().commit();
 			s.close();
 
-			reader = IndexReader.open( dir, true );
+			reader = DirectoryReader.open( dir );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 2, num );
@@ -106,7 +107,7 @@ public class FSDirectoryTest extends SearchTestCase {
 			s.getTransaction().commit();
 			s.close();
 
-			reader = IndexReader.open( dir, true );
+			reader = DirectoryReader.open( dir );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
