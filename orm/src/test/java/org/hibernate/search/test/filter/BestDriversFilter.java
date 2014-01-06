@@ -25,11 +25,13 @@ package org.hibernate.search.test.filter;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.Term;
-//TermDocs was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.OpenBitSet;
 
 /**
@@ -38,12 +40,20 @@ import org.apache.lucene.util.OpenBitSet;
 public class BestDriversFilter extends Filter {
 
 	@Override
-	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+		AtomicReader reader = context.reader();
 		OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
-		TermDocs termDocs = reader.termDocs( new Term( "score", "5" ) );
-		while ( termDocs.next() ) {
-			bitSet.set( termDocs.doc() );
+		DocsEnum termDocsEnum = reader.termDocsEnum( new Term( "score", "5" ) );
+		if ( termDocsEnum == null ) {
+			return bitSet;//All bits already correctly set
+		}
+		while ( termDocsEnum.nextDoc() != DocsEnum.NO_MORE_DOCS ) {
+			final int docID = termDocsEnum.docID();
+			if ( acceptDocs == null || acceptDocs.get( docID ) ) {
+				bitSet.set( docID );
+			}
 		}
 		return bitSet;
 	}
+
 }

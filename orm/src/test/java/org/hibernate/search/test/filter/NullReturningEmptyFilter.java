@@ -22,10 +22,11 @@ package org.hibernate.search.test.filter;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.Bits;
 
 /**
  * Apparently it's legal for Lucene filters to return null
@@ -49,7 +50,7 @@ public class NullReturningEmptyFilter extends Filter implements Serializable {
 	};
 
 	@Override
-	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
 		return EMPTY_DOCIDSET;
 	}
 
