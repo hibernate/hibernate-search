@@ -40,8 +40,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.DocIdBitSet;
+import org.apache.lucene.util.FixedBitSet;
 import org.apache.lucene.util.OpenBitSet;
-//SortedVIntList was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.util.packed.EliasFanoDocIdSet;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 import org.junit.Test;
 
@@ -317,9 +318,24 @@ public class AndDocIdSetsTest {
 
 	// HSEARCH-610
 	@Test
-	public void testWithSortedVIntList() {
-		SortedVIntList idSet1 = new SortedVIntList( 0, 5, 6, 10 );
-		SortedVIntList idSet2 = new SortedVIntList( 6 );
+	public void testWithFixedBitSet() throws IOException {
+		FixedBitSet idSet1 = new FixedBitSet( 12 );
+		idSet1.or( integersToDocIdSet( 0, 5, 6, 10 ).iterator() );
+		FixedBitSet idSet2 = new FixedBitSet( 7 );
+		idSet2.set( 6 );
+		AndDocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
+
+		DocIdSet expected = integersToDocIdSet( 6 );
+		assertTrue( docIdSetsEqual( expected, actual ) );
+	}
+
+	// HSEARCH-610
+	@Test
+	public void testWithEliasFanoBitSet() throws IOException {
+		EliasFanoDocIdSet idSet1 = new EliasFanoDocIdSet( 4, 12 );
+		idSet1.encodeFromDisi( integersToDocIdSet( 0, 5, 6, 10 ).iterator() );
+		EliasFanoDocIdSet idSet2 = new EliasFanoDocIdSet( 1, 6 );
+		idSet2.encodeFromDisi( integersToDocIdSet( 6 ).iterator() );
 		AndDocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
 
 		DocIdSet expected = integersToDocIdSet( 6 );
