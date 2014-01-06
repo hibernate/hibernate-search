@@ -30,9 +30,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.FieldCache;
+import org.apache.lucene.search.FieldCache.Ints;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -319,10 +321,9 @@ public class SortTest extends SearchTestCase {
 		private final int[] field1Values;
 		private final int[] field2Values;
 
-		private int[] currentReaderValuesField1;
-		private int[] currentReaderValuesField2;
+		private Ints currentReaderValuesField1;
+		private Ints currentReaderValuesField2;
 		private int bottom;
-
 
 		public SumFieldComparator(int numHits, String field1, String field2) {
 			this.field1 = field1;
@@ -339,7 +340,6 @@ public class SortTest extends SearchTestCase {
 			return compareValues( v1, v2 );
 		}
 
-
 		private int compareValues(int v1, int v2) {
 			if ( v1 > v2 ) {
 				return 1;
@@ -354,25 +354,27 @@ public class SortTest extends SearchTestCase {
 
 		@Override
 		public int compareBottom(int doc) {
-			int v = currentReaderValuesField1[doc] + currentReaderValuesField2[doc];
+			int v = currentReaderValuesField1.get( doc ) + currentReaderValuesField2.get( doc );
 			return compareValues( bottom, v );
 		}
 
 		@Override
 		public void copy(int slot, int doc) {
-			int v1 = currentReaderValuesField1[doc];
+			int v1 = currentReaderValuesField1.get( doc );
 			field1Values[slot] = v1;
 
-			int v2 = currentReaderValuesField2[doc];
+			int v2 = currentReaderValuesField2.get( doc );
 			field2Values[slot] = v2;
 		}
 
 		@Override
-		public void setNextReader(IndexReader reader, int docBase) throws IOException {
+		public FieldComparator<Integer> setNextReader(AtomicReaderContext context) throws IOException {
+			final AtomicReader reader = context.reader();
 			currentReaderValuesField1 = FieldCache.DEFAULT
-					.getInts( reader, field1, FieldCache.DEFAULT_INT_PARSER, false );
+					.getInts( reader, field1, false );
 			currentReaderValuesField2 = FieldCache.DEFAULT
-					.getInts( reader, field2, FieldCache.DEFAULT_INT_PARSER, false );
+					.getInts( reader, field2, false );
+			return this;
 		}
 
 		@Override
@@ -384,5 +386,11 @@ public class SortTest extends SearchTestCase {
 		public Integer value(int slot) {
 			return field1Values[slot] + field2Values[slot];
 		}
+
+		@Override
+		public int compareDocToValue(int doc, Integer value) throws IOException {
+			return value - field1Values[doc] - field2Values[doc];
+		}
+
 	}
 }
