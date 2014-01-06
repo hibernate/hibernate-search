@@ -24,7 +24,8 @@
 package org.hibernate.search.test.bridge;
 
 import org.apache.lucene.document.Document;
-//Fieldable was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.IndexableField;
+
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
@@ -34,7 +35,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 public class TruncateFieldBridge implements FieldBridge {
 
 	public Object get(String name, Document document) {
-		Fieldable field = document.getFieldable( name );
+		IndexableField field = document.getField( name );
 		return field.stringValue();
 	}
 

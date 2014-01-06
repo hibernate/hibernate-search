@@ -135,7 +135,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 			for ( String fieldName : fieldNames ) {
-				Fieldable field = new Field(
+				Field field = new Field(
 						fieldName,
 						"This text will be replaced by the test analyzers",
 						luceneOptions.getStore(),
@@ -172,7 +172,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			Fieldable field = new Field(
+			Field field = new Field(
 					name,
 					"This text will be replaced by the test analyzers",
 					luceneOptions.getStore(),

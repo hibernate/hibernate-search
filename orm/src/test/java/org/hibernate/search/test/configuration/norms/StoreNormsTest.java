@@ -24,7 +24,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.document.Document;
-//Fieldable was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -63,13 +63,13 @@ public class StoreNormsTest extends SearchTestCase {
 		AddLuceneWork addLuceneWork = (AddLuceneWork) processedQueue.get( 0 );
 		Document doc = addLuceneWork.getDocument();
 
-		Fieldable implicitNormField = doc.getFieldable( "withNormsImplicit" );
+		IndexableField implicitNormField = doc.getField( "withNormsImplicit" );
 		assertFalse( "norms should be stored for this field", implicitNormField.getOmitNorms() );
 
-		Fieldable explicitNormField = doc.getFieldable( "withNormsExplicit" );
+		IndexableField explicitNormField = doc.getField( "withNormsExplicit" );
 		assertFalse( "norms should be stored for this field", explicitNormField.getOmitNorms() );
 
-		Fieldable withoutNormField = doc.getFieldable( "withoutNorms" );
+		IndexableField withoutNormField = doc.getField( "withoutNorms" );
 		assertTrue( "norms should not be stored for this field", withoutNormField.getOmitNorms() );
 	}
 

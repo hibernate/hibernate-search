@@ -27,8 +27,8 @@ import java.util.zip.DataFormatException;
 
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
-//Fieldable was removed in Lucene 4 with no alternative replacement
 
+import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -50,11 +50,11 @@ public class HTMLBoldFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
 	@Override
 	public Object get(String name, Document document) {
-		Fieldable field = document.getFieldable( name );
+		IndexableField field = document.getField( name );
 			String stringValue;
-			if ( field.isBinary() ) {
+			if ( field.binaryValue() != null ) {
 				try {
-					stringValue = CompressionTools.decompressString( field.getBinaryValue() );
+					stringValue = CompressionTools.decompressString( field.binaryValue() );
 				}
 			catch (DataFormatException e) {
 					throw new SearchException( "Field " + name + " looks like binary but couldn't be decompressed" );
