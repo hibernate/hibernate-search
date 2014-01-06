@@ -332,7 +332,7 @@ public class AndDocIdSetsTest {
 		DocIdSet idSet2 = integersToDocIdSet( 0, 5, 6, 10 );
 		DocIdSet actual = createAndDocIdSet( idSet1, idSet2 );
 
-		DocIdSet expected = DocIdSet.EMPTY_DOCIDSET;
+		DocIdSet expected = AndDocIdSet.EMPTY_DOCIDSET;
 		assertTrue( docIdSetsEqual( expected, actual ) );
 	}
 

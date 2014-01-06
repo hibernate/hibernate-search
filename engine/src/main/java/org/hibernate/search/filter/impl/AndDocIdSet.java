@@ -167,7 +167,7 @@ public class AndDocIdSet extends DocIdSet {
 		return targetPosition;
 	}
 
-	private static final DocIdSet EMPTY_DOCIDSET = new DocIdSet() {
+	public static final DocIdSet EMPTY_DOCIDSET = new DocIdSet() {
 
 		@Override
 		public DocIdSetIterator iterator() {
