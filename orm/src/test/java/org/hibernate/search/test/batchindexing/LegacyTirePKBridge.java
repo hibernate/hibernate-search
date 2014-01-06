@@ -24,7 +24,8 @@
 package org.hibernate.search.test.batchindexing;
 
 import org.apache.lucene.document.Document;
-//Fieldable was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.IndexableField;
+
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
@@ -39,9 +40,9 @@ public class LegacyTirePKBridge implements TwoWayFieldBridge {
 	@Override
 	public Object get(String name, Document document) {
 		LegacyTirePK id = new LegacyTirePK();
-		Fieldable field = document.getFieldable( name + CAR_ID );
+		IndexableField field = document.getField( name + CAR_ID );
 		id.setCarId( field.stringValue() );
-		field = document.getFieldable( name + TIRE_ID );
+		field = document.getField( name + TIRE_ID );
 		id.setTireId( field.stringValue() );
 		return id;
 	}

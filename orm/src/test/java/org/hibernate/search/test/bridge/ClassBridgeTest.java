@@ -157,10 +157,10 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertEquals( "id incorrect", 1, ((Departments)projection[0]).getId() );
 		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
-		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getFieldable( "equiptype" ) );
-		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getFieldable( "equiptype" ).stringValue() );
-		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getFieldable( "branchnetwork" ) );
-		assertEquals( "branchnetwork incorrect", "Salt Lake City 1A", ( (Document) projection[1] ).getFieldable( "branchnetwork" ).stringValue() );
+		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getField( "equiptype" ) );
+		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getField( "equiptype" ).stringValue() );
+		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getField( "branchnetwork" ) );
+		assertEquals( "branchnetwork incorrect", "Salt Lake City 1A", ( (Document) projection[1] ).getField( "branchnetwork" ).stringValue() );
 
 		projections.next();
 		projection = projections.get();
@@ -169,10 +169,10 @@ public class ClassBridgeTest extends SearchTestCase {
 		assertEquals( "id incorrect", 4, ((Departments)projection[0]).getId() );
 		assertTrue( "DOCUMENT incorrect", projection[1] instanceof Document );
 		assertEquals( "DOCUMENT size incorrect", 8, ( (Document) projection[1] ).getFields().size() );
-		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getFieldable( "equiptype" ) );
-		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getFieldable( "equiptype" ).stringValue() );
-		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getFieldable( "branchnetwork" ) );
-		assertEquals( "branchnetwork incorrect", "St. George 1D", ( (Document) projection[1] ).getFieldable( "branchnetwork" ).stringValue() );
+		assertNotNull( "equiptype is null", ( (Document) projection[1] ).getField( "equiptype" ) );
+		assertEquals( "equiptype incorrect", "Cisco", ( (Document) projection[1] ).getField( "equiptype" ).stringValue() );
+		assertNotNull( "branchnetwork is null", ( (Document) projection[1] ).getField( "branchnetwork" ) );
+		assertEquals( "branchnetwork incorrect", "St. George 1D", ( (Document) projection[1] ).getField( "branchnetwork" ).stringValue() );
 
 		assertTrue( "incorrect result count returned", projections.isLast() );
 		//cleanup

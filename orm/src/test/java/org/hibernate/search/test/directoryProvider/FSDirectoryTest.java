@@ -74,7 +74,7 @@ public class FSDirectoryTest extends SearchTestCase {
 				assertTrue( docs.next() );
 				doc = reader.document( docs.doc() );
 				assertFalse( docs.next() );
-				assertEquals( "1", doc.getFieldable( "id" ).stringValue() );
+				assertEquals( "1", doc.getField( "id" ).stringValue() );
 			}
 			finally {
 				reader.close();
@@ -115,7 +115,7 @@ public class FSDirectoryTest extends SearchTestCase {
 				assertTrue( docs.next() );
 				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
 				assertFalse( docs.next() );
-				assertEquals( "2", doc.getFieldable( "id" ).stringValue() );
+				assertEquals( "2", doc.getField( "id" ).stringValue() );
 			}
 			finally {
 				reader.close();
