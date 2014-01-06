@@ -86,7 +86,7 @@ public class ProgrammaticIndexAndQueryNullTest extends SearchTestCase {
 		assertEquals(
 				"The programmatically configured null value should be in the document",
 				"@null@",
-				doc.getFieldable( "value" ).stringValue()
+				doc.getField( "value" ).stringValue()
 		);
 
 		tx.commit();

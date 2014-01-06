@@ -24,7 +24,7 @@
 package org.hibernate.search.test.id;
 
 import org.apache.lucene.document.Document;
-//Fieldable was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -37,9 +37,9 @@ public class PersonPKBridge implements TwoWayFieldBridge {
 	@Override
 	public Object get(String name, Document document) {
 		PersonPK id = new PersonPK();
-		Fieldable field = document.getFieldable( name + ".firstName" );
+		IndexableField field = document.getField( name + ".firstName" );
 		id.setFirstName( field.stringValue() );
-		field = document.getFieldable( name + ".lastName" );
+		field = document.getField( name + ".lastName" );
 		id.setLastName( field.stringValue() );
 		return id;
 	}

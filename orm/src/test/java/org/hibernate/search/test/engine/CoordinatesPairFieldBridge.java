@@ -24,7 +24,7 @@
 package org.hibernate.search.test.engine;
 
 import org.apache.lucene.document.Document;
-//Fieldable was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -47,15 +47,15 @@ public class CoordinatesPairFieldBridge implements TwoWayFieldBridge {
 	@Override
 	public Object get(String name, Document document) {
 		StringBuilder sb = new StringBuilder( 7 );
-		Fieldable xFieldable = document.getFieldable( getXFieldName( name ) );
-		Fieldable yFieldable = document.getFieldable( getYFieldName( name ) );
+		IndexableField xFieldable = document.getField( getXFieldName( name ) );
+		IndexableField yFieldable = document.getField( getYFieldName( name ) );
 		appendValue( xFieldable, sb );
 		sb.append( ';' );
 		appendValue( yFieldable, sb );
 		return sb.toString();
 	}
 
-	private void appendValue(final Fieldable field, final StringBuilder sb) {
+	private void appendValue(final IndexableField field, final StringBuilder sb) {
 		if ( field != null ) {
 			sb.append( field.stringValue() );
 		}

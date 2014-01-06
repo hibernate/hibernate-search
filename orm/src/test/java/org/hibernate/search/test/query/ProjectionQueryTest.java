@@ -458,7 +458,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "id field name not projected", 1001, projection[0] );
 		assertEquals(
 				"Document fields should not be lazy on DOCUMENT projection",
-				"Jackson", ( (Document) projection[1] ).getFieldable( "lastname" ).stringValue()
+				"Jackson", ( (Document) projection[1] ).getField( "lastname" ).stringValue()
 		);
 		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[1] ).getFields().size() );
 
