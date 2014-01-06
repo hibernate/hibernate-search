@@ -145,7 +145,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		s.close();
 
 		FSDirectory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
-		IndexReader indexReader = IndexReader.open( dir, true );
+		IndexReader indexReader = DirectoryReader.open( dir );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		try {
 			QueryParser qp = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
@@ -180,7 +180,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		s.close();
 
 		Directory dir = FSDirectory.open( new File( getBaseIndexDir(), "Documents" ) );
-		IndexReader indexReader = IndexReader.open( dir, true );
+		IndexReader indexReader = DirectoryReader.open( dir );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		// deleting before search, but after IndexSearcher creation:
 		// ( fails when deleting -concurrently- to IndexSearcher initialization! )
