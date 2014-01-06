@@ -64,13 +64,13 @@ public class StoreNormsTest extends SearchTestCase {
 		Document doc = addLuceneWork.getDocument();
 
 		IndexableField implicitNormField = doc.getField( "withNormsImplicit" );
-		assertFalse( "norms should be stored for this field", implicitNormField.getOmitNorms() );
+		assertFalse( "norms should be stored for this field", implicitNormField.fieldType().omitNorms() );
 
 		IndexableField explicitNormField = doc.getField( "withNormsExplicit" );
-		assertFalse( "norms should be stored for this field", explicitNormField.getOmitNorms() );
+		assertFalse( "norms should be stored for this field", explicitNormField.fieldType().omitNorms() );
 
 		IndexableField withoutNormField = doc.getField( "withoutNorms" );
-		assertTrue( "norms should not be stored for this field", withoutNormField.getOmitNorms() );
+		assertTrue( "norms should not be stored for this field", withoutNormField.fieldType().omitNorms() );
 	}
 
 	@Override
