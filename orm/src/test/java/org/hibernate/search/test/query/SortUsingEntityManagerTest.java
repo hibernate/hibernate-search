@@ -82,7 +82,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	public void testResultOrderedByDateDescending() throws Exception {
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
-		Sort dateDescending = new Sort( new SortField( "creationDate", SortField.STRING, DESC ) );
+		Sort dateDescending = new Sort( new SortField( "creationDate", SortField.Type.STRING, DESC ) );
 		List<ProductArticle> result = query( "Hib*" ).setSort( dateDescending ).setFirstResult( 3 ).getResultList();
 
 		assertThat( result ).as( "query result" ).hasSize( 3 );

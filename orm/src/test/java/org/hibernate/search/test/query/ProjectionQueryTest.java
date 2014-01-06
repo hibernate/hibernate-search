@@ -170,7 +170,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 				FullTextQuery.DOCUMENT,
 				FullTextQuery.ID
 		);
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		resetFieldSelector();
 		ScrollableResults projections = hibQuery.scroll();
@@ -231,7 +231,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.ID );
 		hibQuery.setResultTransformer( new ProjectionToDelimStringResultTransformer() );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		resetFieldSelector();
 		@SuppressWarnings("unchecked")
@@ -268,7 +268,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 				FullTextQuery.DOCUMENT,
 				FullTextQuery.ID
 		);
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		hibQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
 
@@ -417,7 +417,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNotNull( "Date", projection[8] );
 		assertNotNull( "Lucene internal doc id", projection[9] );
 
-		hibQuery.setSort( new Sort( new SortField("lastname", SortField.STRING_VAL) ) );
+		hibQuery.setSort( new Sort( new SortField( "lastname", SortField.Type.STRING ) ) );
 		hibQuery.setProjection(
 				FullTextQuery.THIS, FullTextQuery.SCORE
 		);
