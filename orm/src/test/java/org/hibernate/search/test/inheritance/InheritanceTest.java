@@ -104,7 +104,7 @@ public class InheritanceTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "Query filtering on superclass return mapped subclasses", 2, result.size() );
 
-		query = new TermRangeQuery( "weight", "04000", "05000", true, true );
+		query = TermRangeQuery.newStringRange( "weight", "04000", "05000", true, true );
 		hibQuery = s.createFullTextQuery( query, Animal.class );
 		assertItsTheElephant( hibQuery.list() );
 
