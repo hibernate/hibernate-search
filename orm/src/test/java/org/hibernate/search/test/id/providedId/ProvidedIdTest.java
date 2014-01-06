@@ -36,6 +36,8 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.Similarity;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.Work;
@@ -108,8 +110,11 @@ public class ProvidedIdTest {
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 3, hits.totalHits );
 
+		final Similarity defaultSimilarity = new DefaultSimilarity();
+
 		//follows an example of what Infinispan Query actually needs to resolve a search request:
-		LazyQueryState lowLevelSearcher = new LazyQueryState( searcher, false, false );
+		LazyQueryState lowLevelSearcher = new LazyQueryState( luceneQuery, indexReader, defaultSimilarity, false, false );
+
 		QueryHits queryHits = new QueryHits(
 				lowLevelSearcher, null, null,
 				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, sf.getTimingSource() ),
@@ -143,7 +148,6 @@ public class ProvidedIdTest {
 		assertTrue( titles.contains( "Regular goat" ) );
 		assertTrue( titles.contains( "Mini Goat" ) );
 		assertTrue( titles.contains( "Big Goat" ) );
-		searcher.close();
 		sf.getIndexReaderAccessor().close( indexReader );
 	}
 }
