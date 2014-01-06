@@ -157,7 +157,6 @@ public class FSDirectoryTest extends SearchTestCase {
 			assertEquals( "Hibernate in Action", doc.get( "title" ) );
 		}
 		finally {
-			searcher.close();
 			indexReader.close();
 			dir.close();
 		}
@@ -191,7 +190,6 @@ public class FSDirectoryTest extends SearchTestCase {
 		assertEquals( 1, hits.totalHits );
 		org.apache.lucene.document.Document doc = searcher.doc( 0 );
 		assertEquals( "Hibernate Search in Action", doc.get( "title" ) );
-		searcher.close();
 		indexReader.close();
 		dir.close();
 	}
