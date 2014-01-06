@@ -23,14 +23,16 @@
  */
 package org.hibernate.search.test.embedded.depth;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.index.ReaderUtil;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
@@ -160,7 +162,7 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		checkRawIndexFields();
 	}
 
-	private void checkRawIndexFields() {
+	private void checkRawIndexFields() throws IOException {
 		// check raw index as well:
 		Assert.assertTrue( indexContainsField( "name" ) );
 		Assert.assertTrue( indexContainsField( "employees.name" ) );
@@ -175,11 +177,16 @@ public class WorkDoneOnEntitiesTest extends SearchTestCase {
 		Assert.assertFalse( indexContainsField( "parents.parents.parents.employees.name" ) );
 	}
 
-	private boolean indexContainsField(String fieldName) {
+	private boolean indexContainsField(String fieldName) throws IOException {
 		IndexReaderAccessor indexReaderAccessor = getSearchFactory().getIndexReaderAccessor();
 		IndexReader indexReader = indexReaderAccessor.open( WorkingPerson.class );
 		try {
-			return ReaderUtil.getIndexedFields( indexReader ).contains( fieldName );
+			for ( AtomicReaderContext leave : indexReader.leaves() ) {
+				if ( leave.reader().terms( fieldName ) != null ) {
+					return true;
+				}
+			}
+			return false;
 		}
 		finally {
 			indexReaderAccessor.close( indexReader );
