@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.directoryProvider;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -85,7 +86,7 @@ public class RamDirectoryTest extends SearchTestCase {
 	}
 
 	private int getDocumentNbr() throws Exception {
-		IndexReader reader = IndexReader.open( getDirectory( Document.class ), true );
+		IndexReader reader = DirectoryReader.open( getDirectory( Document.class ) );
 		try {
 			return reader.numDocs();
 		}
