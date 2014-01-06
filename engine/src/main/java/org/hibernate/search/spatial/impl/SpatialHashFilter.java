@@ -76,8 +76,10 @@ public final class SpatialHashFilter extends Filter {
 						break;
 					}
 					else {
-						matchedDocumentsIds.fastSet( docId );
-						found = true;
+						if ( acceptDocs == null || acceptDocs.get( docId ) ) {
+							matchedDocumentsIds.fastSet( docId );
+							found = true;
+						}
 					}
 				}
 			}
