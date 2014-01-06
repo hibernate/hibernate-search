@@ -377,7 +377,6 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		IndexReader indexReader = fullTextSession.getSearchFactory().getIndexReaderAccessor().open( ProvidedIdEntry.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
-		searcher.close();
 		fullTextSession.getSearchFactory().getIndexReaderAccessor().close( indexReader );
 		transaction.commit();
 		getSession().close();

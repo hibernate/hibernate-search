@@ -99,7 +99,6 @@ public class MutableFactoryTest {
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
-		searcher.close();
 		sf.getIndexReaderAccessor().close( indexReader );
 
 		sf = builder.currentFactory( sf )
@@ -119,7 +118,6 @@ public class MutableFactoryTest {
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
-		searcher.close();
 		sf.getIndexReaderAccessor().close( indexReader );
 
 		sf.close();
@@ -146,7 +144,6 @@ public class MutableFactoryTest {
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
-		searcher.close();
 		sf.getIndexReaderAccessor().close( indexReader );
 
 		sf.addClasses( B.class, C.class );
@@ -164,7 +161,6 @@ public class MutableFactoryTest {
 		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
-		searcher.close();
 		sf.getIndexReaderAccessor().close( indexReader );
 
 		luceneQuery = parser.parse( "Vincent" );
@@ -174,7 +170,6 @@ public class MutableFactoryTest {
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
-		searcher.close();
 		sf.getIndexReaderAccessor().close( indexReader );
 
 		sf.close();
@@ -226,7 +221,6 @@ public class MutableFactoryTest {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			TopDocs hits = searcher.search( luceneQuery, 1000 );
 			assertEquals( 1, hits.totalHits );
-			searcher.close();
 			sf.getIndexReaderAccessor().close( indexReader );
 		}
 	}
@@ -302,7 +296,6 @@ public class MutableFactoryTest {
 						failureInfo = "failure: Emmanuel" + i + " for " + aClass.getName();
 						return;
 					}
-					searcher.close();
 					factory.getIndexReaderAccessor().close( indexReader );
 				}
 			}
