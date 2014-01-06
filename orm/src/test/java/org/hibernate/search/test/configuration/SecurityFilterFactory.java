@@ -25,12 +25,14 @@ package org.hibernate.search.test.configuration;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.Term;
-//TermDocs was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.OpenBitSet;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Key;
@@ -38,8 +40,6 @@ import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
 
 public class SecurityFilterFactory {
-
-	private static final long serialVersionUID = -19238668272676998L;
 
 	private String ownerName;
 
@@ -61,7 +61,7 @@ public class SecurityFilterFactory {
 	}
 
 	private static final class SecurityFilter extends Filter {
-		private static final long serialVersionUID = -5105989141875576599L;
+
 		private final String ownerName;
 
 		private SecurityFilter(final String ownerName) {
@@ -69,11 +69,18 @@ public class SecurityFilterFactory {
 		}
 
 		@Override
-		public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+		public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+			final AtomicReader reader = context.reader();
 			OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
-			TermDocs termDocs = reader.termDocs( new Term( "owner", ownerName ) );
-			while ( termDocs.next() ) {
-				bitSet.set( termDocs.doc() );
+			DocsEnum termDocsEnum = reader.termDocsEnum( new Term( "owner", ownerName ) );
+			if ( termDocsEnum == null ) {
+				return bitSet;//All bits already correctly set
+			}
+			while ( termDocsEnum.nextDoc() != DocsEnum.NO_MORE_DOCS ) {
+				final int docID = termDocsEnum.docID();
+				if ( acceptDocs == null || acceptDocs.get( docID ) ) {
+					bitSet.set( docID );
+				}
 			}
 			return bitSet;
 		}
