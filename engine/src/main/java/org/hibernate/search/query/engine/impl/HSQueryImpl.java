@@ -272,6 +272,9 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			int max = max( first, queryHits.getTotalHits() );
 
 			int size = max - first + 1 < 0 ? 0 : max - first + 1;
+			if ( size == 0 ) {
+				return Collections.emptyList();
+			}
 			List<EntityInfo> infos = new ArrayList<EntityInfo>( size );
 			DocumentExtractor extractor = buildDocumentExtractor( searcher, queryHits, first, max );
 			for ( int index = first; index <= max; index++ ) {
