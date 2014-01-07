@@ -174,10 +174,8 @@ public class ShardsTest extends SearchTestCase {
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
-				TermDocs docs = reader.termDocs( new Term( "name", "mouse" ) );
-				assertTrue( docs.next() );
-				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-				assertFalse( docs.next() );
+				int numberOfMice = reader.docFreq( new Term( "name", "mouse" ) );
+				assertEquals( 1, numberOfMice );
 			}
 			finally {
 				reader.close();
