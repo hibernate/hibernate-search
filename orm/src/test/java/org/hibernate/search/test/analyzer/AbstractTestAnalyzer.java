@@ -23,13 +23,10 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 
 /**
  * @author Emmanuel Bernard
@@ -43,39 +40,6 @@ public abstract class AbstractTestAnalyzer extends Analyzer {
 	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
 		Tokenizer tokenizer = new StreamWrappingTokenizer( reader, getTokens() );
 		return new TokenStreamComponents( tokenizer );
-	}
-
-	private static final class StreamWrappingTokenizer extends Tokenizer {
-
-		private final OffsetAttribute offsetAttribute = addAttribute( OffsetAttribute.class );
-		private final CharTermAttribute termAttribute = addAttribute( CharTermAttribute.class );
-		private final String[] tokens;
-		private int position = 0;
-
-		public StreamWrappingTokenizer(Reader input, String[] tokens) {
-			super( input );
-			this.tokens = tokens;
-		}
-
-		@Override
-		public boolean incrementToken() throws IOException {
-			if ( position >= tokens.length ) {
-				return false;
-			}
-			else {
-				clearAttributes();
-				final String token = tokens[position++];
-				termAttribute.append( token );
-				offsetAttribute.setOffset( 0, token.length() );
-				return true;
-			}
-		}
-
-		@Override
-		public void reset() throws IOException {
-			super.reset();
-			position = 0;
-		}
 	}
 
 }
