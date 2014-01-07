@@ -23,99 +23,56 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import java.io.IOException;
 import java.io.Reader;
-import java.util.Collections;
 import java.util.Map;
 
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.apache.lucene.util.AttributeSource.AttributeFactory;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
-public abstract class TestTokenizer extends Tokenizer implements TokenizerFactory {
-	private final CharTermAttribute termAttribute = addAttribute( CharTermAttribute.class );
-	private int i = 0;
+public abstract class TestTokenizer extends TokenizerFactory {
 
-	public TestTokenizer(Reader input) {
-		super( input );
-	}
-
-	public abstract String[] getTokens();
-
-	@Override
-	public final boolean incrementToken() throws IOException {
-		if ( i < getTokens().length ) {
-			clearAttributes();
-			termAttribute.append( getTokens()[i] );
-			i++;
-			return true;
+	protected TestTokenizer(Map<String, String> args) {
+		super( args );
+		assureMatchVersion();
+		if ( !args.isEmpty() ) {
+			throw new IllegalArgumentException( "Unknown parameters: " + args );
 		}
-		return false;
 	}
 
 	@Override
-	public void init(Map<String, String> args) {
-	}
-
-	@Override
-	public Map<String, String> getArgs() {
-		return Collections.emptyMap();
-	}
+	public abstract StreamWrappingTokenizer create(AttributeFactory factory, Reader input);
 
 	public static class TestTokenizer1 extends TestTokenizer {
-		private final String[] tokens = { "dog" };
-
-		public TestTokenizer1() {
-			super( null );
+		public TestTokenizer1(Map<String, String> args) {
+			super( args );
 		}
-
 		@Override
-		public String[] getTokens() {
-			return tokens;
-		}
-
-		@Override
-		public Tokenizer create(Reader input) {
-			return this;
+		public StreamWrappingTokenizer create(AttributeFactory factory, Reader input) {
+			return new StreamWrappingTokenizer( input, new String[]{ "dog" } );
 		}
 	}
 
 	public static class TestTokenizer2 extends TestTokenizer {
-		private final String[] tokens = { "cat" };
-
-		public TestTokenizer2() {
-			super( null );
+		public TestTokenizer2(Map<String, String> args) {
+			super( args );
 		}
-
 		@Override
-		public String[] getTokens() {
-			return tokens;
-		}
-
-		@Override
-		public Tokenizer create(Reader input) {
-			return this;
+		public StreamWrappingTokenizer create(AttributeFactory factory, Reader input) {
+			return new StreamWrappingTokenizer( input, new String[]{ "cat" } );
 		}
 	}
 
 	public static class TestTokenizer3 extends TestTokenizer {
-		private final String[] tokens = { "mouse" };
-
-		public TestTokenizer3() {
-			super( null );
+		public TestTokenizer3(Map<String, String> args) {
+			super( args );
 		}
-
 		@Override
-		public String[] getTokens() {
-			return tokens;
-		}
-
-		@Override
-		public Tokenizer create(Reader input) {
-			return this;
+		public StreamWrappingTokenizer create(AttributeFactory factory, Reader input) {
+			return new StreamWrappingTokenizer( input, new String[]{ "mouse" } );
 		}
 	}
 }
