@@ -28,6 +28,8 @@ import java.io.Serializable;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Represents possible options to be applied to an
@@ -134,22 +136,21 @@ public enum IndexWriterSetting implements Serializable {
 	},
 	/**
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setUseCompoundFile(boolean)
+	 * @deprecated No longer applied.
 	 */
+	@Deprecated
 	USE_COMPOUND_FILE( "use_compound_file" ) {
 		@Override
 		public Integer parseVal(String value) {
-			return USE_COMPOUND_FILE.parseBoolean( value );
-		}
-
-		@Override
-		public void applySetting(LogByteSizeMergePolicy logByteSizeMergePolicy, int value) {
-			boolean useCompoundFile = intToBoolean( value );
-			logByteSizeMergePolicy.setUseCompoundFile( useCompoundFile );
+			log.deprecatedPropertyIgnored( "use_compound_file" );
+			return IndexWriterSetting.FALSE;
 		}
 	};
 
 	private static final Integer TRUE = 1;
 	private static final Integer FALSE = 0;
+
+	private static final Log log = LoggerFactory.make();
 
 	private final String cfgKey;
 
