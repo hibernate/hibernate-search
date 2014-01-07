@@ -24,13 +24,16 @@
 package org.hibernate.search.test.directoryProvider;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-//TermDocs was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -38,16 +41,17 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
+import org.junit.Assert;
 
 /**
  * @author Gavin King
+ * @author Sanne Grinovero
  */
 public class FSDirectoryTest extends SearchTestCase {
 
@@ -66,15 +70,10 @@ public class FSDirectoryTest extends SearchTestCase {
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
-				TermDocs docs = reader.termDocs( new Term( "Abstract", "hibernate" ) );
-				assertTrue( docs.next() );
-				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-				assertFalse( docs.next() );
-				docs = reader.termDocs( new Term( "title", "action" ) );
-				assertTrue( docs.next() );
-				doc = reader.document( docs.doc() );
-				assertFalse( docs.next() );
-				assertEquals( "1", doc.getField( "id" ).stringValue() );
+				assertEquals( 1, reader.docFreq( new Term( "Abstract", "hibernate" ) ) );
+				assertEquals( 1, reader.docFreq( new Term( "title", "action" ) ) );
+				assertEquals( "1", projectSingleField( reader, "id", new Term( "title", "action" ) ) );
+
 			}
 			finally {
 				reader.close();
@@ -92,10 +91,7 @@ public class FSDirectoryTest extends SearchTestCase {
 			try {
 				int num = reader.numDocs();
 				assertEquals( 2, num );
-				TermDocs docs = reader.termDocs( new Term( "Abstract", "ejb" ) );
-				assertTrue( docs.next() );
-				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-				assertFalse( docs.next() );
+				assertEquals( 1, reader.docFreq( new Term( "Abstract", "ejb" ) ) );
 			}
 			finally {
 				reader.close();
@@ -111,11 +107,8 @@ public class FSDirectoryTest extends SearchTestCase {
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
-				TermDocs docs = reader.termDocs( new Term( "title", "seam" ) );
-				assertTrue( docs.next() );
-				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-				assertFalse( docs.next() );
-				assertEquals( "2", doc.getField( "id" ).stringValue() );
+				assertEquals( 1, reader.docFreq( new Term( "title", "seam" ) ) );
+				assertEquals( "2", projectSingleField( reader, "id", new Term( "title", "seam" ) ) );
 			}
 			finally {
 				reader.close();
@@ -130,6 +123,27 @@ public class FSDirectoryTest extends SearchTestCase {
 		s.delete( s.createCriteria( Document.class ).uniqueResult() );
 		s.getTransaction().commit();
 		s.close();
+	}
+
+	/**
+	 * Project a field as a String from a Lucene Document matching the provided term.
+	 * The method asserts that one match is found, and no more.
+	 */
+	private String projectSingleField(IndexReader reader, String fieldName, Term term) throws IOException {
+		String projection = null;
+		for ( AtomicReaderContext leaf : reader.leaves() ) {
+			final AtomicReader atomicReader = leaf.reader();
+			final DocsEnum termDocsEnum = atomicReader.termDocsEnum( term );
+			while ( termDocsEnum.nextDoc() != DocsEnum.NO_MORE_DOCS ) {
+				final int docID = termDocsEnum.docID();
+				org.apache.lucene.document.Document document = reader.document( docID );
+				String value = document.get( fieldName );
+				Assert.assertNull( "duplicate matches found! This method assumes a single document will match the Term.", projection );
+				projection = value;
+			}
+		}
+		Assert.assertNotNull( projection );
+		return projection;
 	}
 
 	public void testBoost() throws Exception {
