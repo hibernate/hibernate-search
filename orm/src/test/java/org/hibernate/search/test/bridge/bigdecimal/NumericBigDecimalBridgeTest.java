@@ -32,6 +32,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
@@ -46,7 +47,7 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.testing.SkipForDialect;
@@ -122,23 +123,39 @@ public class NumericBigDecimalBridgeTest extends SearchTestCase {
 		}
 	}
 
-	public static class BigDecimalNumericFieldBridge extends NumericFieldBridge {
+	public static class BigDecimalNumericFieldBridge implements TwoWayFieldBridge {
 		private static final BigDecimal storeFactor = BigDecimal.valueOf( 100 );
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			if ( value != null ) {
+			if ( value == null ) {
+				if ( luceneOptions.indexNullAs() != null ) {
+					luceneOptions.addFieldToDocument( name, luceneOptions.indexNullAs(), document );
+				}
+			}
+			else {
 				BigDecimal decimalValue = (BigDecimal) value;
 				long indexedValue = decimalValue.multiply( storeFactor ).longValue();
-				luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
+				luceneOptions.addLongFieldToDocument( name, indexedValue, document );
 			}
 		}
 
 		@Override
 		public Object get(String name, Document document) {
-			String fromLucene = document.get( name );
-			BigDecimal storedBigDecimal = new BigDecimal( fromLucene );
-			return storedBigDecimal.divide( storeFactor );
+			final IndexableField field = document.getField( name );
+			if ( field != null ) {
+				Number numericValue = field.numericValue();
+				BigDecimal bigValue = new BigDecimal( numericValue.longValue() );
+				return bigValue.divide( storeFactor );
+			}
+			else {
+				return null;
+			}
+		}
+
+		@Override
+		public final String objectToString(final Object object) {
+			return String.valueOf( object );
 		}
 	}
 }
