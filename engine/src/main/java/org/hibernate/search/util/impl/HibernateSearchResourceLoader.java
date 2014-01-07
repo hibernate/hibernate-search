@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.lucene.analysis.util.ResourceLoader;
+import org.hibernate.search.SearchException;
 
 /**
  * @author Emmanuel Bernard
@@ -51,7 +52,13 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 
 	@Override
 	public InputStream openResource(String resource) throws IOException {
-		return FileHelper.openResource( resource );
+		InputStream inputStream = FileHelper.openResource( resource );
+		if ( inputStream == null ) {
+			throw new SearchException( "Resource not found: " + resource );
+		}
+		else {
+			return inputStream;
+		}
 	}
 
 	@Override
