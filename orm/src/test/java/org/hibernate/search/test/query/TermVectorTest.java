@@ -23,9 +23,12 @@
  */
 package org.hibernate.search.test.query;
 
+import org.apache.lucene.index.DocsAndPositionsEnum;
 import org.apache.lucene.index.IndexReader;
-//org.apache.lucene.index.TermPositionVector was removed in Lucene 4 with no alternative replacement
-//org.apache.lucene.index.TermVectorOffsetInfo was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.util.BytesRef;
+
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -34,6 +37,7 @@ import org.hibernate.search.test.SearchTestCase;
 
 /**
  * @author John Griffin
+ * @author Sanne Grinovero
  */
 public class TermVectorTest extends SearchTestCase {
 
@@ -53,21 +57,25 @@ public class TermVectorTest extends SearchTestCase {
 		 * to assert a few. - J.G.
 		 */
 		int x = 0; // only Document zero is tested: asserts rely on natural document order
-		TermPositionVector vector = (TermPositionVector) reader.getTermFreqVector( x, "content" );
-		assertNotNull( vector );
-		String[] terms = vector.getTerms();
-		int[] freqs = vector.getTermFrequencies();
+		Terms termVector = reader.getTermVector( x, "content" );
+		assertNotNull( termVector );
+		TermsEnum iterator = termVector.iterator( null );
+		BytesRef next = iterator.next(); //move to first Document: we expect it to exist
+		assertNotNull( next );
+		long totalTermFreq = iterator.totalTermFreq();
 
-		assertEquals( "electrical", terms[x] );
-		assertEquals( 2, freqs[x] );
+		assertEquals( "electrical", next.utf8ToString() );
+		assertEquals( 2, totalTermFreq );
 
-		TermVectorOffsetInfo[] offsets = vector.getOffsets( x );
-		assertEquals( 0, offsets[x].getStartOffset() );
-		assertEquals( 10, offsets[x].getEndOffset() );
+		final DocsAndPositionsEnum docsAndPositions = iterator.docsAndPositions( null, null );
+		docsAndPositions.advance( 0 );//move to Document id 0
 
-		int[] termPositions = vector.getTermPositions( 0 );
-		assertEquals( 0, termPositions[0] );
-		assertEquals( 3, termPositions[1] );
+		docsAndPositions.nextPosition();
+		assertEquals( 0, docsAndPositions.startOffset() );//first term in sentence
+		assertEquals( 10, docsAndPositions.endOffset() );
+
+		docsAndPositions.nextPosition();
+		assertEquals( 29, docsAndPositions.startOffset() );//Term is mentioned again at character 29
 
 		// cleanup
 		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
@@ -93,8 +101,8 @@ public class TermVectorTest extends SearchTestCase {
 		SearchFactory searchFactory = s.getSearchFactory();
 		IndexReader reader = searchFactory.getIndexReaderAccessor().open( Employee.class );
 
-		TermPositionVector vector = (TermPositionVector) reader.getTermFreqVector( 0, "dept" );
-		assertNull( "should not find a term position vector", vector );
+		Terms termVector = reader.getTermVector( 0, "dept" );
+		assertNull( "should not find a term position vector", termVector );
 
 		// cleanup
 		for ( Object element : s.createQuery( "from " + ElectricalProperties.class.getName() ).list() ) {
