@@ -25,12 +25,12 @@
 package org.hibernate.search.test.util;
 
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.assertEquals;
 
 import java.io.IOException;
 
+import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.FieldInfo;
@@ -66,7 +66,7 @@ public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderPro
 	 */
 	public static void assertFieldSelectorEnabled(String... expectedFieldNames) throws IOException {
 		if ( expectedFieldNames == null || expectedFieldNames.length == 0 ) {
-			assertNull( FieldSelectorLeakingReaderProvider.fieldSelector );
+			assertFieldSelectorDisabled();
 		}
 		else {
 			assertNotNull( FieldSelectorLeakingReaderProvider.fieldSelector );
@@ -89,7 +89,9 @@ public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderPro
 	}
 
 	public static void assertFieldSelectorDisabled() {
-		assertNull( FieldSelectorLeakingReaderProvider.fieldSelector );
+		StoredFieldVisitor fieldVisitor = FieldSelectorLeakingReaderProvider.fieldSelector;
+		//DocumentStoredFieldVisitor is the type of the default fieldVisitor, so it's expected:
+		assertTrue( fieldVisitor == null || fieldVisitor instanceof DocumentStoredFieldVisitor );
 	}
 
 	public DirectoryReader openIndexReader() {
