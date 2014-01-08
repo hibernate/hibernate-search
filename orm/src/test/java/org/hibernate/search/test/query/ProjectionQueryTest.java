@@ -45,7 +45,6 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
@@ -95,7 +94,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		resetFieldSelector();
 		List result = hibQuery.list();
 		assertNotNull( result );
-		assertFieldSelectorEnabled( ProjectionConstants.ID );
+		assertFieldSelectorEnabled( "id" );
 
 		Object[] projection = (Object[]) result.get( 0 );
 		assertNotNull( projection );
@@ -236,7 +235,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		resetFieldSelector();
 		@SuppressWarnings("unchecked")
 		List<String> result = hibQuery.list();
-		assertFieldSelectorEnabled( "lastname", "dept", ProjectionConstants.ID );
+		assertFieldSelectorEnabled( "lastname", "dept", "id" );
 		assertTrue( "incorrect transformation", result.get( 0 ).startsWith( "1000, Griffin, ITech" ) );
 		assertTrue( "incorrect transformation", result.get( 1 ).startsWith( "1002, Jimenez, ITech" ) );
 
@@ -635,7 +634,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( 1, result.size() );
 		assertTrue( "Should not trigger projection", result.get( 0 ) instanceof Book );
-		assertFieldSelectorEnabled( ProjectionConstants.ID );
+		assertFieldSelectorEnabled( "id" );
 
 		query = parser.parse( "summary:fleurs" );
 		hibQuery = s.createFullTextQuery( query, Book.class );
