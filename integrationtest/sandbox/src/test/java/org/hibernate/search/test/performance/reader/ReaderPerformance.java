@@ -35,6 +35,7 @@ import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.test.SearchTestCase;
@@ -83,7 +84,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	private void buildBigIndex() throws InterruptedException, IOException {
 		System.out.println( "Going to create fake index..." );
 		FSDirectory directory = FSDirectory.open( new File( getBaseIndexDir(), Detective.class.getCanonicalName() ) );
-		Analyzer analyzer = new SimpleAnalyzer( Version.LUCENE_CURRENT );
+		SimpleAnalyzer analyzer = new SimpleAnalyzer( Version.LUCENE_CURRENT );
 		IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_CURRENT, analyzer);
 		IndexWriter iw = new IndexWriter( directory, cfg );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
