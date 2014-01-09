@@ -34,6 +34,7 @@ import org.apache.lucene.util.Bits;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.SegmentReader;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 
@@ -58,8 +59,7 @@ public class ExcludeAllFilter extends Filter implements Serializable {
 	}
 
 	public static void verifyItsAReadOnlySegmentReader(IndexReader reader) {
-		String implementationName = reader.getClass().getName();
-		if ( ! "org.apache.lucene.index.ReadOnlySegmentReader".equals( implementationName ) ) {
+		if ( ! ( reader instanceof SegmentReader ) ) {
 			throw new SearchException( "test failed: we should receive subreaders" );
 		}
 	}
