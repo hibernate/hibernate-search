@@ -30,8 +30,8 @@ import java.util.UUID;
 import junit.framework.Assert;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
-//NumericField was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
@@ -149,8 +149,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 		doc.add( field );
 		field = new Field( "logo", shirt.getLogo(), Field.Store.NO, Field.Index.ANALYZED );
 		doc.add( field );
-		NumericField numField = new NumericField( "length" );
-		numField.setDoubleValue( shirt.getLength() );
+		DoubleField numField = new DoubleField( "length", shirt.getLength(), Field.Store.NO );
 		doc.add( numField );
 		LuceneWork luceneWork = new AddLuceneWork(
 				shirt.getId(), String.valueOf( shirt.getId() ), shirt.getClass(), doc
