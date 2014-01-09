@@ -86,7 +86,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestCase {
 		@SuppressWarnings( "unchecked" )
 		List<Item> resultList = (List<Item>) fullTextSession.createFullTextQuery( rootQuery, Item.class ).list();
 		assertNotNull( resultList );
-		assertTrue( resultList.size() == 1 );
+		assertEquals( 1, resultList.size() );
 
 		tx.commit();
 		session.close();
@@ -155,7 +155,7 @@ public class NumericBigDecimalBridgeTest extends SearchTestCase {
 
 		@Override
 		public final String objectToString(final Object object) {
-			return String.valueOf( object );
+			return object == null ? null : String.valueOf( object );
 		}
 	}
 }
