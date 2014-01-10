@@ -144,8 +144,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.6.2</luceneVersion>
-        <infinispanVersion>6.0.0.Final</infinispanVersion>
-        <jgroupsVersion>3.4.1.Final</jgroupsVersion>
+        <infinispanVersion>6.0.1.Final</infinispanVersion>
+        <jgroupsVersion>3.4.2.Final</jgroupsVersion>
         <hibernateVersion>4.3.0.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
