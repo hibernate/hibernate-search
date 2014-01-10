@@ -103,7 +103,9 @@ public class SharedIndexTest {
 
 	@After
 	public void tearDown() throws Exception {
-		node.close();
+		if ( node != null ) {
+			node.close();
+		}
 	}
 
 	@BeforeClass
