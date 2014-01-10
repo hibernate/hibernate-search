@@ -143,14 +143,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>**\*.java</exclude> <!-- we don't want to run performance tests for each build -->
-					</excludes>
-				</configuration>
-			</plugin>
-			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>

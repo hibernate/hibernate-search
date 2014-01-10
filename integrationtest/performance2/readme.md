@@ -3,8 +3,6 @@ Hibernate Search Performance Tests
 
 ## Description
 
-Performance tests are disabled by default, they are not part of normal build.
-
 Test can be run in two modes, standalone via `TestRunnerStandalone` or in container via `TestRunnerArquillain`.
 
 Test is controled by class `TestScenario` or more precisely by one of its subclass, 
