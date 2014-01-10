@@ -32,6 +32,7 @@ import javax.persistence.PersistenceContext;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.Version;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -59,11 +60,15 @@ public class TestRunnerArquillian {
 
 	private static final TestScenario scenario = TestScenarioFactory.create();
 
+	public static final String RUNNER_PROPERTIES = "runner.properties";
+	public static final String TARGET_DIR_KEY = "target";
+
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		WebArchive archive = ShrinkWrap
 				.create( WebArchive.class, TestRunnerArquillian.class.getSimpleName() + ".war" )
 				.addPackages( true, TestRunnerArquillian.class.getPackage() )
+				.addClass( TestConstants.class )
 				.addAsResource( createPersistenceXml(), "META-INF/persistence.xml" )
 				.addAsLibraries( DependencyResolvers.use( MavenDependencyResolver.class )
 						.artifact( "org.hibernate:hibernate-search-orm:" + Version.getVersionString() )
@@ -71,7 +76,8 @@ public class TestRunnerArquillian {
 						.exclusion( "org.hibernate:hibernate-core" )
 						.exclusion( "org.jboss.logging:jboss-logging" )
 						.resolveAs( JavaArchive.class ) )
-				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
+				.addAsWebInfResource( new StringAsset( TARGET_DIR_KEY + "=" + TestConstants.getTargetDir( TestRunnerArquillian.class ).getAbsolutePath() ), "classes/" + RUNNER_PROPERTIES );
 		return archive;
 	}
 

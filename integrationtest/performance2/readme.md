@@ -10,7 +10,7 @@ which should be specified via system property `-Dscenario`.
 Test scenario defines used hibernate configuration, number of threads, number of test cycles and what tasks will be executed during one test cycle. 
 It has following phases: initialize database, warm up, clean up, initialize index and own measurement.
 
-At the end is generated test report. It contains summary about test environment, used versions, 
+At the end is generated test report, into target directory. It contains summary about test environment, used versions, 
 total time per each phase, total time per each task, approximately memory usage before and after test, 
 log from index check and log about uncaught exceptions.
 

@@ -25,6 +25,8 @@ package org.hibernate.search.test.performance.scenario;
 
 import static org.apache.commons.lang.StringUtils.leftPad;
 import static org.apache.commons.lang.StringUtils.rightPad;
+import static org.hibernate.search.test.performance.TestRunnerArquillian.RUNNER_PROPERTIES;
+import static org.hibernate.search.test.performance.TestRunnerArquillian.TARGET_DIR_KEY;
 import static org.hibernate.search.test.performance.scenario.TestContext.ASSERT_QUERY_RESULTS;
 import static org.hibernate.search.test.performance.scenario.TestContext.CHECK_INDEX_STATE;
 import static org.hibernate.search.test.performance.scenario.TestContext.MEASURE_MEMORY;
@@ -33,8 +35,10 @@ import static org.hibernate.search.test.performance.scenario.TestContext.THREADS
 import static org.hibernate.search.test.performance.scenario.TestContext.VERBOSE;
 import static org.hibernate.search.test.performance.util.Util.runGarbageCollectorAndWait;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -46,6 +50,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.performance.task.AbstractTask;
 import org.hibernate.search.test.performance.util.CheckerLuceneIndex;
 import org.hibernate.search.test.performance.util.CheckerUncaughtExceptions;
@@ -164,10 +169,11 @@ public class TestReporter {
 
 	private static PrintStream createOutputStream(String testScenarioName) {
 		try {
-			String reportName = "report-" + testScenarioName + "-" + DateFormatUtils.format( new Date(), "yyyy-MM-dd-HH:mm" ) + ".txt";
+			File targetDir = getTargetDir();
+			File reportFile = new File( targetDir, "report-" + testScenarioName + "-" + DateFormatUtils.format( new Date(), "yyyy-MM-dd-HH'h'mm'm'" ) + ".txt" );
 
 			final OutputStream std = System.out;
-			final OutputStream file = new PrintStream( reportName );
+			final OutputStream file = new PrintStream( reportFile );
 			final OutputStream stream = new OutputStream() {
 
 				@Override
@@ -192,6 +198,23 @@ public class TestReporter {
 		}
 		catch (FileNotFoundException e) {
 			throw new RuntimeException( e );
+		}
+	}
+
+	private static File getTargetDir() {
+		InputStream runnerPropertiesStream = TestReporter.class.getResourceAsStream( "/" + RUNNER_PROPERTIES );
+		if ( runnerPropertiesStream != null ) {
+			Properties runnerProperties = new Properties();
+			try {
+				runnerProperties.load( runnerPropertiesStream );
+			}
+			catch (IOException e) {
+				throw new RuntimeException( e );
+			}
+			return new File( runnerProperties.getProperty( TARGET_DIR_KEY ) );
+		}
+		else {
+			return TestConstants.getTargetDir( TestReporter.class );
 		}
 	}
 
