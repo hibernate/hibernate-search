@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//Fieldable was removed in Lucene 4 with no alternative replacement
-
+import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
@@ -112,7 +111,7 @@ public class NativeJavaSerializer implements Serializer {
 	}
 
 	@Override
-	public void fields(List<Fieldable> fields) {
+	public void fields(List<IndexableField> fields) {
 		serialFields = new HashSet<SerializableFieldable>( fields.size() );
 	}
 
@@ -162,12 +161,13 @@ public class NativeJavaSerializer implements Serializer {
 	}
 
 	@Override
-	public void addDocument(float boost) {
-		currentDocument = new SerializableDocument( serialFields, boost );
+	public void addDocument() {
+		currentDocument = new SerializableDocument( serialFields );
 	}
 
 	private void clearDocument() {
 		currentDocument = null;
 		serialFields = null;
 	}
+
 }

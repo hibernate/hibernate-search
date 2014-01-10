@@ -20,21 +20,23 @@
  */
 package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
+import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableBinaryField extends SerializableField {
+
 	private byte[] value;
-	private int offset;
-	private int length;
 
 	public SerializableBinaryField(LuceneFieldContext context) {
 		super( context );
-		this.value = context.getBinaryValue();
-		this.offset = context.getBinaryOffset();
-		this.length = context.getBinaryLength();
+		final BytesRef binaryValue = context.getBinaryValue();
+		final int length = binaryValue.length;
+		byte[] extractedBuffer = new byte[length];
+		System.arraycopy( binaryValue.bytes, binaryValue.offset, extractedBuffer, 0	, length );
+		this.value = extractedBuffer;
 	}
 
 	public byte[] getValue() {
@@ -42,10 +44,10 @@ public class SerializableBinaryField extends SerializableField {
 	}
 
 	public int getOffset() {
-		return offset;
+		return 0;
 	}
 
 	public int getLength() {
-		return length;
+		return value.length;
 	}
 }
