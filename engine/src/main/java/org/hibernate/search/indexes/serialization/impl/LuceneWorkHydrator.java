@@ -37,6 +37,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.FieldType.NumericType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
@@ -192,32 +193,28 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		final FieldType type = buildFieldType( precisionStep, store, indexed, omitNorms, omitTermFreqAndPositions );
-		final IntField numField = new IntField( name, value, type );
+		final IntField numField = new IntField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
 	public void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		final FieldType type = buildFieldType( precisionStep, store, indexed, omitNorms, omitTermFreqAndPositions );
-		final LongField numField = new LongField( name, value, type );
+		final LongField numField = new LongField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
 	public void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		final FieldType type = buildFieldType( precisionStep, store, indexed, omitNorms, omitTermFreqAndPositions );
-		final FloatField numField = new FloatField( name, value, type );
+		final FloatField numField = new FloatField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
 	public void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		final FieldType type = buildFieldType( precisionStep, store, indexed, omitNorms, omitTermFreqAndPositions );
-		final DoubleField numField = new DoubleField( name, value, type );
+		final DoubleField numField = new DoubleField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
@@ -226,13 +223,15 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	 * TODO FieldType has several more attributes currently ignored. This is temporarily meant to not break too much Lucene 3x code.
 	 * Also: if we move to a static index schema serializing the field attributes should be unnecessary.
 	 */
-	private FieldType buildFieldType(int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms, boolean omitTermFreqAndPositions) {
+	private FieldType buildFieldType(int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms,
+			boolean omitTermFreqAndPositions, NumericType numericFieldType) {
 		final FieldType type = new FieldType();
 		type.setNumericPrecisionStep( precisionStep );
 		type.setStored( store == SerializableStore.YES );
 		type.setIndexOptions( omitTermFreqAndPositions ? IndexOptions.DOCS_AND_FREQS : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
 		type.setOmitNorms( omitNorms );
 		type.setIndexed( indexed );
+		type.setNumericType( numericFieldType );
 		return type;
 	}
 
@@ -250,8 +249,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	@Override
 	public void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		FieldType type = Field.translateFieldType( getStore( store ), getIndex( index ), getTermVector( termVector ) );
-		type.setOmitNorms( omitNorms );
-		type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
+		//type.setOmitNorms( omitNorms );
+		//type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
 		Field luceneField = new Field( name, value, type );
 		luceneField.setBoost( boost );
 		getLuceneDocument().add( luceneField );
@@ -260,8 +259,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	@Override
 	public void addFieldWithTokenStreamData(String name, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		FieldType type = Field.translateFieldType( Store.NO, Index.ANALYZED, getTermVector( termVector ) );
-		type.setOmitNorms( omitNorms );
-		type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
+		//type.setOmitNorms( omitNorms );
+		//type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
 		Field luceneField = new Field( name, new CopyTokenStream( tokens ), type );
 		luceneField.setBoost( boost );
 		getLuceneDocument().add( luceneField );
@@ -275,8 +274,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	@Override
 	public void addFieldWithSerializableReaderData(String name, byte[] valueAsByte, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		FieldType type = Field.translateFieldType( Store.NO, Index.ANALYZED, getTermVector( termVector ) );
-		type.setOmitNorms( omitNorms );
-		type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
+		//type.setOmitNorms( omitNorms );
+		//type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
 		Reader value = (Reader) toSerializable( valueAsByte, loader );
 		Field luceneField = new Field( name, value, type );
 		luceneField.setBoost( boost );

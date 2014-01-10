@@ -45,8 +45,8 @@ import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.index.IndexableField;
-//Fieldable was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.util.AttributeImpl;
+import org.apache.lucene.util.BytesRef;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -246,9 +246,11 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public void addFieldWithBinaryData(LuceneFieldContext context) {
 		GenericRecord field = createNormalField( "BinaryField", context );
-		field.put( "offset", context.getBinaryOffset() );
-		field.put( "length", context.getBinaryLength() );
-		field.put( "value", ByteBuffer.wrap( context.getBinaryValue() ) );
+		BytesRef binaryValue = context.getBinaryValue();
+		field.put( "value", ByteBuffer.wrap( binaryValue.bytes, binaryValue.offset, binaryValue.length ) );
+		//Following two attributes are meant for serialization format backwards compatibility:
+		field.put( "offset", 0 );
+		field.put( "length", binaryValue.length );
 		fieldables.add( field );
 	}
 
@@ -308,7 +310,8 @@ public class AvroSerializer implements Serializer {
 		else if (attr instanceof PayloadAttribute) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "PayloadAttribute" ) );
 			PayloadAttribute payloadAttr = (PayloadAttribute) attr;
-			record.put( "payload", ByteBuffer.wrap( payloadAttr.getPayload().toByteArray() ) );
+			BytesRef payload = payloadAttr.getPayload();
+			record.put( "payload", ByteBuffer.wrap( payload.bytes, payload.offset, payload.length ) );
 			return record;
 		}
 		else if (attr instanceof KeywordAttribute) {
@@ -343,7 +346,7 @@ public class AvroSerializer implements Serializer {
 			return record;
 		}
 		else if (attr instanceof Serializable) {
-			return ByteBuffer.wrap( toByteArray( attr ) );
+			return ByteBuffer.wrap( toByteArray( (Serializable) attr ) );
 		}
 		else {
 			throw log.attributeNotRecognizedNorSerializable( attr.getClass() );
@@ -368,6 +371,11 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public void addDocument() {
 		document = new GenericData.Record( protocol.getType( "Document" ) );
+		//backwards compatibility: we used to have a boost here in Lucene 3 / Hibernate Search 4.x
+		//With Lucene 3 there was a notion of "Document level boost" which was then dropped.
+		//Using the constant 1f doesn't hurt as it would be multiplied by the field boost,
+		//which in the new design incorporates the factor.
+		document.put( "boost", 1f );
 		document.put( "fieldables", fieldables );
 	}
 

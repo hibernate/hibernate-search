@@ -79,7 +79,7 @@ public class JavaSerializationDeserializer implements Deserializer {
 	}
 
 	private void buildLuceneDocument(SerializableDocument document, LuceneWorksBuilder hydrator) {
-		hydrator.defineDocument( document.getBoost() );
+		hydrator.defineDocument();
 		for ( SerializableFieldable field : document.getFieldables() ) {
 			if ( field instanceof SerializableCustomFieldable ) {
 				SerializableCustomFieldable safeField = (SerializableCustomFieldable) field;
