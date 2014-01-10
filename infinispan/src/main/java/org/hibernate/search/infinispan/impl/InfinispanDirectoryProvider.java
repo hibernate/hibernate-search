@@ -23,11 +23,13 @@
  */
 package org.hibernate.search.infinispan.impl;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.infinispan.Cache;
-import org.infinispan.lucene.InfinispanDirectory;
+import org.infinispan.lucene.directory.DirectoryBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
+import org.apache.lucene.store.Directory;
 
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -45,7 +47,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class InfinispanDirectoryProvider implements org.hibernate.search.store.DirectoryProvider<InfinispanDirectory> {
+public class InfinispanDirectoryProvider implements org.hibernate.search.store.DirectoryProvider<Directory> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
@@ -73,9 +75,9 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	private String metadataCacheName;
 	private String dataCacheName;
 	private String lockingCacheName;
-	private int chunkSize;
+	private Integer chunkSize;
 
-	private InfinispanDirectory directory;
+	private Directory directory;
 
 	private EmbeddedCacheManager cacheManager;
 
@@ -87,9 +89,8 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		metadataCacheName = InfinispanIntegration.getMetadataCacheName( properties );
 		dataCacheName = InfinispanIntegration.getDataCacheName( properties );
 		lockingCacheName = InfinispanIntegration.getLockingCacheName( properties );
-		chunkSize = ConfigurationParseHelper.getIntValue(
-				properties, "chunk_size", InfinispanDirectory.DEFAULT_BUFFER_SIZE
-		);
+		//Let it return null if it's not set, so that we can avoid applying any override.
+		chunkSize = ConfigurationParseHelper.getIntValue( properties, "chunk_size" );
 	}
 
 	@Override
@@ -99,20 +100,30 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		Cache<?,?> metadataCache = cacheManager.getCache( metadataCacheName );
 		Cache<?,?> dataCache = cacheManager.getCache( dataCacheName );
 		Cache<?,?> lockingCache = cacheManager.getCache( lockingCacheName );
-		directory = new InfinispanDirectory( metadataCache, dataCache, lockingCache, directoryProviderName, chunkSize );
+		org.infinispan.lucene.directory.BuildContext directoryBuildContext = DirectoryBuilder
+				.newDirectoryInstance( metadataCache, dataCache, lockingCache, directoryProviderName );
+		if ( chunkSize != null ) {
+			directoryBuildContext.chunkSize( chunkSize.intValue() );
+		}
+		directory = directoryBuildContext.create();
 		DirectoryProviderHelper.initializeIndexIfNeeded( directory );
 		log.debugf( "Initialized Infinispan index: '%s'", directoryProviderName );
 	}
 
 	@Override
 	public void stop() {
-		directory.close();
+		try {
+			directory.close();
+		}
+		catch (IOException e) {
+			log.unableToCloseLuceneDirectory( directory, e );
+		}
 		serviceManager.releaseService( CacheManagerServiceProvider.class );
 		log.debug( "Stopped InfinispanDirectory" );
 	}
 
 	@Override
-	public InfinispanDirectory getDirectory() {
+	public Directory getDirectory() {
 		return directory;
 	}
 

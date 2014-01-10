@@ -271,4 +271,25 @@ public class ConfigurationParseHelper {
 		}
 	}
 
+	/**
+	 * Retrieves a configuration property and parses it as an Integer if it exists,
+	 * or returns null if the property is not set (undefined).
+	 * @param cfg configuration Properties
+	 * @param key the property key
+	 * @return the Integer or null
+	 * @throws SearchException both for empty (non-null) values and for Strings not containing a valid int representation.
+	 */
+	public static Integer getIntValue(Properties cfg, String key) {
+		String propValue = cfg.getProperty( key );
+		if ( propValue == null ) {
+			return null;
+		}
+		if ( StringHelper.isEmpty( propValue.trim() ) ) {
+			throw log.configuratioPropertyCantBeEmpty( key );
+		}
+		else {
+			return parseInt( propValue, 0, "Unable to parse " + key + ": " + propValue );
+		}
+	}
+
 }

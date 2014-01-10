@@ -760,4 +760,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 194, value = "Unable to load configured class '%s' as 'sharding_strategy'")
 	SearchException getUnableToLoadShardingStrategyClassException(String className);
+
+	@Message(id = 195, value = "Configuration property '%s' should not be empty: illegal format.")
+	SearchException configuratioPropertyCantBeEmpty(String key);
+
 }
