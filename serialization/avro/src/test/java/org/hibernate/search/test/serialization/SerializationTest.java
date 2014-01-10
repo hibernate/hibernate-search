@@ -45,12 +45,18 @@ import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttributeImpl
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttributeImpl;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
-//Fieldable was removed in Lucene 4 with no alternative replacement
-//NumericField was removed in Lucene 4 with no alternative replacement
-//Payload was removed in Lucene 4 with no alternative replacement
+import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
+import org.apache.lucene.util.BytesRef;
 import org.apache.solr.handler.AnalysisRequestHandlerBase;
+
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -62,7 +68,6 @@ import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
-import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
@@ -182,9 +187,9 @@ public class SerializationTest {
 				searchFactoryHolder.getSearchFactory()
 		);
 		List<LuceneWork> works = buildWorks();
-
 		long begin;
 		long end;
+		/*
 		byte[] javaBytes = null;
 		begin = System.nanoTime();
 		for ( int i = 0; i < loop; i++ ) {
@@ -205,6 +210,7 @@ public class SerializationTest {
 		}
 		end = System.nanoTime();
 		log.debug( "Java de-serialization: " + ( ( end - begin ) / 1000000 ) );
+		*/
 
 		byte[] avroBytes = null;
 		begin = System.nanoTime();
@@ -224,8 +230,7 @@ public class SerializationTest {
 		log.debug( "Avro deserialization: " + ( ( end - begin ) / 1000000 ) );
 
 		//make sure the compiler does not cheat
-		log.debug( copyOfWorks == copyOfWorkForJavaSerial );
-
+		//log.debug( copyOfWorks == copyOfWorkForJavaSerial );
 	}
 
 	private List<LuceneWork> buildWorks() throws Exception {
@@ -246,21 +251,16 @@ public class SerializationTest {
 		);
 
 		Document doc = new Document();
-		doc.setBoost( 2.3f );
-		NumericField numField = new NumericField( "double", 23, Field.Store.NO, true );
-		numField.setDoubleValue( 23d );
-		numField.setOmitNorms( true );
-		numField.setOmitTermFreqAndPositions( true );
-		numField.setBoost( 3f );
+		Field numField = new DoubleField( "double", 23d, Store.NO );
+		//numField.setBoost( 3f );
+		//numField.setOmitNorms( true );
+		//numField.setOmitTermFreqAndPositions( true );
 		doc.add( numField );
-		numField = new NumericField( "int", 23, Field.Store.NO, true );
-		numField.setIntValue( 23 );
+		numField = new IntField( "int", 23, Store.NO );
 		doc.add( numField );
-		numField = new NumericField( "float", 23, Field.Store.NO, true );
-		numField.setFloatValue( 2.3f );
+		numField = new FloatField( "float", 2.3f, Store.NO );
 		doc.add( numField );
-		numField = new NumericField( "long", 23, Field.Store.NO, true );
-		numField.setLongValue( 23l );
+		numField = new LongField( "long", 23l, Store.NO );
 		doc.add( numField );
 
 		Map<String, String> analyzers = new HashMap<String, String>();
@@ -268,7 +268,6 @@ public class SerializationTest {
 		works.add( new AddLuceneWork( 123, "123", RemoteEntity.class, doc, analyzers ) );
 
 		doc = new Document();
-		doc.setBoost( 2.3f );
 		Field field = new Field(
 				"StringF",
 				"String field",
@@ -276,8 +275,8 @@ public class SerializationTest {
 				Field.Index.ANALYZED,
 				Field.TermVector.WITH_OFFSETS
 		);
-		field.setOmitNorms( true );
-		field.setOmitTermFreqAndPositions( true );
+//		field.setOmitNorms( true );
+//		field.setOmitTermFreqAndPositions( true );
 		field.setBoost( 3f );
 		doc.add( field );
 
@@ -306,8 +305,8 @@ public class SerializationTest {
 
 		CopyTokenStream tokenStream = new CopyTokenStream( tokens );
 		field = new Field( "tokenstream", tokenStream, Field.TermVector.WITH_POSITIONS_OFFSETS );
-		field.setOmitNorms( true );
-		field.setOmitTermFreqAndPositions( true );
+//		field.setOmitNorms( true );
+//		field.setOmitTermFreqAndPositions( true );
 		field.setBoost( 3f );
 		doc.add( field );
 
@@ -328,7 +327,7 @@ public class SerializationTest {
 		tokens.get( 0 ).add( charAttr );
 
 		PayloadAttributeImpl payloadAttribute = new PayloadAttributeImpl();
-		payloadAttribute.setPayload( new Payload( new byte[] { 0, 1, 2, 3 } ) );
+		payloadAttribute.setPayload( new BytesRef( new byte[] { 0, 1, 2, 3 } ) );
 		tokens.get( 0 ).add( payloadAttribute );
 
 		KeywordAttributeImpl keywordAttr = new KeywordAttributeImpl();
@@ -394,41 +393,39 @@ public class SerializationTest {
 		assertDocument( work.getDocument(), copy.getDocument() );
 	}
 
-	private void assertDocument(Document document, Document copy) {
-		assertThat( document.getBoost() ).isEqualTo( copy.getBoost() );
-		for ( int index = 0; index < document.getFields().size(); index++ ) {
-			Fieldable field = document.getFields().get( index );
-			Fieldable fieldCopy = copy.getFields().get( index );
-			assertThat( field ).isInstanceOf( fieldCopy.getClass() );
-			if ( field instanceof NumericField ) {
-				assertNumericField( (NumericField) field, (NumericField) fieldCopy );
-			}
-			else if ( field instanceof Field ) {
-				assertNormalField( (Field) field, (Field) fieldCopy );
-			}
+	private void assertDocument(Document original, Document copy) {
+		assertThat( original.getFields().size() ).isEqualTo( copy.getFields().size() );
+		for ( int index = 0; index < original.getFields().size(); index++ ) {
+			IndexableField field = original.getFields().get( index );
+			IndexableField fieldCopy = copy.getFields().get( index );
+			assertFieldEquality( (Field) field, (Field) fieldCopy );
 		}
 	}
 
-	private void assertNormalField(Field field, Field copy) {
-		assertThat( copy.name() ).isEqualTo( field.name() );
-		assertThat( copy.getBinaryLength() ).isEqualTo( field.getBinaryLength() );
-		assertThat( copy.getBinaryOffset() ).isEqualTo( field.getBinaryOffset() );
-		assertThat( copy.getBinaryValue() ).isEqualTo( field.getBinaryValue() );
-		assertThat( copy.getBoost() ).isEqualTo( field.getBoost() );
-		assertThat( copy.getOmitNorms() ).isEqualTo( field.getOmitNorms() );
-		assertThat( copy.getOmitTermFreqAndPositions() ).isEqualTo( field.getOmitTermFreqAndPositions() );
-		assertThat( copy.isBinary() ).isEqualTo( field.isBinary() );
-		assertThat( copy.isIndexed() ).isEqualTo( field.isIndexed() );
-		assertThat( copy.isLazy() ).isEqualTo( field.isLazy() );
-		assertThat( copy.isStoreOffsetWithTermVector() ).isEqualTo( field.isStoreOffsetWithTermVector() );
-		assertThat( copy.isStorePositionWithTermVector() ).isEqualTo( field.isStorePositionWithTermVector() );
-		assertThat( copy.isStored() ).isEqualTo( field.isStored() );
-		assertThat( copy.isTokenized() ).isEqualTo( field.isTokenized() );
-		assertThat( compareReaders( copy.readerValue(), field.readerValue() ) ).isTrue();
-		assertThat( compareTokenStreams( field.tokenStreamValue(), copy.tokenStreamValue() ) ).isTrue();
-		assertThat( copy.stringValue() ).isEqualTo( field.stringValue() );
+	private void assertFieldEquality(Field original, Field copy) {
+		assertThat( copy.name() ).isEqualTo( original.name() );
+		assertThat( copy.binaryValue() ).isEqualTo( original.binaryValue() );
+		assertThat( copy.boost() ).isEqualTo( original.boost() );
+		assertFieldType( copy.fieldType(), original.fieldType() );
+		assertThat( compareReaders( copy.readerValue(), original.readerValue() ) ).isTrue();
+		assertThat( compareTokenStreams( original.tokenStreamValue(), copy.tokenStreamValue() ) ).isTrue();
+		assertThat( copy.stringValue() ).isEqualTo( original.stringValue() );
+	}
 
-		assertThat( copy.isTermVectorStored() ).isEqualTo( field.isTermVectorStored() );
+	private void assertFieldType(FieldType copy, FieldType original) {
+		assertThat( original.omitNorms() ).isEqualTo( copy.omitNorms() );
+		assertThat( original.storeTermVectorOffsets() ).isEqualTo( copy.storeTermVectorOffsets() );
+		assertThat( original.storeTermVectorPayloads() ).isEqualTo( copy.storeTermVectorPayloads() );
+		assertThat( original.storeTermVectorOffsets() ).isEqualTo( copy.storeTermVectorOffsets() );
+		assertThat( original.docValueType() ).isEqualTo( copy.docValueType() );
+		assertThat( original.indexed() ).isEqualTo( copy.indexed() );
+		assertThat( original.indexOptions() ).isEqualTo( copy.indexOptions() );
+		assertThat( original.numericPrecisionStep() ).isEqualTo( copy.numericPrecisionStep() );
+		assertThat( original.numericType() ).isEqualTo( copy.numericType() );
+		assertThat( original.stored() ).isEqualTo( copy.stored() );
+		assertThat( original.storeTermVectors() ).isEqualTo( copy.storeTermVectors() );
+		assertThat( original.tokenized() ).isEqualTo( copy.tokenized() );
+		assertThat( original.toString() ).isEqualTo( copy.toString() );
 	}
 
 	private boolean compareTokenStreams(TokenStream original, TokenStream copy) {
@@ -523,34 +520,11 @@ public class SerializationTest {
 		}
 	}
 
-	private void assertNumericField(NumericField field, NumericField copy) {
-		assertThat( copy.name() ).isEqualTo( field.name() );
-		assertThat( copy.getBinaryLength() ).isEqualTo( field.getBinaryLength() );
-		assertThat( copy.getBinaryOffset() ).isEqualTo( field.getBinaryOffset() );
-		assertThat( copy.getBinaryValue() ).isEqualTo( field.getBinaryValue() );
-		assertThat( copy.getBoost() ).isEqualTo( field.getBoost() );
-		assertThat( copy.getDataType() ).isEqualTo( field.getDataType() );
-		assertThat( copy.getNumericValue() ).isEqualTo( field.getNumericValue() );
-		assertThat( copy.getOmitNorms() ).isEqualTo( field.getOmitNorms() );
-		assertThat( copy.getOmitTermFreqAndPositions() ).isEqualTo( field.getOmitTermFreqAndPositions() );
-		assertThat( copy.getPrecisionStep() ).isEqualTo( field.getPrecisionStep() );
-		assertThat( copy.isBinary() ).isEqualTo( field.isBinary() );
-		assertThat( copy.isIndexed() ).isEqualTo( field.isIndexed() );
-		assertThat( copy.isLazy() ).isEqualTo( field.isLazy() );
-		assertThat( copy.isStoreOffsetWithTermVector() ).isEqualTo( field.isStoreOffsetWithTermVector() );
-		assertThat( copy.isStorePositionWithTermVector() ).isEqualTo( field.isStorePositionWithTermVector() );
-		assertThat( copy.isStored() ).isEqualTo( field.isStored() );
-		assertThat( copy.isTokenized() ).isEqualTo( field.isTokenized() );
-		assertThat( copy.readerValue() ).isEqualTo( field.readerValue() );
-		assertThat( copy.tokenStreamValue() ).isEqualTo( field.tokenStreamValue() );
-		assertThat( copy.stringValue() ).isEqualTo( field.stringValue() );
-	}
-
 	private void assertDelete(DeleteLuceneWork work, DeleteLuceneWork copy) {
 		assertThat( work.getEntityClass() ).as( "Delete.getEntityClass is not copied" )
 				.isEqualTo( copy.getEntityClass() );
 		assertThat( work.getId() ).as( "Delete.getId is not copied" ).isEqualTo( copy.getId() );
-		assertThat( work.getDocument() ).as( "Delete.getDocument is not the same" ).isEqualTo( copy.getDocument() );
+		assertThat( (Object) work.getDocument() ).as( "Delete.getDocument is not the same" ).isEqualTo( copy.getDocument() );
 		assertThat( work.getIdInString() ).as( "Delete.getIdInString is not the same" )
 				.isEqualTo( copy.getIdInString() );
 		assertThat( work.getFieldToAnalyzerMap() ).as( "Delete.getFieldToAnalyzerMap is not the same" )
