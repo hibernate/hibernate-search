@@ -678,4 +678,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 198, value = "Unexpected status '%s' for service '%s'. Check for circular dependencies or unreleased resources in your services.")
 	SearchException getUnexpectedServiceStatusException(String status, String service);
 
+	@Message(id = 199, value = "Configuration property '%s' should not be empty: illegal format.")
+	SearchException configuratioPropertyCantBeEmpty(String key);
+
 }
