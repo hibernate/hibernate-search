@@ -23,23 +23,28 @@
   -->
 <module xmlns="urn:jboss:module:1.1" name="org.apache.lucene" slot="${luceneVersion}">
     <resources>
-        <resource-root path="lucene-core-${luceneVersion}.jar" />
-        <resource-root path="lucene-core-${luceneVersion}.jar" />
-        <resource-root path="lucene-analyzers-${luceneVersion}.jar" />
-        <resource-root path="lucene-highlighter-${luceneVersion}.jar" />
-        <resource-root path="lucene-memory-${luceneVersion}.jar" />
-        <resource-root path="lucene-kuromoji-${luceneVersion}.jar" />
-        <resource-root path="lucene-misc-${luceneVersion}.jar" />
-        <resource-root path="lucene-phonetic-${luceneVersion}.jar" />
-        <resource-root path="lucene-spatial-${luceneVersion}.jar" />
-        <resource-root path="lucene-spellchecker-${luceneVersion}.jar" />
-        <resource-root path="lucene-grouping-${luceneVersion}.jar" />
-        <resource-root path="lucene-smartcn-${luceneVersion}.jar" />
-        <resource-root path="lucene-stempel-${luceneVersion}.jar" />
-        <resource-root path="lucene-facet-${luceneVersion}.jar" />
-
-        <resource-root path="lucene-regex-${luceneRegexVersion}.jar" />
         <resource-root path="jakarta-regexp-${luceneRegexJakartaVersion}.jar" />
+        <resource-root path="lucene-analyzers-common-${luceneVersion}.jar" />
+        <resource-root path="lucene-analyzers-icu-${luceneVersion}.jar" />
+        <resource-root path="lucene-analyzers-kuromoji-${luceneVersion}.jar" />
+        <resource-root path="lucene-analyzers-phonetic-${luceneVersion}.jar" />
+        <resource-root path="lucene-codecs-${luceneVersion}.jar" />
+        <resource-root path="lucene-core-${luceneVersion}.jar" />
+        <resource-root path="lucene-facet-${luceneVersion}.jar" />
+        <resource-root path="lucene-grouping-${luceneVersion}.jar" />
+        <resource-root path="lucene-highlighter-${luceneVersion}.jar" />
+        <resource-root path="lucene-join-${luceneVersion}.jar" />
+        <resource-root path="lucene-memory-${luceneVersion}.jar" />
+        <resource-root path="lucene-misc-${luceneVersion}.jar" />
+        <resource-root path="lucene-queries-${luceneVersion}.jar" />
+        <resource-root path="lucene-queryparser-${luceneVersion}.jar" />
+
+		<!-- Different version attribute! -->
+        <resource-root path="lucene-regex-${luceneRegexVersion}.jar" />
+
+        <resource-root path="lucene-spatial-${luceneVersion}.jar" />
+        <resource-root path="lucene-suggest-${luceneVersion}.jar" />
+
     </resources>
     <dependencies>
         <module name="javax.api" optional="true" />
