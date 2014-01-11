@@ -42,7 +42,6 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -66,11 +65,8 @@ public class ModuleMemberRegistrationIT {
 		return archive;
 	}
 
-	private static Asset manifest() {
-		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", "org.hibernate.search.orm services" )
-				.exportAsString();
-		return new StringAsset( manifest );
+	public static Asset manifest() {
+		return SolrModuleMemberRegistrationIT.manifest( false );
 	}
 
 	private static Asset persistenceXml() {

@@ -38,7 +38,7 @@
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
         <hibernate.search.version>${project.version}</hibernate.search.version>
-        <hibernate.search.module.slot>main</hibernate.search.module.slot>
+        <hibernate.search.module.slot>${project.version}</hibernate.search.module.slot>
     </properties>
 
     <dependencies>

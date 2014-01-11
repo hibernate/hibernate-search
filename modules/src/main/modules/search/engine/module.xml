@@ -38,7 +38,7 @@
         <module name="org.hibernate.commons-annotations" />
         <module name="org.apache.lucene" export="true" slot="${luceneVersion}" />
         <module name="org.apache.solr" export="true" optional="true" slot="${luceneVersion}" />
-        <module name="org.infinispan.lucene-directory" slot="${infinispanVersion}" />
+        <module name="org.infinispan.lucene-directory" export="true" services="import" slot="${infinispanVersion}" />
         <module name="org.infinispan" />
         <module name="org.infinispan.commons" />
         <module name="org.jboss.logging" />
