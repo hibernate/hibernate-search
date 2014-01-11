@@ -33,6 +33,7 @@ import junit.framework.Assert;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
+import org.hibernate.search.Version;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
@@ -68,14 +69,19 @@ public class SolrModuleMemberRegistrationIT {
 				.create( WebArchive.class, SolrModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, SolrMember.class, MemberRegistration.class, Resources.class, AnalyzerUtils.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.add( manifest(), "META-INF/MANIFEST.MF" )
+				.add( manifest( true ), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
 	}
 
-	private static Asset manifest() {
+	public static Asset manifest(boolean includeSolr) {
+		final String currentVersion = Version.getVersionString();
+		String dependencyDef = "org.hibernate.search.orm:" + currentVersion + " services";
+		if ( includeSolr ) {
+			dependencyDef = dependencyDef + ", org.apache.solr:3.6.2";
+		}
 		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", "org.hibernate.search.orm services, org.apache.solr:3.6.2" )
+				.attribute( "Dependencies", dependencyDef )
 				.exportAsString();
 		return new StringAsset( manifest );
 	}

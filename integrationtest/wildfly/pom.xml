@@ -46,8 +46,8 @@
         <enforcer.skip>true</enforcer.skip>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.wildfly>8.0.0.Beta1</version.wildfly>
-        <version.arquillian>1.1.1.Final</version.arquillian>
+        <version.wildfly>8.0.0.CR1</version.wildfly>
+        <version.arquillian>1.1.2.Final</version.arquillian>
         <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
     </properties>
 

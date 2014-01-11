@@ -26,13 +26,10 @@ package org.hibernate.search.test.integration.jms;
 import java.io.File;
 
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
+import org.hibernate.search.test.integration.wildfly.ModuleMemberRegistrationIT;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.descriptor.api.Descriptors;
-import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
@@ -71,13 +68,7 @@ public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends SearchNewEntity
 	}
 
 	private static void addDependecies(Archive<?> archive) {
-		archive.add( manifest(), "META-INF/MANIFEST.MF" );
+		archive.add( ModuleMemberRegistrationIT.manifest(), "META-INF/MANIFEST.MF" );
 	}
 
-	private static Asset manifest() {
-		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", "org.hibernate.search.orm services" )
-				.exportAsString();
-		return new StringAsset( manifest );
-	}
 }

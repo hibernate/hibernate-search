@@ -50,6 +50,7 @@
     <persistence passivation="false">
        <singleFile
          fetchPersistentState="true"
+         preload="true"
          purgeOnStartup="false"
          shared="true"
          ignoreModifications="false"
@@ -62,6 +63,7 @@
     <persistence passivation="false">
        <singleFile
          fetchPersistentState="true"
+         preload="true"
          purgeOnStartup="false"
          shared="true"
          ignoreModifications="false"

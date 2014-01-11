@@ -45,6 +45,7 @@ import org.hibernate.search.util.impl.ReflectionHelper;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * ReaderProvider to inspect the type of FieldSelector being applied.
@@ -88,6 +89,11 @@ public class FieldSelectorLeakingReaderProvider extends NotSharedReaderProvider 
 			}
 			assertNotNull( fieldSelections );
 			assertEquals( expectedFieldNames.length, fieldSelections.size() );
+			for ( String field : expectedFieldNames ) {
+				assertTrue( "did not contain field: " + field, fieldSelections.containsKey( field ) );
+				assertTrue( FieldSelectorResult.LOAD.equals( fieldSelections.get( field ) ) ||
+						FieldSelectorResult.LOAD_AND_BREAK.equals( fieldSelections.get( field ) ) );
+			}
 		}
 	}
 
