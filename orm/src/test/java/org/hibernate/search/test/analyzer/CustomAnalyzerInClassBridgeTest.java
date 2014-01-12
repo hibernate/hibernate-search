@@ -30,7 +30,6 @@ import javax.persistence.Table;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-//Fieldable was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 
