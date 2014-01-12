@@ -25,7 +25,6 @@
 package org.hibernate.search.bridge.builtin.impl;
 
 import org.apache.lucene.document.Document;
-//Fieldable was removed in Lucene 4 with no alternative replacement
 
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.LuceneOptions;

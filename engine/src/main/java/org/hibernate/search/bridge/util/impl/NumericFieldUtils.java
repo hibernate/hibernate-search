@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.bridge.util.impl;
 
-//NumericField was removed in Lucene 4 with no alternative replacement
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.SearchException;
