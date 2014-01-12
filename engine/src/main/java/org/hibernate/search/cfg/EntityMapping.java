@@ -27,7 +27,7 @@ import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.solr.analysis.TokenizerFactory;
+import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.BoostStrategy;

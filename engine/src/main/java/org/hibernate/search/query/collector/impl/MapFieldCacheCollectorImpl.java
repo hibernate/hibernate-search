@@ -22,9 +22,8 @@ package org.hibernate.search.query.collector.impl;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.Collector;
-
 import org.hibernate.search.query.fieldcache.impl.FieldLoadingStrategy;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
@@ -58,10 +57,10 @@ final class MapFieldCacheCollectorImpl extends FieldCacheCollector {
 	}
 
 	@Override
-	public void setNextReader(IndexReader reader, int docBase) throws IOException {
-		this.currentDocBase = docBase;
-		this.collectorStrategy.loadNewCacheValues( reader );
-		this.delegate.setNextReader( reader, docBase );
+	public void setNextReader(AtomicReaderContext context) throws IOException {
+		this.currentDocBase = context.docBase;
+		this.collectorStrategy.loadNewCacheValues( context );
+		this.delegate.setNextReader( context );
 	}
 
 	@Override

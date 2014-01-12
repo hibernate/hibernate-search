@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.annotations;
 
-import org.apache.solr.analysis.CharFilterFactory;
+import org.apache.lucene.analysis.util.CharFilterFactory;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

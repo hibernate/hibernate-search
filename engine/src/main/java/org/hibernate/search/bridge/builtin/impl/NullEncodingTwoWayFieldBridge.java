@@ -25,8 +25,8 @@
 package org.hibernate.search.bridge.builtin.impl;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
 
+import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 
@@ -45,7 +45,7 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 
 	@Override
 	public Object get(String name, Document document) {
-		Fieldable field = document.getFieldable( name );
+		final IndexableField field = document.getField( name );
 		String stringValue = field.stringValue();
 		if ( nullMarker.equals( stringValue ) ) {
 			return null;

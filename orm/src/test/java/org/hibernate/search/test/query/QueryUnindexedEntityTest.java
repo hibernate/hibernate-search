@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.test.query;
 
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;

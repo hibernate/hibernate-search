@@ -25,15 +25,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
-import org.apache.lucene.search.Similarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
@@ -139,11 +139,12 @@ class IndexWriterHolder {
 	 * Also each new IndexWriter needs a new MergePolicy.
 	 */
 	private IndexWriter createNewIndexWriter() throws IOException {
+		final IndexWriterConfig indexWriterConfig = writerConfig.clone(); //Each writer config can be attached only once to an IndexWriter
 		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO make it possible to configure a different policy?
-		writerConfig.setMergePolicy( newMergePolicy );
+		indexWriterConfig.setMergePolicy( newMergePolicy );
 		MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler, this.indexName );
-		writerConfig.setMergeScheduler( mergeScheduler );
-		return new IndexWriter( directoryProvider.getDirectory(), writerConfig );
+		indexWriterConfig.setMergeScheduler( mergeScheduler );
+		return new IndexWriter( directoryProvider.getDirectory(), indexWriterConfig );
 	}
 
 	/**
@@ -223,11 +224,11 @@ class IndexWriterHolder {
 	 * @param applyDeletes Applying deletes is expensive, say no if you can deal with stale hits during queries
 	 * @return a new NRT IndexReader if an IndexWriter is available, or <code>null</code> otherwise
 	 */
-	public IndexReader openNRTIndexReader(boolean applyDeletes) {
+	public DirectoryReader openNRTIndexReader(boolean applyDeletes) {
 		final IndexWriter indexWriter = writer.get();
 		try {
 			if ( indexWriter != null ) {
-				return IndexReader.open( indexWriter, applyDeletes );
+				return DirectoryReader.open( indexWriter, applyDeletes );
 			}
 			else {
 				return null;
@@ -246,9 +247,9 @@ class IndexWriterHolder {
 	/**
 	 * Opens an IndexReader from the DirectoryProvider (not using the IndexWriter)
 	 */
-	public IndexReader openDirectoryIndexReader() {
+	public DirectoryReader openDirectoryIndexReader() {
 		try {
-			return IndexReader.open( directoryProvider.getDirectory() );
+			return DirectoryReader.open( directoryProvider.getDirectory() );
 		}
 		// following exceptions should be propagated as the IndexReader is needed by
 		// the main thread

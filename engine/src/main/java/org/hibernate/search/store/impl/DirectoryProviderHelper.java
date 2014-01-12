@@ -29,8 +29,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -152,7 +152,7 @@ public final class DirectoryProviderHelper {
 		Version version = Environment.DEFAULT_LUCENE_MATCH_VERSION;
 		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
 		try {
-			if ( ! IndexReader.indexExists( directory ) ) {
+			if ( ! DirectoryReader.indexExists( directory ) ) {
 				IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE );
 				IndexWriter iw = new IndexWriter( directory, iwriterConfig );
 				iw.close();
@@ -187,23 +187,13 @@ public final class DirectoryProviderHelper {
 			if ( indexDir == null ) {
 				throw new SearchException( "To use \"simple\" as a LockFactory strategy an indexBase path must be set" );
 			}
-			try {
-				return new SimpleFSLockFactory( indexDir );
-			}
-			catch (IOException e) {
-				throw new SearchException( "Could not initialize SimpleFSLockFactory", e );
-			}
+			return new SimpleFSLockFactory( indexDir );
 		}
 		else if ( "native".equals( lockFactoryName ) ) {
 			if ( indexDir == null ) {
 				throw new SearchException( "To use \"native\" as a LockFactory strategy an indexBase path must be set" );
 			}
-			try {
-				return new NativeFSLockFactory( indexDir );
-			}
-			catch (IOException e) {
-				throw new SearchException( "Could not initialize NativeFSLockFactory", e );
-			}
+			return new NativeFSLockFactory( indexDir );
 		}
 		else if ( "single".equals( lockFactoryName ) ) {
 			return new SingleInstanceLockFactory();

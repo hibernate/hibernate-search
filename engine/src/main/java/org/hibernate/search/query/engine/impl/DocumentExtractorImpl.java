@@ -22,16 +22,15 @@ package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.FieldSelectorResult;
-import org.apache.lucene.document.MapFieldSelector;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
-
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
@@ -40,8 +39,10 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.collector.impl.FieldCacheCollector;
+
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.logging.impl.Log;
+
 
 /**
  * DocumentExtractor is a traverser over the full-text results (EntityInfo)
@@ -67,14 +68,14 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final String[] projection;
 	private final QueryHits queryHits;
-	private final IndexSearcherWithPayload searcher;
-	private FieldSelector fieldSelector;
+	private final LazyQueryState searcher;
+	private ReusableDocumentStoredFieldVisitor fieldLoadingVisitor;
 	private boolean allowFieldSelection;
 	private boolean needId;
 	private final Map<String, Class> targetedClasses;
 	private int firstIndex;
 	private int maxIndex;
-	private Object query;
+	private Query query;
 	private final Class singleClassIfPossible; //null when not possible
 	private final FieldCacheCollector classTypeCollector; //null when not used
 	private final FieldCacheCollector idsCollector; //null when not used
@@ -85,8 +86,8 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 								String[] projection,
 								Set<String> idFieldNames,
 								boolean allowFieldSelection,
-								IndexSearcherWithPayload searcher,
-								Object query,
+								LazyQueryState searcher,
+								Query query,
 								int firstIndex,
 								int maxIndex,
 								Set<Class<?>> classesAndSubclasses) {
@@ -120,14 +121,14 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	}
 
 	private void initFieldSelection(String[] projection, Set<String> idFieldNames) {
-		Map<String, FieldSelectorResult> fields;
+		HashSet<String> fields;
 		if ( projection == null ) {
 			// we're going to load hibernate entities
 			needId = true;
-			fields = new HashMap<String, FieldSelectorResult>( 2 ); // id + class
+			fields = new HashSet<String>( 2 ); // id + class
 		}
 		else {
-			fields = new HashMap<String, FieldSelectorResult>( projection.length + 2 ); // we actually have no clue
+			fields = new HashSet<String>( projection.length + 2 ); // we actually have no clue
 			for ( String projectionName : projection ) {
 				if ( projectionName == null ) {
 					continue;
@@ -160,26 +161,20 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 					continue;
 				}
 				else {
-					fields.put( projectionName, FieldSelectorResult.LOAD );
+					fields.add( projectionName );
 				}
 			}
 		}
 		if ( singleClassIfPossible == null && classTypeCollector == null ) {
-			fields.put( ProjectionConstants.OBJECT_CLASS, FieldSelectorResult.LOAD );
+			fields.add( ProjectionConstants.OBJECT_CLASS );
 		}
 		if ( needId && idsCollector == null ) {
 			for ( String idFieldName : idFieldNames ) {
-				fields.put( idFieldName, FieldSelectorResult.LOAD );
+				fields.add( idFieldName );
 			}
 		}
-		if ( fields.size() == 1 ) {
-			// surprised: from unit tests it seems this case is possible quite often
-			// so apply an additional optimization using LOAD_AND_BREAK instead:
-			String key = fields.keySet().iterator().next();
-			fields.put( key, FieldSelectorResult.LOAD_AND_BREAK );
-		}
 		if ( fields.size() != 0 ) {
-			this.fieldSelector = new MapFieldSelector( fields );
+			this.fieldLoadingVisitor = new ReusableDocumentStoredFieldVisitor( fields );
 		}
 		// else: this.fieldSelector = null; //We need no fields at all
 	}
@@ -288,17 +283,18 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 
 	@Override
 	public void close() {
-		searcher.closeSearcher( query, searchFactoryImplementor );
+		searcher.close();
 	}
 
 	private Document extractDocument(int index) throws IOException {
 		if ( allowFieldSelection ) {
-			if ( fieldSelector == null ) {
+			if ( fieldLoadingVisitor == null ) {
 				//we need no fields
 				return null;
 			}
 			else {
-				return queryHits.doc( index, fieldSelector );
+				queryHits.doc( index, fieldLoadingVisitor );
+				return fieldLoadingVisitor.getDocumentAndReset();
 			}
 		}
 		else {
@@ -317,10 +313,10 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	 * @throws IOException
 	 */
 	private String forceClassNameExtraction(int scoreDocIndex) throws IOException {
-		Map<String, FieldSelectorResult> fields = new HashMap<String, FieldSelectorResult>( 1 );
-		fields.put( ProjectionConstants.OBJECT_CLASS, FieldSelectorResult.LOAD_AND_BREAK );
-		MapFieldSelector classOnly = new MapFieldSelector( fields );
-		Document doc = queryHits.doc( scoreDocIndex, classOnly );
+		final Set<String> fields = Collections.singleton( ProjectionConstants.OBJECT_CLASS );
+		final ReusableDocumentStoredFieldVisitor classOnly = new ReusableDocumentStoredFieldVisitor( fields );
+		queryHits.doc( scoreDocIndex, classOnly );
+		final Document doc = classOnly.getDocumentAndReset();
 		return doc.get( ProjectionConstants.OBJECT_CLASS );
 	}
 

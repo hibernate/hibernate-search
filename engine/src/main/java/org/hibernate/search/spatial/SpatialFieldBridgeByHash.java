@@ -86,13 +86,13 @@ public class SpatialFieldBridgeByHash extends SpatialFieldBridge implements Para
 				}
 
 				if ( numericFieldsIndex ) {
-					luceneOptions.addNumericFieldToDocument(
+					luceneOptions.addDoubleFieldToDocument(
 							SpatialHelper.formatLatitude( name ),
 							latitude,
 							document
 					);
 
-					luceneOptions.addNumericFieldToDocument(
+					luceneOptions.addDoubleFieldToDocument(
 							SpatialHelper.formatLongitude( name ),
 							longitude,
 							document

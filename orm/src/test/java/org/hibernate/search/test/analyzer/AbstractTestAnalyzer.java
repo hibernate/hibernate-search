@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,43 +23,23 @@
  */
 package org.hibernate.search.test.analyzer;
 
-import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+import org.apache.lucene.analysis.Tokenizer;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public abstract class AbstractTestAnalyzer extends Analyzer {
 
 	protected abstract String[] getTokens();
 
 	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		return new InternalTokenStream();
+	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+		Tokenizer tokenizer = new StreamWrappingTokenizer( reader, getTokens() );
+		return new TokenStreamComponents( tokenizer );
 	}
 
-	private class InternalTokenStream extends TokenStream {
-		private int position;
-		private TermAttribute termAttribute;
-
-		public InternalTokenStream() {
-			super();
-			termAttribute = addAttribute( TermAttribute.class );
-		}
-
-		@Override
-		public boolean incrementToken() throws IOException {
-			if ( position >= getTokens().length ) {
-				return false;
-			}
-			else {
-				termAttribute.setTermBuffer( getTokens()[position++] );
-				return true;
-			}
-		}
-	}
 }

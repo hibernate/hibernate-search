@@ -24,7 +24,8 @@
 package org.hibernate.search.bridge.builtin.impl;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.index.IndexableField;
+
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
@@ -51,7 +52,7 @@ public class TwoWayString2FieldBridgeAdaptor extends String2FieldBridgeAdaptor i
 
 	@Override
 	public Object get(String name, Document document) {
-		Fieldable field = document.getFieldable( name );
+		final IndexableField field = document.getField( name );
 		if ( field == null ) {
 			return stringBridge.stringToObject( null );
 		}

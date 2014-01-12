@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.embedded.graph;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.hibernate.Session;
 import org.hibernate.search.test.SearchTestCase;
@@ -71,7 +72,7 @@ public class RecursiveGraphTest extends SearchTestCase {
 	}
 
 	private int getDocumentNbr(Class type) throws Exception {
-		IndexReader reader = IndexReader.open( getDirectory( type ), false );
+		IndexReader reader = DirectoryReader.open( getDirectory( type ) );
 		try {
 			return reader.numDocs();
 		}

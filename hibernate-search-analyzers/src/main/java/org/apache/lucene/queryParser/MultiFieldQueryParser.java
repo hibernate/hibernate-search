@@ -1,8 +1,8 @@
-/*
+/* 
  * Hibernate, Relational Persistence for Idiomatic Java
- *
+ * 
  * JBoss, Home of Professional Open Source
- * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2013 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -18,19 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.bridge.builtin;
+package org.apache.lucene.queryParser;
 
-import org.apache.lucene.document.Document;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.util.Version;
 
-/**
- * Long numeric field bridge, capable of decoding long values from Field
- *
- * @author Gustavo Fernandes
- */
-public class LongNumericFieldBridge extends NumericFieldBridge {
+public class MultiFieldQueryParser extends org.apache.lucene.queryparser.classic.MultiFieldQueryParser {
 
-	@Override
-	public Object get(String name, Document document) {
-		return Long.valueOf( document.getFieldable( name ).stringValue() );
+	public MultiFieldQueryParser(Version matchVersion, String[] fields, Analyzer analyzer) {
+		super( matchVersion, fields, analyzer );
 	}
+
 }

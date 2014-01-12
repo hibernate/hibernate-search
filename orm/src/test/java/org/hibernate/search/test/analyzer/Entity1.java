@@ -26,8 +26,8 @@ package org.hibernate.search.test.analyzer;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.apache.solr.analysis.StandardFilterFactory;
-import org.apache.solr.analysis.StandardTokenizerFactory;
+import org.apache.lucene.analysis.standard.StandardFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.Indexed;

@@ -26,8 +26,8 @@ package org.hibernate.search.cfg;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.solr.analysis.TokenizerFactory;
-import org.apache.solr.analysis.TokenFilterFactory;
+import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 /**
  * @author Emmanuel Bernard

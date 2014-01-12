@@ -21,8 +21,10 @@ package org.hibernate.search.query.fieldcache.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.FieldCache;
+import org.apache.lucene.search.FieldCache.Ints;
 
 /**
  * We need a collection of similar implementations, one per each FieldCache.DEFAULT.accessmethod
@@ -33,19 +35,20 @@ import org.apache.lucene.search.FieldCache;
  */
 public final class IntFieldLoadingStrategy implements FieldLoadingStrategy {
 	private final String fieldName;
-	private int[] currentCache;
+	private Ints currentCache;
 
 	public IntFieldLoadingStrategy(String fieldName) {
 		this.fieldName = fieldName;
 	}
 
 	@Override
-	public void loadNewCacheValues(IndexReader reader) throws IOException {
-		currentCache = FieldCache.DEFAULT.getInts( reader, fieldName );
+	public void loadNewCacheValues(AtomicReaderContext context) throws IOException {
+		final AtomicReader reader = context.reader();
+		currentCache = FieldCache.DEFAULT.getInts( reader, fieldName, false );
 	}
 
 	@Override
 	public Integer collect(int relativeDocId) {
-		return currentCache[relativeDocId];
+		return currentCache.get( relativeDocId );
 	}
 }

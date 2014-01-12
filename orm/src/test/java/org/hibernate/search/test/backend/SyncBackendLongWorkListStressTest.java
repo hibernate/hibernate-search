@@ -25,7 +25,7 @@ package org.hibernate.search.test.backend;
 
 import java.io.File;
 
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.Transaction;

@@ -26,10 +26,10 @@ package org.hibernate.search.test.analyzer;
 
 import java.lang.annotation.ElementType;
 
-import org.apache.solr.analysis.GermanStemFilterFactory;
-import org.apache.solr.analysis.LowerCaseFilterFactory;
-import org.apache.solr.analysis.SnowballPorterFilterFactory;
-import org.apache.solr.analysis.StandardTokenizerFactory;
+import org.apache.lucene.analysis.de.GermanStemFilterFactory;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;

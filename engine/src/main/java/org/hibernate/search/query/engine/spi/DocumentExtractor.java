@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.query.engine.spi;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 import org.apache.lucene.search.TopDocs;
@@ -37,7 +38,8 @@ import org.apache.lucene.search.TopDocs;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface DocumentExtractor {
+public interface DocumentExtractor extends Closeable {
+
 	EntityInfo extract(int index) throws IOException;
 
 	int getFirstIndex();

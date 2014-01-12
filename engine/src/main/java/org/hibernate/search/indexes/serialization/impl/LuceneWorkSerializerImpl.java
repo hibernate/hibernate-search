@@ -25,9 +25,9 @@ import java.util.List;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Fieldable;
-import org.apache.lucene.document.NumericField;
-
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.FieldType.NumericType;
+import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -151,47 +151,37 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 		}
 	}
 
-
 	private void buildDocument(Document document, Serializer serializer) {
-		List<Fieldable> docFields = document.getFields();
+		final List<IndexableField> docFields = document.getFields();
 		serializer.fields( docFields );
-		for ( Fieldable fieldable : docFields ) {
-			if ( fieldable instanceof NumericField ) {
-				NumericField safeField = (NumericField) fieldable;
-				LuceneNumericFieldContext context = new LuceneNumericFieldContext( (NumericField) fieldable );
-				switch ( safeField.getDataType() ) {
+		for ( IndexableField fieldable : docFields ) {
+			final FieldType fieldType = (FieldType) fieldable.fieldType();
+			final NumericType numericType = fieldType.numericType();
+			if ( numericType != null ) {
+				LuceneNumericFieldContext context = new LuceneNumericFieldContext( fieldType, fieldable.name(), fieldable.boost() );
+				switch ( numericType ) {
 					case INT:
-						serializer.addIntNumericField(
-								safeField.getNumericValue().intValue(),
-								context
-						);
+						serializer.addIntNumericField( fieldable.numericValue().intValue(), context );
 						break;
 					case LONG:
-						serializer.addLongNumericField(
-								safeField.getNumericValue().longValue(),
-								context
-						);
+						serializer.addLongNumericField( fieldable.numericValue().longValue(), context );
 						break;
 					case FLOAT:
-						serializer.addFloatNumericField(
-								safeField.getNumericValue().floatValue(),
-								context
-						);
+						serializer.addFloatNumericField( fieldable.numericValue().floatValue(), context );
 						break;
 					case DOUBLE:
-						serializer.addDoubleNumericField(
-								safeField.getNumericValue().doubleValue(),
-								context
-						);
+						serializer.addDoubleNumericField( fieldable.numericValue().doubleValue(), context );
 						break;
 					default:
-						String dataType = safeField.getDataType() == null ? "null" : safeField.getDataType().toString();
+						String dataType = numericType.toString();
 						throw log.unknownNumericFieldType( dataType );
 				}
 			}
 			else if (fieldable instanceof Field) {
 				Field safeField = (Field) fieldable;
-				if ( safeField.isBinary() ) {
+				//FIXME it seems like in new Field implementation it's possible to have multiple data types at the same time. Investigate?
+				//The following sequence of else/ifs would not be appropriate.
+				if ( safeField.binaryValue() != null ) {
 					serializer.addFieldWithBinaryData( new LuceneFieldContext( safeField ) );
 				}
 				else if ( safeField.stringValue() != null ) {
@@ -210,14 +200,11 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 					throw log.unknownFieldType( safeField.getClass() );
 				}
 			}
-			else if ( fieldable != null ) { //Today Fieldable is Serializable but for how long?
-				serializer.addFieldWithSerializableFieldable( toByteArray( fieldable ) );
-			}
 			else {
 				throw log.cannotSerializeCustomField( fieldable.getClass() );
 			}
 		}
-		serializer.addDocument( document.getBoost() );
+		serializer.addDocument();
 	}
 
 	@Override

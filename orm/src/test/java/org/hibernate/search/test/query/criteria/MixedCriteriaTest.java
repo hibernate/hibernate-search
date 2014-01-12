@@ -25,7 +25,7 @@ package org.hibernate.search.test.query.criteria;
 
 import java.util.List;
 
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Criteria;
 import org.hibernate.Session;

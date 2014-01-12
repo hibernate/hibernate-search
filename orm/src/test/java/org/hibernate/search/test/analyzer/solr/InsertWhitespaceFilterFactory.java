@@ -23,13 +23,20 @@
  */
 package org.hibernate.search.test.analyzer.solr;
 
+import java.util.Map;
+
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.solr.analysis.BaseTokenFilterFactory;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 /**
  * @author Hardy Ferentschik
  */
-public class InsertWhitespaceFilterFactory extends BaseTokenFilterFactory {
+public class InsertWhitespaceFilterFactory extends TokenFilterFactory {
+
+	public InsertWhitespaceFilterFactory(Map<String, String> args) {
+		super( args );
+	}
+
 	@Override
 	public InsertWhitespaceFilter create(TokenStream input) {
 		return new InsertWhitespaceFilter( input );

@@ -19,7 +19,6 @@
 
 package org.hibernate.search.test.query.fieldcache;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -62,7 +61,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		FieldSelectorLeakingReaderProvider.resetFieldSelector();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Location.class );
-		fullTextQuery.setSort( new Sort( new SortField( "description", SortField.STRING ) ) ); // to avoid loading in document order -- too easy
+		fullTextQuery.setSort( new Sort( new SortField( "description", SortField.Type.STRING ) ) ); // to avoid loading in document order -- too easy
 		List<Location> locations = fullTextQuery.list();
 		FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled();
 		Assert.assertEquals( NUM_LOCATIONS, locations.size() );
@@ -81,7 +80,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		Country italy = new Country( "Italy", 39d );
 		for ( int i = 0; i < NUM_LOCATIONS; i++ ) {
 			session.persist( new Location( i, Long.valueOf( i ), 7 * i, Double.valueOf( 9 * i ), Integer
-					.valueOf( 100 - i ), String.valueOf( i ) + "42", null, italy, BigDecimal.ONE ) );
+					.valueOf( 100 - i ), String.valueOf( i ) + "42", null, italy, Float.valueOf( 1f ) ) );
 		}
 		transaction.commit();
 		session.close();

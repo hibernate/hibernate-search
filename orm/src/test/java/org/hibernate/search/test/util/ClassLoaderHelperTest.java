@@ -30,8 +30,8 @@ import static org.junit.Assert.fail;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.search.DefaultSimilarity;
-import org.apache.lucene.search.Similarity;
+import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.Session;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -106,11 +106,11 @@ public class ClassLoaderHelperTest {
 		wrappingTestFromClass(
 				"Wrong configuration of default similarity: " +
 						"class org.hibernate.search.indexes.impl.DirectoryBasedIndexManager " +
-						"is not a subtype of org.apache.lucene.search.Similarity",
+						"is not a subtype of org.apache.lucene.search.similarities.Similarity",
 				Similarity.class, DirectoryBasedIndexManager.class, "default similarity"
 		);
 		wrappingTestFromClass(
-				"Unable to instantiate default similarity class: org.apache.lucene.search.Similarity. " +
+				"Unable to instantiate default similarity class: org.apache.lucene.search.similarities.Similarity. " +
 						"Verify it has a no-args public constructor and is not abstract.",
 				Similarity.class, Similarity.class, "default similarity"
 		);

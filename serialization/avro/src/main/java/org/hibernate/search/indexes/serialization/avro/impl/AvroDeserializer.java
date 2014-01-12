@@ -173,7 +173,7 @@ public class AvroDeserializer implements Deserializer {
 	}
 
 	private void buildLuceneDocument(GenericRecord document, LuceneWorksBuilder hydrator) {
-		hydrator.defineDocument( asFloat( document, "boost" ) );
+		hydrator.defineDocument();
 		List<GenericRecord> fieldables = asListOfGenericRecords( document, "fieldables" );
 		for ( GenericRecord field : fieldables ) {
 			String schema = field.getSchema().getName();

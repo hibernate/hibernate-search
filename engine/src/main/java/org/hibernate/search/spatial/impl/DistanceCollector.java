@@ -22,11 +22,13 @@ package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldCache;
+import org.apache.lucene.search.FieldCache.Doubles;
 import org.apache.lucene.search.Scorer;
-import org.apache.lucene.util.collections.IntToDoubleMap;
+import org.apache.lucene.facet.collections.IntToDoubleMap;
 import org.hibernate.search.spatial.Coordinates;
 
 public class DistanceCollector extends Collector {
@@ -66,15 +68,18 @@ public class DistanceCollector extends Collector {
 	}
 
 	@Override
-	public void setNextReader(IndexReader reader, int docBase) throws IOException {
-		delegate.setNextReader( reader, docBase );
-		double[] unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( reader, latitudeField );
-		double[] unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( reader, longitudeField );
+	public void setNextReader(AtomicReaderContext newContext) throws IOException {
+		delegate.setNextReader( newContext );
+		final AtomicReader atomicReader = newContext.reader();
+		final int numDocs = atomicReader.numDocs();
+		final Doubles unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
+		final Doubles unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
 
-		this.docBase = docBase;
-		for ( int i = 0 ; i < unbasedLatitudeValues.length ; i ++ ) {
-			latitudeValues.put( this.docBase + i, unbasedLatitudeValues[i] );
-			longitudeValues.put( this.docBase + i, unbasedLongitudeValues[i] );
+		this.docBase = newContext.docBase;
+		for ( int i = 0 ; i < numDocs; i ++ ) {
+			//TODO avoid fully copying this structure
+			latitudeValues.put( this.docBase + i, unbasedLatitudeValues.get( i ) );
+			longitudeValues.put( this.docBase + i, unbasedLongitudeValues.get( i ) );
 		}
 	}
 

@@ -21,8 +21,10 @@ package org.hibernate.search.query.fieldcache.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.FieldCache;
+import org.apache.lucene.search.FieldCache.Longs;
 
 /**
  * We need a collection of similar implementations, one per each FieldCache.DEFAULT.accessmethod
@@ -33,19 +35,20 @@ import org.apache.lucene.search.FieldCache;
  */
 public final class LongFieldLoadingStrategy implements FieldLoadingStrategy {
 	private final String fieldName;
-	private long[] currentCache;
+	private Longs currentCache;
 
 	public LongFieldLoadingStrategy(String fieldName) {
 		this.fieldName = fieldName;
 	}
 
 	@Override
-	public void loadNewCacheValues(IndexReader reader) throws IOException {
-		currentCache = FieldCache.DEFAULT.getLongs( reader, fieldName );
+	public void loadNewCacheValues(AtomicReaderContext context) throws IOException {
+		final AtomicReader reader = context.reader();
+		currentCache = FieldCache.DEFAULT.getLongs( reader, fieldName, false );
 	}
 
 	@Override
 	public Long collect(int relativeDocId) {
-		return currentCache[relativeDocId];
+		return currentCache.get( relativeDocId );
 	}
 }
