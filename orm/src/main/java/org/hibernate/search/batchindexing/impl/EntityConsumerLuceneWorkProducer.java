@@ -92,7 +92,7 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 	}
 
 	@Override
-	public void run(Session upperSession) {
+	public void run(Session upperSession) throws Exception {
 		Session session = upperSession;
 		if ( upperSession == null ) {
 			session = sessionFactory.openSession();
@@ -105,9 +105,6 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 			transaction.begin();
 			indexAllQueue( session );
 			transaction.commit();
-		}
-		catch (Throwable e) {
-			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage(), e );
 		}
 		finally {
 			producerEndSignal.countDown();
