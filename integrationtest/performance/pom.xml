@@ -172,17 +172,10 @@
 
 	<profiles>
 		<profile>
-			<id>hsearch440</id>
+			<id>hsearch450</id>
 			<properties>
-				<hibernateSearchVersion>4.4.0.Final</hibernateSearchVersion>
-				<hibernateVersion>4.2.6.Final</hibernateVersion>
-			</properties>
-		</profile>
-		<profile>
-			<id>hsearch430</id>
-			<properties>
-				<hibernateSearchVersion>4.3.0.Final</hibernateSearchVersion>
-				<hibernateVersion>4.2.2.Final</hibernateVersion>
+				<hibernateSearchVersion>4.5.0.Alpha2</hibernateSearchVersion>
+				<hibernateVersion>4.3.0.Final</hibernateVersion>
 			</properties>
 		</profile>
 	</profiles>
