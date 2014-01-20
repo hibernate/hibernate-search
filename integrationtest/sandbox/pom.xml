@@ -37,8 +37,8 @@
 
     <artifactId>hibernate-search-performance</artifactId>
 
-    <name>Hibernate Search Performance Tests</name>
-    <description>Hibernate Search Performance Tests</description>
+    <name>Hibernate Search Sandbox Performance Tests</name>
+    <description>Hibernate Search Performance Tests which are not part of the build</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
