@@ -32,8 +32,8 @@
     <artifactId>hibernate-search-modules</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Module</name>
-    <description>Hibernate Search modules creation to use in JBoss AS</description>
+    <name>Hibernate Search Wildfly Module</name>
+    <description>Hibernate Search modules creation to use in JBoss AS / Wildfly</description>
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
