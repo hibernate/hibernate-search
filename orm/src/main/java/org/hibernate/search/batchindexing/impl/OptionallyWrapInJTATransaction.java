@@ -75,7 +75,7 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 	}
 
 	@Override
-	public void runWithErrroHandler() throws Exception {
+	public void runWithErrorHandler() throws Exception {
 		if ( wrapInTransaction ) {
 			final Session session;
 			final StatelessSession statelessSession;

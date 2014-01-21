@@ -46,7 +46,7 @@ abstract class ErrorHandledRunnable implements Runnable {
 	public final void run() {
 		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
 		try {
-			runWithErrroHandler();
+			runWithErrorHandler();
 		}
 		catch (Exception re) {
 			//being this an async thread we want to make sure everything is somehow reported
@@ -55,7 +55,7 @@ abstract class ErrorHandledRunnable implements Runnable {
 		}
 	}
 
-	protected abstract void runWithErrroHandler() throws Exception;
+	protected abstract void runWithErrorHandler() throws Exception;
 
 	protected void cleanUpOnError() {
 		//no-op unless overridden

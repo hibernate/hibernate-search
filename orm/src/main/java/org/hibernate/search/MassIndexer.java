@@ -61,11 +61,12 @@ public interface MassIndexer {
 	MassIndexer batchSizeToLoadObjects(int batchSize);
 
 	/**
-	 * Sets the number of threads used to load the lazy collections
-	 * related to the indexed entities.
+	 * Deprecated: value is ignored.
 	 * @param numberOfThreads
 	 * @return <tt>this</tt> for method chaining
+	 * @deprecated Being ignored: this method will be removed.
 	 */
+	@Deprecated
 	MassIndexer threadsForSubsequentFetching(int numberOfThreads);
 
 	/**
