@@ -22,9 +22,7 @@ package org.hibernate.search.engine.impl;
 import java.util.Collection;
 import java.util.Map;
 
-import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.persister.collection.CollectionPersister;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -64,27 +62,14 @@ public class HibernateSessionLoadingInitializer extends HibernateStatelessInitia
 
 	@Override
 	public <T> Collection<T> initializeCollection(Collection<T> value) {
-		if ( value instanceof PersistentCollection ) {
-			preparePersistentCollection( (PersistentCollection) value );
-		}
+		//No action needed
 		return value;
 	}
 
 	@Override
 	public <K,V> Map<K,V> initializeMap(Map<K,V> value) {
-		if ( value instanceof PersistentCollection ) {
-			preparePersistentCollection( (PersistentCollection) value );
-		}
+		//No action needed
 		return value;
-	}
-
-	private void preparePersistentCollection( PersistentCollection value ) {
-		// we have to check that it's not already associated, might have happened via cascading:
-		if ( value.setCurrentSession( hibernateSession ) ) {
-			String role = value.getRole();
-			CollectionPersister collectionPersister = hibernateSession.getFactory().getCollectionPersister( role );
-			hibernateSession.getPersistenceContext().addInitializedDetachedCollection( collectionPersister, value );
-		}
 	}
 
 }
