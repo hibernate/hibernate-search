@@ -26,8 +26,11 @@ package org.hibernate.search.util.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -41,7 +44,7 @@ import java.util.TreeMap;
 public final class CollectionHelper {
 
 	private CollectionHelper() {
-		//now allowed
+		// not allowed
 	}
 
 	public static <K, V> HashMap<K, V> newHashMap() {
@@ -63,4 +66,14 @@ public final class CollectionHelper {
 	public static <T> Set<T> asSet(T... ts) {
 		return new HashSet<T>( Arrays.asList( ts ) );
 	}
+
+	public static <T> List<T> toImmutableList(final Collection<T> c) {
+		if ( c.isEmpty() ) {
+			return Collections.emptyList();
+		}
+		else {
+			return Collections.unmodifiableList( new ArrayList<T>( c ) );
+		}
+	}
+
 }
