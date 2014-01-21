@@ -26,6 +26,7 @@ package org.hibernate.search.engine.metadata.impl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +34,8 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.util.impl.ReflectionHelper;
+
+import static org.hibernate.search.util.impl.CollectionHelper.toImmutableList;
 
 /**
  * Encapsulating the metadata for a single indexed property (field or getter).
@@ -43,15 +46,16 @@ import org.hibernate.search.util.impl.ReflectionHelper;
  */
 public class PropertyMetadata {
 	private final XProperty propertyAccessor;
-	private final Map<String, DocumentFieldMetadata> documentFieldMetadata;
-	private final Set<DocumentFieldMetadata> documentFieldMetadataSet;
+	private final Map<String, DocumentFieldMetadata> documentFieldMetadataMap;
+	private final List<DocumentFieldMetadata> documentFieldMetadataList;
 	private final BoostStrategy dynamicBoostStrategy;
+	private final String propertyAccessorName;
 
 	private PropertyMetadata(Builder builder) {
 		this.propertyAccessor = builder.propertyAccessor;
-		this.documentFieldMetadataSet = Collections.unmodifiableSet( builder.fieldMetadataSet );
-		this.documentFieldMetadata = createDocumentFieldMetadataMap( builder.fieldMetadataSet );
-
+		this.documentFieldMetadataList = toImmutableList( builder.fieldMetadataSet );
+		this.documentFieldMetadataMap = createDocumentFieldMetadataMap( builder.fieldMetadataSet );
+		this.propertyAccessorName = propertyAccessor == null ? null : propertyAccessor.getName();
 		if ( builder.dynamicBoostStrategy != null ) {
 			this.dynamicBoostStrategy = builder.dynamicBoostStrategy;
 		}
@@ -73,15 +77,15 @@ public class PropertyMetadata {
 	}
 
 	public String getPropertyAccessorName() {
-		return propertyAccessor == null ? null : propertyAccessor.getName();
+		return propertyAccessorName;
 	}
 
-	public Set<DocumentFieldMetadata> getFieldMetadata() {
-		return documentFieldMetadataSet;
+	public List<DocumentFieldMetadata> getFieldMetadata() {
+		return documentFieldMetadataList;
 	}
 
 	public DocumentFieldMetadata getFieldMetadata(String fieldName) {
-		return documentFieldMetadata.get( fieldName );
+		return documentFieldMetadataMap.get( fieldName );
 	}
 
 	public BoostStrategy getDynamicBoostStrategy() {
@@ -127,7 +131,7 @@ public class PropertyMetadata {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "PropertyMetadata{" );
 		sb.append( "propertyAccessor=" ).append( propertyAccessor );
-		sb.append( ", fieldMetadata=" ).append( documentFieldMetadataSet );
+		sb.append( ", fieldMetadata=" ).append( documentFieldMetadataList );
 		sb.append( ", dynamicBoostStrategy=" ).append( dynamicBoostStrategy );
 		sb.append( '}' );
 		return sb.toString();
