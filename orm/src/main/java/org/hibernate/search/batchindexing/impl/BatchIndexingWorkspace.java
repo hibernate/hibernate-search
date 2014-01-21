@@ -50,11 +50,9 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	private final SessionFactoryImplementor sessionFactory;
 
-	private final ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities;
-	private final ProducerConsumerQueue<List<?>> fromEntityToAddwork;
+	private final ProducerConsumerQueue<List<Serializable>> primaryKeyStream;
 
-	private final int objectLoadingThreadNum;
-	private final int luceneWorkerBuildingThreadNum;
+	private final int documentBuilderThreads;
 	private final Class<?> indexedType;
 	private final String idNameOfIndexedType;
 
@@ -79,7 +77,6 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 								SessionFactoryImplementor sessionFactory,
 								Class<?> entityType,
 								int objectLoadingThreads,
-								int collectionLoadingThreads,
 								CacheMode cacheMode,
 								int objectLoadingBatchSize,
 								CountDownLatch endAllSignal,
@@ -96,8 +93,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		this.sessionFactory = sessionFactory;
 
 		//thread pool sizing:
-		this.objectLoadingThreadNum = objectLoadingThreads;
-		this.luceneWorkerBuildingThreadNum = collectionLoadingThreads;//collections are loaded as needed by building the document
+		this.documentBuilderThreads = objectLoadingThreads;
 
 		//loading options:
 		this.cacheMode = cacheMode;
@@ -105,12 +101,11 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		this.backend = backend;
 
 		//pipelining queues:
-		this.fromIdentifierListToEntities = new ProducerConsumerQueue<List<Serializable>>( 1 );
-		this.fromEntityToAddwork = new ProducerConsumerQueue<List<?>>( objectLoadingThreadNum );
+		this.primaryKeyStream = new ProducerConsumerQueue<List<Serializable>>( 1 );
 
 		//end signal shared with other instances:
 		this.endAllSignal = endAllSignal;
-		this.producerEndSignal = new CountDownLatch( luceneWorkerBuildingThreadNum );
+		this.producerEndSignal = new CountDownLatch( documentBuilderThreads );
 
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
@@ -120,14 +115,12 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	public void runWithErrroHandler() {
 		try {
 			final ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
-			final BatchTransactionalContext btctx = new BatchTransactionalContext( searchFactoryImplementor, sessionFactory, errorHandler );
+			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( searchFactoryImplementor, sessionFactory, errorHandler );
 			//first start the consumers, then the producers (reverse order):
-			//from entity to LuceneWork:
-			startTransformationToLuceneWork( btctx, errorHandler );
-			//from primary key to loaded entity:
-			startTransformationToEntities( btctx, errorHandler );
+			//from primary keys to LuceneWork ADD operations:
+			startTransformationToLuceneWork( transactionalContext, errorHandler );
 			//from class definition to all primary keys:
-			startProducingPrimaryKeys( btctx, errorHandler );
+			startProducingPrimaryKeys( transactionalContext, errorHandler );
 			try {
 				producerEndSignal.await(); //await for all work being sent to the backend
 				log.debugf( "All work for type %s has been produced", indexedType.getName() );
@@ -143,10 +136,10 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		}
 	}
 
-	private void startProducingPrimaryKeys(BatchTransactionalContext btctx, ErrorHandler errorHandler) {
-		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction( btctx,
+	private void startProducingPrimaryKeys(BatchTransactionalContext transactionalContext, ErrorHandler errorHandler) {
+		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction( transactionalContext,
 				new IdentifierProducer(
-						fromIdentifierListToEntities, sessionFactory,
+						primaryKeyStream, sessionFactory,
 						objectLoadingBatchSize, indexedType, monitor,
 						objectsLimit, errorHandler, idFetchSize
 				));
@@ -160,15 +153,16 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		}
 	}
 
-	private void startTransformationToEntities(BatchTransactionalContext btctx, ErrorHandler errorHandler) {
-		final Runnable entityOutputter = new OptionallyWrapInJTATransaction( btctx,
-				new IdentifierConsumerEntityProducer(
-						fromIdentifierListToEntities, fromEntityToAddwork, monitor,
-						sessionFactory, cacheMode, indexedType, idNameOfIndexedType
+	private void startTransformationToLuceneWork(BatchTransactionalContext transactionalContext, ErrorHandler errorHandler) {
+		final Runnable entityOutputter = new OptionallyWrapInJTATransaction( transactionalContext,
+				new IdentifierConsumerDocumentProducer(
+						primaryKeyStream, monitor, sessionFactory, producerEndSignal,
+						cacheMode, indexedType, searchFactoryImplementor,
+						idNameOfIndexedType, backend, errorHandler
 				));
-		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( objectLoadingThreadNum, "entityloader" );
+		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
 		try {
-			for ( int i = 0; i < objectLoadingThreadNum; i++ ) {
+			for ( int i = 0; i < documentBuilderThreads; i++ ) {
 				execFirstLoader.execute( entityOutputter );
 			}
 		}
@@ -177,22 +171,5 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		}
 	}
 
-	private void startTransformationToLuceneWork(BatchTransactionalContext btctx, ErrorHandler errorHandler) {
-		final Runnable luceneOutputter = new OptionallyWrapInJTATransaction( btctx,
-				new EntityConsumerLuceneWorkProducer(
-					fromEntityToAddwork, monitor,
-					sessionFactory, producerEndSignal, searchFactoryImplementor,
-					cacheMode, backend, errorHandler
-					));
-		final ThreadPoolExecutor execDocBuilding = Executors.newFixedThreadPool( luceneWorkerBuildingThreadNum, "collectionsloader" );
-		try {
-			for ( int i = 0; i < luceneWorkerBuildingThreadNum; i++ ) {
-				execDocBuilding.execute( luceneOutputter );
-			}
-		}
-		finally {
-			execDocBuilding.shutdown();
-		}
-	}
 
 }
