@@ -50,8 +50,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final Class<?>[] rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final SessionFactoryImplementor sessionFactory;
 	private final int typesToIndexInParallel;
-	private final int objectLoadingThreads;
-	private final int collectionLoadingThreads;
+	private final int documentBuilderThreads;
 	private final CacheMode cacheMode;
 	private final int objectLoadingBatchSize;
 	private final boolean optimizeAtEnd;
@@ -66,8 +65,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 							SearchFactoryImplementor searchFactoryImplementor,
 							SessionFactoryImplementor sessionFactory,
 							int typesToIndexInParallel,
-							int objectLoadingThreads,
-							int collectionLoadingThreads,
+							int documentBuilderThreads,
 							CacheMode cacheMode,
 							int objectLoadingBatchSize,
 							long objectsLimit,
@@ -81,8 +79,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
 		this.sessionFactory = sessionFactory;
 		this.typesToIndexInParallel = typesToIndexInParallel;
-		this.objectLoadingThreads = objectLoadingThreads;
-		this.collectionLoadingThreads = collectionLoadingThreads;
+		this.documentBuilderThreads = documentBuilderThreads;
 		this.cacheMode = cacheMode;
 		this.objectLoadingBatchSize = objectLoadingBatchSize;
 		this.optimizeAtEnd = optimizeAtEnd;
@@ -94,7 +91,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	}
 
 	@Override
-	public void runWithErrroHandler() {
+	public void runWithErrorHandler() {
 		final BatchBackend backend = searchFactoryImplementor.makeBatchBackend( monitor );
 		try {
 			beforeBatch( backend ); // purgeAll and pre-optimize activities
@@ -123,7 +120,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 			executor.execute(
 					new BatchIndexingWorkspace(
 							searchFactoryImplementor, sessionFactory, type,
-							objectLoadingThreads, collectionLoadingThreads,
+							documentBuilderThreads,
 							cacheMode, objectLoadingBatchSize, endAllSignal,
 							monitor, backend, objectsLimit, idFetchSize
 					)
