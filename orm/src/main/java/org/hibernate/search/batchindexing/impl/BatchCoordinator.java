@@ -29,7 +29,6 @@ import java.util.concurrent.ExecutorService;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.CacheMode;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
@@ -44,16 +43,14 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class BatchCoordinator implements Runnable {
+public class BatchCoordinator extends ErrorHandledRunnable {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final Class<?>[] rootEntities; //entity types to reindex excluding all subtypes of each-other
-	private final SearchFactoryImplementor searchFactoryImplementor;
 	private final SessionFactoryImplementor sessionFactory;
 	private final int typesToIndexInParallel;
-	private final int objectLoadingThreads;
-	private final int collectionLoadingThreads;
+	private final int documentBuilderThreads;
 	private final CacheMode cacheMode;
 	private final int objectLoadingBatchSize;
 	private final boolean optimizeAtEnd;
@@ -62,15 +59,13 @@ public class BatchCoordinator implements Runnable {
 	private final CountDownLatch endAllSignal;
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
-	private final ErrorHandler errorHandler;
 	private final int idFetchSize;
 
 	public BatchCoordinator(Set<Class<?>> rootEntities,
 							SearchFactoryImplementor searchFactoryImplementor,
 							SessionFactoryImplementor sessionFactory,
 							int typesToIndexInParallel,
-							int objectLoadingThreads,
-							int collectionLoadingThreads,
+							int documentBuilderThreads,
 							CacheMode cacheMode,
 							int objectLoadingBatchSize,
 							long objectsLimit,
@@ -79,13 +74,12 @@ public class BatchCoordinator implements Runnable {
 							boolean optimizeAfterPurge,
 							MassIndexerProgressMonitor monitor,
 							int idFetchSize) {
+		super( searchFactoryImplementor );
 		this.idFetchSize = idFetchSize;
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
-		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.sessionFactory = sessionFactory;
 		this.typesToIndexInParallel = typesToIndexInParallel;
-		this.objectLoadingThreads = objectLoadingThreads;
-		this.collectionLoadingThreads = collectionLoadingThreads;
+		this.documentBuilderThreads = documentBuilderThreads;
 		this.cacheMode = cacheMode;
 		this.objectLoadingBatchSize = objectLoadingBatchSize;
 		this.optimizeAtEnd = optimizeAtEnd;
@@ -94,31 +88,22 @@ public class BatchCoordinator implements Runnable {
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 		this.endAllSignal = new CountDownLatch( rootEntities.size() );
-		this.errorHandler = searchFactoryImplementor.getErrorHandler();
 	}
 
 	@Override
-	public void run() {
+	public void runWithErrroHandler() {
+		final BatchBackend backend = searchFactoryImplementor.makeBatchBackend( monitor );
 		try {
-			final BatchBackend backend = searchFactoryImplementor.makeBatchBackend( monitor );
-			try {
-				beforeBatch( backend ); // purgeAll and pre-optimize activities
-				doBatchWork( backend );
-				afterBatch( backend );
-			}
-			catch (InterruptedException e) {
-				log.interruptedBatchIndexing();
-				Thread.currentThread().interrupt();
-			}
-			finally {
-				monitor.indexingCompleted();
-			}
+			beforeBatch( backend ); // purgeAll and pre-optimize activities
+			doBatchWork( backend );
+			afterBatch( backend );
 		}
-		catch (RuntimeException re) {
-			// each batch processing stage is already supposed to properly handle any kind
-			// of exception, still since this is possibly an async operation we need a safety
-			// for the unexpected exceptions
-			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , re );
+		catch (InterruptedException e) {
+			log.interruptedBatchIndexing();
+			Thread.currentThread().interrupt();
+		}
+		finally {
+			monitor.indexingCompleted();
 		}
 	}
 
@@ -135,7 +120,7 @@ public class BatchCoordinator implements Runnable {
 			executor.execute(
 					new BatchIndexingWorkspace(
 							searchFactoryImplementor, sessionFactory, type,
-							objectLoadingThreads, collectionLoadingThreads,
+							documentBuilderThreads,
 							cacheMode, objectLoadingBatchSize, endAllSignal,
 							monitor, backend, objectsLimit, idFetchSize
 					)

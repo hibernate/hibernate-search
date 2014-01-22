@@ -58,8 +58,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	// default settings defined here:
 	private int typesToIndexInParallel = 1;
-	private int objectLoadingThreads = 2; //loading the main entity
-	private int collectionLoadingThreads = 4; //also responsible for loading of lazy @IndexedEmbedded collections
+	private int documentBuilderThreads = 6; //loading the main entity, also responsible for loading of lazy @IndexedEmbedded collections
 	private int objectLoadingBatchSize = 10;
 	private long objectsLimit = 0; //means no limit at all
 	private CacheMode cacheMode = CacheMode.IGNORE;
@@ -150,7 +149,7 @@ public class MassIndexerImpl implements MassIndexer {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
-		this.objectLoadingThreads = numberOfThreads;
+		this.documentBuilderThreads = numberOfThreads;
 		return this;
 	}
 
@@ -164,11 +163,12 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	@Override
+	@Deprecated
 	public MassIndexer threadsForSubsequentFetching(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
-		this.collectionLoadingThreads = numberOfThreads;
+		//currently a no-op
 		return this;
 	}
 
@@ -228,7 +228,7 @@ public class MassIndexerImpl implements MassIndexer {
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
 				rootEntities, searchFactoryImplementor, sessionFactory,
-				typesToIndexInParallel, objectLoadingThreads, collectionLoadingThreads,
+				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
 				monitor, idFetchSize

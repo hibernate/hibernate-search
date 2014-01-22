@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -44,22 +44,15 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class BatchIndexingWorkspace implements Runnable {
+public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final SearchFactoryImplementor searchFactory;
 	private final SessionFactoryImplementor sessionFactory;
 
-	//following order shows the 4 stages of an entity flowing to the index:
-	private final ThreadPoolExecutor execIdentifiersLoader;
-	private final ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities;
-	private final ThreadPoolExecutor execFirstLoader;
-	private final ProducerConsumerQueue<List<?>> fromEntityToAddwork;
-	private final ThreadPoolExecutor execDocBuilding;
+	private final ProducerConsumerQueue<List<Serializable>> primaryKeyStream;
 
-	private final int objectLoadingThreadNum;
-	private final int luceneWorkerBuildingThreadNum;
+	private final int documentBuilderThreads;
 	private final Class<?> indexedType;
 	private final String idNameOfIndexedType;
 
@@ -84,7 +77,6 @@ public class BatchIndexingWorkspace implements Runnable {
 								SessionFactoryImplementor sessionFactory,
 								Class<?> entityType,
 								int objectLoadingThreads,
-								int collectionLoadingThreads,
 								CacheMode cacheMode,
 								int objectLoadingBatchSize,
 								CountDownLatch endAllSignal,
@@ -92,78 +84,43 @@ public class BatchIndexingWorkspace implements Runnable {
 								BatchBackend backend,
 								long objectsLimit,
 								int idFetchSize) {
-
+		super( searchFactoryImplementor );
 		this.indexedType = entityType;
 		this.idFetchSize = idFetchSize;
 		this.idNameOfIndexedType = searchFactoryImplementor.getIndexBinding( entityType )
 				.getDocumentBuilder()
 				.getIdentifierName();
-		this.searchFactory = searchFactoryImplementor;
 		this.sessionFactory = sessionFactory;
 
 		//thread pool sizing:
-		this.objectLoadingThreadNum = objectLoadingThreads;
-		this.luceneWorkerBuildingThreadNum = collectionLoadingThreads;//collections are loaded as needed by building the document
+		this.documentBuilderThreads = objectLoadingThreads;
 
 		//loading options:
 		this.cacheMode = cacheMode;
 		this.objectLoadingBatchSize = objectLoadingBatchSize;
 		this.backend = backend;
 
-		//executors: (quite expensive constructor)
-		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
-		this.execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
-		this.execFirstLoader = Executors.newFixedThreadPool( objectLoadingThreadNum, "entityloader" );
-		this.execDocBuilding = Executors.newFixedThreadPool( luceneWorkerBuildingThreadNum, "collectionsloader" );
-
 		//pipelining queues:
-		this.fromIdentifierListToEntities = new ProducerConsumerQueue<List<Serializable>>( 1 );
-		this.fromEntityToAddwork = new ProducerConsumerQueue<List<?>>( objectLoadingThreadNum );
+		this.primaryKeyStream = new ProducerConsumerQueue<List<Serializable>>( 1 );
 
 		//end signal shared with other instances:
 		this.endAllSignal = endAllSignal;
-		this.producerEndSignal = new CountDownLatch( luceneWorkerBuildingThreadNum );
+		this.producerEndSignal = new CountDownLatch( documentBuilderThreads );
 
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 	}
 
 	@Override
-	public void run() {
-		ErrorHandler errorHandler = searchFactory.getErrorHandler();
+	public void runWithErrroHandler() {
 		try {
-			final BatchTransactionalContext btctx = new BatchTransactionalContext( sessionFactory, errorHandler );
-
+			final ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
+			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( searchFactoryImplementor, sessionFactory, errorHandler );
 			//first start the consumers, then the producers (reverse order):
-			for ( int i = 0; i < luceneWorkerBuildingThreadNum; i++ ) {
-				//from entity to LuceneWork:
-				final EntityConsumerLuceneWorkProducer producer = new EntityConsumerLuceneWorkProducer(
-						fromEntityToAddwork, monitor,
-						sessionFactory, producerEndSignal, searchFactory,
-						cacheMode, backend, errorHandler
-				);
-				execDocBuilding.execute( new OptionallyWrapInJTATransaction( btctx, producer ) );
-			}
-			for ( int i = 0; i < objectLoadingThreadNum; i++ ) {
-				//from primary key to loaded entity:
-				final IdentifierConsumerEntityProducer producer = new IdentifierConsumerEntityProducer(
-						fromIdentifierListToEntities, fromEntityToAddwork, monitor,
-						sessionFactory, cacheMode, indexedType, idNameOfIndexedType, errorHandler
-				);
-				execFirstLoader.execute( new OptionallyWrapInJTATransaction( btctx, producer ) );
-			}
+			//from primary keys to LuceneWork ADD operations:
+			startTransformationToLuceneWork( transactionalContext, errorHandler );
 			//from class definition to all primary keys:
-			final IdentifierProducer producer = new IdentifierProducer(
-					fromIdentifierListToEntities, sessionFactory,
-					objectLoadingBatchSize, indexedType, monitor,
-					objectsLimit, errorHandler, idFetchSize
-			);
-			execIdentifiersLoader.execute( new OptionallyWrapInJTATransaction( btctx, producer ) );
-
-			//shutdown all executors:
-			execIdentifiersLoader.shutdown();
-			execFirstLoader.shutdown();
-			execDocBuilding.shutdown();
+			startProducingPrimaryKeys( transactionalContext, errorHandler );
 			try {
 				producerEndSignal.await(); //await for all work being sent to the backend
 				log.debugf( "All work for type %s has been produced", indexedType.getName() );
@@ -174,13 +131,45 @@ public class BatchIndexingWorkspace implements Runnable {
 				throw new SearchException( "Interrupted on batch Indexing; index will be left in unknown state!", e );
 			}
 		}
-		catch (RuntimeException re) {
-			//being this an async thread we want to make sure everything is somehow reported
-			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , re );
-		}
 		finally {
 			endAllSignal.countDown();
 		}
 	}
+
+	private void startProducingPrimaryKeys(BatchTransactionalContext transactionalContext, ErrorHandler errorHandler) {
+		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction( transactionalContext,
+				new IdentifierProducer(
+						primaryKeyStream, sessionFactory,
+						objectLoadingBatchSize, indexedType, monitor,
+						objectsLimit, errorHandler, idFetchSize
+				));
+		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
+		final ThreadPoolExecutor execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
+		try {
+			execIdentifiersLoader.execute( primaryKeyOutputter );
+		}
+		finally {
+			execIdentifiersLoader.shutdown();
+		}
+	}
+
+	private void startTransformationToLuceneWork(BatchTransactionalContext transactionalContext, ErrorHandler errorHandler) {
+		final Runnable entityOutputter = new OptionallyWrapInJTATransaction( transactionalContext,
+				new IdentifierConsumerDocumentProducer(
+						primaryKeyStream, monitor, sessionFactory, producerEndSignal,
+						cacheMode, indexedType, searchFactoryImplementor,
+						idNameOfIndexedType, backend, errorHandler
+				));
+		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
+		try {
+			for ( int i = 0; i < documentBuilderThreads; i++ ) {
+				execFirstLoader.execute( entityOutputter );
+			}
+		}
+		finally {
+			execFirstLoader.shutdown();
+		}
+	}
+
 
 }

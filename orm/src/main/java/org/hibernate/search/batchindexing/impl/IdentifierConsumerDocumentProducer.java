@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -29,12 +29,14 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import org.hibernate.CacheMode;
+import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
-import org.hibernate.LockOptions;
+import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
@@ -55,44 +57,53 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Component of batch-indexing pipeline, using chained producer-consumers.
- * This {@code Runnable} will consume entities by taking them one-by-one from the queue
- * and produce for each entity an {@code AddLuceneWork} instance for the output queue.
+ * This {@code SessionAwareRunnable} is consuming entity identifiers and
+ * producing corresponding {@code AddLuceneWork} instances being forwarded
+ * to the index writing backend.
+ * It will finish when the queue it is consuming from will
+ * signal there are no more identifiers.
  *
  * @author Sanne Grinovero
  */
-public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
+public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final ProducerConsumerQueue<List<?>> source;
+	private final ProducerConsumerQueue<List<Serializable>> source;
 	private final SessionFactory sessionFactory;
-	private final Map<Class<?>, EntityIndexBinding> entityIndexBinders;
-	private final MassIndexerProgressMonitor monitor;
 	private final CacheMode cacheMode;
-	private final CountDownLatch producerEndSignal;
-	private final BatchBackend backend;
+	private final Class<?> type;
+	private final MassIndexerProgressMonitor monitor;
+	private final Map<Class<?>, EntityIndexBinding> entityIndexBinders;
+	private final String idName;
 	private final ErrorHandler errorHandler;
+	private final BatchBackend backend;
+	private final CountDownLatch producerEndSignal;
 
-	public EntityConsumerLuceneWorkProducer(
-			ProducerConsumerQueue<List<?>> entitySource,
+	public IdentifierConsumerDocumentProducer(
+			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			MassIndexerProgressMonitor monitor,
 			SessionFactory sessionFactory,
 			CountDownLatch producerEndSignal,
-			SearchFactoryImplementor searchFactory, CacheMode cacheMode,
-			BatchBackend backend, ErrorHandler errorHandler) {
-		this.source = entitySource;
+			CacheMode cacheMode, Class<?> type,
+			SearchFactoryImplementor searchFactory,
+			String idName, BatchBackend backend, ErrorHandler errorHandler) {
+		this.source = fromIdentifierListToEntities;
 		this.monitor = monitor;
 		this.sessionFactory = sessionFactory;
-		this.producerEndSignal = producerEndSignal;
 		this.cacheMode = cacheMode;
+		this.type = type;
+		this.idName = idName;
 		this.backend = backend;
 		this.errorHandler = errorHandler;
+		this.producerEndSignal = producerEndSignal;
 		this.entityIndexBinders = searchFactory.getIndexBindings();
+		log.trace( "created" );
 	}
 
 	@Override
-	public void run(Session upperSession) {
+	public void run(Session upperSession) throws Exception {
+		log.trace( "started" );
 		Session session = upperSession;
 		if ( upperSession == null ) {
 			session = sessionFactory.openSession();
@@ -103,11 +114,8 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 		try {
 			Transaction transaction = Helper.getTransactionAndMarkForJoin( session );
 			transaction.begin();
-			indexAllQueue( session );
+			loadAllFromQueue( session );
 			transaction.commit();
-		}
-		catch (Throwable e) {
-			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage(), e );
 		}
 		finally {
 			producerEndSignal.countDown();
@@ -115,25 +123,68 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 				session.close();
 			}
 		}
-		log.debug( "finished" );
+		log.trace( "finished" );
 	}
 
-	private void indexAllQueue(Session session) {
+	private void loadAllFromQueue(Session session) {
 		final InstanceInitializer sessionInitializer = new HibernateSessionLoadingInitializer(
 				(SessionImplementor) session
 		);
 		try {
+			Object take;
+			do {
+				take = source.take();
+				if ( take != null ) {
+					@SuppressWarnings("unchecked")
+					List<Serializable> idList = (List<Serializable>) take;
+					log.tracef( "received list of ids %s", idList );
+					loadList( idList, session, sessionInitializer );
+				}
+			}
+			while ( take != null );
+		}
+		catch (InterruptedException e) {
+			// just quit
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	/**
+	 * Loads a list of entities of defined type using their identifiers.
+	 * The loaded objects are then transformed into Lucene Documents
+	 * and forwarded to the indexing backend.
+	 *
+	 * @param listIds the list of entity identifiers (of type
+	 * @param session the session to be used
+	 * @param sessionInitializer
+	 *
+	 * @throws InterruptedException
+	 */
+	private void loadList(List<Serializable> listIds, Session session, InstanceInitializer sessionInitializer) throws InterruptedException {
+		Criteria criteria = session
+				.createCriteria( type )
+				.setCacheMode( cacheMode )
+				.setLockMode( LockMode.NONE )
+				.setCacheable( false )
+				.setFlushMode( FlushMode.MANUAL )
+				.setFetchSize( listIds.size() )
+				.setResultTransformer( CriteriaSpecification.DISTINCT_ROOT_ENTITY )
+				.add( Restrictions.in( idName, listIds ) );
+		List<?> list = criteria.list();
+		monitor.entitiesLoaded( list.size() );
+		indexAllQueue( session, list, sessionInitializer );
+		session.clear();
+	}
+
+	private void indexAllQueue(Session session, List<?> entities, InstanceInitializer sessionInitializer) {
+		try {
 			ConversionContext contextualBridge = new ContextualExceptionBridgeHelper();
-			while ( true ) {
-				List<?> takeList = source.take();
-				if ( takeList == null ) {
-					break;
+				if ( entities == null && entities.isEmpty() ) {
+					return;
 				}
 				else {
-					log.tracef( "received a list of objects to index: %s", takeList );
-					for ( Object object : takeList ) {
-						//trick to attach the objects to session:
-						session.buildLockRequest( LockOptions.NONE ).lock( object );
+					log.tracef( "received a list of objects to index: %s", entities );
+					for ( Object object : entities ) {
 						try {
 							index( object, session, sessionInitializer, contextualBridge );
 							monitor.documentsBuilt( 1 );
@@ -149,10 +200,8 @@ public class EntityConsumerLuceneWorkProducer implements SessionAwareRunnable {
 							);
 							errorHandler.handleException( errorMsg, e );
 						}
-						session.clear();
 					}
 				}
-			}
 		}
 		catch (InterruptedException e) {
 			// just quit

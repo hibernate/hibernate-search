@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -47,6 +48,8 @@ import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.util.impl.CollectionHelper.toImmutableList;
 
 /**
  * Class containing all the meta data extracted for a single type ( and all classes in its hierarchy ).
@@ -86,7 +89,7 @@ public class TypeMetadata {
 	/**
 	 * Set of all Java property (field or getter) metadata instances
 	 */
-	private final Set<PropertyMetadata> propertyMetadataSet;
+	private final List<PropertyMetadata> propertyMetadata;
 
 	/**
 	 * Metadata for a document field keyed against the field name
@@ -106,7 +109,7 @@ public class TypeMetadata {
 	/**
 	 * Set of field meta data instances contributed by class bridges
 	 */
-	private final Set<DocumentFieldMetadata> classBridgeFields;
+	private final List<DocumentFieldMetadata> classBridgeFields;
 
 	/**
 	 * Document field metadata keyed against the field name. These fields are contributed by class bridges
@@ -116,12 +119,12 @@ public class TypeMetadata {
 	/**
 	 * Metadata of embedded types ({@code @IndexedEmbedded})
 	 */
-	private final Set<EmbeddedTypeMetadata> embeddedTypeMetadata;
+	private final List<EmbeddedTypeMetadata> embeddedTypeMetadata;
 
 	/**
 	 * List of contained in properties ({@code @ContainedIn})
 	 */
-	private final Set<ContainedInMetadata> containedInMetadata;
+	private final List<ContainedInMetadata> containedInMetadata;
 
 	/**
 	 * The scoped analyzer for this entity
@@ -137,7 +140,7 @@ public class TypeMetadata {
 	 * Encountered property names of field, embedded and contained in collections. Used to optimize indexing based
 	 * on ORM collection update events.
 	 */
-	private final Set<String> collectionRoles;
+	private final List<String> collectionRoles;
 
 	/**
 	 * Flag indicating whether the JPA @Id is used as document id. See {@link org.hibernate.search.engine.impl.WorkPlan}
@@ -162,13 +165,13 @@ public class TypeMetadata {
 		this.classBoostStrategy = builder.classBoostStrategy;
 		this.stateInspectionOptimizationsEnabled = builder.stateInspectionOptimizationsEnabled;
 		this.idPropertyMetadata = builder.idPropertyMetadata;
-		this.embeddedTypeMetadata = Collections.unmodifiableSet( builder.embeddedTypeMetadata );
-		this.containedInMetadata = Collections.unmodifiableSet( builder.containedInMetadata );
+		this.embeddedTypeMetadata = toImmutableList( builder.embeddedTypeMetadata );
+		this.containedInMetadata = toImmutableList( builder.containedInMetadata );
 		this.optimizationBlackList = Collections.unmodifiableSet( builder.optimizationClassList );
-		this.collectionRoles = Collections.unmodifiableSet( builder.collectionRoles );
+		this.collectionRoles = toImmutableList( builder.collectionRoles );
 		this.jpaIdUsedAsDocumentId = determineWhetherDocumentIdPropertyIsTheSameAsJpaIdProperty( builder.jpaProperty );
-		this.classBridgeFields = Collections.unmodifiableSet( builder.classBridgeFields );
-		this.propertyMetadataSet = Collections.unmodifiableSet( builder.propertyMetadataList );
+		this.classBridgeFields = toImmutableList( builder.classBridgeFields );
+		this.propertyMetadata = toImmutableList( builder.propertyMetadataList );
 		this.propertyGetterNameToPropertyMetadata = keyPropertyMetadata( builder.propertyMetadataList );
 		this.documentFieldNameToFieldMetadata = keyFieldMetadata( builder.propertyMetadataList );
 		this.classBridgeFieldNameToDocumentFieldMetadata = copyClassBridgeMetadata( builder.classBridgeFields );
@@ -178,8 +181,8 @@ public class TypeMetadata {
 		return indexedType;
 	}
 
-	public Set<PropertyMetadata> getAllPropertyMetadata() {
-		return propertyMetadataSet;
+	public List<PropertyMetadata> getAllPropertyMetadata() {
+		return propertyMetadata;
 	}
 
 	public PropertyMetadata getPropertyMetadataForProperty(String propertyName) {
@@ -190,7 +193,7 @@ public class TypeMetadata {
 		return idPropertyMetadata;
 	}
 
-	public Set<DocumentFieldMetadata> getClassBridgeMetadata() {
+	public List<DocumentFieldMetadata> getClassBridgeMetadata() {
 		return classBridgeFields;
 	}
 
@@ -198,11 +201,11 @@ public class TypeMetadata {
 		return documentFieldNameToFieldMetadata.get( fieldName );
 	}
 
-	public Set<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
+	public List<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
 		return embeddedTypeMetadata;
 	}
 
-	public Set<ContainedInMetadata> getContainedInMetadata() {
+	public List<ContainedInMetadata> getContainedInMetadata() {
 		return containedInMetadata;
 	}
 
