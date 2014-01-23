@@ -1,6 +1,26 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.5.0.CR1 (23-01-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1260] - LazyInitializationException while indexing
+    * [HSEARCH-1476] - Configuration property 'merge_calibrate_by_deletes' not parsed correctly
+
+** Improvement
+    * [HSEARCH-1468] - Reduce amount of objects created by the FacetCollector
+    * [HSEARCH-1477] - Trivial optimization for empty results
+    * [HSEARCH-1486] - Minimize allocation cost of iterating on metadata fields
+
+** Task
+    * [HSEARCH-1481] - Upgrade to Hibernate ORM 4.3.0.Final
+    * [HSEARCH-1482] - Upgrade to Infinispan 6.0.1.Final and JGroups 3.4.2.Final
+    * [HSEARCH-1483] - Upgrade to WildFly 8.0.0.CR1
+    * [HSEARCH-1485] - Update H2 testing database to avoid some issues under load
+    * [HSEARCH-1487] - Upgrade to Hibernate ORM 4.3.1.Final
+
+
 Version 4.5.0.Alpha2 (16-12-2013)
 ------------------------
 
