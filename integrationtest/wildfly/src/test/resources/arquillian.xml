@@ -10,7 +10,7 @@
 
     <container qualifier="jboss" default="true">
         <configuration>
-            <property name="jbossHome">${basedir}/target/wildfly-${version.wildfly}</property>
+            <property name="jbossHome">${basedir}/target/wildfly-${wildflyVersion}</property>
             <!--
                  Please leave this as false. It is a good, early catch for the reviewers to make
                  sure that they have not left a stale server running when merging pull requests

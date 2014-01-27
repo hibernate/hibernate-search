@@ -176,9 +176,9 @@
         <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
 
         <!-- Integration tests -->
-        <version.arquillian>1.1.2.Final</version.arquillian>
-        <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
-        <version.wildfly>8.0.0.CR1</version.wildfly>
+        <arquillianVersion>1.1.2.Final</arquillianVersion>
+        <shrinkwrapResolverVersion>2.0.0-alpha-1</shrinkwrapResolverVersion>
+        <wildflyVersion>8.0.0.CR1</wildflyVersion>
     </properties>
 
     <dependencyManagement>

@@ -10,7 +10,7 @@
 
     <container qualifier="jboss" default="true">
         <configuration>
-            <property name="jbossHome">${basedir}/target/wildfly-${version.wildfly}</property>
+            <property name="jbossHome">${basedir}/target/wildfly-${wildflyVersion}</property>
         </configuration>
     </container>
 

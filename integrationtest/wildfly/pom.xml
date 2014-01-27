@@ -54,7 +54,7 @@
             <dependency>
                 <groupId>org.jboss.shrinkwrap.resolver</groupId>
                 <artifactId>shrinkwrap-resolver-bom</artifactId>
-                <version>${version.shrinkwrapResolver}</version>
+                <version>${shrinkwrapResolverVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -62,7 +62,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
-                <version>${version.arquillian}</version>
+                <version>${arquillianVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -129,7 +129,7 @@
         <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <version>${version.wildfly}</version>
+            <version>${wildflyVersion}</version>
             <scope>test</scope>
         </dependency>
 
@@ -210,7 +210,7 @@
                                 <artifactItem>
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>wildfly-dist</artifactId>
-                                    <version>${version.wildfly}</version>
+                                    <version>${wildflyVersion}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
@@ -222,7 +222,7 @@
                                     <classifier>wildfly-8-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${version.wildfly}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -241,7 +241,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/wildfly-${version.wildfly}</outputDirectory>
+                            <outputDirectory>${basedir}/target/wildfly-${wildflyVersion}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
