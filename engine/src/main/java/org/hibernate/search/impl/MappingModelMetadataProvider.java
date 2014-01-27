@@ -775,7 +775,8 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		@Override
 		public Annotation[] getAnnotations() {
 			initAnnotations();
-			return new Annotation[0];
+			Collection<Annotation> tmpCollection = annotations.values();
+			return tmpCollection.toArray( new Annotation[tmpCollection.size()] );
 		}
 	}
 }

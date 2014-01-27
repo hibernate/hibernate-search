@@ -39,8 +39,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
-import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
-import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
+import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
@@ -96,11 +96,14 @@ public class AnalyzerTest extends SearchTestCase {
 		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( getCfg() );
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
-		Set<XClass> optimizationBlackList = new HashSet<XClass>();
 		ConfigContext context = new ConfigContext( searchConfig );
+		MetadataProvider metadataProvider = new AnnotationMetadataProvider(
+				searchConfig.getReflectionManager(),
+				context
+		);
+
 		try {
-			new DocumentBuilderContainedEntity( xclass, context, reflectionManager,
-					optimizationBlackList, HibernateStatelessInitializer.INSTANCE );
+			metadataProvider.getTypeMetadataFor( reflectionManager.toClass( xclass ) );
 			fail();
 		}
 		catch (SearchException e) {

@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,21 +21,28 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine.metadata.impl;
+package org.hibernate.search.test.configuration.bootstrapfailure;
+
+import java.sql.Timestamp;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface MetadataProvider {
+@Entity
+public class NoSearchEntity {
 
-	/**
-	 * Returns the Search related metadata for the specified type.
-	 *
-	 * @param clazz The type of interest.
-	 *
-	 * @return the {@code TypeMetadata} for the specified type
-	 */
-	TypeMetadata getTypeMetadataFor(Class<?> clazz);
+	@Id
+	private Timestamp id;
 
-	boolean containsSearchMetadata(Class<?> clazz);
+	public Timestamp getId() {
+		return id;
+	}
+
+	public void setId(Timestamp id) {
+		this.id = id;
+	}
+
 }

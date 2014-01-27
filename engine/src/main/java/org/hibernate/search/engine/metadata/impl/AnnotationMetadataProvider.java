@@ -128,6 +128,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return typeMetadataBuilder.build();
 	}
 
+	@Override
+	public boolean containsSearchMetadata(Class<?> clazz) {
+		XClass xClass = reflectionManager.toXClass( clazz );
+		return ReflectionHelper.containsSearchAnnotations( xClass );
+	}
+
 	protected void checkDocumentId(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
 			boolean isRoot,
