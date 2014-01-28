@@ -25,7 +25,6 @@ package org.hibernate.search.test.id;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import org.hibernate.annotations.common.reflection.Filter;
@@ -34,6 +33,9 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMethod;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import org.hibernate.search.engine.metadata.impl.MetadataProvider;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.impl.SimpleInitializer;
@@ -44,7 +46,7 @@ import org.junit.Test;
 
 /**
  * The order in which the XClass methods will be listed varies depending on the platform and JVM,
- * in particular we had an issue with annotations <code>@Id</code> and <code>@DocumentId</code>
+ * in particular we had an issue with annotations {@code @Id} and {@code @DocumentId}
  * when encountering them in unexpected order. This test verifies iteration order doesn't affect
  * our capability to startup correctly.
  *
@@ -73,10 +75,13 @@ public class UnorderedIdScanTest {
 	private static void tryCreatingDocumentBuilder(XClass mappedXClass, ReflectionManager reflectionManager) {
 		ManualConfiguration cfg = new ManualConfiguration();
 		ConfigContext context = new ConfigContext( cfg );
+		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, context );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( mappedXClass ));
 		new DocumentBuilderIndexedEntity( mappedXClass,
+				typeMetadata,
 				context,
 				reflectionManager,
-				new HashSet(),
+				Collections.emptySet(),
 				SimpleInitializer.INSTANCE );
 	}
 

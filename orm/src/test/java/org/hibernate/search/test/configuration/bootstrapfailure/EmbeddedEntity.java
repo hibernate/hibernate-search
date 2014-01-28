@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,21 +21,52 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.engine.metadata.impl;
+package org.hibernate.search.test.configuration.bootstrapfailure;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+import org.hibernate.search.annotations.ContainedIn;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface MetadataProvider {
+@Entity
+public class EmbeddedEntity {
+	@Id
+	@GeneratedValue
+	private long id;
 
-	/**
-	 * Returns the Search related metadata for the specified type.
-	 *
-	 * @param clazz The type of interest.
-	 *
-	 * @return the {@code TypeMetadata} for the specified type
-	 */
-	TypeMetadata getTypeMetadataFor(Class<?> clazz);
+	@ManyToOne
+	@ContainedIn
+	private IndexedEntity indexedEntity;
 
-	boolean containsSearchMetadata(Class<?> clazz);
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public IndexedEntity getIndexedEntity() {
+		return indexedEntity;
+	}
+
+	public void setIndexedEntity(IndexedEntity indexedEntity) {
+		this.indexedEntity = indexedEntity;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "EmbeddedEntity{" );
+		sb.append( "id=" ).append( id );
+		sb.append( ", indexedEntity=" ).append( indexedEntity );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
+
+
