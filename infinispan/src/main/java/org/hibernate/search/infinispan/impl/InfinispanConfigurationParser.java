@@ -46,6 +46,7 @@ public class InfinispanConfigurationParser {
 
 	private final ParserRegistry configurationParser;
 	private final ClassLoader searchConfigClassloader;
+	private final ClassLoader userDeploymentClassloader;
 
 	public InfinispanConfigurationParser(ClassLoader searchConfigClassloader) {
 		this.searchConfigClassloader = searchConfigClassloader;
@@ -53,6 +54,7 @@ public class InfinispanConfigurationParser {
 		//needs to be pointed to the Infinispan module.
 		ClassLoader ispnClassLoadr = ParserRegistry.class.getClassLoader();
 		configurationParser = new ParserRegistry( ispnClassLoadr );
+		this.userDeploymentClassloader = Thread.currentThread().getContextClassLoader();
 	}
 
 	/**
@@ -68,7 +70,10 @@ public class InfinispanConfigurationParser {
 		FileLookup fileLookup = FileLookupFactory.newInstance();
 		InputStream is = fileLookup.lookupFile( filename, searchConfigClassloader );
 		if ( is == null ) {
-			throw new FileNotFoundException( filename );
+			is = fileLookup.lookupFile( filename, userDeploymentClassloader );
+			if ( is == null ) {
+				throw new FileNotFoundException( filename );
+			}
 		}
 		try {
 			ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
