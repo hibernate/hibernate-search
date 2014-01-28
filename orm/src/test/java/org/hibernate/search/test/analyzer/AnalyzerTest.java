@@ -31,16 +31,17 @@ import org.apache.lucene.analysis.Token;
 import org.apache.lucene.queryParser.QueryParser;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
-import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
-import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
+import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
@@ -78,7 +79,11 @@ public class AnalyzerTest extends SearchTestCase {
 
 		// at query time we use a standard analyzer. We explicitly search for tokens which can only be found if the
 		// right language specific stemmer was used at index time
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "references.text", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				"references.text",
+				TestConstants.standardAnalyzer
+		);
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "aufeinanderschlug" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( 1, query.getResultSize() );
@@ -96,15 +101,21 @@ public class AnalyzerTest extends SearchTestCase {
 		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( getCfg() );
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
-		Set<XClass> optimizationBlackList = new HashSet<XClass>();
 		ConfigContext context = new ConfigContext( searchConfig );
+		MetadataProvider metadataProvider = new AnnotationMetadataProvider(
+				searchConfig.getReflectionManager(),
+				context
+		);
+
 		try {
-			new DocumentBuilderContainedEntity( xclass, context, reflectionManager,
-					optimizationBlackList, HibernateStatelessInitializer.INSTANCE );
+			metadataProvider.getTypeMetadataFor( reflectionManager.toClass( xclass ) );
 			fail();
 		}
 		catch (SearchException e) {
-			assertTrue( "Wrong error message", e.getMessage().startsWith( "Multiple AnalyzerDiscriminator defined in the same class hierarchy" ));
+			assertTrue(
+					"Wrong error message",
+					e.getMessage().startsWith( "Multiple AnalyzerDiscriminator defined in the same class hierarchy" )
+			);
 		}
 	}
 
@@ -121,7 +132,11 @@ public class AnalyzerTest extends SearchTestCase {
 		tx.commit();
 
 		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				"id",
+				TestConstants.standardAnalyzer
+		);
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "entity:alarm" );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery, MyEntity.class );
 		assertEquals( 1, query.getResultSize() );
