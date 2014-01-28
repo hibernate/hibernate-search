@@ -26,7 +26,7 @@ import org.hibernate.search.bridge.LuceneOptions;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class ItemClassBridge implements FieldBridge {
+public class NoopClassBridge implements FieldBridge {
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
