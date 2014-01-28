@@ -42,6 +42,8 @@ import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
@@ -319,14 +321,14 @@ public class SearchFactoryBuilder {
 
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
 		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
+		final org.hibernate.search.engine.metadata.impl.MetadataProvider metadataProvider =
+				new AnnotationMetadataProvider( cfg.getReflectionManager(), context );
 
 		for ( Map.Entry<XClass, Class<?>> mapping : classMappings.entrySet() ) {
-
 			XClass mappedXClass = mapping.getKey();
 			Class<?> mappedClass = mapping.getValue();
 
 			if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
-
 				if ( mappedXClass.isAbstract() ) {
 					log.abstractClassesCannotInsertDocuments();
 					continue;
@@ -335,11 +337,13 @@ public class SearchFactoryBuilder {
 				rootIndexedEntities.add( mappedXClass );
 				indexingHierarchy.addIndexedClass( mappedClass );
 			}
-			else {
+			else if ( metadataProvider.containsSearchMetadata( mappedClass ) ) {
 				//FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 				//XClass unfortunately is not (yet) genericized: TODO?
+
+				TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( mappedClass);
 				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
-						mappedXClass, context, cfg.getReflectionManager(), optimizationBlackListedTypes, cfg.getInstanceInitializer()
+						mappedXClass, typeMetadata, cfg.getReflectionManager(), optimizationBlackListedTypes, cfg.getInstanceInitializer()
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
@@ -365,9 +369,11 @@ public class SearchFactoryBuilder {
 			// Create all DocumentBuilderIndexedEntity
 			// FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 			// XClass unfortunately is not (yet) genericized: TODO ?
+			TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( mappedClass);
 			final DocumentBuilderIndexedEntity<?> documentBuilder =
 					new DocumentBuilderIndexedEntity(
 							mappedXClass,
+							typeMetadata,
 							context,
 							cfg.getReflectionManager(),
 							optimizationBlackListedTypes,

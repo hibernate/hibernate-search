@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -40,13 +39,11 @@ import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.impl.WorkPlan;
-import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.ContainedInMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
-import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -77,13 +74,13 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * Constructor.
 	 *
 	 * @param xClass The class for which to build a document builder
-	 * @param configContext Handle to default configuration settings
+	 * @param typeMetadata metadata for the specified class
 	 * @param reflectionManager Reflection manager to use for processing the annotations
 	 * @param optimizationBlackList keeps track of types on which we need to disable collection events optimizations
 	 * @param instanceInitializer a {@link org.hibernate.search.spi.InstanceInitializer} object.
 	 */
 	public AbstractDocumentBuilder(XClass xClass,
-			ConfigContext configContext,
+			TypeMetadata typeMetadata,
 			ReflectionManager reflectionManager,
 			Set<XClass> optimizationBlackList,
 			InstanceInitializer instanceInitializer) {
@@ -95,9 +92,7 @@ public abstract class AbstractDocumentBuilder<T> {
 		this.entityState = EntityState.CONTAINED_IN_ONLY;
 		this.beanXClass = xClass;
 		this.beanClass = reflectionManager.toClass( xClass );
-
-		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, configContext );
-		this.typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( xClass ) );
+		this.typeMetadata = typeMetadata;
 
 		optimizationBlackList.addAll( typeMetadata.getOptimizationBlackList() );
 	}
@@ -367,7 +362,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * @param collectionRoleName a {@link java.lang.String} object.
 	 *
 	 * @return {@code true} if an update to the collection identified by the given role name effects the index
-	 *         state, {@code false} otherwise.
+	 * state, {@code false} otherwise.
 	 */
 	public boolean collectionChangeRequiresIndexUpdate(String collectionRoleName) {
 		if ( collectionRoleName == null ) {
