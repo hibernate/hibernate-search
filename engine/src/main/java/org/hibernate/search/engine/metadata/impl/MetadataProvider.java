@@ -36,4 +36,6 @@ public interface MetadataProvider {
 	 * @return the {@code TypeMetadata} for the specified type
 	 */
 	TypeMetadata getTypeMetadataFor(Class<?> clazz);
+
+	boolean containsSearchMetadata(Class<?> clazz);
 }
