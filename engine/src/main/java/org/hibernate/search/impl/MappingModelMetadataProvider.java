@@ -244,7 +244,9 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 	/**
 	 * Creates the proxy for an annotation using Hibernate Commons Annotations
+	 *
 	 * @param annotation the AnnotationDescriptor
+	 *
 	 * @return the proxy
 	 */
 	private static Annotation createAnnotation(AnnotationDescriptor annotation) {
@@ -405,11 +407,11 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 
 		private void createFields(PropertyDescriptor property) {
-			final Collection<Map<String,Object>> fields = property.getFields();
-			final Map<String,Object> spatial = property.getSpatial();
-			final Map<String,Object> latitude = property.getLatitude();
-			final Map<String,Object> longitude = property.getLongitude();
-			final Collection<Map<String,Object>> numericFields = property.getNumericFields();
+			final Collection<Map<String, Object>> fields = property.getFields();
+			final Map<String, Object> spatial = property.getSpatial();
+			final Map<String, Object> latitude = property.getLatitude();
+			final Map<String, Object> longitude = property.getLongitude();
+			final Collection<Map<String, Object>> numericFields = property.getNumericFields();
 			List<org.hibernate.search.annotations.Field> fieldAnnotations =
 					new ArrayList<org.hibernate.search.annotations.Field>( fields.size() );
 			List<NumericField> numericFieldAnnotations = new ArrayList<NumericField>( numericFields.size() );
@@ -500,7 +502,7 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 
 			final NumericField[] numericFieldArray = new NumericField[numericFieldAnnotations.size()];
 			final NumericField[] numericFieldAsArray = numericFieldAnnotations.toArray( numericFieldArray );
-			numericFieldsAnnotation.setValue( "value", numericFieldAsArray);
+			numericFieldsAnnotation.setValue( "value", numericFieldAsArray );
 			annotations.put( NumericFields.class, createAnnotation( numericFieldsAnnotation ) );
 			fieldsAnnotation.setValue( "value", fieldAsArray );
 			annotations.put( Fields.class, createAnnotation( fieldsAnnotation ) );
@@ -775,7 +777,8 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		@Override
 		public Annotation[] getAnnotations() {
 			initAnnotations();
-			return new Annotation[0];
+			Collection<Annotation> tmpCollection = annotations.values();
+			return tmpCollection.toArray( new Annotation[tmpCollection.size()] );
 		}
 	}
 }
