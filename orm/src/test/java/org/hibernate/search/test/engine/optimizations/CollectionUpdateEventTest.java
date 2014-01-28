@@ -27,6 +27,7 @@ import org.hibernate.collection.internal.PersistentBag;
 import org.hibernate.collection.internal.PersistentSet;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.cfg.EntityMapping;
+import org.hibernate.search.cfg.IndexedMapping;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.test.util.TestForIssue;
@@ -44,8 +45,14 @@ import static org.junit.Assert.assertTrue;
  * @author Sanne Grinovero
  * @author Tom Waterhouse
  */
-@TestForIssue( jiraKey = "HSEARCH-679")
+@TestForIssue(jiraKey = "HSEARCH-679")
 public class CollectionUpdateEventTest {
+
+	private static boolean WITH_CLASS_BRIDGE_ON_ITEM = true;
+	private static boolean WITHOUT_CLASS_BRIDGE_ON_ITEM = false;
+
+	private static boolean WITH_CLASS_BRIDGE_ON_CATALOG = true;
+	private static boolean WITHOUT_CLASS_BRIDGE_ON_CATALOG = false;
 
 	/**
 	 * If the top level class has a class bridge or dynamic boost, then we can't safely
@@ -53,7 +60,7 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithClassBridge() {
-		testScenario( true, 2, false );
+		testScenario( WITH_CLASS_BRIDGE_ON_ITEM, 2, WITHOUT_CLASS_BRIDGE_ON_CATALOG );
 	}
 
 	/**
@@ -61,7 +68,7 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithoutClassBridge() {
-		testScenario( false, 2, false );
+		testScenario( WITHOUT_CLASS_BRIDGE_ON_ITEM, 2, WITHOUT_CLASS_BRIDGE_ON_CATALOG );
 	}
 
 	/**
@@ -70,7 +77,7 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithNoEnoughDepth() {
-		testScenario( true, 1, false );
+		testScenario( WITH_CLASS_BRIDGE_ON_ITEM, 1, WITHOUT_CLASS_BRIDGE_ON_CATALOG );
 	}
 
 	/**
@@ -79,14 +86,14 @@ public class CollectionUpdateEventTest {
 	 */
 	@Test
 	public void testWithDeepClassBridge() {
-		testScenario( false, 1, true );
+		testScenario( WITHOUT_CLASS_BRIDGE_ON_ITEM, 1, WITH_CLASS_BRIDGE_ON_CATALOG );
 	}
 
-	private void testScenario(boolean usingClassBridge, int depth, boolean usingClassBridgeOnEmbedded) {
-		FullTextSessionBuilder fulltextSessionBuilder = createSearchFactory(
-				usingClassBridge,
+	private void testScenario(boolean withClassBridgeOnItem, int depth, boolean withClassBridgeOnCatalog) {
+		FullTextSessionBuilder fulltextSessionBuilder = configure(
+				withClassBridgeOnItem,
 				depth,
-				usingClassBridgeOnEmbedded
+				withClassBridgeOnCatalog
 		);
 		try {
 			initializeData( fulltextSessionBuilder );
@@ -101,7 +108,7 @@ public class CollectionUpdateEventTest {
 
 				updateCatalogsCollection( fullTextSession, catalog );
 
-				if ( ( usingClassBridge || usingClassBridgeOnEmbedded ) && depth > 1 ) {
+				if ( ( withClassBridgeOnItem || withClassBridgeOnCatalog ) && depth > 1 ) {
 					assertTrue( "catalogItems should have been initialized", catalogItems.wasInitialized() );
 				}
 				else {
@@ -117,36 +124,35 @@ public class CollectionUpdateEventTest {
 		}
 	}
 
-	private FullTextSessionBuilder createSearchFactory(boolean defineClassBridge, int depth, boolean usingClassBridgeOnEmbedded) {
+	private FullTextSessionBuilder configure(boolean withClassBridgeOnItem, int depth, boolean withClassBridgeOnCatalog) {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder()
 				.addAnnotatedClass( Catalog.class )
 				.addAnnotatedClass( CatalogItem.class )
 				.addAnnotatedClass( Consumer.class )
 				.addAnnotatedClass( Item.class );
 		SearchMapping fluentMapping = builder.fluentMapping();
+		// mapping for Catalog
 		EntityMapping catalogMapping = fluentMapping
 				.entity( Catalog.class );
-		if ( usingClassBridgeOnEmbedded ) {
-			catalogMapping.classBridge( ItemClassBridge.class );
+		if ( withClassBridgeOnCatalog ) {
+			catalogMapping.classBridge( NoopClassBridge.class );
 		}
 		catalogMapping
-				.property( "catalogItems", ElementType.FIELD ).containedIn()
-				.entity( CatalogItem.class )
+				.property( "catalogItems", ElementType.FIELD ).containedIn();
+
+		// mapping for CatalogItem
+		fluentMapping.entity( CatalogItem.class )
 				.property( "item", ElementType.FIELD ).containedIn()
 				.property( "catalog", ElementType.FIELD ).indexEmbedded();
-		if ( defineClassBridge ) {
-			fluentMapping
-					.entity( Item.class )
-					.classBridge( ItemClassBridge.class )
-					.indexed()
-					.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
+
+		// mapping for Item
+		IndexedMapping itemMapping = fluentMapping
+				.entity( Item.class )
+				.indexed();
+		if ( withClassBridgeOnItem ) {
+			itemMapping.classBridge( NoopClassBridge.class );
 		}
-		else {
-			fluentMapping
-					.entity( Item.class )
-					.indexed()
-					.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
-		}
+		itemMapping.property( "catalogItems", ElementType.FIELD ).indexEmbedded().depth( depth );
 		return builder.build();
 	}
 

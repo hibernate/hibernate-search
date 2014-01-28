@@ -115,6 +115,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		ParseContext parseContext = new ParseContext();
 		parseContext.processingClass( xClass );
 		parseContext.setCurrentClass( xClass );
+
 		initializeClass(
 				typeMetadataBuilder,
 				true,
@@ -128,7 +129,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return typeMetadataBuilder.build();
 	}
 
-	protected void checkDocumentId(XProperty member,
+	@Override
+	public boolean containsSearchMetadata(Class<?> clazz) {
+		XClass xClass = reflectionManager.toXClass( clazz );
+		return ReflectionHelper.containsSearchAnnotations( xClass );
+	}
+
+	private void checkDocumentId(XProperty member,
 			TypeMetadata.Builder typeMetadataBuilder,
 			boolean isRoot,
 			String prefix,
@@ -1267,8 +1274,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	private void validateAllPathsEncountered(XProperty member, PathsContext updatedPathsContext) {
-		Set<String> unencounteredPaths = updatedPathsContext.getUnencounteredPaths();
-		if ( unencounteredPaths.size() > 0 ) {
+		Set<String> unEncounteredPaths = updatedPathsContext.getUnencounteredPaths();
+		if ( unEncounteredPaths.size() > 0 ) {
 			StringBuilder sb = new StringBuilder( "Found invalid @IndexedEmbedded->paths configured on class " );
 			sb.append( member.getType().getName() );
 			sb.append( ", member " );
@@ -1276,7 +1283,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			sb.append( ": " );
 
 			String prefix = updatedPathsContext.embeddedAnn.prefix();
-			for ( String path : unencounteredPaths ) {
+			for ( String path : unEncounteredPaths ) {
 				sb.append( removeLeadingPrefixFromPath( path, prefix ) );
 				sb.append( ',' );
 			}
