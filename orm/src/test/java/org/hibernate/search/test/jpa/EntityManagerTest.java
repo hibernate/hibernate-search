@@ -23,8 +23,10 @@
  */
 package org.hibernate.search.test.jpa;
 
+import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.TestConstants;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -38,6 +40,29 @@ import static org.junit.Assert.assertEquals;
  * @author Emmanuel Bernard
  */
 public class EntityManagerTest extends JPATestCase {
+
+	@Test
+	public void testMassIndexer() throws Exception {
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+		em.getTransaction().begin();
+		Bretzel bretzel = new Bretzel( 23, 34 );
+		em.persist( bretzel );
+		em.getTransaction().commit();
+		em.clear();
+		assertEquals( 1, countBretzelsViaIndex( em ) );
+		em.purgeAll( Bretzel.class );
+		em.flushToIndexes();
+		assertEquals( 0, countBretzelsViaIndex( em ) );
+		em.createIndexer( Bretzel.class ).startAndWait();
+		assertEquals( 1, countBretzelsViaIndex( em ) );
+	}
+
+	private int countBretzelsViaIndex(FullTextEntityManager em) {
+		QueryBuilder queryBuilder = em.getSearchFactory().buildQueryBuilder().forEntity( Bretzel.class ).get();
+		Query allQuery = queryBuilder.all().createQuery();
+		FullTextQuery fullTextQuery = em.createFullTextQuery( allQuery, Bretzel.class );
+		return fullTextQuery.getResultSize();
+	}
 
 	@Test
 	public void testQuery() throws Exception {
