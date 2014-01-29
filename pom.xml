@@ -402,101 +402,41 @@
                 <version>${bytemanVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.jbossts.jta</groupId>
+                <groupId>org.jboss.narayana.jta</groupId>
                 <artifactId>narayana-jta</artifactId>
                 <version>${narayanaVersion}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>org.jboss.ws.native</groupId>
-                        <artifactId>jbossws-native-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.byteman</groupId>
                         <artifactId>byteman</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.jboss.byteman</groupId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>byteman-submit</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>emma</artifactId>
-                        <groupId>emma</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>emma_ant</artifactId>
-                        <groupId>emma</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>hornetq-core</artifactId>
-                        <groupId>org.hornetq</groupId>
+                        <groupId>org.jboss.byteman</groupId>
                     </exclusion>
                     <exclusion>
                         <artifactId>hornetq-journal</artifactId>
                         <groupId>org.hornetq</groupId>
                     </exclusion>
                     <exclusion>
+                        <artifactId>jboss-logmanager</artifactId>
+                        <groupId>org.jboss.logmanager</groupId>
+                    </exclusion>
+                    <exclusion>
                         <artifactId>hornetq-commons</artifactId>
                         <groupId>org.hornetq</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>netty</artifactId>
-                        <groupId>io.netty</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>wrapper</artifactId>
-                        <groupId>tanukisoft</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jacorb</artifactId>
-                        <groupId>jacorb</groupId>
                     </exclusion>
                     <exclusion>
                         <artifactId>jfreechart</artifactId>
                         <groupId>jfree</groupId>
                     </exclusion>
                     <exclusion>
-                        <artifactId>jboss-corba-ots-spi</artifactId>
-                        <groupId>org.jboss.integration</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jboss-server-manager</artifactId>
-                        <groupId>org.jboss.jbossas</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jboss-ejb-api_3.1_spec</artifactId>
-                        <groupId>org.jboss.spec.javax.ejb</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jnp-client</artifactId>
-                        <groupId>org.jboss.naming</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-                        <groupId>org.jboss.spec.javax.servlet</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jbossws-common</artifactId>
-                        <groupId>org.jboss.ws</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jcl-over-slf4j</artifactId>
-                        <groupId>org.slf4j</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-processor</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-generator</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jboss.logmanager</groupId>
-                        <artifactId>jboss-logmanager</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jfree</groupId>
                         <artifactId>jcommon</artifactId>
+                        <groupId>jfree</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
+                        <groupId>org.jboss.spec.javax.interceptor</groupId>
                     </exclusion>
                 </exclusions>
             </dependency>
