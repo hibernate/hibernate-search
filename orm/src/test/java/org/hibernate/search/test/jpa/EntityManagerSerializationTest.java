@@ -31,6 +31,7 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.test.TestConstants;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -48,6 +49,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	 * @throws Exception
 	 *             in case the test fails.
 	 */
+	@Test
 	public void testSerialization() throws Exception {
 		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 
@@ -89,7 +91,7 @@ public class EntityManagerSerializationTest extends JPATestCase {
 		assertEquals( "getSingleResult and object retrieval", 23f, ( (Bretzel) em
 				.createFullTextQuery( query )
 				.getSingleResult() )
-				.getSaltQty() );
+				.getSaltQty(), 0.3f );
 		assertEquals( 1, em.createFullTextQuery( query ).getResultSize() );
 		em.getTransaction().commit();
 
