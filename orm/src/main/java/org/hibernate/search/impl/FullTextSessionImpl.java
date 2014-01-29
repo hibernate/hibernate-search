@@ -220,7 +220,12 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 		MutableSearchFactory msf = (MutableSearchFactory) getSearchFactoryImplementor();
 		ServiceManager serviceManager = msf.getServiceManager();
 		MassIndexerFactory service = serviceManager.requestService( MassIndexerFactoryProvider.class, null );
-		return service.createMassIndexer( getSearchFactoryImplementor(), getFactory(), types );
+		try {
+			return service.createMassIndexer( getSearchFactoryImplementor(), getFactory(), types );
+		}
+		finally {
+			serviceManager.releaseService( MassIndexerFactoryProvider.class );
+		}
 	}
 
 	@Override
