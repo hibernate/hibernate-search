@@ -43,11 +43,9 @@ import static org.junit.Assert.assertEquals;
 public class EntityManagerSerializationTest extends JPATestCase {
 
 	/**
-	 * Test that a entity manager can successfully be serialized and
-	 * deserialized.
+	 * Test that a entity manager can successfully be serialized and deserialized.
 	 *
-	 * @throws Exception
-	 *             in case the test fails.
+	 * @throws Exception in case the test fails.
 	 */
 	@Test
 	public void testSerialization() throws Exception {
@@ -72,26 +70,40 @@ public class EntityManagerSerializationTest extends JPATestCase {
 	 * Helper method for testing the entity manager before and after
 	 * serialization.
 	 *
-	 * @param em
+	 * @param em Entity manager used for indexing and searching
+	 *
 	 * @throws Exception
 	 */
 	private static void indexSearchAssert(FullTextEntityManager em) throws Exception {
+		// index a Bretzel
 		em.getTransaction().begin();
 		Bretzel bretzel = new Bretzel( 23, 34 );
 		em.persist( bretzel );
 		em.getTransaction().commit();
 		em.clear();
 		em.getTransaction().begin();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+
+		// execute a non matching query
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				"title",
+				TestConstants.stopAnalyzer
+		);
 		Query query = parser.parse( "saltQty:noword" );
 		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
-		query = new TermQuery( new Term( "saltQty", "23.0" ) );
-		assertEquals( "getResultList", 1, em.createFullTextQuery( query )
-				.getResultList().size() );
-		assertEquals( "getSingleResult and object retrieval", 23f, ( (Bretzel) em
+
+		// execute a matching query
+		query = new TermQuery( new Term( "saltQty", "23" ) );
+		assertEquals(
+				"getResultList", 1, em.createFullTextQuery( query )
+				.getResultList().size()
+		);
+		assertEquals(
+				"getSingleResult and object retrieval", 23, ( (Bretzel) em
 				.createFullTextQuery( query )
 				.getSingleResult() )
-				.getSaltQty(), 0.3f );
+				.getSaltQty()
+		);
 		assertEquals( 1, em.createFullTextQuery( query ).getResultSize() );
 		em.getTransaction().commit();
 

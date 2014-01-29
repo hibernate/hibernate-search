@@ -23,13 +23,15 @@
  */
 package org.hibernate.search.test.jpa;
 
-import org.hibernate.search.jpa.Search;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.test.TestConstants;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.index.Term;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.jpa.Search;
+import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.test.TestConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -38,6 +40,31 @@ import static org.junit.Assert.assertEquals;
  * @author Emmanuel Bernard
  */
 public class EntityManagerTest extends JPATestCase {
+
+	@Test
+	public void testMassIndexer() throws Exception {
+		// index a Bretzel
+		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+		em.getTransaction().begin();
+		Bretzel bretzel = new Bretzel( 23, 34 );
+		em.persist( bretzel );
+		em.getTransaction().commit();
+		em.clear();
+
+		// verify against index
+		assertEquals( 1, countBretzelsViaIndex( em ) );
+		em.purgeAll( Bretzel.class );
+
+		// clear index
+		em.flushToIndexes();
+
+		// verify Bretzel removed from index
+		assertEquals( 0, countBretzelsViaIndex( em ) );
+
+		// re-index
+		em.createIndexer( Bretzel.class ).startAndWait();
+		assertEquals( 1, countBretzelsViaIndex( em ) );
+	}
 
 	@Test
 	public void testQuery() throws Exception {
@@ -51,10 +78,12 @@ public class EntityManagerTest extends JPATestCase {
 		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 		Query query = parser.parse( "saltQty:noword" );
 		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
-		query = new TermQuery( new Term("saltQty", "23.0") );
+		query = new TermQuery( new Term( "saltQty", "23" ) );
 		assertEquals( "getResultList", 1, em.createFullTextQuery( query ).getResultList().size() );
-		assertEquals( "getSingleResult and object retrieval", 23f,
-				( (Bretzel) em.createFullTextQuery( query ).getSingleResult() ).getSaltQty(), 0f );
+		assertEquals(
+				"getSingleResult and object retrieval", 23,
+				( (Bretzel) em.createFullTextQuery( query ).getSingleResult() ).getSaltQty()
+		);
 		assertEquals( 1, em.createFullTextQuery( query ).getResultSize() );
 		em.getTransaction().commit();
 
@@ -92,5 +121,12 @@ public class EntityManagerTest extends JPATestCase {
 		return new Class[] {
 				Bretzel.class
 		};
+	}
+
+	private int countBretzelsViaIndex(FullTextEntityManager em) {
+		QueryBuilder queryBuilder = em.getSearchFactory().buildQueryBuilder().forEntity( Bretzel.class ).get();
+		Query allQuery = queryBuilder.all().createQuery();
+		FullTextQuery fullTextQuery = em.createFullTextQuery( allQuery, Bretzel.class );
+		return fullTextQuery.getResultSize();
 	}
 }

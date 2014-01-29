@@ -44,20 +44,18 @@ public class Bretzel {
 	private Integer id;
 
 	@Field(analyze = Analyze.NO)
-	private float saltQty;
+	private int saltQty;
 
 	@Field(analyze = Analyze.NO)
-	private float weight;
-
+	private int weight;
 
 	public Bretzel() {
 	}
 
-	public Bretzel(float saltQty, float weight) {
+	public Bretzel(int saltQty, int weight) {
 		this.saltQty = saltQty;
 		this.weight = weight;
 	}
-
 
 	public Integer getId() {
 		return id;
@@ -67,19 +65,19 @@ public class Bretzel {
 		this.id = id;
 	}
 
-	public float getSaltQty() {
+	public int getSaltQty() {
 		return saltQty;
 	}
 
-	public void setSaltQty(float saltQty) {
+	public void setSaltQty(int saltQty) {
 		this.saltQty = saltQty;
 	}
 
-	public float getWeight() {
+	public int getWeight() {
 		return weight;
 	}
 
-	public void setWeight(float weight) {
+	public void setWeight(int weight) {
 		this.weight = weight;
 	}
 }
