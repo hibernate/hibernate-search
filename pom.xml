@@ -597,9 +597,7 @@
                         <requireMavenVersion>
                             <version>3.0.4</version>
                         </requireMavenVersion>
-                        <!-- ORM 4.3 beta versions are not allowing us to converge -->
-                        <!-- See HSEARCH-1437 -->
-                        <!-- <DependencyConvergence />-->
+                        <DependencyConvergence />
                     </rules>
                 </configuration>
             </plugin>
