@@ -41,7 +41,7 @@
     <dependencies>
         <!-- JBoss TS -->
         <dependency>
-            <groupId>org.jboss.jbossts.jta</groupId>
+            <groupId>org.jboss.narayana.jta</groupId>
             <artifactId>narayana-jta</artifactId>
         </dependency>
 
