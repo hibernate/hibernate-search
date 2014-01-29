@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.5.0.Final (29-01-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1447] - Failure to boot if a non-indexed entity is having a complex ID for which no appropriate TwoWayFieldBridge can be guessed
+    * [HSEARCH-1490] - Wrong classloader used to load configuration files for a managed Infinispan cache
+
+** Improvement
+    * [HSEARCH-1488] - Improve release plugin configuration
+
+** Task
+    * [HSEARCH-1437] - Re-enable DependencyConvergence from Maven Enforcer plugin
+
+
 Version 4.5.0.CR1 (23-01-2014)
 ------------------------
 
