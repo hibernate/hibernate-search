@@ -49,7 +49,6 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.BytesRef;
-import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -294,14 +293,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addTokenTrackingAttribute(List<Integer> positions) {
-		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attr = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
-		int size = positions.size() - 1;
-		int[] basePosition = new int[size];
-		for ( int index = 0; index < size; index++ ) {
-			basePosition[index] = positions.get( index );
-		}
-		attr.reset( basePosition, positions.get( size ) );
-		getAttributes().add( attr );
+		//TokenTrackingAttribute is no longer available
+		throw new SearchException( "Serialization of TokenTrackingAttribute is no longer supported" );
 	}
 
 	@Override

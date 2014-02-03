@@ -47,7 +47,6 @@ import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
-import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
@@ -291,17 +290,7 @@ public class AvroSerializer implements Serializer {
 	}
 
 	private Object buildAttributeImpl(AttributeImpl attr) {
-		if ( attr instanceof AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) {
-			GenericRecord record = new GenericData.Record( protocol.getType( "TokenTrackingAttribute" ) );
-			int[] positions = ( (AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) attr ).getPositions();
-			List<Integer> fullPositions = new ArrayList<Integer>( positions.length );
-			for ( int position : positions ) {
-				fullPositions.add( position );
-			}
-			record.put( "positions", fullPositions );
-			return record;
-		}
-		else if (attr instanceof CharTermAttributeImpl) {
+		if (attr instanceof CharTermAttributeImpl) {
 			GenericRecord record = new GenericData.Record( protocol.getType( "CharTermAttribute" ) );
 			CharTermAttribute charAttr = (CharTermAttribute) attr;
 			record.put( "sequence", charAttr.toString() );
