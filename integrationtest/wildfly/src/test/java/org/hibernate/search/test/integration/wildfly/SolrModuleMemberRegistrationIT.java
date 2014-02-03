@@ -78,7 +78,7 @@ public class SolrModuleMemberRegistrationIT {
 		final String currentVersion = Version.getVersionString();
 		String dependencyDef = "org.hibernate.search.orm:" + currentVersion + " services";
 		if ( includeSolr ) {
-			dependencyDef = dependencyDef + ", org.apache.solr:3.6.2";
+			dependencyDef = dependencyDef + ", org.apache.solr:4.6.1";
 		}
 		String manifest = Descriptors.create( ManifestDescriptor.class )
 				.attribute( "Dependencies", dependencyDef )

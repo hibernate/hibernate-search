@@ -22,9 +22,9 @@ package org.hibernate.search.test.envers;
 
 import java.util.List;
 
-import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -307,7 +307,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestCase {
 	private List<Person> findPeopleFromIndex(FullTextSession session, String term, String value) {
 		Query luceneQuery = createLuceneQuery( term, value );
 		return session.createFullTextQuery( luceneQuery, Person.class )
-				.setSort( new Sort( new SortField( "surname", SortField.STRING ) ) ).list();
+				.setSort( new Sort( new SortField( "surname", SortField.Type.STRING ) ) ).list();
 	}
 
 	private Person findPersonFromIndexBySurname(FullTextSession session, String surname) {

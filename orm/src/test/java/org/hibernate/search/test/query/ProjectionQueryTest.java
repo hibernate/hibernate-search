@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.query;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Iterator;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.Date;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -169,7 +170,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 				FullTextQuery.DOCUMENT,
 				FullTextQuery.ID
 		);
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		resetFieldSelector();
 		ScrollableResults projections = hibQuery.scroll();
@@ -230,7 +231,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept", FullTextQuery.THIS, FullTextQuery.SCORE, FullTextQuery.ID );
 		hibQuery.setResultTransformer( new ProjectionToDelimStringResultTransformer() );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		resetFieldSelector();
 		@SuppressWarnings("unchecked")
@@ -267,7 +268,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 				FullTextQuery.DOCUMENT,
 				FullTextQuery.ID
 		);
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		hibQuery.setResultTransformer( new ProjectionToMapResultTransformer() );
 
@@ -416,7 +417,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertNotNull( "Date", projection[8] );
 		assertNotNull( "Lucene internal doc id", projection[9] );
 
-		hibQuery.setSort( new Sort( new SortField("lastname", SortField.STRING_VAL) ) );
+		hibQuery.setSort( new Sort( new SortField( "lastname", SortField.Type.STRING ) ) );
 		hibQuery.setProjection(
 				FullTextQuery.THIS, FullTextQuery.SCORE
 		);
@@ -457,7 +458,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "id field name not projected", 1001, projection[0] );
 		assertEquals(
 				"Document fields should not be lazy on DOCUMENT projection",
-				"Jackson", ( (Document) projection[1] ).getFieldable( "lastname" ).stringValue()
+				"Jackson", ( (Document) projection[1] ).getField( "lastname" ).stringValue()
 		);
 		assertEquals( "DOCUMENT size incorrect", 5, ( (Document) projection[1] ).getFields().size() );
 
@@ -526,7 +527,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 	}
 
-	public void testProjectionUnmappedFieldValues() throws ParseException {
+	public void testProjectionUnmappedFieldValues() throws ParseException, IOException {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 		s.persist( new CalendarDay().setDayFromItalianString( "01/04/2011" ) );

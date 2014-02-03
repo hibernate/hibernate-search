@@ -26,7 +26,8 @@ package org.hibernate.search.test.util;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.LowerCaseTokenizer;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * @author Hardy Ferentschik
@@ -37,9 +38,9 @@ public class BarAnalyzer extends Analyzer {
 	}
 
 	@Override
-	public TokenStream tokenStream(String fieldName, Reader reader) {
-		return null;
+	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+		//Not particularly important, but at least it's a fully functional Analyzer:
+		return new TokenStreamComponents( new LowerCaseTokenizer( TestConstants.getTargetLuceneVersion(), reader ) );
 	}
+
 }
-
-

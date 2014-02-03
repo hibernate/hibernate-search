@@ -27,10 +27,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
-
+import org.apache.lucene.util.Bits;
 import org.hibernate.search.exception.AssertionFailure;
 
 /**
@@ -76,23 +77,24 @@ public class ChainedFilter extends Filter {
 	}
 
 	@Override
-	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
 		int size = chainedFilters.size();
 		if ( size == 0 ) {
 			throw new AssertionFailure( "No filters to chain" );
 		}
 		else if ( size == 1 ) {
-			return chainedFilters.get( 0 ).getDocIdSet( reader );
+			return chainedFilters.get( 0 ).getDocIdSet( context, acceptDocs );
 		}
 		else {
 			List<DocIdSet> subSets = new ArrayList<DocIdSet>( size );
 			for ( Filter f : chainedFilters ) {
-				subSets.add( f.getDocIdSet( reader ) );
+				subSets.add( f.getDocIdSet( context, acceptDocs ) );
 			}
 			subSets = FilterOptimizationHelper.mergeByBitAnds( subSets );
 			if ( subSets.size() == 1 ) {
 				return subSets.get( 0 );
 			}
+			final AtomicReader reader = context.reader();
 			return new AndDocIdSet( subSets, reader.maxDoc() );
 		}
 	}
@@ -105,4 +107,5 @@ public class ChainedFilter extends Filter {
 		sb.append( '}' );
 		return sb.toString();
 	}
+
 }

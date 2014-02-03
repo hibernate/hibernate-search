@@ -45,11 +45,10 @@ public interface LuceneWorksBuilder {
 
 	void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext);
 
-	void defineDocument(float boost);
+	void defineDocument();
 
 	void addFieldable(byte[] instance);
 
-	//TODO forgot boost => do it across the whole chain
 	void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
 	void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
@@ -58,7 +57,13 @@ public interface LuceneWorksBuilder {
 
 	void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 
+	/**
+	 * @deprecated addFieldWithBinaryData(String name, byte[] value, int offset, int length)
+	 */
+	@Deprecated
 	void addFieldWithBinaryData(String name, byte[] value, int offset, int length, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
+
+	void addFieldWithBinaryData(String name, byte[] value, int offset, int length);
 
 	void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);
 

@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,20 +23,18 @@
  */
 package org.hibernate.search.impl;
 
-import java.util.Collections;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.util.ResourceLoader;
+import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.util.Version;
-import org.apache.solr.analysis.CharFilterFactory;
-import org.apache.solr.analysis.TokenFilterFactory;
+import org.apache.lucene.analysis.util.CharFilterFactory;
+import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.solr.analysis.TokenizerChain;
-import org.apache.solr.analysis.TokenizerFactory;
-import org.apache.solr.common.ResourceLoader;
-import org.apache.solr.util.plugin.ResourceLoaderAware;
-
-import org.hibernate.search.Environment;
+import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
@@ -66,13 +64,13 @@ final class SolrAnalyzerBuilder {
 	 * @param analyzerDef The <code>AnalyzerDef</code> annotation as found in the annotated domain class.
 	 * @param luceneMatchVersion The lucene version (required since Lucene 3.x)
 	 * @return a Lucene <code>Analyzer</code>
+	 * @throws IOException
 	 */
-	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) {
+	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) throws IOException {
 		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader();
 		TokenizerDef token = analyzerDef.tokenizer();
-		TokenizerFactory tokenFactory = instanceFromClass( TokenizerFactory.class, token.factory(), "Tokenizer factory" );
 		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( token.params(), luceneMatchVersion );
-		tokenFactory.init( tokenMapsOfParameters );
+		TokenizerFactory tokenFactory = instanceFromClass( TokenizerFactory.class, token.factory(), "Tokenizer factory", tokenMapsOfParameters );
 		injectResourceLoader( tokenFactory, defaultResourceLoader, tokenMapsOfParameters );
 
 		final int length = analyzerDef.filters().length;
@@ -81,34 +79,22 @@ final class SolrAnalyzerBuilder {
 		CharFilterFactory[] charFilters = new CharFilterFactory[charLength];
 		for ( int index = 0; index < length; index++ ) {
 			TokenFilterDef filterDef = analyzerDef.filters()[index];
-			filters[index] = instanceFromClass( TokenFilterFactory.class, filterDef.factory(), "Token filter factory" );
 			final Map<String, String> mapOfParameters = getMapOfParameters( filterDef.params(), luceneMatchVersion );
-			filters[index].init( mapOfParameters );
+			filters[index] = instanceFromClass( TokenFilterFactory.class, filterDef.factory(), "Token filter factory", mapOfParameters );
 			injectResourceLoader( filters[index], defaultResourceLoader, mapOfParameters );
 		}
 		for ( int index = 0; index < charFilters.length; index++ ) {
 			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
-			charFilters[index] = instanceFromClass( CharFilterFactory.class, charFilterDef.factory(), "Character filter factory" );
-			final Map<String, String> mapOfParameters = getMapOfParameters(
-					charFilterDef.params(), luceneMatchVersion
-			);
-			charFilters[index].init( mapOfParameters );
+			final Map<String, String> mapOfParameters = getMapOfParameters( charFilterDef.params(), luceneMatchVersion );
+			charFilters[index] = instanceFromClass( CharFilterFactory.class, charFilterDef.factory(), "Character filter factory", mapOfParameters );
 			injectResourceLoader( charFilters[index], defaultResourceLoader, mapOfParameters );
 		}
 		return new TokenizerChain( charFilters, tokenFactory, filters );
 	}
 
-	private static void injectResourceLoader(Object processor, ResourceLoader defaultResourceLoader, Map<String, String> mapOfParameters) {
+	private static void injectResourceLoader(Object processor, ResourceLoader defaultResourceLoader, Map<String, String> mapOfParameters) throws IOException {
 		if ( processor instanceof ResourceLoaderAware ) {
-			String charset = mapOfParameters.get( Environment.RESOURCE_CHARSET );
-			final ResourceLoader localResourceLoader;
-			if ( charset != null ) {
-				localResourceLoader = new HibernateSearchResourceLoader( charset );
-			}
-			else {
-				localResourceLoader = defaultResourceLoader;
-			}
-			( (ResourceLoaderAware) processor ).inform( localResourceLoader );
+			( (ResourceLoaderAware) processor ).inform( defaultResourceLoader );
 		}
 	}
 
@@ -118,6 +104,6 @@ final class SolrAnalyzerBuilder {
 			mapOfParams.put( param.name(), param.value() );
 		}
 		mapOfParams.put( SOLR_LUCENE_VERSION_PARAM, luceneMatchVersion.toString() );
-		return Collections.unmodifiableMap( mapOfParams );
+		return mapOfParams;
 	}
 }

@@ -20,7 +20,6 @@
  */
 package org.hibernate.search.bridge.util.impl;
 
-import org.apache.lucene.document.NumericField;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.SearchException;
@@ -83,19 +82,4 @@ public final class NumericFieldUtils {
 		return createNumericRangeQuery( fieldName, value, value, true, true );
 	}
 
-	public static void setNumericValue(Object value, NumericField numericField) {
-		Class numericClass = value.getClass();
-		if ( numericClass.isAssignableFrom( Double.class ) ) {
-			numericField.setDoubleValue( (Double) value );
-		}
-		if ( numericClass.isAssignableFrom( Long.class ) ) {
-			numericField.setLongValue( (Long) value );
-		}
-		if ( numericClass.isAssignableFrom( Integer.class ) ) {
-			numericField.setIntValue( (Integer) value );
-		}
-		if ( numericClass.isAssignableFrom( Float.class ) ) {
-			numericField.setFloatValue( (Float) value );
-		}
-	}
 }

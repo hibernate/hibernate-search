@@ -25,7 +25,7 @@ package org.hibernate.search.test.analyzer.inheritance;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;

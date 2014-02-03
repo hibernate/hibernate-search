@@ -30,7 +30,6 @@ import javax.persistence.Table;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 
@@ -135,7 +134,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 			for ( String fieldName : fieldNames ) {
-				Fieldable field = new Field(
+				Field field = new Field(
 						fieldName,
 						"This text will be replaced by the test analyzers",
 						luceneOptions.getStore(),
@@ -172,7 +171,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			Fieldable field = new Field(
+			Field field = new Field(
 					name,
 					"This text will be replaced by the test analyzers",
 					luceneOptions.getStore(),

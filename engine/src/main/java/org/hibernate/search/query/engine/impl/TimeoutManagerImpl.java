@@ -122,7 +122,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 			if ( this.type != Type.LIMIT && timedOut ) {
 				throw timeoutExceptionFactory.createTimeoutException(
 						"Full-text query took longer than expected (in microsecond): " + TimeUnit.NANOSECONDS.toMicros( elapsedTime ),
-						luceneQuery
+						String.valueOf( luceneQuery )
 				);
 			}
 			return timedOut;
@@ -180,7 +180,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 			if ( e == null ) {
 				e = timeoutExceptionFactory.createTimeoutException(
 						"Timeout period exceeded",
-						luceneQuery );
+						String.valueOf( luceneQuery ) );
 			}
 			throw e;
 		}

@@ -26,13 +26,13 @@ package org.hibernate.search.test.compression;
 import java.util.List;
 import java.util.zip.DataFormatException;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -68,10 +68,10 @@ public class CompressionTest extends SearchTestCase {
 			ScoreDoc doc = topDocs.scoreDocs[0];
 			Document document = indexReader.document( doc.doc );
 			{
-				Fieldable[] fields = document.getFieldables( "title" );
+				IndexableField[] fields = document.getFields( "title" );
 				assertEquals( 1, fields.length );
-				assertTrue( fields[0].isIndexed() );
-				assertTrue( fields[0].isStored() );
+				assertTrue( fields[0].fieldType().indexed() );
+				assertTrue( fields[0].fieldType().stored() );
 				assertFalse( isCompressed( fields[0] ) );
 				assertEquals(
 						"Hibernate in Action, third edition",
@@ -79,7 +79,7 @@ public class CompressionTest extends SearchTestCase {
 				);
 			}
 			{
-				Fieldable[] fields = document.getFieldables( "abstract" );
+				IndexableField[] fields = document.getFields( "abstract" );
 				assertEquals( 1, fields.length );
 				assertTrue( isCompressed( fields[0] ) );
 				assertEquals(
@@ -88,7 +88,7 @@ public class CompressionTest extends SearchTestCase {
 				);
 			}
 			{
-				Fieldable[] fields = document.getFieldables( "text" );
+				IndexableField[] fields = document.getFields( "text" );
 				assertEquals( 1, fields.length );
 				assertTrue( isCompressed( fields[0] ) );
 				assertEquals(
@@ -161,23 +161,23 @@ public class CompressionTest extends SearchTestCase {
 		}
 	}
 
-	private String restoreValue(Fieldable field) throws DataFormatException {
-		if ( field.isBinary() ) {
+	private String restoreValue(IndexableField field) throws DataFormatException {
+		if ( field.binaryValue() != null ) {
 			Assert.assertNull( "we rely on this in the Projection implementation", field.stringValue() );
-			return CompressionTools.decompressString( field.getBinaryValue() );
+			return CompressionTools.decompressString( field.binaryValue() );
 		}
 		else {
 			return field.stringValue();
 		}
 	}
 
-	private boolean isCompressed(Fieldable field) {
-		if ( !field.isBinary() ) {
+	private boolean isCompressed(IndexableField field) {
+		if ( field.binaryValue() == null ) {
 			return false;
 		}
 		else {
 			try {
-				CompressionTools.decompressString( field.getBinaryValue() );
+				CompressionTools.decompressString( field.binaryValue() );
 				return true;
 			}
 			catch (DataFormatException e) {

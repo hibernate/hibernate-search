@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

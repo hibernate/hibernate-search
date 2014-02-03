@@ -55,7 +55,7 @@ public class QueryBooksByAverageRatingTask extends AbstractTask {
 				.createQuery();
 
 		List<Book> result = fts.createFullTextQuery( q, Book.class )
-				.setSort( new Sort( new SortField( "rating", SortField.FLOAT, true ) ) )
+				.setSort( new Sort( new SortField( "rating", SortField.Type.FLOAT, true ) ) )
 				.list();
 	}
 

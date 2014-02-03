@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010-2011, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,17 +23,10 @@
  */
 package org.hibernate.search.util.impl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import org.apache.solr.common.ResourceLoader;
-import org.apache.solr.util.plugin.ResourceLoaderAware;
-
+import org.apache.lucene.analysis.util.ResourceLoader;
 import org.hibernate.search.SearchException;
 
 /**
@@ -41,66 +34,45 @@ import org.hibernate.search.SearchException;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
-	private final String charset;
 
+	private final ClassLoader classLoader;
+
+	/**
+	 * Used only temporarily to keep the number of changes limited in the scope of
+	 * Lucene 4 migration. TODO HSEARCH-1456 ClassLoader instances should be passed explicitly.
+	 */
+	@Deprecated
 	public HibernateSearchResourceLoader() {
-		this.charset = null;
+		this.classLoader = HibernateSearchResourceLoader.class.getClassLoader();
 	}
 
-	public HibernateSearchResourceLoader(String charset) {
-		this.charset = charset;
+	public HibernateSearchResourceLoader(ClassLoader classLoader) {
+		this.classLoader = classLoader;
 	}
 
 	@Override
 	public InputStream openResource(String resource) throws IOException {
-		return FileHelper.openResource( resource );
-	}
-
-	@Override
-	public List<String> getLines(String resource) throws IOException {
-		final InputStream stream = openResource( resource );
-		if ( stream == null ) {
+		InputStream inputStream = FileHelper.openResource( resource );
+		if ( inputStream == null ) {
 			throw new SearchException( "Resource not found: " + resource );
 		}
-		try {
-			final InputStreamReader charsetAwareReader;
-			charsetAwareReader = charset == null ?
-					new InputStreamReader( stream ) :
-					new InputStreamReader( stream, charset );
-			final List<String> results = new ArrayList<String>();
-			final BufferedReader reader = new BufferedReader( charsetAwareReader );
-			try {
-				String line = reader.readLine();
-				while ( line != null ) {
-					// comment or empty line
-					if ( line.length() != 0 && !line.startsWith( "#" ) ) {
-						results.add( line );
-					}
-					line = reader.readLine();
-				}
-			}
-			finally {
-				FileHelper.closeResource( reader );
-			}
-			return Collections.unmodifiableList( results );
-		}
-		finally {
-			FileHelper.closeResource( stream );
+		else {
+			return inputStream;
 		}
 	}
 
 	@Override
-	public Object newInstance(String cname, String... subpackages) {
-		if ( subpackages != null && subpackages.length > 0 ) {
-			throw new UnsupportedOperationException( "newInstance(classname, packages) not implemented" );
-		}
-
-		final Object instance = ClassLoaderHelper.instanceFromName(
-				Object.class, cname, this.getClass(), "Solr resource"
-		);
-		if ( instance instanceof ResourceLoaderAware ) {
-			( (ResourceLoaderAware) instance ).inform( this );
-		}
-		return instance;
+	public <T> Class<? extends T> findClass(String cname, Class<T> expectedType) {
+		return ClassLoaderHelper.classForName( expectedType, cname, classLoader, describeComponent( cname) );
 	}
+
+	@Override
+	public <T> T newInstance(String cname, Class<T> expectedType) {
+		return ClassLoaderHelper.instanceFromName( expectedType, cname, classLoader, describeComponent( cname) );
+	}
+
+	private static String describeComponent(final String classname) {
+		return "Lucene Analyzer component " + classname;
+	}
+
 }

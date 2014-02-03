@@ -169,14 +169,7 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 	}
 
 	private Query createRangeQuery(String min, String max, boolean includeMin, boolean includeMax) {
-		return new TermRangeQuery(
-				getFieldName(),
-				min,
-				max,
-				includeMin,
-				includeMax
-		);
+		return TermRangeQuery.newStringRange( getFieldName(), min, max, includeMin, includeMax );
 	}
+
 }
-
-

@@ -39,4 +39,5 @@ public final class AnalyzerForTests1 extends AbstractTestAnalyzer {
 	protected String[] getTokens() {
 		return tokens;
 	}
+
 }

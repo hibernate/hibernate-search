@@ -66,8 +66,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 						entityType.getCanonicalName() ) );
 			}
 
-			queryAnalyzer = new ScopedAnalyzer();
-			queryAnalyzer.setGlobalAnalyzer( factory.getAnalyzer( indexBoundType ) );
+			queryAnalyzer = new ScopedAnalyzer( factory.getAnalyzer( indexBoundType ) );
 			context = new QueryBuildingContext( factory, queryAnalyzer, indexBoundType );
 		}
 

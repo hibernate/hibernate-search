@@ -32,8 +32,8 @@ import java.util.Locale;
 
 import javax.persistence.EntityTransaction;
 
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.jpa.FullTextEntityManager;
@@ -82,7 +82,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	public void testResultOrderedByDateDescending() throws Exception {
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
-		Sort dateDescending = new Sort( new SortField( "creationDate", SortField.STRING, DESC ) );
+		Sort dateDescending = new Sort( new SortField( "creationDate", SortField.Type.STRING, DESC ) );
 		List<ProductArticle> result = query( "Hib*" ).setSort( dateDescending ).setFirstResult( 3 ).getResultList();
 
 		assertThat( result ).as( "query result" ).hasSize( 3 );

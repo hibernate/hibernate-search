@@ -30,8 +30,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.util.Bits;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.SegmentReader;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.filter.impl.AndDocIdSet;
 
 /**
  * @author Emmanuel Bernard
@@ -43,18 +48,18 @@ public class ExcludeAllFilter extends Filter implements Serializable {
 	private static final Map<IndexReader,IndexReader> invokedOnReaders = new ConcurrentHashMap<IndexReader,IndexReader>();
 
 	@Override
-	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+		AtomicReader reader = context.reader();
 		verifyItsAReadOnlySegmentReader( reader );
 		final IndexReader previousValue = invokedOnReaders.put( reader, reader );
 		if ( previousValue != null ) {
 			throw new IllegalStateException( "Called twice" );
 		}
-		return DocIdSet.EMPTY_DOCIDSET;
+		return AndDocIdSet.EMPTY_DOCIDSET;
 	}
 
 	public static void verifyItsAReadOnlySegmentReader(IndexReader reader) {
-		String implementationName = reader.getClass().getName();
-		if ( ! "org.apache.lucene.index.ReadOnlySegmentReader".equals( implementationName ) ) {
+		if ( ! ( reader instanceof SegmentReader ) ) {
 			throw new SearchException( "test failed: we should receive subreaders" );
 		}
 	}

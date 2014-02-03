@@ -49,7 +49,7 @@ public class QueryBooksByTotalSoldTask extends AbstractTask {
 				.createQuery();
 
 		fts.createFullTextQuery( q, Book.class )
-				.setSort( new Sort( new SortField( "totalSold", SortField.LONG, true ) ) )
+				.setSort( new Sort( new SortField( "totalSold", SortField.Type.LONG, true ) ) )
 				.setMaxResults( 100 )
 				.list();
 	}

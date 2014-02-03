@@ -21,8 +21,6 @@
 
 package org.hibernate.search.query.engine;
 
-import org.apache.lucene.search.Query;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 
@@ -39,15 +37,15 @@ public class QueryTimeoutException extends SearchException {
 
 	public static final TimeoutExceptionFactory DEFAULT_TIMEOUT_EXCEPTION_FACTORY = new DefaultSearchTimeoutException();
 
-	private QueryTimeoutException(String message, Query query) {
-		super( message + " \"" + query + '\"' );
+	private QueryTimeoutException(String message, String queryDescription) {
+		super( message + " \"" + queryDescription + '\"' );
 	}
 
 	private static class DefaultSearchTimeoutException implements TimeoutExceptionFactory {
 
 		@Override
-		public QueryTimeoutException createTimeoutException(String message, Query query) {
-			return new QueryTimeoutException( message, query );
+		public RuntimeException createTimeoutException(String message, String queryDescription) {
+			return new QueryTimeoutException( message, queryDescription );
 		}
 
 	}

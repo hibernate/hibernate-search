@@ -22,6 +22,7 @@ package org.hibernate.search.test.reader.nrtreaders;
 
 import java.util.List;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -187,7 +188,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 	}
 
 	private int getDocumentNbrFromFilesystem(NRTIndexManager documentsIndexManager) throws Exception {
-		IndexReader reader = IndexReader.open( documentsIndexManager.getDirectoryProvider().getDirectory(), true );
+		IndexReader reader = DirectoryReader.open( documentsIndexManager.getDirectoryProvider().getDirectory() );
 		try {
 			return reader.numDocs();
 		}

@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -57,14 +57,10 @@ import org.hibernate.search.bridge.builtin.CalendarBridge;
 import org.hibernate.search.bridge.builtin.CharacterBridge;
 import org.hibernate.search.bridge.builtin.DateBridge;
 import org.hibernate.search.bridge.builtin.DoubleBridge;
-import org.hibernate.search.bridge.builtin.DoubleNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.EnumBridge;
 import org.hibernate.search.bridge.builtin.FloatBridge;
-import org.hibernate.search.bridge.builtin.FloatNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.IntegerBridge;
-import org.hibernate.search.bridge.builtin.IntegerNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.LongBridge;
-import org.hibernate.search.bridge.builtin.LongNumericFieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.ShortBridge;
 import org.hibernate.search.bridge.builtin.StringBridge;
@@ -74,9 +70,6 @@ import org.hibernate.search.bridge.builtin.UrlBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinArrayBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
-import org.hibernate.search.bridge.builtin.impl.BuiltinNumericArrayBridge;
-import org.hibernate.search.bridge.builtin.impl.BuiltinNumericIterableBridge;
-import org.hibernate.search.bridge.builtin.impl.BuiltinNumericMapBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
@@ -165,18 +158,22 @@ public final class BridgeFactory {
 	public static final FieldBridge ARRAY_CALENDAR_SECOND = new BuiltinArrayBridge( CALENDAR_SECOND );
 
 	public static final FieldBridge ITERABLE_BRIDGE = new BuiltinIterableBridge();
-	public static final FieldBridge NUMERIC_ITERABLE_BRIDGE = new BuiltinNumericIterableBridge();
+	public static final BuiltinIterableBridge ITERABLE_BRIDGE_DOUBLE = new BuiltinIterableBridge( NumericFieldBridge.DOUBLE_FIELD_BRIDGE );
+	public static final BuiltinIterableBridge ITERABLE_BRIDGE_FLOAT = new BuiltinIterableBridge( NumericFieldBridge.FLOAT_FIELD_BRIDGE );
+	public static final BuiltinIterableBridge ITERABLE_BRIDGE_INT = new BuiltinIterableBridge( NumericFieldBridge.INT_FIELD_BRIDGE );
+	public static final BuiltinIterableBridge ITERABLE_BRIDGE_LONG = new BuiltinIterableBridge( NumericFieldBridge.LONG_FIELD_BRIDGE );
 
 	public static final FieldBridge ARRAY_BRIDGE = new BuiltinArrayBridge();
-	public static final FieldBridge NUMERIC_ARRAY_BRIDGE = new BuiltinNumericArrayBridge();
+	public static final BuiltinArrayBridge ARRAY_BRIDGE_DOUBLE = new BuiltinArrayBridge( NumericFieldBridge.DOUBLE_FIELD_BRIDGE );
+	public static final BuiltinArrayBridge ARRAY_BRIDGE_FLOAT = new BuiltinArrayBridge( NumericFieldBridge.FLOAT_FIELD_BRIDGE );
+	public static final BuiltinArrayBridge ARRAY_BRIDGE_INT = new BuiltinArrayBridge( NumericFieldBridge.INT_FIELD_BRIDGE );
+	public static final BuiltinArrayBridge ARRAY_BRIDGE_LONG = new BuiltinArrayBridge( NumericFieldBridge.LONG_FIELD_BRIDGE );
 
 	public static final FieldBridge MAP_BRIDGE = new BuiltinMapBridge();
-	public static final FieldBridge NUMERIC_MAP_BRIDGE = new BuiltinNumericMapBridge();
-
-	public static final NumericFieldBridge INT_NUMERIC = new IntegerNumericFieldBridge();
-	public static final NumericFieldBridge LONG_NUMERIC = new LongNumericFieldBridge();
-	public static final NumericFieldBridge FLOAT_NUMERIC = new FloatNumericFieldBridge();
-	public static final NumericFieldBridge DOUBLE_NUMERIC = new DoubleNumericFieldBridge();
+	public static final BuiltinMapBridge MAP_BRIDGE_DOUBLE = new BuiltinMapBridge( NumericFieldBridge.DOUBLE_FIELD_BRIDGE );
+	public static final BuiltinMapBridge MAP_BRIDGE_FLOAT = new BuiltinMapBridge( NumericFieldBridge.FLOAT_FIELD_BRIDGE );
+	public static final BuiltinMapBridge MAP_BRIDGE_INT = new BuiltinMapBridge( NumericFieldBridge.INT_FIELD_BRIDGE );
+	public static final BuiltinMapBridge MAP_BRIDGE_LONG = new BuiltinMapBridge( NumericFieldBridge.LONG_FIELD_BRIDGE );
 
 	public static final TwoWayFieldBridge DATE_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(
 			DateBridge.DATE_MILLISECOND );
@@ -198,8 +195,11 @@ public final class BridgeFactory {
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private static Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
-	private static Map<String, NumericFieldBridge> numericBridges = new HashMap<String, NumericFieldBridge>();
+	private static final Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
+	private static final Map<String, NumericFieldBridge> numericBridges = new HashMap<String, NumericFieldBridge>();
+	private static final Map<String, BuiltinMapBridge> numericMapBridges = new HashMap<String, BuiltinMapBridge>();
+	private static final Map<String, BuiltinArrayBridge> numericArrayBridges = new HashMap<String, BuiltinArrayBridge>();
+	private static final Map<String, BuiltinIterableBridge> numericIterableBridges = new HashMap<String, BuiltinIterableBridge>();
 
 	static {
 		builtInBridges.put( Character.class.getName(), CHARACTER );
@@ -227,14 +227,41 @@ public final class BridgeFactory {
 		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
 		builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND );
 
-		numericBridges.put( Integer.class.getName(), INT_NUMERIC );
-		numericBridges.put( int.class.getName(), INT_NUMERIC );
-		numericBridges.put( Long.class.getName(), LONG_NUMERIC );
-		numericBridges.put( long.class.getName(), LONG_NUMERIC );
-		numericBridges.put( Double.class.getName(), DOUBLE_NUMERIC );
-		numericBridges.put( double.class.getName(), DOUBLE_NUMERIC );
-		numericBridges.put( Float.class.getName(), FLOAT_NUMERIC );
-		numericBridges.put( float.class.getName(), FLOAT_NUMERIC );
+		numericBridges.put( Integer.class.getName(), NumericFieldBridge.INT_FIELD_BRIDGE );
+		numericBridges.put( int.class.getName(), NumericFieldBridge.INT_FIELD_BRIDGE );
+		numericBridges.put( Long.class.getName(), NumericFieldBridge.LONG_FIELD_BRIDGE );
+		numericBridges.put( long.class.getName(), NumericFieldBridge.LONG_FIELD_BRIDGE );
+		numericBridges.put( Double.class.getName(), NumericFieldBridge.DOUBLE_FIELD_BRIDGE );
+		numericBridges.put( double.class.getName(), NumericFieldBridge.DOUBLE_FIELD_BRIDGE );
+		numericBridges.put( Float.class.getName(), NumericFieldBridge.FLOAT_FIELD_BRIDGE );
+		numericBridges.put( float.class.getName(), NumericFieldBridge.FLOAT_FIELD_BRIDGE );
+
+		numericMapBridges.put( Integer.class.getName(), MAP_BRIDGE_INT );
+		numericMapBridges.put( int.class.getName(), MAP_BRIDGE_INT );
+		numericMapBridges.put( Long.class.getName(), MAP_BRIDGE_LONG );
+		numericMapBridges.put( long.class.getName(), MAP_BRIDGE_LONG );
+		numericMapBridges.put( Double.class.getName(), MAP_BRIDGE_DOUBLE );
+		numericMapBridges.put( double.class.getName(), MAP_BRIDGE_DOUBLE );
+		numericMapBridges.put( Float.class.getName(), MAP_BRIDGE_FLOAT );
+		numericMapBridges.put( float.class.getName(), MAP_BRIDGE_FLOAT );
+
+		numericArrayBridges.put( Integer.class.getName(), ARRAY_BRIDGE_INT );
+		numericArrayBridges.put( int.class.getName(), ARRAY_BRIDGE_INT );
+		numericArrayBridges.put( Long.class.getName(), ARRAY_BRIDGE_LONG );
+		numericArrayBridges.put( long.class.getName(), ARRAY_BRIDGE_LONG );
+		numericArrayBridges.put( Double.class.getName(), ARRAY_BRIDGE_DOUBLE );
+		numericArrayBridges.put( double.class.getName(), ARRAY_BRIDGE_DOUBLE );
+		numericArrayBridges.put( Float.class.getName(), ARRAY_BRIDGE_FLOAT );
+		numericArrayBridges.put( float.class.getName(), ARRAY_BRIDGE_FLOAT );
+
+		numericIterableBridges.put( Integer.class.getName(), ITERABLE_BRIDGE_INT );
+		numericIterableBridges.put( int.class.getName(), ITERABLE_BRIDGE_INT );
+		numericIterableBridges.put( Long.class.getName(), ITERABLE_BRIDGE_LONG );
+		numericIterableBridges.put( long.class.getName(), ITERABLE_BRIDGE_LONG );
+		numericIterableBridges.put( Double.class.getName(), ITERABLE_BRIDGE_DOUBLE );
+		numericIterableBridges.put( double.class.getName(), ITERABLE_BRIDGE_DOUBLE );
+		numericIterableBridges.put( Float.class.getName(), ITERABLE_BRIDGE_FLOAT );
+		numericIterableBridges.put( float.class.getName(), ITERABLE_BRIDGE_FLOAT );
 	}
 
 	private BridgeFactory() {
@@ -500,15 +527,15 @@ public final class BridgeFactory {
 		}
 
 		if ( isIterable( reflectionManager, member ) ) {
-			return NUMERIC_ITERABLE_BRIDGE;
+			return numericIterableBridges.get( member.getElementClass().getName() );
 		}
 
 		if ( member.isArray() ) {
-			return NUMERIC_ARRAY_BRIDGE;
+			return numericArrayBridges.get( member.getElementClass().getName() );
 		}
 
 		if ( isMap( member ) ) {
-			return NUMERIC_MAP_BRIDGE;
+			return numericMapBridges.get( member.getElementClass().getName() );
 		}
 
 		return null;

@@ -25,10 +25,11 @@ package org.hibernate.search.filter.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
-
+import org.apache.lucene.util.Bits;
 import org.hibernate.search.util.impl.SoftLimitMRUCache;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -83,7 +84,8 @@ public class CachingWrapperFilter extends Filter {
 	}
 
 	@Override
-	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
+	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
+		final AtomicReader reader = context.reader();
 		DocIdSet cached = (DocIdSet) cache.get( reader );
 		if ( cached != null ) {
 			return cached;
@@ -93,7 +95,7 @@ public class CachingWrapperFilter extends Filter {
 			if ( cached != null ) {
 				return cached;
 			}
-			final DocIdSet docIdSet = filter.getDocIdSet( reader );
+			final DocIdSet docIdSet = filter.getDocIdSet( context, acceptDocs );
 			cache.put( reader, docIdSet );
 			return docIdSet;
 		}
@@ -116,4 +118,5 @@ public class CachingWrapperFilter extends Filter {
 	public int hashCode() {
 		return filter.hashCode() ^ 0x1117BF25;
 	}
+
 }

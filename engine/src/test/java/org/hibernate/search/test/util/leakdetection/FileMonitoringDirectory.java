@@ -22,10 +22,12 @@ package org.hibernate.search.test.util.leakdetection;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.lucene.store.DataInput;
+import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.RAMDirectory;
@@ -42,16 +44,16 @@ public class FileMonitoringDirectory extends RAMDirectory {
 	private final ConcurrentMap<IndexInput,IndexInput> openInputs = new ConcurrentHashMap<IndexInput, IndexInput>( 40 );
 
 	@Override
-	public IndexOutput createOutput(String name) throws IOException {
-		IndexOutput indexOutput = super.createOutput( name );
+	public IndexOutput createOutput(String name, IOContext context) throws IOException {
+		IndexOutput indexOutput = super.createOutput( name, context );
 		IndexOutputDelegate tracked = new IndexOutputDelegate( indexOutput );
 		openOutputs.put( tracked, tracked );
 		return tracked;
 	}
 
 	@Override
-	public IndexInput openInput(String name) throws IOException {
-		IndexInput openInput = super.openInput( name );
+	public IndexInput openInput(String name, IOContext context) throws IOException {
+		IndexInput openInput = super.openInput( name, context );
 		IndexInputDelegate tracked = new IndexInputDelegate( openInput );
 		openInputs.put( tracked, tracked );
 		return tracked;
@@ -159,18 +161,13 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		}
 
 		@Override
-		public void writeChars(String s, int start, int length) throws IOException {
-			delegate.writeChars( s, start, length );
-		}
-
-		@Override
-		public void writeChars(char[] s, int start, int length) throws IOException {
-			delegate.writeChars( s, start, length );
-		}
-
-		@Override
 		public void writeStringStringMap(Map<String, String> map) throws IOException {
 			delegate.writeStringStringMap( map );
+		}
+
+		@Override
+		public void writeStringSet(Set<String> set) throws IOException {
+			delegate.writeStringSet( set );
 		}
 
 	}
@@ -199,16 +196,6 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		// except equals & hashcode :
 
 		@Override
-		public void skipChars(int length) throws IOException {
-			delegate.skipChars( length );
-		}
-
-		@Override
-		public void setModifiedUTF8StringsMode() {
-			delegate.setModifiedUTF8StringsMode();
-		}
-
-		@Override
 		public byte readByte() throws IOException {
 			return delegate.readByte();
 		}
@@ -224,11 +211,6 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		}
 
 		@Override
-		public short readShort() throws IOException {
-			return delegate.readShort();
-		}
-
-		@Override
 		public long getFilePointer() {
 			return delegate.getFilePointer();
 		}
@@ -239,18 +221,18 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		}
 
 		@Override
-		public int readInt() throws IOException {
-			return delegate.readInt();
-		}
-
-		@Override
 		public long length() {
 			return delegate.length();
 		}
 
 		@Override
-		public void copyBytes(IndexOutput out, long numBytes) throws IOException {
-			delegate.copyBytes( out, numBytes );
+		public short readShort() throws IOException {
+			return delegate.readShort();
+		}
+
+		@Override
+		public int readInt() throws IOException {
+			return delegate.readInt();
 		}
 
 		@Override
@@ -274,13 +256,13 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		}
 
 		@Override
-		public void readChars(char[] buffer, int start, int length) throws IOException {
-			delegate.readChars( buffer, start, length );
+		public Map<String, String> readStringStringMap() throws IOException {
+			return delegate.readStringStringMap();
 		}
 
 		@Override
-		public Map<String, String> readStringStringMap() throws IOException {
-			return delegate.readStringStringMap();
+		public Set<String> readStringSet() throws IOException {
+			return delegate.readStringSet();
 		}
 
 	}

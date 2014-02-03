@@ -1501,8 +1501,8 @@ public class Team {
         </table>
 
         <para>We recommend to check all the implementations of
-        <classname>org.apache.solr.analysis.TokenizerFactory</classname> and
-        <classname>org.apache.solr.analysis.TokenFilterFactory</classname> in
+        <classname>org.apache.lucene.analysis.util.TokenizerFactory</classname> and
+        <classname>org.apache.lucene.analysis.util.TokenFilterFactory</classname> in
         your IDE to see the implementations available.</para>
       </section>
     </section>
@@ -1632,7 +1632,7 @@ public class BlogEntry {
         <title>Using the scoped analyzer when building a full-text
         query</title>
 
-        <programlisting language="JAVA" role="JAVA">org.apache.lucene.queryParser.QueryParser parser = new QueryParser(
+        <programlisting language="JAVA" role="JAVA">org.apache.lucene.queryparser.classic.QueryParser parser = new QueryParser(
     "title", 
     fullTextSession.getSearchFactory().getAnalyzer( Song.class )
 );

@@ -34,7 +34,6 @@ import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.util.Version;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
@@ -246,16 +245,17 @@ public class TypeMetadata {
 		stateInspectionOptimizationsEnabled = false;
 	}
 
-	public LuceneOptions getClassLuceneOptions(DocumentFieldMetadata fieldMetadata) {
-		return new LuceneOptionsImpl( fieldMetadata );
+	public LuceneOptions getClassLuceneOptions(DocumentFieldMetadata fieldMetadata, float documentLevelBoost) {
+		return new LuceneOptionsImpl( fieldMetadata, 1f, documentLevelBoost );
 	}
 
 	public LuceneOptions getFieldLuceneOptions(PropertyMetadata propertyMetadata,
 			DocumentFieldMetadata fieldMetadata,
-			Object value) {
+			Object value, float documentBoost) {
 		return new LuceneOptionsImpl(
 				fieldMetadata,
-				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value )
+				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value ),
+				documentBoost
 		);
 	}
 
@@ -393,8 +393,7 @@ public class TypeMetadata {
 		public Builder(Class<?> indexedType, ConfigContext configContext, ScopedAnalyzer scopedAnalyzer) {
 			this.indexedType = indexedType;
 			this.scopedAnalyzer = scopedAnalyzer;
-			Version luceneVersion = configContext.getLuceneMatchVersion();
-			this.passThroughAnalyzer = new PassThroughAnalyzer( luceneVersion );
+			this.passThroughAnalyzer = new PassThroughAnalyzer();
 		}
 
 		public Builder idProperty(PropertyMetadata propertyMetadata) {
