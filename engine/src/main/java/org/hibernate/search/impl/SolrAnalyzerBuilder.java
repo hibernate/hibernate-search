@@ -33,7 +33,6 @@ import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.util.Version;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.solr.analysis.TokenizerChain;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
