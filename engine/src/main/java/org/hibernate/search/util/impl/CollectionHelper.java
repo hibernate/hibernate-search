@@ -63,6 +63,10 @@ public final class CollectionHelper {
 		return new ArrayList<T>();
 	}
 
+	public static <T> ArrayList<T> newArrayList(final int size) {
+		return new ArrayList<T>( size );
+	}
+
 	public static <T> Set<T> asSet(T... ts) {
 		return new HashSet<T>( Arrays.asList( ts ) );
 	}
