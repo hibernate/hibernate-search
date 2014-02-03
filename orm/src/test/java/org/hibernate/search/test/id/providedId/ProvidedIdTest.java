@@ -30,12 +30,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.similarities.Similarity;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.Work;
@@ -43,7 +45,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
-import org.hibernate.search.query.engine.impl.IndexSearcherWithPayload;
+import org.hibernate.search.query.engine.impl.LazyQueryState;
 import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -108,10 +110,13 @@ public class ProvidedIdTest {
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 3, hits.totalHits );
 
+		final Similarity defaultSimilarity = new DefaultSimilarity();
+
 		//follows an example of what Infinispan Query actually needs to resolve a search request:
-		IndexSearcherWithPayload lowLevelSearcher = new IndexSearcherWithPayload( searcher, false, false );
+		LazyQueryState lowLevelSearcher = new LazyQueryState( luceneQuery, indexReader, defaultSimilarity, false, false );
+
 		QueryHits queryHits = new QueryHits(
-				lowLevelSearcher, luceneQuery, null, null,
+				lowLevelSearcher, null, null,
 				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, sf.getTimingSource() ),
 				null,
 				false,
@@ -143,7 +148,6 @@ public class ProvidedIdTest {
 		assertTrue( titles.contains( "Regular goat" ) );
 		assertTrue( titles.contains( "Mini Goat" ) );
 		assertTrue( titles.contains( "Big Goat" ) );
-		searcher.close();
 		sf.getIndexReaderAccessor().close( indexReader );
 	}
 }

@@ -26,11 +26,11 @@ package org.hibernate.search.test.shards;
 import java.io.File;
 import java.util.List;
 
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.Session;
@@ -133,7 +133,7 @@ public class ShardsTest extends SearchTestCase {
 
 		FSDirectory animal00Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal00" ) );
 		try {
-			IndexReader reader = IndexReader.open( animal00Directory, true );
+			IndexReader reader = DirectoryReader.open( animal00Directory );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
@@ -148,7 +148,7 @@ public class ShardsTest extends SearchTestCase {
 
 		FSDirectory animal01Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.1" ) );
 		try {
-			IndexReader reader = IndexReader.open( animal01Directory );
+			IndexReader reader = DirectoryReader.open( animal01Directory );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
@@ -170,14 +170,12 @@ public class ShardsTest extends SearchTestCase {
 
 		animal01Directory = FSDirectory.open( new File( getBaseIndexDir(), "Animal.1" ) );
 		try {
-			IndexReader reader = IndexReader.open( animal01Directory );
+			IndexReader reader = DirectoryReader.open( animal01Directory );
 			try {
 				int num = reader.numDocs();
 				assertEquals( 1, num );
-				TermDocs docs = reader.termDocs( new Term( "name", "mouse" ) );
-				assertTrue( docs.next() );
-				org.apache.lucene.document.Document doc = reader.document( docs.doc() );
-				assertFalse( docs.next() );
+				int numberOfMice = reader.docFreq( new Term( "name", "mouse" ) );
+				assertEquals( 1, numberOfMice );
 			}
 			finally {
 				reader.close();

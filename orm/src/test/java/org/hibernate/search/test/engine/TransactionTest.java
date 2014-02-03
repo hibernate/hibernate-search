@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.Session;
@@ -89,7 +90,7 @@ public class TransactionTest extends SearchTestCase {
 	}
 
 	private int getDocumentNumber() throws IOException {
-		IndexReader reader = IndexReader.open( getDirectory( Document.class ), false );
+		IndexReader reader = DirectoryReader.open( getDirectory( Document.class ) );
 		try {
 			return reader.numDocs();
 		}

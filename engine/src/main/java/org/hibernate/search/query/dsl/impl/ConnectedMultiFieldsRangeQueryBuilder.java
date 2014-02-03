@@ -123,13 +123,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 					null :
 					Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
 
-			perFieldQuery = new TermRangeQuery(
-					fieldName,
-					lowerTerm,
-					upperTerm,
-					!rangeContext.isExcludeFrom(),
-					!rangeContext.isExcludeTo()
-			);
+			perFieldQuery = TermRangeQuery.newStringRange( fieldName, lowerTerm, upperTerm, !rangeContext.isExcludeFrom(), !rangeContext.isExcludeTo() );
 		}
 
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();

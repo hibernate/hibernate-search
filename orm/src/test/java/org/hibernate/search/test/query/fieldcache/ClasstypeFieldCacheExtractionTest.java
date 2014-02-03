@@ -19,6 +19,7 @@
 
 package org.hibernate.search.test.query.fieldcache;
 
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
@@ -106,12 +107,15 @@ public class ClasstypeFieldCacheExtractionTest {
 			storeDemoData( builder );
 			performtest( builder, expectedLoadedFields );
 		}
+		catch (IOException e) {
+			Assert.fail( "unexpected exception " + e );
+		}
 		finally {
 			builder.close();
 		}
 	}
 
-	private void performtest(FullTextSessionBuilder builder, String... expectedLoadedFields) {
+	private void performtest(FullTextSessionBuilder builder, String... expectedLoadedFields) throws IOException {
 		QueryBuilder queryBuilder = builder.getSearchFactory().buildQueryBuilder().forEntity( Item.class ).get();
 		Query query = queryBuilder.all().createQuery();
 		FullTextSession fullTextSession = builder.openFullTextSession();

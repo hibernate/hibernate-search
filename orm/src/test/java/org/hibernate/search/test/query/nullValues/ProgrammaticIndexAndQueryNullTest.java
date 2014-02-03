@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Transaction;
@@ -86,7 +86,7 @@ public class ProgrammaticIndexAndQueryNullTest extends SearchTestCase {
 		assertEquals(
 				"The programmatically configured null value should be in the document",
 				"@null@",
-				doc.getFieldable( "value" ).stringValue()
+				doc.getField( "value" ).stringValue()
 		);
 
 		tx.commit();

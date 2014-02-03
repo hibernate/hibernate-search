@@ -30,10 +30,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.lucene.analysis.SimpleAnalyzer;
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.test.SearchTestCase;
@@ -82,8 +84,9 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	private void buildBigIndex() throws InterruptedException, IOException {
 		System.out.println( "Going to create fake index..." );
 		FSDirectory directory = FSDirectory.open( new File( getBaseIndexDir(), Detective.class.getCanonicalName() ) );
-		IndexWriter.MaxFieldLength fieldLength = new IndexWriter.MaxFieldLength( IndexWriter.DEFAULT_MAX_FIELD_LENGTH );
-		IndexWriter iw = new IndexWriter( directory, new SimpleAnalyzer(), true, fieldLength );
+		SimpleAnalyzer analyzer = new SimpleAnalyzer( Version.LUCENE_CURRENT );
+		IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_CURRENT, analyzer);
+		IndexWriter iw = new IndexWriter( directory, cfg );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
 		for ( int batch = 0; batch <= 5000000; batch++ ) {
@@ -92,7 +95,8 @@ public abstract class ReaderPerformance extends SearchTestCase {
 		executor.shutdown();
 		executor.awaitTermination( 600, TimeUnit.SECONDS );
 		iw.commit();
-		iw.optimize();
+		iw.forceMergeDeletes();
+		iw.forceMerge( 1 );
 		iw.close();
 		System.out.println( "Index created." );
 	}

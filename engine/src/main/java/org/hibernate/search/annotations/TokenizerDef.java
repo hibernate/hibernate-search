@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Documented;
 
-import org.apache.solr.analysis.TokenizerFactory;
+import org.apache.lucene.analysis.util.TokenizerFactory;
 
 /**
  * Define a <code>TokenizerFactory</code> and its parameters.

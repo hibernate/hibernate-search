@@ -62,7 +62,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		FieldSelectorLeakingReaderProvider.resetFieldSelector();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, Location.class );
-		fullTextQuery.setSort( new Sort( new SortField( "description", SortField.STRING ) ) ); // to avoid loading in document order -- too easy
+		fullTextQuery.setSort( new Sort( new SortField( "description", SortField.Type.STRING ) ) ); // to avoid loading in document order -- too easy
 		List<Location> locations = fullTextQuery.list();
 		FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled();
 		Assert.assertEquals( NUM_LOCATIONS, locations.size() );

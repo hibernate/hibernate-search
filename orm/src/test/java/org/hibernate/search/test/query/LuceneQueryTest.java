@@ -26,7 +26,7 @@ package org.hibernate.search.test.query;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -376,7 +376,7 @@ public class LuceneQueryTest extends SearchTestCase {
 
 		Query query = parser.parse( "dept:ITech" );
 		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
 
@@ -419,7 +419,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		hibQuery.setFetchSize( 3 );
 		hibQuery.setFirstResult( 1 );
 		hibQuery.setMaxResults( 3 );
-		hibQuery.setSort( new Sort( new SortField( "id", SortField.STRING ) ) );
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 
 		ScrollableResults results = hibQuery.scroll();
 		results.beforeFirst();

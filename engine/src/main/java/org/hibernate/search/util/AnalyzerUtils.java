@@ -50,26 +50,39 @@ public final class AnalyzerUtils {
 	public static final Log log = LoggerFactory.make();
 
 	public static List<String> tokenizedTermValues(Analyzer analyzer, String field, String text) throws IOException {
-		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
-		CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
-		List<String> tokenList = new ArrayList<String>();
-		while ( stream.incrementToken() ) {
-			String s = new String( term.buffer(), 0, term.length() );
-			tokenList.add( s );
+		final List<String> tokenList = new ArrayList<String>();
+		final TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
+		try {
+			CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
+			stream.reset();
+			while ( stream.incrementToken() ) {
+				String s = new String( term.buffer(), 0, term.length() );
+				tokenList.add( s );
+			}
+			stream.end();
+		}
+		finally {
+			stream.close();
 		}
 		return tokenList;
 	}
 
 	public static Token[] tokensFromAnalysis(Analyzer analyzer, String field, String text) throws IOException {
-		TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
-		CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
-		List<Token> tokenList = new ArrayList<Token>();
-		while ( stream.incrementToken() ) {
-			Token token = new Token();
-			token.copyBuffer( term.buffer(), 0, term.length() );
-			tokenList.add( token );
+		final List<Token> tokenList = new ArrayList<Token>();
+		final TokenStream stream = analyzer.tokenStream( field, new StringReader( text ) );
+		try {
+			CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
+			stream.reset();
+			while ( stream.incrementToken() ) {
+				Token token = new Token();
+				token.copyBuffer( term.buffer(), 0, term.length() );
+				tokenList.add( token );
+			}
+			stream.end();
 		}
-
+		finally {
+			stream.close();
+		}
 		return tokenList.toArray( new Token[tokenList.size()] );
 	}
 

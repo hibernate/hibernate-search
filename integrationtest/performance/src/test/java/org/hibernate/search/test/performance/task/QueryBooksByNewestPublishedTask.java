@@ -49,7 +49,7 @@ public class QueryBooksByNewestPublishedTask extends AbstractTask {
 				.createQuery();
 
 		fts.createFullTextQuery( q, Book.class )
-				.setSort( new Sort( new SortField( "publicationDate", SortField.STRING, true ) ) )
+				.setSort( new Sort( new SortField( "publicationDate", SortField.Type.STRING, true ) ) )
 				.setMaxResults( 100 )
 				.list();
 	}

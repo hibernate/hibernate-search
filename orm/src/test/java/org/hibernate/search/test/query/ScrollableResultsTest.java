@@ -83,7 +83,7 @@ public class ScrollableResultsTest {
 	public void testScrollingForward() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "id", SortField.STRING ) );
+		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -119,7 +119,7 @@ public class ScrollableResultsTest {
 	public void testScrollingBackwards() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "id", SortField.STRING ) );
+		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -150,7 +150,7 @@ public class ScrollableResultsTest {
 	public void testResultsAreManaged() {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "summary", "number") );
-		Sort sort = new Sort( new SortField( "id", SortField.STRING ) );
+		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, AlternateBook.class )
 			.setSort( sort )
@@ -197,7 +197,7 @@ public class ScrollableResultsTest {
 		Transaction tx = sess.beginTransaction();
 		TermQuery tq = new TermQuery( new Term( "dept", "num") );
 		//the tests relies on the results being returned sorted by id:
-		Sort sort = new Sort( new SortField( "id", SortField.STRING ) );
+		Sort sort = new Sort( new SortField( "id", SortField.Type.STRING ) );
 		ScrollableResults scrollableResults = sess
 			.createFullTextQuery( tq, Employee.class )
 			.setProjection(

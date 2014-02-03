@@ -33,7 +33,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;

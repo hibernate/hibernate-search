@@ -37,8 +37,8 @@ import org.hibernate.search.test.TestConstants;
 import org.hibernate.Transaction;
 import org.hibernate.ScrollableResults;
 import org.hibernate.ScrollMode;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.analysis.core.StopAnalyzer;
 
 /**
  * @author Emmanuel Bernard

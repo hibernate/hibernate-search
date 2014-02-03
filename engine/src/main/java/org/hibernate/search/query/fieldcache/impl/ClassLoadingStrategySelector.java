@@ -1,6 +1,8 @@
 /*
+ * Hibernate, Relational Persistence for Idiomatic Java
+ *
  * JBoss, Home of Professional Open Source
- * Copyright 2011 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2011-2014 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -19,18 +21,15 @@
 
 package org.hibernate.search.query.fieldcache.impl;
 
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.bridge.builtin.DoubleNumericFieldBridge;
-import org.hibernate.search.bridge.builtin.FloatNumericFieldBridge;
-import org.hibernate.search.bridge.builtin.IntegerNumericFieldBridge;
-import org.hibernate.search.bridge.builtin.LongNumericFieldBridge;
 
 /**
  * A {@code FieldCacheCollectorFactory} requires two parameters which are inferred from
- * the type of field and it's applied bridges. Not all cases can be covered.
+ * the type of field and its applied bridges. Not all cases can be covered.
  * This class contains helpers to extract the proper parameters to create such a factory.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -49,17 +48,8 @@ public final class ClassLoadingStrategySelector {
 		else if ( fieldBridge instanceof TwoWayString2FieldBridgeAdaptor ) {
 			return FieldCacheLoadingType.STRING;
 		}
-		else if ( fieldBridge instanceof IntegerNumericFieldBridge ) {
-			return FieldCacheLoadingType.INT;
-		}
-		else if ( fieldBridge instanceof LongNumericFieldBridge ) {
-			return FieldCacheLoadingType.LONG;
-		}
-		else if ( fieldBridge instanceof DoubleNumericFieldBridge ) {
-			return FieldCacheLoadingType.DOUBLE;
-		}
-		else if ( fieldBridge instanceof FloatNumericFieldBridge ) {
-			return FieldCacheLoadingType.FLOAT;
+		else if ( fieldBridge instanceof NumericFieldBridge ) {
+			return ((NumericFieldBridge) fieldBridge ).getFieldCacheLoadingType();
 		}
 		else {
 			// we don't know how to extract this: no fieldCache will be available

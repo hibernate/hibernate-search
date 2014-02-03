@@ -24,8 +24,9 @@ import java.io.Reader;
 import java.io.Serializable;
 
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
-
+import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
@@ -34,11 +35,14 @@ import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class LuceneFieldContext {
-	private Field field;
+public final class LuceneFieldContext {
+
+	private final Field field;
+	private final FieldType fieldType;
 
 	public LuceneFieldContext(Field field) {
 		this.field = field;
+		fieldType = field.fieldType();
 	}
 
 	public String getName() {
@@ -46,11 +50,11 @@ public class LuceneFieldContext {
 	}
 
 	public SerializableStore getStore() {
-		return field.isStored() ? SerializableStore.YES : SerializableStore.NO;
+		return fieldType.stored() ? SerializableStore.YES : SerializableStore.NO;
 	}
 
 	public SerializableIndex getIndex() {
-		Field.Index index = Field.Index.toIndex( field.isIndexed(), field.isTokenized(), field.getOmitNorms() );
+		Field.Index index = Field.Index.toIndex( fieldType.indexed(), fieldType.tokenized(), fieldType.omitNorms() );
 		switch ( index ) {
 			case ANALYZED:
 				return SerializableIndex.ANALYZED;
@@ -68,7 +72,7 @@ public class LuceneFieldContext {
 	}
 
 	public SerializableTermVector getTermVector() {
-		Field.TermVector vector = Field.TermVector.toTermVector( field.isTermVectorStored(), field.isStoreOffsetWithTermVector(), field.isStorePositionWithTermVector() );
+		Field.TermVector vector = Field.TermVector.toTermVector( fieldType.storeTermVectors(), fieldType.storeTermVectorOffsets(), fieldType.storeTermVectorPositions() );
 		switch ( vector ) {
 			case NO:
 				return SerializableTermVector.NO;
@@ -86,15 +90,15 @@ public class LuceneFieldContext {
 	}
 
 	public float getBoost() {
-		return field.getBoost();
+		return field.boost();
 	}
 
 	public boolean isOmitNorms() {
-		return field.getOmitNorms();
+		return fieldType.omitNorms();
 	}
 
 	public boolean isOmitTermFreqAndPositions() {
-		return field.getIndexOptions() == IndexOptions.DOCS_ONLY;
+		return fieldType.indexOptions() == IndexOptions.DOCS_ONLY;
 	}
 
 	public String getStringValue() {
@@ -115,15 +119,8 @@ public class LuceneFieldContext {
 		return CopyTokenStream.buildSerializabletokenStream( field.tokenStreamValue() );
 	}
 
-	public byte[] getBinaryValue() {
-		return field.getBinaryValue();
+	public BytesRef getBinaryValue() {
+		return field.binaryValue();
 	}
 
-	public int getBinaryOffset() {
-		return field.getBinaryOffset();
-	}
-
-	public int getBinaryLength() {
-		return field.getBinaryLength();
-	}
 }

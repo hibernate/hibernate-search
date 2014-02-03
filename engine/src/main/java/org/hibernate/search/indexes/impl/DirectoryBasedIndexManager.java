@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.search.Similarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;

@@ -58,7 +58,8 @@ public class CustomerShardingStrategy implements IndexShardingStrategy {
 
 	@Override
 	public IndexManager getIndexManagerForAddition(Class<?> entity, Serializable id, String idInString, Document document) {
-		Integer customerID = Integer.parseInt( document.getFieldable( "customerID" ).stringValue() );
+		final String stringValueId = document.getField( "customerID" ).stringValue();
+		final Integer customerID = Integer.parseInt( stringValueId );
 		return indexManagers[customerID];
 	}
 

@@ -19,8 +19,6 @@
 
 package org.hibernate.search.query.engine.spi;
 
-import org.apache.lucene.search.Query;
-
 /**
  * The internal engine will use this exception factory to
  * throw exceptions of an appropriate type according to a
@@ -30,6 +28,6 @@ import org.apache.lucene.search.Query;
  */
 public interface TimeoutExceptionFactory {
 
-	RuntimeException createTimeoutException(String message, Query query);
+	RuntimeException createTimeoutException(String message, String queryDescription);
 
 }

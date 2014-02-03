@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.index.StoredFieldVisitor;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
@@ -43,7 +43,6 @@ import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
-import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.Counter;
 
 import org.hibernate.search.SearchException;
@@ -68,8 +67,7 @@ public class QueryHits {
 
 	private static final int DEFAULT_TOP_DOC_RETRIEVAL_SIZE = 100;
 
-	private final org.apache.lucene.search.Query preparedQuery;
-	private final IndexSearcherWithPayload searcher;
+	private final LazyQueryState searcher;
 	private final Filter filter;
 	private final Sort sort;
 	private final Map<String, FacetingRequestImpl> facetRequests;
@@ -99,8 +97,7 @@ public class QueryHits {
 
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 
-	public QueryHits(IndexSearcherWithPayload searcher,
-					org.apache.lucene.search.Query preparedQuery,
+	public QueryHits(LazyQueryState searcher,
 					Filter filter,
 					Sort sort,
 					TimeoutManagerImpl timeoutManager,
@@ -112,13 +109,12 @@ public class QueryHits {
 					String spatialFieldName)
 			throws IOException {
 		this(
-				searcher, preparedQuery, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager, facetRequests,
+				searcher, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager, facetRequests,
 				enableFieldCacheOnTypes, idFieldCollector, timeoutExceptionFactory, spatialSearchCenter, spatialFieldName
 		);
 	}
 
-	public QueryHits(IndexSearcherWithPayload searcher,
-					org.apache.lucene.search.Query preparedQuery,
+	public QueryHits(LazyQueryState searcher,
 					Filter filter,
 					Sort sort,
 					Integer n,
@@ -131,7 +127,6 @@ public class QueryHits {
 					String spatialFieldName)
 			throws IOException {
 		this.timeoutManager = timeoutManager;
-		this.preparedQuery = preparedQuery;
 		this.searcher = searcher;
 		this.filter = filter;
 		this.sort = sort;
@@ -145,11 +140,18 @@ public class QueryHits {
 	}
 
 	public Document doc(int index) throws IOException {
-		return searcher.getSearcher().doc( docId( index ) );
+		return searcher.doc( docId( index ) );
 	}
 
-	public Document doc(int index, FieldSelector selector) throws IOException {
-		return searcher.getSearcher().doc( docId( index ), selector );
+	/**
+	 * This document loading strategy doesn't return anything as it's the responsibility
+	 * of the passed StoredFieldVisitor instance to collect the data it needs.
+	 * @param index
+	 * @param fieldVisitor
+	 * @throws IOException
+	 */
+	public void visitDocument(int index, StoredFieldVisitor fieldVisitor) throws IOException {
+		searcher.doc( docId( index ), fieldVisitor );
 	}
 
 	public ScoreDoc scoreDoc(int index) throws IOException {
@@ -165,7 +167,7 @@ public class QueryHits {
 		if ( timeoutManager.isTimedOut() && index >= topDocs.scoreDocs.length ) {
 			throw timeoutExceptionFactory.createTimeoutException(
 					"Timeout period exceeded. Cannot load document: " + index,
-					preparedQuery
+					searcher.describeQuery()
 			);
 		}
 		return topDocs.scoreDocs[index];
@@ -187,7 +189,7 @@ public class QueryHits {
 	}
 
 	public Explanation explain(int index) throws IOException {
-		final Explanation explanation = searcher.getSearcher().explain( preparedQuery, docId( index ) );
+		final Explanation explanation = searcher.explain( docId( index ) );
 		timeoutManager.isTimedOut();
 		return explanation;
 	}
@@ -214,15 +216,14 @@ public class QueryHits {
 	 * @throws IOException in case a search exception occurs
 	 */
 	private void updateTopDocs(int n) throws IOException {
-		int totalMaxDocs = searcher.getSearcher().maxDoc();
+		final int totalMaxDocs = searcher.maxDoc();
 		final int maxDocs = Math.min( n, totalMaxDocs );
-		final Weight weight = preparedQuery.weight( searcher.getSearcher() );
 
 		final TopDocsCollector<?> topDocCollector;
 		final TotalHitCountCollector hitCountCollector;
 		Collector collector = null;
 		if ( maxDocs != 0 ) {
-			topDocCollector = createTopDocCollector( maxDocs, weight );
+			topDocCollector = createTopDocCollector( maxDocs );
 			hitCountCollector = null;
 			collector = topDocCollector;
 			collector = optionallyEnableFieldCacheOnTypes( collector, totalMaxDocs, maxDocs );
@@ -240,7 +241,7 @@ public class QueryHits {
 		boolean timeoutNow = isImmediateTimeout();
 		if ( !timeoutNow ) {
 			try {
-				searcher.getSearcher().search( weight, filter, collector );
+				searcher.search( filter, collector );
 			}
 			catch (TimeLimitingCollector.TimeExceededException e) {
 				//we have reached the time limit and stopped before the end
@@ -325,10 +326,10 @@ public class QueryHits {
 		return maybeTimeLimitingCollector;
 	}
 
-	private TopDocsCollector<?> createTopDocCollector(int maxDocs, Weight weight) throws IOException {
+	private TopDocsCollector<?> createTopDocCollector(int maxDocs) throws IOException {
 		TopDocsCollector<?> topCollector;
 		if ( sort == null ) {
-			topCollector = TopScoreDocCollector.create( maxDocs, !weight.scoresDocsOutOfOrder() );
+			topCollector = TopScoreDocCollector.create( maxDocs, !searcher.scoresDocsOutOfOrder() );
 		}
 		else {
 			boolean fillFields = true;
@@ -338,7 +339,7 @@ public class QueryHits {
 					fillFields,
 					searcher.isFieldSortDoTrackScores(),
 					searcher.isFieldSortDoMaxScore(),
-					!weight.scoresDocsOutOfOrder()
+					!searcher.scoresDocsOutOfOrder()
 			);
 		}
 		return topCollector;

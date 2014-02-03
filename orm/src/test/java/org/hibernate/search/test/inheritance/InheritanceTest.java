@@ -27,7 +27,7 @@ import java.util.List;
 import java.io.Serializable;
 
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
@@ -104,7 +104,7 @@ public class InheritanceTest extends SearchTestCase {
 		assertNotNull( result );
 		assertEquals( "Query filtering on superclass return mapped subclasses", 2, result.size() );
 
-		query = new TermRangeQuery( "weight", "04000", "05000", true, true );
+		query = TermRangeQuery.newStringRange( "weight", "04000", "05000", true, true );
 		hibQuery = s.createFullTextQuery( query, Animal.class );
 		assertItsTheElephant( hibQuery.list() );
 

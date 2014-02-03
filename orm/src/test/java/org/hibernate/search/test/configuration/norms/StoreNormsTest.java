@@ -24,7 +24,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -63,14 +63,14 @@ public class StoreNormsTest extends SearchTestCase {
 		AddLuceneWork addLuceneWork = (AddLuceneWork) processedQueue.get( 0 );
 		Document doc = addLuceneWork.getDocument();
 
-		Fieldable implicitNormField = doc.getFieldable( "withNormsImplicit" );
-		assertFalse( "norms should be stored for this field", implicitNormField.getOmitNorms() );
+		IndexableField implicitNormField = doc.getField( "withNormsImplicit" );
+		assertFalse( "norms should be stored for this field", implicitNormField.fieldType().omitNorms() );
 
-		Fieldable explicitNormField = doc.getFieldable( "withNormsExplicit" );
-		assertFalse( "norms should be stored for this field", explicitNormField.getOmitNorms() );
+		IndexableField explicitNormField = doc.getField( "withNormsExplicit" );
+		assertFalse( "norms should be stored for this field", explicitNormField.fieldType().omitNorms() );
 
-		Fieldable withoutNormField = doc.getFieldable( "withoutNorms" );
-		assertTrue( "norms should not be stored for this field", withoutNormField.getOmitNorms() );
+		IndexableField withoutNormField = doc.getField( "withoutNorms" );
+		assertTrue( "norms should not be stored for this field", withoutNormField.fieldType().omitNorms() );
 	}
 
 	@Override

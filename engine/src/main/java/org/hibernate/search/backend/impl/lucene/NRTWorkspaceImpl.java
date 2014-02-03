@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.search.exception.AssertionFailure;
@@ -84,7 +85,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	private static final Log log = LoggerFactory.make();
 
 	private final ReentrantLock writeLock = new ReentrantLock();
-	private final AtomicReference<IndexReader> currentReader = new AtomicReference<IndexReader>();
+	private final AtomicReference<DirectoryReader> currentReader = new AtomicReference<DirectoryReader>();
 
 	/**
 	 * Visits {@code LuceneWork} types to determine the kind of flushing we need to apply on the indexes
@@ -175,7 +176,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	 *
 	 * @return the refreshed {@code IndexReader}
 	 */
-	private synchronized IndexReader refreshReaders() {
+	private synchronized DirectoryReader refreshReaders() {
 		//double-check for the case we don't need anymore to refresh
 		if ( indexReaderIsFresh() ) {
 			return currentReader.get();
@@ -186,8 +187,8 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 		final boolean flushDeletes = currentReaderGen < readerGenRequiringFlushDeletes;
 		final long openingGen = Math.max( readerGenRequiringFlushDeletes, readerGenRequiringFlushWrites );
 
-		final IndexReader newIndexReader = writerHolder.openNRTIndexReader( flushDeletes );
-		final IndexReader oldReader = currentReader.getAndSet( newIndexReader );
+		final DirectoryReader newIndexReader = writerHolder.openNRTIndexReader( flushDeletes );
+		final DirectoryReader oldReader = currentReader.getAndSet( newIndexReader );
 		this.currentReaderGen = openingGen;
 		try {
 			if ( oldReader != null ) {
@@ -207,7 +208,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	}
 
 	@Override
-	public IndexReader openIndexReader() {
+	public DirectoryReader openIndexReader() {
 		return openIndexReader( ! indexReaderIsFresh() );
 	}
 
@@ -215,8 +216,8 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	 * @param needRefresh when {@code false} it won't guarantee the index reader to be affected by "latest" changes
 	 * @return returns an {@code IndexReader} instance, either pooled or a new one
 	 */
-	private IndexReader openIndexReader(final boolean needRefresh) {
-		IndexReader indexReader;
+	private DirectoryReader openIndexReader(final boolean needRefresh) {
+		DirectoryReader indexReader;
 		if ( needRefresh ) {
 			indexReader = refreshReaders();
 		}

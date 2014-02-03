@@ -34,7 +34,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.Transaction;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 
 /**
  * @author Emmanuel Bernard

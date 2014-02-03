@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010-2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -23,9 +23,9 @@
  */
 package org.hibernate.search.reader.impl;
 
-import org.apache.lucene.index.IndexReader;
+import java.io.IOException;
 
-import org.hibernate.search.exception.AssertionFailure;
+import org.apache.lucene.index.IndexReader;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.util.logging.impl.Log;
@@ -61,22 +61,16 @@ public final class MultiReaderFactory {
 		if ( multiReader == null ) {
 			return;
 		}
-		IndexReader[] readers;
-		ReaderProvider[] managers;
-		if ( multiReader instanceof CacheableMultiReader ) {
-			CacheableMultiReader castMultiReader = (CacheableMultiReader) multiReader;
-			readers = ReaderProviderHelper.getSubReadersFromMultiReader( castMultiReader );
-			managers = castMultiReader.managers;
+		try {
+			//This used to be more complex, complexity is now hidden into
+			//org.hibernate.search.reader.impl.ManagedMultiReader#doClose()
+			multiReader.close();
 		}
-		else {
-			throw new AssertionFailure( "Everything should be wrapped in a CacheableMultiReader" );
+		catch (IOException e) {
+			//The implementation of IndexReader we use would actually never throw
+			//an IOException, so just in case user is passing a custom IndexReader.
+			log.couldNotCloseResource( e );
 		}
-		log.debugf( "Closing MultiReader: %s", multiReader );
-		for ( int i = 0; i < readers.length; i++ ) {
-			ReaderProvider container = managers[i];
-			container.closeIndexReader( readers[i] ); // might be virtual
-		}
-		log.trace( "IndexReader closed." );
 	}
 
 }

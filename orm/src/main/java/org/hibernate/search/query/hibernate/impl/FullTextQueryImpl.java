@@ -411,8 +411,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	private static final TimeoutExceptionFactory exceptionFactory = new TimeoutExceptionFactory() {
 
 		@Override
-		public RuntimeException createTimeoutException(String message, org.apache.lucene.search.Query luceneQuery) {
-			return new QueryTimeoutException( message, (SQLException) null, luceneQuery.toString() );
+		public RuntimeException createTimeoutException(String message, String queryDescription) {
+			return new QueryTimeoutException( message, (SQLException) null, queryDescription );
 		}
 
 	};

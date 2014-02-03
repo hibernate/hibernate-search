@@ -27,23 +27,15 @@ import java.util.Set;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableDocument implements Serializable {
-	private float boost;
+
 	private Set<SerializableFieldable> fieldables;
 
-	public SerializableDocument(Set<SerializableFieldable> fieldables, float boost) {
+	public SerializableDocument(Set<SerializableFieldable> fieldables) {
 		this.fieldables = fieldables;
-		this.boost = boost;
-	}
-
-	public float getBoost() {
-		return boost;
-	}
-
-	public void setBoost(float boost) {
-		this.boost = boost;
 	}
 
 	public Set<SerializableFieldable> getFieldables() {
 		return fieldables;
 	}
+
 }

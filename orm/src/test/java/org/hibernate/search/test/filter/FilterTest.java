@@ -108,7 +108,7 @@ public class FilterTest extends SearchTestCase {
 	public void testStraightFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
-		Filter dateFilter = new TermRangeFilter( "delivery", "2001", "2005", true, true );
+		Filter dateFilter = TermRangeFilter.newStringRange( "delivery", "2001", "2005", true, true );
 		ftQuery.setFilter( dateFilter );
 		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
 

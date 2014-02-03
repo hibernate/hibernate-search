@@ -21,7 +21,7 @@ package org.hibernate.search.query.fieldcache.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.AtomicReaderContext;
 
 /**
  * Using as composition in implementations of {@link org.hibernate.search.query.collector.impl.FieldCacheCollector},
@@ -37,10 +37,10 @@ public interface FieldLoadingStrategy {
 	 * A new IndexReader is opened - implementations usually need this to
 	 * load the next array of cached data.
 	 *
-	 * @param reader the {@code IndexReader} for which to load the new cache values
+	 * @param atomicReaderContext the {@code AtomicReaderContext} for which to load the new cache values
 	 * @throws java.io.IOException in case an error occurs reading the cache values from the index
 	 */
-	void loadNewCacheValues(IndexReader reader) throws IOException;
+	void loadNewCacheValues(AtomicReaderContext atomicReaderContext) throws IOException;
 
 	/**
 	 * The collector wants to pick a specific element from the cache.

@@ -26,7 +26,6 @@
     <resources>
         <resource-root path="solr-analysis-extras-${luceneVersion}.jar" />
         <resource-root path="solr-core-${luceneVersion}.jar" />
-        <resource-root path="solr-solrj-${luceneVersion}.jar" />
         <resource-root path="commons-io-${commonsIoVersion}.jar" />
         <resource-root path="commons-codec-${commonsCodecVersion}.jar" />
         <resource-root path="commons-lang-${commonsLangVersion}.jar" />

@@ -23,10 +23,11 @@ package org.hibernate.search.test.engine;
 import java.math.BigDecimal;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.TwoWayFieldBridge;
 
-public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
+public class BigDecimalNumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
 	private static final BigDecimal storeFactor = BigDecimal.valueOf( 100 );
 
@@ -44,6 +45,11 @@ public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
 		String fromLucene = document.get( name );
 		BigDecimal storedBigDecimal = new BigDecimal( fromLucene );
 		return storedBigDecimal.divide( storeFactor );
+	}
+
+	@Override
+	public String objectToString(Object object) {
+		return object.toString();
 	}
 
 }
