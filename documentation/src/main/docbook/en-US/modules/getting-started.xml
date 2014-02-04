@@ -512,12 +512,21 @@ em.close();</programlisting>
     <para>When using the <literal>@Analyzer</literal> annotation one can
     either specify the fully qualified classname of the analyzer to use or one
     can refer to an analyzer definition defined by the
-    <literal>@AnalyzerDef</literal> annotation. In the latter case the Solr
+    <literal>@AnalyzerDef</literal> annotation. In the latter case the
     analyzer framework with its factories approach is utilized. To find out
-    more about the factory classes available you can either browse the Solr
+    more about the factory classes available you can either browse the Lucene
     JavaDoc or read the corresponding section on the <ulink
     url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">Solr
-    Wiki.</ulink></para>
+    Wiki</ulink>.</para>
+
+    <note><para>How does this relate to the Apache Solr project?</para>
+    <para>Apache Solr is a sister project of Apache Lucene, and is the
+    project which initially created these analyzers; that's why most of the
+    documentation for these additional analyzers is still in the Solr Wiki.
+    For historical reasons you might find documentation referring to these
+    analyzers as the "Solr Analyzer Framework", but you don't need to depend
+    on Apache Solr anymore as the most useful analyzers where moved into
+    Lucene.</para></note>
 
     <para>In the example below a
     <classname>StandardTokenizerFactory</classname> is used followed by two
@@ -529,11 +538,11 @@ em.close();</programlisting>
     whereas the snowball filter finally applies language specific
     stemming.</para>
 
-    <para>Generally, when using the Solr framework you have to start with a
+    <para>Generally, when using the Analyzer Framework you have to start with a
     tokenizer followed by an arbitrary number of filters.</para>
 
     <example>
-      <title>Using <classname>@AnalyzerDef</classname> and the Solr framework
+      <title>Using <classname>@AnalyzerDef</classname> and the Analyzer Framework
       to define and use an analyzer</title>
 
       <programlisting language="JAVA" role="JAVA">@Entity
