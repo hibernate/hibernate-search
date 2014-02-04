@@ -36,11 +36,6 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${module.xml.basedir}/solr/module.xml</source>
-            <outputDirectory>/org/apache/solr/${luceneVersion}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
             <source>${module.xml.basedir}/search/engine/module.xml</source>
             <outputDirectory>/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
@@ -71,7 +66,6 @@
             </includes>
             <excludes>
                 <exclude>org.apache.lucene:*</exclude>
-                <exclude>org.apache.solr:*</exclude>
                 <exclude>org.hibernate.common:*</exclude>
                 <exclude>org.slf4j:slf4j-api:*</exclude>
                 <exclude>org.jboss.logging:*</exclude>
@@ -111,19 +105,10 @@
                 <include>org.apache.lucene:*</include>
                 <include>jakarta-regexp:jakarta-regexp:*</include>
             </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/apache/solr/${luceneVersion}</outputDirectory>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.apache.solr:*</include>
-            </includes>
             <excludes>
-                <exclude>org.apache.lucene:*</exclude>
+                <exclude>org.apache.lucene:lucene-sandbox</exclude>
             </excludes>
         </dependencySet>
+
     </dependencySets>
 </assembly>

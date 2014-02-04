@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.hibernate.search.Version;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
@@ -42,6 +43,7 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
+import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -66,7 +68,12 @@ public class ModuleMemberRegistrationIT {
 	}
 
 	public static Asset manifest() {
-		return SolrModuleMemberRegistrationIT.manifest( false );
+		final String currentVersion = Version.getVersionString();
+		String dependencyDef = "org.hibernate.search.orm:" + currentVersion + " services";
+		String manifest = Descriptors.create( ManifestDescriptor.class )
+				.attribute( "Dependencies", dependencyDef )
+				.exportAsString();
+		return new StringAsset( manifest );
 	}
 
 	private static Asset persistenceXml() {
