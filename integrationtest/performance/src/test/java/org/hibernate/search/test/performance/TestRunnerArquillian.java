@@ -47,6 +47,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
+import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
@@ -77,6 +78,7 @@ public class TestRunnerArquillian {
 						.exclusion( "org.jboss.logging:jboss-logging" )
 						.resolveAs( JavaArchive.class ) )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
+				.add( manifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( new StringAsset( TARGET_DIR_KEY + "=" + TestConstants.getTargetDir( TestRunnerArquillian.class ).getAbsolutePath() ), "classes/" + RUNNER_PROPERTIES );
 		return archive;
 	}
@@ -99,6 +101,13 @@ public class TestRunnerArquillian {
 		}
 
 		return new StringAsset( pd.exportAsString() );
+	}
+
+	public static Asset manifest() {
+		String manifest = Descriptors.create( ManifestDescriptor.class )
+				.attribute( "Dependencies", "org.apache.commons.lang" )
+				.exportAsString();
+		return new StringAsset( manifest );
 	}
 
 	@PersistenceContext
