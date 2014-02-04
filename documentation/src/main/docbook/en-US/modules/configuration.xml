@@ -1857,8 +1857,8 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
     </itemizedlist>
 
     <para>Unpack the modules in your WildFly <literal>modules</literal>
-    directory: this will create modules for Hibernate Search, Apache Lucene
-    and some useful Solr libraries. The Hibernate Search modules are:</para>
+    directory: this will create modules for Hibernate Search and Apache Lucene.
+    The Hibernate Search modules are:</para>
 
     <itemizedlist>
       <listitem>

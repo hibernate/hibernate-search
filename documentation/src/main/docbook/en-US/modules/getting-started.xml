@@ -72,8 +72,9 @@
           <row>
             <entry>Hibernate Core</entry>
 
-            <entry>You will need <literal>hibernate-core-&hibernateVersion;.jar</literal>
-            and its transitive dependencies (either from the <ulink
+            <entry>You will need
+            <literal>hibernate-core-&hibernateVersion;.jar</literal> and its
+            transitive dependencies (either from the <ulink
             url="http://sourceforge.net/projects/hibernate/files/hibernate3/">distribution
             bundle</ulink> or the maven repository).</entry>
           </row>
@@ -89,8 +90,7 @@
             has also its own set of annotations (<emphasis>@Indexed,
             @DocumentId, @Field,...</emphasis>) for which there exists so far
             no XML based alternative; a better option is the <xref
-            linkend="hsearch-mapping-programmaticapi"/>.</para>
-            </entry>
+            linkend="hsearch-mapping-programmaticapi"/>.</para></entry>
           </row>
         </tbody>
       </tgroup>
@@ -153,7 +153,6 @@
     JBoss Maven repository is mandatory, because it contains the needed
     Infinispan dependencies which are currently not mirrored by
     <literal>central</literal>.</para>
-
   </section>
 
   <section>
@@ -512,12 +511,25 @@ em.close();</programlisting>
     <para>When using the <literal>@Analyzer</literal> annotation one can
     either specify the fully qualified classname of the analyzer to use or one
     can refer to an analyzer definition defined by the
-    <literal>@AnalyzerDef</literal> annotation. In the latter case the Solr
+    <literal>@AnalyzerDef</literal> annotation. In the latter case the
     analyzer framework with its factories approach is utilized. To find out
-    more about the factory classes available you can either browse the Solr
+    more about the factory classes available you can either browse the Lucene
     JavaDoc or read the corresponding section on the <ulink
     url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">Solr
-    Wiki.</ulink></para>
+    Wiki</ulink>.</para>
+
+    <note>
+      <para>Why the reference to the Apache Solr wiki?</para>
+
+      <para>Apache Solr was historically an indepedent sister project of
+      Apache Lucene and the analyzer factory framework was originally
+      developed within it. By now, Lucene and Solr have merged, but the
+      documentation for these additional analyzers can still be found in the
+      Solr Wiki. You might find other documentation referring to the "Solr
+      Analyzer Framework" - just remember you don't need to depend on Apache
+      Solr anymore to use it. The required classes are part of the core Lucene
+      distribution.</para>
+    </note>
 
     <para>In the example below a
     <classname>StandardTokenizerFactory</classname> is used followed by two
@@ -529,12 +541,12 @@ em.close();</programlisting>
     whereas the snowball filter finally applies language specific
     stemming.</para>
 
-    <para>Generally, when using the Solr framework you have to start with a
-    tokenizer followed by an arbitrary number of filters.</para>
+    <para>Generally, when using the Analyzer Framework you have to start with
+    a tokenizer followed by an arbitrary number of filters.</para>
 
     <example>
-      <title>Using <classname>@AnalyzerDef</classname> and the Solr framework
-      to define and use an analyzer</title>
+      <title>Using <classname>@AnalyzerDef</classname> and the Analyzer
+      Framework to define and use an analyzer</title>
 
       <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
