@@ -53,7 +53,7 @@ To build the distribution bundle run:
 
     > mvn clean install -Pdist -s settings-example.xml
 
-Last but not least, if you want to run the performance test under _integration/performance_:
+If you want to run the performance test under _integration/performance_:
 
     > mvn clean install -Pperf -s settings-example.xml
 
@@ -64,7 +64,7 @@ module directory.
     
 If you want to contribute, you find all you need to know in [Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
 
-## Source code structure
+### Source code structure
 
 The project is split in several Maven modules.
 
@@ -126,5 +126,5 @@ semi private.
 
 ## License
 
-This software and its documentation are distributed under the terms of the FSF Lesser Gnu Public License (see lgpl.txt).
+This software and its documentation are distributed under the terms of the FSF Lesser GNU Public License (see lgpl.txt).
 
