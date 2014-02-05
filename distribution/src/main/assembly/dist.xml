@@ -82,8 +82,6 @@
                 <exclude>dom4j:*</exclude>
                 <exclude>javassist:javassist</exclude>
                 <exclude>org.jboss.spec.javax.transaction:*</exclude>
-            </excludes>
-            <excludes>
                 <exclude>org.jboss.logging:jboss-logging-annotations</exclude>
             </excludes>
         </dependencySet>
