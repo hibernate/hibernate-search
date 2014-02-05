@@ -64,6 +64,52 @@ module directory.
     
 If you want to contribute, you find all you need to know in [Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
 
+### Code structure
+
+The project is split in different modules.
+
+
+analyzers:
+Optional additional analyzers.
+
+backends:
+Remote backends receiving an indexing job and executing it via different
+protocols.
+
+build-config:
+Code related artefacts like checkstyle rules.
+
+distribution:
+Builds the distribution package.
+
+documentation:
+The project documentation.
+
+engine:
+Engine of the project. Most of the beef is here.
+
+infinispan:
+Backend storing indexes in Infinispan.
+
+integrationtest:
+Integration tests with various technologies like WildFly, Spring. Also include performance tests.
+
+legacy:
+Old Maven GAV kept for backward compatibility.
+
+modules:
+Integration with containers like WildFly.
+
+orm:
+Native integration offering Hibernate Search for Hibernate ORM.
+
+serialization:
+Serialization code used by remote backends.
+
+testing:
+Various helper classes to write tests using Hibernate Search. This module is
+semi private.
+
 ## Contact
 
 ### Latest Documentation:
