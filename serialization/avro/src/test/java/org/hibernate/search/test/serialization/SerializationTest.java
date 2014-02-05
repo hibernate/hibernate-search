@@ -55,7 +55,6 @@ import org.apache.lucene.document.LongField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
-import org.apache.solr.handler.AnalysisRequestHandlerBase;
 
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -75,6 +74,7 @@ import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -210,9 +210,6 @@ public class SerializationTest {
 	private List<List<AttributeImpl>> buildTokenSteamWithAttributes() {
 		List<List<AttributeImpl>> tokens = new ArrayList<List<AttributeImpl>>();
 		tokens.add( new ArrayList<AttributeImpl>() );
-		AnalysisRequestHandlerBase.TokenTrackingAttributeImpl attrImpl = new AnalysisRequestHandlerBase.TokenTrackingAttributeImpl();
-		attrImpl.reset( new int[] { 1, 2, 3 }, 4 );
-		tokens.get( 0 ).add( attrImpl );
 
 		CharTermAttributeImpl charAttr = new CharTermAttributeImpl();
 		charAttr.append( "Wazzza" );
@@ -354,11 +351,7 @@ public class SerializationTest {
 	}
 
 	private void testAttributeTypes(AttributeImpl origAttr, AttributeImpl copyAttr) {
-		if ( origAttr instanceof AnalysisRequestHandlerBase.TokenTrackingAttributeImpl ) {
-			assertThat( ( (AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) origAttr ).getPositions() )
-					.isEqualTo( ( (AnalysisRequestHandlerBase.TokenTrackingAttributeImpl) copyAttr ).getPositions() );
-		}
-		else if ( origAttr instanceof CharTermAttribute ) {
+		if ( origAttr instanceof CharTermAttribute ) {
 			assertThat( origAttr.toString() ).isEqualTo( copyAttr.toString() );
 		}
 		else if ( origAttr instanceof PayloadAttribute ) {
@@ -391,6 +384,9 @@ public class SerializationTest {
 			OffsetAttribute cop = (OffsetAttribute) copyAttr;
 			assertThat( orig.startOffset() ).isEqualTo( cop.startOffset() );
 			assertThat( orig.endOffset() ).isEqualTo( cop.endOffset() );
+		}
+		else {
+			Assert.fail( "Unexpected Attribute implementation received" );
 		}
 	}
 

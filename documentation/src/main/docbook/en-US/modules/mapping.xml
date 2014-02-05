@@ -1130,7 +1130,8 @@ public class MyEntity {
       <classname>Tokenizer</classname> starts the tokenizing process by
       turning the character input into tokens which are then further processed
       by the <classname>TokenFilter</classname>s. Hibernate Search supports
-      this infrastructure by utilizing the Solr analyzer framework.</para>
+      this infrastructure by utilizing the advanced analyzers provided
+      by Lucene; this is often referred to as the Analyzer Framework.</para>
 
       <note>
         <para>Some of the analyzers and filters will require additional
@@ -1144,17 +1145,9 @@ public class MyEntity {
         linkend="table-available-filters"/> to see which anaylzers and filters
         have additional dependencies</para>
 
-        <para>Prior to Search version 3.3.0.Beta2 it was required to add the
-        Solr dependency <emphasis>org.apache.solr:solr-core</emphasis> when
-        you wanted to use the analyzer definition framework. In case you are
-        using Maven this is no longer needed: all required Solr dependencies
-        are now defined as dependencies of the artifact
-        <emphasis>org.hibernate:hibernate-search-analyzers</emphasis>; just
-        add the following dependency :<programlisting>&lt;dependency&gt;
-   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
-   &lt;artifactId&gt;hibernate-search-analyzers&lt;/artifactId&gt;
-   &lt;version&gt;&version;&lt;/version&gt;
-&lt;dependency&gt;</programlisting></para>
+        <para>Prior to Hibernate Search version 5 it was required to add the
+        Apache Solr dependency to your project as well; this is no longer needed.
+        </para>
       </note>
 
       <para>Let's have a look at a concrete example now - <xref
@@ -1168,23 +1161,22 @@ public class MyEntity {
       expected to ignore case.</para>
 
       <example id="example-analyzer-def">
-        <title><classname>@AnalyzerDef</classname> and the Solr
-        framework</title>
+        <title><classname>@AnalyzerDef</classname> and the Analyzer Framework</title>
 
         <programlisting language="JAVA" role="JAVA">@AnalyzerDef(name="customanalyzer",
   charFilters = {
     @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
       @Parameter(name = "mapping",
-        value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+        value = "org/hibernate/search/test/analyzer/mapping-chars.properties")
     })
   },
   tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
   filters = {
-    @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
+    @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
     @TokenFilterDef(factory = LowerCaseFilterFactory.class),
     @TokenFilterDef(factory = StopFilterFactory.class, params = {
       @Parameter(name="words",
-        value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
+        value= "org/hibernate/search/test/analyzer/stoplist.properties" ),
       @Parameter(name="ignoreCase", value="true")
     })
 })
@@ -1201,9 +1193,7 @@ public class Team {
 
       <para>Some tokenizers, token filters or char filters load resources like
       a configuration or metadata file. This is the case for the stop filter
-      and the synonym filter. If the resource charset is not using the VM
-      default, you can explicitly specify it by adding a
-      <literal>resource_charset</literal> parameter.</para>
+      and the synonym filter.</para>
 
       <example id="example-analyzer-def-charset">
         <title>Use a specific charset to load the property file</title>
@@ -1212,17 +1202,16 @@ public class Team {
   charFilters = {
     @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
       @Parameter(name = "mapping",
-        value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+        value = "org/hibernate/search/test/analyzer/mapping-chars.properties")
     })
   },
   tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
   filters = {
-    @TokenFilterDef(factory = ISOLatin1AccentFilterFactory.class),
+    @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
     @TokenFilterDef(factory = LowerCaseFilterFactory.class),
     @TokenFilterDef(factory = StopFilterFactory.class, params = {
       @Parameter(name="words",
-        value= "org/hibernate/search/test/analyzer/solr/stoplist.properties" ),
-      @Parameter(name="resource_charset", value = "UTF-16BE"),
+        value= "org/hibernate/search/test/analyzer/stoplist.properties" ),
       @Parameter(name="ignoreCase", value="true")
   })
 })
@@ -1276,7 +1265,7 @@ public class Team {
       <section>
         <title>Available analyzers</title>
 
-        <para>Solr and Lucene come with a lot of useful default char filters,
+        <para>Apache Lucene comes with a lot of useful default char filters,
         tokenizers and filters. You can find a complete list of char filter
         factories, tokenizer factories and filter factories at <ulink
         url="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters</ulink>.
@@ -1313,7 +1302,7 @@ public class Team {
                     "ø" =&gt; "o"
                 </literallayout> </para></entry>
 
-                <entry>none</entry>
+                <entry>lucene-analyzers-common</entry>
               </row>
 
               <row>
@@ -1323,7 +1312,7 @@ public class Team {
 
                 <entry>none</entry>
 
-                <entry>none</entry>
+                <entry>lucene-analyzers-common</entry>
               </row>
             </tbody>
           </tgroup>
@@ -1353,7 +1342,7 @@ public class Team {
 
                 <entry>none</entry>
 
-                <entry>none</entry>
+                <entry>lucene-analyzers-common</entry>
               </row>
 
               <row>
@@ -1364,7 +1353,7 @@ public class Team {
 
                 <entry>none</entry>
 
-                <entry><literal>solr-core</literal></entry>
+                <entry><literal>lucene-analyzers-common</literal></entry>
               </row>
 
               <row>
@@ -1377,7 +1366,7 @@ public class Team {
                 expression to use for tokenizing</para><para>group: says which
                 pattern group to extract into tokens</para></entry>
 
-                <entry><literal>solr-core</literal></entry>
+                <entry><literal>lucene-analyzers-common</literal></entry>
               </row>
             </tbody>
           </tgroup>
@@ -1407,7 +1396,7 @@ public class Team {
 
                 <entry>none</entry>
 
-                <entry><literal>solr-core</literal></entry>
+                <entry><literal>lucene-analyzers-common</literal></entry>
               </row>
 
               <row>
@@ -1417,7 +1406,7 @@ public class Team {
 
                 <entry>none</entry>
 
-                <entry><literal>solr-core</literal></entry>
+                <entry><literal>lucene-analyzers-common</literal></entry>
               </row>
 
               <row>
@@ -1431,7 +1420,7 @@ public class Team {
                 <literal>case</literal> should be ignore when comparing stop
                 words, <literal>false</literal> otherwise </para></entry>
 
-                <entry><literal>solr-core</literal></entry>
+                <entry><literal>lucene-analyzers-common</literal></entry>
               </row>
 
               <row>
@@ -1445,17 +1434,17 @@ public class Team {
                 Finnish, French, German, Italian, Norwegian, Portuguese,
                 Russian, Spanish, Swedish and a few more</entry>
 
-                <entry><literal>solr-core</literal></entry>
+                <entry><literal>lucene-analyzers-common</literal></entry>
               </row>
 
               <row>
-                <entry><classname>ISOLatin1AccentFilterFactory</classname></entry>
+                <entry><classname>ASCIIFoldingFilterFactory</classname></entry>
 
                 <entry>Remove accents for languages like French</entry>
 
                 <entry>none</entry>
 
-                <entry><literal>solr-core</literal></entry>
+                <entry><literal>lucene-analyzers-common</literal></entry>
               </row>
 
               <row>
@@ -1473,7 +1462,7 @@ public class Team {
                 maximum length of the code to be generated. Supported only for
                 Metaphone and DoubleMetaphone encodings</para></entry>
 
-                <entry><literal>solr-core</literal> and
+                <entry><literal>lucene-analyzers-phonetic</literal> and
                 <literal>commons-codec</literal></entry>
               </row>
 
@@ -1493,14 +1482,14 @@ public class Team {
                 <classname>CollationKeyFilter</classname> javadocs for more
                 info</entry>
 
-                <entry><literal>solr-core</literal> and
+                <entry><literal>lucene-analyzers-common</literal> and
                 <literal>commons-io</literal></entry>
               </row>
             </tbody>
           </tgroup>
         </table>
 
-        <para>We recommend to check all the implementations of
+        <para>We recommend to check out the implementations of
         <classname>org.apache.lucene.analysis.util.TokenizerFactory</classname> and
         <classname>org.apache.lucene.analysis.util.TokenFilterFactory</classname> in
         your IDE to see the implementations available.</para>

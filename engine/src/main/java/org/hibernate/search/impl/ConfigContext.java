@@ -88,7 +88,6 @@ public final class ConfigContext {
 
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
-	private final boolean solrPresent;
 	private final boolean jpaPresent;
 	private final Version luceneMatchVersion;
 	private final String nullToken;
@@ -103,7 +102,6 @@ public final class ConfigContext {
 	public ConfigContext(SearchConfiguration cfg, SearchMapping searchMapping) {
 		luceneMatchVersion = getLuceneMatchVersion( cfg );
 		defaultAnalyzer = initAnalyzer( cfg );
-		solrPresent = isPresent( "org.apache.solr.analysis.TokenizerChain" );
 		jpaPresent = isPresent( "javax.persistence.Id" );
 		nullToken = initNullToken( cfg );
 		implicitProvidedId = cfg.isIdProvidedImplicit();
@@ -223,17 +221,6 @@ public final class ConfigContext {
 	}
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {
-		if ( !solrPresent ) {
-			throw new SearchException(
-					"Use of @AnalyzerDef while Solr is not present in the classpath. Add apache-solr-analyzer.jar"
-			);
-		}
-
-		// SolrAnalyzerBuilder references Solr classes.
-		// InitContext should not (directly or indirectly) load a Solr class to avoid hard dependency
-		// unless necessary
-		// the current mechanism (check Solr class presence and call SolrAnalyzerBuilder if needed
-		// seems to be sufficient on Apple VM (derived from Sun's
 		try {
 			return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion );
 		}

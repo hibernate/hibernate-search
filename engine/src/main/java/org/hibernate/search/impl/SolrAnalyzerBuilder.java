@@ -33,7 +33,6 @@ import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.util.Version;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
-import org.apache.solr.analysis.TokenizerChain;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.CharFilterDef;
@@ -45,9 +44,7 @@ import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
 import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass;
 
 /**
- * Instances of this class are used to build Lucene analyzers which are defined using the solr <code>TokenFilterFactory</code>.
- * To make the dependency to the solr framework optional only this class has direct dependencies to solr. Solr dependencies
- * are not supposed to be used anywhere else (except the actual configuration of the analyzers in the domain model).
+ * Instances of this class are used to build Lucene analyzers which are defined using a <code>TokenFilterFactory</code>.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

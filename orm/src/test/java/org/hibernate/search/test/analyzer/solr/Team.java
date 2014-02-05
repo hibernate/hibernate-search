@@ -69,7 +69,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 						@TokenFilterDef(factory = LowerCaseFilterFactory.class),
 						@TokenFilterDef(factory = StopFilterFactory.class, params = {
 								@Parameter(name = "words",
-										value = "org/hibernate/search/test/analyzer/solr/stoplist.properties"),
+										value = "org/hibernate/search/test/analyzer/stoplist.properties"),
 								@Parameter(name = "ignoreCase", value = "true")
 						}),
 						@TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
@@ -143,7 +143,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 				filters = {
 						@TokenFilterDef(factory = SynonymFilterFactory.class, params = {
 								@Parameter(name = "synonyms",
-										value = "org/hibernate/search/test/analyzer/solr/synonyms.properties")
+										value = "org/hibernate/search/test/analyzer/synonyms.properties")
 						})
 				}),
 
@@ -175,7 +175,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 		@AnalyzerDef(name = "mapping_char_analyzer",
 				charFilters = {
 						@CharFilterDef(factory = MappingCharFilterFactory.class, params = {
-								@Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/solr/mapping-chars.properties")
+								@Parameter(name = "mapping", value = "org/hibernate/search/test/analyzer/mapping-chars.properties")
 						})
 				},
 				tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class)

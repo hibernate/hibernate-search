@@ -65,6 +65,9 @@
                 <include>dom4j:dom4j</include>
                 <include>javassist:javassist</include>
             </includes>
+            <excludes>
+                <exclude>org.jboss.logging:jboss-logging-annotations</exclude>
+            </excludes>
         </dependencySet>
 
         <dependencySet>
@@ -79,6 +82,7 @@
                 <exclude>dom4j:*</exclude>
                 <exclude>javassist:javassist</exclude>
                 <exclude>org.jboss.spec.javax.transaction:*</exclude>
+                <exclude>org.jboss.logging:jboss-logging-annotations</exclude>
             </excludes>
         </dependencySet>
 
@@ -113,6 +117,9 @@
                 <include>org.hibernate:hibernate-search-infinispan</include>
                 <include>org.infinispan:infinispan-lucene-directory</include>
             </includes>
+            <excludes>
+                <exclude>org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec</exclude>
+            </excludes>
         </dependencySet>
 
         <dependencySet>
@@ -148,6 +155,7 @@
                 <include>javax.jms:jms</include>
                 <include>javax.annotation:jsr250-api</include>
                 <include>org.hibernate.javax.persistence:*</include>
+                <include>org.jboss.spec.javax.transaction:jboss-transaction-api_1.1_spec</include>
             </includes>
         </dependencySet>
 
