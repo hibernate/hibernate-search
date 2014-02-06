@@ -244,7 +244,7 @@ public final class ConfigContext {
 	}
 
 	private Version getLuceneMatchVersion(SearchConfiguration cfg) {
-		Version version;
+		final Version version;
 		String tmp = cfg.getProperty( Environment.LUCENE_MATCH_VERSION );
 		if ( StringHelper.isEmpty( tmp ) ) {
 			log.recommendConfiguringLuceneVersion();
@@ -259,7 +259,7 @@ public final class ConfigContext {
 			}
 			catch (IllegalArgumentException e) {
 				StringBuilder msg = new StringBuilder( tmp );
-				msg.append( " is a invalid value for the Lucene match version. Possible values are: " );
+				msg.append( " is an invalid value for the Lucene match version. Possible values are: " );
 				for ( Version v : Version.values() ) {
 					msg.append( v.toString() );
 					msg.append( ", " );

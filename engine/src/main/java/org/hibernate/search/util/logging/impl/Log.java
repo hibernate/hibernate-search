@@ -319,7 +319,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 75, value = "Configuration setting " + org.hibernate.search.Environment.LUCENE_MATCH_VERSION
-			+ " was not specified, using LUCENE_CURRENT.")
+			+ " was not specified: using LUCENE_CURRENT.")
 	void recommendConfiguringLuceneVersion();
 
 	@Message(id = 76, value = "Could not open Lucene index: index data is corrupted. index name: '%1$s'")
