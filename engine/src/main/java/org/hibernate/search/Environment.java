@@ -168,7 +168,7 @@ public final class Environment {
 	public static final String GENERATE_STATS = "hibernate.search.generate_statistics";
 
 	/**
-	 * The Lucene match version parameter. Needed since Lucene 3.x
+	 * The Lucene match version parameter. Highly recommended since Lucene 3.
 	 */
 	public static final String LUCENE_MATCH_VERSION = "hibernate.search.lucene_version";
 
