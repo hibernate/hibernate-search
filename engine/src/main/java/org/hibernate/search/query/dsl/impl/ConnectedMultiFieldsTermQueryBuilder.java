@@ -58,31 +58,31 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 	private final Object value;
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext termContext;
-	private final List<FieldContext> fieldContexts;
+	private final FieldsContext fieldsContext;
 	private final QueryBuildingContext queryContext;
 
 	public ConnectedMultiFieldsTermQueryBuilder(TermQueryContext termContext,
 												Object value,
-												List<FieldContext> fieldContexts,
+												FieldsContext fieldsContext,
 												QueryCustomizer queryCustomizer,
 												QueryBuildingContext queryContext) {
 		this.termContext = termContext;
 		this.value = value;
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
-		this.fieldContexts = fieldContexts;
+		this.fieldsContext = fieldsContext;
 	}
 
 	@Override
 	public Query createQuery() {
-		final int size = fieldContexts.size();
+		final int size = fieldsContext.size();
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		if ( size == 1 ) {
-			return queryCustomizer.setWrappedQuery( createQuery( fieldContexts.get( 0 ), conversionContext ) ).createQuery();
+			return queryCustomizer.setWrappedQuery( createQuery( fieldsContext.getFirst(), conversionContext ) ).createQuery();
 		}
 		else {
 			BooleanQuery aggregatedFieldsQuery = new BooleanQuery();
-			for ( FieldContext fieldContext : fieldContexts ) {
+			for ( FieldContext fieldContext : fieldsContext ) {
 				aggregatedFieldsQuery.add( createQuery( fieldContext, conversionContext ), BooleanClause.Occur.SHOULD );
 			}
 			return queryCustomizer.setWrappedQuery( aggregatedFieldsQuery ).createQuery();

@@ -24,9 +24,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.query.dsl.TermTermination;
@@ -38,18 +35,14 @@ public class ConnectedTermMatchingContext implements TermMatchingContext, FieldB
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final TermQueryContext termContext;
-	private final List<FieldContext> fieldContexts;
-	//when a varargs of fields are passed, apply the same customization for all.
-	//keep the index of the first context in this queue
-	private int firstOfContext = 0;
+	private final FieldsContext fieldsContext;
 
 	public ConnectedTermMatchingContext(TermQueryContext termContext,
 			String field, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.termContext = termContext;
-		this.fieldContexts = new ArrayList<FieldContext>(4);
-		this.fieldContexts.add( new FieldContext( field ) );
+		this.fieldsContext = new FieldsContext( new String[] { field } );
 	}
 
 	public ConnectedTermMatchingContext(TermQueryContext termContext,
@@ -57,57 +50,41 @@ public class ConnectedTermMatchingContext implements TermMatchingContext, FieldB
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.termContext = termContext;
-		this.fieldContexts = new ArrayList<FieldContext>(fields.length);
-		for ( String field : fields ) {
-			this.fieldContexts.add( new FieldContext( field ) );
-		}
+		this.fieldsContext = new FieldsContext( fields );
 	}
 
 	@Override
 	public TermTermination matching(Object value) {
-		return new ConnectedMultiFieldsTermQueryBuilder( termContext, value, fieldContexts, queryCustomizer, queryContext);
+		return new ConnectedMultiFieldsTermQueryBuilder( termContext, value, fieldsContext, queryCustomizer, queryContext);
 	}
 
 	@Override
 	public TermMatchingContext andField(String field) {
-		this.fieldContexts.add( new FieldContext( field ) );
-		this.firstOfContext = fieldContexts.size() - 1;
+		fieldsContext.add( field );
 		return this;
 	}
 
 	@Override
 	public TermMatchingContext boostedTo(float boost) {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.getFieldCustomizer().boostedTo( boost );
-		}
+		fieldsContext.boostedTo( boost );
 		return this;
-	}
-
-	private List<FieldContext> getCurrentFieldContexts() {
-		return fieldContexts.subList( firstOfContext, fieldContexts.size() );
 	}
 
 	@Override
 	public TermMatchingContext ignoreAnalyzer() {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.setIgnoreAnalyzer( true );
-		}
+		fieldsContext.ignoreAnalyzer();
 		return this;
 	}
 
 	@Override
 	public TermMatchingContext ignoreFieldBridge() {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.setIgnoreFieldBridge( true );
-		}
+		fieldsContext.ignoreFieldBridge();
 		return this;
 	}
 
 	@Override
 	public TermMatchingContext withFieldBridge(FieldBridge fieldBridge) {
-		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
-			fieldContext.setFieldBridge( fieldBridge );
-		}
+		fieldsContext.withFieldBridge( fieldBridge );
 		return this;
 	}
 }
