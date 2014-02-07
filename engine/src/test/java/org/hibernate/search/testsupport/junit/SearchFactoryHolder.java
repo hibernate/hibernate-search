@@ -23,9 +23,12 @@ package org.hibernate.search.testsupport.junit;
 import java.util.Properties;
 
 import org.junit.Assert;
-
+import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
+import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.rules.ExternalResource;
@@ -81,6 +84,13 @@ public class SearchFactoryHolder extends ExternalResource {
 		Assert.assertNull( "SessionFactory already initialized", sf );
 		configuration.put( key, value );
 		return this;
+	}
+
+	public AbstractWorkspaceImpl extractWorkspace(Class indexedType) {
+		EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( indexedType );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
+		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
+		return backend.getIndexResources().getWorkspace();
 	}
 
 }
