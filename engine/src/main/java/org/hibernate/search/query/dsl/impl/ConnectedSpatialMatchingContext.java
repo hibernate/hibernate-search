@@ -34,13 +34,11 @@ public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final SpatialQueryContext spatialContext;
-	private final ConnectedQueryBuilder queryBuilder;
 
-	public ConnectedSpatialMatchingContext(QueryBuildingContext queryContext, QueryCustomizer queryCustomizer, SpatialQueryContext spatialContext, ConnectedQueryBuilder queryBuilder) {
+	public ConnectedSpatialMatchingContext(QueryBuildingContext queryContext, QueryCustomizer queryCustomizer, SpatialQueryContext spatialContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.spatialContext = spatialContext;
-		this.queryBuilder = queryBuilder;
 	}
 
 	@Override
@@ -60,7 +58,7 @@ public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 		@Override
 		public SpatialTermination ofCoordinates(Coordinates coordinates) {
 			mother.spatialContext.setCoordinates( coordinates );
-			return new ConnectedSpatialQueryBuilder( mother.spatialContext, mother.queryCustomizer, mother.queryContext, mother.queryBuilder );
+			return new ConnectedSpatialQueryBuilder( mother.spatialContext, mother.queryCustomizer, mother.queryContext );
 		}
 
 		@Override
@@ -72,7 +70,7 @@ public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 		@Override
 		public SpatialTermination andLongitude(double longitude) {
 			mother.spatialContext.setCoordinates( Point.fromDegrees( latitude, longitude ) );
-			return new ConnectedSpatialQueryBuilder( mother.spatialContext, mother.queryCustomizer, mother.queryContext, mother.queryBuilder );
+			return new ConnectedSpatialQueryBuilder( mother.spatialContext, mother.queryCustomizer, mother.queryContext );
 		}
 	}
 }
