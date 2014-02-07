@@ -33,27 +33,25 @@ public class ConnectedSpatialContext implements SpatialContext {
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
 	private final SpatialQueryContext spatialContext;
-	private final ConnectedQueryBuilder queryBuilder;
 
-	public ConnectedSpatialContext(QueryBuildingContext context, ConnectedQueryBuilder queryBuilder) {
+	public ConnectedSpatialContext(QueryBuildingContext context) {
 		this.queryContext = context;
 		this.queryCustomizer = new QueryCustomizer();
 		//today we only do constant score for spatial queries
 		queryCustomizer.withConstantScore();
 		spatialContext = new SpatialQueryContext();
-		this.queryBuilder = queryBuilder;
 	}
 
 	@Override
 	public SpatialMatchingContext onCoordinates(String field) {
 		spatialContext.setCoordinatesField( field );
-		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext, queryBuilder );
+		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext );
 	}
 
 	@Override
 	public SpatialMatchingContext onDefaultCoordinates() {
 		spatialContext.setDefaultCoordinatesField();
-		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext, queryBuilder );
+		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext );
 	}
 
 	@Override

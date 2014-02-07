@@ -40,13 +40,11 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 	private final SpatialQueryContext spatialContext;
 	private final QueryCustomizer queryCustomizer;
 	private final QueryBuildingContext queryContext;
-	private final ConnectedQueryBuilder queryBuilder;
 
-	public ConnectedSpatialQueryBuilder(SpatialQueryContext spatialContext, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext, ConnectedQueryBuilder queryBuilder) {
+	public ConnectedSpatialQueryBuilder(SpatialQueryContext spatialContext, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
 		this.spatialContext = spatialContext;
 		this.queryCustomizer = queryCustomizer;
 		this.queryContext = queryContext;
-		this.queryBuilder = queryBuilder;
 	}
 
 	@Override
