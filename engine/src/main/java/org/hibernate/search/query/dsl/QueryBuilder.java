@@ -80,4 +80,10 @@ public interface QueryBuilder {
 	 * Build a spatial query
 	 */
 	SpatialContext spatial();
+
+	/**
+	 * Build a query matching resembling content.
+	 * It uses an approach similar to Lucene's {@code MoreLikeThis}
+	 */
+	MoreLikeThisContext moreLikeThis();
 }
