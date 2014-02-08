@@ -1,6 +1,54 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Alpha1 (08-02-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1260] - LazyInitializationException while indexing
+    * [HSEARCH-1365] - Extract Lucene serialization support as well as remote backends into a dedicated modules
+    * [HSEARCH-1442] - IndexedEmbedded field not found
+    * [HSEARCH-1447] - Failure to boot if a non-indexed entity is having a complex ID for which no appropriate TwoWayFieldBridge can be guessed
+    * [HSEARCH-1451] - Nested @IndexedEmbedded is not recognized anymore
+    * [HSEARCH-1459] - Refactor ServiceManager and ServiceProvider
+    * [HSEARCH-1462] - Search should not use EntityKey constructor
+    * [HSEARCH-1476] - Configuration property 'merge_calibrate_by_deletes' not parsed correctly
+    * [HSEARCH-1490] - Wrong classloader used to load configuration files for a managed Infinispan cache
+    * [HSEARCH-1495] - Using MassIndexer leads to logged messages about unreleased service MassIndexerFactoryProvider
+
+** Deprecation
+    * [HSEARCH-1484] - Configuration property 'use_compound_file' is going to be ignored (deprecated)
+
+** Improvement
+    * [HSEARCH-1191] - Update to Lucene 4.x
+    * [HSEARCH-1468] - Reduce amount of objects created by the FacetCollector
+    * [HSEARCH-1477] - Trivial optimization for empty results
+    * [HSEARCH-1480] - Helper newArrayList should mandate a size hint
+    * [HSEARCH-1486] - Minimize allocation cost of iterating on metadata fields
+    * [HSEARCH-1488] - Improve release plugin configuration
+    * [HSEARCH-1501] - Remove dependency to Apache Solr
+    * [HSEARCH-1503] - Explain in README.md what each module is about
+    * [HSEARCH-1506] - Exclude transitive dependencies to jboss-logging-annotations
+
+** Task
+    * [HSEARCH-1327] - Reword reference for Quad Tree for Spatial Hash in spatial module
+    * [HSEARCH-1437] - Re-enable DependencyConvergence from Maven Enforcer plugin
+    * [HSEARCH-1444] - Disable usage of shadow services from ORM in our testsuite
+    * [HSEARCH-1458] - Disallow mistaken import statements, like using JGroups helpers instead of JUnit
+    * [HSEARCH-1460] - Migrate WFK performance test suite to Hibernate Search
+    * [HSEARCH-1463] - Upgrade to Hibernate ORM 4.3.0.CR2
+    * [HSEARCH-1466] - Enforce consistent order of test execution
+    * [HSEARCH-1479] - Speedup release operations by skipping second tests and remote checkout
+    * [HSEARCH-1481] - Upgrade to Hibernate ORM 4.3.0.Final
+    * [HSEARCH-1482] - Upgrade to Infinispan 6.0.1.Final and JGroups 3.4.2.Final
+    * [HSEARCH-1483] - Upgrade to WildFly 8.0.0.CR1
+    * [HSEARCH-1485] - Update H2 testing database to avoid some issues under load
+    * [HSEARCH-1487] - Upgrade to Hibernate ORM 4.3.1.Final
+    * [HSEARCH-1489] - The performance module should use the same versions as used by other modules
+    * [HSEARCH-1496] - EntityManagerSerializationTest was unintentionally disabled
+    * [HSEARCH-1504] - Update links to javadocs of related projects
+
+
 Version 4.5.0.Alpha1 (14-10-2013)
 ------------------------
 
