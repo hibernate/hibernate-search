@@ -27,6 +27,7 @@ package org.hibernate.search.query.dsl.impl;
 import org.hibernate.search.query.dsl.AllContext;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.FacetContext;
+import org.hibernate.search.query.dsl.MoreLikeThisContext;
 import org.hibernate.search.query.dsl.PhraseContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.RangeContext;
@@ -79,5 +80,10 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 	@Override
 	public SpatialContext spatial() {
 		return new ConnectedSpatialContext( context );
+	}
+
+	@Override
+	public MoreLikeThisContext moreLikeThis() {
+		return new ConnectedMoreLikeThisContext( context );
 	}
 }
