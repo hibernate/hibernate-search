@@ -679,7 +679,7 @@ public interface Log extends BasicLogger {
 	SearchException getUnexpectedServiceStatusException(String status, String service);
 
 	@Message(id = 199, value = "Configuration property '%s' should not be empty: illegal format.")
-	SearchException configuratioPropertyCantBeEmpty(String key);
+	SearchException configurationPropertyCantBeEmpty(String key);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = 200, value = "Configuration property '%s' is deprecated and will be ignored.")

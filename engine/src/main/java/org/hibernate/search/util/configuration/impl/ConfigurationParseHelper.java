@@ -285,7 +285,7 @@ public class ConfigurationParseHelper {
 			return null;
 		}
 		if ( StringHelper.isEmpty( propValue.trim() ) ) {
-			throw log.configuratioPropertyCantBeEmpty( key );
+			throw log.configurationPropertyCantBeEmpty( key );
 		}
 		else {
 			return parseInt( propValue, 0, "Unable to parse " + key + ": " + propValue );
