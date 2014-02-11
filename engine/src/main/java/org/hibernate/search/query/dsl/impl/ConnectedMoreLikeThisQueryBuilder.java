@@ -24,9 +24,22 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import org.apache.lucene.search.Query;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.MoreLikeThisTermination;
+import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -69,7 +82,66 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 
 	@Override
 	public Query createQuery() {
+		final SearchFactoryImplementor searchFactory = queryContext.getFactory();
+		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
+		if ( fieldsContext.size() == 0 ) {
+			Integer docId = getLuceneDocumentIdFromEntityId( documentBuilder );
+			IndexReader indexReader = null;
+			try {
+				indexReader = searchFactory.getIndexReaderAccessor().open( queryContext.getEntityType() );
+				String[] fieldNames = getAllCompatibleFieldNames( documentBuilder );
+				return new MoreLikeThisBuilder( documentBuilder, searchFactory )
+						.fieldNames( fieldNames )
+						.indexReader( indexReader )
+						.documentNumber( docId )
+						.createQuery();
+			}
+			finally {
+				if ( indexReader != null ) {
+					searchFactory.getIndexReaderAccessor().close( indexReader );
+				}
+			}
+		}
+		//TODO implement explicit set of fields and field customization
+		//TODO implement INPUT.READER
+		//TODO implement INOUT.STRING
 		return null;
 	}
 
+	private String[] getAllCompatibleFieldNames(DocumentBuilderIndexedEntity<?> documentBuilder) {
+		// TODO does that return embedded properties?
+		Collection<DocumentFieldMetadata> allFieldMetadata = documentBuilder.getTypeMetadata().getAllDocumentFieldMetadata();
+		List<String> fieldNames = new ArrayList<String>( allFieldMetadata.size() );
+		for ( DocumentFieldMetadata fieldMetadata : allFieldMetadata ) {
+			if ( ( fieldMetadata.getTermVector() != Field.TermVector.NO //has term vector
+				|| fieldMetadata.getStore() != org.hibernate.search.annotations.Store.NO ) //is stored
+				&& !fieldMetadata.isId() ) { //Exclude id fields as they are not meaningful for MoreLikeThis
+				fieldNames.add( fieldMetadata.getName() );
+			}
+		}
+		if ( fieldNames.size() == 0 ) {
+			throw log.noFieldCompatibleForMoreLikeThis( documentBuilder.getBeanClass() );
+		}
+		return fieldNames.toArray( new String[fieldNames.size()] );
+	}
+
+	private Integer getLuceneDocumentIdFromEntityId(DocumentBuilderIndexedEntity<?> documentBuilder) {
+		//look for all fields of the entity
+		String id = documentBuilder.getIdBridge().objectToString( input );
+		TermQuery findById = new TermQuery( new Term( documentBuilder.getIdKeywordName(), id ) );
+		HSQuery query = queryContext.getFactory().createHSQuery();
+		//can't use Arrays.asList for some obscure capture reason
+		List<Class<?>> classes = new ArrayList<Class<?>>(1);
+		classes.add( queryContext.getEntityType() );
+		List<EntityInfo> entityInfos = query
+				.luceneQuery( findById )
+				.maxResults( 1 )
+				.projection( HSQuery.DOCUMENT_ID )
+				.targetedEntities( classes )
+				.queryEntityInfos();
+		if ( entityInfos.size() == 0 ) {
+			throw log.entityWithIdNotFound( queryContext.getEntityType(), id );
+		}
+		return (Integer) entityInfos.iterator().next().getProjection()[0];
+	}
 }
