@@ -34,6 +34,7 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.errors.EmptyQueryException;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -690,4 +691,19 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 202, value = "%s cannot be cast to int without changing its value. Hibernate Search does not support multi values field with so many entries.")
 	SearchException unableToConvertLongToIntException(long l);
+
+	@Message(id = 203, value = "Unable to find entity $1%s with id $2%s")
+	SearchException entityWithIdNotFound(Class<?> entityType, String id);
+
+	@Message(id = 204, value = "No field from %s can be used for More Like This queries. They are neither stored or including the term vectors.")
+	SearchException noFieldCompatibleForMoreLikeThis(Class<?> entityType);
+
+	@Message(id = 205, value = "Field '$1%s' for class '$2%s' is unknown by Hibernate Search. Cannot be used in MoreLikeThis for now.")
+	SearchException fieldUnknownByHibernateSearchCannotBeUsedInMlt(Class<?> beanClass, String fieldName);
+
+	@Message(id = 206, value = "An IOException happened while accessing the Lucene indexes related to '%1$s'")
+	SearchException ioExceptionOnIndexOfEntity(@Cause IOException e, Class<?> entityType);
+
+	@Message(id = 207, value = "MoreLikeThis queries require a TFIDFSimilarity for entity '$1%s'")
+	SearchException requireTFIDFSimilarity(Class<?> beanClass);
 }

@@ -200,6 +200,16 @@ public class TypeMetadata {
 		return documentFieldNameToFieldMetadata.get( fieldName );
 	}
 
+	/**
+	 * Return all {@code DocumentFieldMetadata}.
+	 * Instances are not duplicated in the collection. We use {@code Collection} instead of {@code Set} for
+	 * implementation reasons.
+	 */
+	public Collection<DocumentFieldMetadata> getAllDocumentFieldMetadata() {
+		//no need to wrap as unmodifiable collections, the instances are already safe.
+		return documentFieldNameToFieldMetadata.values();
+	}
+
 	public List<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
 		return embeddedTypeMetadata;
 	}
