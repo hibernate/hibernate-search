@@ -40,10 +40,12 @@ import org.apache.lucene.analysis.core.KeywordTokenizer;
  */
 public final class PassThroughAnalyzer extends Analyzer {
 
+	public static final PassThroughAnalyzer INSTANCE = new PassThroughAnalyzer();
+
 	/**
 	 * Create a new PassThroughAnalyzer.
 	 */
-	public PassThroughAnalyzer() {
+	private PassThroughAnalyzer() {
 	}
 
 	@Override

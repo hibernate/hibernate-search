@@ -393,7 +393,7 @@ public class TypeMetadata {
 		public Builder(Class<?> indexedType, ConfigContext configContext, ScopedAnalyzer scopedAnalyzer) {
 			this.indexedType = indexedType;
 			this.scopedAnalyzer = scopedAnalyzer;
-			this.passThroughAnalyzer = new PassThroughAnalyzer();
+			this.passThroughAnalyzer = PassThroughAnalyzer.INSTANCE;
 		}
 
 		public Builder idProperty(PropertyMetadata propertyMetadata) {
