@@ -158,7 +158,19 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 				query = new WildcardQuery( new Term( fieldName, term ) );
 				break;
 			case FUZZY:
-				query = new FuzzyQuery( new Term( fieldName, term ) ); //TODO new FuzzyQuery takes different options: expose them.
+				int maxEditDistance;
+				if ( termContext.getThreshold() != null ) {
+					//support legacy withThreshold setting
+					maxEditDistance = FuzzyQuery.floatToEdits( termContext.getThreshold(), term.length() );
+				}
+				else {
+					maxEditDistance = termContext.getMaxEditDistance();
+				}
+				query = new FuzzyQuery(
+						new Term( fieldName, term ),
+						maxEditDistance,
+						termContext.getPrefixLength()
+				);
 				break;
 			default:
 				throw new AssertionFailure( "Unknown approximation: " + termContext.getApproximation() );

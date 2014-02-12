@@ -685,4 +685,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 200, value = "Configuration property '%s' is deprecated and will be ignored.")
 	void deprecatedPropertyIgnored(String propertyName);
 
+	@Message(id = 201, value = "The edit distance must be either 1 or 2")
+	SearchException incorrectEditDistance();
 }
