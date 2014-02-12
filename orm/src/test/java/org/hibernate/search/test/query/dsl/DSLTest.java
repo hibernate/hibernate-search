@@ -824,7 +824,7 @@ public class DSLTest extends SearchTestCase {
 				@Override
 				public boolean matches(Collection<?> value) {
 					for ( Term term : (Collection<Term>) value ) {
-						if ( term.field().equals( "internalDescription" ) ) {
+						if ( "internalDescription".equals( term.field() ) ) {
 							return true;
 						}
 					}

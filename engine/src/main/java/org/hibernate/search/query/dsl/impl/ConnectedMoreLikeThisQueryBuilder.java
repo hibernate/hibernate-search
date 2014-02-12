@@ -85,6 +85,7 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 
 	@Override
 	public Query createQuery() {
+		Query query;
 		final SearchFactoryImplementor searchFactory = queryContext.getFactory();
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 		if ( fieldsContext.size() == 0 ) {
@@ -93,11 +94,11 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 			try {
 				indexReader = searchFactory.getIndexReaderAccessor().open( queryContext.getEntityType() );
 				String[] fieldNames = getAllCompatibleFieldNames( documentBuilder );
-				return new MoreLikeThisBuilder( documentBuilder, searchFactory )
+				query = new MoreLikeThisBuilder( documentBuilder, searchFactory )
 						.fieldNames( fieldNames )
 						.indexReader( indexReader )
-						.otherMoreLikeThisContext( moreLikeThisContext )
 						.documentNumber( docId )
+						.otherMoreLikeThisContext( moreLikeThisContext )
 						.createQuery();
 			}
 			finally {
@@ -106,10 +107,13 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 				}
 			}
 		}
+		else {
+			return null;
+		}
 		//TODO implement explicit set of fields and field customization
 		//TODO implement INPUT.READER
 		//TODO implement INOUT.STRING
-		return null;
+		return queryCustomizer.setWrappedQuery( query ).createQuery();
 	}
 
 	private String[] getAllCompatibleFieldNames(DocumentBuilderIndexedEntity<?> documentBuilder) {
