@@ -113,6 +113,12 @@ public class MoreLikeThisBuilder {
 		return this;
 	}
 
+	public MoreLikeThisBuilder otherMoreLikeThisContext(MoreLikeThisQueryContext moreLikeThisContext) {
+		this.boost = moreLikeThisContext.isBoostTerms();
+		this.boostFactor = moreLikeThisContext.getTermBoostFactor();
+		return this;
+	}
+
 	/**
 	 * Return a query that will return docs like the passed lucene document ID.
 	 */

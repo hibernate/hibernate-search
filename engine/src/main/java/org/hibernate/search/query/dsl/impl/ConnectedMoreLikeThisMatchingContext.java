@@ -39,11 +39,13 @@ import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuil
 public class ConnectedMoreLikeThisMatchingContext implements MoreLikeThisOpenedMatchingContext, MoreLikeThisTerminalMatchingContext {
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
+	private final MoreLikeThisQueryContext moreLikeThisContext;
 	private final FieldsContext fieldsContext;
 
-	public ConnectedMoreLikeThisMatchingContext(String[] fieldNames, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
+	public ConnectedMoreLikeThisMatchingContext(String[] fieldNames, MoreLikeThisQueryContext moreLikeThisContext, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
 		this.queryCustomizer = queryCustomizer;
 		this.queryContext = queryContext;
+		this.moreLikeThisContext = moreLikeThisContext;
 		this.fieldsContext = new FieldsContext( fieldNames );
 	}
 
@@ -73,7 +75,7 @@ public class ConnectedMoreLikeThisMatchingContext implements MoreLikeThisOpenedM
 
 	@Override
 	public MoreLikeThisTermination toEntityWithId(Object id) {
-		return new ConnectedMoreLikeThisQueryBuilder( id, ID, fieldsContext, queryCustomizer, queryContext );
+		return new ConnectedMoreLikeThisQueryBuilder( id, ID, fieldsContext, moreLikeThisContext, queryCustomizer, queryContext );
 	}
 
 	@Override
