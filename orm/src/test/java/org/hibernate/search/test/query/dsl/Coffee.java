@@ -31,7 +31,6 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 

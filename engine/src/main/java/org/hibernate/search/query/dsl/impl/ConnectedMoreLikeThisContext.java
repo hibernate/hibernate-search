@@ -38,25 +38,37 @@ public class ConnectedMoreLikeThisContext implements MoreLikeThisContext {
 
 	private final QueryBuildingContext queryContext;
 	private final QueryCustomizer queryCustomizer;
+	private final MoreLikeThisQueryContext moreLikeThisContext;
 
 	public ConnectedMoreLikeThisContext(QueryBuildingContext context) {
 		this.queryContext = context;
 		this.queryCustomizer = new QueryCustomizer();
+		this.moreLikeThisContext = new MoreLikeThisQueryContext();
+	}
+
+	@Override
+	public MoreLikeThisContext boostTermsByFactor(float factor) {
+		moreLikeThisContext.setBoostTerms( true );
+		moreLikeThisContext.setTermBoostFactor( factor );
+		return this;
 	}
 
 	@Override
 	public MoreLikeThisTerminalMatchingContext comparingAllFields() {
-		return new ConnectedMoreLikeThisMatchingContext( ALL_FIELDS, queryCustomizer, queryContext );
+		return new ConnectedMoreLikeThisMatchingContext( ALL_FIELDS, moreLikeThisContext, queryCustomizer, queryContext );
 	}
 
 	@Override
 	public MoreLikeThisOpenedMatchingContext comparingFields(String... fieldNames) {
-		return new ConnectedMoreLikeThisMatchingContext( fieldNames, queryCustomizer, queryContext );
+		return new ConnectedMoreLikeThisMatchingContext( fieldNames, moreLikeThisContext, queryCustomizer, queryContext );
 	}
 
 	@Override
 	public MoreLikeThisOpenedMatchingContext comparingField(String fieldName) {
-		return new ConnectedMoreLikeThisMatchingContext( new String[] {fieldName}, queryCustomizer, queryContext );
+		return new ConnectedMoreLikeThisMatchingContext(
+				new String[] {fieldName},
+				moreLikeThisContext,
+				queryCustomizer, queryContext );
 	}
 
 	@Override

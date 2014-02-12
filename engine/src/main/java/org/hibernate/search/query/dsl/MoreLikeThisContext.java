@@ -31,6 +31,14 @@ public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisCont
 
 	//TODO add returnEntityComparedWith?
 	//TODO today we return the matching entity we could exclude it with a Boolean MUST NOT
+	/**
+	 * Boost significant terms relative to their scores.
+	 * Amplified by the boost factor (1 is the recommended default to start with).
+	 *
+	 * Unless activated, terms are not boosted by their individual frequency.
+	 * When activated, significant terms will have their influence increased more than by default.
+	 */
+	MoreLikeThisContext boostTermsByFactor(float factor);
 
 	/**
 	 * Match the content using "all" of the indexed fields of the entity.
