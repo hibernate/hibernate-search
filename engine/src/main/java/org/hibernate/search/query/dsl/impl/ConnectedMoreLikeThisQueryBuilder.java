@@ -89,10 +89,10 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 		final SearchFactoryImplementor searchFactory = queryContext.getFactory();
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
 		if ( fieldsContext.size() == 0 ) {
-			Integer docId = getLuceneDocumentIdFromEntityId( documentBuilder );
-			IndexReader indexReader = null;
+			IndexReader indexReader = searchFactory.getIndexReaderAccessor().open( queryContext.getEntityType() );
 			try {
-				indexReader = searchFactory.getIndexReaderAccessor().open( queryContext.getEntityType() );
+				// retrieving the docId and building the more like this query form the term vectors must be using the same index reader
+				Integer docId = getLuceneDocumentIdFromEntityId( documentBuilder );
 				String[] fieldNames = getAllCompatibleFieldNames( documentBuilder );
 				query = new MoreLikeThisBuilder( documentBuilder, searchFactory )
 						.fieldNames( fieldNames )
@@ -102,9 +102,7 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 						.createQuery();
 			}
 			finally {
-				if ( indexReader != null ) {
-					searchFactory.getIndexReaderAccessor().close( indexReader );
-				}
+				searchFactory.getIndexReaderAccessor().close( indexReader );
 			}
 		}
 		else {
