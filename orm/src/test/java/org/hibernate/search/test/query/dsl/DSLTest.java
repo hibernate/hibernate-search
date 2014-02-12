@@ -26,11 +26,15 @@ package org.hibernate.search.test.query.dsl;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.lucene.document.DateTools;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
@@ -39,12 +43,15 @@ import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.analysis.core.StopFilterFactory;
+import org.fest.assertions.Condition;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Factory;
@@ -742,7 +749,7 @@ public class DSLTest extends SearchTestCase {
 		Query query = builder.all().createQuery();
 		List<?> results = fullTextSession.createFullTextQuery( query, Object.class ).list();
 
-		assertEquals( "expected all instances of all indexed types", 7, results.size() );
+		assertEquals( "expected all instances of all indexed types", 29, results.size() );
 
 		transaction.commit();
 	}
@@ -781,6 +788,60 @@ public class DSLTest extends SearchTestCase {
 		}
 		catch (SearchException e) {
 			// success
+		}
+		finally {
+			transaction.commit();
+		}
+	}
+
+	public void testMoreLikeThis() {
+		Transaction transaction = fullTextSession.beginTransaction();
+		try {
+			QueryBuilder qb = fullTextSession.getSearchFactory()
+					.buildQueryBuilder()
+					.forEntity( Coffee.class )
+					.get();
+			Query decaff = qb.keyword().onField( "name" ).matching( "Decaffeinato" ).createQuery();
+			Coffee decaffInstance = (Coffee) fullTextSession.createFullTextQuery( decaff, Coffee.class ).list().get( 0 );
+			Query mltQuery = qb.moreLikeThis().comparingAllFields().toEntityWithId( decaffInstance.getId() ).createQuery();
+			List<Object[]> results = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+
+			assertThat( results ).isNotEmpty();
+
+			Set<Term> terms = new HashSet<Term>( 100 );
+			mltQuery.extractTerms( terms );
+			assertThat( terms )
+					.describedAs( "intenseDescription should be ignored" )
+					.doesNotSatisfy( new Condition<Collection<?>>() {
+				@Override
+				public boolean matches(Collection<?> value) {
+					for ( Term term : (Collection<Term>) value ) {
+						if ( term.field().equals( "internalDescription" ) ) {
+							return true;
+						}
+					}
+					return false;
+				}
+			} );
+
+			// set to true to display results
+			if (false) {
+				StringBuilder builder = new StringBuilder( "Initial coffee: " )
+						.append( decaffInstance )
+						.append( "\n\n" )
+						.append( "Matching coffees" ).append( "\n" );
+				for ( Object[] entry : results ) {
+					builder.append( "Coffee: " ).append( entry[0] ).append( "\n" )
+							.append( "    Score: " ).append( entry[1] );
+				}
+				builder.append( "Query: " ).append( mltQuery.toString() );
+				//CHECKSTYLE:OFF
+				System.out.println( builder.toString() );
+				//CHECKSTYLE:ON
+			}
 		}
 		finally {
 			transaction.commit();
@@ -839,8 +900,151 @@ public class DSLTest extends SearchTestCase {
 		car = new SportsCar( 2, "Morris", 180 );
 		fullTextSession.persist( car );
 
+		createCoffee(
+				"Kazaar",
+				"EXCEPTIONALLY INTENSE AND SYRUPY",
+				"A daring blend of two Robustas from Brazil and Guatemala, specially prepared for Nespresso, and a separately roasted Arabica from South America, Kazaar is a coffee of exceptional intensity. Its powerful bitterness and notes of pepper are balanced by a full and creamy texture.",
+				12
+		);
+		createCoffee(
+				"Dharkan",
+				"LONG ROASTED AND VELVETY",
+				"This blend of Arabicas from Latin America and Asia fully unveils its character thanks to the technique of long roasting at a low temperature. Its powerful personality reveals intense roasted notes together with hints of bitter cocoa powder and toasted cereals that express themselves in a silky and velvety txture.",
+				11
+		);
+		createCoffee(
+				"Ristretto",
+				"POWERFUL AND CONTRASTING",
+				"A blend of South American and East African Arabicas, with a touch of Robusta, roasted separately to create the subtle fruity note of this full-bodied, intense espresso.",
+				10
+		);
+		createCoffee(
+				"Arpeggio",
+				"INTENSE AND CREAMY",
+				"A dark roast of pure South and Central American Arabicas, Arpeggio has a strong character and intense body, enhanced by cocoa notes.",
+				9
+		);
+		createCoffee(
+				"Roma",
+				"FULL AND BALANCED",
+				"The balance of lightly roasted South and Central American Arabicas with Robusta, gives Roma sweet and woody notes and a full, lasting taste on the palate.",
+				8
+		);
+		createCoffee(
+				"Livanto",
+				"ROUND AND BALANCED",
+				"A pure Arabica from South and Central America, Livanto is a well-balanced espresso characterised by a roasted caramelised note.",
+				6
+		);
+		createCoffee(
+				"Capriccio",
+				"RICH AND DISTINCTIVE",
+				"Blending South American Arabicas with a touch of Robusta, Capriccio is an espresso with a rich aroma and a strong typical cereal note.",
+				5
+		);
+		createCoffee(
+				"Volluto",
+				"SWEET AND LIGHT",
+				"A pure and lightly roasted Arabica from South America, Volluto reveals sweet and biscuity flavours, reinforced by a little acidity and a fruity note.",
+				4
+		);
+		createCoffee(
+				"Cosi",
+				"LIGHT AND LEMONY",
+				"Pure, lightly roasted East African, Central and South American Arabicas make Cosi a light-bodied espresso with refreshing citrus notes.",
+				3
+		);
+		createCoffee(
+				"Indriya from India",
+				"POWERFUL AND SPICY",
+				"Indriya from India is the noble marriage of Arabicas with a hint of Robusta from southern India. It is a full-bodied espresso, which has a distinct personality with notes of spices.",
+				10
+		);
+		createCoffee(
+				"Rosabaya de Colombia",
+				"FRUITY AND BALANCED",
+				"This blend of fine, individually roasted Colombian Arabicas, develops a subtle acidity with typical red fruit and winey notes.",
+				6
+		);
+		createCoffee(
+				"Dulsão do Brasil",
+				"SWEET AND SATINY SMOOTH",
+				"A pure Arabica coffee, Dulsão do Brasil is a delicate blend of red and yellow Bourbon beans from Brazil. Its satiny smooth, elegantly balanced flavor is enhanced with a note of delicately toasted grain.",
+				4
+		);
+		createCoffee(
+				"Bukeela ka Ethiopia",
+				"",
+				"This delicate Lungo expresses a floral bouquet reminiscent of jasmine, white lily, bergamot and orange blossom together with notes of wood. A pure Arabica blend composed of two very different coffees coming from the birthplace of coffee, Ethiopia. The blend’s coffees are roasted separately: one portion short and dark to guarantee the body, the other light but longer to preserve the delicate notes.",
+				3
+		);
+		createCoffee(
+				"Fortissio Lungo",
+				"RICH AND INTENSE",
+				"Made from Central and South American Arabicas with just a hint of Robusta, Fortissio Lungo is an intense full-bodied blend with bitterness, which develops notes of dark roasted beans.",
+				7
+		);
+		createCoffee(
+				"Vivalto Lungo",
+				"COMPLEX AND BALANCED",
+				"Vivalto Lungo is a balanced coffee made from a complex blend of separately roasted South American and East African Arabicas, combining roasted and subtle floral notes.",
+				4
+		);
+		createCoffee(
+				"Linizio Lungo",
+				"ROUND AND SMOOTH",
+				"Mild and well-rounded on the palate, Linizio Lungo is a blend of fine Arabicas enhancing malt and cereal notes.",
+				4
+		);
+		createCoffee(
+				"Decaffeinato Intenso",
+				"DENSE AND POWERFUL",
+				"Dark roasted South American Arabicas with a touch of Robusta bring out the subtle cocoa and roasted cereal notes of this full-bodied decaffeinated espresso.",
+				7
+		);
+		createCoffee(
+				"Decaffeinato Lungo",
+				"LIGHT AND FULL-FLAVOURED",
+				"The slow roasting of this blend of South American Arabicas with a touch of Robusta gives Decaffeinato Lungo a smooth, creamy body and roasted cereal flavour.",
+				3
+		);
+		createCoffee(
+				"Decaffeinato",
+				"FRUITY AND DELICATE",
+				"A blend of South American Arabicas reinforced with just a touch of Robusta is lightly roasted to reveal an aroma of red fruit.",
+				2
+		);
+		createCoffee(
+				"Caramelito",
+				"CARAMEL FLAVOURED",
+				"The sweet flavour of caramel softens the roasted notes of the Livanto Grand Cru. This delicate gourmet marriage evokes the creaminess of soft toffee.",
+				6
+		);
+		createCoffee(
+				"Ciocattino",
+				"CHOCOLATE FLAVOURED",
+				"Dark and bitter chocolate notes meet the caramelized roast of the Livanto Grand Cru. A rich combination reminiscent of a square of dark chocolate.",
+				6
+		);
+		createCoffee(
+				"Vanilio",
+				"VANILLA FLAVOURED",
+				"A balanced harmony between the rich and the velvety aromas of vanilla and the mellow flavour of the Livanto Grand Cru. A blend distinguished by its full flavour, infinitely smooth and silky on the palate.",
+				6
+		);
+
 		tx.commit();
 		fullTextSession.clear();
+	}
+
+	private void createCoffee(String title, String summary, String description, int intensity) {
+		Coffee coffee = new Coffee();
+		coffee.setName( title );
+		coffee.setSummary( summary );
+		coffee.setDescription( description );
+		coffee.setIntensity( intensity );
+		coffee.setInternalDescription( "Same internal description of coffee and blend that would make things look quite the same." );
+		fullTextSession.persist( coffee );
 	}
 
 	private void cleanUpTestData() {
@@ -855,7 +1059,7 @@ public class DSLTest extends SearchTestCase {
 		tx = fullTextSession.beginTransaction();
 		@SuppressWarnings("unchecked")
 		final List<Object> results = fullTextSession.createQuery( "from " + Object.class.getName() ).list();
-		assertEquals( 7, results.size() );
+		assertEquals( 29, results.size() );
 
 		for ( Object entity : results ) {
 			fullTextSession.delete( entity );
@@ -872,7 +1076,8 @@ public class DSLTest extends SearchTestCase {
 				POI.class,
 				Car.class,
 				SportsCar.class,
-				Animal.class
+				Animal.class,
+				Coffee.class
 		};
 	}
 
