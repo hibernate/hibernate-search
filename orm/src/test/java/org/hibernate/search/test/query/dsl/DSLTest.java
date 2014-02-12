@@ -803,7 +803,12 @@ public class DSLTest extends SearchTestCase {
 					.get();
 			Query decaff = qb.keyword().onField( "name" ).matching( "Decaffeinato" ).createQuery();
 			Coffee decaffInstance = (Coffee) fullTextSession.createFullTextQuery( decaff, Coffee.class ).list().get( 0 );
-			Query mltQuery = qb.moreLikeThis().comparingAllFields().toEntityWithId( decaffInstance.getId() ).createQuery();
+			Query mltQuery = qb
+					.moreLikeThis()
+							.boostTermsByFactor( 1 )
+						.comparingAllFields()
+						.toEntityWithId( decaffInstance.getId() )
+						.createQuery();
 			List<Object[]> results = (List<Object[]>) fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
@@ -828,7 +833,7 @@ public class DSLTest extends SearchTestCase {
 			} );
 
 			// set to true to display results
-			if (false) {
+			if ( false ) {
 				StringBuilder builder = new StringBuilder( "Initial coffee: " )
 						.append( decaffInstance )
 						.append( "\n\n" )

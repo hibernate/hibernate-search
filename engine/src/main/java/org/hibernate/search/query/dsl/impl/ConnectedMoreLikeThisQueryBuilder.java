@@ -55,14 +55,17 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 	private final FieldsContext fieldsContext;
 	private final INPUT_TYPE inputType;
 	private final Object input;
+	private final MoreLikeThisQueryContext moreLikeThisContext;
 
 	public ConnectedMoreLikeThisQueryBuilder(Object id,
 											INPUT_TYPE inputType,
 											FieldsContext fieldsContext,
+											MoreLikeThisQueryContext moreLikeThisContext,
 											QueryCustomizer queryCustomizer,
 											QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
+		this.moreLikeThisContext = moreLikeThisContext;
 		this.fieldsContext = fieldsContext;
 		this.inputType = inputType;
 		this.input = id;
@@ -93,6 +96,7 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 				return new MoreLikeThisBuilder( documentBuilder, searchFactory )
 						.fieldNames( fieldNames )
 						.indexReader( indexReader )
+						.otherMoreLikeThisContext( moreLikeThisContext )
 						.documentNumber( docId )
 						.createQuery();
 			}
