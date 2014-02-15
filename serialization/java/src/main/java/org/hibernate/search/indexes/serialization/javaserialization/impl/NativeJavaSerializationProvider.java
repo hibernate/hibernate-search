@@ -22,6 +22,7 @@ package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
 import java.util.Properties;
 
+import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
@@ -31,7 +32,8 @@ import org.hibernate.search.spi.BuildContext;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik
  */
-public class NativeJavaSerializationProvider implements SerializationProvider {
+public class NativeJavaSerializationProvider implements SerializationProvider, Startable {
+
 	private Serializer serializer;
 
 	@Override

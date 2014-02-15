@@ -25,10 +25,11 @@
 package org.hibernate.search.test.engine.service;
 
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.Stoppable;
 
 /**
+ * The implementation is marked as Stoppable
+ *
  * @author Hardy Ferentschik
  */
-public interface StoppableService extends Service, Stoppable {
+public interface StoppableService extends Service {
 }

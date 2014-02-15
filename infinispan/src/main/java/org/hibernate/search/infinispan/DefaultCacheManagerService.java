@@ -31,6 +31,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.infinispan.impl.InfinispanConfigurationParser;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.BuildContext;
@@ -48,7 +50,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
  *
  * @author Sanne Grinovero
  */
-public class DefaultCacheManagerService implements CacheManagerService {
+public class DefaultCacheManagerService implements CacheManagerService, Startable, Stoppable {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 

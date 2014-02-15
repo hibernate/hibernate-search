@@ -26,7 +26,6 @@ package org.hibernate.search.hcore.impl;
 import org.hibernate.SessionFactory;
 
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.Startable;
 
 /**
  * A Hibernate Search service which allows to request a Hibernate {@code SessionFactory} during bootstrapping.
@@ -34,6 +33,6 @@ import org.hibernate.search.engine.service.spi.Startable;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public interface HibernateSessionFactoryService extends Service, Startable {
+public interface HibernateSessionFactoryService extends Service {
 	SessionFactory getSessionFactory();
 }
