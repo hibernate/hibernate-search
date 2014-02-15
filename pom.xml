@@ -162,7 +162,7 @@
         <jacksonAslVersion>1.9.13</jacksonAslVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
         <commonsIoVersion>2.1</commonsIoVersion>
-        <jbossTransactionApiVersion>1.0.1.Final</jbossTransactionApiVersion>
+        <jbossTransactionApiVersion>1.0.0.Final</jbossTransactionApiVersion>
         <commonsCodecVersion>1.6</commonsCodecVersion>
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <activeMQVersion>5.8.0</activeMQVersion>
@@ -497,7 +497,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.transaction</groupId>
-                <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                <artifactId>jboss-transaction-api_1.2_spec</artifactId>
                 <version>${jbossTransactionApiVersion}</version>
             </dependency>
             <!-- Manage version of xml-apis to have dom4j and Tika requirements converge -->
