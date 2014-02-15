@@ -179,7 +179,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 	private void indexAllQueue(Session session, List<?> entities, InstanceInitializer sessionInitializer) {
 		try {
 			ConversionContext contextualBridge = new ContextualExceptionBridgeHelper();
-				if ( entities == null && entities.isEmpty() ) {
+				if ( entities == null || entities.isEmpty() ) {
 					return;
 				}
 				else {
