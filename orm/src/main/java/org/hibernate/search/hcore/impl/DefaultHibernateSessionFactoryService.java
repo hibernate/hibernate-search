@@ -26,7 +26,7 @@ package org.hibernate.search.hcore.impl;
 import java.util.Properties;
 
 import org.hibernate.SessionFactory;
-
+import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -37,7 +37,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class DefaultHibernateSessionFactoryService implements HibernateSessionFactoryService {
+public class DefaultHibernateSessionFactoryService implements HibernateSessionFactoryService, Startable {
 	private static final Log log = LoggerFactory.make();
 
 	private volatile SessionFactory sessionFactory;

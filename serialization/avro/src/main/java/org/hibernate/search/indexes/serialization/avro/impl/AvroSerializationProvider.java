@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import org.apache.avro.Protocol;
 
+import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
@@ -61,7 +62,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class AvroSerializationProvider implements SerializationProvider {
+public class AvroSerializationProvider implements SerializationProvider, Startable {
 
 	private static final Log log = LoggerFactory.make();
 	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1_0/";

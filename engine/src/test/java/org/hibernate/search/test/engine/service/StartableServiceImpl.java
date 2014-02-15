@@ -27,12 +27,13 @@ package org.hibernate.search.test.engine.service;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.spi.BuildContext;
 
 /**
  * @author Hardy Ferentschik
  */
-public class StartableServiceImpl implements StartableService {
+public class StartableServiceImpl implements StartableService, Startable {
 	AtomicBoolean started = new AtomicBoolean( false );
 
 	@Override

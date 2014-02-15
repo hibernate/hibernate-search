@@ -21,7 +21,6 @@
 package org.hibernate.search.indexes.serialization.spi;
 
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.Startable;
 
 /**
  * Provides access to a serializer and deserializer to send the necessary work load for remote backends over the wire.
@@ -36,8 +35,10 @@ import org.hibernate.search.engine.service.spi.Startable;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik
  */
-public interface SerializationProvider extends Service, Startable {
+public interface SerializationProvider extends Service {
+
 	Serializer getSerializer();
 
 	Deserializer getDeserializer();
+
 }

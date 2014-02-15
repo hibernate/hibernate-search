@@ -24,14 +24,12 @@
 package org.hibernate.search.infinispan;
 
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
 import org.infinispan.manager.EmbeddedCacheManager;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface CacheManagerService extends Service, Startable, Stoppable {
+public interface CacheManagerService extends Service {
 
 	EmbeddedCacheManager getEmbeddedCacheManager();
 

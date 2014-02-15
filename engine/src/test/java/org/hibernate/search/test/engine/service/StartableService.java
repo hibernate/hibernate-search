@@ -25,10 +25,11 @@
 package org.hibernate.search.test.engine.service;
 
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.Startable;
 
 /**
+ * The implementation is marked as Startable
+ *
  * @author Hardy Ferentschik
  */
-public interface StartableService extends Service, Startable {
+public interface StartableService extends Service {
 }

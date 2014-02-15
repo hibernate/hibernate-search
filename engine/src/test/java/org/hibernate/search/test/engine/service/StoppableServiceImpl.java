@@ -26,10 +26,12 @@ package org.hibernate.search.test.engine.service;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.hibernate.search.engine.service.spi.Stoppable;
+
 /**
  * @author Hardy Ferentschik
  */
-public class StoppableServiceImpl implements StoppableService {
+public class StoppableServiceImpl implements StoppableService, Stoppable {
 	AtomicBoolean stopped = new AtomicBoolean( false );
 
 	@Override
