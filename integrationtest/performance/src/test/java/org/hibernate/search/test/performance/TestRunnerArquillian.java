@@ -31,8 +31,8 @@ import javax.persistence.PersistenceContext;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.Version;
 import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.test.integration.wildfly.PackagerHelper;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -42,14 +42,11 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
 import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -71,12 +68,7 @@ public class TestRunnerArquillian {
 				.addPackages( true, TestRunnerArquillian.class.getPackage() )
 				.addClass( TestConstants.class )
 				.addAsResource( createPersistenceXml(), "META-INF/persistence.xml" )
-				.addAsLibraries( DependencyResolvers.use( MavenDependencyResolver.class )
-						.artifact( "org.hibernate:hibernate-search-orm:" + Version.getVersionString() )
-						.exclusion( "org.hibernate:hibernate-entitymanager" )
-						.exclusion( "org.hibernate:hibernate-core" )
-						.exclusion( "org.jboss.logging:jboss-logging" )
-						.resolveAs( JavaArchive.class ) )
+				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.add( manifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( new StringAsset( TARGET_DIR_KEY + "=" + TestConstants.getTargetDir( TestRunnerArquillian.class ).getAbsolutePath() ), "classes/" + RUNNER_PROPERTIES );
