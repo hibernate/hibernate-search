@@ -155,11 +155,11 @@
         <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>2.1.4</bytemanVersion>
-        <jbossLoggingVersion>3.1.3.GA</jbossLoggingVersion>
-        <jbossLoggingProcessorVersion>1.1.0.Final</jbossLoggingProcessorVersion>
+        <jbossLoggingVersion>3.1.4.GA</jbossLoggingVersion>
+        <jbossLoggingProcessorVersion>1.2.0.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>5.0.0.Final</narayanaVersion>
         <avroVersion>1.7.5</avroVersion>
-        <jacksonAslVersion>1.9.12</jacksonAslVersion>
+        <jacksonAslVersion>1.9.13</jacksonAslVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
         <commonsIoVersion>2.1</commonsIoVersion>
         <jbossTransactionApiVersion>1.0.1.Final</jbossTransactionApiVersion>
@@ -174,8 +174,8 @@
 
         <!-- Integration tests -->
         <arquillianVersion>1.1.2.Final</arquillianVersion>
-        <shrinkwrapResolverVersion>2.0.0-alpha-1</shrinkwrapResolverVersion>
-        <wildflyVersion>8.0.0.CR1</wildflyVersion>
+        <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
+        <wildflyVersion>8.0.0.Final</wildflyVersion>
     </properties>
 
     <dependencyManagement>
