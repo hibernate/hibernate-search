@@ -31,8 +31,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
@@ -58,16 +57,11 @@ public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSla
 		public static final File[] LIBRARIES = init();
 
 		private static File[] init() {
-			MavenDependencyResolver resolver = DependencyResolvers.use( MavenDependencyResolver.class );
-			String currentVersion = Version.getVersionString();
-			File[] libraryFiles = resolver
-					.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
-					.exclusion( "org.hibernate:hibernate-entitymanager" )
-					.exclusion( "org.hibernate:hibernate-core" )
-					.exclusion( "org.hibernate:hibernate-search-analyzers" )
-					.exclusion( "org.jboss.logging:jboss-logging" )
-					.exclusion( "org.slf4j:slf4j-api" )
-					.resolveAsFiles();
+			final String currentVersion = Version.getVersionString();
+			File[] libraryFiles = Maven.resolver()
+					.resolve( "org.hibernate:hibernate-search-orm:" + currentVersion )
+					.withoutTransitivity()
+					.asFile();
 			return libraryFiles;
 		}
 	}
