@@ -23,8 +23,6 @@ package org.hibernate.search.query.engine.spi;
 import java.io.Closeable;
 import java.io.IOException;
 
-import org.apache.lucene.search.TopDocs;
-
 /**
  * DocumentExtractor is a traverser over the full-text results (EntityInfo)
  *
@@ -48,9 +46,4 @@ public interface DocumentExtractor extends Closeable {
 
 	void close();
 
-	/**
-	 * @experimental We are thinking at ways to encapsulate needs for exposing TopDocs (and whether or not it makes sense)
-	 * Try to avoid it if you can
-	 */
-	TopDocs getTopDocs();
 }
