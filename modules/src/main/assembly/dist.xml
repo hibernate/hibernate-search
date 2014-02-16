@@ -103,7 +103,6 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.apache.lucene:*</include>
-                <include>jakarta-regexp:jakarta-regexp:*</include>
             </includes>
             <excludes>
                 <exclude>org.apache.lucene:lucene-sandbox</exclude>

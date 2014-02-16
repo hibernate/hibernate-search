@@ -26,13 +26,8 @@
         <resource-root path="lucene-core-${luceneVersion}.jar" />
         <resource-root path="lucene-queryparser-${luceneVersion}.jar" />
         <resource-root path="lucene-queries-${luceneVersion}.jar" />
-        <resource-root path="jakarta-regexp-${luceneRegexJakartaVersion}.jar" />
         <resource-root path="lucene-facet-${luceneVersion}.jar" />
         <resource-root path="lucene-analyzers-common-${luceneVersion}.jar" />
-
-        <!-- Different version attribute! -->
-        <resource-root path="lucene-regex-${luceneRegexVersion}.jar" />
-
     </resources>
     <dependencies>
         <module name="javax.api" optional="true" />
