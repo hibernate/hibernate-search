@@ -33,7 +33,7 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.query.engine.spi.DocumentExtractor;
+import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
@@ -84,7 +84,7 @@ public class QuerySerializationTest extends SearchTestCaseJUnit4 {
 	}
 
 	private int extractResultSize(HSQuery hsQuery) {
-		DocumentExtractor documentExtractor = hsQuery.queryDocumentExtractor();
+		DocumentExtractorImpl documentExtractor = (DocumentExtractorImpl) hsQuery.queryDocumentExtractor();
 		TopDocs topDocs = documentExtractor.getTopDocs();
 		documentExtractor.close();
 		return topDocs.totalHits;

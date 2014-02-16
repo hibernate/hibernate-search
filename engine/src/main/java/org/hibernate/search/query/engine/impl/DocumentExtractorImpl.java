@@ -320,7 +320,9 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 		return doc.get( ProjectionConstants.OBJECT_CLASS );
 	}
 
-	@Override
+	/**
+	 * Needed for testing
+	 */
 	public TopDocs getTopDocs() {
 		return queryHits.getTopDocs();
 	}
