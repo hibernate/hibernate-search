@@ -131,12 +131,6 @@
    &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
    &lt;version&gt;&hibernateVersion;&lt;/version&gt;
 &lt;/dependency&gt;
-&lt;!-- Additional Analyzers: --&gt;
-&lt;dependency&gt;
-   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
-   &lt;artifactId&gt;hibernate-search-analyzers&lt;/artifactId&gt;
-   &lt;version&gt;&version;&lt;/version&gt;
-&lt;/dependency&gt;
 &lt;!-- Infinispan integration: --&gt;
 &lt;dependency&gt;
    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;

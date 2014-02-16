@@ -45,7 +45,6 @@
         <module>backends/jgroups</module>
         <module>backends/jms</module>
         <module>orm</module>
-        <module>analyzers</module>
         <module>testing</module>
         <module>infinispan</module>
         <module>modules</module>
@@ -273,11 +272,6 @@
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>${jacksonAslVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-search-analyzers</artifactId>
-                <version>${project.version}</version>
             </dependency>
              <dependency>
                 <groupId>org.apache.commons</groupId>
