@@ -60,7 +60,6 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-engine</include>
-                <include>org.hibernate:hibernate-search-analyzer</include>
                 <include>org.hibernate:hibernate-search-infinispan</include>
                 <include>org.hibernate:hibernate-search-serialization-avro</include>
             </includes>

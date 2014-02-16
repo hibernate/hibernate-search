@@ -27,7 +27,6 @@
         <resource-root path="hibernate-search-engine-${hibernate.search.version}.jar" />
         <resource-root path="hibernate-search-serialization-avro-${hibernate.search.version}.jar" />
         <resource-root path="hibernate-search-infinispan-${hibernate.search.version}.jar" />
-        <resource-root path="hibernate-search-analyzers-${hibernate.search.version}.jar" />
         <resource-root path="avro-${avroVersion}.jar" />
         <resource-root path="jackson-core-asl-${jacksonAslVersion}.jar" />
         <resource-root path="jackson-mapper-asl-${jacksonAslVersion}.jar" />

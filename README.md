@@ -68,9 +68,6 @@ If you want to contribute, you find all you need to know in [Contributing to Hib
 
 The project is split in several Maven modules.
 
-analyzers:
-Optional additional analyzers.
-
 backends:
 Remote backends receiving an indexing job and executing it via different
 protocols.
