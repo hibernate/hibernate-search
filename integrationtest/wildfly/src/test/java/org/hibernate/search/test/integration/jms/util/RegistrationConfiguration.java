@@ -25,8 +25,7 @@ package org.hibernate.search.test.integration.jms.util;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.logging.impl.Log;
 
 /**
  * @author Davide D'Alto
@@ -35,7 +34,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class RegistrationConfiguration {
 
-	private static final Logger log = LoggerFactory.getLogger( RegistrationConfiguration.class );
+	//private static final Logger log = LoggerFactory.getLogger( RegistrationConfiguration.class );
+	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 	public static final String DESTINATION_QUEUE = "jms/queue/hsearch";
 	private static final int MAX_ATTEMPTS = 3;
 
