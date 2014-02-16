@@ -20,8 +20,8 @@
  */
 package org.hibernate.search.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.search.util.logging.impl.Log;
+import org.jboss.logging.Logger;
 
 /**
  * Well-known-location lookup for the test-skip log...
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class SkipLog {
 
-	public static final Logger LOG = LoggerFactory.getLogger( "org.hibernate.search.test.SKIPPED" );
+	public static final Log LOG = Logger.getMessageLogger( Log.class, "org.hibernate.search.test.SKIPPED" );
 
 	private SkipLog() {
 		//not allowed
