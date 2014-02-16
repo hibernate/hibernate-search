@@ -60,6 +60,12 @@ class ConnectedFuzzyContext implements FuzzyContext {
 	}
 
 	@Override
+	public FuzzyContext withEditDistanceUpTo(int maxEditDistance) {
+		termContext.setMaxEditDistance( maxEditDistance );
+		return this;
+	}
+
+	@Override
 	public ConnectedFuzzyContext withPrefixLength(int prefixLength) {
 		termContext.setPrefixLength( prefixLength );
 		return this;
