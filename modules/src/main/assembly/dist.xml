@@ -72,6 +72,7 @@
                 <exclude>org.jgroups:jgroups</exclude>
                 <exclude>org.infinispan:*</exclude>
                 <exclude>org.apache.commons:*</exclude>
+                <exclude>org.apache.avro:*</exclude>
             </excludes>
         </dependencySet>
 
