@@ -168,8 +168,6 @@
         <commonsIoVersion>2.1</commonsIoVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
         <paranamerVersion>2.3</paranamerVersion>
-        <luceneRegexVersion>3.0.3</luceneRegexVersion>
-        <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
 
         <!-- Integration tests -->
         <arquillianVersion>1.1.2.Final</arquillianVersion>
@@ -220,11 +218,6 @@
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-phonetic</artifactId>
                 <version>${luceneVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-regex</artifactId>
-                <version>${luceneRegexVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
