@@ -27,12 +27,9 @@
         <resource-root path="hibernate-search-engine-${hibernate.search.version}.jar" />
         <resource-root path="hibernate-search-serialization-avro-${hibernate.search.version}.jar" />
         <resource-root path="hibernate-search-infinispan-${hibernate.search.version}.jar" />
-        <resource-root path="avro-${avroVersion}.jar" />
-        <resource-root path="jackson-core-asl-${jacksonAslVersion}.jar" />
-        <resource-root path="jackson-mapper-asl-${jacksonAslVersion}.jar" />
-        <resource-root path="paranamer-${paranamerVersion}.jar" />
     </resources>
     <dependencies>
+        <module name="org.apache.avro" />
         <module name="javax.transaction.api" />
         <module name="org.hibernate" />
         <module name="org.hibernate.commons-annotations" />
