@@ -21,7 +21,6 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
 package org.hibernate.search.query.collector.impl;
 
 import java.io.IOException;
@@ -41,7 +40,6 @@ import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
-import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.dsl.impl.RangeFacetImpl;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
@@ -51,7 +49,6 @@ import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 import org.hibernate.search.query.fieldcache.impl.FieldLoadingStrategy;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
-import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
 
 /**
  * A custom {@code Collector} used for handling facet requests.
@@ -81,7 +78,7 @@ public class FacetCollector extends Collector {
 
 	/**
 	 * Flag indicating whether the data structure has been initialised. Initialisation happens on the first call
-	 * to {@link #setNextReader(org.apache.lucene.index.IndexReader, int)}.
+	 * to {@link #setNextReader(AtomicReaderContext)}.
 	 */
 	private boolean initialised = false;
 
@@ -137,7 +134,7 @@ public class FacetCollector extends Collector {
 		if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( request.getSort() )
 				|| FacetSortOrder.RANGE_DEFINITION_ORDER.equals( request.getSort() ) ) {
 			facetList = createRangeFacetList( counter.getCounts().entrySet(), request, counter.getCounts().size() );
-			Collections.sort( facetList, new RangeDefinitionOrderFacetComparator( ) );
+			Collections.sort( facetList, new RangeDefinitionOrderFacetComparator() );
 			if ( facetRequest.getMaxNumberOfFacets() > 0 ) {
 				facetList = facetList.subList( 0, Math.min( facetRequest.getMaxNumberOfFacets(), facetList.size() ) );
 			}
@@ -186,12 +183,12 @@ public class FacetCollector extends Collector {
 
 	private <N extends Number> FacetCounter createFacetCounter(FacetingRequestImpl request) {
 		if ( request instanceof DiscreteFacetRequest ) {
-			return new SimpleFacetCounter();
+			return new FacetCounter.SimpleFacetCounter();
 		}
 		else if ( request instanceof RangeFacetRequest ) {
 			@SuppressWarnings("unchecked")
 			RangeFacetRequest<N> rangeFacetRequest = (RangeFacetRequest<N>) request;
-			return new RangeFacetCounter<N>( rangeFacetRequest );
+			return new FacetCounter.RangeFacetCounter<N>( rangeFacetRequest );
 		}
 		else {
 			throw new IllegalArgumentException( "Unsupported cache type" );
@@ -209,7 +206,7 @@ public class FacetCollector extends Collector {
 			return;
 		}
 		final TermsEnum iterator = terms.iterator( null ); //we have no TermsEnum to reuse
-		BytesRef byteRef = null;
+		BytesRef byteRef;
 		while ( ( byteRef = iterator.next() ) != null ) {
 			final String fieldValue = byteRef.utf8ToString();
 			facetCounts.initCount( fieldValue );
@@ -244,75 +241,4 @@ public class FacetCollector extends Collector {
 			return ( (RangeFacetImpl) facet1 ).getRangeIndex() - ( (RangeFacetImpl) facet2 ).getRangeIndex();
 		}
 	}
-
-	public abstract static class FacetCounter {
-		private Map<String, IntegerWrapper> counts = newHashMap();
-
-		Map<String, IntegerWrapper> getCounts() {
-			return counts;
-		}
-
-		void initCount(String value) {
-			if ( !counts.containsKey( value ) ) {
-				counts.put( value, new IntegerWrapper() );
-			}
-		}
-
-		void incrementCount(String value) {
-			IntegerWrapper integerWrapper = counts.get( value );
-			if ( integerWrapper == null ) {
-				integerWrapper = new IntegerWrapper();
-				counts.put( value, integerWrapper );
-			}
-			integerWrapper.incrementCount();
-		}
-
-		abstract void countValue(Object value);
-	}
-
-	static class SimpleFacetCounter extends FacetCounter {
-		@Override
-		void countValue(Object value) {
-			incrementCount( (String) value );
-		}
-	}
-
-	static class RangeFacetCounter<T> extends FacetCounter {
-		private final List<FacetRange<T>> ranges;
-
-		RangeFacetCounter(RangeFacetRequest<T> request) {
-			this.ranges = request.getFacetRangeList();
-			for ( FacetRange<T> range : ranges ) {
-				initCount( range.getRangeString() );
-			}
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		void countValue(Object value) {
-			for ( FacetRange<T> range : ranges ) {
-				if ( range.isInRange( (T) value ) ) {
-					incrementCount( range.getRangeString() );
-				}
-			}
-		}
-	}
-
-	/**
-	 * Replacement of Integer which is mutable,
-	 * so that we can avoid creating many objects
-	 * while counting hits for each facet.
-	 */
-	private static final class IntegerWrapper {
-		int count = 0;
-
-		public int getCount() {
-			return count;
-		}
-
-		public void incrementCount() {
-			this.count++;
-		}
-	}
-
 }
