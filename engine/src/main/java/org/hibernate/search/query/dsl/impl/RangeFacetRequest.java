@@ -58,7 +58,7 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 		}
 
 		if ( o instanceof Date ) { // for date faceting we are using the string field cache
-			return String.class;
+			return String[].class;
 		}
 		else {
 			return o.getClass();

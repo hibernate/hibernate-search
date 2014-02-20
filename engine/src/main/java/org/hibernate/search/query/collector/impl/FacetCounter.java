@@ -26,6 +26,7 @@ package org.hibernate.search.query.collector.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 
@@ -61,14 +62,22 @@ public abstract class FacetCounter {
 	public static class SimpleFacetCounter extends FacetCounter {
 		@Override
 		void countValue(Object value) {
-			incrementCount( (String) value );
+			if ( !( value instanceof String[] ) ) {
+				throw new AssertionFailure( "Unexpected field value type " + value.getClass() );
+			}
+			String[] values = (String[]) value;
+			for ( String stringValue : values ) {
+				incrementCount( stringValue );
+			}
 		}
 	}
 
 	public static class RangeFacetCounter<T> extends FacetCounter {
 		private final List<FacetRange<T>> ranges;
+		private final Class<?> fieldCacheType;
 
 		RangeFacetCounter(RangeFacetRequest<T> request) {
+			this.fieldCacheType = request.getFieldCacheType();
 			this.ranges = request.getFacetRangeList();
 			for ( FacetRange<T> range : ranges ) {
 				initCount( range.getRangeString() );
@@ -79,9 +88,21 @@ public abstract class FacetCounter {
 		@SuppressWarnings("unchecked")
 		void countValue(Object value) {
 			for ( FacetRange<T> range : ranges ) {
-				if ( range.isInRange( (T) value ) ) {
-					incrementCount( range.getRangeString() );
+				if ( String[].class.equals( fieldCacheType ) ) {
+					String[] stringValues = (String[]) value;
+					for ( String stringValue : stringValues ) {
+						countIfInRange( (T) stringValue, range );
+					}
 				}
+				else {
+					countIfInRange( (T) value, range );
+				}
+			}
+		}
+
+		private void countIfInRange(T value, FacetRange<T> range) {
+			if ( range.isInRange( value ) ) {
+				incrementCount( range.getRangeString() );
 			}
 		}
 	}

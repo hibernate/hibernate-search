@@ -27,10 +27,11 @@ package org.hibernate.search.query.dsl.impl;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.search.query.facet.Facet;
 
 /**
+ * A facet request for string based fields.
+ *
  * @author Hardy Ferentschik
  */
 public class DiscreteFacetRequest extends FacetingRequestImpl {
@@ -40,7 +41,7 @@ public class DiscreteFacetRequest extends FacetingRequestImpl {
 
 	@Override
 	public Class<?> getFieldCacheType() {
-		return String.class;
+		return String[].class;
 	}
 
 	@Override

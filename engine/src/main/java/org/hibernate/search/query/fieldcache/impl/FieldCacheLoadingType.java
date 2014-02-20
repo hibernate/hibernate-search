@@ -29,6 +29,12 @@ import java.util.Map;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public enum FieldCacheLoadingType {
+	STRING_ARRAY {
+		@Override
+		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
+			return new MultiStringFieldLoadingStrategy( fieldName );
+		}
+	},
 	STRING {
 		@Override
 		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
@@ -63,6 +69,7 @@ public enum FieldCacheLoadingType {
 	static Map<Class<?>, FieldCacheLoadingType> fieldCacheTypes = new HashMap<Class<?>, FieldCacheLoadingType>();
 
 	static {
+		fieldCacheTypes.put( String[].class, STRING_ARRAY );
 		fieldCacheTypes.put( String.class, STRING );
 		fieldCacheTypes.put( Integer.class, INT );
 		fieldCacheTypes.put( Long.class, LONG );
