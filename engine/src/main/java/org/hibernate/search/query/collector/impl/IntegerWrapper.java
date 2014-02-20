@@ -21,42 +21,24 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
-package org.hibernate.search.query.dsl.impl;
-
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.query.facet.Facet;
+package org.hibernate.search.query.collector.impl;
 
 /**
- * A facet request for string based fields.
+ * Replacement of Integer which is mutable, so that we can avoid creating many objects while counting hits for each facet.
  *
+ * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class DiscreteFacetRequest extends FacetingRequestImpl {
-	DiscreteFacetRequest(String name, String fieldName) {
-		super( name, fieldName );
+public final class IntegerWrapper {
+	int count = 0;
+
+	public int getCount() {
+		return count;
 	}
 
-	@Override
-	public Class<?> getFieldCacheType() {
-		return String[].class;
-	}
-
-	@Override
-	public Facet createFacet(String value, int count) {
-		return new SimpleFacet( getFacetingName(), getFieldName(), value, count );
-	}
-
-	static class SimpleFacet extends AbstractFacet {
-		SimpleFacet(String facetingName, String fieldName, String value, int count) {
-			super( facetingName, fieldName, value, count );
-		}
-
-		@Override
-		public Query getFacetQuery() {
-			return new TermQuery( new Term( getFieldName(), getValue() ) );
-		}
+	public void incrementCount() {
+		this.count++;
 	}
 }
+
+
