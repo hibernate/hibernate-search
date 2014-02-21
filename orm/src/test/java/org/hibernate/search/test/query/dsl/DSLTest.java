@@ -805,7 +805,7 @@ public class DSLTest extends SearchTestCase {
 			Coffee decaffInstance = (Coffee) fullTextSession.createFullTextQuery( decaff, Coffee.class ).list().get( 0 );
 			Query mltQuery = qb
 					.moreLikeThis()
-							.boostTermsByFactor( 1 )
+							.favorSignificantTermsWithFactor( 1 )
 						.comparingAllFields()
 						.toEntityWithId( decaffInstance.getId() )
 						.createQuery();

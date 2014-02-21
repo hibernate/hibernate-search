@@ -47,7 +47,7 @@ public class ConnectedMoreLikeThisContext implements MoreLikeThisContext {
 	}
 
 	@Override
-	public MoreLikeThisContext boostTermsByFactor(float factor) {
+	public MoreLikeThisContext favorSignificantTermsWithFactor(float factor) {
 		moreLikeThisContext.setBoostTerms( true );
 		moreLikeThisContext.setTermBoostFactor( factor );
 		return this;
