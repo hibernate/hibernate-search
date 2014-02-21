@@ -29,6 +29,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +56,8 @@ import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.PriorityQueue;
 import org.apache.lucene.util.UnicodeUtil;
 
+import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -89,8 +92,9 @@ public class MoreLikeThisBuilder {
 	private float boostFactor = 1;
 	private TFIDFSimilarity similarity;
 	private int documentNumber;
-	private String[] fieldNames;
+	private String[] compatibleFieldNames;
 	private IndexReader indexReader;
+	private FieldsContext fieldsContext;
 
 	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity<?> documentBuilder, SearchFactoryImplementor searchFactory ) {
 		log.requireTFIDFSimilarity( documentBuilder.getBeanClass() );
@@ -103,8 +107,8 @@ public class MoreLikeThisBuilder {
 		return this;
 	}
 
-	public MoreLikeThisBuilder fieldNames(String... fieldNames) {
-		this.fieldNames = fieldNames;
+	public MoreLikeThisBuilder compatibleFieldNames(String... compatibleFieldNames) {
+		this.compatibleFieldNames = compatibleFieldNames;
 		return this;
 	}
 
@@ -135,21 +139,22 @@ public class MoreLikeThisBuilder {
 	 * Create the More Like This query from a PriorityQueue
 	 */
 	private Query createQuery(List<PriorityQueue<Object[]>> q) {
-		//TODO in the original algorithm, the number of terms is limited to maxQueryTerms
-		//TODO In the current implementation, we do nbrOfFields * maxQueryTerms
-		int length = fieldNames.length;
+		//In the original algorithm, the number of terms is limited to maxQueryTerms
+		//In the current implementation, we do nbrOfFields * maxQueryTerms
+		int length = fieldsContext.size();
 		if ( length == 0 ) {
 			throw new AssertionFailure( "Querying MoreLikeThis on 0 field." );
 		}
 		else if ( length == 1 ) {
-			return createQuery( q.get( 0 ) );
+			return createQuery( q.get( 0 ), fieldsContext.getFirst() );
 		}
 		else {
-			//TODO migrate to DisjunctionMaxQuery
 			BooleanQuery query = new BooleanQuery();
+			//the fieldsContext indexes are aligned with the priority queue's
+			Iterator<FieldContext> fieldsContextIterator = fieldsContext.iterator();
 			for ( PriorityQueue<Object[]> queue : q ) {
 				try {
-					query.add( createQuery( queue ), BooleanClause.Occur.SHOULD );
+					query.add( createQuery( queue, fieldsContextIterator.next() ), BooleanClause.Occur.SHOULD );
 				}
 				catch (BooleanQuery.TooManyClauses ignore) {
 					break;
@@ -159,12 +164,20 @@ public class MoreLikeThisBuilder {
 		}
 	}
 
-	private Query createQuery(PriorityQueue<Object[]> q) {
+	private Query createQuery(PriorityQueue<Object[]> q, FieldContext fieldContext) {
+		if ( q == null ) {
+			final FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
+			if ( fieldBridge instanceof NumericFieldBridge ) {
+				// we probably can do something here
+				//TODO how to build the query where we don't have the value?
+			}
+			throw log.fieldCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getBeanClass() );
+		}
+
 		BooleanQuery query = new BooleanQuery();
 		Object cur;
 		int qterms = 0;
 		float bestScore = 0;
-
 		while ( ( cur = q.pop() ) != null ) {
 			Object[] ar = (Object[]) cur;
 			TermQuery tq = new TermQuery( new Term( (String) ar[1], (String) ar[0] ) );
@@ -190,53 +203,71 @@ public class MoreLikeThisBuilder {
 				break;
 			}
 		}
-
-		return query;
+		// Apply field adjustments
+		return fieldContext.getFieldCustomizer().setWrappedQuery( query ).createQuery();
 	}
 
 	/**
 	 * Find words for a more-like-this query former.
-	 * Store them per field name.
+	 * Store them per field name according to the order of fieldnames defined in {@link #fieldsContext}.
+	 * If the field name is not compatible with term retrieval, the queue will be empty for that index.
 	 */
 	private List<PriorityQueue<Object[]>> retrieveTerms() throws IOException {
-		Map<String,Map<String, Int>> termFreqMapPerFieldname = new HashMap<String,Map<String, Int>>( fieldNames.length );
+		int size = fieldsContext.size();
+		Map<String,Map<String, Int>> termFreqMapPerFieldname = new HashMap<String,Map<String, Int>>( size );
 		final Fields vectors = indexReader.getTermVectors( documentNumber );
 		Document maybeDocument = null;
-		for ( String fieldName : fieldNames ) {
-			Map<String,Int> termFreqMap = new HashMap<String, Int>();
-			termFreqMapPerFieldname.put( fieldName, termFreqMap );
-			final Terms vector;
-			if ( vectors != null ) {
-				vector = vectors.terms( fieldName );
-			}
-			else {
-				vector = null;
-			}
-
-			// field does not store term vector info
-			if ( vector == null ) {
-				if ( maybeDocument == null ) {
-					maybeDocument = indexReader.document( documentNumber );
+		for ( FieldContext fieldContext : fieldsContext ) {
+			String fieldName = fieldContext.getField();
+			if ( isCompatibleField( fieldName ) ) {
+				Map<String,Int> termFreqMap = new HashMap<String, Int>();
+				termFreqMapPerFieldname.put( fieldName, termFreqMap );
+				final Terms vector;
+				if ( vectors != null ) {
+					vector = vectors.terms( fieldName );
 				}
-				IndexableField[] fields = maybeDocument.getFields( fieldName );
-				for ( IndexableField field : fields ) {
-					//TODO how can I read compressed data
-					//TODO numbers?
-					final String stringValue = field.stringValue();
-					if ( stringValue != null ) {
-						addTermFrequencies( new StringReader( stringValue ), termFreqMap, fieldName );
+				else {
+					vector = null;
+				}
+
+				// field does not store term vector info
+				if ( vector == null ) {
+					if ( maybeDocument == null ) {
+						maybeDocument = indexReader.document( documentNumber );
+					}
+					IndexableField[] fields = maybeDocument.getFields( fieldName );
+					for ( IndexableField field : fields ) {
+						//TODO how can I read compressed data
+						//TODO numbers?
+						final String stringValue = field.stringValue();
+						if ( stringValue != null ) {
+							addTermFrequencies( new StringReader( stringValue ), termFreqMap, fieldName );
+						}
 					}
 				}
+				else {
+					addTermFrequencies( termFreqMap, vector );
+				}
 			}
 			else {
-				addTermFrequencies( termFreqMap, vector );
+				//place null as the field is not compatible
+				termFreqMapPerFieldname.put( fieldName, null );
 			}
 		}
-		List<PriorityQueue<Object[]>> results = new ArrayList<PriorityQueue<Object[]>>( fieldNames.length );
+		List<PriorityQueue<Object[]>> results = new ArrayList<PriorityQueue<Object[]>>( size );
 		for ( Map.Entry<String,Map<String,Int>> entry : termFreqMapPerFieldname.entrySet() ) {
 			results.add( createQueue( entry.getKey(), entry.getValue() ) );
 		}
 		return results;
+	}
+
+	private boolean isCompatibleField(String fieldName) {
+		for ( String compatibleFieldName : compatibleFieldNames ) {
+			if ( compatibleFieldName.equals( fieldName ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -245,6 +276,10 @@ public class MoreLikeThisBuilder {
 	 * @param words a map of words keyed on the word(String) with Int objects as the values.
 	 */
 	private PriorityQueue<Object[]> createQueue(String fieldName, Map<String, Int> words) throws IOException {
+		if ( words == null ) {
+			//incompatible field name
+			return null;
+		}
 		// have collected all words in doc and their freqs
 		int numDocs = indexReader.numDocs();
 		FreqQ res = new FreqQ( words.size() ); // will order words by score
@@ -389,6 +424,11 @@ public class MoreLikeThisBuilder {
 			return true;
 		}
 		return stopWords != null && stopWords.contains( term );
+	}
+
+	public MoreLikeThisBuilder fieldsContext(FieldsContext fieldsContext) {
+		this.fieldsContext = fieldsContext;
+		return this;
 	}
 
 	/**

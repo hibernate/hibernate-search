@@ -88,25 +88,25 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 		Query query;
 		final SearchFactoryImplementor searchFactory = queryContext.getFactory();
 		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
-		if ( fieldsContext.size() == 0 ) {
-			IndexReader indexReader = searchFactory.getIndexReaderAccessor().open( queryContext.getEntityType() );
-			try {
-				// retrieving the docId and building the more like this query form the term vectors must be using the same index reader
-				Integer docId = getLuceneDocumentIdFromEntityId( documentBuilder );
-				String[] fieldNames = getAllCompatibleFieldNames( documentBuilder );
-				query = new MoreLikeThisBuilder( documentBuilder, searchFactory )
-						.fieldNames( fieldNames )
-						.indexReader( indexReader )
-						.documentNumber( docId )
-						.otherMoreLikeThisContext( moreLikeThisContext )
-						.createQuery();
+		IndexReader indexReader = searchFactory.getIndexReaderAccessor().open( queryContext.getEntityType() );
+		// retrieving the docId and building the more like this query form the term vectors must be using the same index reader
+		try {
+			String[] fieldNames = getAllCompatibleFieldNames( documentBuilder );
+			if ( fieldsContext.size() == 0 ) {
+				// Use all compatible fields when comparingAllFields is used
+				fieldsContext.addAll( fieldNames );
 			}
-			finally {
-				searchFactory.getIndexReaderAccessor().close( indexReader );
-			}
+			Integer docId = getLuceneDocumentIdFromEntityId( documentBuilder );
+			query = new MoreLikeThisBuilder( documentBuilder, searchFactory )
+					.compatibleFieldNames( fieldNames )
+					.fieldsContext( fieldsContext )
+					.indexReader( indexReader )
+					.documentNumber( docId )
+					.otherMoreLikeThisContext( moreLikeThisContext )
+					.createQuery();
 		}
-		else {
-			return null;
+		finally {
+			searchFactory.getIndexReaderAccessor().close( indexReader );
 		}
 		//TODO implement explicit set of fields and field customization
 		//TODO implement INPUT.READER

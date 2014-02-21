@@ -706,4 +706,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 207, value = "MoreLikeThis queries require a TFIDFSimilarity for entity '$1%s'")
 	SearchException requireTFIDFSimilarity(Class<?> beanClass);
+
+	@Message(id = 208, value = "Field %s of entity %s cannot be used in a MoreLikeThis query")
+	SearchException fieldCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
 }
