@@ -35,6 +35,7 @@ import java.util.TimeZone;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
@@ -795,6 +796,7 @@ public class DSLTest extends SearchTestCase {
 	}
 
 	public void testMoreLikeThis() {
+		boolean outputLogs = true;
 		Transaction transaction = fullTextSession.beginTransaction();
 		try {
 			QueryBuilder qb = fullTextSession.getSearchFactory()
@@ -819,7 +821,7 @@ public class DSLTest extends SearchTestCase {
 			Set<Term> terms = new HashSet<Term>( 100 );
 			mltQuery.extractTerms( terms );
 			assertThat( terms )
-					.describedAs( "intenseDescription should be ignored" )
+					.describedAs( "internalDescription should be ignored" )
 					.doesNotSatisfy( new Condition<Collection<?>>() {
 				@Override
 				public boolean matches(Collection<?> value) {
@@ -831,25 +833,62 @@ public class DSLTest extends SearchTestCase {
 					return false;
 				}
 			} );
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
 
-			// set to true to display results
-			if ( false ) {
-				StringBuilder builder = new StringBuilder( "Initial coffee: " )
-						.append( decaffInstance )
-						.append( "\n\n" )
-						.append( "Matching coffees" ).append( "\n" );
-				for ( Object[] entry : results ) {
-					builder.append( "Coffee: " ).append( entry[0] ).append( "\n" )
-							.append( "    Score: " ).append( entry[1] );
-				}
-				builder.append( "Query: " ).append( mltQuery.toString() );
-				//CHECKSTYLE:OFF
-				System.out.println( builder.toString() );
-				//CHECKSTYLE:ON
+			//custom fields
+			mltQuery = qb
+					.moreLikeThis()
+					.comparingField( "summary" ).boostedTo( 10f )
+					.andField( "description" )
+					.toEntityWithId( decaffInstance.getId() )
+					.createQuery();
+			results = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+
+			assertThat( results ).isNotEmpty();
+			assertThat( mltQuery instanceof BooleanQuery );
+			BooleanQuery topMltQuery = (BooleanQuery) mltQuery;
+			// FIXME: I'd prefer a test that uses data instead of how the query is actually built
+			assertThat( topMltQuery.getClauses() ).onProperty( "query.boost" ).contains( 1f, 10f );
+
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
+
+			//using non compatible field
+			try {
+				qb
+						.moreLikeThis()
+						.comparingField( "summary" )
+						.andField( "internalDescription" )
+						.toEntityWithId( decaffInstance.getId() )
+						.createQuery();
+			}
+			catch (SearchException e) {
+				assertThat( e.getMessage() )
+						.as( "Internal description is neither stored nor store termvectors" )
+						.contains( "internalDescription" );
 			}
 		}
 		finally {
 			transaction.commit();
+		}
+	}
+
+	private void outputQueryAndResults(boolean outputLogs, Coffee originalInstance, Query mltQuery, List<Object[]> results) {
+		// set to true to display results
+		if ( outputLogs ) {
+			StringBuilder builder = new StringBuilder( "Initial coffee: " )
+					.append( originalInstance ) .append( "\n\n" )
+					.append( "Query: " ).append( mltQuery.toString() ).append( "\n\n" )
+					.append( "Matching coffees" ).append( "\n" );
+			for ( Object[] entry : results ) {
+				builder.append( "Coffee: " ).append( entry[0] ).append( "\n" )
+						.append( "    Score: " ).append( entry[1] );
+			}
+			//CHECKSTYLE:OFF
+			System.out.println( builder.toString() );
+			//CHECKSTYLE:ON
 		}
 	}
 
