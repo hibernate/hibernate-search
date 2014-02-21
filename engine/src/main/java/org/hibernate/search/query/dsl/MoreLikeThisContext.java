@@ -38,7 +38,7 @@ public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisCont
 	 * Unless activated, terms are not boosted by their individual frequency.
 	 * When activated, significant terms will have their influence increased more than by default.
 	 */
-	MoreLikeThisContext boostTermsByFactor(float factor);
+	MoreLikeThisContext favorSignificantTermsWithFactor(float factor);
 
 	/**
 	 * Match the content using "all" of the indexed fields of the entity.
