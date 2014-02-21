@@ -64,6 +64,15 @@ public class FieldsContext implements Iterable<FieldContext> {
 		fieldContexts.add( new FieldContext( fieldName ) );
 	}
 
+	public void addAll(String... fieldNames) {
+		if ( fieldNames.length != 0 ) {
+			firstOfContext = fieldContexts.size();
+			for ( String fieldName : fieldNames ) {
+				doAdd( fieldName );
+			}
+		}
+	}
+
 	public void boostedTo(float boost) {
 		for ( FieldContext fieldContext : getCurrentFieldContexts() ) {
 			fieldContext.getFieldCustomizer().boostedTo( boost );
