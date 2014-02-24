@@ -22,7 +22,8 @@
 package org.hibernate.search.query.fieldcache.impl;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.SortedSetDocValues;
@@ -58,21 +59,17 @@ public final class MultiStringFieldLoadingStrategy implements FieldLoadingStrate
 	public String[] collect(int relativeDocId) {
 		// use the loaded SortedSetDocValues to retrieve all values for the field
 		sortedSetDocValues.setDocument( relativeDocId );
-		int valueCount = safeLongToInt( sortedSetDocValues.getValueCount() );
-		String[] values = new String[valueCount];
+		List<String> values = new ArrayList<String>();
 
 		BytesRef bytesRef = new BytesRef();
-		int i;
-		for ( i = 0; i < valueCount; i++ ) {
-			long ordinal = sortedSetDocValues.nextOrd();
-			// not all documents have the same amount of ordinals
-			if ( ordinal == SortedSetDocValues.NO_MORE_ORDS ) {
-				break;
-			}
+		long ordinal = sortedSetDocValues.nextOrd();
+		while ( ordinal != SortedSetDocValues.NO_MORE_ORDS ) {
 			sortedSetDocValues.lookupOrd( ordinal, bytesRef );
-			values[i] = bytesRef.utf8ToString();
+			values.add( bytesRef.utf8ToString() );
+			ordinal = sortedSetDocValues.nextOrd();
 		}
-		return Arrays.copyOf( values, i );
+
+		return values.toArray( new String[values.size()] );
 	}
 
 	private int safeLongToInt(long l) {
