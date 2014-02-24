@@ -34,6 +34,9 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMethod;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import org.hibernate.search.engine.metadata.impl.MetadataProvider;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.impl.SimpleInitializer;
@@ -73,7 +76,10 @@ public class UnorderedIdScanTest {
 	private static void tryCreatingDocumentBuilder(XClass mappedXClass, ReflectionManager reflectionManager) {
 		ManualConfiguration cfg = new ManualConfiguration();
 		ConfigContext context = new ConfigContext( cfg );
+		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, context );
+		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( mappedXClass ));
 		new DocumentBuilderIndexedEntity( mappedXClass,
+				typeMetadata,
 				context,
 				reflectionManager,
 				new HashSet(),

@@ -144,9 +144,9 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * @param optimizationBlackList mutable register, keeps track of types on which we need to disable collection events optimizations
 	 * @param instanceInitializer helper class for class object graph navigation
 	 */
-	public DocumentBuilderIndexedEntity(XClass clazz, ConfigContext context,
+	public DocumentBuilderIndexedEntity(XClass clazz, TypeMetadata typeMetadata, ConfigContext context,
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {
-		super( clazz, context, reflectionManager, optimizationBlackList, instanceInitializer );
+		super( clazz, typeMetadata, reflectionManager, optimizationBlackList, instanceInitializer );
 
 		idPropertyMetadata = providedIdMetadata( clazz, context, reflectionManager );
 		if ( idPropertyMetadata == null ) {

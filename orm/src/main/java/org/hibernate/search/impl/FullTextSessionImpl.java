@@ -45,7 +45,6 @@ import org.hibernate.ReplicationMode;
 import org.hibernate.SQLQuery;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
-import org.hibernate.SessionEventListener;
 import org.hibernate.SessionFactory;
 import org.hibernate.SimpleNaturalIdLoadAccess;
 import org.hibernate.Transaction;
@@ -57,9 +56,9 @@ import org.hibernate.engine.jdbc.spi.JdbcConnectionAccess;
 import org.hibernate.engine.query.spi.sql.NativeSQLQuerySpecification;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.LoadQueryInfluencers;
+import org.hibernate.engine.spi.NonFlushedChanges;
 import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.QueryParameters;
-import org.hibernate.engine.spi.SessionEventListenerManager;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.query.spi.ParameterMetadata;
@@ -568,6 +567,16 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	}
 
 	@Override
+	public NonFlushedChanges getNonFlushedChanges() {
+		return sessionImplementor.getNonFlushedChanges();
+	}
+
+	@Override
+	public void applyNonFlushedChanges(NonFlushedChanges nonFlushedChanges) {
+		sessionImplementor.applyNonFlushedChanges( nonFlushedChanges );
+	}
+
+	@Override
 	public String getEntityName(Object object) {
 		return session.getEntityName( object );
 	}
@@ -857,16 +866,6 @@ public class FullTextSessionImpl implements FullTextSession, SessionImplementor 
 	@Override
 	public SimpleNaturalIdLoadAccess bySimpleNaturalId(Class entityClass) {
 		return session.bySimpleNaturalId( entityClass );
-	}
-
-	@Override
-	public void addEventListeners(SessionEventListener... listeners) {
-		session.addEventListeners( listeners );
-	}
-
-	@Override
-	public SessionEventListenerManager getEventListenerManager() {
-		return sessionImplementor.getEventListenerManager();
 	}
 
 }

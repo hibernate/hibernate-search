@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.util.impl;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
@@ -31,6 +32,7 @@ import java.util.List;
 
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.util.StringHelper;
 
 /**
@@ -115,4 +117,53 @@ public abstract class ReflectionHelper {
 		}
 		return hierarchy;
 	}
+
+	/**
+	 * Checks whether the specified class contains any Search specific annotations.
+	 *
+	 * @param mappedClass the {@code XClass} to check for Search annotations
+	 *
+	 * @return Returns {@code true} if the class contains at least one Search annotation, {@code false} otherwise
+	 */
+	public static boolean containsSearchAnnotations(XClass mappedClass) {
+		// check the type annotations
+		if ( containsSearchAnnotation( mappedClass.getAnnotations() ) ) {
+			return true;
+		}
+
+		for ( XProperty method : mappedClass.getDeclaredProperties( XClass.ACCESS_PROPERTY ) ) {
+			if ( containsSearchAnnotation( method.getAnnotations() ) ) {
+				return true;
+			}
+		}
+
+		for ( XProperty field : mappedClass.getDeclaredProperties( XClass.ACCESS_FIELD ) ) {
+			if ( containsSearchAnnotation( field.getAnnotations() ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if the annotation is a Search annotation by comparing the package of the annotation.
+	 *
+	 * @param annotation the annotation to check
+	 *
+	 * @return Returns {@code true} if the annotation is a Search annotation, {@code false} otherwise
+	 */
+	public static boolean isSearchAnnotation(Annotation annotation) {
+		return "org.hibernate.search.annotations".equals( annotation.annotationType().getPackage().getName() );
+	}
+
+	private static boolean containsSearchAnnotation(Annotation[] annotations) {
+		for ( Annotation annotation : annotations ) {
+			if ( isSearchAnnotation( annotation ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }
