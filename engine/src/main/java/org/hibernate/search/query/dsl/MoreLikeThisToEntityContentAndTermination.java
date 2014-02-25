@@ -31,8 +31,4 @@ package org.hibernate.search.query.dsl;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public interface MoreLikeThisToEntityContentAndTermination extends Termination<MoreLikeThisToEntityContentAndTermination> {
-	/**
-	 * When comparing fields, excludes the ones where the example instance has a value of 0 (default)
-	 */
-	MoreLikeThisToEntityContentAndTermination excludeZeros();
 }
