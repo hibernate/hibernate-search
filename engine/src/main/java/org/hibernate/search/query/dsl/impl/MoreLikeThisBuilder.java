@@ -58,7 +58,7 @@ import org.apache.lucene.util.UnicodeUtil;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.AssertionFailure;
@@ -73,7 +73,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class MoreLikeThisBuilder {
+public class MoreLikeThisBuilder<T> {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -81,7 +81,7 @@ public class MoreLikeThisBuilder {
 	private int maxNumTokensParsed = MoreLikeThis.DEFAULT_MAX_NUM_TOKENS_PARSED;
 	private int maxWordLen = MoreLikeThis.DEFAULT_MAX_WORD_LENGTH;
 	private Set<?> stopWords = MoreLikeThis.DEFAULT_STOP_WORDS;
-	private DocumentBuilderIndexedEntity<?> documentBuilder;
+	private DocumentBuilderIndexedEntity<T> documentBuilder;
 	// We lower the min defaults to 1 because we don't merge the freq of *all* fields unlike the original MoreLikeThis
 	// TODO: is that hurting performance? Could we guess "small fields" and ony lower these?
 	private int minTermFreq = 1; //MoreLikeThis.DEFAULT_MIN_TERM_FREQ;
@@ -91,12 +91,14 @@ public class MoreLikeThisBuilder {
 	private boolean boost = MoreLikeThis.DEFAULT_BOOST;
 	private float boostFactor = 1;
 	private TFIDFSimilarity similarity;
-	private int documentNumber;
+	private Integer documentNumber;
 	private String[] compatibleFieldNames;
 	private IndexReader indexReader;
 	private FieldsContext fieldsContext;
+	private Object input;
+	private QueryBuildingContext queryContext;
 
-	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity<?> documentBuilder, SearchFactoryImplementor searchFactory ) {
+	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity<T> documentBuilder, SearchFactoryImplementor searchFactory ) {
 		log.requireTFIDFSimilarity( documentBuilder.getBeanClass() );
 		this.documentBuilder = documentBuilder;
 		this.similarity = (TFIDFSimilarity) searchFactory.getIndexBindings().get( documentBuilder.getBeanClass() ).getSimilarity();
@@ -112,7 +114,7 @@ public class MoreLikeThisBuilder {
 		return this;
 	}
 
-	public MoreLikeThisBuilder documentNumber(int docNum) {
+	public MoreLikeThisBuilder documentNumber(Integer docNum) {
 		this.documentNumber = docNum;
 		return this;
 	}
@@ -215,8 +217,26 @@ public class MoreLikeThisBuilder {
 	private List<PriorityQueue<Object[]>> retrieveTerms() throws IOException {
 		int size = fieldsContext.size();
 		Map<String,Map<String, Int>> termFreqMapPerFieldname = new HashMap<String,Map<String, Int>>( size );
-		final Fields vectors = indexReader.getTermVectors( documentNumber );
+		final Fields vectors;
 		Document maybeDocument = null;
+		if ( documentNumber == null && size > 0 ) {
+			//build the document from the entity instance
+
+			//first build the list of fields we are interested in
+			String[] fieldNames = new String[ size ];
+			Iterator<FieldContext> fieldsContextIterator = fieldsContext.iterator();
+			for ( int index = 0 ; index < size ; index++ ) {
+				fieldNames[index] = fieldsContextIterator.next().getField();
+			}
+			//TODO should we keep the fieldToAnalyzerMap around to pass to the analyzer?
+			Map<String,String> fieldToAnalyzerMap = new HashMap<String, String>( );
+			//FIXME by calling documentBuilder we don't honor .comparingField("foo").ignoreFieldBridge(): probably not a problem in practice though
+			maybeDocument = documentBuilder.getDocument( (T) input, null, fieldToAnalyzerMap, null, new ContextualExceptionBridgeHelper(), fieldNames );
+			vectors = null;
+		}
+		else {
+			vectors = indexReader.getTermVectors( documentNumber );
+		}
 		for ( FieldContext fieldContext : fieldsContext ) {
 			String fieldName = fieldContext.getField();
 			if ( isCompatibleField( fieldName ) ) {
@@ -241,7 +261,7 @@ public class MoreLikeThisBuilder {
 						//TODO numbers?
 						final String stringValue = field.stringValue();
 						if ( stringValue != null ) {
-							addTermFrequencies( new StringReader( stringValue ), termFreqMap, fieldName );
+							addTermFrequencies( new StringReader( stringValue ), termFreqMap, fieldContext );
 						}
 					}
 				}
@@ -365,17 +385,16 @@ public class MoreLikeThisBuilder {
 	 * @param termFreqMap a Map of terms and their frequencies
 	 * @param fieldName Used by analyzer for any special per-field analysis
 	 */
-	private void addTermFrequencies(Reader r, Map<String, Int> termFreqMap, String fieldName)
+	private void addTermFrequencies(Reader r, Map<String, Int> termFreqMap, FieldContext fieldContext)
 			throws IOException {
-		DocumentFieldMetadata fieldMetadata = documentBuilder.getTypeMetadata()
-				.getDocumentFieldMetadataFor( fieldName );
-		if ( fieldMetadata == null ) {
-			//TODO should we fix this?
-			throw log.fieldUnknownByHibernateSearchCannotBeUsedInMlt( documentBuilder.getBeanClass(), fieldName );
-		}
-		Analyzer analyzer = fieldMetadata.getAnalyzer();
+		String fieldName = fieldContext.getField();
+		Analyzer analyzer = queryContext.getQueryAnalyzer();
 		//TODO The original MLT implementation forces fields with analyzers. Seems that a pass through makes sense.
-		analyzer = analyzer != null ? analyzer : PassThroughAnalyzer.INSTANCE;
+		//analyzer = analyzer != null ? analyzer : PassThroughAnalyzer.INSTANCE;
+		if ( fieldContext.isIgnoreAnalyzer() ) {
+			// essentially does the Reader to String conversion for us
+			analyzer = PassThroughAnalyzer.INSTANCE;
+		}
 		TokenStream ts = analyzer.tokenStream( fieldName, r );
 		try {
 			int tokenCount = 0;
@@ -428,6 +447,16 @@ public class MoreLikeThisBuilder {
 
 	public MoreLikeThisBuilder fieldsContext(FieldsContext fieldsContext) {
 		this.fieldsContext = fieldsContext;
+		return this;
+	}
+
+	public MoreLikeThisBuilder input(Object input) {
+		this.input = input;
+		return this;
+	}
+
+	public MoreLikeThisBuilder queryContext(QueryBuildingContext queryContext) {
+		this.queryContext = queryContext;
 		return this;
 	}
 

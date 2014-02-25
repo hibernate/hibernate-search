@@ -869,6 +869,93 @@ public class DSLTest extends SearchTestCase {
 						.as( "Internal description is neither stored nor store termvectors" )
 						.contains( "internalDescription" );
 			}
+
+			// pass entity itself in a managed state
+			mltQuery = qb
+					.moreLikeThis()
+					.comparingField( "summary" ).boostedTo( 10f )
+					.andField( "description" )
+					.toEntity( decaffInstance )
+					.createQuery();
+			List<Object[]> entityResults = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+
+			// query from id and from the managed entity should match
+			assertThat( entityResults ).isNotEmpty();
+			assertThat( entityResults ).hasSize( results.size() );
+			for ( int index = 0 ; index < entityResults.size() ; index++ ) {
+				Object[] real = entityResults.get( index );
+				Object[] expected = results.get( index );
+				assertThat( real[1] ).isEqualTo( expected[1] );
+				assertThat( ( (Coffee) real[0] ).getId() ).isEqualTo( ( (Coffee) expected[0] ).getId() );
+			}
+
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
+
+			// pass entity itself with a matching id but different values
+			// the id should take precedene
+			Coffee nonMatchingOne = (Coffee) results.get( results.size() - 1 )[0];
+			Coffee copyOfDecaffInstance = new Coffee();
+			copyOfDecaffInstance.setId( decaffInstance.getId() );
+			copyOfDecaffInstance.setInternalDescription( nonMatchingOne.getInternalDescription() );
+			copyOfDecaffInstance.setName( nonMatchingOne.getName() );
+			copyOfDecaffInstance.setDescription( nonMatchingOne.getDescription() );
+			copyOfDecaffInstance.setIntensity( nonMatchingOne.getIntensity() );
+			copyOfDecaffInstance.setSummary( nonMatchingOne.getSummary() );
+			mltQuery = qb
+					.moreLikeThis()
+					.comparingField( "summary" ).boostedTo( 10f )
+					.andField( "description" )
+					.toEntity( copyOfDecaffInstance )
+					.createQuery();
+			entityResults = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+
+			// query from id and from the managed entity should match
+			assertThat( entityResults ).isNotEmpty();
+			assertThat( entityResults ).hasSize( results.size() );
+			for ( int index = 0 ; index < entityResults.size() ; index++ ) {
+				Object[] real = entityResults.get( index );
+				Object[] expected = results.get( index );
+				assertThat( real[1] ).isEqualTo( expected[1] );
+				assertThat( ( (Coffee) real[0] ).getId() ).isEqualTo( ( (Coffee) expected[0] ).getId() );
+			}
+
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
+
+			// pass entity itself with the right values but no id
+			copyOfDecaffInstance = new Coffee();
+			copyOfDecaffInstance.setInternalDescription( decaffInstance.getInternalDescription() );
+			copyOfDecaffInstance.setName( decaffInstance.getName() );
+			copyOfDecaffInstance.setDescription( decaffInstance.getDescription() );
+			copyOfDecaffInstance.setIntensity( decaffInstance.getIntensity() );
+			copyOfDecaffInstance.setSummary( decaffInstance.getSummary() );
+			mltQuery = qb
+					.moreLikeThis()
+					.comparingField( "summary" ).boostedTo( 10f )
+					.andField( "description" )
+					.toEntity( copyOfDecaffInstance )
+					.createQuery();
+			entityResults = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+
+			// query from id and from the managed entity should match
+			assertThat( entityResults ).isNotEmpty();
+			assertThat( entityResults ).hasSize( results.size() );
+			for ( int index = 0 ; index < entityResults.size() ; index++ ) {
+				Object[] real = entityResults.get( index );
+				Object[] expected = results.get( index );
+				assertThat( real[1] ).isEqualTo( expected[1] );
+				assertThat( ( (Coffee) real[0] ).getId() ).isEqualTo( ( (Coffee) expected[0] ).getId() );
+			}
+
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
 		}
 		finally {
 			transaction.commit();
@@ -883,8 +970,8 @@ public class DSLTest extends SearchTestCase {
 					.append( "Query: " ).append( mltQuery.toString() ).append( "\n\n" )
 					.append( "Matching coffees" ).append( "\n" );
 			for ( Object[] entry : results ) {
-				builder.append( "Coffee: " ).append( entry[0] ).append( "\n" )
-						.append( "    Score: " ).append( entry[1] );
+				builder.append( "    Score: " ).append( entry[1] );
+				builder.append( " | Coffee: " ).append( entry[0] ).append( "\n" );
 			}
 			//CHECKSTYLE:OFF
 			System.out.println( builder.toString() );
