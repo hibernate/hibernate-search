@@ -57,6 +57,7 @@ public interface MoreLikeThisMatchingContext {
 	 * Selected fields must have a field bridge compatible with
 	 * the provided content.
 	 */
+	//TODO should we support it? What's the use case
 	MoreLikeThisTermination toContent(Reader reader);
 
 	/**
@@ -65,6 +66,7 @@ public interface MoreLikeThisMatchingContext {
 	 * Selected fields must have a field bridge compatible with
 	 * the provided content.
 	 */
+	//TODO should we support it? What's the use case
 	MoreLikeThisTermination toContent(String data);
 
 }
