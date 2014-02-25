@@ -482,6 +482,13 @@ Query luceneQuery = mythQB
     .createQuery();</programlisting>
       </section>
 
+      <section id="search-query-querydsl-spatial">
+        <title>Spatial (or geolocation) queries</title>
+
+        <para>This set of queries has its own chapter, check out <xref
+        linkend="spatial"/>.</para>
+      </section>
+
       <section>
         <title>Combining queries</title>
 
@@ -1824,29 +1831,30 @@ FacetingRequest labelFacetingRequest = builder.facet()
         discrete value for the indexed field <constant>label</constant>. The
         <classname>Facet</classname> instance will record the actual field
         value including how often this particular field value occurs within
-        the original query results. Parameters <methodname>orderedBy</methodname>,
+        the original query results. Parameters
+        <methodname>orderedBy</methodname>,
         <methodname>includeZeroCounts</methodname> and
         <methodname>maxFacetCount</methodname> are optional and can be applied
-        on any faceting request.
-        Parameter <methodname>orderedBy</methodname> allows to specify in which
-        order the created facets will be returned. The default is
-        <constant>FacetSortOrder.COUNT_DESC</constant>, but you can also sort
-        on the field value. Parameter <methodname>includeZeroCount</methodname>
-        determines whether facets with a count of 0 will be included in the
-        result (by default they are) and <methodname>maxFacetCount</methodname>
-        allows to limit the maximum amount of facets returned.</para>
+        on any faceting request. Parameter <methodname>orderedBy</methodname>
+        allows to specify in which order the created facets will be returned.
+        The default is <constant>FacetSortOrder.COUNT_DESC</constant>, but you
+        can also sort on the field value. Parameter
+        <methodname>includeZeroCount</methodname> determines whether facets
+        with a count of 0 will be included in the result (by default they are)
+        and <methodname>maxFacetCount</methodname> allows to limit the maximum
+        amount of facets returned.</para>
 
         <note>
           <para>There are several preconditions an indexed field has to meet
-          in order to categorize (facet) on it. The indexed
-          property must be of type <classname>String</classname>,
-          <classname>Date</classname> or a subtype of
-          <classname>Number</classname>; also <constant>null</constant> values
-          should be avoided. Finally the property has to be indexed with
-          <constant>Analyze.NO</constant> and you can not use it in combination
-          with <classname>@NumericField</classname>. When you need these other
-          options we suggest to index the property twice and use the appropriate
-          field depending on the use case: <programlisting>...
+          in order to categorize (facet) on it. The indexed property must be
+          of type <classname>String</classname>, <classname>Date</classname>
+          or a subtype of <classname>Number</classname>; also
+          <constant>null</constant> values should be avoided. Finally the
+          property has to be indexed with <constant>Analyze.NO</constant> and
+          you can not use it in combination with
+          <classname>@NumericField</classname>. When you need these other
+          options we suggest to index the property twice and use the
+          appropriate field depending on the use case: <programlisting>...
 @Fields({
   @Field( name="price" ),
   @Field( name="price_facet", analyze=Analyze.NO )
@@ -1863,14 +1871,14 @@ private int price;
         <title>Creating a range faceting request</title>
 
         <para>The creation of a range faceting request is similar. We also
-        start with a name for the request and the field to facet on. Then
-        we have to specify ranges for the field values. A range faceting
-        request can be seen in <xref linkend="example-range-faceting"/>.
-        There, three different price ranges are specified.
-        <methodname>below</methodname> and <methodname>above</methodname> can
-        only be specified once, but you can specify as many
-        <methodname>from</methodname> - <methodname>to</methodname> ranges as
-        you want. For each range boundary you can also specify via
+        start with a name for the request and the field to facet on. Then we
+        have to specify ranges for the field values. A range faceting request
+        can be seen in <xref linkend="example-range-faceting"/>. There, three
+        different price ranges are specified. <methodname>below</methodname>
+        and <methodname>above</methodname> can only be specified once, but you
+        can specify as many <methodname>from</methodname> -
+        <methodname>to</methodname> ranges as you want. For each range
+        boundary you can also specify via
         <methodname>excludeLimit</methodname> whether it is included into the
         range or not.</para>
 
@@ -1903,8 +1911,8 @@ FacetingRequest priceFacetingRequest = builder.facet()
       via <methodname>orderedBy</methodname> when creating the faceting
       request. The default value is
       <constant>FacetSortOrder.COUNT_DESC</constant>, meaning facets are
-      ordered by their count in descending order (highest count first).
-      Other values are <constant>COUNT_ASC</constant>,
+      ordered by their count in descending order (highest count first). Other
+      values are <constant>COUNT_ASC</constant>,
       <constant>FIELD_VALUE</constant> and
       <constant>RANGE_DEFINITION_ORDER</constant>.
       <constant>COUNT_ASC</constant> returns the facets in ascending count
@@ -1915,8 +1923,8 @@ FacetingRequest priceFacetingRequest = builder.facet()
       faceting request and returns the facets in the same order in which the
       ranges are defined. For <xref linkend="example-range-faceting"/> this
       would mean the facet for the range of below 1000 would be returned
-      first, followed by the facet for the range 1001 to 1500 and finally
-      the facet for above 1500.</para>
+      first, followed by the facet for the range 1001 to 1500 and finally the
+      facet for above 1500.</para>
     </section>
 
     <section id="section-applying-faceting-request">
@@ -1957,8 +1965,8 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
       each request you will get a list of <classname>Facet</classname>
       instances. Facet requests stay active and get applied to the fulltext
       query until they are either explicitly disabled via
-      <methodname>disableFaceting(&lt;facetName&gt;)</methodname> or the
-      query is discarded.</para>
+      <methodname>disableFaceting(&lt;facetName&gt;)</methodname> or the query
+      is discarded.</para>
     </section>
 
     <section id="section-interpreting-facet-result">
