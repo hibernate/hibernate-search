@@ -364,7 +364,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 
 		Document doc = new Document();
-		getInstanceInitializer().getClass( instance );
 		final Class<?> entityType = objectInitializer.getClass( instance );
 		final float documentLevelBoost = getMetadata().getClassBoost( instance );
 
