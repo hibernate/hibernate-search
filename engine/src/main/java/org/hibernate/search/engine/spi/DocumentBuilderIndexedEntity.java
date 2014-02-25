@@ -322,7 +322,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	public AddLuceneWork createAddWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext conversionContext) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext );
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext, null );
 		final AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new AddLuceneWork( id, idInString, entityClass, doc );
@@ -335,7 +335,7 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 
 	public UpdateLuceneWork createUpdateWork(Class<T> entityClass, T entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge );
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge, null );
 		final UpdateLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new UpdateLuceneWork( id, idInString, entityClass, doc );
@@ -355,43 +355,53 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
 	 * @param objectInitializer used to ensure that all objects are initalized
 	 * @param conversionContext a {@link org.hibernate.search.bridge.spi.ConversionContext} object.
+	 * @param includedFieldNames list of field names to consider. Others can be excluded. Null if all fields are considered.
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
-	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer, ConversionContext conversionContext) {
+	public Document getDocument(T instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer, ConversionContext conversionContext, String[] includedFieldNames) {
+		// TODO as it is, includedFieldNames is not generally useful as we don't know if a fieldbridge creates specific fields or not
+		// TODO only used at the moment to filter the id field and the class field
+
 		if ( fieldToAnalyzerMap == null ) {
 			throw new IllegalArgumentException( "fieldToAnalyzerMap cannot be null" );
 		}
+		//sensible default for outside callers
+		if ( objectInitializer == null ) {
+			objectInitializer = getInstanceInitializer();
+		}
 
 		Document doc = new Document();
-		getInstanceInitializer().getClass( instance );
 		final Class<?> entityType = objectInitializer.getClass( instance );
 		final float documentLevelBoost = getMetadata().getClassBoost( instance );
 
 		// add the class name of the entity to the document
-		Field classField =
-				new Field(
-						ProjectionConstants.OBJECT_CLASS,
-						entityType.getName(),
-						Field.Store.YES,
-						Field.Index.NOT_ANALYZED_NO_NORMS,
-						Field.TermVector.NO
-				);
-		doc.add( classField );
+		if ( containsFieldName( ProjectionConstants.OBJECT_CLASS, includedFieldNames ) ) {
+			Field classField =
+					new Field(
+							ProjectionConstants.OBJECT_CLASS,
+							entityType.getName(),
+							Field.Store.YES,
+							Field.Index.NOT_ANALYZED_NO_NORMS,
+							Field.TermVector.NO
+					);
+			doc.add( classField );
+		}
 
 		// now add the entity id to the document
-		DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
+		if ( containsFieldName( idFieldName, includedFieldNames ) ) {
+			DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
+			LuceneOptions luceneOptions = new LuceneOptionsImpl( idFieldMetaData, idFieldMetaData.getBoost(), documentLevelBoost );
+			final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( getIdBridge() );
+			conversionContext.setClass( entityType );
+			conversionContext.pushProperty( idFieldMetaData.getName() );
 
-		LuceneOptions luceneOptions = new LuceneOptionsImpl( idFieldMetaData, idFieldMetaData.getBoost(), documentLevelBoost );
-		final FieldBridge contextualizedBridge = conversionContext.oneWayConversionContext( getIdBridge() );
-		conversionContext.setClass( entityType );
-		conversionContext.pushProperty( idFieldMetaData.getName() );
-
-		try {
-			contextualizedBridge.set( idFieldMetaData.getName(), id, doc, luceneOptions );
-		}
-		finally {
-			conversionContext.popProperty();
+			try {
+				contextualizedBridge.set( idFieldMetaData.getName(), id, doc, luceneOptions );
+			}
+			finally {
+				conversionContext.popProperty();
+			}
 		}
 
 		// finally add all other document fields
@@ -569,6 +579,30 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 				conversionContext.popProperty();
 			}
 		}
+	}
+
+	/**
+	 * Check if a given value is present in an array.
+	 *
+	 * A array {@code null} contains all possible values.
+	 * Otherwise, a value {@code null} is always considered non present.
+	 * The last behavior is not currently used, it is merely an optimization.
+	 */
+	private boolean containsFieldName(String value, String[] array) {
+		//null array means contains all possible values
+		if ( array == null ) {
+			return true;
+		}
+		//null value is meaningless
+		if ( value == null ) {
+			return false;
+		}
+		for ( String containedValue : array ) {
+			if ( value.equals( containedValue ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void processEmbeddedNullValue(Document doc, EmbeddedTypeMetadata embeddedTypeMetadata, ConversionContext conversionContext) {

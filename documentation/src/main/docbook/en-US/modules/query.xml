@@ -482,6 +482,188 @@ Query luceneQuery = mythQB
     .createQuery();</programlisting>
       </section>
 
+      <section id="search-query-querydsl-spatial">
+        <title>Spatial (or geolocation) queries</title>
+
+        <para>This set of queries has its own chapter, check out <xref
+        linkend="spatial"/>.</para>
+      </section>
+
+      <section id="search-query-querydsl-mlt">
+        <title>More Like This queries</title>
+
+        <para>Have you ever looked at an article or document and thought "I
+        want to find more that look like this"? Have you ever appreciated an
+        e-commerce website that gives you similar articles than the one you
+        are exploring?</para>
+
+        <para>More Like This queries are achieving just that. You feed it an
+        entity (or its identifier) and Hibernate Search returns the list of
+        entities that are similar.</para>
+
+        <note>
+          <title>How does it work?</title>
+
+          <para>For each (selected) field of the targeted entity, we look at
+          the most meaningful terms. Then we create a query matching the most
+          meaningful terms per field. This is a slight variation compared to
+          the original Lucene <classname>MoreLikeThisQuery</classname>
+          implementation.</para>
+        </note>
+
+        <para>The query DSL API should be self explaining, let's look at some
+        usage examples.</para>
+
+        <programlisting language="JAVA" role="JAVA">QueryBuilder qb = fullTextSession.getSearchFactory()
+        .buildQueryBuilder()
+        .forEntity( Coffee.class )
+        .get();
+
+Query mltQuery = qb
+        .moreLikeThis()
+            .comparingAllFields()
+            .toEntityWithId( coffeeId )
+            .createQuery();
+List&lt;Object[]&gt; results = (List&lt;Object[]&gt;) fullTextSession
+        .createFullTextQuery( mltQuery, Coffee.class )
+        .setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+        .list();</programlisting>
+
+        <para>This first example takes a <classname>Coffee</classname> id and
+        finds the matching coffees across all fields. To be fair, this is not
+        <emphasis>all</emphasis> fields:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>the id is excluded as it would not make much sense</para>
+          </listitem>
+
+          <listitem>
+            <para>fields storing term vectors are considered</para>
+          </listitem>
+
+          <listitem>
+            <para>fields storing the actual value are considered</para>
+          </listitem>
+
+          <listitem>
+            <para>numeric fields are excluded today but that might change in a
+            future version</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>Looking at the <classname>Coffee</classname> class, the
+        following fields are considered: <literal>name</literal> as it is
+        stored, <literal>description</literal> as it stores the term vector.
+        <literal>id</literal> and <literal>internalDescription</literal> are
+        excluded.</para>
+
+        <programlisting language="JAVA" role="JAVA">@Entity @Indexed
+public class Coffee {
+
+    @Id @GeneratedValue
+    public Integer getId() { return id; }
+
+    @Field(termVector = TermVector.NO, store = Store.YES)
+    public String getName() { return name; }
+
+    @Field(termVector = TermVector.YES)
+    public String getSummary() { return summary; }
+
+    @Column(length = 2000)
+    @Field(termVector = TermVector.YES)
+    public String getDescription() { return description; }
+
+    public int getIntensity() { return intensity; }
+
+    // Not stored nor term vector, i.e. cannot be used for More Like This
+    @Field
+    public String getInternalDescription() { return internalDescription; }
+
+    // [...]
+}</programlisting>
+
+        <para>Here we have used a projection to retrieve the relative score of
+        each element. We might use the score to only display the results for
+        which the score is high enough.</para>
+
+        <tip>
+          <para>For best performance and best results, store the term vectors
+          for the fields you want to involve in a More Like This query.</para>
+        </tip>
+
+        <para>Often, you are only interested in a few key fields to find
+        similar entities. Plus some fields are more important than others and
+        should be boosted.</para>
+
+        <programlisting language="JAVA" role="JAVA">Query mltQuery = qb
+        .moreLikeThis()
+            .comparingField("summary").boostedTo(10f)
+            .andField("description")
+            .toEntityWithId( coffeeId )
+            .createQuery();</programlisting>
+
+        <para>In this example, we look for similar entities by summary and
+        description. But similar summaries are more important than similar
+        descriptions. This is a critical tool to make More Like This
+        meaningful for your data set.</para>
+
+        <para>Instead of providing the entity id, you can pass the full entity
+        object. If the entity contains the identifier, we will use it to find
+        the term vectors or field values. This means that we will compare the
+        entity state as stored in the Lucene index. If the identifier cannot
+        be retrieved (for example if the entity has not been persisted yet),
+        we will look at each of the entity properties to find the most
+        meaningful terms. The latter is slower and won't give the best results
+        - avoid it if possible.</para>
+
+        <para>Here is how you pass the entity instance you want to compare
+        with:</para>
+
+        <programlisting language="JAVA" role="JAVA">Coffee coffee = ...; //managed entity from somewhere
+
+Query mltQuery = qb
+        .moreLikeThis()
+            .comparingField("summary").boostedTo(10f)
+            .andField("description")
+            .toEntity( coffee )
+            .createQuery();</programlisting>
+
+        <note>
+          <para>By default, the results contain at the top the entity you are
+          comparing with. This is particularly useful to compare relative
+          scores. If you don't need it, you can exclude it.</para>
+
+          <programlisting language="JAVA" role="JAVA">Query mltQuery = qb
+        .moreLikeThis()
+                .excludeEntityUsedForComparison()
+            .comparingField("summary").boostedTo(10f)
+            .andField("description")
+            .toEntity( coffee )
+            .createQuery();</programlisting>
+        </note>
+
+        <para>You can ask Hibernate Search to give a higher score to the very
+        similar entities and downgrade the score of mildly similar entities.
+        We do that by boosting each meaningful terms by their individual
+        overall score. Start with a boost factor of <literal>1</literal> and
+        adjust from there.</para>
+
+        <programlisting language="JAVA" role="JAVA">Query mltQuery = qb
+        .moreLikeThis()
+                .favorSignificantTermsWithFactor(1f)
+            .comparingField("summary").boostedTo(10f)
+            .andField("description")
+            .toEntity( coffee )
+            .createQuery();</programlisting>
+
+        <para>Remember, more like this is a very subjective meaning and will
+        vary depending on your data and the rules of your domain. With the
+        various options offered, Hibernate Search arms you with the tools to
+        adjust this weapon. Make sure to continuously test the results on your
+        data set.</para>
+      </section>
+
       <section>
         <title>Combining queries</title>
 
@@ -1824,29 +2006,30 @@ FacetingRequest labelFacetingRequest = builder.facet()
         discrete value for the indexed field <constant>label</constant>. The
         <classname>Facet</classname> instance will record the actual field
         value including how often this particular field value occurs within
-        the original query results. Parameters <methodname>orderedBy</methodname>,
+        the original query results. Parameters
+        <methodname>orderedBy</methodname>,
         <methodname>includeZeroCounts</methodname> and
         <methodname>maxFacetCount</methodname> are optional and can be applied
-        on any faceting request.
-        Parameter <methodname>orderedBy</methodname> allows to specify in which
-        order the created facets will be returned. The default is
-        <constant>FacetSortOrder.COUNT_DESC</constant>, but you can also sort
-        on the field value. Parameter <methodname>includeZeroCount</methodname>
-        determines whether facets with a count of 0 will be included in the
-        result (by default they are) and <methodname>maxFacetCount</methodname>
-        allows to limit the maximum amount of facets returned.</para>
+        on any faceting request. Parameter <methodname>orderedBy</methodname>
+        allows to specify in which order the created facets will be returned.
+        The default is <constant>FacetSortOrder.COUNT_DESC</constant>, but you
+        can also sort on the field value. Parameter
+        <methodname>includeZeroCount</methodname> determines whether facets
+        with a count of 0 will be included in the result (by default they are)
+        and <methodname>maxFacetCount</methodname> allows to limit the maximum
+        amount of facets returned.</para>
 
         <note>
           <para>There are several preconditions an indexed field has to meet
-          in order to categorize (facet) on it. The indexed
-          property must be of type <classname>String</classname>,
-          <classname>Date</classname> or a subtype of
-          <classname>Number</classname>; also <constant>null</constant> values
-          should be avoided. Finally the property has to be indexed with
-          <constant>Analyze.NO</constant> and you can not use it in combination
-          with <classname>@NumericField</classname>. When you need these other
-          options we suggest to index the property twice and use the appropriate
-          field depending on the use case: <programlisting>...
+          in order to categorize (facet) on it. The indexed property must be
+          of type <classname>String</classname>, <classname>Date</classname>
+          or a subtype of <classname>Number</classname>; also
+          <constant>null</constant> values should be avoided. Finally the
+          property has to be indexed with <constant>Analyze.NO</constant> and
+          you can not use it in combination with
+          <classname>@NumericField</classname>. When you need these other
+          options we suggest to index the property twice and use the
+          appropriate field depending on the use case: <programlisting>...
 @Fields({
   @Field( name="price" ),
   @Field( name="price_facet", analyze=Analyze.NO )
@@ -1863,14 +2046,14 @@ private int price;
         <title>Creating a range faceting request</title>
 
         <para>The creation of a range faceting request is similar. We also
-        start with a name for the request and the field to facet on. Then
-        we have to specify ranges for the field values. A range faceting
-        request can be seen in <xref linkend="example-range-faceting"/>.
-        There, three different price ranges are specified.
-        <methodname>below</methodname> and <methodname>above</methodname> can
-        only be specified once, but you can specify as many
-        <methodname>from</methodname> - <methodname>to</methodname> ranges as
-        you want. For each range boundary you can also specify via
+        start with a name for the request and the field to facet on. Then we
+        have to specify ranges for the field values. A range faceting request
+        can be seen in <xref linkend="example-range-faceting"/>. There, three
+        different price ranges are specified. <methodname>below</methodname>
+        and <methodname>above</methodname> can only be specified once, but you
+        can specify as many <methodname>from</methodname> -
+        <methodname>to</methodname> ranges as you want. For each range
+        boundary you can also specify via
         <methodname>excludeLimit</methodname> whether it is included into the
         range or not.</para>
 
@@ -1903,8 +2086,8 @@ FacetingRequest priceFacetingRequest = builder.facet()
       via <methodname>orderedBy</methodname> when creating the faceting
       request. The default value is
       <constant>FacetSortOrder.COUNT_DESC</constant>, meaning facets are
-      ordered by their count in descending order (highest count first).
-      Other values are <constant>COUNT_ASC</constant>,
+      ordered by their count in descending order (highest count first). Other
+      values are <constant>COUNT_ASC</constant>,
       <constant>FIELD_VALUE</constant> and
       <constant>RANGE_DEFINITION_ORDER</constant>.
       <constant>COUNT_ASC</constant> returns the facets in ascending count
@@ -1915,8 +2098,8 @@ FacetingRequest priceFacetingRequest = builder.facet()
       faceting request and returns the facets in the same order in which the
       ranges are defined. For <xref linkend="example-range-faceting"/> this
       would mean the facet for the range of below 1000 would be returned
-      first, followed by the facet for the range 1001 to 1500 and finally
-      the facet for above 1500.</para>
+      first, followed by the facet for the range 1001 to 1500 and finally the
+      facet for above 1500.</para>
     </section>
 
     <section id="section-applying-faceting-request">
@@ -1957,8 +2140,8 @@ List&lt;Facet&gt; facets = facetManager.getFacets("priceFaceting");
       each request you will get a list of <classname>Facet</classname>
       instances. Facet requests stay active and get applied to the fulltext
       query until they are either explicitly disabled via
-      <methodname>disableFaceting(&lt;facetName&gt;)</methodname> or the
-      query is discarded.</para>
+      <methodname>disableFaceting(&lt;facetName&gt;)</methodname> or the query
+      is discarded.</para>
     </section>
 
     <section id="section-interpreting-facet-result">
