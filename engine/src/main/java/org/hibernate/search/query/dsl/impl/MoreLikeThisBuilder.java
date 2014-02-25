@@ -464,8 +464,6 @@ public class MoreLikeThisBuilder<T> {
 			throws IOException {
 		String fieldName = fieldContext.getField();
 		Analyzer analyzer = queryContext.getQueryAnalyzer();
-		//TODO The original MLT implementation forces fields with analyzers. Seems that a pass through makes sense.
-		//analyzer = analyzer != null ? analyzer : PassThroughAnalyzer.INSTANCE;
 		if ( fieldContext.isIgnoreAnalyzer() ) {
 			// essentially does the Reader to String conversion for us
 			analyzer = PassThroughAnalyzer.INSTANCE;
