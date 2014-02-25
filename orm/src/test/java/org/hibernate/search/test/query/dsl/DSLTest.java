@@ -892,7 +892,7 @@ public class DSLTest extends SearchTestCase {
 				assertThat( ( (Coffee) real[0] ).getId() ).isEqualTo( ( (Coffee) expected[0] ).getId() );
 			}
 
-			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, entityResults );
 
 			// pass entity itself with a matching id but different values
 			// the id should take precedene
@@ -925,7 +925,7 @@ public class DSLTest extends SearchTestCase {
 				assertThat( ( (Coffee) real[0] ).getId() ).isEqualTo( ( (Coffee) expected[0] ).getId() );
 			}
 
-			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, entityResults );
 
 			// pass entity itself with the right values but no id
 			copyOfDecaffInstance = new Coffee();
@@ -955,7 +955,38 @@ public class DSLTest extends SearchTestCase {
 				assertThat( ( (Coffee) real[0] ).getId() ).isEqualTo( ( (Coffee) expected[0] ).getId() );
 			}
 
-			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, entityResults );
+
+			// exclude comparing entity
+			mltQuery = qb
+					.moreLikeThis()
+					.comparingField( "summary" ).boostedTo( 10f )
+					.andField( "description" )
+					.toEntityWithId( decaffInstance.getId() )
+					.createQuery();
+			results = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+			mltQuery = qb
+					.moreLikeThis()
+						.excludeEntityUsedForComparison()
+					.comparingField( "summary" ).boostedTo( 10f )
+					.andField( "description" )
+					.toEntityWithId( decaffInstance.getId() )
+					.createQuery();
+			List<Object[]> resultsWoComparingEntity = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+			assertThat( resultsWoComparingEntity ).hasSize( results.size() - 1 );
+			for ( int index = 0 ; index < resultsWoComparingEntity.size() ; index++ ) {
+				Object[] real = resultsWoComparingEntity.get( index );
+				Object[] expected = results.get( index + 1 );
+				assertThat( real[1] ).isEqualTo( expected[1] );
+				assertThat( ( (Coffee) real[0] ).getId() ).isEqualTo( ( (Coffee) expected[0] ).getId() );
+			}
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, resultsWoComparingEntity );
 		}
 		finally {
 			transaction.commit();

@@ -47,6 +47,12 @@ public class ConnectedMoreLikeThisContext implements MoreLikeThisContext {
 	}
 
 	@Override
+	public MoreLikeThisContext excludeEntityUsedForComparison() {
+		moreLikeThisContext.setExcludeEntityUsedForComparison( true );
+		return this;
+	}
+
+	@Override
 	public MoreLikeThisContext favorSignificantTermsWithFactor(float factor) {
 		moreLikeThisContext.setBoostTerms( true );
 		moreLikeThisContext.setTermBoostFactor( factor );

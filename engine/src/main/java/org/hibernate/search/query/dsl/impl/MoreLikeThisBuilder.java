@@ -47,6 +47,7 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.queries.mlt.MoreLikeThis;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;
@@ -62,9 +63,14 @@ import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
+import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ID;
+import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ENTITY;
 
 /**
  * Class inspired and code copied from Apache Lucene MoreLikeThis class.
@@ -97,6 +103,9 @@ public class MoreLikeThisBuilder<T> {
 	private FieldsContext fieldsContext;
 	private Object input;
 	private QueryBuildingContext queryContext;
+	private boolean excludeEntityCompared;
+	private ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE inputType;
+	private TermQuery findById;
 
 	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity<T> documentBuilder, SearchFactoryImplementor searchFactory ) {
 		log.requireTFIDFSimilarity( documentBuilder.getBeanClass() );
@@ -114,14 +123,10 @@ public class MoreLikeThisBuilder<T> {
 		return this;
 	}
 
-	public MoreLikeThisBuilder documentNumber(Integer docNum) {
-		this.documentNumber = docNum;
-		return this;
-	}
-
 	public MoreLikeThisBuilder otherMoreLikeThisContext(MoreLikeThisQueryContext moreLikeThisContext) {
 		this.boost = moreLikeThisContext.isBoostTerms();
 		this.boostFactor = moreLikeThisContext.getTermBoostFactor();
+		this.excludeEntityCompared = moreLikeThisContext.isExcludeEntityUsedForComparison();
 		return this;
 	}
 
@@ -130,10 +135,80 @@ public class MoreLikeThisBuilder<T> {
 	 */
 	public Query createQuery() {
 		try {
-			return createQuery( retrieveTerms() );
+			documentNumber = getLuceneDocumentIdFromIdAsTermOrNull( documentBuilder );
+			return maybeExcludeComparedEntity( createQuery( retrieveTerms() ) );
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnIndexOfEntity( e, documentBuilder.getBeanClass() );
+		}
+	}
+
+	/**
+	 * Try and retrieve the document id from the input. If failing and a backup approach exists, returns null.
+	 */
+	private Integer getLuceneDocumentIdFromIdAsTermOrNull(DocumentBuilderIndexedEntity<?> documentBuilder) {
+		String id;
+		if ( inputType == ID ) {
+			id = documentBuilder.getIdBridge().objectToString( input );
+		}
+		else if ( inputType == ENTITY ) {
+			// Try and extract the id, if failing the id will be null
+			try {
+				// I expect a two way bridge to return null from a null input, correct?
+				id = documentBuilder.getIdBridge().objectToString( documentBuilder.getId( input ) );
+			}
+			catch (IllegalStateException e) {
+				id = null;
+			}
+		}
+		else {
+			throw new AssertionFailure( "We don't support no string and reader for MoreLikeThis" );
+		}
+		if ( id == null ) {
+			return null;
+		}
+		findById = new TermQuery( new Term( documentBuilder.getIdKeywordName(), id ) );
+		HSQuery query = queryContext.getFactory().createHSQuery();
+		//can't use Arrays.asList for some obscure capture reason
+		List<Class<?>> classes = new ArrayList<Class<?>>(1);
+		classes.add( queryContext.getEntityType() );
+		List<EntityInfo> entityInfos = query
+				.luceneQuery( findById )
+				.maxResults( 1 )
+				.projection( HSQuery.DOCUMENT_ID )
+				.targetedEntities( classes )
+				.queryEntityInfos();
+		if ( entityInfos.size() == 0 ) {
+			if ( inputType == ID ) {
+				throw log.entityWithIdNotFound( queryContext.getEntityType(), id );
+			}
+			else {
+				return null;
+			}
+		}
+		return (Integer) entityInfos.iterator().next().getProjection()[0];
+	}
+
+	private Query maybeExcludeComparedEntity(Query query) {
+		// It would be better to attach a collector to exclude a document by its id
+		// but at this stage we could have documents reordered and thus with a different id
+		// Maybe a Filter would be more efficient?
+		if ( excludeEntityCompared && documentNumber != null ) {
+			BooleanQuery booleanQuery;
+			if ( ! ( query instanceof BooleanQuery ) ) {
+				booleanQuery = new BooleanQuery();
+				booleanQuery.add( query, BooleanClause.Occur.MUST );
+			}
+			else {
+				booleanQuery = (BooleanQuery) query;
+			}
+			booleanQuery.add(
+					new ConstantScoreQuery( findById ),
+					BooleanClause.Occur.MUST_NOT );
+			return booleanQuery;
+		}
+		else {
+			return query;
 		}
 	}
 
@@ -457,6 +532,15 @@ public class MoreLikeThisBuilder<T> {
 
 	public MoreLikeThisBuilder queryContext(QueryBuildingContext queryContext) {
 		this.queryContext = queryContext;
+		return this;
+	}
+
+	public MoreLikeThisBuilder idAsTerm(String idAsTerm) {
+		return this;
+	}
+
+	public MoreLikeThisBuilder inputType(ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE inputType) {
+		this.inputType = inputType;
 		return this;
 	}
 
