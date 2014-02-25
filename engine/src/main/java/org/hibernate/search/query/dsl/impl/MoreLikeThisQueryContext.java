@@ -30,6 +30,7 @@ package org.hibernate.search.query.dsl.impl;
 public class MoreLikeThisQueryContext {
 	private boolean boostTerms = false;
 	private float termBoostFactor = 1f;
+	private boolean excludeEntityUsedForComparison;
 
 	public boolean isBoostTerms() {
 		return boostTerms;
@@ -45,5 +46,13 @@ public class MoreLikeThisQueryContext {
 
 	public void setTermBoostFactor(float termBoostFactor) {
 		this.termBoostFactor = termBoostFactor;
+	}
+
+	public void setExcludeEntityUsedForComparison(boolean excludeEntityUsedForComparison) {
+		this.excludeEntityUsedForComparison = excludeEntityUsedForComparison;
+	}
+
+	public boolean isExcludeEntityUsedForComparison() {
+		return excludeEntityUsedForComparison;
 	}
 }

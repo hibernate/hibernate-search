@@ -29,8 +29,11 @@ package org.hibernate.search.query.dsl;
  */
 public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisContext> {
 
-	//TODO add returnEntityComparedWith?
-	//TODO today we return the matching entity we could exclude it with a Boolean MUST NOT
+	/**
+	 * Exclude the entity used for comparison from the results
+	 */
+	MoreLikeThisContext excludeEntityUsedForComparison();
+
 	/**
 	 * Boost significant terms relative to their scores.
 	 * Amplified by the boost factor (1 is the recommended default to start with).

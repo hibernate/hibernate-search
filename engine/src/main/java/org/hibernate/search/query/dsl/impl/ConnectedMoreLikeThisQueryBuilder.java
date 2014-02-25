@@ -30,18 +30,13 @@ import java.util.List;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.MoreLikeThisTermination;
 import org.hibernate.search.query.dsl.MoreLikeThisToEntityContentAndTermination;
-import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -97,13 +92,12 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 				// Use all compatible fields when comparingAllFields is used
 				fieldsContext.addAll( fieldNames );
 			}
-			Integer docId = getLuceneDocumentIdFromInputOrNull( documentBuilder );
 			query = new MoreLikeThisBuilder( documentBuilder, searchFactory )
 					.compatibleFieldNames( fieldNames )
 					.fieldsContext( fieldsContext )
 					.queryContext( queryContext )
 					.indexReader( indexReader )
-					.documentNumber( docId )
+					.inputType( inputType )
 					.input( input )
 					.otherMoreLikeThisContext( moreLikeThisContext )
 					.createQuery();
@@ -131,54 +125,6 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 			throw log.noFieldCompatibleForMoreLikeThis( documentBuilder.getBeanClass() );
 		}
 		return fieldNames.toArray( new String[fieldNames.size()] );
-	}
-
-	/**
-	 * Try and retrieve the document id from the input. If failing and a backup approach exists, returns null.
-	 */
-	private Integer getLuceneDocumentIdFromInputOrNull(DocumentBuilderIndexedEntity<?> documentBuilder) {
-		//look for all fields of the entity
-		String id;
-		if ( inputType == INPUT_TYPE.ID ) {
-			id = documentBuilder.getIdBridge().objectToString( input );
-		}
-		else if ( inputType == INPUT_TYPE.ENTITY ) {
-			// Try and extract the id, if failing the id will be null
-			try {
-				// I expect a two way bridge to return null from a null input, correct?
-				id = documentBuilder.getIdBridge().objectToString( documentBuilder.getId( input ) );
-			}
-			catch (IllegalStateException e) {
-				id = null;
-			}
-		}
-		else {
-			throw new AssertionFailure( "We don't support no string and reader for MoreLikeThis" );
-		}
-
-		if ( id == null ) {
-			return null;
-		}
-		TermQuery findById = new TermQuery( new Term( documentBuilder.getIdKeywordName(), id ) );
-		HSQuery query = queryContext.getFactory().createHSQuery();
-		//can't use Arrays.asList for some obscure capture reason
-		List<Class<?>> classes = new ArrayList<Class<?>>(1);
-		classes.add( queryContext.getEntityType() );
-		List<EntityInfo> entityInfos = query
-				.luceneQuery( findById )
-				.maxResults( 1 )
-				.projection( HSQuery.DOCUMENT_ID )
-				.targetedEntities( classes )
-				.queryEntityInfos();
-		if ( entityInfos.size() == 0 ) {
-			if ( inputType == INPUT_TYPE.ID ) {
-				throw log.entityWithIdNotFound( queryContext.getEntityType(), id );
-			}
-			else {
-				return null;
-			}
-		}
-		return (Integer) entityInfos.iterator().next().getProjection()[0];
 	}
 
 	public static final class MoreLikeThisTerminationImpl extends ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTermination {
