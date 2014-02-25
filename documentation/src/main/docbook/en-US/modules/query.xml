@@ -489,6 +489,181 @@ Query luceneQuery = mythQB
         linkend="spatial"/>.</para>
       </section>
 
+      <section id="search-query-querydsl-mlt">
+        <title>More Like This queries</title>
+
+        <para>Have you ever looked at an article or document and thought "I
+        want to find more that look like this"? Have you ever appreciated an
+        e-commerce website that gives you similar articles than the one you
+        are exploring?</para>
+
+        <para>More Like This queries are achieving just that. You feed it an
+        entity (or its identifier) and Hibernate Search returns the list of
+        entities that are similar.</para>
+
+        <note>
+          <title>How does it work?</title>
+
+          <para>For each (selected) field of the targeted entity, we look at
+          the most meaningful terms. Then we create a query matching the most
+          meaningful terms per field. This is a slight variation compared to
+          the original Lucene <classname>MoreLikeThisQuery</classname>
+          implementation.</para>
+        </note>
+
+        <para>The query DSL API should be self explaining, let's look at some
+        usage examples.</para>
+
+        <programlisting language="JAVA" role="JAVA">QueryBuilder qb = fullTextSession.getSearchFactory()
+        .buildQueryBuilder()
+        .forEntity( Coffee.class )
+        .get();
+
+Query mltQuery = qb
+        .moreLikeThis()
+            .comparingAllFields()
+            .toEntityWithId( coffeeId )
+            .createQuery();
+List&lt;Object[]&gt; results = (List&lt;Object[]&gt;) fullTextSession
+        .createFullTextQuery( mltQuery, Coffee.class )
+        .setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+        .list();</programlisting>
+
+        <para>This first example takes a <classname>Coffee</classname> id and
+        finds the matching coffees across all fields. To be fair, this is not
+        <emphasis>all</emphasis> fields:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>the id is excluded as it would not make much sense</para>
+          </listitem>
+
+          <listitem>
+            <para>fields storing term vectors are considered</para>
+          </listitem>
+
+          <listitem>
+            <para>fields storing the actual value are considered</para>
+          </listitem>
+
+          <listitem>
+            <para>numeric fields are excluded today but that might change in a
+            future version</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>Looking at the <classname>Coffee</classname> class, the
+        following fields are considered: <literal>name</literal> as it is
+        stored, <literal>description</literal> as it stores the term vector.
+        <literal>id</literal> and <literal>internalDescription</literal> are
+        excluded.</para>
+
+        <programlisting language="JAVA" role="JAVA">@Entity @Indexed
+public class Coffee {
+
+    @Id @GeneratedValue
+    public Integer getId() { return id; }
+
+    @Field(termVector = TermVector.NO, store = Store.YES)
+    public String getName() { return name; }
+
+    @Field(termVector = TermVector.YES)
+    public String getSummary() { return summary; }
+
+    @Column(length = 2000)
+    @Field(termVector = TermVector.YES)
+    public String getDescription() { return description; }
+
+    public int getIntensity() { return intensity; }
+
+    // Not stored nor term vector, i.e. cannot be used for More Like This
+    @Field
+    public String getInternalDescription() { return internalDescription; }
+
+    // [...]
+}</programlisting>
+
+        <para>Here we have used a projection to retrieve the relative score of
+        each element. We might use the score to only display the results for
+        which the score is high enough.</para>
+
+        <tip>
+          <para>For best performance and best results, store the term vectors
+          for the fields you want to involve in a More Like This query.</para>
+        </tip>
+
+        <para>Often, you are only interested in a few key fields to find
+        similar entities. Plus some fields are more important than others and
+        should be boosted.</para>
+
+        <programlisting language="JAVA" role="JAVA">Query mltQuery = qb
+        .moreLikeThis()
+            .comparingField("summary").boostedTo(10f)
+            .andField("description")
+            .toEntityWithId( coffeeId )
+            .createQuery();</programlisting>
+
+        <para>In this example, we look for similar entities by summary and
+        description. But similar summaries are more important than similar
+        descriptions. This is a critical tool to make More Like This
+        meaningful for your data set.</para>
+
+        <para>Instead of providing the entity id, you can pass the full entity
+        object. If the entity contains the identifier, we will use it to find
+        the term vectors or field values. This means that we will compare the
+        entity state as stored in the Lucene index. If the identifier cannot
+        be retrieved (for example if the entity has not been persisted yet),
+        we will look at each of the entity properties to find the most
+        meaningful terms. The latter is slower and won't give the best results
+        - avoid it if possible.</para>
+
+        <para>Here is how you pass the entity instance you want to compare
+        with:</para>
+
+        <programlisting language="JAVA" role="JAVA">Coffee coffee = ...; //managed entity from somewhere
+
+Query mltQuery = qb
+        .moreLikeThis()
+            .comparingField("summary").boostedTo(10f)
+            .andField("description")
+            .toEntity( coffee )
+            .createQuery();</programlisting>
+
+        <note>
+          <para>By default, the results contain at the top the entity you are
+          comparing with. This is particularly useful to compare relative
+          scores. If you don't need it, you can exclude it.</para>
+
+          <programlisting language="JAVA" role="JAVA">Query mltQuery = qb
+        .moreLikeThis()
+                .excludeEntityUsedForComparison()
+            .comparingField("summary").boostedTo(10f)
+            .andField("description")
+            .toEntity( coffee )
+            .createQuery();</programlisting>
+        </note>
+
+        <para>You can ask Hibernate Search to give a higher score to the very
+        similar entities and downgrade the score of mildly similar entities.
+        We do that by boosting each meaningful terms by their individual
+        overall score. Start with a boost factor of <literal>1</literal> and
+        adjust from there.</para>
+
+        <programlisting language="JAVA" role="JAVA">Query mltQuery = qb
+        .moreLikeThis()
+                .favorSignificantTermsWithFactor(1f)
+            .comparingField("summary").boostedTo(10f)
+            .andField("description")
+            .toEntity( coffee )
+            .createQuery();</programlisting>
+
+        <para>Remember, more like this is a very subjective meaning and will
+        vary depending on your data and the rules of your domain. With the
+        various options offered, Hibernate Search arms you with the tools to
+        adjust this weapon. Make sure to continuously test the results on your
+        data set.</para>
+      </section>
+
       <section>
         <title>Combining queries</title>
 
