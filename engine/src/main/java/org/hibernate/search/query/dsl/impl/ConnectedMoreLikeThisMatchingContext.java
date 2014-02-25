@@ -31,6 +31,7 @@ import org.hibernate.search.query.dsl.MoreLikeThisTerminalMatchingContext;
 import org.hibernate.search.query.dsl.MoreLikeThisTermination;
 import org.hibernate.search.query.dsl.MoreLikeThisToEntityContentAndTermination;
 
+import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ENTITY;
 import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ID;
 
 /**
@@ -75,12 +76,26 @@ public class ConnectedMoreLikeThisMatchingContext implements MoreLikeThisOpenedM
 
 	@Override
 	public MoreLikeThisTermination toEntityWithId(Object id) {
-		return new ConnectedMoreLikeThisQueryBuilder( id, ID, fieldsContext, moreLikeThisContext, queryCustomizer, queryContext );
+		return new ConnectedMoreLikeThisQueryBuilder.MoreLikeThisTerminationImpl(
+				id,
+				ID,
+				fieldsContext,
+				moreLikeThisContext,
+				queryCustomizer,
+				queryContext
+		);
 	}
 
 	@Override
 	public MoreLikeThisToEntityContentAndTermination toEntity(Object entity) {
-		return null;
+		return new ConnectedMoreLikeThisQueryBuilder.MoreLikeThisToEntityContentAndTerminationImpl(
+				entity,
+				ENTITY,
+				fieldsContext,
+				moreLikeThisContext,
+				queryCustomizer,
+				queryContext
+		);
 	}
 
 	@Override

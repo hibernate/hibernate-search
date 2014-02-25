@@ -37,7 +37,9 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.MoreLikeThisTermination;
+import org.hibernate.search.query.dsl.MoreLikeThisToEntityContentAndTermination;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.util.logging.impl.Log;
@@ -46,7 +48,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTermination {
+public abstract class ConnectedMoreLikeThisQueryBuilder {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -83,7 +85,6 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 		STRING
 	}
 
-	@Override
 	public Query createQuery() {
 		Query query;
 		final SearchFactoryImplementor searchFactory = queryContext.getFactory();
@@ -96,19 +97,20 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 				// Use all compatible fields when comparingAllFields is used
 				fieldsContext.addAll( fieldNames );
 			}
-			Integer docId = getLuceneDocumentIdFromEntityId( documentBuilder );
+			Integer docId = getLuceneDocumentIdFromInputOrNull( documentBuilder );
 			query = new MoreLikeThisBuilder( documentBuilder, searchFactory )
 					.compatibleFieldNames( fieldNames )
 					.fieldsContext( fieldsContext )
+					.queryContext( queryContext )
 					.indexReader( indexReader )
 					.documentNumber( docId )
+					.input( input )
 					.otherMoreLikeThisContext( moreLikeThisContext )
 					.createQuery();
 		}
 		finally {
 			searchFactory.getIndexReaderAccessor().close( indexReader );
 		}
-		//TODO implement explicit set of fields and field customization
 		//TODO implement INPUT.READER
 		//TODO implement INOUT.STRING
 		return queryCustomizer.setWrappedQuery( query ).createQuery();
@@ -131,9 +133,32 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 		return fieldNames.toArray( new String[fieldNames.size()] );
 	}
 
-	private Integer getLuceneDocumentIdFromEntityId(DocumentBuilderIndexedEntity<?> documentBuilder) {
+	/**
+	 * Try and retrieve the document id from the input. If failing and a backup approach exists, returns null.
+	 */
+	private Integer getLuceneDocumentIdFromInputOrNull(DocumentBuilderIndexedEntity<?> documentBuilder) {
 		//look for all fields of the entity
-		String id = documentBuilder.getIdBridge().objectToString( input );
+		String id;
+		if ( inputType == INPUT_TYPE.ID ) {
+			id = documentBuilder.getIdBridge().objectToString( input );
+		}
+		else if ( inputType == INPUT_TYPE.ENTITY ) {
+			// Try and extract the id, if failing the id will be null
+			try {
+				// I expect a two way bridge to return null from a null input, correct?
+				id = documentBuilder.getIdBridge().objectToString( documentBuilder.getId( input ) );
+			}
+			catch (IllegalStateException e) {
+				id = null;
+			}
+		}
+		else {
+			throw new AssertionFailure( "We don't support no string and reader for MoreLikeThis" );
+		}
+
+		if ( id == null ) {
+			return null;
+		}
 		TermQuery findById = new TermQuery( new Term( documentBuilder.getIdKeywordName(), id ) );
 		HSQuery query = queryContext.getFactory().createHSQuery();
 		//can't use Arrays.asList for some obscure capture reason
@@ -146,8 +171,27 @@ public class ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTerminatio
 				.targetedEntities( classes )
 				.queryEntityInfos();
 		if ( entityInfos.size() == 0 ) {
-			throw log.entityWithIdNotFound( queryContext.getEntityType(), id );
+			if ( inputType == INPUT_TYPE.ID ) {
+				throw log.entityWithIdNotFound( queryContext.getEntityType(), id );
+			}
+			else {
+				return null;
+			}
 		}
 		return (Integer) entityInfos.iterator().next().getProjection()[0];
+	}
+
+	public static final class MoreLikeThisTerminationImpl extends ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisTermination {
+
+		public MoreLikeThisTerminationImpl(Object id, INPUT_TYPE inputType, FieldsContext fieldsContext, MoreLikeThisQueryContext moreLikeThisContext, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
+			super( id, inputType, fieldsContext, moreLikeThisContext, queryCustomizer, queryContext );
+		}
+	}
+
+	public static final class MoreLikeThisToEntityContentAndTerminationImpl extends ConnectedMoreLikeThisQueryBuilder implements MoreLikeThisToEntityContentAndTermination {
+
+		public MoreLikeThisToEntityContentAndTerminationImpl(Object id, INPUT_TYPE inputType, FieldsContext fieldsContext, MoreLikeThisQueryContext moreLikeThisContext, QueryCustomizer queryCustomizer, QueryBuildingContext queryContext) {
+			super( id, inputType, fieldsContext, moreLikeThisContext, queryCustomizer, queryContext );
+		}
 	}
 }
