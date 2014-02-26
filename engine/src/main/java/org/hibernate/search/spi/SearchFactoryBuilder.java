@@ -158,12 +158,12 @@ public class SearchFactoryBuilder {
 		final Properties configurationProperties = factoryState.getConfigurationProperties();
 		BuildContext buildContext = new BuildContext();
 
-		IncrementalSearchConfiguration cfg = new IncrementalSearchConfiguration( classes, configurationProperties, factoryState );
+		IncrementalSearchConfiguration searchConfiguration = new IncrementalSearchConfiguration( classes, configurationProperties, factoryState );
 
-		applySearchMappingToMetadata( cfg.getReflectionManager(), cfg.getProgrammaticMapping() );
+		applySearchMappingToMetadata( searchConfiguration.getReflectionManager(), searchConfiguration.getProgrammaticMapping() );
 
 		//FIXME The current initDocumentBuilders
-		initDocumentBuilders( cfg, buildContext, cfg.getProgrammaticMapping() );
+		initDocumentBuilders( searchConfiguration, buildContext, searchConfiguration.getProgrammaticMapping() );
 		final Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
 		Set<Class<?>> indexedClasses = documentBuildersIndexedEntities.keySet();
 		for ( EntityIndexBinding entityIndexBinding : documentBuildersIndexedEntities.values() ) {
@@ -232,7 +232,7 @@ public class SearchFactoryBuilder {
 		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities, cfg.getProperties() );
 		// build worker and back end components
 		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
-		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg.getProperties() ) );
+		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg ) );
 		factoryState.setCacheBitResultsSize(
 				ConfigurationParseHelper.getIntValue(
 						cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
@@ -265,21 +265,21 @@ public class SearchFactoryBuilder {
 		}
 	}
 
-	private static FilterCachingStrategy buildFilterCachingStrategy(Properties properties) {
+	private FilterCachingStrategy buildFilterCachingStrategy(SearchConfiguration searchConfiguration) {
 		FilterCachingStrategy filterCachingStrategy;
-		String impl = properties.getProperty( Environment.FILTER_CACHING_STRATEGY );
-		if ( StringHelper.isEmpty( impl ) || "mru".equalsIgnoreCase( impl ) ) {
+		String filterCachingStrategyName = searchConfiguration.getProperties().getProperty( Environment.FILTER_CACHING_STRATEGY );
+		if ( StringHelper.isEmpty( filterCachingStrategyName ) || "mru".equalsIgnoreCase( filterCachingStrategyName ) ) {
 			filterCachingStrategy = new MRUFilterCachingStrategy();
 		}
 		else {
-			filterCachingStrategy = ClassLoaderHelper.instanceFromName(
+			Class<?> filterCachingStrategyClass = searchConfiguration.getClassLoaderService().classForName( filterCachingStrategyName );
+			filterCachingStrategy = ClassLoaderHelper.instanceFromClass(
 					FilterCachingStrategy.class,
-					impl,
-					ImmutableSearchFactory.class.getClassLoader(),
+					filterCachingStrategyClass,
 					"filterCachingStrategy"
 			);
 		}
-		filterCachingStrategy.initialize( properties );
+		filterCachingStrategy.initialize( searchConfiguration.getProperties() );
 		return filterCachingStrategy;
 	}
 
@@ -554,8 +554,8 @@ public class SearchFactoryBuilder {
 		return indexingStrategy;
 	}
 
-	public static ErrorHandler createErrorHandler(SearchConfiguration searchCfg) {
-		String errorHandlerClassName = searchCfg.getProperty( Environment.ERROR_HANDLER );
+	public ErrorHandler createErrorHandler(SearchConfiguration searchConfiguration) {
+		String errorHandlerClassName = searchConfiguration.getProperty( Environment.ERROR_HANDLER );
 		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
 			return new LogErrorHandler();
 		}
@@ -563,9 +563,11 @@ public class SearchFactoryBuilder {
 			return new LogErrorHandler();
 		}
 		else {
-			return ClassLoaderHelper.instanceFromName(
-					ErrorHandler.class, errorHandlerClassName,
-					ImmutableSearchFactory.class.getClassLoader(), "Error Handler"
+			Class<?> errorHandlerClass = searchConfiguration.getClassLoaderService().classForName( errorHandlerClassName );
+			return ClassLoaderHelper.instanceFromClass(
+					ErrorHandler.class,
+					errorHandlerClass,
+					"Error Handler"
 			);
 		}
 	}

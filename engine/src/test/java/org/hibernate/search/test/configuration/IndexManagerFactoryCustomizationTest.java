@@ -23,7 +23,6 @@ package org.hibernate.search.test.configuration;
 import java.lang.annotation.ElementType;
 
 import junit.framework.Assert;
-
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -55,22 +54,24 @@ public class IndexManagerFactoryCustomizationTest {
 	@Test
 	public void testOverriddenDefaultImplementation() {
 		ManualConfiguration cfg = new ManualConfiguration();
-		cfg.setIndexManagerFactory( new DefaultIndexManagerFactory() {
-			@Override
-			public IndexManager createDefaultIndexManager() {
-				return new NRTIndexManager();
-			}
-		} );
+		cfg.setIndexManagerFactory(
+				new DefaultIndexManagerFactory( cfg.getClassLoaderService() ) {
+					@Override
+					public IndexManager createDefaultIndexManager() {
+						return new NRTIndexManager();
+					}
+				}
+		);
 		verifyIndexManagerTypeIs( NRTIndexManager.class, cfg );
 	}
 
 	private void verifyIndexManagerTypeIs(Class<? extends IndexManager> expectedIndexManagerClass, ManualConfiguration cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
-			.entity( Document.class ).indexed().indexName( "documents" )
-			.property( "id", ElementType.FIELD ).documentId()
-			.property( "title", ElementType.FIELD ).field()
-			;
+				.entity( Document.class ).indexed().indexName( "documents" )
+				.property( "id", ElementType.FIELD ).documentId()
+				.property( "title", ElementType.FIELD ).field()
+		;
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.addClass( Document.class );
@@ -101,8 +102,10 @@ public class IndexManagerFactoryCustomizationTest {
 
 	@Indexed(index = "dvds")
 	public static final class Dvd {
-		@DocumentId long id;
-		@Field String title;
+		@DocumentId
+		long id;
+		@Field
+		String title;
 	}
 
 }

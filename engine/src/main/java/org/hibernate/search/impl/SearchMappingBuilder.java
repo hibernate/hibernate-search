@@ -59,8 +59,7 @@ public class SearchMappingBuilder {
 	 * @return SearchMapping
 	 */
 	public static SearchMapping getSearchMapping(SearchConfiguration cfg) {
-
-		//try SearchConfiguration object first and then properties
+		// try SearchConfiguration object first and then properties
 		Object modelMappingProperty = cfg.getProgrammaticMapping();
 		if ( modelMappingProperty == null ) {
 			modelMappingProperty = cfg.getProperties().get( Environment.MODEL_MAPPING );

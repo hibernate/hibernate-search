@@ -58,5 +58,6 @@ public interface ServiceManager {
 	/**
 	 * Stops all services.
 	 */
+	// TODO - define exact behavior of this method - see HSEARCH-1547 (HF)
 	void releaseAllServices();
 }
