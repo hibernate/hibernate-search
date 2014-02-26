@@ -106,7 +106,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			session = sessionFactory.openStatelessSession();
 		}
 		try {
-			Transaction transaction = Helper.getTransactionAndMarkForJoin( session );
+			Transaction transaction = session.getTransaction();
 			transaction.begin();
 			loadAllIdentifiers( session );
 			transaction.commit();
