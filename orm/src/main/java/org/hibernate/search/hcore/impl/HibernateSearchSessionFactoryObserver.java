@@ -26,7 +26,7 @@ package org.hibernate.search.hcore.impl;
 import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
 
-import org.hibernate.search.util.StringHelper;
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.Version;
@@ -36,6 +36,7 @@ import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.jmx.IndexControl;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -56,14 +57,18 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private static final Log log = LoggerFactory.make();
 
 	private Configuration configuration;
+	private ClassLoaderService classLoaderService;
 	private final FullTextIndexEventListener listener;
 
 	private String indexControlMBeanName;
 	private SearchFactoryImplementor searchFactoryImplementor;
 
-	public HibernateSearchSessionFactoryObserver(Configuration configuration, FullTextIndexEventListener listener) {
+	public HibernateSearchSessionFactoryObserver(Configuration configuration,
+			FullTextIndexEventListener listener,
+			ClassLoaderService classLoaderService) {
 		this.configuration = configuration;
 		this.listener = listener;
+		this.classLoaderService = classLoaderService;
 	}
 
 	@Override
@@ -72,7 +77,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			configuration.getProperties().put( SESSION_FACTORY_PROPERTY_KEY, factory );
 			if ( searchFactoryImplementor == null ) {
 				searchFactoryImplementor = new SearchFactoryBuilder()
-						.configuration( new SearchConfigurationFromHibernateCore( configuration ) )
+						.configuration( new SearchConfigurationFromHibernateCore( configuration, classLoaderService ) )
 						.buildSearchFactory();
 			}
 

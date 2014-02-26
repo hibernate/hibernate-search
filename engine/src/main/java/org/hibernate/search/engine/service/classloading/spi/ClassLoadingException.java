@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2013, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,15 +21,35 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+package org.hibernate.search.engine.service.classloading.spi;
+
+import org.hibernate.search.SearchException;
+
 /**
- * Classes offering a service infrastructure for Search.
+ * Indicates a problem performing class loading.
  *
- * Entry point is the {@code ServiceManager} which allows to retrieve and release services. Services can be provided
- * programmatically or discovered via Java's {@link java.util.ServiceLoader} mechanism.
- *
- * In order to be a service an interface must extend the {@code Service} interface. Optionally a service can also
- * implement {@code Startable} and/or {@code Stoppable} in order to get live cycle callbacks.
- *
+ * @author Steve Ebersole
  * @author Hardy Ferentschik
  */
-package org.hibernate.search.engine.service.spi;
+public class ClassLoadingException extends SearchException {
+	/**
+	 * Constructs a {@code ClassLoadingException} using the specified message and cause.
+	 *
+	 * @param message A message explaining the exception condition.
+	 * @param cause The underlying cause
+	 */
+	public ClassLoadingException(String message, Throwable cause) {
+		super( message, cause );
+	}
+
+	/**
+	 * Constructs a {@code ClassLoadingException} using the specified message.
+	 *
+	 * @param message A message explaining the exception condition.
+	 */
+	public ClassLoadingException(String message) {
+		super( message );
+	}
+}
+
+

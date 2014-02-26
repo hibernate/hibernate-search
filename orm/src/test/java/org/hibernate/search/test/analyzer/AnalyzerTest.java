@@ -34,6 +34,7 @@ import org.hibernate.Transaction;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -98,7 +99,10 @@ public class AnalyzerTest extends SearchTestCase {
 	}
 
 	public void testMultipleAnalyzerDiscriminatorDefinitions() {
-		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( getCfg() );
+		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore(
+				getCfg(),
+				new ClassLoaderServiceImpl() // ORM internal class. Should be ok for testing (HF)
+		);
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
 		ConfigContext context = new ConfigContext( searchConfig );

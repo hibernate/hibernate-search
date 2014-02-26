@@ -35,8 +35,9 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
-import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
@@ -47,13 +48,23 @@ import org.hibernate.search.spi.InstanceInitializer;
 public class SearchConfigurationFromHibernateCore extends SearchConfigurationBase implements SearchConfiguration {
 
 	private final org.hibernate.cfg.Configuration cfg;
+	private final ClassLoaderService classLoaderService;
 	private ReflectionManager reflectionManager;
 
-	public SearchConfigurationFromHibernateCore(org.hibernate.cfg.Configuration cfg) {
+
+	public SearchConfigurationFromHibernateCore(org.hibernate.cfg.Configuration cfg,
+			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
+		// hmm, not sure why we throw NullPointerExceptions from these sanity checks
+		// Shouldn't we use AssertionFailure or a log message + SearchException? (HF)
 		if ( cfg == null ) {
 			throw new NullPointerException( "Configuration is null" );
 		}
 		this.cfg = cfg;
+
+		if ( hibernateClassLoaderService == null ) {
+			throw new NullPointerException( "ClassLoaderService is null" );
+		}
+		this.classLoaderService = new DelegatingClassLoaderService( hibernateClassLoaderService );
 	}
 
 	@Override
@@ -81,7 +92,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		if ( reflectionManager == null ) {
 			try {
 				//TODO introduce a ReflectionManagerHolder interface to avoid reflection
-				//I want to avoid hard link between HAN and Validator for such a simple need
+				//I want to avoid hard link between HAN and Search for such a simple need
 				//reuse the existing reflectionManager one when possible
 				reflectionManager =
 						(ReflectionManager) cfg.getClass().getMethod( "getReflectionManager" ).invoke( cfg );
@@ -104,6 +115,21 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		return Collections.emptyMap();
 	}
 
+	@Override
+	public InstanceInitializer getInstanceInitializer() {
+		return HibernateStatelessInitializer.INSTANCE;
+	}
+
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return true;
+	}
+
+	@Override
+	public ClassLoaderService getClassLoaderService() {
+		return classLoaderService;
+	}
+
 	private static class ClassIterator implements Iterator<Class<?>> {
 		private Iterator hibernatePersistentClassIterator;
 		private Class<?> future;
@@ -119,7 +145,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 				return true;
 			}
 			do {
-				if ( ! hibernatePersistentClassIterator.hasNext() ) {
+				if ( !hibernatePersistentClassIterator.hasNext() ) {
 					future = null;
 					return false;
 				}
@@ -133,7 +159,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		@Override
 		public Class<?> next() {
 			//run hasNext to init the next element
-			if ( ! hasNext() ) {
+			if ( !hasNext() ) {
 				throw new NoSuchElementException();
 			}
 			Class<?> result = future;
@@ -146,15 +172,4 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 			throw new UnsupportedOperationException( "Cannot modify Hibernate Core metadata" );
 		}
 	}
-
-	@Override
-	public InstanceInitializer getInstanceInitializer() {
-		return HibernateStatelessInitializer.INSTANCE;
-	}
-
-	@Override
-	public boolean isIndexMetadataComplete() {
-		return true;
-	}
-
 }

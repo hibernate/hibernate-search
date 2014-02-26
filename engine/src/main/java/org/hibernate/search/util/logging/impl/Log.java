@@ -707,4 +707,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 207, value = "Field %s of entity %s cannot be used in a MoreLikeThis query")
 	SearchException fieldCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
 
+	@Message(id = 208, value = "ClassLoaderService cannot be provided via SearchConfiguration#getProvidedServices. Use SearchConfiguration#getClassLoaderService")
+	SearchException classLoaderServiceContainedInProvidedServicesException();
+
 }

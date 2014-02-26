@@ -21,8 +21,8 @@
 package org.hibernate.search.test.engine.service;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -115,18 +115,6 @@ public class StandardServiceManagerTest {
 		SimpleService simpleService2 = serviceManagerUnderTest.requestService( SimpleService.class );
 		assertNotNull( "The service should be created", simpleService2 );
 		assertTrue( "The same service instance should have been returned", simpleService1 == simpleService2 );
-	}
-
-	@Test
-	public void testReleaseAll() {
-		SimpleService simpleService1 = serviceManagerUnderTest.requestService( SimpleService.class );
-		assertNotNull( "The service should be created", simpleService1 );
-
-		serviceManagerUnderTest.releaseAllServices();
-
-		SimpleService simpleService2 = serviceManagerUnderTest.requestService( SimpleService.class );
-		assertNotNull( "The service should be created", simpleService2 );
-		assertTrue( "A new service instance should have been created", simpleService1 != simpleService2 );
 	}
 
 	@Test
