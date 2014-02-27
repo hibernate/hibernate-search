@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -407,7 +409,12 @@ public final class BridgeFactory {
 		return bridge;
 	}
 
-	public static FieldBridge guessType(Field field, NumericField numericField, XMember member, ReflectionManager reflectionManager) {
+	public static FieldBridge guessType(Field field,
+			NumericField numericField,
+			XMember member,
+			ReflectionManager reflectionManager,
+			ServiceManager serviceManager
+	) {
 		FieldBridge bridge;
 		org.hibernate.search.annotations.FieldBridge bridgeAnn;
 		//@Field bridge has priority over @FieldBridge
@@ -432,7 +439,7 @@ public final class BridgeFactory {
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.TikaBridge.class ) ) {
 			org.hibernate.search.annotations.TikaBridge annotation = member.getAnnotation( org.hibernate.search.annotations.TikaBridge.class );
-			bridge = createTikaBridge( annotation );
+			bridge = createTikaBridge( annotation, serviceManager );
 		}
 		else if ( numericField != null ) {
 			bridge = guessNumericFieldBridge( member, reflectionManager );
@@ -461,14 +468,14 @@ public final class BridgeFactory {
 		return bridge;
 	}
 
-	private static FieldBridge createTikaBridge(org.hibernate.search.annotations.TikaBridge annotation) {
+	private static FieldBridge createTikaBridge(org.hibernate.search.annotations.TikaBridge annotation, ServiceManager serviceManager) {
 		Class<?> tikaBridgeClass;
 		FieldBridge tikaBridge;
 		try {
-			tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME, BridgeFactory.class.getClassLoader() );
+			tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME, serviceManager);
 			tikaBridge = ClassLoaderHelper.instanceFromClass( FieldBridge.class, tikaBridgeClass, "Tika bridge" );
 		}
-		catch (ClassNotFoundException e) {
+		catch (ClassLoadingException e) {
 			throw new AssertionFailure( "Unable to find Tika bridge class: " + TIKA_BRIDGE_NAME );
 		}
 

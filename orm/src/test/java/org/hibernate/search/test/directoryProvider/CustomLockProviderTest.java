@@ -61,7 +61,7 @@ public class CustomLockProviderTest {
 	}
 
 	@Test
-	public void testFailOnInexistentLockingFactory() {
+	public void testFailOnNonExistentLockingFactory() {
 		FullTextSessionBuilder builder = new FullTextSessionBuilder();
 		try {
 			builder

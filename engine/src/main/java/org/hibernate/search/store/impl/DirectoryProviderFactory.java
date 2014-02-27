@@ -28,8 +28,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
@@ -72,16 +73,23 @@ public final class DirectoryProviderFactory {
 		String maybeShortCut = className.toLowerCase();
 
 		DirectoryProvider<?> provider;
+		ServiceManager serviceManager = context.getServiceManager();
 		//try and use the built-in shortcuts before loading the provider as a fully qualified class name
 		if ( defaultProviderClasses.containsKey( maybeShortCut ) ) {
 			String fullClassName = defaultProviderClasses.get( maybeShortCut );
-			provider = ClassLoaderHelper.instanceFromName( DirectoryProvider.class,
-					fullClassName, DirectoryProviderFactory.class.getClassLoader(), "directory provider" );
+			provider = ClassLoaderHelper.instanceFromName(
+					DirectoryProvider.class,
+					fullClassName,
+					"directory provider",
+					serviceManager
+			);
 		}
 		else {
 			provider = ClassLoaderHelper.instanceFromName(
-					DirectoryProvider.class, className,
-					DirectoryProviderFactory.class.getClassLoader(), "directory provider"
+					DirectoryProvider.class,
+					className,
+					"directory provider",
+					serviceManager
 			);
 		}
 		try {

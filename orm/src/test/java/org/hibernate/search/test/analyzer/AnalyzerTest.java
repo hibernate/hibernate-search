@@ -46,6 +46,7 @@ import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.test.util.TestBuildContext;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -105,7 +106,7 @@ public class AnalyzerTest extends SearchTestCase {
 		);
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
-		ConfigContext context = new ConfigContext( searchConfig );
+		ConfigContext context = new ConfigContext( searchConfig, new TestBuildContext( searchConfig ) );
 		MetadataProvider metadataProvider = new AnnotationMetadataProvider(
 				searchConfig.getReflectionManager(),
 				context

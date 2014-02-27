@@ -37,6 +37,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
@@ -85,11 +86,13 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	private String directoryProviderName;
 	private Properties properties;
 	private UpdateTask updateTask;
+	private ServiceManager serviceManager;
 
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.properties = properties;
 		this.directoryProviderName = directoryProviderName;
+		this.serviceManager = context.getServiceManager();
 		//source guessing
 		sourceIndexDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, false );
 		log.debugf( "Source directory: %s", sourceIndexDir.getPath() );
@@ -153,8 +156,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		int readCurrentState = current; //Unneeded value, but ensure visibility of state protected by memory barrier
 		int currentToBe = 0;
 		try {
-			directory1 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "1" ), properties );
-			directory2 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "2" ), properties );
+			directory1 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "1" ), properties, serviceManager );
+			directory2 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "2" ), properties, serviceManager );
 			File currentMarker = new File( indexDir, "current1" );
 			File current2Marker = new File( indexDir, "current2" );
 			if ( currentMarker.exists() ) {

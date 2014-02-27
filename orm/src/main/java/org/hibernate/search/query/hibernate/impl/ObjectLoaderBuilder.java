@@ -21,7 +21,6 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
 package org.hibernate.search.query.hibernate.impl;
 
 import java.util.List;
@@ -29,15 +28,18 @@ import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.search.exception.AssertionFailure;
+
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -109,14 +111,16 @@ public class ObjectLoaderBuilder {
 		if ( criteria instanceof CriteriaImpl ) {
 			String targetEntity = ( (CriteriaImpl) criteria ).getEntityOrClassName();
 			if ( entityType == null ) {
+				ServiceManager serviceManager = searchFactoryImplementor.getServiceManager();
 				try {
-					entityType = ClassLoaderHelper.classForName(
-							targetEntity,
-							ObjectLoaderBuilder.class.getClassLoader()
-					);
+					ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+					entityType = classLoaderService.classForName( targetEntity );
 				}
-				catch (ClassNotFoundException e) {
+				catch (ClassLoadingException e) {
 					throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
+				}
+				finally {
+					serviceManager.releaseService( ClassLoaderService.class );
 				}
 			}
 			else {

@@ -28,6 +28,7 @@ import java.util.Properties;
 
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
@@ -44,17 +45,19 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 
 	private String indexName;
 	private Properties properties;
+	private ServiceManager serviceManager;
 
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
-		indexName = directoryProviderName;
+		this.indexName = directoryProviderName;
 		this.properties = properties;
+		this.serviceManager = context.getServiceManager();
 	}
 
 	@Override
 	public void start(DirectoryBasedIndexManager indexManager) {
 		try {
-			directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties ) );
+			directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties, serviceManager ) );
 			properties = null;
 			DirectoryProviderHelper.initializeIndexIfNeeded( directory );
 		}

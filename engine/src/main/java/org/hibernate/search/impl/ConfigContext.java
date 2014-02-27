@@ -37,7 +37,6 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XPackage;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
@@ -46,6 +45,9 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.DelegateNamedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
@@ -92,20 +94,25 @@ public final class ConfigContext {
 	private final Version luceneMatchVersion;
 	private final String nullToken;
 	private final boolean implicitProvidedId;
-
 	private final SearchMapping searchMapping;
+	private final ServiceManager serviceManager;
 
-	public ConfigContext(SearchConfiguration cfg) {
-		this( cfg, null );
+	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext) {
+		this( searchConfiguration, buildContext, null );
 	}
 
-	public ConfigContext(SearchConfiguration cfg, SearchMapping searchMapping) {
-		luceneMatchVersion = getLuceneMatchVersion( cfg );
-		defaultAnalyzer = initAnalyzer( cfg );
-		jpaPresent = isPresent( "javax.persistence.Id" );
-		nullToken = initNullToken( cfg );
-		implicitProvidedId = cfg.isIdProvidedImplicit();
+	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping) {
+		this.serviceManager = buildContext.getServiceManager();
+		this.luceneMatchVersion = getLuceneMatchVersion( searchConfiguration );
+		this.defaultAnalyzer = initAnalyzer( searchConfiguration );
+		this.jpaPresent = isPresent( "javax.persistence.Id" );
+		this.nullToken = initNullToken( searchConfiguration );
+		this.implicitProvidedId = searchConfiguration.isIdProvidedImplicit();
 		this.searchMapping = searchMapping;
+	}
+
+	public ServiceManager getServiceManager() {
+		return serviceManager;
 	}
 
 	/**
@@ -157,8 +164,7 @@ public final class ConfigContext {
 		String analyzerClassName = cfg.getProperty( Environment.ANALYZER_CLASS );
 		if ( analyzerClassName != null ) {
 			try {
-				// Use the same class loader used to load the SearchConfiguration implementation class ...
-				analyzerClass = ClassLoaderHelper.classForName( analyzerClassName, cfg.getClass().getClassLoader() );
+				analyzerClass = ClassLoaderHelper.classForName( analyzerClassName, serviceManager );
 			}
 			catch (Exception e) {
 				return buildLazyAnalyzer( analyzerClassName );
@@ -222,10 +228,10 @@ public final class ConfigContext {
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {
 		try {
-			return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion );
+			return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion, serviceManager );
 		}
 		catch (IOException e) {
-			throw new SearchException( "Could not initializer Analyzer definitition" + analyzerDef, e );
+			throw new SearchException( "Could not initializer Analyzer definition" + analyzerDef, e );
 		}
 	}
 
@@ -235,7 +241,7 @@ public final class ConfigContext {
 
 	private boolean isPresent(String className) {
 		try {
-			ClassLoaderHelper.classForName( className, ConfigContext.class.getClassLoader() );
+			ClassLoaderHelper.classForName( className, serviceManager );
 			return true;
 		}
 		catch (Exception e) {
@@ -275,7 +281,7 @@ public final class ConfigContext {
 	 * @param annotatedElement an annotated element
 	 *
 	 * @return a string which identifies the location/point the annotation was placed on. Something of the
-	 *         form package.[[className].[field|member]]
+	 * form package.[[className].[field|member]]
 	 */
 	private String buildAnnotationDefinitionPoint(XAnnotatedElement annotatedElement) {
 		if ( annotatedElement instanceof XClass ) {
@@ -289,7 +295,7 @@ public final class ConfigContext {
 			return ( (XPackage) annotatedElement ).getName();
 		}
 		else {
-			throw new SearchException( "Unknown XAnnoatedElement: " + annotatedElement );
+			throw new SearchException( "Unknown XAnnotatedElement: " + annotatedElement );
 		}
 	}
 
@@ -305,6 +311,7 @@ public final class ConfigContext {
 	 * {@code @ClassBridge} annotations representing the corresponding analyzer etc. configuration.
 	 *
 	 * @param type the type for which to return the configured class bridge instances
+	 *
 	 * @return a map with class bridge instances and their configuration; May be empty but never {@code null}
 	 */
 	public Map<FieldBridge, ClassBridge> getClassBridgeInstances(Class<?> type) {

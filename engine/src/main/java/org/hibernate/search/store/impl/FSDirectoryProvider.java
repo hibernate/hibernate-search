@@ -67,7 +67,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 		try {
 			indexName = indexDir.getCanonicalPath();
 			//this is cheap so it's not done in start()
-			directory = DirectoryProviderHelper.createFSIndex( indexDir, properties );
+			directory = DirectoryProviderHelper.createFSIndex( indexDir, properties, context.getServiceManager() );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + directoryProviderName, e );

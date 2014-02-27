@@ -23,88 +23,25 @@ package org.hibernate.search.test.util;
 import java.util.Properties;
 
 import org.apache.lucene.search.similarities.DefaultSimilarity;
-import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.exception.impl.LogErrorHandler;
-import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
  * At this point mainly used for tests
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class RamIndexManager extends DirectoryBasedIndexManager {
-
-	private static final LogErrorHandler logErrorHandler = new LogErrorHandler();
 
 	public static RamIndexManager makeRamDirectory() {
 		RamIndexManager ramIndexManager = new RamIndexManager();
 		Properties properties = new Properties();
 		properties.setProperty( "directory_provider", "ram" );
-		ramIndexManager.initialize( "testIndex", properties, new DefaultSimilarity(), new EmptyWorkerBuildContext() );
+		ramIndexManager.initialize(
+				"testIndex",
+				properties,
+				new DefaultSimilarity(),
+				new TestWorkerBuildContext( new ManualConfiguration() )
+		);
 		return ramIndexManager;
 	}
-
-	private static class EmptyWorkerBuildContext implements WorkerBuildContext {
-
-		@Override
-		public SearchFactoryImplementor getUninitializedSearchFactory() {
-			return null;
-		}
-
-		@Override
-		public String getIndexingStrategy() {
-			return null;
-		}
-
-		@Override
-		public IndexManagerHolder getAllIndexesManager() {
-			return null;
-		}
-
-		@Override
-		public ErrorHandler getErrorHandler() {
-			return logErrorHandler;
-		}
-
-		@Override
-		public boolean isTransactionManagerExpected() {
-			return false;
-		}
-
-		@Override
-		public InstanceInitializer getInstanceInitializer() {
-			return SimpleInitializer.INSTANCE;
-		}
-
-		@Override
-		public boolean isIndexMetadataComplete() {
-			return true;
-		}
-
-		@Override
-		public ServiceManager getServiceManager() {
-			return new ServiceManager() {
-
-				@Override
-				public <S extends Service> S requestService(Class<S> serviceRole) {
-					return null;
-				}
-
-				@Override
-				public <S extends Service> void releaseService(Class<S> serviceRole) {
-				}
-
-				@Override
-				public void releaseAllServices() {
-				}
-			};
-		}
-	}
-
 }
