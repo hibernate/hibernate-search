@@ -58,7 +58,7 @@ public abstract class WorkerFactory {
 			worker = new TransactionalWorker();
 		}
 		else {
-			worker = ClassLoaderHelper.instanceFromName( Worker.class, impl, WorkerFactory.class, "worker" );
+			worker = ClassLoaderHelper.instanceFromName( Worker.class, impl, WorkerFactory.class.getClassLoader(), "worker" );
 		}
 		worker.initialize( props, context, queueingProcessor );
 		return worker;

@@ -204,7 +204,7 @@ public final class DirectoryProviderHelper {
 		else {
 			LockFactoryProvider lockFactoryFactory = ClassLoaderHelper.instanceFromName(
 					LockFactoryProvider.class,
-					lockFactoryName, DirectoryProviderHelper.class, LOCKING_STRATEGY_PROP_NAME
+					lockFactoryName, DirectoryProviderHelper.class.getClassLoader(), LOCKING_STRATEGY_PROP_NAME
 			);
 			return lockFactoryFactory.createLockFactory( indexDir, dirConfiguration );
 		}

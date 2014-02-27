@@ -76,12 +76,12 @@ public final class DirectoryProviderFactory {
 		if ( defaultProviderClasses.containsKey( maybeShortCut ) ) {
 			String fullClassName = defaultProviderClasses.get( maybeShortCut );
 			provider = ClassLoaderHelper.instanceFromName( DirectoryProvider.class,
-					fullClassName, DirectoryProviderFactory.class, "directory provider" );
+					fullClassName, DirectoryProviderFactory.class.getClassLoader(), "directory provider" );
 		}
 		else {
 			provider = ClassLoaderHelper.instanceFromName(
 					DirectoryProvider.class, className,
-					DirectoryProviderFactory.class, "directory provider"
+					DirectoryProviderFactory.class.getClassLoader(), "directory provider"
 			);
 		}
 		try {
