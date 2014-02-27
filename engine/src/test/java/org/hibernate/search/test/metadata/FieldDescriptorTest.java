@@ -32,6 +32,7 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.metadata.FieldDescriptor;
@@ -40,6 +41,7 @@ import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 import org.hibernate.search.test.util.FooAnalyzer;
 import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.test.util.TestBuildContext;
 import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +63,11 @@ public class FieldDescriptorTest {
 
 	@Before
 	public void setUp() {
-		ConfigContext configContext = new ConfigContext( new ManualConfiguration() );
+		SearchConfiguration searchConfiguration = new ManualConfiguration();
+		ConfigContext configContext = new ConfigContext(
+				searchConfiguration,
+				new TestBuildContext( searchConfiguration )
+		);
 		metadataProvider = new AnnotationMetadataProvider( new JavaReflectionManager(), configContext );
 	}
 

@@ -104,8 +104,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	public void addPurgeAllLuceneWork(String entityClassName) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
-				LuceneWorkHydrator.class.getClassLoader(),
-				"entity class"
+				"entity class",
+				searchFactory.getServiceManager()
 		);
 		results.add( new PurgeAllLuceneWork( entityClass ) );
 	}
@@ -124,8 +124,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	public void addDeleteLuceneWork(String entityClassName, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
-				LuceneWorkHydrator.class.getClassLoader(),
-				"entity class"
+				"entity class",
+				searchFactory.getServiceManager()
 		);
 		LuceneWork result = new DeleteLuceneWork(
 				id,
@@ -140,8 +140,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	public void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
-				LuceneWorkHydrator.class.getClassLoader(),
-				"entity class"
+				"entity class",
+				searchFactory.getServiceManager()
 		);
 		LuceneWork result = new AddLuceneWork(
 				id,
@@ -159,8 +159,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	public void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext) {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
-				LuceneWorkHydrator.class.getClassLoader(),
-				"entity class"
+				"entity class",
+				searchFactory.getServiceManager()
 		);
 		LuceneWork result = new UpdateLuceneWork(
 				id,

@@ -22,17 +22,18 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
-import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.ExplicitOnlyOptimizerStrategy;
+import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -64,15 +65,21 @@ public class PropertiesParseHelper {
 	 *
 	 * @param indexProps The index configuration properties
 	 * @param context The WorkerBuildContext provides a view of the default setting
+	 *
 	 * @return {@code true} when the index metadata is fully defined.
 	 */
 	public static boolean isIndexMetadataComplete(Properties indexProps, WorkerBuildContext context) {
-		return ConfigurationParseHelper.getBooleanValue( indexProps, Environment.INDEX_METADATA_COMPLETE, context.isIndexMetadataComplete() );
+		return ConfigurationParseHelper.getBooleanValue(
+				indexProps,
+				Environment.INDEX_METADATA_COMPLETE,
+				context.isIndexMetadataComplete()
+		);
 	}
 
 	/**
 	 * @param indexName the index name (used for logging)
 	 * @param indexProps MaskedProperties for this IndexManager
+	 *
 	 * @return the maximum queue length to be used on the backends of this index
 	 */
 	public static int extractMaxQueueSize(String indexName, Properties indexProps) {
@@ -84,8 +91,10 @@ public class PropertiesParseHelper {
 							"Illegal value for property " + Environment.MAX_QUEUE_LENGTH + " on index " + indexName
 					);
 			if ( parsedInt < 1 ) {
-				throw new SearchException( "Property " + Environment.MAX_QUEUE_LENGTH + " on index "
-						+ indexName + "must be strictly positive" );
+				throw new SearchException(
+						"Property " + Environment.MAX_QUEUE_LENGTH + " on index "
+								+ indexName + "must be strictly positive"
+				);
 			}
 			return parsedInt;
 		}
@@ -94,22 +103,27 @@ public class PropertiesParseHelper {
 		}
 	}
 
-	public static OptimizerStrategy getOptimizerStrategy(IndexManager callback, Properties indexProps) {
-		MaskedProperty optimizerCfg = new MaskedProperty(indexProps, "optimizer" );
-		String customImplementation = optimizerCfg.getProperty( "implementation" );
-		if ( customImplementation != null && (! "default".equalsIgnoreCase( customImplementation ) ) ) {
-			return ClassLoaderHelper.instanceFromName( OptimizerStrategy.class,
-					customImplementation,
-					callback.getClass().getClassLoader(),
-					"Optimizer Strategy" );
+	public static OptimizerStrategy getOptimizerStrategy(IndexManager callback,
+			Properties indexProperties,
+			WorkerBuildContext buildContext) {
+		MaskedProperty maskedProperty = new MaskedProperty( indexProperties, "optimizer" );
+		String optimizerImplClassName = maskedProperty.getProperty( "implementation" );
+		if ( optimizerImplClassName != null && ( !"default".equalsIgnoreCase( optimizerImplClassName ) ) ) {
+			ServiceManager serviceManager = buildContext.getServiceManager();
+			return ClassLoaderHelper.instanceFromName(
+					OptimizerStrategy.class,
+					optimizerImplClassName,
+					"Optimizer Strategy",
+					serviceManager
+			);
 		}
 		else {
-			boolean incremental = optimizerCfg.containsKey( "operation_limit.max" )
-				|| optimizerCfg.containsKey( "transaction_limit.max" );
+			boolean incremental = maskedProperty.containsKey( "operation_limit.max" )
+					|| maskedProperty.containsKey( "transaction_limit.max" );
 			OptimizerStrategy optimizerStrategy;
 			if ( incremental ) {
 				optimizerStrategy = new IncrementalOptimizerStrategy();
-				optimizerStrategy.initialize( callback, optimizerCfg );
+				optimizerStrategy.initialize( callback, maskedProperty );
 			}
 			else {
 				optimizerStrategy = new ExplicitOnlyOptimizerStrategy();
@@ -136,26 +150,31 @@ public class PropertiesParseHelper {
 		return new LuceneIndexingParameters( properties );
 	}
 
-	public static DirectoryBasedReaderProvider createDirectoryBasedReaderProvider(DirectoryBasedIndexManager indexManager, Properties cfg) {
-		Properties props = new MaskedProperty( cfg, Environment.READER_PREFIX );
-		String impl = props.getProperty( "strategy" );
+	public static DirectoryBasedReaderProvider createDirectoryBasedReaderProvider(DirectoryBasedIndexManager indexManager,
+			Properties properties,
+			WorkerBuildContext buildContext) {
+		Properties maskedProperties = new MaskedProperty( properties, Environment.READER_PREFIX );
+		String readerProviderImplName = maskedProperties.getProperty( "strategy" );
 		DirectoryBasedReaderProvider readerProvider;
-		if ( StringHelper.isEmpty( impl ) ) {
+		if ( StringHelper.isEmpty( readerProviderImplName ) ) {
 			readerProvider = new SharingBufferReaderProvider();
 		}
-		else if ( "not-shared".equalsIgnoreCase( impl ) ) {
+		else if ( "not-shared".equalsIgnoreCase( readerProviderImplName ) ) {
 			readerProvider = new NotSharedReaderProvider();
 		}
-		else if ( "shared".equalsIgnoreCase( impl ) ) {
+		else if ( "shared".equalsIgnoreCase( readerProviderImplName ) ) {
 			readerProvider = new SharingBufferReaderProvider();
 		}
 		else {
+			ServiceManager serviceManager = buildContext.getServiceManager();
 			readerProvider = ClassLoaderHelper.instanceFromName(
-					DirectoryBasedReaderProvider.class, impl,
-					PropertiesParseHelper.class.getClassLoader(), "readerProvider"
+					DirectoryBasedReaderProvider.class,
+					readerProviderImplName,
+					"readerProvider",
+					serviceManager
 			);
 		}
-		readerProvider.initialize( indexManager, props );
+		readerProvider.initialize( indexManager, maskedProperties );
 		return readerProvider;
 	}
 

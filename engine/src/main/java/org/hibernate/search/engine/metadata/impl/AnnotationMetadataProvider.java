@@ -39,6 +39,7 @@ import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -163,7 +164,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					parseContext.setExplicitDocumentId( true );
 				}
 
-				FieldBridge idBridge = BridgeFactory.guessType( null, numericFieldAnn, member, reflectionManager );
+				FieldBridge idBridge = BridgeFactory.guessType( null, numericFieldAnn, member, reflectionManager, configContext.getServiceManager() );
 				if ( !( idBridge instanceof TwoWayFieldBridge ) ) {
 					throw new SearchException(
 							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName()
@@ -192,7 +193,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				String fieldName = prefix + attributeName;
 				Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 				Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
-				FieldBridge fieldBridge = BridgeFactory.guessType( null, null, member, reflectionManager );
+				FieldBridge fieldBridge = BridgeFactory.guessType( null, null, member, reflectionManager, configContext.getServiceManager() );
 
 				DocumentFieldMetadata fieldMetadata =
 						new DocumentFieldMetadata.Builder( fieldName, Store.YES, index, termVector )
@@ -248,10 +249,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<? extends Annotation> jpaIdClass =
-						ClassLoaderHelper.classForName( "javax.persistence.Id", ConfigContext.class.getClassLoader() );
+						ClassLoaderHelper.classForName( "javax.persistence.Id", configContext.getServiceManager() );
 				jpaId = member.getAnnotation( jpaIdClass );
 			}
-			catch (ClassNotFoundException e) {
+			catch (ClassLoadingException e) {
 				throw new SearchException( "Unable to load @Id.class even though it should be present ?!" );
 			}
 			if ( jpaId != null ) {
@@ -486,7 +487,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				null,
 				null,
 				member,
-				reflectionManager
+				reflectionManager,
+				configContext.getServiceManager()
 		);
 
 		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
@@ -799,7 +801,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				fieldAnnotation,
 				numericFieldAnnotation,
 				member,
-				reflectionManager
+				reflectionManager,
+				configContext.getServiceManager()
 		);
 
 		String nullToken = determineNullToken( fieldAnnotation, configContext );
@@ -892,11 +895,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				Class<? extends Annotation> transientAnnotationClass =
 						ClassLoaderHelper.classForName(
 								"javax.persistence.Transient",
-								ConfigContext.class.getClassLoader()
+								configContext.getServiceManager()
 						);
 				transientAnnotation = member.getAnnotation( transientAnnotationClass );
 			}
-			catch (ClassNotFoundException e) {
+			catch (ClassLoadingException e) {
 				throw new SearchException( "Unable to load @Transient.class even though it should be present ?!" );
 			}
 			return transientAnnotation != null;
@@ -1265,7 +1268,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			NumericField numericField = member.getAnnotation( NumericField.class );
-			FieldBridge fieldBridge = BridgeFactory.guessType( null, numericField, member, reflectionManager );
+			FieldBridge fieldBridge = BridgeFactory.guessType( null, numericField, member, reflectionManager, configContext.getServiceManager() );
 			if ( fieldBridge instanceof StringBridge ) {
 				fieldBridge = new NullEncodingFieldBridge( (StringBridge) fieldBridge, indexNullAs );
 			}

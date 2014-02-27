@@ -28,6 +28,7 @@ import java.io.InputStream;
 
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**
  * @author Emmanuel Bernard
@@ -35,19 +36,10 @@ import org.hibernate.search.SearchException;
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
 
-	private final ClassLoader classLoader;
+	private final ServiceManager serviceManager;
 
-	/**
-	 * Used only temporarily to keep the number of changes limited in the scope of
-	 * Lucene 4 migration. TODO HSEARCH-1456 ClassLoader instances should be passed explicitly.
-	 */
-	@Deprecated
-	public HibernateSearchResourceLoader() {
-		this.classLoader = HibernateSearchResourceLoader.class.getClassLoader();
-	}
-
-	public HibernateSearchResourceLoader(ClassLoader classLoader) {
-		this.classLoader = classLoader;
+	public HibernateSearchResourceLoader(ServiceManager serviceManager) {
+		this.serviceManager = serviceManager;
 	}
 
 	@Override
@@ -63,12 +55,12 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 
 	@Override
 	public <T> Class<? extends T> findClass(String cname, Class<T> expectedType) {
-		return ClassLoaderHelper.classForName( expectedType, cname, classLoader, describeComponent( cname) );
+		return ClassLoaderHelper.classForName( expectedType, cname, describeComponent( cname ), serviceManager );
 	}
 
 	@Override
 	public <T> T newInstance(String cname, Class<T> expectedType) {
-		return ClassLoaderHelper.instanceFromName( expectedType, cname, classLoader, describeComponent( cname) );
+		return ClassLoaderHelper.instanceFromName( expectedType, cname, describeComponent( cname ), serviceManager );
 	}
 
 	private static String describeComponent(final String classname) {

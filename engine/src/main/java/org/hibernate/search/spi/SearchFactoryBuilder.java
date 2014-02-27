@@ -308,21 +308,21 @@ public class SearchFactoryBuilder {
 	 * Initialize the document builder
 	 * This algorithm seems to be safe for incremental search factories.
 	 */
-	private void initDocumentBuilders(SearchConfiguration cfg, BuildContext buildContext, SearchMapping searchMapping) {
-		ConfigContext context = new ConfigContext( cfg, searchMapping );
+	private void initDocumentBuilders(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping) {
+		ConfigContext configContext = new ConfigContext( searchConfiguration, buildContext, searchMapping );
 
-		initProgrammaticAnalyzers( context, cfg.getReflectionManager() );
-		initProgrammaticallyDefinedFilterDef( cfg.getReflectionManager() );
+		initProgrammaticAnalyzers( configContext, searchConfiguration.getReflectionManager() );
+		initProgrammaticallyDefinedFilterDef( searchConfiguration.getReflectionManager() );
 		final PolymorphicIndexHierarchy indexingHierarchy = factoryState.getIndexHierarchy();
 		final Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
-		final Map<XClass, Class<?>> classMappings = initializeClassMappings( cfg, cfg.getReflectionManager() );
+		final Map<XClass, Class<?>> classMappings = initializeClassMappings( searchConfiguration, searchConfiguration.getReflectionManager() );
 
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
 		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
 		final org.hibernate.search.engine.metadata.impl.MetadataProvider metadataProvider =
-				new AnnotationMetadataProvider( cfg.getReflectionManager(), context );
+				new AnnotationMetadataProvider( searchConfiguration.getReflectionManager(), configContext );
 
 		for ( Map.Entry<XClass, Class<?>> mapping : classMappings.entrySet() ) {
 			XClass mappedXClass = mapping.getKey();
@@ -343,7 +343,7 @@ public class SearchFactoryBuilder {
 
 				TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( mappedClass );
 				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
-						mappedXClass, typeMetadata, cfg.getReflectionManager(), optimizationBlackListedTypes, cfg.getInstanceInitializer()
+						mappedXClass, typeMetadata, searchConfiguration.getReflectionManager(), optimizationBlackListedTypes, searchConfiguration.getInstanceInitializer()
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
@@ -359,7 +359,7 @@ public class SearchFactoryBuilder {
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
 			Class mappedClass = classMappings.get( mappedXClass );
-			MutableEntityIndexBinding entityIndexBinding = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, cfg, buildContext );
+			MutableEntityIndexBinding entityIndexBinding = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, searchConfiguration, buildContext );
 
 			// interceptor might use non indexed state
 			if ( entityIndexBinding.getEntityIndexingInterceptor() != null ) {
@@ -374,10 +374,10 @@ public class SearchFactoryBuilder {
 					new DocumentBuilderIndexedEntity(
 							mappedXClass,
 							typeMetadata,
-							context,
-							cfg.getReflectionManager(),
+							configContext,
+							searchConfiguration.getReflectionManager(),
 							optimizationBlackListedTypes,
-							cfg.getInstanceInitializer()
+							searchConfiguration.getInstanceInitializer()
 					);
 			entityIndexBinding.setDocumentBuilderIndexedEntity( documentBuilder );
 
@@ -385,7 +385,7 @@ public class SearchFactoryBuilder {
 		}
 
 		disableBlackListedTypesOptimization( classMappings, optimizationBlackListedTypes, documentBuildersIndexedEntities, documentBuildersContainedEntities );
-		factoryState.setAnalyzers( context.initLazyAnalyzers() );
+		factoryState.setAnalyzers( configContext.initLazyAnalyzers() );
 	}
 
 	/**

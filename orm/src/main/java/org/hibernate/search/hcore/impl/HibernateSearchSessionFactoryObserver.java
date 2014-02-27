@@ -124,7 +124,10 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			JMXRegistrar.unRegisterMBean( objectName );
 		}
 
-		IndexControl indexCtrlBean = new IndexControl( configuration.getProperties() );
+		IndexControl indexCtrlBean = new IndexControl(
+				configuration.getProperties(),
+				searchFactoryImplementor.getServiceManager()
+		);
 		JMXRegistrar.registerMBean( indexCtrlBean, objectName );
 		indexControlMBeanName = objectName;
 	}

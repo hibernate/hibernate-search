@@ -39,6 +39,7 @@ import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
 
 import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass;
@@ -63,11 +64,18 @@ final class SolrAnalyzerBuilder {
 	 * @return a Lucene <code>Analyzer</code>
 	 * @throws IOException
 	 */
-	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef, Version luceneMatchVersion) throws IOException {
-		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader();
+	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef,
+			Version luceneMatchVersion,
+			ServiceManager serviceManager) throws IOException {
+		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader( serviceManager );
 		TokenizerDef token = analyzerDef.tokenizer();
 		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( token.params(), luceneMatchVersion );
-		TokenizerFactory tokenFactory = instanceFromClass( TokenizerFactory.class, token.factory(), "Tokenizer factory", tokenMapsOfParameters );
+		TokenizerFactory tokenFactory = instanceFromClass(
+				TokenizerFactory.class,
+				token.factory(),
+				"Tokenizer factory",
+				tokenMapsOfParameters
+		);
 		injectResourceLoader( tokenFactory, defaultResourceLoader, tokenMapsOfParameters );
 
 		final int length = analyzerDef.filters().length;
@@ -77,13 +85,26 @@ final class SolrAnalyzerBuilder {
 		for ( int index = 0; index < length; index++ ) {
 			TokenFilterDef filterDef = analyzerDef.filters()[index];
 			final Map<String, String> mapOfParameters = getMapOfParameters( filterDef.params(), luceneMatchVersion );
-			filters[index] = instanceFromClass( TokenFilterFactory.class, filterDef.factory(), "Token filter factory", mapOfParameters );
+			filters[index] = instanceFromClass(
+					TokenFilterFactory.class,
+					filterDef.factory(),
+					"Token filter factory",
+					mapOfParameters
+			);
 			injectResourceLoader( filters[index], defaultResourceLoader, mapOfParameters );
 		}
 		for ( int index = 0; index < charFilters.length; index++ ) {
 			CharFilterDef charFilterDef = analyzerDef.charFilters()[index];
-			final Map<String, String> mapOfParameters = getMapOfParameters( charFilterDef.params(), luceneMatchVersion );
-			charFilters[index] = instanceFromClass( CharFilterFactory.class, charFilterDef.factory(), "Character filter factory", mapOfParameters );
+			final Map<String, String> mapOfParameters = getMapOfParameters(
+					charFilterDef.params(),
+					luceneMatchVersion
+			);
+			charFilters[index] = instanceFromClass(
+					CharFilterFactory.class,
+					charFilterDef.factory(),
+					"Character filter factory",
+					mapOfParameters
+			);
 			injectResourceLoader( charFilters[index], defaultResourceLoader, mapOfParameters );
 		}
 		return new TokenizerChain( charFilters, tokenFactory, filters );

@@ -153,6 +153,9 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 				mockClassLoaderService
 		);
 
+		// returning object.class is fair enough for testing purposes
+		expect( mockClassLoaderService.classForName( "javax.persistence.Id" ) ).andReturn( Object.class );
+
 		EasyMockUnitils.replay();
 
 		integratorUnderTest.integrate( cfg, mockSessionFactoryImplementor, mockSessionFactoryServiceRegistry );

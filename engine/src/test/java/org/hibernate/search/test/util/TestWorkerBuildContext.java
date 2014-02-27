@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,35 +21,38 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.query.hibernate.impl;
+package org.hibernate.search.test.util;
 
-import java.util.List;
-
-import org.hibernate.search.util.impl.CollectionHelper;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
- * @author Emmanuel Bernard
+ * A {@code WorkerBuildContext} implementation for running tests.
+ *
+ * @author Hardy Ferentschik
  */
-public class LoaderHelper {
-	private static final List<String> objectNotFoundExceptions = CollectionHelper.newArrayList( 2 );
+public class TestWorkerBuildContext extends TestBuildContext implements WorkerBuildContext {
 
-	static {
-		objectNotFoundExceptions.add( "org.hibernate.ObjectNotFoundException" );
-		objectNotFoundExceptions.add( "javax.persistence.EntityNotFoundException" );
+	public TestWorkerBuildContext(SearchConfiguration searchConfiguration) {
+		super( searchConfiguration );
 	}
 
-	private LoaderHelper() {
+	@Override
+	public boolean isTransactionManagerExpected() {
+		return false;
 	}
 
-	public static boolean isObjectNotFoundException(RuntimeException e) {
-		boolean objectNotFound = false;
-		String exceptionClassName = e.getClass().getName();
-		for ( String fqc : objectNotFoundExceptions ) {
-			if ( fqc.equals( exceptionClassName ) ) {
-				objectNotFound = true;
-				break;
-			}
-		}
-		return objectNotFound;
+	@Override
+	public boolean isIndexMetadataComplete() {
+		return true;
+	}
+
+	@Override
+	public InstanceInitializer getInstanceInitializer() {
+		return SimpleInitializer.INSTANCE;
 	}
 }
+
+

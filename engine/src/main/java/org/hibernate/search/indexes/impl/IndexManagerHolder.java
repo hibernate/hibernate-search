@@ -31,7 +31,6 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Indexed;
@@ -40,8 +39,9 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -49,9 +49,9 @@ import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
-import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.store.impl.NotShardedStrategy;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -95,12 +95,12 @@ public class IndexManagerHolder {
 			XClass entity,
 			Class mappedClass,
 			SearchConfiguration cfg,
-			WorkerBuildContext context
+			WorkerBuildContext buildContext
 	) {
 		String indexName = getIndexName( entity, cfg );
 		Properties[] indexProperties = getIndexProperties( cfg, indexName );
-		Similarity similarity = createSimilarity( indexName, cfg, indexProperties[0], entity );
-		boolean isDynamicSharding = isShardingDynamic( indexProperties[0] );
+		Similarity similarity = createSimilarity( indexName, cfg, indexProperties[0], entity, buildContext );
+		boolean isDynamicSharding = isShardingDynamic( indexProperties[0], buildContext );
 
 		IndexManager[] indexManagers = new IndexManager[0];
 		if ( !isDynamicSharding ) {
@@ -111,18 +111,19 @@ public class IndexManagerHolder {
 					mappedClass,
 					cfg,
 
-					context
+					buildContext
 			);
 		}
 
 		IndexShardingStrategy shardingStrategy = null;
 		if ( !isDynamicSharding ) {
-			shardingStrategy = createIndexShardingStrategy( indexProperties, indexManagers );
+			shardingStrategy = createIndexShardingStrategy( indexProperties, indexManagers, buildContext );
 		}
 
 		ShardIdentifierProvider shardIdentifierProvider = null;
 		if ( isDynamicSharding ) {
-			shardIdentifierProvider = createShardIdentifierProvider( context, indexProperties[0]
+			shardIdentifierProvider = createShardIdentifierProvider(
+					buildContext, indexProperties[0]
 			);
 		}
 
@@ -138,7 +139,7 @@ public class IndexManagerHolder {
 				isDynamicSharding,
 				indexProperties[0],
 				indexName,
-				context,
+				buildContext,
 				this,
 				cfg.getIndexManagerFactory()
 		);
@@ -350,17 +351,18 @@ public class IndexManagerHolder {
 		}
 	}
 
-	private ShardIdentifierProvider createShardIdentifierProvider(WorkerBuildContext context, Properties indexProperty) {
+	private ShardIdentifierProvider createShardIdentifierProvider(WorkerBuildContext buildContext, Properties indexProperty) {
 		ShardIdentifierProvider shardIdentifierProvider;
 		String shardIdentityProviderName = indexProperty.getProperty( SHARDING_STRATEGY );
-
+		ServiceManager serviceManager = buildContext.getServiceManager();
 		shardIdentifierProvider = ClassLoaderHelper.instanceFromName(
 				ShardIdentifierProvider.class,
 				shardIdentityProviderName,
-				DirectoryProviderFactory.class.getClassLoader(),
-				"ShardIdentifierProvider"
+				"ShardIdentifierProvider",
+				serviceManager
 		);
-		shardIdentifierProvider.initialize( new MaskedProperty( indexProperty, SHARDING_STRATEGY ), context );
+
+		shardIdentifierProvider.initialize( new MaskedProperty( indexProperty, SHARDING_STRATEGY ), buildContext );
 
 		return shardIdentifierProvider;
 	}
@@ -387,7 +389,11 @@ public class IndexManagerHolder {
 		return interceptor;
 	}
 
-	private Similarity createSimilarity(String directoryProviderName, SearchConfiguration cfg, Properties indexProperties, XClass clazz) {
+	private Similarity createSimilarity(String directoryProviderName,
+			SearchConfiguration searchConfiguration,
+			Properties indexProperties,
+			XClass clazz,
+			WorkerBuildContext buildContext) {
 		// first check on class level
 		Similarity classLevelSimilarity = null;
 
@@ -413,16 +419,11 @@ public class IndexManagerHolder {
 		}
 
 		// now we check the config
-		Similarity configLevelSimilarity = null;
-		String similarityClassName = indexProperties.getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
-		if ( similarityClassName != null ) {
-			configLevelSimilarity = ClassLoaderHelper.instanceFromName(
-					Similarity.class,
-					similarityClassName,
-					DirectoryProviderFactory.class.getClassLoader(),
-					"Similarity class for index " + directoryProviderName
-			);
-		}
+		Similarity configLevelSimilarity = getConfiguredPerIndexSimilarity(
+				directoryProviderName,
+				indexProperties,
+				buildContext
+		);
 
 		if ( classLevelSimilarity != null && configLevelSimilarity != null ) {
 			throw log.getInconsistentSimilaritySettingBetweenAnnotationsAndConfigPropertiesException(
@@ -437,22 +438,45 @@ public class IndexManagerHolder {
 			return configLevelSimilarity;
 		}
 		else {
-			String defaultSimilarityClassName = cfg.getProperty( Environment.SIMILARITY_CLASS );
-			if ( StringHelper.isEmpty( defaultSimilarityClassName ) ) {
-				return DEFAULT_SIMILARITY;
-			}
-			else {
-				return ClassLoaderHelper.instanceFromName(
-						Similarity.class,
-						defaultSimilarityClassName,
-						ConfigContext.class.getClassLoader(),
-						"default similarity"
-				);
-			}
+			return getDefaultSimilarity( searchConfiguration, buildContext );
 		}
 	}
 
-	private IndexShardingStrategy createIndexShardingStrategy( Properties[] indexProps, IndexManager[] indexManagers ) {
+	private Similarity getDefaultSimilarity(SearchConfiguration searchConfiguration, WorkerBuildContext buildContext) {
+		String defaultSimilarityClassName = searchConfiguration.getProperty( Environment.SIMILARITY_CLASS );
+		if ( StringHelper.isEmpty( defaultSimilarityClassName ) ) {
+			return DEFAULT_SIMILARITY;
+		}
+		else {
+			ServiceManager serviceManager = buildContext.getServiceManager();
+			return ClassLoaderHelper.instanceFromName(
+					Similarity.class,
+					defaultSimilarityClassName,
+					"default similarity",
+					serviceManager
+			);
+
+		}
+	}
+
+	private Similarity getConfiguredPerIndexSimilarity(String directoryProviderName, Properties indexProperties, WorkerBuildContext buildContext) {
+		Similarity configLevelSimilarity = null;
+		String similarityClassName = indexProperties.getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
+		if ( similarityClassName != null ) {
+			ServiceManager serviceManager = buildContext.getServiceManager();
+			configLevelSimilarity = ClassLoaderHelper.instanceFromName(
+					Similarity.class,
+					similarityClassName,
+					"Similarity class for index " + directoryProviderName,
+					serviceManager
+			);
+		}
+		return configLevelSimilarity;
+	}
+
+	private IndexShardingStrategy createIndexShardingStrategy(Properties[] indexProps,
+			IndexManager[] indexManagers,
+			WorkerBuildContext buildContext) {
 		IndexShardingStrategy shardingStrategy;
 
 		// any indexProperty will do, the indexProps[0] surely exists.
@@ -466,11 +490,12 @@ public class IndexManagerHolder {
 			}
 		}
 		else {
+			ServiceManager serviceManager = buildContext.getServiceManager();
 			shardingStrategy = ClassLoaderHelper.instanceFromName(
 					IndexShardingStrategy.class,
 					shardingStrategyName,
-					DirectoryProviderFactory.class.getClassLoader(),
-					"IndexShardingStrategy"
+					"IndexShardingStrategy",
+					serviceManager
 			);
 		}
 		shardingStrategy.initialize(
@@ -541,7 +566,7 @@ public class IndexManagerHolder {
 		return indexManager;
 	}
 
-	private boolean isShardingDynamic(Properties indexProperty) {
+	private boolean isShardingDynamic(Properties indexProperty, WorkerBuildContext buildContext) {
 		boolean isShardingDynamic = false;
 
 		String shardingStrategyName = indexProperty.getProperty( SHARDING_STRATEGY );
@@ -553,10 +578,10 @@ public class IndexManagerHolder {
 		try {
 			shardingStrategy = ClassLoaderHelper.classForName(
 					shardingStrategyName,
-					DirectoryProviderFactory.class.getClassLoader()
+					buildContext.getServiceManager()
 			);
 		}
-		catch (ClassNotFoundException e) {
+		catch (ClassLoadingException e) {
 			throw log.getUnableToLoadShardingStrategyClassException( shardingStrategyName );
 		}
 
