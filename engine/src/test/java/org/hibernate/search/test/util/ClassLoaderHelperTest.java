@@ -23,25 +23,21 @@
  */
 package org.hibernate.search.test.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.Session;
 import org.hibernate.search.Environment;
-import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@code ClassLoaderHelper}. Verifying amongst other that it throws easy to understand exceptions.
@@ -50,26 +46,6 @@ import org.junit.Test;
  * @author Hardy Ferentschik
  */
 public class ClassLoaderHelperTest {
-
-	@Test
-	public void testInstanceFromName() {
-		IndexManager indexManager = ClassLoaderHelper.instanceFromName(
-				IndexManager.class, DirectoryBasedIndexManager.class.getName(), getClass(), "Lucene index manager"
-		);
-		assertNotNull( indexManager );
-		assertTrue( indexManager.getClass().equals( DirectoryBasedIndexManager.class ) );
-
-		try {
-			ClassLoaderHelper.instanceFromName(
-					BackendQueueProcessor.class, "HeyThisClassIsNotThere", getClass(), "backend"
-			);
-			fail( "was expecting a SearchException" );
-		}
-		catch (Exception e) {
-			assertEquals( e.getClass(), SearchException.class );
-			assertEquals( "Unable to find backend implementation class: HeyThisClassIsNotThere", e.getMessage() );
-		}
-	}
 
 	@Test
 	public void testInstanceFromClass() {
@@ -93,15 +69,6 @@ public class ClassLoaderHelperTest {
 						"org.hibernate.search.test.util.ClassLoaderHelperTest does not implement " +
 						"interface org.hibernate.search.indexes.spi.IndexManager",
 				IndexManager.class, ClassLoaderHelperTest.class, "Lucene index manager"
-		);
-		wrappingTestFromClass(
-				"org.hibernate.search.impl.FullTextSessionImpl defined for component session " +
-						"is missing a no-arguments constructor",
-				FullTextSession.class, FullTextSessionImpl.class, "session"
-		);
-		wrappingTestFromClass(
-				"org.hibernate.Session defined for component session is an interface: implementation required.",
-				FullTextSession.class, Session.class, "session"
 		);
 		wrappingTestFromClass(
 				"Wrong configuration of default similarity: " +
