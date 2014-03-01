@@ -24,19 +24,20 @@
 
 package org.hibernate.search.test.engine;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.bridge.builtin.ClassBridge;
+import org.hibernate.search.bridge.builtin.EnumBridge;
 import org.hibernate.search.test.SearchTestCase;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * @author Emmanuel Bernard
@@ -78,14 +79,27 @@ public class TransactionSynchronizationTest extends SearchTestCase {
 	@Indexed
 	@Table(name = "Test007")
 	public static class Test {
-		@Id @GeneratedValue
-		public Integer getId() { return id; }
-		public void setId(Integer id) { this.id = id; }
+		@Id
+		@GeneratedValue
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
 		private Integer id;
 
-		@Field(bridge = @FieldBridge(impl = ClassBridge.class))
-		public String getIncorrectType() { return incorrectType; }
-		public void setIncorrectType(String incorrectType) { this.incorrectType = incorrectType; }
+		@Field(bridge = @FieldBridge(impl = EnumBridge.class))
+		public String getIncorrectType() {
+			return incorrectType;
+		}
+
+		public void setIncorrectType(String incorrectType) {
+			this.incorrectType = incorrectType;
+		}
+
 		private String incorrectType;
 	}
 }
