@@ -28,7 +28,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.bridge.builtin.ClassBridge;
+import org.hibernate.search.bridge.builtin.EnumBridge;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -53,7 +53,7 @@ public class IncorrectSet {
 	private SubIncorrect subIncorrect;
 
 	public static class SubIncorrect {
-		@Field( bridge = @FieldBridge(impl = ClassBridge.class) )
+		@Field( bridge = @FieldBridge(impl = EnumBridge.class) )
 		public String getName() { return name; }
 		public void setName(String name) { this.name = name; }
 		private String name;

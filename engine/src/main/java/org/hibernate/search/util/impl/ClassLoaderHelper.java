@@ -341,30 +341,4 @@ public class ClassLoaderHelper {
 			serviceManager.releaseService( ClassLoaderService.class );
 		}
 	}
-
-	/**
-	 * Perform resolution of a class name.
-	 * <p/>
-	 * Here we first check the context classloader, if one, before delegating to
-	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
-	 *
-	 * @param name The class name
-	 * @param classLoader The classloader from which this call originated.
-	 *
-	 * @return The class reference.
-	 *
-	 * @throws ClassNotFoundException From {@link Class#forName(String, boolean, ClassLoader)}.
-	 */
-	public static Class classForName(String name, ClassLoader classLoader) throws ClassNotFoundException {
-		try {
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-			if ( contextClassLoader != null ) {
-				return contextClassLoader.loadClass( name );
-			}
-		}
-		catch (Throwable ignore) {
-		}
-		return Class.forName( name, true, classLoader );
-	}
-
 }
