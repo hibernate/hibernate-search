@@ -29,8 +29,6 @@ import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.SortedSetDocValues;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.util.BytesRef;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A {@code FieldLoadingStrategy} which uses {@link SortedSetDocValues} to load fields with multiple values.
@@ -38,7 +36,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class MultiStringFieldLoadingStrategy implements FieldLoadingStrategy {
-	private static final Log log = LoggerFactory.make();
 
 	private final String fieldName;
 	private SortedSetDocValues sortedSetDocValues;
@@ -72,10 +69,4 @@ public final class MultiStringFieldLoadingStrategy implements FieldLoadingStrate
 		return values.toArray( new String[values.size()] );
 	}
 
-	private int safeLongToInt(long l) {
-		if ( l < Integer.MIN_VALUE || l > Integer.MAX_VALUE ) {
-			throw log.unableToConvertLongToIntException( l );
-		}
-		return (int) l;
-	}
 }

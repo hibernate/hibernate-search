@@ -688,6 +688,4 @@ public interface Log extends BasicLogger {
 	@Message(id = 201, value = "The edit distance must be either 1 or 2")
 	SearchException incorrectEditDistance();
 
-	@Message(id = 202, value = "%s cannot be cast to int without changing its value. Hibernate Search does not support multi values field with so many entries.")
-	SearchException unableToConvertLongToIntException(long l);
 }
