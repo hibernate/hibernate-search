@@ -40,6 +40,7 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 
 	private volatile CountDownLatch threadTrap;
 	private volatile boolean failOnMessage = false;
+	private volatile boolean receivedAnything = false;
 
 	public JGroupsReceivingMockBackend() {
 		super( new MasterNodeSelector() );
@@ -47,17 +48,27 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 
 	@Override
 	public void applyWork(List<LuceneWork> workList, IndexingMonitor monitor) {
+		receivedSomething();
 		countDownAndJoin();
+	}
+
+	private void receivedSomething() {
+		receivedAnything = true;
 	}
 
 	@Override
 	public void applyStreamWork(LuceneWork singleOperation, IndexingMonitor monitor) {
 		//Unused
+		receivedSomething();
 		countDownAndJoin();
 	}
 
 	public void resetThreadTrap() {
 		threadTrap = new CountDownLatch( 2 );
+	}
+
+	public boolean wasSomethingReceived() {
+		return receivedAnything;
 	}
 
 	public void countDownAndJoin() {

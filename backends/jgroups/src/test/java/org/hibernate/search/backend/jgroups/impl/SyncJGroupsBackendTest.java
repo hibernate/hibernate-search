@@ -21,6 +21,7 @@
 package org.hibernate.search.backend.jgroups.impl;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 
@@ -93,9 +94,12 @@ public class SyncJGroupsBackendTest {
 		boolean timeoutTriggered = false;
 		try {
 			//DVDs are sync operations so they will timeout:
-			System.out.println( "[PRESEND] Timestamp: " + System.nanoTime() );
+			final long presendTimestamp = System.nanoTime();
+			System.out.println( "[PRESEND] Timestamp: " + presendTimestamp );
 			storeDvd( 1, "Hibernate Search in Action" );
-			System.out.println( "[POSTSEND] Timestamp: " + System.nanoTime() );
+			final long postsendTimestamp = System.nanoTime();
+			final long differenceInMilliseconds = TimeUnit.MILLISECONDS.convert( (postsendTimestamp - presendTimestamp), TimeUnit.NANOSECONDS );
+			System.out.println( "[POSTSEND] Timestamp: " + postsendTimestamp + " Diff: " + differenceInMilliseconds + " ms." );
 		}
 		catch (SearchException se) {
 			//Expected: we're inducing the RPC into timeout by blocking receiver processing
@@ -107,6 +111,7 @@ public class SyncJGroupsBackendTest {
 			//release the receiver
 			dvdBackendMock.releaseBlockedThreads();
 		}
+		Assert.assertTrue( "The backend didn't receive any message: something wrong with the test setup of network configuration", dvdBackendMock.wasSomethingReceived() );
 		Assert.assertTrue( timeoutTriggered );
 
 		JGroupsReceivingMockBackend booksBackendMock = extractMockBackend( "books" );
