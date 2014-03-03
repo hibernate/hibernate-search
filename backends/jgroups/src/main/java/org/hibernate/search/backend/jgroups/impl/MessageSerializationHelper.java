@@ -63,12 +63,13 @@ public final class MessageSerializationHelper {
 	 * Is the reverse operation of {@link #prependString(String, byte[])}
 	 * The buffer is not altered.
 	 *
+	 * @param startOffset the starting offset of our message in the larger network buffer
 	 * @param rawBuffer an array of byte.
 	 * @return the String, assuming it's encoded by this same class.
 	 */
-	public static String extractIndexName(final byte[] rawBuffer) {
-		int indexNameByteLength = fromByteToInt( rawBuffer[0] );
-		return new String( rawBuffer, 1, indexNameByteLength, STRING_ENCODING );
+	public static String extractIndexName(final int startOffset, final byte[] rawBuffer) {
+		int indexNameByteLength = fromByteToInt( rawBuffer[startOffset] );
+		return new String( rawBuffer, startOffset + 1, indexNameByteLength, STRING_ENCODING );
 	}
 
 	/**
@@ -76,13 +77,16 @@ public final class MessageSerializationHelper {
 	 * the original buffer discarding the prefixed string.
 	 * The buffer is not altered.
 	 *
+	 * @param startOffset the starting offset of our message in the larger network buffer
+	 * @param bufferLength we won't attempt to access the buffer beyond this index
 	 * @param rawBuffer an array of byte.
 	 * @return the smaller byte buffer
 	 */
-	public static byte[] extractSerializedQueue(final byte[] rawBuffer) {
-		int indexNameByteLength = rawBuffer[0];
-		byte[] serializedQueue = new byte[ rawBuffer.length - 1 - indexNameByteLength ];
-		System.arraycopy( rawBuffer, indexNameByteLength + 1, serializedQueue, 0, serializedQueue.length );
+	public static byte[] extractSerializedQueue(final int startOffset, final int bufferLength, final byte[] rawBuffer) {
+		final int indexNameByteLength = fromByteToInt( rawBuffer[startOffset] );
+		final int relevantStartingOffset = startOffset + 1 + indexNameByteLength;
+		byte[] serializedQueue = new byte[ bufferLength - 1 - indexNameByteLength ];
+		System.arraycopy( rawBuffer, relevantStartingOffset, serializedQueue, 0, serializedQueue.length );
 		return serializedQueue;
 	}
 
