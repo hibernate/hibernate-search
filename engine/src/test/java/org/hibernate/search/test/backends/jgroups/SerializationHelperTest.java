@@ -53,8 +53,19 @@ public class SerializationHelperTest {
 		byte[] someRandom = "Some random string to test payload".getBytes();
 		String indexName = "this is my favourite index";
 		byte[] buffer = MessageSerializationHelper.prependString( indexName, someRandom );
-		Assert.assertEquals( indexName, MessageSerializationHelper.extractIndexName( buffer ) );
-		Assert.assertTrue( Arrays.equals( someRandom, MessageSerializationHelper.extractSerializedQueue( buffer ) ) );
+		Assert.assertEquals( indexName, MessageSerializationHelper.extractIndexName( 0, buffer ) );
+		Assert.assertTrue( Arrays.equals( someRandom, MessageSerializationHelper.extractSerializedQueue( 0, buffer.length, buffer ) ) );
+	}
+
+	@Test
+	public void partialBufferEncoding() {
+		byte[] someRandom = "Some random string to test payload".getBytes();
+		String indexName = "this is my favourite index";
+		byte[] buffer = MessageSerializationHelper.prependString( indexName, someRandom );
+		byte[] mixed = new byte[ buffer.length + 7 ];
+		System.arraycopy( buffer, 0, mixed, 2, buffer.length );
+		Assert.assertEquals( indexName, MessageSerializationHelper.extractIndexName( 0, buffer ) );
+		Assert.assertTrue( Arrays.equals( someRandom, MessageSerializationHelper.extractSerializedQueue( 0, buffer.length, buffer ) ) );
 	}
 
 }

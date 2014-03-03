@@ -55,9 +55,11 @@ public class JGroupsReceiver extends ReceiverAdapter {
 	@Override
 	public void receive(Message message) {
 		try {
-			byte[] rawBuffer = message.getRawBuffer();
-			String indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
-			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
+			final byte[] rawBuffer = message.getRawBuffer();
+			final int messageOffset = message.getOffset();
+			final int bufferLength = message.getLength();
+			String indexName = MessageSerializationHelper.extractIndexName( messageOffset, rawBuffer );
+			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( messageOffset, bufferLength, rawBuffer );
 			IndexManager indexManager = searchFactory.getIndexManagerHolder().getIndexManager( indexName );
 			List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
 			queues++;
