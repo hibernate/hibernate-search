@@ -64,13 +64,15 @@ public class JGroupsMasterMessageListener implements Receiver {
 
 	@Override
 	public void receive(Message message) {
+		final int offset = message.getOffset();
+		final int bufferLength = message.getLength();
 		final byte[] rawBuffer = message.getRawBuffer();
-		final String indexName = MessageSerializationHelper.extractIndexName( rawBuffer );
+		final String indexName = MessageSerializationHelper.extractIndexName( offset, rawBuffer );
 		final NodeSelectorStrategy nodeSelector = selector.getMasterNodeSelector( indexName );
 		try {
 			//nodeSelector can be null if we receive the message during shutdown
 			if ( nodeSelector != null && nodeSelector.isIndexOwnerLocal() ) {
-				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( rawBuffer );
+				byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( offset, bufferLength, rawBuffer );
 				final IndexManager indexManager = context.getAllIndexesManager().getIndexManager( indexName );
 				if ( indexManager != null ) {
 					final List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
