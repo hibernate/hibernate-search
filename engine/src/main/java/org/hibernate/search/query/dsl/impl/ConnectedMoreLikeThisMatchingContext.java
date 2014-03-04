@@ -24,8 +24,6 @@
 
 package org.hibernate.search.query.dsl.impl;
 
-import java.io.Reader;
-
 import org.hibernate.search.query.dsl.MoreLikeThisOpenedMatchingContext;
 import org.hibernate.search.query.dsl.MoreLikeThisTerminalMatchingContext;
 import org.hibernate.search.query.dsl.MoreLikeThisTermination;
@@ -98,13 +96,4 @@ public class ConnectedMoreLikeThisMatchingContext implements MoreLikeThisOpenedM
 		);
 	}
 
-	@Override
-	public MoreLikeThisTermination toContent(Reader reader) {
-		return null;
-	}
-
-	@Override
-	public MoreLikeThisTermination toContent(String data) {
-		return null;
-	}
 }

@@ -24,8 +24,6 @@
 
 package org.hibernate.search.query.dsl;
 
-import java.io.Reader;
-
 /**
  * Super interface offering the way to provide the matching content
  * as well as customize the preceding field.
@@ -50,23 +48,5 @@ public interface MoreLikeThisMatchingContext {
 	 */
 	//TODO genericize it
 	MoreLikeThisToEntityContentAndTermination toEntity(Object entity);
-
-	/**
-	 * Find entities looking like the content provided.
-	 * Only the selected fields will be used for comparison.
-	 * Selected fields must have a field bridge compatible with
-	 * the provided content.
-	 */
-	//TODO should we support it? What's the use case
-	MoreLikeThisTermination toContent(Reader reader);
-
-	/**
-	 * Find entities looking like the content provided.
-	 * Only the selected fields will be used for comparison.
-	 * Selected fields must have a field bridge compatible with
-	 * the provided content.
-	 */
-	//TODO should we support it? What's the use case
-	MoreLikeThisTermination toContent(String data);
 
 }
