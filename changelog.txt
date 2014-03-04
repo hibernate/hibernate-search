@@ -1,6 +1,44 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Alpha2 (05-03-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-726] - Facetted search on embedded collections takes only first element from collection
+    * [HSEARCH-1513] - CachingWrapperFilter attempts to cache null docIdSets
+    * [HSEARCH-1515] - NPE because of inverted boolean check in IdentifierConsumerDocumentProducer
+    * [HSEARCH-1522] - Javadoc generation is not linking correctly to the Lucene documentation
+    * [HSEARCH-1523] - Depending on both javax.transaction:jta and org.jboss.spec.javax.transaction specs
+    * [HSEARCH-1524] - JGroups tests failing on Windows
+    * [HSEARCH-1532] - JGroups backend buffer handling is not considering the offset on message delivery
+
+** Improvement
+    * [HSEARCH-1505] - Reuse the JBoss Modules already included in WildFly 8
+    * [HSEARCH-1509] - Minor cleanups in the Query DSL
+    * [HSEARCH-1511] - Provide new FuzzyQuery options to the DSL
+    * [HSEARCH-1514] - A Service should be flagged Startable or Stoppable as an implementation detail
+    * [HSEARCH-1517] - Upgrade to WildFly 8.0.0.Final
+    * [HSEARCH-1519] - Upgrade to ShrinkWrap stable 2.0
+    * [HSEARCH-1520] - Remove hibernate-search-analyzers module
+
+** New Feature
+    * [HSEARCH-1492] - Provide a "More Like This" feature to find similar entities
+
+** Patch
+    * [HSEARCH-1534] - Avoid usage of SLF4J in our testsuite
+
+** Remove Feature
+    * [HSEARCH-1521] - Stop including lucene-regex in the provided modules
+
+** Task
+    * [HSEARCH-789] - Polish or remove topDocs being exposed on Query SPI
+    * [HSEARCH-1529] - Remove double InstanceInitializer call in DocumentBuilder
+    * [HSEARCH-1530] - Upgrade to Infinispan 7.0.0.Alpha1 and JGroups 3.5.0.Alpha1
+    * [HSEARCH-1531] - Upgrade to Hibernate ORM 4.3.4.Final
+    * [HSEARCH-1535] - Revert removal of DocumentExtractor#getTopDocs
+
+
 Version 5.0.0.Alpha1 (08-02-2014)
 ------------------------
 
