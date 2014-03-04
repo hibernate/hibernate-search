@@ -24,34 +24,20 @@ import java.io.Serializable;
 
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
-import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.util.Bits;
 
 /**
  * Apparently it's legal for Lucene filters to return null
- * on {@link DocIdSet#iterator()} : make sure we can deal with it as well.
+ * on {@link Filter#getDocIdSet} : make sure we can deal with it as well.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class NullReturningEmptyFilter extends Filter implements Serializable {
 
-	public static final DocIdSet EMPTY_DOCIDSET = new DocIdSet() {
-
-		@Override
-		public DocIdSetIterator iterator() {
-			return null;
-		}
-
-		@Override
-		public boolean isCacheable() {
-			return true;
-		}
-	};
-
 	@Override
 	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
-		return EMPTY_DOCIDSET;
+		return null;
 	}
 
 }

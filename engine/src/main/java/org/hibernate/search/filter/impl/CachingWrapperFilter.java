@@ -40,8 +40,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * the filter <code>BitSet</code>.
  *
  * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  * @see org.apache.lucene.search.CachingWrapperFilter
- * @see <a href="http://opensource.atlassian.com/projects/hibernate/browse/HSEARCH-174">HSEARCH-174</a>
+ * @see <a href="https://hibernate.atlassian.net/browse/HSEARCH-174">HSEARCH-174</a>
  */
 @SuppressWarnings("serial")
 public class CachingWrapperFilter extends Filter {
@@ -49,6 +50,13 @@ public class CachingWrapperFilter extends Filter {
 	private static final Log log = LoggerFactory.make();
 
 	public static final int DEFAULT_SIZE = 5;
+
+	/**
+	 * Any Filter could return null as a value representing an empty match set,
+	 * we need to use NULL_OBJECT as a marker token to be able to cache this
+	 * return value.
+	 */
+	private static final Object NULL_OBJECT = new Object();
 
 	/**
 	 * The cache using soft references in order to store the filter bit sets.
@@ -86,18 +94,34 @@ public class CachingWrapperFilter extends Filter {
 	@Override
 	public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
 		final AtomicReader reader = context.reader();
-		DocIdSet cached = (DocIdSet) cache.get( reader );
+		Object cached = cache.get( reader );
 		if ( cached != null ) {
-			return cached;
+			if ( cached == NULL_OBJECT ) {
+				return null;
+			}
+			else {
+				return (DocIdSet) cached;
+			}
 		}
 		synchronized ( cache ) {
-			cached = (DocIdSet) cache.get( reader );
+			cached = cache.get( reader );
 			if ( cached != null ) {
-				return cached;
+				if ( cached == NULL_OBJECT ) {
+					return null;
+				}
+				else {
+					return (DocIdSet) cached;
+				}
 			}
 			final DocIdSet docIdSet = filter.getDocIdSet( context, acceptDocs );
-			cache.put( reader, docIdSet );
-			return docIdSet;
+			if ( docIdSet == null ) {
+				cache.put( reader, NULL_OBJECT );
+				return null;
+			}
+			else {
+				cache.put( reader, docIdSet );
+				return docIdSet;
+			}
 		}
 	}
 

@@ -38,6 +38,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.TestForIssue;
 
 /**
  * @author Emmanuel Bernard
@@ -125,6 +126,20 @@ public class FilterTest extends SearchTestCase {
 		ftQuery.disableFullTextFilter( "bestDriver" );
 		ftQuery.setFilter( null );
 		assertEquals( "Should not filter anymore", 3, ftQuery.getResultSize() );
+	}
+
+	@TestForIssue(jiraKey = "HSEARCH-1513")
+	public void testCachedEmptyFilters() {
+		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "bestDriver" );
+		Filter dateFilter = TermRangeFilter.newStringRange( "delivery", "2001", "2005", true, true );
+		ftQuery.setFilter( dateFilter );
+		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
+
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "bestDriver" );
+		ftQuery.enableFullTextFilter( "cached_empty" );
+		assertEquals( "two filters, one is empty, should not match anything", 0, ftQuery.getResultSize() );
 	}
 
 	public void testMultipleFiltersOfSameTypeWithDifferentParameters() {

@@ -63,7 +63,10 @@ import org.hibernate.search.annotations.Resolution;
 				cache = FilterCacheModeType.INSTANCE_ONLY),
 		@FullTextFilterDef(name = "empty",
 				impl = NullReturningEmptyFilter.class,
-				cache = FilterCacheModeType.INSTANCE_ONLY)
+				cache = FilterCacheModeType.INSTANCE_ONLY),
+		@FullTextFilterDef(name = "cached_empty",
+				impl = NullReturningEmptyFilter.class,
+				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS)
 })
 public class Driver {
 	@Id

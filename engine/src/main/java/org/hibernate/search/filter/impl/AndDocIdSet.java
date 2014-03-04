@@ -75,8 +75,13 @@ public class AndDocIdSet extends DocIdSet {
 		int size = andedDocIdSets.size();
 		DocIdSetIterator[] iterators = new DocIdSetIterator[size];
 		for ( int i = 0; i < size; i++ ) {
+			DocIdSet docIdSet = andedDocIdSets.get( i );
+			if ( docIdSet == null ) {
+				// Since Lucene 4 even the docIdSet could be returned at null to signify an empty match
+				return EMPTY_DOCIDSET;
+			}
 			// build all iterators
-			DocIdSetIterator docIdSetIterator = andedDocIdSets.get( i ).iterator();
+			DocIdSetIterator docIdSetIterator = docIdSet.iterator();
 			if ( docIdSetIterator == null ) {
 				// the Lucene API permits to return null on any iterator for empty matches
 				return EMPTY_DOCIDSET;
