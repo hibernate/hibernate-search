@@ -1004,9 +1004,7 @@ public class DSLTest extends SearchTestCase {
 				builder.append( "    Score: " ).append( entry[1] );
 				builder.append( " | Coffee: " ).append( entry[0] ).append( "\n" );
 			}
-			//CHECKSTYLE:OFF
 			System.out.println( builder.toString() );
-			//CHECKSTYLE:ON
 		}
 	}
 
