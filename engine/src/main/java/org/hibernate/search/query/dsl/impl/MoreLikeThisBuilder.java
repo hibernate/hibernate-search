@@ -50,6 +50,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.CharsRef;
@@ -108,9 +109,14 @@ public class MoreLikeThisBuilder<T> {
 	private TermQuery findById;
 
 	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity<T> documentBuilder, SearchFactoryImplementor searchFactory ) {
-		log.requireTFIDFSimilarity( documentBuilder.getBeanClass() );
 		this.documentBuilder = documentBuilder;
-		this.similarity = (TFIDFSimilarity) searchFactory.getIndexBindings().get( documentBuilder.getBeanClass() ).getSimilarity();
+		Similarity configuredSimilarity = searchFactory.getIndexBindings().get( documentBuilder.getBeanClass() ).getSimilarity();
+		if ( configuredSimilarity instanceof TFIDFSimilarity ) {
+			this.similarity = (TFIDFSimilarity) configuredSimilarity;
+		}
+		else {
+			throw log.requireTFIDFSimilarity( documentBuilder.getBeanClass() );
+		}
 	}
 
 	public MoreLikeThisBuilder indexReader(IndexReader indexReader) {
