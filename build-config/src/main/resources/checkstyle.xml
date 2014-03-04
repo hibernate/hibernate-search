@@ -168,7 +168,7 @@
 
         <!--  Avoid some import statements -->
         <module name="IllegalImport">
-            <property name="illegalPkgs" value="java.awt, sun"/>
+            <property name="illegalPkgs" value="java.awt, sun, org.slf4j"/>
         </module>
         <module name="org.hibernate.checkstyle.checks.regexp.IllegalImport">
             <property name="illegalClassnames" value="org.jgroups.util.Util.assertTrue, org.jgroups.util.Util.assertFalse, org.jgroups.util.Util.assertNotNull" />
