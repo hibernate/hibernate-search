@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
 /**
@@ -37,6 +39,8 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
  * @since 4.3
  */
 public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor implements BackendQueueProcessor {
+
+	private static final Log log = LoggerFactory.make();
 
 	private volatile CountDownLatch threadTrap;
 	private volatile boolean failOnMessage = false;
@@ -75,7 +79,7 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 		if ( failOnMessage ) {
 			throw new NullPointerException( "Simulated Failure" );
 		}
-		System.out.println( "[PREJOIN] Timestamp: " + System.nanoTime() );
+		log.trace( "[PREJOIN] Timestamp: " + System.nanoTime() );
 		try {
 			threadTrap.countDown();
 			//Basically we want to wait forever until we are awoken; we
@@ -89,7 +93,7 @@ public class JGroupsReceivingMockBackend extends JGroupsBackendQueueProcessor im
 			Thread.currentThread().interrupt();
 			e.printStackTrace();
 		}
-		System.out.println( "[POSTJOIN] Timestamp: " + System.nanoTime() );
+		log.trace( "[POSTJOIN] Timestamp: " + System.nanoTime() );
 	}
 
 	public int releaseBlockedThreads() {

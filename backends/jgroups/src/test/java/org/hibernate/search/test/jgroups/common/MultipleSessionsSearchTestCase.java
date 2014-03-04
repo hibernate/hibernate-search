@@ -28,6 +28,7 @@ import org.hibernate.SessionFactory;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.TestConstants;
 
 /**
  * Test class to simulate clustered environment (one master, and one slave node)
@@ -61,8 +62,14 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCaseJUnit
 		super.configure( cfg );
 
 		//master
-		cfg.setProperty( "hibernate.search.default.sourceBase", getBaseIndexDir().getAbsolutePath() + masterCopy );
-		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() + masterMain );
+		cfg.setProperty(
+				"hibernate.search.default.sourceBase",
+				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterCopy
+		);
+		cfg.setProperty(
+				"hibernate.search.default.indexBase",
+				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterMain
+		);
 		cfg.setProperty( "hibernate.search.default.refresh", "1" );
 		cfg.setProperty(
 				"hibernate.search.default.directory_provider", "filesystem-master"
@@ -73,8 +80,14 @@ public abstract class MultipleSessionsSearchTestCase extends SearchTestCaseJUnit
 		super.configure( cfg );
 
 		//slave(s)
-		cfg.setProperty( "hibernate.search.default.sourceBase", getBaseIndexDir().getAbsolutePath() + masterCopy );
-		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() + slave );
+		cfg.setProperty(
+				"hibernate.search.default.sourceBase",
+				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + masterCopy
+		);
+		cfg.setProperty(
+				"hibernate.search.default.indexBase",
+				TestConstants.getIndexDirectory( MultipleSessionsSearchTestCase.class ) + slave
+		);
 		cfg.setProperty( "hibernate.search.default.refresh", "1" );
 		cfg.setProperty(
 				"hibernate.search.default.directory_provider", "filesystem-slave"

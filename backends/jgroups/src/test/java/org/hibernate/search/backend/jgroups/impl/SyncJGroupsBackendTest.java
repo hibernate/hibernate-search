@@ -38,6 +38,8 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.TimeoutException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,6 +59,7 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-1296")
 public class SyncJGroupsBackendTest {
 
+	private static final Log log = LoggerFactory.make();
 	private static final String JGROUPS_CONFIGURATION = "jgroups-testing-udp.xml";
 
 	@Rule
@@ -68,14 +71,12 @@ public class SyncJGroupsBackendTest {
 		.withProperty( "hibernate.search.books.worker.execution", "async" )
 		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
 		.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
-		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
-		;
+		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
 
 	@Rule
 	public SearchFactoryHolder masterNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
 		.withProperty( "hibernate.search.default.worker.backend", JGroupsReceivingMockBackend.class.getName() )
-		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION )
-		;
+		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
 
 	@Test
 	public void testSynchAsConfigured() {
@@ -95,11 +96,11 @@ public class SyncJGroupsBackendTest {
 		try {
 			//DVDs are sync operations so they will timeout:
 			final long presendTimestamp = System.nanoTime();
-			System.out.println( "[PRESEND] Timestamp: " + presendTimestamp );
+			log.trace( "[PRESEND] Timestamp: " + presendTimestamp );
 			storeDvd( 1, "Hibernate Search in Action" );
 			final long postsendTimestamp = System.nanoTime();
 			final long differenceInMilliseconds = TimeUnit.MILLISECONDS.convert( (postsendTimestamp - presendTimestamp), TimeUnit.NANOSECONDS );
-			System.out.println( "[POSTSEND] Timestamp: " + postsendTimestamp + " Diff: " + differenceInMilliseconds + " ms." );
+			log.trace( "[POSTSEND] Timestamp: " + postsendTimestamp + " Diff: " + differenceInMilliseconds + " ms." );
 		}
 		catch (SearchException se) {
 			//Expected: we're inducing the RPC into timeout by blocking receiver processing
