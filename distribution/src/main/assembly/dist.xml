@@ -66,7 +66,7 @@
                 <include>javassist:javassist</include>
             </includes>
             <excludes>
-                <exclude>org.jboss.logging:jboss-logging-annotations</exclude>
+                <exclude>org.jboss:jandex</exclude>
             </excludes>
         </dependencySet>
 
@@ -81,8 +81,6 @@
             <excludes>
                 <exclude>dom4j:*</exclude>
                 <exclude>javassist:javassist</exclude>
-                <exclude>org.jboss.spec.javax.transaction:*</exclude>
-                <exclude>org.jboss.logging:jboss-logging-annotations</exclude>
             </excludes>
         </dependencySet>
 
@@ -92,8 +90,6 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <!-- hibernate-search-engine-->
-                <include>org.hibernate:hibernate-search-analyzers</include>
                 <include>org.apache.lucene:lucene-analyzers</include>
             </includes>
         </dependencySet>
@@ -117,9 +113,6 @@
                 <include>org.hibernate:hibernate-search-infinispan</include>
                 <include>org.infinispan:infinispan-lucene-directory</include>
             </includes>
-            <excludes>
-                <exclude>org.jboss.spec.javax.transaction:*</exclude>
-            </excludes>
         </dependencySet>
 
         <dependencySet>
@@ -151,7 +144,6 @@
             <outputDirectory>/dist/lib/provided</outputDirectory>
             <scope>provided</scope>
             <includes>
-                <include>javax.transaction:jta</include>
                 <include>javax.jms:jms</include>
                 <include>javax.annotation:jsr250-api</include>
                 <include>org.hibernate.javax.persistence:*</include>
