@@ -321,7 +321,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	}
 
 	/**
-	 * Needed for testing
+	 * Required by Infinispan Query.
 	 */
 	public TopDocs getTopDocs() {
 		return queryHits.getTopDocs();
