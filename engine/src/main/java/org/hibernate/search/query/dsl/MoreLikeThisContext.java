@@ -71,12 +71,4 @@ public interface MoreLikeThisContext extends QueryCustomization<MoreLikeThisCont
 	 */
 	MoreLikeThisOpenedMatchingContext comparingField(String fieldName);
 
-	//TODO should we keep it
-	// if yes it should contain the list of specific options
-	// a class hierarchy of MoreLikeThisContext <- {MorelikeThisBeginningContext|MoreLikeThisFavorFieldSimilarityContext|MoreLikeThisFavorOverallSimilarityContext}
-	// *beginning would have favorPerFieldSimilarity and favorOverallSimilarity
-	// favorFieldSimilarity would have DisMax specific settings and can carry on to the field selection
-	// favorOverallimilarity would have Boolean specific settings and can carry on to the field selection
-	MoreLikeThisContext favorPerFieldSimilarity();
-
 }

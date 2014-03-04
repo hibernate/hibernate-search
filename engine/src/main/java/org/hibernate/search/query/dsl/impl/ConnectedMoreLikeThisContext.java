@@ -78,12 +78,6 @@ public class ConnectedMoreLikeThisContext implements MoreLikeThisContext {
 	}
 
 	@Override
-	public MoreLikeThisContext favorPerFieldSimilarity() {
-		//TODO not implemented yet
-		return this;
-	}
-
-	@Override
 	public MoreLikeThisContext boostedTo(float boost) {
 		queryCustomizer.boostedTo( boost );
 		return this;
