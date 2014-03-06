@@ -56,7 +56,10 @@ public interface ServiceManager {
 	<S extends Service> void releaseService(Class<S> serviceRole);
 
 	/**
-	 * Stops all services.
+	 * Stops all (non provided) services even if they have not been properly released.
+	 *
+	 * Called by Hibernate Search when the {@link org.hibernate.search.SearchFactory} is closed.
+	 * At this stage, services should no longer be requested. The behavior is undefined.
 	 */
 	void releaseAllServices();
 }
