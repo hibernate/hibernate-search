@@ -51,7 +51,7 @@ import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.store.impl.NotShardedStrategy;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.BytemanHelper;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.test.util.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
@@ -268,7 +268,7 @@ public class ShardingConfigurationTest {
 	}
 
 	private MutableSearchFactory getSearchFactory(Map<String, String> shardingProperties) {
-		ManualConfiguration configuration = new ManualConfiguration();
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest();
 		configuration.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		for ( Map.Entry<String, String> entry : shardingProperties.entrySet() ) {
 			configuration.addProperty( entry.getKey(), entry.getValue() );

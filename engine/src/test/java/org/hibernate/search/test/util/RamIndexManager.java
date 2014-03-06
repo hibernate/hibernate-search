@@ -24,6 +24,8 @@ import java.util.Properties;
 
 import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.WorkerBuildContextForTest;
 
 /**
  * At this point mainly used for tests
@@ -40,7 +42,7 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 				"testIndex",
 				properties,
 				new DefaultSimilarity(),
-				new TestWorkerBuildContext( new ManualConfiguration() )
+				new WorkerBuildContextForTest( new SearchConfigurationForTest() )
 		);
 		return ramIndexManager;
 	}

@@ -29,7 +29,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 import org.junit.Test;
 
@@ -44,7 +44,7 @@ public class MutableSearchFactoryAndJMXTest {
 		File simpleJndiDir = new File( targetDir, "simpleJndi" );
 		simpleJndiDir.mkdir();
 
-		ManualConfiguration configuration = new HibernateManualConfiguration()
+		SearchConfigurationForTest configuration = new HibernateManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
 				.addProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" )

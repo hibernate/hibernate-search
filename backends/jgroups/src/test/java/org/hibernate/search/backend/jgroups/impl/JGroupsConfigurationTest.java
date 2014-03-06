@@ -26,7 +26,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -45,7 +45,7 @@ public class JGroupsConfigurationTest {
 
 	@Test
 	public void refuseConfigurationFileOnDefaultIndex() throws Throwable {
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.worker.backend", "jgroupsMaster" )
 			.addProperty( "hibernate.search.default.worker.backend.jgroups.configurationFile", "some non existing file" )
 			;
@@ -56,7 +56,7 @@ public class JGroupsConfigurationTest {
 
 	@Test
 	public void refuseConfigurationFileOnSpecificIndex() throws Throwable {
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.dvds.worker.backend", "jgroupsMaster" )
 			.addProperty( "hibernate.search.dvds.worker.backend.jgroups.configurationFile", "some non existing file" )
 			;
@@ -67,7 +67,7 @@ public class JGroupsConfigurationTest {
 
 	@Test
 	public void acceptConfigurationFile() throws Throwable {
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.dvds.worker.backend", "jgroupsMaster" )
 			.addProperty( "hibernate.search.services.jgroups.configurationFile", "some non existing file" )
 			;
@@ -82,7 +82,7 @@ public class JGroupsConfigurationTest {
 	 * @param cfg a configuration to try booting
 	 * @throws Throwable
 	 */
-	private static void bootConfiguration(ManualConfiguration cfg) throws Throwable {
+	private static void bootConfiguration(SearchConfigurationForTest cfg) throws Throwable {
 		cfg.addClass( Dvd.class );
 		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		SearchFactoryImplementor buildSearchFactory = null;

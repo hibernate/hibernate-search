@@ -52,8 +52,8 @@ import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 
 import org.junit.Test;
 
@@ -65,7 +65,7 @@ public class ProvidedIdTest {
 
 	@Test
 	public void testProvidedId() throws Exception {
-		final ManualConfiguration configuration = new HibernateManualConfiguration()
+		final SearchConfigurationForTest configuration = new HibernateManualConfiguration()
 				.addClass( ProvidedIdPerson.class )
 				.addClass( ProvidedIdPersonSub.class )
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
@@ -86,7 +86,7 @@ public class ProvidedIdTest {
 		person3.setName( "Regular goat" );
 		person3.setBlurb( "Is anorexic" );
 
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 
 		Work<ProvidedIdPerson> work = new Work<ProvidedIdPerson>( person1, 1, WorkType.INDEX );
 		sf.getWorker().performWork( work, tc );

@@ -34,8 +34,8 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -61,7 +61,7 @@ public class ImplicitProvidedIdTest {
 			.property( "title", ElementType.FIELD ).field()
 			.property( "text", ElementType.FIELD ).field()
 			;
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			.addClass( Book.class );
@@ -79,7 +79,7 @@ public class ImplicitProvidedIdTest {
 			.property( "title", ElementType.FIELD ).field()
 			.property( "text", ElementType.FIELD ).field()
 			;
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			.setIdProvidedImplicit( true )
@@ -97,7 +97,7 @@ public class ImplicitProvidedIdTest {
 			.property( "title", ElementType.FIELD ).field()
 			.property( "text", ElementType.FIELD ).field()
 			;
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			.setIdProvidedImplicit( true )
@@ -115,7 +115,7 @@ public class ImplicitProvidedIdTest {
 			.property( "title", ElementType.FIELD ).field()
 			.property( "text", ElementType.FIELD ).field()
 			;
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			.setIdProvidedImplicit( false ) //DEFAULT
@@ -133,7 +133,7 @@ public class ImplicitProvidedIdTest {
 			.property( "title", ElementType.FIELD ).field()
 			.property( "text", ElementType.FIELD ).field()
 			;
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			//.setIdProvidedImplicit( false ) //Test it's the default
@@ -149,7 +149,7 @@ public class ImplicitProvidedIdTest {
 				.property( "title", ElementType.FIELD ).documentId()
 				.property( "text", ElementType.FIELD ).field()
 			;
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			//.setIdProvidedImplicit( false ) //Test it's the default
@@ -161,7 +161,7 @@ public class ImplicitProvidedIdTest {
 	 * @param cfg The SearchFactory configuration to be tested
 	 * @param fieldName The expected name of the ID field
 	 */
-	private void storeBooksViaProvidedId(ManualConfiguration cfg, String fieldName, boolean matchTitle) {
+	private void storeBooksViaProvidedId(SearchConfigurationForTest cfg, String fieldName, boolean matchTitle) {
 		SearchFactoryImplementor sf = null;
 		try {
 			//Should fail right here when @ProvidedId is not enabled:
@@ -173,7 +173,7 @@ public class ImplicitProvidedIdTest {
 					" or a nasty exception will remind them. Can't we just assume it's always annotated?";
 			String isbn = "some entity-external id";
 			Work work = new Work( book, isbn, WorkType.ADD, false );
-			ManualTransactionContext tc = new ManualTransactionContext();
+			TransactionContextForTest tc = new TransactionContextForTest();
 			sf.getWorker().performWork( work, tc );
 			tc.end();
 

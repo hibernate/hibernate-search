@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,45 +21,38 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
+package org.hibernate.search.testsupport.setup;
 
-import java.util.List;
-import java.util.ArrayList;
-import javax.transaction.Synchronization;
-import javax.transaction.Status;
-
-import org.hibernate.search.backend.TransactionContext;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.spi.WorkerBuildContext;
 
 /**
- * @author Emmanuel Bernard
+ * A {@code WorkerBuildContext} implementation for running tests.
+ *
+ * @author Hardy Ferentschik
  */
-public class ManualTransactionContext implements TransactionContext {
-	private boolean progress = true;
-	private List<Synchronization> syncs = new ArrayList<Synchronization>();
+public class WorkerBuildContextForTest extends BuildContextForTest implements WorkerBuildContext {
 
-	@Override
-	public boolean isTransactionInProgress() {
-		return progress;
+	public WorkerBuildContextForTest(SearchConfiguration searchConfiguration) {
+		super( searchConfiguration );
 	}
 
 	@Override
-	public Object getTransactionIdentifier() {
-		return this;
+	public boolean isTransactionManagerExpected() {
+		return false;
 	}
 
 	@Override
-	public void registerSynchronization(Synchronization synchronization) {
-		syncs.add( synchronization );
+	public boolean isIndexMetadataComplete() {
+		return true;
 	}
 
-	public void end() {
-		this.progress = false;
-		for ( Synchronization sync : syncs ) {
-			sync.beforeCompletion();
-		}
-
-		for ( Synchronization sync : syncs ) {
-			sync.afterCompletion( Status.STATUS_COMMITTED );
-		}
+	@Override
+	public InstanceInitializer getInstanceInitializer() {
+		return SimpleInitializer.INSTANCE;
 	}
 }
+
+

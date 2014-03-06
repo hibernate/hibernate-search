@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
+package org.hibernate.search.testsupport.setup;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
@@ -38,11 +38,11 @@ import org.hibernate.search.spi.BuildContext;
  *
  * @author Hardy Ferentschik
  */
-public class TestBuildContext implements BuildContext {
+public class BuildContextForTest implements BuildContext {
 	private static final String INDEXING_STRATEGY_EVENT = "event";
 	private final SearchConfiguration searchConfiguration;
 
-	public TestBuildContext(SearchConfiguration searchConfiguration) {
+	public BuildContextForTest(SearchConfiguration searchConfiguration) {
 		this.searchConfiguration = searchConfiguration;
 	}
 

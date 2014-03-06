@@ -29,7 +29,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.errors.EmptyQueryException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.util.SearchFactoryHolder;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -57,7 +57,7 @@ public class EmptyQueryExceptionTest {
 		book.text = "The question is, does an empty book have 'space' tokens in it?";
 
 		Work work = new Work( book, book.title, WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 
