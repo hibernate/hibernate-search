@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
+package org.hibernate.search.test.util.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -68,7 +68,7 @@ public class ClassLoaderHelperTest {
 		//testing proper error messages:
 		wrappingTestFromClass(
 				"Wrong configuration of Lucene index manager: class " +
-						"org.hibernate.search.test.util.ClassLoaderHelperTest does not implement " +
+						"org.hibernate.search.test.util.impl.ClassLoaderHelperTest does not implement " +
 						"interface org.hibernate.search.indexes.spi.IndexManager",
 				IndexManager.class, ClassLoaderHelperTest.class, "Lucene index manager"
 		);
