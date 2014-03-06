@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
+package org.hibernate.search.test.util.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -68,7 +68,7 @@ public class ClassLoaderHelperTest {
 		//testing proper error messages:
 		wrappingTestFromClass(
 				"Wrong configuration of Lucene index manager: class " +
-						"org.hibernate.search.test.util.ClassLoaderHelperTest does not implement " +
+						"org.hibernate.search.test.util.impl.ClassLoaderHelperTest does not implement " +
 						"interface org.hibernate.search.indexes.spi.IndexManager",
 				IndexManager.class, ClassLoaderHelperTest.class, "Lucene index manager"
 		);
@@ -112,7 +112,7 @@ public class ClassLoaderHelperTest {
 		catch (SearchException e) {
 			assertEquals( e.getClass(), SearchException.class );
 			assertEquals(
-					"Unable to instantiate analyzer class: org.hibernate.search.test.util.BarAnalyzer. " +
+					"Unable to instantiate analyzer class: org.hibernate.search.testsupport.analyzer.BarAnalyzer. " +
 							"Class neither has a default constructor nor a constructor with a Version parameter",
 					e.getMessage()
 			);
