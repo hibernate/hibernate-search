@@ -27,9 +27,9 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,14 +52,15 @@ public class StandardServiceManagerTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private ManualConfiguration manualConfiguration;
+
+	private SearchConfigurationForTest searchConfiguration;
 	private ServiceManager serviceManagerUnderTest;
 
 	@Before
 	public void setUp() {
-		manualConfiguration = new ManualConfiguration();
+		searchConfiguration = new SearchConfigurationForTest();
 		serviceManagerUnderTest = new StandardServiceManager(
-				manualConfiguration,
+				searchConfiguration,
 				new DummyBuildContext()
 		);
 	}
@@ -128,7 +129,7 @@ public class StandardServiceManagerTest {
 
 	@Test
 	public void providedServicesHavePrecedence() {
-		ManualConfiguration configuration = new ManualConfiguration();
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest();
 		configuration.getProvidedServices().put( SimpleService.class, new ProgrammaticallyConfiguredSimpleService() );
 
 		serviceManagerUnderTest = new StandardServiceManager(
@@ -168,13 +169,16 @@ public class StandardServiceManagerTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1547")
 	public void testProvidedServicesCannotImplementStartable() {
-		manualConfiguration = new ManualConfiguration();
+		searchConfiguration = new SearchConfigurationForTest();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000210" ) );
-		manualConfiguration.addProvidedService( StartableProvidedService.class, new StartableProvidedServiceImpl() );
+		searchConfiguration.addProvidedService(
+				StartableProvidedService.class,
+				new StartableProvidedServiceImpl()
+		);
 		serviceManagerUnderTest = new StandardServiceManager(
-				manualConfiguration,
+				searchConfiguration,
 				new DummyBuildContext()
 		);
 	}
@@ -182,13 +186,16 @@ public class StandardServiceManagerTest {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1547")
 	public void testProvidedServicesCannotImplementStoppable() {
-		manualConfiguration = new ManualConfiguration();
+		searchConfiguration = new SearchConfigurationForTest();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000210" ) );
-		manualConfiguration.addProvidedService( StoppableProvidedService.class, new StoppableProvidedServiceImpl() );
+		searchConfiguration.addProvidedService(
+				StoppableProvidedService.class,
+				new StoppableProvidedServiceImpl()
+		);
 		serviceManagerUnderTest = new StandardServiceManager(
-				manualConfiguration,
+				searchConfiguration,
 				new DummyBuildContext()
 		);
 	}

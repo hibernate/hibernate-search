@@ -21,38 +21,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
-
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.impl.SimpleInitializer;
-import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.WorkerBuildContext;
-
 /**
- * A {@code WorkerBuildContext} implementation for running tests.
+ * Classes used to bootstrap and setup Search in order to run a test.
  *
  * @author Hardy Ferentschik
  */
-public class TestWorkerBuildContext extends TestBuildContext implements WorkerBuildContext {
-
-	public TestWorkerBuildContext(SearchConfiguration searchConfiguration) {
-		super( searchConfiguration );
-	}
-
-	@Override
-	public boolean isTransactionManagerExpected() {
-		return false;
-	}
-
-	@Override
-	public boolean isIndexMetadataComplete() {
-		return true;
-	}
-
-	@Override
-	public InstanceInitializer getInstanceInitializer() {
-		return SimpleInitializer.INSTANCE;
-	}
-}
-
-
+package org.hibernate.search.testsupport.setup;

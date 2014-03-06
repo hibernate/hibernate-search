@@ -27,6 +27,7 @@ import junit.framework.Assert;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.rules.ExternalResource;
 
 /**
@@ -60,7 +61,7 @@ public class SearchFactoryHolder extends ExternalResource {
 
 	@Override
 	protected void before() throws Throwable {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setProgrammaticMapping( buildMappingDefinition );
 		for ( String key : configuration.stringPropertyNames() ) {
 			cfg.addProperty( key, configuration.getProperty( key ) );

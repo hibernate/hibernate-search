@@ -30,6 +30,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +42,6 @@ import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.TestForIssue;
 
 import static junit.framework.Assert.assertEquals;
@@ -133,7 +133,7 @@ public class MultipleStatisticsMBeanTest {
 	}
 
 	private SearchFactoryImplementor createSearchFactoryUsingJndiPrefix(String suffix) {
-		ManualConfiguration configuration = new ManualConfiguration()
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
 				.addProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" )

@@ -35,7 +35,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.test.util.SearchFactoryHolder;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -61,7 +61,7 @@ public class PropertiesExampleBridgeTest {
 				.property( "race", "dwarf" );
 
 			Work work = new Work( holder, holder.id, WorkType.ADD, false );
-			ManualTransactionContext tc = new ManualTransactionContext();
+			TransactionContextForTest tc = new TransactionContextForTest();
 			searchFactory.getWorker().performWork( work, tc );
 			tc.end();
 		}

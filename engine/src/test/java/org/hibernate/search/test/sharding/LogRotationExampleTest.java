@@ -46,7 +46,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProvider;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Rule;
@@ -138,7 +138,7 @@ public class LogRotationExampleTest {
 
 		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
 		Work work = new Work( log, log.timestamp, WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}
@@ -149,7 +149,7 @@ public class LogRotationExampleTest {
 
 		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
 		Work work = new Work( LogMessage.class, log.timestamp, WorkType.DELETE );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}

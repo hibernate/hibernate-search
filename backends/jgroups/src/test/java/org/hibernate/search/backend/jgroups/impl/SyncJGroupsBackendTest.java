@@ -36,7 +36,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.SearchFactoryHolder;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.test.util.TestForIssue;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -191,7 +191,7 @@ public class SyncJGroupsBackendTest {
 
 	private void storeObject(Object entity, Serializable id) {
 		Work work = new Work( entity, id, WorkType.UPDATE, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		slaveNode.getSearchFactory().getWorker().performWork( work, tc );
 		tc.end();
 	}

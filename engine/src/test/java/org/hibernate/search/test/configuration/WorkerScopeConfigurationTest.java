@@ -23,6 +23,7 @@ package org.hibernate.search.test.configuration;
 import java.lang.annotation.ElementType;
 import java.util.Properties;
 
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,7 +37,6 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.test.util.ManualConfiguration;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
@@ -49,11 +49,11 @@ import static junit.framework.Assert.fail;
  * @author Hardy Ferentschik
  */
 public class WorkerScopeConfigurationTest {
-	private ManualConfiguration manualConfiguration;
+	private SearchConfigurationForTest manualConfiguration;
 
 	@Before
 	public void setUp() {
-		manualConfiguration = new ManualConfiguration();
+		manualConfiguration = new SearchConfigurationForTest();
 		SearchMapping searchMapping = new SearchMapping();
 		searchMapping.entity( Document.class ).indexed()
 				.property( "id", ElementType.FIELD ).documentId()

@@ -50,8 +50,8 @@ import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.test.TestConstants;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
@@ -69,14 +69,14 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testCreateEmptyFactory() throws Exception {
-		final ManualConfiguration configuration = getTestConfiguration();
+		final SearchConfigurationForTest configuration = getTestConfiguration();
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		sf.close();
 	}
 
 	@Test
 	public void testAddingClassFullModel() throws Exception {
-		ManualConfiguration configuration = getTestConfiguration();
+		SearchConfigurationForTest configuration = getTestConfiguration();
 		//FIXME downcasting of MSF. create a getDelegate() ?
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
@@ -84,7 +84,7 @@ public class MutableFactoryTest {
 				.addClass( A.class )
 				.buildSearchFactory();
 
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 
 		doIndexWork( new A( 1, "Emmanuel" ), 1, sf, tc );
 
@@ -108,7 +108,7 @@ public class MutableFactoryTest {
 				.addClass( B.class )
 				.buildSearchFactory();
 
-		tc = new ManualTransactionContext();
+		tc = new TransactionContextForTest();
 
 		doIndexWork( new B( 1, "Noel" ), 1, sf, tc );
 
@@ -128,12 +128,12 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testAddingClassSimpleAPI() throws Exception {
-		ManualConfiguration configuration = getTestConfiguration();
+		SearchConfigurationForTest configuration = getTestConfiguration();
 		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 
 		sf.addClasses( A.class );
 
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 
 		doIndexWork( new A( 1, "Emmanuel" ), 1, sf, tc );
 
@@ -155,7 +155,7 @@ public class MutableFactoryTest {
 
 		sf.addClasses( B.class, C.class );
 
-		tc = new ManualTransactionContext();
+		tc = new TransactionContextForTest();
 
 		doIndexWork( new B( 1, "Noel" ), 1, sf, tc );
 		doIndexWork( new C( 1, "Vincent" ), 1, sf, tc );
@@ -182,7 +182,7 @@ public class MutableFactoryTest {
 		sf.close();
 	}
 
-	private static void doIndexWork(Object entity, Integer id, SearchFactoryIntegrator sfi, ManualTransactionContext tc) {
+	private static void doIndexWork(Object entity, Integer id, SearchFactoryIntegrator sfi, TransactionContextForTest tc) {
 		Work<?> work = new Work<Object>( entity, id, WorkType.INDEX );
 		sfi.getWorker().performWork( work, tc );
 	}
@@ -194,7 +194,7 @@ public class MutableFactoryTest {
 				"name",
 				TestConstants.standardAnalyzer
 		);
-		ManualConfiguration configuration = getTestConfiguration();
+		SearchConfigurationForTest configuration = getTestConfiguration();
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
 		List<DoAddClasses> runnables = new ArrayList<DoAddClasses>( 10 );
 		final int nbrOfThread = 10;
@@ -296,7 +296,7 @@ public class MutableFactoryTest {
 					searchFactoryImplementor.addClasses( aClass );
 					Object entity = aClass.getConstructor( Integer.class, String.class )
 							.newInstance( i, "Emmanuel" + i );
-					ManualTransactionContext context = new ManualTransactionContext();
+					TransactionContextForTest context = new TransactionContextForTest();
 					MutableFactoryTest.doIndexWork( entity, i, searchFactoryImplementor, context );
 					context.end();
 
@@ -332,7 +332,7 @@ public class MutableFactoryTest {
 		}
 	}
 
-	private static ManualConfiguration getTestConfiguration() {
+	private static SearchConfigurationForTest getTestConfiguration() {
 		return new HibernateManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );

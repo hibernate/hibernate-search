@@ -50,7 +50,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.reader.impl.ManagedMultiReader;
 import org.hibernate.search.reader.impl.ReaderProviderHelper;
 import org.hibernate.search.test.util.SearchFactoryHolder;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,7 +81,7 @@ public class FreshReadersProvidedTest {
 			lastDwarf.name = "Thorin Oakenshield";
 
 			Work work = new Work( lastDwarf, lastDwarf.id, WorkType.ADD, false );
-			ManualTransactionContext tc = new ManualTransactionContext();
+			TransactionContextForTest tc = new TransactionContextForTest();
 			searchFactory.getWorker().performWork( work, tc );
 			tc.end();
 		}
@@ -118,7 +118,7 @@ public class FreshReadersProvidedTest {
 			balin.name = "Balin";
 
 			Work work = new Work( balin, balin.id, WorkType.ADD, false );
-			ManualTransactionContext tc = new ManualTransactionContext();
+			TransactionContextForTest tc = new TransactionContextForTest();
 			searchFactory.getWorker().performWork( work, tc );
 			tc.end();
 		}

@@ -35,8 +35,8 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.test.util.leakdetection.FileMonitoringDirectory;
 import org.hibernate.search.test.util.leakdetection.FileMonitoringDirectoryProvider;
 import org.junit.Test;
@@ -155,13 +155,13 @@ public class AllFilesClosedTest {
 
 	private void storeObject(Object entity, Serializable id) {
 		Work work = new Work( entity, id, WorkType.UPDATE, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}
 
 	protected SearchFactoryImplementor initializeSearchFactory() {
-		ManualConfiguration cfg = new ManualConfiguration()
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", FileMonitoringDirectoryProvider.class.getName() )
 			.addProperty( "hibernate.search.default.reader.strategy", "shared" )
 			.addProperty( "hibernate.search.index2.reader.strategy", "not-shared" ) //close all readers closed aggressively
@@ -175,7 +175,7 @@ public class AllFilesClosedTest {
 			.buildSearchFactory();
 	}
 
-	protected void overrideProperties(ManualConfiguration cfg) {
+	protected void overrideProperties(SearchConfigurationForTest cfg) {
 		//nothing to do
 	}
 

@@ -55,7 +55,7 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -355,7 +355,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		person3.setName( "Regular goat" );
 		person3.setBlurb( "Is anorexic" );
 
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 
 		Work<ProvidedIdEntry> work = new Work<ProvidedIdEntry>( person1, 1, WorkType.INDEX );
 		sf.getWorker().performWork( work, tc );

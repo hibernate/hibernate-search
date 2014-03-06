@@ -32,7 +32,7 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -48,25 +48,25 @@ public class IndexMetadataCompleteConfiguredTest {
 
 	@Test
 	public void testDefaultImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		verifyIndexCompleteMetadataOption( true, cfg );
 	}
 
 	@Test
 	public void testIndexMetadataCompleteFalse() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setIndexMetadataComplete( false );
 		verifyIndexCompleteMetadataOption( false, cfg );
 	}
 
 	@Test
 	public void testIndexMetadataCompleteTrue() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setIndexMetadataComplete( true );
 		verifyIndexCompleteMetadataOption( true, cfg );
 	}
 
-	private void verifyIndexCompleteMetadataOption(boolean expectation, ManualConfiguration cfg) {
+	private void verifyIndexCompleteMetadataOption(boolean expectation, SearchConfigurationForTest cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
 			.entity( Document.class ).indexed().indexName( "index1" )
