@@ -48,7 +48,7 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Rule;
 import org.junit.Test;
 

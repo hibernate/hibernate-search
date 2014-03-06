@@ -41,7 +41,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
 
 /**

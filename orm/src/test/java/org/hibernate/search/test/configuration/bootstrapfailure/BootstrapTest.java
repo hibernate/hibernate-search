@@ -26,7 +26,7 @@ package org.hibernate.search.test.configuration.bootstrapfailure;
 import java.util.Set;
 
 import org.hibernate.search.test.SearchTestCaseJUnit4;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNull;

@@ -42,7 +42,7 @@ import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
 import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 

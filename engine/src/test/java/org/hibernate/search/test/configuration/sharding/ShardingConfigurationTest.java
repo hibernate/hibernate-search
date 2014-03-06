@@ -49,10 +49,10 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
 import org.hibernate.search.store.impl.NotShardedStrategy;
-import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.test.util.BytemanHelper;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Test;
@@ -145,7 +145,7 @@ public class ShardingConfigurationTest {
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
 			targetMethod = "idHashShardingWithSingleShard",
-			helper = "org.hibernate.search.test.util.BytemanHelper",
+			helper = "org.hibernate.search.testsupport.BytemanHelper",
 			action = "countInvocation()",
 			name = "testSettingIdHashShardingStrategyWithoutNumberOfShards")
 	public void testSettingIdHashShardingStrategyWithoutNumberOfShards() {
