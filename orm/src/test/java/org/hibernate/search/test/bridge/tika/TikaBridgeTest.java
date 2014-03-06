@@ -52,8 +52,8 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Assert;
 
 /**

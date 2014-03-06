@@ -50,7 +50,7 @@ import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.backend.jgroups.impl.MessageSerializationHelper;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 

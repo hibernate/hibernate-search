@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.backend.jgroups.impl;
 
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.jgroups.Address;
 import org.jgroups.Global;
 import org.jgroups.View;

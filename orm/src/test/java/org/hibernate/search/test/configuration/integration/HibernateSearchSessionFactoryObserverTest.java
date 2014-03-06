@@ -30,7 +30,7 @@ import javax.persistence.Id;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.test.util.BytemanHelper;
+import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.test.util.ServiceRegistryTools;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
@@ -53,7 +53,7 @@ public class HibernateSearchSessionFactoryObserverTest {
 	@BMRules(rules = {
 			@BMRule(targetClass = "org.hibernate.internal.SessionFactoryImpl",
 					targetMethod = "close",
-					helper = "org.hibernate.search.test.util.BytemanHelper",
+					helper = "org.hibernate.search.testsupport.BytemanHelper",
 					action = "countInvocation()",
 					name = "Session close counter"),
 			@BMRule(targetClass = "org.hibernate.search.spi.SearchFactoryBuilder",

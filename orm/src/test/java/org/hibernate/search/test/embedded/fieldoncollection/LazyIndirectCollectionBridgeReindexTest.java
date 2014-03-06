@@ -33,7 +33,7 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.embedded.depth.Person;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 
 @TestForIssue(jiraKey = "HSEARCH-1030")
 public class LazyIndirectCollectionBridgeReindexTest extends SearchTestCase {
