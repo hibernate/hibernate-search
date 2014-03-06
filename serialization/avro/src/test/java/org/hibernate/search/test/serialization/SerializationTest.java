@@ -55,23 +55,22 @@ import org.apache.lucene.document.LongField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
-
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.serialization.avro.impl.AvroSerializationProvider;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -409,7 +408,8 @@ public class SerializationTest {
 		assertThat( work.getEntityClass() ).as( "Delete.getEntityClass is not copied" )
 				.isEqualTo( copy.getEntityClass() );
 		assertThat( work.getId() ).as( "Delete.getId is not copied" ).isEqualTo( copy.getId() );
-		assertThat( (Object) work.getDocument() ).as( "Delete.getDocument is not the same" ).isEqualTo( copy.getDocument() );
+		assertThat( (Object) work.getDocument() ).as( "Delete.getDocument is not the same" )
+				.isEqualTo( copy.getDocument() );
 		assertThat( work.getIdInString() ).as( "Delete.getIdInString is not the same" )
 				.isEqualTo( copy.getIdInString() );
 		assertThat( work.getFieldToAnalyzerMap() ).as( "Delete.getFieldToAnalyzerMap is not the same" )

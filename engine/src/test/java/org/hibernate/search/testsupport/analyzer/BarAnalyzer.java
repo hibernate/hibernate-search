@@ -21,34 +21,26 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util.textbuilder;
+package org.hibernate.search.testsupport.analyzer;
 
-import org.junit.Test;
+import java.io.Reader;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.LowerCaseTokenizer;
+import org.hibernate.search.test.TestConstants;
 
 /**
- * Tests WordDictionary and WordInventor,
- * these are test utilities not part of the Search distribution;
- * the test exists to spot if the text they produce is unchanged, so
- * that other tests can rely on working test utilities.
- *
- * @see WordDictionary
- * @see SentenceInventor
- *
- * @author Sanne Grinovero
+ * @author Hardy Ferentschik
  */
-public class TextProductionTest {
+public class BarAnalyzer extends Analyzer {
 
-	@Test
-	public void testSomeWordsGetBuilt() {
-		SentenceInventor wi = new SentenceInventor( 7L, 200 );
-		String randomPeriod = wi.nextPeriod();
-		// randomPeriod will be some random sentence like "Qoswo, orrmi ag ybwp bbtb kw qgtqaon lyhk nbv: qrqm flyui hyshm jmpqyb qmolml fjxw gnumocv Twwg."
-		// but exact string contents depends on environment
-		assertNotNull( randomPeriod );
-		assertTrue( randomPeriod.length() > 0 );
+	private BarAnalyzer() {
+	}
+
+	@Override
+	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+		//Not particularly important, but at least it's a fully functional Analyzer:
+		return new TokenStreamComponents( new LowerCaseTokenizer( TestConstants.getTargetLuceneVersion(), reader ) );
 	}
 
 }

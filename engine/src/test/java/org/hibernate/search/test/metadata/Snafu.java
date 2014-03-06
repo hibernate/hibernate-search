@@ -34,7 +34,7 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
-import org.hibernate.search.test.util.FooAnalyzer;
+import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 
 /**
  * @author Hardy Ferentschik

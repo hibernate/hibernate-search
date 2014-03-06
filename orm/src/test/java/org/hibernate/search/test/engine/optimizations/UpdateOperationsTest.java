@@ -30,8 +30,8 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.hibernate.search.test.util.LeakingLuceneBackend;
-import org.hibernate.search.test.util.LeakingOptimizer;
+import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.optimizer.LeakingOptimizer;
 import org.junit.Test;
 
 /**

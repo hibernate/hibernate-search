@@ -33,7 +33,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.util.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.test.util.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;

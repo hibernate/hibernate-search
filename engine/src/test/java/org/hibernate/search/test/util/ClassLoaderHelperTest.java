@@ -31,6 +31,8 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.testsupport.analyzer.BarAnalyzer;
+import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.junit.Test;
 
@@ -110,7 +112,7 @@ public class ClassLoaderHelperTest {
 		catch (SearchException e) {
 			assertEquals( e.getClass(), SearchException.class );
 			assertEquals(
-					"Unable to instantiate analyzer class: org.hibernate.search.test.util.BarAnalyzer. " +
+					"Unable to instantiate analyzer class: org.hibernate.search.testsupport.analyzer.BarAnalyzer. " +
 							"Class neither has a default constructor nor a constructor with a Version parameter",
 					e.getMessage()
 			);

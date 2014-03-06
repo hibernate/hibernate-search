@@ -31,7 +31,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.junit.Assert;

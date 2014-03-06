@@ -37,8 +37,8 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.test.util.leakdetection.FileMonitoringDirectory;
-import org.hibernate.search.test.util.leakdetection.FileMonitoringDirectoryProvider;
+import org.hibernate.search.testsupport.leakdetection.FileMonitoringDirectory;
+import org.hibernate.search.testsupport.leakdetection.FileMonitoringDirectoryProvider;
 import org.junit.Test;
 
 /**
