@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
+package org.hibernate.search.testsupport.setup;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -43,7 +43,7 @@ import org.hibernate.search.util.impl.AggregatedClassLoader;
  * @author Steve Ebersole
  * @author Hardy Ferentschik
  */
-public class TestClassLoaderService implements ClassLoaderService, Stoppable {
+public class ClassLoaderServiceForTest implements ClassLoaderService, Stoppable {
 
 	private final Map<Class, ServiceLoader> serviceLoaders = new HashMap<Class, ServiceLoader>();
 	private AggregatedClassLoader aggregatedClassLoader;
@@ -51,8 +51,8 @@ public class TestClassLoaderService implements ClassLoaderService, Stoppable {
 	/**
 	 * Constructs a ClassLoaderServiceImpl with standard set-up
 	 */
-	public TestClassLoaderService() {
-		this( TestClassLoaderService.class.getClassLoader() );
+	public ClassLoaderServiceForTest() {
+		this( ClassLoaderServiceForTest.class.getClassLoader() );
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class TestClassLoaderService implements ClassLoaderService, Stoppable {
 	 *
 	 * @param classLoader The ClassLoader to use
 	 */
-	public TestClassLoaderService(ClassLoader classLoader) {
+	public ClassLoaderServiceForTest(ClassLoader classLoader) {
 		this( Collections.singletonList( classLoader ) );
 	}
 
@@ -69,7 +69,7 @@ public class TestClassLoaderService implements ClassLoaderService, Stoppable {
 	 *
 	 * @param providedClassLoaders The ClassLoader instances to use
 	 */
-	public TestClassLoaderService(Collection<ClassLoader> providedClassLoaders) {
+	public ClassLoaderServiceForTest(Collection<ClassLoader> providedClassLoaders) {
 		final LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<ClassLoader>();
 
 		// first, add all provided class loaders, if any
@@ -82,7 +82,7 @@ public class TestClassLoaderService implements ClassLoaderService, Stoppable {
 		}
 
 		// normalize adding known class-loaders...
-		orderedClassLoaderSet.add( TestClassLoaderService.class.getClassLoader() );
+		orderedClassLoaderSet.add( ClassLoaderServiceForTest.class.getClassLoader() );
 
 		// then the TCCL, if one...
 		final ClassLoader tccl = locateTCCL();

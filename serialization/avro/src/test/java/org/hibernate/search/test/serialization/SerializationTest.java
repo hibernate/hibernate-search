@@ -70,7 +70,7 @@ import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.test.util.SearchFactoryHolder;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -98,7 +98,7 @@ public class SerializationTest {
 	@Before
 	public void setUp() {
 		ServiceManager serviceManager = new StandardServiceManager(
-				new ManualConfiguration(),
+				new SearchConfigurationForTest(),
 				null
 		);
 

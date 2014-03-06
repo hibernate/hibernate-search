@@ -40,8 +40,8 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -59,7 +59,7 @@ public class AppliedOnTypeAwareBridgeTest {
 		Foo foo = new Foo( 0l );
 
 		Work<Foo> work = new Work<Foo>( foo, foo.getId(), WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}
@@ -71,7 +71,7 @@ public class AppliedOnTypeAwareBridgeTest {
 		Bar bar = new Bar( 0l );
 
 		Work<Bar> work = new Work<Bar>( bar, bar.getId(), WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}
@@ -83,14 +83,14 @@ public class AppliedOnTypeAwareBridgeTest {
 		Snafu snafu = new Snafu( 0l );
 
 		Work<Snafu> work = new Work<Snafu>( snafu, snafu.getId(), WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}
 
 
 	private SearchFactoryImplementor createSearchFactory(Class<?> clazz) {
-		ManualConfiguration configuration = new ManualConfiguration()
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addClass( clazz );
 

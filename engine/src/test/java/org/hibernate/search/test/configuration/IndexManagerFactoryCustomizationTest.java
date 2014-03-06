@@ -33,7 +33,7 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.test.util.TestForIssue;
 import org.junit.Test;
 
@@ -47,13 +47,13 @@ public class IndexManagerFactoryCustomizationTest {
 
 	@Test
 	public void testDefaultImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		verifyIndexManagerTypeIs( DirectoryBasedIndexManager.class, cfg );
 	}
 
 	@Test
 	public void testOverriddenDefaultImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setIndexManagerFactory(
 				new DefaultIndexManagerFactory( cfg.getClassLoaderService() ) {
 					@Override
@@ -65,7 +65,7 @@ public class IndexManagerFactoryCustomizationTest {
 		verifyIndexManagerTypeIs( NRTIndexManager.class, cfg );
 	}
 
-	private void verifyIndexManagerTypeIs(Class<? extends IndexManager> expectedIndexManagerClass, ManualConfiguration cfg) {
+	private void verifyIndexManagerTypeIs(Class<? extends IndexManager> expectedIndexManagerClass, SearchConfigurationForTest cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
 				.entity( Document.class ).indexed().indexName( "documents" )

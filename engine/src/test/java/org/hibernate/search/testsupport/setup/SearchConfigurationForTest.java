@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
+package org.hibernate.search.testsupport.setup;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,12 +40,13 @@ import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
- * Manually defines the configuration
+ * Manually defines the configuration.
+ *
  * Classes and properties are the only implemented options at the moment
  *
  * @author Emmanuel Bernard
  */
-public class ManualConfiguration extends SearchConfigurationBase implements SearchConfiguration {
+public class SearchConfigurationForTest extends SearchConfigurationBase implements SearchConfiguration {
 
 	private final Map<String, Class<?>> classes;
 	private final Properties properties;
@@ -58,25 +59,25 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	private IndexManagerFactory indexManagerFactory;
 	private ClassLoaderService classLoaderService;
 
-	public ManualConfiguration() {
+	public SearchConfigurationForTest() {
 		this( SimpleInitializer.INSTANCE );
 	}
 
-	public ManualConfiguration(InstanceInitializer init) {
+	public SearchConfigurationForTest(InstanceInitializer init) {
 		this.initializer = init;
 		this.classes = new HashMap<String, Class<?>>();
 		this.properties = new Properties();
 		this.providedServices = new HashMap<Class<? extends Service>, Object>();
-		this.classLoaderService = new TestClassLoaderService();
+		this.classLoaderService = new ClassLoaderServiceForTest();
 		this.indexManagerFactory = new DefaultIndexManagerFactory( classLoaderService );
 	}
 
-	public ManualConfiguration addProperty(String key, String value) {
+	public SearchConfigurationForTest addProperty(String key, String value) {
 		properties.setProperty( key, value );
 		return this;
 	}
 
-	public ManualConfiguration addClass(Class<?> indexed) {
+	public SearchConfigurationForTest addClass(Class<?> indexed) {
 		classes.put( indexed.getName(), indexed );
 		return this;
 	}
@@ -111,7 +112,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 		return programmaticMapping;
 	}
 
-	public ManualConfiguration setProgrammaticMapping(SearchMapping programmaticMapping) {
+	public SearchConfigurationForTest setProgrammaticMapping(SearchMapping programmaticMapping) {
 		this.programmaticMapping = programmaticMapping;
 		return this;
 	}
@@ -149,7 +150,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 		return idProvidedImplicit;
 	}
 
-	public ManualConfiguration setIdProvidedImplicit(boolean idProvidedImplicit) {
+	public SearchConfigurationForTest setIdProvidedImplicit(boolean idProvidedImplicit) {
 		this.idProvidedImplicit = idProvidedImplicit;
 		return this;
 	}

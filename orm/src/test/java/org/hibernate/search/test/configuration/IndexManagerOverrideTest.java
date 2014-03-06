@@ -47,7 +47,7 @@ public class IndexManagerOverrideTest {
 			.setProperty( "hibernate.search.Book.indexmanager", "near-real-time" )
 			.setProperty(
 					"hibernate.search." + Foo.class.getName() + ".indexmanager",
-					"org.hibernate.search.test.util.RamIndexManager"
+					"org.hibernate.search.testsupport.indexmanager.RamIndexManager"
 			)
 			.addAnnotatedClass( BlogEntry.class )
 			.addAnnotatedClass( Foo.class )

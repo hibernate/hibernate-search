@@ -34,7 +34,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.SearchFactoryHolder;
-import org.hibernate.search.test.util.ManualTransactionContext;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.test.util.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
@@ -76,7 +76,7 @@ public class SharedReleasesLocksTest {
 		book.id = id;
 		book.title = bookTitle;
 		Work work = new Work( book, book.id, WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		sfHolder.getSearchFactory().getWorker().performWork( work, tc );
 		tc.end();
 	}

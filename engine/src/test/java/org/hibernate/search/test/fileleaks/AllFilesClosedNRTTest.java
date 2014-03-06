@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.test.fileleaks;
 
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
@@ -28,7 +28,7 @@ import org.hibernate.search.test.util.ManualConfiguration;
 public class AllFilesClosedNRTTest extends AllFilesClosedTest {
 
 	@Override
-	protected void overrideProperties(ManualConfiguration cfg) {
+	protected void overrideProperties(SearchConfigurationForTest cfg) {
 		cfg.addProperty( "hibernate.search.default.indexmanager", "near-real-time" );
 	}
 
