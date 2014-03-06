@@ -62,9 +62,10 @@ public class SerializationHelperTest {
 		String indexName = "this is my favourite index";
 		byte[] buffer = MessageSerializationHelper.prependString( indexName, someRandom );
 		byte[] mixed = new byte[ buffer.length + 7 ];
-		System.arraycopy( buffer, 0, mixed, 2, buffer.length );
-		Assert.assertEquals( indexName, MessageSerializationHelper.extractIndexName( 0, buffer ) );
-		Assert.assertTrue( Arrays.equals( someRandom, MessageSerializationHelper.extractSerializedQueue( 0, buffer.length, buffer ) ) );
+		final int offset = 2;
+		System.arraycopy( buffer, 0, mixed, offset, buffer.length );
+		Assert.assertEquals( indexName, MessageSerializationHelper.extractIndexName( offset, mixed ) );
+		Assert.assertTrue( Arrays.equals( someRandom, MessageSerializationHelper.extractSerializedQueue( offset, buffer.length, mixed ) ) );
 	}
 
 }
