@@ -30,7 +30,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
 import org.junit.Assert;
 
 /**

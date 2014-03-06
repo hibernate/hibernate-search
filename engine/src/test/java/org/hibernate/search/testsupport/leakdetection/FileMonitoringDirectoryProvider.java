@@ -18,44 +18,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.util;
+package org.hibernate.search.testsupport.leakdetection;
 
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicLong;
+import org.hibernate.search.store.impl.RAMDirectoryProvider;
 
-import org.apache.lucene.index.IndexWriter;
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.store.Workspace;
-import org.hibernate.search.store.optimization.OptimizerStrategy;
 
-public class LeakingOptimizer implements OptimizerStrategy {
-
-	private static final AtomicLong totalOperations = new AtomicLong();
-
-	@Override
-	public boolean performOptimization(IndexWriter writer) {
-		return false;
-	}
+/**
+ * This DirectoryProvider enables us to check that all files have been properly closed,
+ * both after writes and reads.
+ *
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ */
+public class FileMonitoringDirectoryProvider extends RAMDirectoryProvider {
 
 	@Override
-	public void addOperationWithinTransactionCount(long increment) {
-		totalOperations.addAndGet( increment );
-	}
-
-	@Override
-	public void optimize(Workspace workspace) {
-	}
-
-	@Override
-	public void initialize(IndexManager indexManager, Properties indexProperties) {
-	}
-
-	public static long getTotalOperations() {
-		return totalOperations.get();
-	}
-
-	public static void reset() {
-		totalOperations.set( 0l );
+	protected FileMonitoringDirectory makeRAMDirectory() {
+		return new FileMonitoringDirectory();
 	}
 
 }

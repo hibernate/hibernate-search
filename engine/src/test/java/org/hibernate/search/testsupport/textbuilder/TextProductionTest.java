@@ -21,41 +21,34 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.shards;
+package org.hibernate.search.testsupport.textbuilder;
 
-import static org.junit.Assert.assertTrue;
-
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.store.impl.IdHashShardingStrategy;
-import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
-import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
+ * Tests WordDictionary and WordInventor,
+ * these are test utilities not part of the Search distribution;
+ * the test exists to spot if the text they produce is unchanged, so
+ * that other tests can rely on working test utilities.
+ *
+ * @see WordDictionary
+ * @see SentenceInventor
+ *
  * @author Sanne Grinovero
  */
-public class IdShardingStrategyTest {
-
-	private IdHashShardingStrategy shardStrategy;
-
-	@Before
-	public void setUp() throws Exception {
-		shardStrategy = new IdHashShardingStrategy();
-		shardStrategy.initialize( null, new IndexManager[] {
-				RamIndexManager.makeRamDirectory(), RamIndexManager.makeRamDirectory() } );
-	}
+public class TextProductionTest {
 
 	@Test
-	public void testHashOverflow() {
-		String key = String.valueOf( Integer.MAX_VALUE - 1 );
-		// any key will do as long as it's hash is negative
-		assertTrue( key.hashCode() < 0 );
-		assertAcceptableId( key );
-	}
-
-	private void assertAcceptableId(String id) {
-		shardStrategy.getIndexManagerForAddition( null, id, id, null );
-		shardStrategy.getIndexManagersForDeletion( null, id, id );
+	public void testSomeWordsGetBuilt() {
+		SentenceInventor wi = new SentenceInventor( 7L, 200 );
+		String randomPeriod = wi.nextPeriod();
+		// randomPeriod will be some random sentence like "Qoswo, orrmi ag ybwp bbtb kw qgtqaon lyhk nbv: qrqm flyui hyshm jmpqyb qmolml fjxw gnumocv Twwg."
+		// but exact string contents depends on environment
+		assertNotNull( randomPeriod );
+		assertTrue( randomPeriod.length() > 0 );
 	}
 
 }

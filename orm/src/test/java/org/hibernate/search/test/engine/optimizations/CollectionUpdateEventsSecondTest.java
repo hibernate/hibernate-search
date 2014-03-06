@@ -32,7 +32,7 @@ import org.hibernate.event.spi.LoadEventListener;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 import org.junit.Test;

@@ -52,10 +52,11 @@ import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
 
-import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
-import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
-import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.resetFieldSelector;
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
 
 /**
  * Tests several aspects of projection queries.
@@ -674,7 +675,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
 		configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		configuration.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
+		configuration.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
 	}
 
 }

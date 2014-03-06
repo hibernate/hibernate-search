@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.test.util;
+package org.hibernate.search.testsupport.progessmonitor;
 
 import java.util.concurrent.atomic.AtomicLong;
 

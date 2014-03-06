@@ -35,10 +35,11 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
 
-import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
-import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
-import static org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.resetFieldSelector;
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
+import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
 
 /**
  * TestCase for HSEARCH-178 (Search hitting HHH-2763)
@@ -160,7 +161,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
 		configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		configuration.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
+		configuration.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
 		configuration.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 

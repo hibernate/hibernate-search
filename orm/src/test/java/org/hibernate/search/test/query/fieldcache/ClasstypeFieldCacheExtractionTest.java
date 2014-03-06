@@ -38,7 +38,7 @@ import org.hibernate.search.test.configuration.Address;
 import org.hibernate.search.test.configuration.Country;
 import org.hibernate.search.test.configuration.Item;
 import org.hibernate.search.test.configuration.ProductCatalog;
-import org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider;
+import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 
 import org.junit.Test;
@@ -100,7 +100,7 @@ public class ClasstypeFieldCacheExtractionTest {
 		}
 		builder.addAnnotatedClass( Item.class )
 			.addAnnotatedClass( ProductCatalog.class )
-			.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() )
+			.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() )
 			.setProperty( Environment.MODEL_MAPPING, Mapping.class.getName() )
 			.build();
 		try {
