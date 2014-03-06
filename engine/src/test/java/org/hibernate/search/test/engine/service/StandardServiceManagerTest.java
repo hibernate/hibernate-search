@@ -28,7 +28,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.test.util.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.matchers.JUnitMatchers;

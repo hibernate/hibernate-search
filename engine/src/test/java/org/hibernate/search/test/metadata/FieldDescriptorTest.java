@@ -39,7 +39,7 @@ import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
-import org.hibernate.search.test.util.FooAnalyzer;
+import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.test.util.TestForIssue;

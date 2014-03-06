@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,26 +21,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.test.util;
-
-import java.io.Reader;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.LowerCaseTokenizer;
-import org.hibernate.search.test.TestConstants;
-
 /**
+ * Test helpers for {@code ReaderProvider}s.
+ *
  * @author Hardy Ferentschik
  */
-public class BarAnalyzer extends Analyzer {
-
-	private BarAnalyzer() {
-	}
-
-	@Override
-	protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-		//Not particularly important, but at least it's a fully functional Analyzer:
-		return new TokenStreamComponents( new LowerCaseTokenizer( TestConstants.getTargetLuceneVersion(), reader ) );
-	}
-
-}
+package org.hibernate.search.testsupport.readerprovider;

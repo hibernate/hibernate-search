@@ -31,6 +31,8 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.testsupport.analyzer.BarAnalyzer;
+import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.junit.Test;
 

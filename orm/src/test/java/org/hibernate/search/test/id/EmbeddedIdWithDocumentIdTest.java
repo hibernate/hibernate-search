@@ -30,7 +30,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
 
 /**
  * Related to HSEARCH-1050: check we deal nicely with weird DocumentId

@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.test.util.leakdetection;
+package org.hibernate.search.testsupport.leakdetection;
 
 import java.io.IOException;
 import java.util.Map;

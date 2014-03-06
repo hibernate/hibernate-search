@@ -28,7 +28,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.test.util.SearchFactoryHolder;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.junit.Rule;
 import org.junit.Test;
 
