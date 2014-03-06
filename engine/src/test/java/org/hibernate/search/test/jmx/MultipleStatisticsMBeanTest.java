@@ -41,8 +41,8 @@ import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;

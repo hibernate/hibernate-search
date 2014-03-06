@@ -42,7 +42,7 @@ import org.hibernate.search.backend.impl.WorkQueue;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * Testcase for HSEARCH-257.

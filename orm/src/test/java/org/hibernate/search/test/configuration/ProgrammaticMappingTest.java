@@ -54,7 +54,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

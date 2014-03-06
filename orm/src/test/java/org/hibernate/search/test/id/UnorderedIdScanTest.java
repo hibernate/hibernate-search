@@ -43,7 +43,7 @@ import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 /**

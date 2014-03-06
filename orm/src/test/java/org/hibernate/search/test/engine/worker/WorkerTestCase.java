@@ -38,7 +38,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Assert;
 import org.junit.Test;
 

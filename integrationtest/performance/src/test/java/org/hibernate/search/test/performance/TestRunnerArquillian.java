@@ -31,7 +31,7 @@ import javax.persistence.PersistenceContext;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.integration.wildfly.PackagerHelper;
 import org.hibernate.search.test.performance.scenario.TestScenario;
 import org.hibernate.search.test.performance.scenario.TestScenarioFactory;

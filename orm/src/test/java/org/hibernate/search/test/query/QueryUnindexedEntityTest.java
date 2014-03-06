@@ -31,7 +31,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * HSEARCH-162 - trying to index an entity which is not marked with @Indexed

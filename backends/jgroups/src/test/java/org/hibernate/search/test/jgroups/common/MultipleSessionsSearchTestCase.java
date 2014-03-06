@@ -28,7 +28,7 @@ import org.hibernate.SessionFactory;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * Test class to simulate clustered environment (one master, and one slave node)

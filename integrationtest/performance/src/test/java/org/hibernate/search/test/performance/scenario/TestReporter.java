@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.performance.task.AbstractTask;
 import org.hibernate.search.test.performance.util.CheckerLuceneIndex;
 import org.hibernate.search.test.performance.util.CheckerUncaughtExceptions;

@@ -34,7 +34,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 
 public class FieldOnCollectionReindexTest extends SearchTestCase {
 

@@ -27,7 +27,7 @@ import java.io.File;
 
 import org.hibernate.search.Environment;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
