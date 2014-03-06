@@ -21,14 +21,14 @@
 package org.hibernate.search.test.engine.service;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.SearchFactoryHolder;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.matchers.JUnitMatchers;
@@ -51,7 +51,7 @@ public class StandardServiceManagerTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private ServiceManager serviceManagerUnderTest = new StandardServiceManager(
-			new ManualConfiguration(),
+			new SearchConfigurationForTest(),
 			new DummyBuildContext()
 	);
 
@@ -118,20 +118,8 @@ public class StandardServiceManagerTest {
 	}
 
 	@Test
-	public void testReleaseAll() {
-		SimpleService simpleService1 = serviceManagerUnderTest.requestService( SimpleService.class );
-		assertNotNull( "The service should be created", simpleService1 );
-
-		serviceManagerUnderTest.releaseAllServices();
-
-		SimpleService simpleService2 = serviceManagerUnderTest.requestService( SimpleService.class );
-		assertNotNull( "The service should be created", simpleService2 );
-		assertTrue( "A new service instance should have been created", simpleService1 != simpleService2 );
-	}
-
-	@Test
 	public void providedServicesHavePrecedence() {
-		ManualConfiguration configuration = new ManualConfiguration();
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest();
 		configuration.getProvidedServices().put( SimpleService.class, new ProgrammaticallyConfiguredSimpleService() );
 
 		serviceManagerUnderTest = new StandardServiceManager(

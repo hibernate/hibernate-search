@@ -31,7 +31,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -48,7 +48,7 @@ public class SearchFactoryTest {
 
 	@Test
 	public void testTypeWithNoDocumentIdThrowsException() {
-		ManualConfiguration cfg = getManualConfiguration();
+		SearchConfigurationForTest cfg = getManualConfiguration();
 
 		SearchMapping mapping = new SearchMapping();
 		mapping
@@ -67,7 +67,7 @@ public class SearchFactoryTest {
 
 	@Test
 	public void testGetIndexedTypesNoTypeIndexed() {
-		ManualConfiguration cfg = getManualConfiguration();
+		SearchConfigurationForTest cfg = getManualConfiguration();
 
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 		Set<Class<?>> indexedClasses = sf.getIndexedTypes();
@@ -76,7 +76,7 @@ public class SearchFactoryTest {
 
 	@Test
 	public void testGetIndexedTypeSingleIndexedType() {
-		ManualConfiguration cfg = getManualConfiguration();
+		SearchConfigurationForTest cfg = getManualConfiguration();
 
 		SearchMapping mapping = new SearchMapping();
 		mapping
@@ -93,7 +93,7 @@ public class SearchFactoryTest {
 
 	@Test
 	public void testGetIndexedTypesMultipleTypes() {
-		ManualConfiguration cfg = getManualConfiguration();
+		SearchConfigurationForTest cfg = getManualConfiguration();
 
 		SearchMapping mapping = new SearchMapping();
 		mapping
@@ -111,7 +111,7 @@ public class SearchFactoryTest {
 
 	@Test
 	public void testGetTypeDescriptorForUnindexedType() {
-		ManualConfiguration cfg = getManualConfiguration();
+		SearchConfigurationForTest cfg = getManualConfiguration();
 
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 		IndexedTypeDescriptor indexedTypeDescriptor = sf.getIndexedTypeDescriptor( Foo.class);
@@ -121,7 +121,7 @@ public class SearchFactoryTest {
 
 	@Test
 	public void testGetTypeDescriptorForIndexedType() {
-		ManualConfiguration cfg = getManualConfiguration();
+		SearchConfigurationForTest cfg = getManualConfiguration();
 
 		SearchMapping mapping = new SearchMapping();
 		mapping
@@ -136,8 +136,8 @@ public class SearchFactoryTest {
 		assertTrue( indexedTypeDescriptor.isIndexed() );
 	}
 
-	private ManualConfiguration getManualConfiguration() {
-		ManualConfiguration cfg = new ManualConfiguration();
+	private SearchConfigurationForTest getManualConfiguration() {
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.addClass( Foo.class );
 		cfg.addClass( Bar.class );

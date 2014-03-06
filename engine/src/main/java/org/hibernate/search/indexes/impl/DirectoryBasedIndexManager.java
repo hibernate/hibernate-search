@@ -99,7 +99,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.similarity = similarity;
 		this.directoryProvider = createDirectoryProvider( indexName, properties, buildContext );
 		this.indexingParameters = PropertiesParseHelper.extractIndexingPerformanceOptions( properties );
-		this.optimizer = PropertiesParseHelper.getOptimizerStrategy( this, properties );
+		this.optimizer = PropertiesParseHelper.getOptimizerStrategy( this, properties, buildContext );
 		this.backend = createBackend( indexName, properties, buildContext );
 		this.directoryProvider.start( this );
 		this.readers = createIndexReader( indexName, properties, buildContext );
@@ -206,7 +206,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	protected DirectoryBasedReaderProvider createIndexReader(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-		return PropertiesParseHelper.createDirectoryBasedReaderProvider( this, cfg );
+		return PropertiesParseHelper.createDirectoryBasedReaderProvider( this, cfg, buildContext );
 	}
 
 	protected DirectoryProvider createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {

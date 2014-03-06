@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.impl.ConfigContext;
@@ -38,8 +39,9 @@ import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.PropertyDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,12 +55,17 @@ import static org.junit.Assert.assertTrue;
 public class PropertyDescriptorTest {
 
 	private static final List<String> TEST_INDEX_NAMES = Arrays.asList(
-			"index-0", "index-0", "index-0" );
+			"index-0", "index-0", "index-0"
+	);
 	private AnnotationMetadataProvider metadataProvider;
 
 	@Before
 	public void setUp() {
-		ConfigContext configContext = new ConfigContext( new ManualConfiguration() );
+		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
+		ConfigContext configContext = new ConfigContext(
+				searchConfiguration,
+				new BuildContextForTest( searchConfiguration )
+		);
 		metadataProvider = new AnnotationMetadataProvider( new JavaReflectionManager(), configContext );
 	}
 

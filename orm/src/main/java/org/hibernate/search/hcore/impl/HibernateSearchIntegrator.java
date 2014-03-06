@@ -24,6 +24,7 @@
 
 package org.hibernate.search.hcore.impl;
 
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.DuplicationStrategy;
@@ -62,9 +63,11 @@ public class HibernateSearchIntegrator implements Integrator {
 		FullTextIndexEventListener fullTextIndexEventListener = new FullTextIndexEventListener();
 		registerHibernateSearchEventListener( fullTextIndexEventListener, serviceRegistry );
 
+		ClassLoaderService hibernateClassLoaderService = serviceRegistry.getService( ClassLoaderService.class );
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
 				configuration,
-				fullTextIndexEventListener
+				fullTextIndexEventListener,
+				hibernateClassLoaderService
 		);
 		sessionFactory.addObserver( observer );
 	}

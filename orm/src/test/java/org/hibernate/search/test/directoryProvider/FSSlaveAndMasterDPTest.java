@@ -37,7 +37,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

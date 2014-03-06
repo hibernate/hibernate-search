@@ -40,9 +40,8 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.ManualTransactionContext;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -60,7 +59,7 @@ public class AppliedOnTypeAwareBridgeTest {
 		Foo foo = new Foo( 0l );
 
 		Work<Foo> work = new Work<Foo>( foo, foo.getId(), WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}
@@ -72,7 +71,7 @@ public class AppliedOnTypeAwareBridgeTest {
 		Bar bar = new Bar( 0l );
 
 		Work<Bar> work = new Work<Bar>( bar, bar.getId(), WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}
@@ -84,14 +83,14 @@ public class AppliedOnTypeAwareBridgeTest {
 		Snafu snafu = new Snafu( 0l );
 
 		Work<Snafu> work = new Work<Snafu>( snafu, snafu.getId(), WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
 	}
 
 
 	private SearchFactoryImplementor createSearchFactory(Class<?> clazz) {
-		ManualConfiguration configuration = new ManualConfiguration()
+		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addClass( clazz );
 
@@ -140,7 +139,8 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	@Indexed
 	@ClassBridge(impl = AppliedOnTypeAwareBridgeTest.TypeAssertingFieldBridge.class,
-			params = @Parameter(name = "type", value = "org.hibernate.search.test.bridge.AppliedOnTypeAwareBridgeTest$Snafu"))
+			params = @Parameter(name = "type",
+					value = "org.hibernate.search.test.bridge.AppliedOnTypeAwareBridgeTest$Snafu"))
 	public static class Snafu {
 		@DocumentId
 		private Long id;
@@ -155,28 +155,23 @@ public class AppliedOnTypeAwareBridgeTest {
 	}
 
 	public static class TypeAssertingFieldBridge implements FieldBridge, AppliedOnTypeAwareBridge, ParameterizedBridge {
-		private Class<?> expectedType;
-		private Class<?> actualType;
+		private String expectedTypeName;
+		private String actualTypeName;
 
 		@Override
 		public void setAppliedOnType(Class<?> returnType) {
-			actualType = returnType;
+			actualTypeName = returnType.getName();
 		}
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			assertTrue( "Type not set prior to calling #set of field bridge", actualType != null );
-			assertEquals( "Unexpected type", expectedType, actualType );
+			assertTrue( "Type not set prior to calling #set of field bridge", actualTypeName != null );
+			assertEquals( "Unexpected type", expectedTypeName, actualTypeName );
 		}
 
 		@Override
 		public void setParameterValues(Map<String, String> parameters) {
-			String expectedTypeName = parameters.get( "type" );
-			expectedType = ClassLoaderHelper.classForName(
-					expectedTypeName,
-					this.getClass().getClassLoader(),
-					"Unable to load type"
-			);
+			expectedTypeName = parameters.get( "type" );
 		}
 	}
 }

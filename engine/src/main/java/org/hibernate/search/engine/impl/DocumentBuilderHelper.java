@@ -42,6 +42,8 @@ import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -61,12 +63,11 @@ public final class DocumentBuilderHelper {
 	private DocumentBuilderHelper() {
 	}
 
-	public static Class getDocumentClass(String className) {
+	public static Class getDocumentClass(String className, ServiceManager serviceManager) {
 		try {
-			// Use the same class loader used to load this class ...
-			return ClassLoaderHelper.classForName( className, DocumentBuilderHelper.class.getClassLoader() );
+			return ClassLoaderHelper.classForName( className, serviceManager );
 		}
-		catch (ClassNotFoundException e) {
+		catch (ClassLoadingException e) {
 			throw new SearchException( "Unable to load indexed class: " + className, e );
 		}
 	}

@@ -30,12 +30,14 @@ import javax.naming.InitialContext;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.impl.JNDIHelper;
-
 
 /**
  * Implementation of the {@code IndexControlMBean} JMX attributes and operations.
@@ -46,14 +48,16 @@ public class IndexControl implements IndexControlMBean {
 
 	private final Properties jndiProperties;
 	private final String sessionFactoryJndiName;
+	private final ServiceManager serviceManager;
 
 	private int batchSize = 25;
 	private int numberOfObjectLoadingThreads = 2;
 	private int numberOfFetchingThreads = 4;
 
-	public IndexControl(Properties props) {
-		this.sessionFactoryJndiName = props.getProperty( "hibernate.session_factory_name" );
-		this.jndiProperties = JNDIHelper.getJndiProperties( props, JNDIHelper.HIBERNATE_JNDI_PREFIX );
+	public IndexControl(Properties properties, ServiceManager serviceManager) {
+		this.sessionFactoryJndiName = properties.getProperty( "hibernate.session_factory_name" );
+		this.jndiProperties = JNDIHelper.getJndiProperties( properties, JNDIHelper.HIBERNATE_JNDI_PREFIX );
+		this.serviceManager = serviceManager;
 	}
 
 	@Override
@@ -98,7 +102,6 @@ public class IndexControl implements IndexControlMBean {
 					.batchSizeToLoadObjects( batchSize )
 					.cacheMode( CacheMode.NORMAL )
 					.threadsToLoadObjects( numberOfObjectLoadingThreads )
-					.threadsForSubsequentFetching( numberOfFetchingThreads )
 					.startAndWait();
 		}
 		catch (InterruptedException e) {
@@ -136,11 +139,15 @@ public class IndexControl implements IndexControlMBean {
 
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
+		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 		try {
-			clazz = ClassLoaderHelper.classForName( entity, IndexControl.class.getClassLoader() );
+			clazz = classLoaderService.classForName( entity );
 		}
-		catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException( entity + "not a indexed entity" );
+		catch (ClassLoadingException e) {
+			throw new IllegalArgumentException( entity + " not a indexed entity" );
+		}
+		finally {
+			serviceManager.releaseService( ClassLoaderService.class );
 		}
 		return clazz;
 	}

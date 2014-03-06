@@ -44,7 +44,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Assert;
 
 /**

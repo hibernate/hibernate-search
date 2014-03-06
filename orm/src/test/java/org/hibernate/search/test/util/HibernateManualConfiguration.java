@@ -22,11 +22,12 @@ package org.hibernate.search.test.util;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class HibernateManualConfiguration extends ManualConfiguration implements SearchConfiguration {
+public class HibernateManualConfiguration extends SearchConfigurationForTest implements SearchConfiguration {
 
 	public HibernateManualConfiguration() {
 		super( HibernateStatelessInitializer.INSTANCE );

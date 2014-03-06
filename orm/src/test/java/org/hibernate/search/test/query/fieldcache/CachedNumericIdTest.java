@@ -39,7 +39,7 @@ import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.engine.Location;
 import org.hibernate.search.test.engine.PinPoint;
 import org.hibernate.search.test.engine.Country;
-import org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider;
+import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
@@ -111,7 +111,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 		super.configure( cfg );
 		// force multiple segments to also verify the docId transformations
 		cfg.setProperty( "hibernate.search.default.indexwriter.transaction.max_merge_docs" , "10" );
-		cfg.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, org.hibernate.search.test.util.FieldSelectorLeakingReaderProvider.class.getName() );
+		cfg.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
 	}
 
 }

@@ -20,12 +20,12 @@
  */
 package org.hibernate.search.impl;
 
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -39,6 +39,12 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory {
 
 	private static final Log log = LoggerFactory.make();
 
+	private final ClassLoaderService classLoaderService;
+
+	public DefaultIndexManagerFactory(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
+	}
+
 	@Override
 	public IndexManager createDefaultIndexManager() {
 		return new DirectoryBasedIndexManager();
@@ -50,43 +56,45 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory {
 			return createDefaultIndexManager();
 		}
 		else {
-			String implName = indexManagerImplementationName.trim();
-			IndexManager im = fromAlias( implName );
-			if ( im == null ) {
-				implName = aliasToFQN( implName );
-				im = ClassLoaderHelper.instanceFromName( IndexManager.class, implName,
-						IndexManagerHolder.class, "index manager" );
+			indexManagerImplementationName = indexManagerImplementationName.trim();
+			IndexManager indexManager = fromAlias( indexManagerImplementationName );
+			if ( indexManager == null ) {
+				indexManagerImplementationName = aliasToFQN( indexManagerImplementationName );
+				Class<?> indexManagerClass = classLoaderService.classForName( indexManagerImplementationName );
+				indexManager = ClassLoaderHelper.instanceFromClass( IndexManager.class, indexManagerClass, "index manager" );
 			}
-			log.indexManagerAliasResolved( indexManagerImplementationName, im.getClass() );
-			return im;
+			log.indexManagerAliasResolved( indexManagerImplementationName, indexManager.getClass() );
+			return indexManager;
 		}
 	}
 
 	/**
 	 * Provide a way to expand known aliases to fully qualified class names.
-	 * As opposed to {@link #fromAlias(String)} we can use this to expend to well
+	 * As opposed to {@link #fromAlias(String)} we can use this to expand to well
 	 * known implementations which are optional on the classpath.
 	 *
-	 * @param implName
+	 * @param alias the alias to replace with the fully qualified class name of the implementation
+	 *
 	 * @return the same name, or a fully qualified class name to use instead
 	 */
-	protected String aliasToFQN(final String implName) {
+	protected String aliasToFQN(final String alias) {
 		// TODO Add the Infinispan implementor here
-		return implName;
+		return alias;
 	}
 
 	/**
 	 * Extension point: allow to override aliases or add new ones to
 	 * directly create class instances.
 	 *
-	 * @param implName the requested alias
-	 * @return <code>null</code> if the alias is unknown.
+	 * @param alias the requested alias
+	 *
+	 * @return return the index manager for the given alias or {@code null} if the alias is unknown.
 	 */
-	protected IndexManager fromAlias(String implName) {
-		if ( "directory-based".equals( implName ) ) {
+	protected IndexManager fromAlias(String alias) {
+		if ( "directory-based".equals( alias ) ) {
 			return new DirectoryBasedIndexManager();
 		}
-		if ( "near-real-time".equals( implName ) ) {
+		if ( "near-real-time".equals( alias ) ) {
 			return new NRTIndexManager();
 		}
 		return null;

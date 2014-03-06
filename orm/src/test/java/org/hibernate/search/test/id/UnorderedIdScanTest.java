@@ -33,6 +33,7 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMethod;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
@@ -40,8 +41,9 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 /**
@@ -73,8 +75,8 @@ public class UnorderedIdScanTest {
 	}
 
 	private static void tryCreatingDocumentBuilder(XClass mappedXClass, ReflectionManager reflectionManager) {
-		ManualConfiguration cfg = new ManualConfiguration();
-		ConfigContext context = new ConfigContext( cfg );
+		SearchConfiguration searchConfiguration = new SearchConfigurationForTest();
+		ConfigContext context = new ConfigContext( searchConfiguration, new BuildContextForTest( searchConfiguration ) );
 		MetadataProvider metadataProvider = new AnnotationMetadataProvider( reflectionManager, context );
 		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( reflectionManager.toClass( mappedXClass ));
 		new DocumentBuilderIndexedEntity( mappedXClass,

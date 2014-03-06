@@ -37,8 +37,8 @@ import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 
 /**
  * Unit test covering proper behavior and integration between Hibernate Search and Envers.

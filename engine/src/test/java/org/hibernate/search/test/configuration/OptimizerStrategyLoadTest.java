@@ -33,7 +33,7 @@ import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.ExplicitOnlyOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
 
@@ -47,40 +47,40 @@ public class OptimizerStrategyLoadTest {
 
 	@Test
 	public void testDefaultImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addProperty( "hibernate.search.default.optimizer.implementation", "default" );
 		verifyOptimizerImplementationIs( ExplicitOnlyOptimizerStrategy.class, cfg );
 	}
 
 	@Test
 	public void testUnsetImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		verifyOptimizerImplementationIs( ExplicitOnlyOptimizerStrategy.class, cfg );
 	}
 
 	@Test
 	public void testIncrementalImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addProperty( "hibernate.search.default.optimizer.transaction_limit.max", "5" );
 		verifyOptimizerImplementationIs( IncrementalOptimizerStrategy.class, cfg );
 	}
 
 	@Test(expected = SearchException.class)
 	public void testIllegalImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addProperty( "hibernate.search.default.optimizer.implementation", "5" );
 		verifyOptimizerImplementationIs( IncrementalOptimizerStrategy.class, cfg );
 	}
 
 	@Test
 	public void testValidExtension() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.addProperty( "hibernate.search.default.optimizer.implementation", CustomOptimizer.class.getName() );
 		verifyOptimizerImplementationIs( CustomOptimizer.class, cfg );
 	}
 
 	@SuppressWarnings("unchecked")
-	private void verifyOptimizerImplementationIs(Class type, ManualConfiguration cfg) {
+	private void verifyOptimizerImplementationIs(Class type, SearchConfigurationForTest cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
 			.entity( Document.class ).indexed()

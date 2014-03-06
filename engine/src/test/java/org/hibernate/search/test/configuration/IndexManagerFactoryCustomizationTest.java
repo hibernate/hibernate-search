@@ -23,7 +23,6 @@ package org.hibernate.search.test.configuration;
 import java.lang.annotation.ElementType;
 
 import junit.framework.Assert;
-
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -34,8 +33,8 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 /**
@@ -48,29 +47,31 @@ public class IndexManagerFactoryCustomizationTest {
 
 	@Test
 	public void testDefaultImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		verifyIndexManagerTypeIs( DirectoryBasedIndexManager.class, cfg );
 	}
 
 	@Test
 	public void testOverriddenDefaultImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
-		cfg.setIndexManagerFactory( new DefaultIndexManagerFactory() {
-			@Override
-			public IndexManager createDefaultIndexManager() {
-				return new NRTIndexManager();
-			}
-		} );
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.setIndexManagerFactory(
+				new DefaultIndexManagerFactory( cfg.getClassLoaderService() ) {
+					@Override
+					public IndexManager createDefaultIndexManager() {
+						return new NRTIndexManager();
+					}
+				}
+		);
 		verifyIndexManagerTypeIs( NRTIndexManager.class, cfg );
 	}
 
-	private void verifyIndexManagerTypeIs(Class<? extends IndexManager> expectedIndexManagerClass, ManualConfiguration cfg) {
+	private void verifyIndexManagerTypeIs(Class<? extends IndexManager> expectedIndexManagerClass, SearchConfigurationForTest cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
-			.entity( Document.class ).indexed().indexName( "documents" )
-			.property( "id", ElementType.FIELD ).documentId()
-			.property( "title", ElementType.FIELD ).field()
-			;
+				.entity( Document.class ).indexed().indexName( "documents" )
+				.property( "id", ElementType.FIELD ).documentId()
+				.property( "title", ElementType.FIELD ).field()
+		;
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.addClass( Document.class );
@@ -101,8 +102,10 @@ public class IndexManagerFactoryCustomizationTest {
 
 	@Indexed(index = "dvds")
 	public static final class Dvd {
-		@DocumentId long id;
-		@Field String title;
+		@DocumentId
+		long id;
+		@Field
+		String title;
 	}
 
 }

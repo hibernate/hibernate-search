@@ -33,8 +33,8 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 
 /**
  * @author Hardy Ferentschik

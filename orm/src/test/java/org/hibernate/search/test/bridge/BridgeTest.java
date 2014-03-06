@@ -52,7 +52,7 @@ import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.builtin.CalendarBridge;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * @author Emmanuel Bernard

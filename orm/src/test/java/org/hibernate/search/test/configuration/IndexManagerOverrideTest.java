@@ -30,6 +30,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class IndexManagerOverrideTest {
 			.setProperty( "hibernate.search.Book.indexmanager", "near-real-time" )
 			.setProperty(
 					"hibernate.search." + Foo.class.getName() + ".indexmanager",
-					"org.hibernate.search.test.util.RamIndexManager"
+					"org.hibernate.search.testsupport.indexmanager.RamIndexManager"
 			)
 			.addAnnotatedClass( BlogEntry.class )
 			.addAnnotatedClass( Foo.class )
@@ -68,7 +69,7 @@ public class IndexManagerOverrideTest {
 
 		//Uses a fully qualified name to load an implementation
 		checkIndexManagerType( allIndexesManager, Foo.class.getName(),
-				org.hibernate.search.test.util.RamIndexManager.class );
+				RamIndexManager.class );
 
 		builder.close();
 	}

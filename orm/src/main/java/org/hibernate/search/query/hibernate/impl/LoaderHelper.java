@@ -23,42 +23,19 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
  * @author Emmanuel Bernard
  */
 public class LoaderHelper {
-
-	private static final List<Class> objectNotFoundExceptions;
+	private static final List<String> objectNotFoundExceptions = CollectionHelper.newArrayList( 2 );
 
 	static {
-		objectNotFoundExceptions = new ArrayList<Class>( 2 );
-		try {
-			objectNotFoundExceptions.add(
-					ClassLoaderHelper.classForName(
-							"org.hibernate.ObjectNotFoundException",
-							LoaderHelper.class.getClassLoader()
-					)
-			);
-		}
-		catch (ClassNotFoundException e) {
-			//leave it alone
-		}
-		try {
-			objectNotFoundExceptions.add(
-					ClassLoaderHelper.classForName(
-							"javax.persistence.EntityNotFoundException",
-							LoaderHelper.class.getClassLoader()
-					)
-			);
-		}
-		catch (ClassNotFoundException e) {
-			//leave it alone
-		}
+		objectNotFoundExceptions.add( "org.hibernate.ObjectNotFoundException" );
+		objectNotFoundExceptions.add( "javax.persistence.EntityNotFoundException" );
 	}
 
 	private LoaderHelper() {
@@ -66,9 +43,9 @@ public class LoaderHelper {
 
 	public static boolean isObjectNotFoundException(RuntimeException e) {
 		boolean objectNotFound = false;
-		Class exceptionClass = e.getClass();
-		for ( Class clazz : objectNotFoundExceptions ) {
-			if ( clazz.isAssignableFrom( exceptionClass ) ) {
+		String exceptionClassName = e.getClass().getName();
+		for ( String fqc : objectNotFoundExceptions ) {
+			if ( fqc.equals( exceptionClassName ) ) {
 				objectNotFound = true;
 				break;
 			}

@@ -37,7 +37,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.jgroups.master.TShirt;
 import org.junit.Assert;
 import org.junit.Test;

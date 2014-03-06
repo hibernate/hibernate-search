@@ -33,11 +33,12 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.internals.SearchFactoryState;
 
 /**
@@ -46,14 +47,14 @@ import org.hibernate.search.spi.internals.SearchFactoryState;
 public class IncrementalSearchConfiguration implements SearchConfiguration {
 	private final List<Class<?>> classes;
 	private final Map<String, Class<?>> classesByName = new HashMap<String, Class<?>>();
-	private final SearchFactoryState state;
+	private final SearchFactoryState searchFactoryState;
 	private final Properties properties;
 	private final ReflectionManager reflectionManager = new JavaReflectionManager();
 
 	public IncrementalSearchConfiguration(List<Class<?>> classes, Properties properties, SearchFactoryState factoryState) {
 		this.properties = properties;
 		this.classes = classes;
-		this.state = factoryState;
+		this.searchFactoryState = factoryState;
 		for ( Class<?> entity : classes ) {
 			classesByName.put( entity.getName(), entity );
 		}
@@ -86,7 +87,7 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 
 	@Override
 	public SearchMapping getProgrammaticMapping() {
-		return state.getProgrammaticMapping();
+		return searchFactoryState.getProgrammaticMapping();
 	}
 
 	@Override
@@ -96,26 +97,31 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 
 	@Override
 	public boolean isTransactionManagerExpected() {
-		return state.isTransactionManagerExpected();
+		return searchFactoryState.isTransactionManagerExpected();
 	}
 
 	@Override
 	public InstanceInitializer getInstanceInitializer() {
-		return state.getInstanceInitializer();
+		return searchFactoryState.getInstanceInitializer();
 	}
 
 	@Override
 	public boolean isIndexMetadataComplete() {
-		return state.isIndexMetadataComplete();
+		return searchFactoryState.isIndexMetadataComplete();
 	}
 
 	@Override
 	public boolean isIdProvidedImplicit() {
-		return state.isIdProvidedImplicit();
+		return searchFactoryState.isIdProvidedImplicit();
 	}
 
 	@Override
 	public IndexManagerFactory getIndexManagerFactory() {
-		return state.getIndexManagerFactory();
+		return searchFactoryState.getIndexManagerFactory();
+	}
+
+	@Override
+	public ClassLoaderService getClassLoaderService() {
+		return searchFactoryState.getServiceManager().requestService( ClassLoaderService.class );
 	}
 }

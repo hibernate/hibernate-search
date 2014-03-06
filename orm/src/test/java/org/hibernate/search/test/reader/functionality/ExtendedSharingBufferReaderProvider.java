@@ -39,26 +39,27 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 /**
  * Testable extension of SharingBufferReaderProvider to make sure IndexReaders
  * are only opened when needed, and always correctly closed.
  *
- * @see SharingBufferIndexProviderTest
  * @author Sanne Grinovero
+ * @see SharingBufferIndexProviderTest
  */
 public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProvider {
 
 	private static final int NUM_DIRECTORY_PROVIDERS = 3;
 	private final Vector<MockIndexReader> createdReadersHistory = new Vector<MockIndexReader>( 500 );
 	final Map<Directory, TestManipulatorPerDP> manipulators = new ConcurrentHashMap<Directory, TestManipulatorPerDP>();
-	private final RAMDirectoryProvider[] directories = new RAMDirectoryProvider[ NUM_DIRECTORY_PROVIDERS ];
+	private final RAMDirectoryProvider[] directories = new RAMDirectoryProvider[NUM_DIRECTORY_PROVIDERS];
 	private final AtomicInteger currentDirectoryIndex = new AtomicInteger();
 	private volatile RAMDirectoryProvider currentDirectory;
 
@@ -80,7 +81,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		private final RAMDirectoryProvider dp = new RAMDirectoryProvider();
 
 		TestManipulatorPerDP(int seed) {
-			dp.initialize( String.valueOf( seed ), null, null );
+			dp.initialize( String.valueOf( seed ), null, new BuildContextForTest( new SearchConfigurationForTest() ) );
 		}
 
 		public void setIndexChanged() {
@@ -102,7 +103,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 	 */
 	public void swithDirectory() {
 		int index = currentDirectoryIndex.incrementAndGet();
-		currentDirectory = directories[ index % NUM_DIRECTORY_PROVIDERS ];
+		currentDirectory = directories[index % NUM_DIRECTORY_PROVIDERS];
 	}
 
 	public boolean isReaderCurrent(MockIndexReader reader) {
@@ -185,7 +186,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 			//make the super constructor happy as the class is "locked down"
 			super( new RAMDirectory(), new AtomicReader[0] );
 			this.isIndexReaderCurrent = isIndexReaderCurrent;
-			if ( ! isIndexReaderCurrent.compareAndSet( false, true ) ) {
+			if ( !isIndexReaderCurrent.compareAndSet( false, true ) ) {
 				throw new IllegalStateException( "Unnecessarily reopened" );
 			}
 			createdReadersHistory.add( this );

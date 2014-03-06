@@ -112,7 +112,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 		session.setCacheMode( cacheMode );
 		session.setDefaultReadOnly( true );
 		try {
-			Transaction transaction = Helper.getTransactionAndMarkForJoin( session );
+			Transaction transaction = session.getTransaction();
 			transaction.begin();
 			loadAllFromQueue( session );
 			transaction.commit();

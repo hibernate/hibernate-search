@@ -39,7 +39,7 @@ import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.GatedLuceneBackend;
+import org.hibernate.search.testsupport.backend.GatedLuceneBackend;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
 
@@ -299,7 +299,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( Environment.USE_SECOND_LEVEL_CACHE, "true" );
-		cfg.setProperty( "hibernate.search.default.worker.backend", org.hibernate.search.test.util.GatedLuceneBackend.class.getName() );
+		cfg.setProperty( "hibernate.search.default.worker.backend", GatedLuceneBackend.class.getName() );
 		cfg.setProperty( Environment.CACHE_REGION_FACTORY, CachingRegionFactory.class.getCanonicalName() );
 	}
 

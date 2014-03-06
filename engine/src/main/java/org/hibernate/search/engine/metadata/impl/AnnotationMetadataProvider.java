@@ -39,6 +39,9 @@ import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
+import org.hibernate.search.annotations.ProvidedId;
+import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
@@ -98,10 +101,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 	private final ReflectionManager reflectionManager;
 	private final ConfigContext configContext;
+	private final BridgeFactory bridgeFactory;
 
 	public AnnotationMetadataProvider(ReflectionManager reflectionManager, ConfigContext configContext) {
 		this.reflectionManager = reflectionManager;
 		this.configContext = configContext;
+		this.bridgeFactory = new BridgeFactory( configContext.getServiceManager() );
 	}
 
 	@Override
@@ -163,7 +168,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					parseContext.setExplicitDocumentId( true );
 				}
 
-				FieldBridge idBridge = BridgeFactory.guessType( null, numericFieldAnn, member, reflectionManager );
+				FieldBridge idBridge = bridgeFactory.guessType( null, numericFieldAnn, member, reflectionManager, configContext.getServiceManager() );
 				if ( !( idBridge instanceof TwoWayFieldBridge ) ) {
 					throw new SearchException(
 							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName()
@@ -192,7 +197,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				String fieldName = prefix + attributeName;
 				Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 				Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
-				FieldBridge fieldBridge = BridgeFactory.guessType( null, null, member, reflectionManager );
+				FieldBridge fieldBridge = bridgeFactory.guessType( null, null, member, reflectionManager, configContext.getServiceManager() );
 
 				DocumentFieldMetadata fieldMetadata =
 						new DocumentFieldMetadata.Builder( fieldName, Store.YES, index, termVector )
@@ -248,10 +253,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<? extends Annotation> jpaIdClass =
-						ClassLoaderHelper.classForName( "javax.persistence.Id", ConfigContext.class.getClassLoader() );
+						ClassLoaderHelper.classForName( "javax.persistence.Id", configContext.getServiceManager() );
 				jpaId = member.getAnnotation( jpaIdClass );
 			}
-			catch (ClassNotFoundException e) {
+			catch (ClassLoadingException e) {
 				throw new SearchException( "Unable to load @Id.class even though it should be present ?!" );
 			}
 			if ( jpaId != null ) {
@@ -263,6 +268,35 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			}
 		}
 		return idAnnotation;
+	}
+
+	private void initializeProvidedIdMetadata(ProvidedId providedId, XClass clazz, TypeMetadata.Builder typeMetadataBuilder) {
+		PropertyMetadata propertyMetadata;
+		FieldBridge providedIdFieldBridge;
+		String providedIdFieldName;
+		if ( providedId != null ) {
+			providedIdFieldBridge = bridgeFactory.extractTwoWayType( providedId.bridge(), clazz, reflectionManager );
+			providedIdFieldName = providedId.name();
+		}
+		else {
+			providedIdFieldBridge = new TwoWayString2FieldBridgeAdaptor( org.hibernate.search.bridge.builtin.StringBridge.INSTANCE );
+			providedIdFieldName = ProvidedId.defaultFieldName;
+		}
+
+		DocumentFieldMetadata fieldMetadata =
+				new DocumentFieldMetadata.Builder(
+						providedIdFieldName,
+						Store.YES,
+						Field.Index.NOT_ANALYZED_NO_NORMS,
+						Field.TermVector.NO
+				)
+						.fieldBridge( providedIdFieldBridge )
+						.boost( 1.0f )
+						.build();
+		propertyMetadata = new PropertyMetadata.Builder( null )
+				.addDocumentField( fieldMetadata )
+				.build();
+		typeMetadataBuilder.idProperty( propertyMetadata );
 	}
 
 	/**
@@ -308,10 +342,23 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		List<XClass> hierarchy = ReflectionHelper.createXClassHierarchy( parseContext.getCurrentClass() );
 
 		// Iterate the class hierarchy top down. This allows to override the default analyzer for the properties if the class holds one
+		ProvidedId explicitProvidedIdAnnotation = null;
+		XClass providedIdHostingClass = null;
 		for ( XClass currentClass : hierarchy ) {
+			if ( currentClass.getAnnotation( ProvidedId.class ) != null ) {
+				explicitProvidedIdAnnotation = currentClass.getAnnotation( ProvidedId.class );
+				providedIdHostingClass = currentClass;
+			}
+
 			parseContext.setCurrentClass( currentClass );
 			initializeClassLevelAnnotations( typeMetadataBuilder, prefix, configContext, parseContext );
 			initializeClassBridgeInstances( typeMetadataBuilder, prefix, configContext, currentClass );
+		}
+
+		boolean isProvidedId = false;
+		if ( explicitProvidedIdAnnotation != null || configContext.isProvidedIdImplicit() ) {
+			initializeProvidedIdMetadata( explicitProvidedIdAnnotation, providedIdHostingClass, typeMetadataBuilder );
+			isProvidedId = true;
 		}
 
 		// if optimizations are enabled, we allow for state in indexed embedded objects which are not
@@ -334,6 +381,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						typeMetadataBuilder,
 						disableOptimizations,
 						isRoot,
+						isProvidedId,
 						configContext,
 						pathsContext,
 						parseContext
@@ -348,6 +396,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						typeMetadataBuilder,
 						disableOptimizations,
 						isRoot,
+						isProvidedId,
 						configContext,
 						pathsContext,
 						parseContext
@@ -435,7 +484,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ClassBridge classBridgeAnnotation,
 			XClass clazz,
 			ConfigContext configContext) {
-		FieldBridge fieldBridge = BridgeFactory.extractType( classBridgeAnnotation, reflectionManager.toClass( clazz ) );
+		FieldBridge fieldBridge = bridgeFactory.extractType( classBridgeAnnotation, reflectionManager.toClass( clazz ) );
 		bindClassBridgeAnnotation( prefix, typeMetadataBuilder, classBridgeAnnotation, fieldBridge, configContext );
 	}
 
@@ -444,8 +493,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ClassBridge classBridgeAnnotation,
 			FieldBridge fieldBridge,
 			ConfigContext configContext) {
-
-		BridgeFactory.injectParameters( classBridgeAnnotation, fieldBridge );
+		bridgeFactory.injectParameters( classBridgeAnnotation, fieldBridge );
 
 		String fieldName = prefix + classBridgeAnnotation.name();
 		Store store = classBridgeAnnotation.store();
@@ -482,11 +530,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Store store = spatialAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		Field.TermVector termVector = Field.TermVector.NO;
-		FieldBridge fieldBridge = BridgeFactory.guessType(
+		FieldBridge fieldBridge = bridgeFactory.guessType(
 				null,
 				null,
 				member,
-				reflectionManager
+				reflectionManager,
+				configContext.getServiceManager()
 		);
 
 		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
@@ -548,7 +597,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		final FieldBridge spatialBridge;
 		XClass clazz = parseContext.getCurrentClass();
 		if ( reflectionManager.toXClass( Coordinates.class ).isAssignableFrom( clazz ) ) {
-			spatialBridge = BridgeFactory.buildSpatialBridge( spatialAnnotation, clazz, null, null );
+			spatialBridge = bridgeFactory.buildSpatialBridge( spatialAnnotation, clazz, null, null );
 		}
 		else {
 			String latitudeField = null;
@@ -601,7 +650,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			}
 
 			if ( latitudeField != null && longitudeField != null ) {
-				spatialBridge = BridgeFactory.buildSpatialBridge(
+				spatialBridge = bridgeFactory.buildSpatialBridge(
 						spatialAnnotation,
 						clazz,
 						latitudeField,
@@ -626,10 +675,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			TypeMetadata.Builder typeMetadataBuilder,
 			boolean disableOptimizations,
 			boolean isRoot,
+			boolean isProvidedId,
 			ConfigContext configContext,
 			PathsContext pathsContext,
 			ParseContext parseContext) {
-		checkDocumentId( member, typeMetadataBuilder, isRoot, prefix, configContext, pathsContext, parseContext );
+		if ( !isProvidedId ) {
+			checkDocumentId( member, typeMetadataBuilder, isRoot, prefix, configContext, pathsContext, parseContext );
+		}
 		checkForField( member, typeMetadataBuilder, prefix, configContext, pathsContext, parseContext );
 		checkForFields( member, typeMetadataBuilder, prefix, configContext, pathsContext, parseContext );
 		checkForSpatial( member, typeMetadataBuilder, prefix, pathsContext, parseContext );
@@ -795,11 +847,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( fieldAnnotation.termVector() );
 
-		FieldBridge fieldBridge = BridgeFactory.guessType(
+		FieldBridge fieldBridge = bridgeFactory.guessType(
 				fieldAnnotation,
 				numericFieldAnnotation,
 				member,
-				reflectionManager
+				reflectionManager,
+				configContext.getServiceManager()
 		);
 
 		String nullToken = determineNullToken( fieldAnnotation, configContext );
@@ -892,11 +945,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				Class<? extends Annotation> transientAnnotationClass =
 						ClassLoaderHelper.classForName(
 								"javax.persistence.Transient",
-								ConfigContext.class.getClassLoader()
+								configContext.getServiceManager()
 						);
 				transientAnnotation = member.getAnnotation( transientAnnotationClass );
 			}
-			catch (ClassNotFoundException e) {
+			catch (ClassLoadingException e) {
 				throw new SearchException( "Unable to load @Transient.class even though it should be present ?!" );
 			}
 			return transientAnnotation != null;
@@ -1265,7 +1318,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		else {
 			NumericField numericField = member.getAnnotation( NumericField.class );
-			FieldBridge fieldBridge = BridgeFactory.guessType( null, numericField, member, reflectionManager );
+			FieldBridge fieldBridge = bridgeFactory.guessType( null, numericField, member, reflectionManager, configContext.getServiceManager() );
 			if ( fieldBridge instanceof StringBridge ) {
 				fieldBridge = new NullEncodingFieldBridge( (StringBridge) fieldBridge, indexNullAs );
 			}

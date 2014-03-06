@@ -23,6 +23,8 @@
  */
 package org.hibernate.search.bridge.builtin;
 
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.TwoWayStringBridge;
@@ -34,6 +36,13 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Emmanuel Bernard
  */
 public class ClassBridge implements TwoWayStringBridge {
+
+	private final ServiceManager serviceManager;
+
+	public ClassBridge(ServiceManager serviceManager) {
+		this.serviceManager = serviceManager;
+	}
+
 	@Override
 	public Object stringToObject(String stringValue) {
 		if ( StringHelper.isEmpty( stringValue ) ) {
@@ -41,9 +50,9 @@ public class ClassBridge implements TwoWayStringBridge {
 		}
 		else {
 			try {
-				return ClassLoaderHelper.classForName( stringValue, ClassBridge.class.getClassLoader() );
+				return ClassLoaderHelper.classForName( stringValue, serviceManager );
 			}
-			catch (ClassNotFoundException e) {
+			catch (ClassLoadingException e) {
 				throw new SearchException( "Unable to deserialize Class: " + stringValue, e );
 			}
 		}

@@ -42,6 +42,7 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -52,6 +53,8 @@ import org.junit.runner.RunWith;
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
+@Ignore
+// TODO - HSEARCH-1121 Disabling test since Infinispan integration seems broken
 public class InfinispanModuleMemberRegistrationIT {
 
 	@Deployment

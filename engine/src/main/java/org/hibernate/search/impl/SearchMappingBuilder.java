@@ -30,7 +30,8 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -59,8 +60,7 @@ public class SearchMappingBuilder {
 	 * @return SearchMapping
 	 */
 	public static SearchMapping getSearchMapping(SearchConfiguration cfg) {
-
-		//try SearchConfiguration object first and then properties
+		// try SearchConfiguration object first and then properties
 		Object modelMappingProperty = cfg.getProgrammaticMapping();
 		if ( modelMappingProperty == null ) {
 			modelMappingProperty = cfg.getProperties().get( Environment.MODEL_MAPPING );
@@ -75,7 +75,8 @@ public class SearchMappingBuilder {
 			mapping = (SearchMapping) programmaticConfig;
 			return mapping;
 		}
-		Class<?> clazz = getProgrammaticMappingClass( programmaticConfig );
+		// TODO - HSEARCH-1121 is there an alternative to using the class loader service like this?
+		Class<?> clazz = getProgrammaticMappingClass( programmaticConfig, cfg.getClassLoaderService() );
 		Method[] methods = clazz.getDeclaredMethods();
 		int count = 0;
 		for ( Method method : methods ) {
@@ -90,7 +91,7 @@ public class SearchMappingBuilder {
 	}
 
 	private static SearchMapping getNewInstanceOfSearchMapping(Class<?> clazz, Method method) {
-		SearchMapping mapping = null;
+		SearchMapping mapping;
 		try {
 			LOG.debugf( "invoking factory method [ %s.%s ] to get search mapping instance", clazz.getName(), method.getName() );
 			Object instance = clazz.newInstance();
@@ -111,14 +112,14 @@ public class SearchMappingBuilder {
 		}
 	}
 
-	private static Class<?> getProgrammaticMappingClass(Object programmaticConfig) {
-		Class<?> clazz = null;
+	private static Class<?> getProgrammaticMappingClass(Object programmaticConfig, ClassLoaderService classLoaderService) {
+		Class<?> clazz;
 		if ( programmaticConfig instanceof String ) {
 			final String className = (String) programmaticConfig;
 			try {
-				clazz = ClassLoaderHelper.classForName( className, SearchMappingBuilder.class.getClassLoader() );
+				clazz = classLoaderService.classForName( className );
 			}
-			catch (ClassNotFoundException e) {
+			catch (ClassLoadingException e) {
 				throw new SearchException( "Unable to find " + Environment.MODEL_MAPPING + "=" + className, e );
 			}
 		}

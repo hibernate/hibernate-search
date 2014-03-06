@@ -31,6 +31,7 @@ import org.easymock.EasyMock;
 import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
 
+import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -70,6 +71,9 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 	@Mock
 	private EventListenerRegistry mockEventListenerRegistry;
+
+	@Mock
+	private ClassLoaderService mockClassLoaderService;
 
 	private HibernateSearchIntegrator integratorUnderTest;
 
@@ -144,6 +148,13 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 				eq( EventType.FLUSH ),
 				isA( FullTextIndexEventListener.class )
 		);
+
+		expect( mockSessionFactoryServiceRegistry.getService( ClassLoaderService.class ) ).andReturn(
+				mockClassLoaderService
+		);
+
+		// returning object.class is fair enough for testing purposes
+		expect( mockClassLoaderService.classForName( "javax.persistence.Id" ) ).andReturn( Object.class );
 
 		EasyMockUnitils.replay();
 

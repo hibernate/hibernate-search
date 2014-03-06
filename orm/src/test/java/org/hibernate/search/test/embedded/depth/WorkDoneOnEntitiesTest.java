@@ -43,7 +43,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
 import org.hibernate.testing.SkipForDialect;
 
 /**
