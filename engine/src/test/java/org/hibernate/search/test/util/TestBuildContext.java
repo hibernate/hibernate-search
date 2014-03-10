@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.util;
 
+import org.hibernate.search.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -57,7 +58,7 @@ public class TestBuildContext implements BuildContext {
 
 	@Override
 	public ServiceManager getServiceManager() {
-		return new StandardServiceManager( searchConfiguration, this );
+		return new StandardServiceManager( searchConfiguration, this, Environment.DEFAULT_SERVICES_MAP );
 	}
 
 	@Override

@@ -30,13 +30,11 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
 
@@ -56,7 +54,6 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	private boolean transactionsExpected = true;
 	private boolean indexMetadataComplete = true;
 	private boolean idProvidedImplicit = false;
-	private IndexManagerFactory indexManagerFactory;
 	private ClassLoaderService classLoaderService;
 
 	public ManualConfiguration() {
@@ -69,7 +66,6 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 		this.properties = new Properties();
 		this.providedServices = new HashMap<Class<? extends Service>, Object>();
 		this.classLoaderService = new DefaultClassLoaderService();
-		this.indexManagerFactory = new DefaultIndexManagerFactory( classLoaderService );
 	}
 
 	public ManualConfiguration addProperty(String key, String value) {
@@ -160,17 +156,11 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	}
 
 	@Override
-	public IndexManagerFactory getIndexManagerFactory() {
-		return indexManagerFactory;
-	}
-
-	@Override
 	public ClassLoaderService getClassLoaderService() {
 		return classLoaderService;
 	}
 
-	public void setIndexManagerFactory(IndexManagerFactory indexManagerFactory) {
-		this.indexManagerFactory = indexManagerFactory;
+	public void setClassLoaderService(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
 	}
-
 }

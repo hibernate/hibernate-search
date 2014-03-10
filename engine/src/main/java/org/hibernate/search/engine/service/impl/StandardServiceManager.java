@@ -38,6 +38,7 @@ import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -55,13 +56,21 @@ public class StandardServiceManager implements ServiceManager {
 	private final BuildContext buildContext;
 	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices = new ConcurrentHashMap<Class<?>, ServiceWrapper<?>>();
 	private final Map<Class<? extends Service>, Object> providedServices;
+	private final Map<Class<? extends Service>, String> defaultServices;
 
 	private volatile boolean allServicesReleased = false;
 
 	public StandardServiceManager(SearchConfiguration searchConfiguration, BuildContext buildContext) {
+		this( searchConfiguration, buildContext, Collections.<Class<? extends Service>, String>emptyMap() );
+	}
+
+	public StandardServiceManager(SearchConfiguration searchConfiguration,
+			BuildContext buildContext,
+			Map<Class<? extends Service>, String> defaultServices) {
 		this.buildContext = buildContext;
 		this.properties = searchConfiguration.getProperties();
 		this.providedServices = createProvidedServices( searchConfiguration );
+		this.defaultServices = defaultServices;
 	}
 
 	@Override
@@ -145,13 +154,12 @@ public class StandardServiceManager implements ServiceManager {
 		return Collections.unmodifiableMap( tmpServices );
 	}
 
-
 	private <S extends Service> ServiceWrapper<S> createAndCacheWrapper(Class<S> serviceRole) {
 		ServiceWrapper<S> wrapper;
 		Set<S> services = requestService( ClassLoaderService.class ).loadJavaServices( serviceRole );
 
 		if ( services.size() == 0 ) {
-			throw log.getNoServiceImplementationFoundException( serviceRole.toString() );
+			tryLoadingDefaultService( serviceRole, services );
 		}
 		else if ( services.size() > 1 ) {
 			throw log.getMultipleServiceImplementationsException(
@@ -167,6 +175,22 @@ public class StandardServiceManager implements ServiceManager {
 			wrapper = previousWrapper;
 		}
 		return wrapper;
+	}
+
+	private <S extends Service> void tryLoadingDefaultService(Class<S> serviceRole, Set<S> services) {
+		// there is no loadable service. Check whether we have a default one we can instantiate
+		if ( defaultServices.containsKey( serviceRole ) ) {
+			S service = ClassLoaderHelper.instanceFromName(
+					serviceRole,
+					defaultServices.get( serviceRole ),
+					"default service",
+					this
+			);
+			services.add( service );
+		}
+		else {
+			throw log.getNoServiceImplementationFoundException( serviceRole.toString() );
+		}
 	}
 
 	private class ServiceWrapper<S> {

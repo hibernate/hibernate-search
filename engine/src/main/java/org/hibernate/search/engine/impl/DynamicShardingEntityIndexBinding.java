@@ -55,7 +55,6 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 			Similarity similarityInstance,
 			EntityIndexingInterceptor<? super T> entityIndexingInterceptor,
 			Properties properties,
-			IndexManagerFactory indexManagerFactory,
 			SearchFactoryImplementor searchFactoryImplementor,
 			IndexManagerHolder indexManagerHolder,
 			String rootDirectoryProviderName) {
@@ -64,6 +63,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 		this.entityIndexingInterceptor = entityIndexingInterceptor;
 		this.properties = properties;
 		this.searchFactory = searchFactoryImplementor;
+		// TODO
 		this.indexManagerFactory = indexManagerFactory;
 		this.indexManagerHolder = indexManagerHolder;
 		this.rootDirectoryProviderName = rootDirectoryProviderName;
@@ -139,7 +139,6 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 				entitySimilarity,
 				entityIndexingInterceptor,
 				properties,
-				indexManagerFactory,
 				searchFactory,
 				indexManagerHolder,
 				rootDirectoryProviderName

@@ -72,8 +72,6 @@ import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.SearchFactoryHolder;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -88,7 +86,6 @@ import static org.junit.Assert.fail;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializationTest {
-	private static final Log log = LoggerFactory.make();
 
 	@Rule
 	public SearchFactoryHolder searchFactoryHolder = new SearchFactoryHolder( RemoteEntity.class );

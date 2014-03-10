@@ -109,8 +109,6 @@ public class IndexManagerHolder {
 					indexProperties,
 					similarity,
 					mappedClass,
-					cfg,
-
 					buildContext
 			);
 		}
@@ -140,8 +138,7 @@ public class IndexManagerHolder {
 				indexProperties[0],
 				indexName,
 				buildContext,
-				this,
-				cfg.getIndexManagerFactory()
+				this
 		);
 	}
 
@@ -183,7 +180,6 @@ public class IndexManagerHolder {
 				entityIndexBinding.getDocumentBuilder().getBeanClass(),
 				entityIndexBinding.getSimilarity(),
 				properties,
-				entityIndexBinding.getIndexManagerFactory(),
 				context
 		);
 		indexManager.setSearchFactory( searchFactory );
@@ -250,25 +246,37 @@ public class IndexManagerHolder {
 
 	private IndexManager createIndexManager(String indexName,
 			Similarity indexSimilarity,
-			IndexManagerFactory indexManagerFactory,
 			Properties properties,
-			WorkerBuildContext context) {
+			WorkerBuildContext workerBuildContext) {
+		// get hold of the index manager factory via the service manager
+		ServiceManager serviceManager = workerBuildContext.getServiceManager();
+		IndexManagerFactory indexManagerFactory = serviceManager.requestService( IndexManagerFactory.class );
+
+		// create IndexManager instance via the index manager factory
 		String indexManagerImplementationName = properties.getProperty( Environment.INDEX_MANAGER_IMPL_NAME );
 		final IndexManager manager;
-		if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
-			manager = indexManagerFactory.createDefaultIndexManager();
-		}
-		else {
-			manager = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName );
-		}
 		try {
-			manager.initialize( indexName, properties, indexSimilarity, context );
+			if ( StringHelper.isEmpty( indexManagerImplementationName ) ) {
+				manager = indexManagerFactory.createDefaultIndexManager();
+			}
+			else {
+				manager = indexManagerFactory.createIndexManagerByName( indexManagerImplementationName );
+			}
+		}
+		finally {
+			serviceManager.releaseService( IndexManagerFactory.class );
+		}
+
+		// init the IndexManager
+		try {
+			manager.initialize( indexName, properties, indexSimilarity, workerBuildContext );
 			return manager;
 		}
 		catch (Exception e) {
 			throw log.unableToInitializeIndexManager( indexName, e );
 		}
 	}
+
 
 	/**
 	 * Extracts the index name used for the entity.
@@ -508,7 +516,6 @@ public class IndexManagerHolder {
 			Properties[] indexProperties,
 			Similarity similarity,
 			Class<?> mappedClass,
-			SearchConfiguration configuration,
 			WorkerBuildContext context) {
 		IndexManager[] indexManagers;
 		int nbrOfIndexManagers = indexProperties.length;
@@ -521,8 +528,7 @@ public class IndexManagerHolder {
 			IndexManager indexManager = indexManagersRegistry.get( indexManagerName );
 			if ( indexManager == null ) {
 				indexManager = createIndexManager(
-						indexManagerName, mappedClass, similarity,
-						indexProp, configuration.getIndexManagerFactory(), context
+						indexManagerName, mappedClass, similarity, indexProp, context
 				);
 			}
 			else {
@@ -549,14 +555,12 @@ public class IndexManagerHolder {
 			Class<?> mappedClass,
 			Similarity similarity,
 			Properties indexProperties,
-			IndexManagerFactory indexManagerFactory,
 			WorkerBuildContext context) {
 		IndexManager indexManager = indexManagersRegistry.get( indexManagerName );
 		if ( indexManager == null ) {
 			indexManager = createIndexManager(
 					indexManagerName,
 					similarity,
-					indexManagerFactory,
 					indexProperties,
 					context
 			);

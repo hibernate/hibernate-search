@@ -20,6 +20,7 @@
  */
 package org.hibernate.search.cfg.spi;
 
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
@@ -29,7 +30,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public interface IndexManagerFactory {
+public interface IndexManagerFactory extends Service {
 
 	/**
 	 * @return a new instance of the default IndexManager

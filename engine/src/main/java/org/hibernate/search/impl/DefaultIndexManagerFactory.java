@@ -20,30 +20,31 @@
  */
 package org.hibernate.search.impl;
 
+import java.util.Properties;
+
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * This is the default IndexManager implementation for Hibernate Search.
+ * This is the default {@code IndexManager} implementation for Hibernate Search.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author Hardy Ferentschik
  */
-public class DefaultIndexManagerFactory implements IndexManagerFactory {
+public class DefaultIndexManagerFactory implements IndexManagerFactory, Startable {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final ClassLoaderService classLoaderService;
-
-	public DefaultIndexManagerFactory(ClassLoaderService classLoaderService) {
-		this.classLoaderService = classLoaderService;
-	}
+	private ServiceManager serviceManager;
 
 	@Override
 	public IndexManager createDefaultIndexManager() {
@@ -60,12 +61,24 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory {
 			IndexManager indexManager = fromAlias( indexManagerImplementationName );
 			if ( indexManager == null ) {
 				indexManagerImplementationName = aliasToFQN( indexManagerImplementationName );
-				Class<?> indexManagerClass = classLoaderService.classForName( indexManagerImplementationName );
-				indexManager = ClassLoaderHelper.instanceFromClass( IndexManager.class, indexManagerClass, "index manager" );
+				Class<?> indexManagerClass = ClassLoaderHelper.classForName(
+						indexManagerImplementationName,
+						serviceManager
+				);
+				indexManager = ClassLoaderHelper.instanceFromClass(
+						IndexManager.class,
+						indexManagerClass,
+						"index manager"
+				);
 			}
 			log.indexManagerAliasResolved( indexManagerImplementationName, indexManager.getClass() );
 			return indexManager;
 		}
+	}
+
+	@Override
+	public void start(Properties properties, BuildContext context) {
+		this.serviceManager = context.getServiceManager();
 	}
 
 	/**

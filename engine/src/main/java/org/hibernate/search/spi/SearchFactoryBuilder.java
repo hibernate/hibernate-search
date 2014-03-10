@@ -42,9 +42,6 @@ import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
-import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
@@ -60,11 +57,13 @@ import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
+import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -88,6 +87,7 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.spi.internals.SearchFactoryState;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -158,9 +158,16 @@ public class SearchFactoryBuilder {
 		final Properties configurationProperties = factoryState.getConfigurationProperties();
 		BuildContext buildContext = new BuildContext();
 
-		IncrementalSearchConfiguration searchConfiguration = new IncrementalSearchConfiguration( classes, configurationProperties, factoryState );
+		IncrementalSearchConfiguration searchConfiguration = new IncrementalSearchConfiguration(
+				classes,
+				configurationProperties,
+				factoryState
+		);
 
-		applySearchMappingToMetadata( searchConfiguration.getReflectionManager(), searchConfiguration.getProgrammaticMapping() );
+		applySearchMappingToMetadata(
+				searchConfiguration.getReflectionManager(),
+				searchConfiguration.getProgrammaticMapping()
+		);
 
 		//FIXME The current initDocumentBuilders
 		initDocumentBuilders( searchConfiguration, buildContext, searchConfiguration.getProgrammaticMapping() );
@@ -229,9 +236,12 @@ public class SearchFactoryBuilder {
 			builder.postInitialize( indexedClasses );
 		}
 
-		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor( documentBuildersIndexedEntities, cfg.getProperties() );
+		QueueingProcessor queueingProcessor = new BatchedQueueingProcessor(
+				documentBuildersIndexedEntities,
+				cfg.getProperties()
+		);
 		// build worker and back end components
-		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor) );
+		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor ) );
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg ) );
 		factoryState.setCacheBitResultsSize(
 				ConfigurationParseHelper.getIntValue(
@@ -267,12 +277,14 @@ public class SearchFactoryBuilder {
 
 	private FilterCachingStrategy buildFilterCachingStrategy(SearchConfiguration searchConfiguration) {
 		FilterCachingStrategy filterCachingStrategy;
-		String filterCachingStrategyName = searchConfiguration.getProperties().getProperty( Environment.FILTER_CACHING_STRATEGY );
+		String filterCachingStrategyName = searchConfiguration.getProperties()
+				.getProperty( Environment.FILTER_CACHING_STRATEGY );
 		if ( StringHelper.isEmpty( filterCachingStrategyName ) || "mru".equalsIgnoreCase( filterCachingStrategyName ) ) {
 			filterCachingStrategy = new MRUFilterCachingStrategy();
 		}
 		else {
-			Class<?> filterCachingStrategyClass = searchConfiguration.getClassLoaderService().classForName( filterCachingStrategyName );
+			Class<?> filterCachingStrategyClass = searchConfiguration.getClassLoaderService()
+					.classForName( filterCachingStrategyName );
 			filterCachingStrategy = ClassLoaderHelper.instanceFromClass(
 					FilterCachingStrategy.class,
 					filterCachingStrategyClass,
@@ -292,7 +304,13 @@ public class SearchFactoryBuilder {
 			factoryState.setFilterDefinitions( new ConcurrentHashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
-			factoryState.setServiceManager( new StandardServiceManager( cfg, buildContext ) );
+			factoryState.setServiceManager(
+					new StandardServiceManager(
+							cfg,
+							buildContext,
+							Environment.DEFAULT_SERVICES_MAP
+					)
+			);
 			factoryState.setAllIndexesManager( new IndexManagerHolder() );
 			factoryState.setErrorHandler( createErrorHandler( cfg ) );
 			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
@@ -300,7 +318,6 @@ public class SearchFactoryBuilder {
 			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );
 			factoryState.setTransactionManagerExpected( cfg.isTransactionManagerExpected() );
 			factoryState.setIdProvidedImplicit( cfg.isIdProvidedImplicit() );
-			factoryState.setIndexManagerFactory( cfg.getIndexManagerFactory() );
 		}
 	}
 
@@ -317,7 +334,10 @@ public class SearchFactoryBuilder {
 		final Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
 		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
-		final Map<XClass, Class<?>> classMappings = initializeClassMappings( searchConfiguration, searchConfiguration.getReflectionManager() );
+		final Map<XClass, Class<?>> classMappings = initializeClassMappings(
+				searchConfiguration,
+				searchConfiguration.getReflectionManager()
+		);
 
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
 		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
@@ -343,7 +363,11 @@ public class SearchFactoryBuilder {
 
 				TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( mappedClass );
 				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
-						mappedXClass, typeMetadata, searchConfiguration.getReflectionManager(), optimizationBlackListedTypes, searchConfiguration.getInstanceInitializer()
+						mappedXClass,
+						typeMetadata,
+						searchConfiguration.getReflectionManager(),
+						optimizationBlackListedTypes,
+						searchConfiguration.getInstanceInitializer()
 				);
 				//TODO enhance that, I don't like to expose EntityState
 				if ( documentBuilder.getEntityState() != EntityState.NON_INDEXABLE ) {
@@ -359,7 +383,12 @@ public class SearchFactoryBuilder {
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
 			Class mappedClass = classMappings.get( mappedXClass );
-			MutableEntityIndexBinding entityIndexBinding = indexesFactory.buildEntityIndexBinding( mappedXClass, mappedClass, searchConfiguration, buildContext );
+			MutableEntityIndexBinding entityIndexBinding = indexesFactory.buildEntityIndexBinding(
+					mappedXClass,
+					mappedClass,
+					searchConfiguration,
+					buildContext
+			);
 
 			// interceptor might use non indexed state
 			if ( entityIndexBinding.getEntityIndexingInterceptor() != null ) {
@@ -384,7 +413,12 @@ public class SearchFactoryBuilder {
 			documentBuildersIndexedEntities.put( mappedClass, entityIndexBinding );
 		}
 
-		disableBlackListedTypesOptimization( classMappings, optimizationBlackListedTypes, documentBuildersIndexedEntities, documentBuildersContainedEntities );
+		disableBlackListedTypesOptimization(
+				classMappings,
+				optimizationBlackListedTypes,
+				documentBuildersIndexedEntities,
+				documentBuildersContainedEntities
+		);
 		factoryState.setAnalyzers( configContext.initLazyAnalyzers() );
 	}
 
@@ -406,7 +440,9 @@ public class SearchFactoryBuilder {
 					log.tracef( "Dirty checking optimizations disabled for class %s", type );
 					entityIndexBinding.getDocumentBuilder().forceStateInspectionOptimizationsDisabled();
 				}
-				DocumentBuilderContainedEntity<?> documentBuilderContainedEntity = documentBuildersContainedEntities.get( type );
+				DocumentBuilderContainedEntity<?> documentBuilderContainedEntity = documentBuildersContainedEntities.get(
+						type
+				);
 				if ( documentBuilderContainedEntity != null ) {
 					log.tracef( "Dirty checking optimizations disabled for class %s", type );
 					documentBuilderContainedEntity.forceStateInspectionOptimizationsDisabled();
@@ -563,7 +599,8 @@ public class SearchFactoryBuilder {
 			return new LogErrorHandler();
 		}
 		else {
-			Class<?> errorHandlerClass = searchConfiguration.getClassLoaderService().classForName( errorHandlerClassName );
+			Class<?> errorHandlerClass = searchConfiguration.getClassLoaderService()
+					.classForName( errorHandlerClassName );
 			return ClassLoaderHelper.instanceFromClass(
 					ErrorHandler.class,
 					errorHandlerClass,

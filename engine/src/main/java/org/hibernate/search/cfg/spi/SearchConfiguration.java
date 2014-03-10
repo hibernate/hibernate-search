@@ -133,13 +133,6 @@ public interface SearchConfiguration {
 	boolean isIdProvidedImplicit();
 
 	/**
-	 * @return the component responsible to create IndexManager instances; this might be a custom
-	 * component to allow for different default implementations, custom aliases, different
-	 * classloaders.
-	 */
-	IndexManagerFactory getIndexManagerFactory();
-
-	/**
 	 * @return Returns a classloader service for this configuration of Search. Access to the service is via the
 	 * {@link org.hibernate.search.engine.service.spi.ServiceManager}
 	 */
