@@ -56,6 +56,8 @@ public class StandardServiceManager implements ServiceManager {
 	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices = new ConcurrentHashMap<Class<?>, ServiceWrapper<?>>();
 	private final Map<Class<? extends Service>, Object> providedServices;
 
+	private volatile boolean allServicesReleased = false;
+
 	public StandardServiceManager(SearchConfiguration searchConfiguration, BuildContext buildContext) {
 		this.buildContext = buildContext;
 		this.properties = searchConfiguration.getProperties();
@@ -67,6 +69,10 @@ public class StandardServiceManager implements ServiceManager {
 	public <S extends Service> S requestService(Class<S> serviceRole) {
 		if ( serviceRole == null ) {
 			throw new IllegalArgumentException( "'null' is not a valid service role" );
+		}
+
+		if ( allServicesReleased ) {
+			throw log.serviceRequestedAfterReleasedAllWasCalled();
 		}
 
 		// provided services have priority over managed services
@@ -103,11 +109,31 @@ public class StandardServiceManager implements ServiceManager {
 		for ( ServiceWrapper wrapper : cachedServices.values() ) {
 			wrapper.ensureStopped();
 		}
+		allServicesReleased = true;
 	}
 
 	private Map<Class<? extends Service>, Object> createProvidedServices(SearchConfiguration searchConfiguration) {
 		Map<Class<? extends Service>, Object> tmpServices = new HashMap<Class<? extends Service>, Object>();
-		tmpServices.putAll( searchConfiguration.getProvidedServices() );
+
+		for ( Map.Entry<Class<? extends Service>, Object> entry : searchConfiguration.getProvidedServices()
+				.entrySet() ) {
+			Object service = entry.getValue();
+			if ( service instanceof Startable ) {
+				throw log.providedServicesCannotImplementStartableOrStoppable(
+						service.getClass().getName(),
+						Startable.class.getName()
+				);
+			}
+			else if ( service instanceof Stoppable ) {
+				throw log.providedServicesCannotImplementStartableOrStoppable(
+						service.getClass().getName(),
+						Stoppable.class.getName()
+				);
+			}
+			else {
+				tmpServices.put( entry.getKey(), entry.getValue() );
+			}
+		}
 
 		if ( tmpServices.containsKey( ClassLoaderService.class ) ) {
 			throw log.classLoaderServiceContainedInProvidedServicesException();

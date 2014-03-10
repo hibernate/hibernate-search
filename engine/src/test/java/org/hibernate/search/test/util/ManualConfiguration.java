@@ -122,6 +122,10 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 		return providedServices;
 	}
 
+	public void addProvidedService(Class<? extends Service> serviceRole, Object service) {
+		providedServices.put( serviceRole, service );
+	}
+
 	@Override
 	public boolean isTransactionManagerExpected() {
 		return this.transactionsExpected;

@@ -34,10 +34,11 @@ import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
- * Provides configuration to Hibernate Search
+ * Provides configuration to Hibernate Search. This is the entry point for bootstrapping Search.
  *
  * @author Navin Surtani  - navin@surtani.org
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public interface SearchConfiguration {
 	/**
@@ -94,6 +95,10 @@ public interface SearchConfiguration {
 	 *
 	 * These services are passed untouched by Hibernate Search. Provided services have priority
 	 * over managed services (ie the ones using the service locator pattern).
+	 * <p>
+	 * Provided services are also not allowed to implement {@link org.hibernate.search.engine.service.spi.Startable} or
+	 * {@link org.hibernate.search.engine.service.spi.Stoppable}. An exception is thrown in this case.
+	 * </p>
 	 *
 	 * @return a map of service roles to service instances
 	 */
