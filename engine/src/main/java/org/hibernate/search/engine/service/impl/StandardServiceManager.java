@@ -24,22 +24,21 @@
 package org.hibernate.search.engine.service.impl;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.impl.AggregatedClassLoader;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -55,20 +54,23 @@ public class StandardServiceManager implements ServiceManager {
 
 	private final Properties properties;
 	private final BuildContext buildContext;
-	private AggregatedClassLoader aggregatedClassLoader;
-
 	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices = new ConcurrentHashMap<Class<?>, ServiceWrapper<?>>();
 	private final Map<Class<? extends Service>, Object> providedServices;
+	private final Map<Class<? extends Service>, String> defaultServices;
 
-	public StandardServiceManager(SearchConfiguration cfg, BuildContext buildContext) {
-		this.properties = cfg.getProperties();
-		this.providedServices = Collections.unmodifiableMap( cfg.getProvidedServices() );
+	private volatile boolean allServicesReleased = false;
+
+	public StandardServiceManager(SearchConfiguration searchConfiguration, BuildContext buildContext) {
+		this( searchConfiguration, buildContext, Collections.<Class<? extends Service>, String>emptyMap() );
+	}
+
+	public StandardServiceManager(SearchConfiguration searchConfiguration,
+			BuildContext buildContext,
+			Map<Class<? extends Service>, String> defaultServices) {
 		this.buildContext = buildContext;
-
-		this.aggregatedClassLoader = new AggregatedClassLoader(
-				Thread.currentThread().getContextClassLoader(),
-				this.getClass().getClassLoader()
-		);
+		this.properties = searchConfiguration.getProperties();
+		this.providedServices = createProvidedServices( searchConfiguration );
+		this.defaultServices = defaultServices;
 	}
 
 	@Override
@@ -76,6 +78,10 @@ public class StandardServiceManager implements ServiceManager {
 	public <S extends Service> S requestService(Class<S> serviceRole) {
 		if ( serviceRole == null ) {
 			throw new IllegalArgumentException( "'null' is not a valid service role" );
+		}
+
+		if ( allServicesReleased ) {
+			throw log.serviceRequestedAfterReleasedAllWasCalled();
 		}
 
 		// provided services have priority over managed services
@@ -97,8 +103,7 @@ public class StandardServiceManager implements ServiceManager {
 			throw new IllegalArgumentException( "'null' is not a valid service role" );
 		}
 
-		//provided services have priority over managed services
-		if ( providedServices.containsKey( providedServices ) ) {
+		if ( providedServices.containsKey( serviceRole ) ) {
 			return;
 		}
 
@@ -113,24 +118,48 @@ public class StandardServiceManager implements ServiceManager {
 		for ( ServiceWrapper wrapper : cachedServices.values() ) {
 			wrapper.ensureStopped();
 		}
+		allServicesReleased = true;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <S extends Service> Set<S> loadJavaServices(Class<S> serviceContract) {
-		ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
-		final HashSet<S> services = new LinkedHashSet<S>();
-		for ( S service : serviceLoader ) {
-			services.add( service );
+	private Map<Class<? extends Service>, Object> createProvidedServices(SearchConfiguration searchConfiguration) {
+		Map<Class<? extends Service>, Object> tmpServices = new HashMap<Class<? extends Service>, Object>();
+
+		for ( Map.Entry<Class<? extends Service>, Object> entry : searchConfiguration.getProvidedServices()
+				.entrySet() ) {
+			Object service = entry.getValue();
+			if ( service instanceof Startable ) {
+				throw log.providedServicesCannotImplementStartableOrStoppable(
+						service.getClass().getName(),
+						Startable.class.getName()
+				);
+			}
+			else if ( service instanceof Stoppable ) {
+				throw log.providedServicesCannotImplementStartableOrStoppable(
+						service.getClass().getName(),
+						Stoppable.class.getName()
+				);
+			}
+			else {
+				tmpServices.put( entry.getKey(), entry.getValue() );
+			}
 		}
-		return services;
+
+		if ( tmpServices.containsKey( ClassLoaderService.class ) ) {
+			throw log.classLoaderServiceContainedInProvidedServicesException();
+		}
+		else {
+			tmpServices.put( ClassLoaderService.class, searchConfiguration.getClassLoaderService() );
+		}
+
+		return Collections.unmodifiableMap( tmpServices );
 	}
 
 	private <S extends Service> ServiceWrapper<S> createAndCacheWrapper(Class<S> serviceRole) {
 		ServiceWrapper<S> wrapper;
-		Set<S> services = loadJavaServices( serviceRole );
+		Set<S> services = requestService( ClassLoaderService.class ).loadJavaServices( serviceRole );
 
 		if ( services.size() == 0 ) {
-			throw log.getNoServiceImplementationFoundException( serviceRole.toString() );
+			tryLoadingDefaultService( serviceRole, services );
 		}
 		else if ( services.size() > 1 ) {
 			throw log.getMultipleServiceImplementationsException(
@@ -138,7 +167,8 @@ public class StandardServiceManager implements ServiceManager {
 					StringHelper.join( services, "," )
 			);
 		}
-		wrapper = new ServiceWrapper<S>( services.iterator().next(), serviceRole, buildContext );
+		S service = services.iterator().next();
+		wrapper = new ServiceWrapper<S>( service, serviceRole, buildContext );
 		@SuppressWarnings("unchecked")
 		ServiceWrapper<S> previousWrapper = (ServiceWrapper<S>) cachedServices.putIfAbsent( serviceRole, wrapper );
 		if ( previousWrapper != null ) {
@@ -147,8 +177,23 @@ public class StandardServiceManager implements ServiceManager {
 		return wrapper;
 	}
 
-	private class ServiceWrapper<S> {
+	private <S extends Service> void tryLoadingDefaultService(Class<S> serviceRole, Set<S> services) {
+		// there is no loadable service. Check whether we have a default one we can instantiate
+		if ( defaultServices.containsKey( serviceRole ) ) {
+			S service = ClassLoaderHelper.instanceFromName(
+					serviceRole,
+					defaultServices.get( serviceRole ),
+					"default service",
+					this
+			);
+			services.add( service );
+		}
+		else {
+			throw log.getNoServiceImplementationFoundException( serviceRole.toString() );
+		}
+	}
 
+	private class ServiceWrapper<S> {
 		private final S service;
 		private final BuildContext context;
 		private final Class<S> serviceClass;

@@ -28,10 +28,11 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 
 /**
- * IFF this class compiles we're good. The idea is that implementors
+ * If this class compiles we're good. The idea is that implementors
  * of the SearchConfiguration SPI are all currently aware of the
  * methods listed here today. If we add new methods to the SPI,
  * we need to make sure we add appropriate default implementations
@@ -41,7 +42,7 @@ import org.hibernate.search.engine.service.spi.Service;
  * after updates in the SearchConfiguration, be careful.
  *
  * The current list of methods are SPI compatible with Hibernate
- * Search version 4.1.0.
+ * Search version 5.0.0.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
@@ -81,6 +82,11 @@ public class SearchConfigurationContractTester extends SearchConfigurationBase i
 
 	@Override
 	public Map<Class<? extends Service>, Object> getProvidedServices() {
+		return null;
+	}
+
+	@Override
+	public ClassLoaderService getClassLoaderService() {
 		return null;
 	}
 

@@ -707,4 +707,13 @@ public interface Log extends BasicLogger {
 	@Message(id = 207, value = "Field %s of entity %s cannot be used in a MoreLikeThis query")
 	SearchException fieldCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
 
+	@Message(id = 208, value = "ClassLoaderService cannot be provided via SearchConfiguration#getProvidedServices. Use SearchConfiguration#getClassLoaderService!")
+	SearchException classLoaderServiceContainedInProvidedServicesException();
+
+	@Message(id = 209, value = "It is not allowed to request further services after ServiceManager#releaseAll has been called.")
+	IllegalStateException serviceRequestedAfterReleasedAllWasCalled();
+
+	@Message(id = 210, value = "Provided service '%s' implements '%s'. Provided services are not allowed to implement either Startable or Stoppable.")
+	SearchException providedServicesCannotImplementStartableOrStoppable(String service, String implementedInterface);
+
 }

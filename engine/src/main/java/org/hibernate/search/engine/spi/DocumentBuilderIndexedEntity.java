@@ -58,7 +58,6 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
-import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
@@ -149,7 +148,11 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 			ReflectionManager reflectionManager, Set<XClass> optimizationBlackList, InstanceInitializer instanceInitializer) {
 		super( clazz, typeMetadata, reflectionManager, optimizationBlackList, instanceInitializer );
 
-		idPropertyMetadata = providedIdMetadata( clazz, context, reflectionManager );
+		ProvidedId providedIdAnnotation = findProvidedId( clazz, reflectionManager );
+		if ( providedIdAnnotation != null || context.isProvidedIdImplicit() ) {
+			idProvided = true;
+		}
+
 		if ( idPropertyMetadata == null ) {
 			idPropertyMetadata = getTypeMetadata().getIdPropertyMetadata();
 		}
@@ -186,42 +189,6 @@ public class DocumentBuilderIndexedEntity<T> extends AbstractDocumentBuilder<T> 
 		}
 		this.entityState = EntityState.INDEXED;
 		this.identifierName = idProvided ? null : idPropertyMetadata.getPropertyAccessor().getName();
-	}
-
-	private PropertyMetadata providedIdMetadata(XClass clazz, ConfigContext context, ReflectionManager reflectionManager) {
-		PropertyMetadata propertyMetadata = null;
-
-		FieldBridge providedIdFieldBridge = null;
-		String providedIdFieldName = null;
-		ProvidedId provided = findProvidedId( clazz, reflectionManager );
-		if ( provided != null ) {
-			providedIdFieldBridge = BridgeFactory.extractTwoWayType( provided.bridge(), clazz, reflectionManager );
-			providedIdFieldName = provided.name();
-			idProvided = true;
-		}
-		else if ( context.isProvidedIdImplicit() ) {
-			providedIdFieldBridge = new TwoWayString2FieldBridgeAdaptor( org.hibernate.search.bridge.builtin.StringBridge.INSTANCE );
-			providedIdFieldName = ProvidedId.defaultFieldName;
-			idProvided = true;
-		}
-
-		if ( idProvided ) {
-			DocumentFieldMetadata fieldMetadata =
-					new DocumentFieldMetadata.Builder(
-							providedIdFieldName,
-							Store.YES,
-							Field.Index.NOT_ANALYZED_NO_NORMS,
-							Field.TermVector.NO
-					)
-							.fieldBridge( providedIdFieldBridge )
-							.boost( 1.0f )
-							.build();
-			propertyMetadata = new PropertyMetadata.Builder( null)
-					.addDocumentField( fieldMetadata )
-					.build();
-		}
-
-		return propertyMetadata;
 	}
 
 	private FieldCacheCollectorFactory figureIdFieldCacheUsage() {

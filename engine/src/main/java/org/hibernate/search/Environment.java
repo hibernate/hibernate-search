@@ -23,6 +23,13 @@
  */
 package org.hibernate.search;
 
+import java.util.Map;
+
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.impl.DefaultIndexManagerFactory;
+import org.hibernate.search.util.impl.CollectionHelper;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -223,6 +230,15 @@ public final class Environment {
 	 * Name of the JMS message property containing the index name to which to apply remote work.
 	 */
 	public static final String INDEX_NAME_JMS_PROPERTY = "HSearchIndexName";
+
+
+	public static final Map<Class<? extends Service>, String> DEFAULT_SERVICES_MAP;
+	// TODO for now we hard code the default services. This could/should be made configurable (HF)
+	static
+	{
+		DEFAULT_SERVICES_MAP = CollectionHelper.newHashMap( 1 );
+		DEFAULT_SERVICES_MAP.put( IndexManagerFactory.class, DefaultIndexManagerFactory.class.getName() );
+	}
 
 	private Environment() {
 	}

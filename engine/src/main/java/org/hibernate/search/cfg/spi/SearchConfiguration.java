@@ -29,14 +29,16 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.spi.InstanceInitializer;
 
 /**
- * Provides configuration to Hibernate Search
+ * Provides configuration to Hibernate Search. This is the entry point for bootstrapping Search.
  *
  * @author Navin Surtani  - navin@surtani.org
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 public interface SearchConfiguration {
 	/**
@@ -93,6 +95,10 @@ public interface SearchConfiguration {
 	 *
 	 * These services are passed untouched by Hibernate Search. Provided services have priority
 	 * over managed services (ie the ones using the service locator pattern).
+	 * <p>
+	 * Provided services are also not allowed to implement {@link org.hibernate.search.engine.service.spi.Startable} or
+	 * {@link org.hibernate.search.engine.service.spi.Stoppable}. An exception is thrown in this case.
+	 * </p>
 	 *
 	 * @return a map of service roles to service instances
 	 */
@@ -108,23 +114,27 @@ public interface SearchConfiguration {
 
 	/**
 	 * @return {@code true} if it is safe to assume that the information we have about
-	 *         index metadata is accurate. This should be set to false for example if the index
-	 *         could contain Documents related to types not known to this SearchFactory instance.
+	 * index metadata is accurate. This should be set to false for example if the index
+	 * could contain Documents related to types not known to this SearchFactory instance.
 	 */
 	boolean isIndexMetadataComplete();
 
+	/**
+	 * Returns the initializer to be used to initialize potentially lazy entities or collections.
+	 *
+	 * @return the initializer to be used to initialize potentially lazy entities or collections.
+	 */
 	InstanceInitializer getInstanceInitializer();
 
 	/**
 	 * @return {@code true} if we should treat indexed entities as implicitly annotated
-	 *         with a {@link org.hibernate.search.annotations.ProvidedId}, if no other Id is specified.
+	 * with a {@link org.hibernate.search.annotations.ProvidedId}, if no other Id is specified.
 	 */
 	boolean isIdProvidedImplicit();
 
 	/**
-	 * @return the component responsible to create IndexManager instances; this might be a custom
-	 *         component to allow for different default implementations, custom aliases, different
-	 *         classloaders.
+	 * @return Returns a classloader service for this configuration of Search. Access to the service is via the
+	 * {@link org.hibernate.search.engine.service.spi.ServiceManager}
 	 */
-	IndexManagerFactory getIndexManagerFactory();
+	ClassLoaderService getClassLoaderService();
 }

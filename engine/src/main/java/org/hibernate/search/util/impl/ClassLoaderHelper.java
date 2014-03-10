@@ -23,21 +23,17 @@
  */
 package org.hibernate.search.util.impl;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.util.Version;
-
 import org.hibernate.search.SearchException;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**
  * Utility class to load instances of other classes by using a fully qualified name,
@@ -55,86 +51,27 @@ public class ClassLoaderHelper {
 	}
 
 	/**
-	 * Load all resources matching a specific name
-	 *
-	 * @param resourceName the resource name
-	 * @param caller the caller
-	 * @return found resource URLs
-	 */
-	public static Enumeration<URL> getResources(String resourceName, Class<?> caller) {
-		if ( resourceName == null ) {
-			throw new SearchException( "Null resource name!" );
-		}
-		if ( caller == null ) {
-			throw new SearchException( "Null caller!" );
-		}
-
-		final Set<URL> urls = new HashSet<URL>();
-		getResources( resourceName, Thread.currentThread().getContextClassLoader(), urls );
-		getResources( resourceName, caller.getClassLoader(), urls );
-		return Collections.enumeration( urls );
-	}
-
-	private static void getResources(String resourceName, ClassLoader cl, Set<URL> urls) {
-		if ( cl == null ) {
-			return;
-		}
-
-		try {
-			Enumeration<URL> e = cl.getResources( resourceName );
-			urls.addAll( Collections.list( e ) );
-		}
-		catch (IOException ioe) {
-			throw new SearchException( "Unable to load resource " + resourceName, ioe );
-		}
-	}
-
-	/**
-	 * Creates an instance of a target class designed by fully qualified name
+	 * Creates an instance of a target class specified by the fully qualified class name using a {@link ClassLoader}
+	 * as fallback when the class cannot be found in the context one.
 	 *
 	 * @param <T> matches the type of targetSuperType: defines the return type
 	 * @param targetSuperType the return type of the function, the classNameToLoad will be checked
 	 * to be assignable to this type.
 	 * @param classNameToLoad a fully qualified class name, whose type is assignable to targetSuperType
-	 * @param caller the class of the caller, needed for classloading purposes
 	 * @param componentDescription a meaningful description of the role the instance will have,
 	 * used to enrich error messages to describe the context of the error
-	 * @return a new instance of classNameToLoad
+	 * @param serviceManager Service manager allowing access to the class loading service
+	 *
+	 * @return a new instance of the type given by {@code classNameToLoad}
+	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * classNotFound, missing proper constructor, wrong type, security errors.
-	 *
-	 * @deprecated Use {@link ClassLoaderHelper#instanceFromName(Class, String, ClassLoader, String)} instead
 	 */
-	@Deprecated
-	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad,
-										Class<?> caller, String componentDescription) {
-		return instanceFromName( targetSuperType, classNameToLoad, caller.getClassLoader(), componentDescription );
-	}
-
-	/**
-	 * Creates an instance of a target class specified by the fully qualified class name using a {@link ClassLoader}
-	 * as fallback when the class cannot be found in the context one.
-	 *
-	 * @param <T>
-	 *            matches the type of targetSuperType: defines the return type
-	 * @param targetSuperType
-	 *            the return type of the function, the classNameToLoad will be checked
-	 *            to be assignable to this type.
-	 * @param classNameToLoad
-	 *            a fully qualified class name, whose type is assignable to targetSuperType
-	 * @param fallbackClassLoader
-	 *            the ClassLoader used when the class cannot be found in the context one
-	 * @param componentDescription
-	 *            a meaningful description of the role the instance will have,
-	 *            used to enrich error messages to describe the context of the error
-	 * @return a new instance of classNameToLoad
-	 * @throws SearchException
-	 *             wrapping other error types with a proper error message for all kind of problems, like
-	 *             classNotFound, missing proper constructor, wrong type, security errors.
-	 */
-	public static <T> T instanceFromName(Class<T> targetSuperType, String classNameToLoad, ClassLoader fallbackClassLoader,
-			String componentDescription) {
-		final Class<?> clazzDef = classForName( classNameToLoad, fallbackClassLoader, componentDescription );
+	public static <T> T instanceFromName(Class<T> targetSuperType,
+			String classNameToLoad,
+			String componentDescription,
+			ServiceManager serviceManager) {
+		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, serviceManager );
 		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
 	}
 
@@ -145,7 +82,9 @@ public class ClassLoaderHelper {
 	 * @param targetSuperType the created instance will be checked to be assignable to this type
 	 * @param classToLoad the class to be instantiated
 	 * @param componentDescription a role name/description to contextualize error messages
+	 *
 	 * @return a new instance of classToLoad
+	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * missing proper constructor, wrong type, security errors.
 	 */
@@ -173,10 +112,12 @@ public class ClassLoaderHelper {
 
 	/**
 	 * Verifies that an object instance is implementing a specific interface, or extending a type.
+	 *
 	 * @param targetSuperType the type to extend, or the interface it should implement
 	 * @param instance the object instance to be verified
 	 * @param classToLoad the Class of the instance
 	 * @param componentDescription a user friendly description of the component represented by the verified instance
+	 *
 	 * @return the same instance
 	 */
 	@SuppressWarnings("unchecked")
@@ -210,7 +151,9 @@ public class ClassLoaderHelper {
 	 * @param classToLoad the class to be instantiated
 	 * @param componentDescription a role name/description to contextualize error messages
 	 * @param constructorParameter a Map to be passed to the constructor. The loaded type must have such a constructor.
+	 *
 	 * @return a new instance of classToLoad
+	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * missing proper constructor, wrong type, security errors.
 	 */
@@ -219,7 +162,7 @@ public class ClassLoaderHelper {
 		checkClassType( classToLoad, componentDescription );
 		Constructor<?> singleMapConstructor = getSingleMapConstructor( classToLoad, componentDescription );
 		if ( constructorParameter == null ) {
-			constructorParameter = new HashMap<String,String>( 0 );//can't use the emptyMap singleton as it needs to be mutable
+			constructorParameter = new HashMap<String, String>( 0 );//can't use the emptyMap singleton as it needs to be mutable
 		}
 		final Object instance;
 		try {
@@ -341,29 +284,37 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	public static Class<?> classForName(String classNameToLoad, ClassLoader classLoader, String componentDescription) {
-		Class<?> clazzDef;
+	public static Class<?> classForName(String classNameToLoad, String componentDescription, ServiceManager serviceManager) {
+		Class<?> clazz;
+		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 		try {
-			clazzDef = classForName( classNameToLoad, classLoader );
+			clazz = classLoaderService.classForName( classNameToLoad );
 		}
-		catch (ClassNotFoundException e) {
+		catch (ClassLoadingException e) {
 			throw new SearchException(
 					"Unable to find " + componentDescription +
 							" implementation class: " + classNameToLoad, e
 			);
 		}
-		return clazzDef;
+		finally {
+			serviceManager.releaseService( ClassLoaderService.class );
+		}
+		return clazz;
 	}
 
-	public static <T> Class<? extends T> classForName(Class<T> targetSuperType, String classNameToLoad, ClassLoader classLoader, String componentDescription) {
-		final Class<?> clazzDef = classForName( classNameToLoad, classLoader, componentDescription );
+	public static <T> Class<? extends T> classForName(Class<T> targetSuperType,
+			String classNameToLoad,
+			String componentDescription,
+			ServiceManager serviceManager) {
+		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, serviceManager );
 		try {
 			return clazzDef.asSubclass( targetSuperType );
 		}
 		catch (ClassCastException cce) {
 			throw new SearchException(
 					"Unable to load class for " + componentDescription + ". Configured implementation " + classNameToLoad +
-					" is not assignable to type " + targetSuperType );
+							" is not assignable to type " + targetSuperType
+			);
 		}
 	}
 
@@ -373,23 +324,21 @@ public class ClassLoaderHelper {
 	 * Here we first check the context classloader, if one, before delegating to
 	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
 	 *
-	 * @param name The class name
-	 * @param classLoader The classloader from which this call originated.
+	 * @param classNameToLoad The class name
+	 * @param serviceManager The service manager from which to retrieve the class loader service
 	 *
 	 * @return The class reference.
 	 *
-	 * @throws ClassNotFoundException From {@link Class#forName(String, boolean, ClassLoader)}.
+	 * @throws ClassLoadingException From {@link Class#forName(String, boolean, ClassLoader)}.
 	 */
-	public static Class classForName(String name, ClassLoader classLoader) throws ClassNotFoundException {
+	public static Class classForName(String classNameToLoad, ServiceManager serviceManager) {
+		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 		try {
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-			if ( contextClassLoader != null ) {
-				return contextClassLoader.loadClass( name );
-			}
+			return classLoaderService.classForName( classNameToLoad );
 		}
-		catch (Throwable ignore) {
-		}
-		return Class.forName( name, true, classLoader );
-	}
 
+		finally {
+			serviceManager.releaseService( ClassLoaderService.class );
+		}
+	}
 }

@@ -21,14 +21,16 @@
 package org.hibernate.search.test.engine.service;
 
 import org.hibernate.search.SearchException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.SearchFactoryHolder;
+import org.hibernate.search.test.util.TestForIssue;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.matchers.JUnitMatchers;
@@ -50,10 +52,17 @@ public class StandardServiceManagerTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private ServiceManager serviceManagerUnderTest = new StandardServiceManager(
-			new ManualConfiguration(),
-			new DummyBuildContext()
-	);
+	private ManualConfiguration manualConfiguration;
+	private ServiceManager serviceManagerUnderTest;
+
+	@Before
+	public void setUp() {
+		manualConfiguration = new ManualConfiguration();
+		serviceManagerUnderTest = new StandardServiceManager(
+				manualConfiguration,
+				new DummyBuildContext()
+		);
+	}
 
 	@Test
 	public void testUnavailableServiceThrowsException() {
@@ -118,18 +127,6 @@ public class StandardServiceManagerTest {
 	}
 
 	@Test
-	public void testReleaseAll() {
-		SimpleService simpleService1 = serviceManagerUnderTest.requestService( SimpleService.class );
-		assertNotNull( "The service should be created", simpleService1 );
-
-		serviceManagerUnderTest.releaseAllServices();
-
-		SimpleService simpleService2 = serviceManagerUnderTest.requestService( SimpleService.class );
-		assertNotNull( "The service should be created", simpleService2 );
-		assertTrue( "A new service instance should have been created", simpleService1 != simpleService2 );
-	}
-
-	@Test
 	public void providedServicesHavePrecedence() {
 		ManualConfiguration configuration = new ManualConfiguration();
 		configuration.getProvidedServices().put( SimpleService.class, new ProgrammaticallyConfiguredSimpleService() );
@@ -153,6 +150,47 @@ public class StandardServiceManagerTest {
 		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000198" ) );
 
 		serviceManagerUnderTest.requestService( FooService.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1547")
+	public void testRequestingServiceAfterReleaseAllThrowsException() {
+		SimpleService simpleService1 = serviceManagerUnderTest.requestService( SimpleService.class );
+		assertNotNull( "The service should be created", simpleService1 );
+
+		serviceManagerUnderTest.releaseAllServices();
+
+		thrown.expect( IllegalStateException.class );
+		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000209" ) );
+		serviceManagerUnderTest.requestService( SimpleService.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1547")
+	public void testProvidedServicesCannotImplementStartable() {
+		manualConfiguration = new ManualConfiguration();
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000210" ) );
+		manualConfiguration.addProvidedService( StartableProvidedService.class, new StartableProvidedServiceImpl() );
+		serviceManagerUnderTest = new StandardServiceManager(
+				manualConfiguration,
+				new DummyBuildContext()
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1547")
+	public void testProvidedServicesCannotImplementStoppable() {
+		manualConfiguration = new ManualConfiguration();
+
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( JUnitMatchers.containsString( "HSEARCH000210" ) );
+		manualConfiguration.addProvidedService( StoppableProvidedService.class, new StoppableProvidedServiceImpl() );
+		serviceManagerUnderTest = new StandardServiceManager(
+				manualConfiguration,
+				new DummyBuildContext()
+		);
 	}
 
 	// actual impl is not relevant for testing the service manager

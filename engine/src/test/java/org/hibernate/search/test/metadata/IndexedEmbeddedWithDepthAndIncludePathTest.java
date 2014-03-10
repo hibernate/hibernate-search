@@ -20,6 +20,8 @@
  */
 package org.hibernate.search.test.metadata;
 
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.test.util.TestBuildContext;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,7 +42,11 @@ public class IndexedEmbeddedWithDepthAndIncludePathTest {
 
 	@Before
 	public void setUp() {
-		ConfigContext configContext = new ConfigContext( new ManualConfiguration() );
+		SearchConfiguration searchConfiguration = new ManualConfiguration();
+		ConfigContext configContext = new ConfigContext(
+				searchConfiguration,
+				new TestBuildContext( searchConfiguration )
+		);
 		metadataProvider = new AnnotationMetadataProvider( new JavaReflectionManager(), configContext );
 	}
 

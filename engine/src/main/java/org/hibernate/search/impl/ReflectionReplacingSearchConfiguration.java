@@ -29,10 +29,10 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.spi.InstanceInitializer;
 
 /**
  * Wraps another SearchConfiguration to override it's ReflectionManager
@@ -43,7 +43,7 @@ import org.hibernate.search.engine.service.spi.Service;
 public final class ReflectionReplacingSearchConfiguration implements SearchConfiguration {
 
 	private final ReflectionManager reflectionManager;
-	private final SearchConfiguration cfg;
+	private final SearchConfiguration searchConfiguration;
 
 	/**
 	 * Create a new SearchConfiguration which returns the same values as the provided SearchConfiguration
@@ -51,31 +51,31 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 	 * defined ReflectionManager.
 	 *
 	 * @param reflectionManager the current reflection manager
-	 * @param cfg the search configuration
+	 * @param searchConfiguration the search configuration
 	 */
-	public ReflectionReplacingSearchConfiguration(ReflectionManager reflectionManager, SearchConfiguration cfg) {
+	public ReflectionReplacingSearchConfiguration(ReflectionManager reflectionManager, SearchConfiguration searchConfiguration) {
 		this.reflectionManager = reflectionManager;
-		this.cfg = cfg;
+		this.searchConfiguration = searchConfiguration;
 	}
 
 	@Override
 	public Iterator<Class<?>> getClassMappings() {
-		return cfg.getClassMappings();
+		return searchConfiguration.getClassMappings();
 	}
 
 	@Override
 	public Class<?> getClassMapping(String name) {
-		return cfg.getClassMapping( name );
+		return searchConfiguration.getClassMapping( name );
 	}
 
 	@Override
 	public String getProperty(String propertyName) {
-		return cfg.getProperty( propertyName );
+		return searchConfiguration.getProperty( propertyName );
 	}
 
 	@Override
 	public Properties getProperties() {
-		return cfg.getProperties();
+		return searchConfiguration.getProperties();
 	}
 
 	@Override
@@ -85,37 +85,36 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 
 	@Override
 	public SearchMapping getProgrammaticMapping() {
-		return cfg.getProgrammaticMapping();
+		return searchConfiguration.getProgrammaticMapping();
 	}
 
 	@Override
 	public Map<Class<? extends Service>, Object> getProvidedServices() {
-		return cfg.getProvidedServices();
+		return searchConfiguration.getProvidedServices();
 	}
 
 	@Override
 	public boolean isTransactionManagerExpected() {
-		return cfg.isTransactionManagerExpected();
+		return searchConfiguration.isTransactionManagerExpected();
 	}
 
 	@Override
 	public InstanceInitializer getInstanceInitializer() {
-		return cfg.getInstanceInitializer();
+		return searchConfiguration.getInstanceInitializer();
 	}
 
 	@Override
 	public boolean isIndexMetadataComplete() {
-		return cfg.isIndexMetadataComplete();
+		return searchConfiguration.isIndexMetadataComplete();
 	}
 
 	@Override
 	public boolean isIdProvidedImplicit() {
-		return cfg.isIdProvidedImplicit();
+		return searchConfiguration.isIdProvidedImplicit();
 	}
 
 	@Override
-	public IndexManagerFactory getIndexManagerFactory() {
-		return cfg.getIndexManagerFactory();
+	public ClassLoaderService getClassLoaderService() {
+		return searchConfiguration.getClassLoaderService();
 	}
-
 }

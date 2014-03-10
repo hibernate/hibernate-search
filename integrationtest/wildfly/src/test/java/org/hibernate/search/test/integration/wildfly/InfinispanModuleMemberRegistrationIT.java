@@ -20,15 +20,10 @@
  */
 package org.hibernate.search.test.integration.wildfly;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
-
 import javax.inject.Inject;
 
+import org.hibernate.search.Version;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
@@ -42,12 +37,17 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
+import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
- * Test the Hibernate Search module in JBoss AS
- * combined with an Infinispan Directory usage.
+ * Test the Hibernate Search module in Wildfly combined with an Infinispan Directory usage.
  *
  * @author Sanne Grinovero
  */
@@ -56,30 +56,52 @@ public class InfinispanModuleMemberRegistrationIT {
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		WebArchive archive = ShrinkWrap
-				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
+		return ShrinkWrap
+				.create( WebArchive.class, InfinispanModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "local-infinispan.xml", "local-infinispan.xml" )
-				.add( ModuleMemberRegistrationIT.manifest(), "META-INF/MANIFEST.MF" )
+				.add( manifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
-		return archive;
 	}
 
 	private static Asset persistenceXml() {
 		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
-			.version( "2.0" )
-			.createPersistenceUnit()
+				.version( "2.0" )
+				.createPersistenceUnit()
 				.name( "primary" )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
-					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
-					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
-					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "infinispan" ).up()
-					.createProperty().name( "hibernate.search.infinispan.configuration_resourcename" ).value( "local-infinispan.xml" ).up()
-				.up().up()
-			.exportAsString();
+				.createProperty()
+				.name( "hibernate.hbm2ddl.auto" )
+				.value( "create-drop" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.lucene_version" )
+				.value( "LUCENE_CURRENT" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.directory_provider" )
+				.value( "infinispan" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.infinispan.configuration_resourcename" )
+				.value( "local-infinispan.xml" )
+				.up()
+				.up()
+				.up()
+				.exportAsString();
 		return new StringAsset( persistenceXml );
+	}
+
+	public static Asset manifest() {
+		final String currentVersion = Version.getVersionString();
+		// here is where we tell Wildfly which Search module to use
+		String dependencyDef = "org.hibernate.search.orm:" + currentVersion + " services";
+		String manifest = Descriptors.create( ManifestDescriptor.class )
+				.attribute( "Dependencies", dependencyDef )
+				.exportAsString();
+		return new StringAsset( manifest );
 	}
 
 	@Inject
@@ -111,7 +133,7 @@ public class InfinispanModuleMemberRegistrationIT {
 	}
 
 	@Test
-	public void testUnexistingMember() throws Exception {
+	public void testNonExistingMember() throws Exception {
 		List<Member> search = memberRegistration.search( "TotallyInventedName" );
 
 		assertNotNull( "Search should never return null", search );

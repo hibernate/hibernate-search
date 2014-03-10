@@ -42,7 +42,6 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.ManualTransactionContext;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -140,7 +139,8 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	@Indexed
 	@ClassBridge(impl = AppliedOnTypeAwareBridgeTest.TypeAssertingFieldBridge.class,
-			params = @Parameter(name = "type", value = "org.hibernate.search.test.bridge.AppliedOnTypeAwareBridgeTest$Snafu"))
+			params = @Parameter(name = "type",
+					value = "org.hibernate.search.test.bridge.AppliedOnTypeAwareBridgeTest$Snafu"))
 	public static class Snafu {
 		@DocumentId
 		private Long id;
@@ -155,28 +155,23 @@ public class AppliedOnTypeAwareBridgeTest {
 	}
 
 	public static class TypeAssertingFieldBridge implements FieldBridge, AppliedOnTypeAwareBridge, ParameterizedBridge {
-		private Class<?> expectedType;
-		private Class<?> actualType;
+		private String expectedTypeName;
+		private String actualTypeName;
 
 		@Override
 		public void setAppliedOnType(Class<?> returnType) {
-			actualType = returnType;
+			actualTypeName = returnType.getName();
 		}
 
 		@Override
 		public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-			assertTrue( "Type not set prior to calling #set of field bridge", actualType != null );
-			assertEquals( "Unexpected type", expectedType, actualType );
+			assertTrue( "Type not set prior to calling #set of field bridge", actualTypeName != null );
+			assertEquals( "Unexpected type", expectedTypeName, actualTypeName );
 		}
 
 		@Override
 		public void setParameterValues(Map<String, String> parameters) {
-			String expectedTypeName = parameters.get( "type" );
-			expectedType = ClassLoaderHelper.classForName(
-					expectedTypeName,
-					this.getClass().getClassLoader(),
-					"Unable to load type"
-			);
+			expectedTypeName = parameters.get( "type" );
 		}
 	}
 }

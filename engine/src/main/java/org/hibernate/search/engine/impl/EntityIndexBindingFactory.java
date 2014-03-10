@@ -21,7 +21,6 @@
 package org.hibernate.search.engine.impl;
 
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -58,8 +57,7 @@ public final class EntityIndexBindingFactory {
 																			Properties properties,
 																			String rootDirectoryProviderName,
 																			WorkerBuildContext context,
-																			IndexManagerHolder indexManagerHolder,
-																			IndexManagerFactory indexManagerFactory) {
+																			IndexManagerHolder indexManagerHolder) {
 		if ( !isDynamicSharding && providers.length == 0 ) {
 			throw log.entityWithNoShard( type );
 		}
@@ -69,7 +67,6 @@ public final class EntityIndexBindingFactory {
 					similarity,
 					safeInterceptor,
 					properties,
-					indexManagerFactory,
 					context.getUninitializedSearchFactory(),
 					indexManagerHolder,
 					rootDirectoryProviderName );

@@ -34,6 +34,7 @@ import org.hibernate.Transaction;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
+import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -45,6 +46,7 @@ import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.test.util.TestBuildContext;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -98,10 +100,13 @@ public class AnalyzerTest extends SearchTestCase {
 	}
 
 	public void testMultipleAnalyzerDiscriminatorDefinitions() {
-		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore( getCfg() );
+		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore(
+				getCfg(),
+				new ClassLoaderServiceImpl() // ORM internal class. Should be ok for testing (HF)
+		);
 		ReflectionManager reflectionManager = searchConfig.getReflectionManager();
 		XClass xclass = reflectionManager.toXClass( BlogEntry.class );
-		ConfigContext context = new ConfigContext( searchConfig );
+		ConfigContext context = new ConfigContext( searchConfig, new TestBuildContext( searchConfig ) );
 		MetadataProvider metadataProvider = new AnnotationMetadataProvider(
 				searchConfig.getReflectionManager(),
 				context

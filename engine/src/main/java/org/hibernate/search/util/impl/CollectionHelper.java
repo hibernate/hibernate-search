@@ -50,6 +50,10 @@ public final class CollectionHelper {
 		return new HashMap<K, V>();
 	}
 
+	public static <K, V> HashMap<K, V> newHashMap(int size) {
+		return new HashMap<K, V>( size );
+	}
+
 	public static <K, V> SortedMap<K, V> newSortedMap() {
 		return new TreeMap<K, V>();
 	}

@@ -27,6 +27,7 @@ import java.util.Set;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -34,7 +35,7 @@ import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
 /**
- * Interface which gives access to the metadata. Intended to be used by Search components.
+ * Interface which gives access to runtime configuration. Intended to be used by Search components.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -45,7 +46,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * Returns a map of all known entity index binding (indexed entities) keyed against the indexed type
 	 *
 	 * @return a map of all known entity index binding (indexed entities) keyed against the indexed type. The empty
-	 *         map is returned if there are no indexed types.
+	 * map is returned if there are no indexed types.
 	 */
 	Map<Class<?>, EntityIndexBinding> getIndexBindings();
 
@@ -80,7 +81,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 
 	/**
 	 * @return {@code true} if we are allowed to inspect entity state to skip some indexing operations.
-	 *         Can be disabled to get pre-3.4 behavior which always rebuilds the document.
+	 * Can be disabled to get pre-3.4 behavior which always rebuilds the document.
 	 */
 	boolean isDirtyChecksEnabled();
 
@@ -108,4 +109,11 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * @return the configuration properties for this factory
 	 */
 	Properties getConfigurationProperties();
+
+	/**
+	 * Returns the service manager.
+	 *
+	 * @return Returns the service manager.
+	 */
+	ServiceManager getServiceManager();
 }

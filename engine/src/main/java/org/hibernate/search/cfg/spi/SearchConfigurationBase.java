@@ -20,10 +20,8 @@
  */
 package org.hibernate.search.cfg.spi;
 
-import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
-
 
 /**
  * Suggested base class to create custom SearchConfiguration implementations.
@@ -36,7 +34,10 @@ import org.hibernate.search.spi.InstanceInitializer;
 public abstract class SearchConfigurationBase implements SearchConfiguration {
 
 	/**
-	 * Safest to default to true.
+	 * {@inheritDoc}
+	 * <p>
+	 * In most cases it is safest to default to {@code true}.
+	 * </p>
 	 */
 	@Override
 	public boolean isTransactionManagerExpected() {
@@ -44,7 +45,10 @@ public abstract class SearchConfigurationBase implements SearchConfiguration {
 	}
 
 	/**
-	 * Safest to default to false.
+	 * {@inheritDoc}
+	 * <p>
+	 * In most cases it is safest to default to {@code false}.
+	 * </p>
 	 */
 	@Override
 	public boolean isIndexMetadataComplete() {
@@ -60,10 +64,4 @@ public abstract class SearchConfigurationBase implements SearchConfiguration {
 	public boolean isIdProvidedImplicit() {
 		return false;
 	}
-
-	@Override
-	public IndexManagerFactory getIndexManagerFactory() {
-		return new DefaultIndexManagerFactory();
-	}
-
 }

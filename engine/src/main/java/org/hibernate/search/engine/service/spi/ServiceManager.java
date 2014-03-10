@@ -24,12 +24,22 @@
 package org.hibernate.search.engine.service.spi;
 
 /**
- * The {@code ServiceManager} is used to manage uniqueness of services and runtime discovery of service implementations.
- * <p/>
- * Uniqueness is meant in the scope of the {@code SearchFactory}, as there is a single {@code ServiceManager} instance
- * per {@code SearchFactory}.
- * <p/>
+ * The {@code ServiceManager} is used to manage services in and runtime discovery of service implementations in the scope
+ * of a single {@code SearchFactory}.
+ * <p>
+ * Services are divided into discovered services (via {@link java.util.ServiceLoader} and provided services. The latter occurs
+ * via {@link org.hibernate.search.cfg.spi.SearchConfiguration#getProvidedServices()} and
+ * {@link org.hibernate.search.cfg.spi.SearchConfiguration#getClassLoaderService()}. Provided services are also treated
+ * special in the sense that they are not allowed to implemented {@link org.hibernate.search.engine.service.spi.Startable} or
+ * {@link org.hibernate.search.engine.service.spi.Stoppable} (an exception is thrown if they do so).
+ * It is the responsibility of the provider of these services to manage their life cycle. This also prevents circular
+ * dependencies where a service where a service during bootstrapping could request other (uninitialized) services via
+ * the {@link org.hibernate.search.engine.service.spi.Startable#start(java.util.Properties, org.hibernate.search.spi.BuildContext)}
+ * callback.
+ * </p>
+ * <p>
  * Any service requested should be released using {@link #releaseService(Class)} when it's not needed anymore.
+ * </p>
  *
  * @author Hardy Ferentschik
  */
@@ -43,6 +53,8 @@ public interface ServiceManager {
 	 * @return the single service fulfilling the specified role.
 	 *
 	 * @throws IllegalArgumentException in case the {@code serviceRole} is {@code null}
+	 * @throws org.hibernate.search.SearchException in case no service fulfilling the role could be located
+	 * @throws java.lang.IllegalStateException in case this method is called after {@link #releaseService(Class)}
 	 */
 	<S extends Service> S requestService(Class<S> serviceRole);
 
@@ -56,7 +68,8 @@ public interface ServiceManager {
 	<S extends Service> void releaseService(Class<S> serviceRole);
 
 	/**
-	 * Stops all services.
+	 * Stops and releases all services. After this method is called no further services can be requested. An
+	 * {@code IllegalStateException} will be thrown in this case.
 	 */
 	void releaseAllServices();
 }

@@ -24,25 +24,28 @@ import java.lang.reflect.Constructor;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * Factory to instantiate the correct Search backend or to be more concrete the {@link BackendQueueProcessor} implementation.
+ *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @author Hardy Ferentschik
  */
 public final class BackendFactory {
-
 	private static final Log log = LoggerFactory.make();
 
 	// TODO - Consider using service mechanism instead of reflection to instantiate backends
@@ -58,14 +61,15 @@ public final class BackendFactory {
 		//not allowed
 	}
 
-	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties properties) {
+	public static BackendQueueProcessor createBackend(DirectoryBasedIndexManager indexManager, WorkerBuildContext buildContext, Properties properties) {
 		String backend = properties.getProperty( Environment.WORKER_BACKEND );
-		return createBackend( backend, indexManager, context, properties );
+		return createBackend( backend, indexManager, buildContext, properties );
 	}
 
-	public static BackendQueueProcessor createBackend(String backend, DirectoryBasedIndexManager indexManager, WorkerBuildContext context,
+	public static BackendQueueProcessor createBackend(String backend,
+			DirectoryBasedIndexManager indexManager,
+			WorkerBuildContext buildContext,
 			Properties properties) {
-
 		final BackendQueueProcessor backendQueueProcessor;
 
 		if ( StringHelper.isEmpty( backend ) || "lucene".equalsIgnoreCase( backend ) ) {
@@ -75,24 +79,24 @@ public final class BackendFactory {
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
 					BackendQueueProcessor.class,
 					JMS_BACKEND_QUEUE_PROCESSOR,
-					BackendFactory.class.getClassLoader(),
-					"JMS backend "
+					"JMS backend ",
+					buildContext.getServiceManager()
 			);
 		}
 		else if ( "blackhole".equalsIgnoreCase( backend ) ) {
 			backendQueueProcessor = new BlackHoleBackendQueueProcessor();
 		}
 		else if ( "jgroupsMaster".equals( backend ) ) {
-			backendQueueProcessor = createJGroupsQueueProcessor( JGROUPS_MASTER_SELECTOR );
+			backendQueueProcessor = createJGroupsQueueProcessor( JGROUPS_MASTER_SELECTOR, buildContext );
 		}
 		else if ( "jgroupsSlave".equals( backend ) ) {
-			backendQueueProcessor = createJGroupsQueueProcessor( JGROUPS_SLAVE_SELECTOR );
+			backendQueueProcessor = createJGroupsQueueProcessor( JGROUPS_SLAVE_SELECTOR, buildContext );
 		}
 		else if ( "jgroups".equals( backend ) ) {
 			Class<?> selectorClass = ClassLoaderHelper.classForName(
 					JGROUPS_AUTO_SELECTOR,
-					BackendFactory.class.getClassLoader(),
-					"JGroups node selector "
+					"JGroups node selector ",
+					buildContext.getServiceManager()
 			);
 
 			final Constructor constructor;
@@ -104,17 +108,18 @@ public final class BackendFactory {
 			catch (Exception e) {
 				throw log.getUnableToCreateJGroupsBackendException( e );
 			}
-			backendQueueProcessor = createJGroupsQueueProcessor( autoNodeSelector );
+			backendQueueProcessor = createJGroupsQueueProcessor( autoNodeSelector, buildContext.getServiceManager() );
 		}
 		else {
+			ServiceManager serviceManager = buildContext.getServiceManager();
 			backendQueueProcessor = ClassLoaderHelper.instanceFromName(
 					BackendQueueProcessor.class,
 					backend,
-					BackendFactory.class.getClassLoader(),
-					"processor"
+					"processor",
+					serviceManager
 			);
 		}
-		backendQueueProcessor.initialize( properties, context, indexManager );
+		backendQueueProcessor.initialize( properties, buildContext, indexManager );
 		return backendQueueProcessor;
 	}
 
@@ -133,6 +138,7 @@ public final class BackendFactory {
 	 *
 	 * @param properties Might optionally contain configuration options for the ExecutorService
 	 * @param indexManagerName The indexManager going to be linked to this ExecutorService
+	 *
 	 * @return null if the work needs execution in sync
 	 */
 	public static ExecutorService buildWorkersExecutor(Properties properties, String indexManagerName) {
@@ -155,29 +161,30 @@ public final class BackendFactory {
 		return ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE );
 	}
 
-	private static BackendQueueProcessor createJGroupsQueueProcessor(String selectorClass) {
+	private static BackendQueueProcessor createJGroupsQueueProcessor(String selectorClass, BuildContext buildContext) {
+		ServiceManager serviceManager = buildContext.getServiceManager();
 		return createJGroupsQueueProcessor(
 				ClassLoaderHelper.instanceFromName(
 						Object.class,
 						selectorClass,
-						BackendFactory.class.getClassLoader(),
-						"JGroups node selector"
-				)
+						"JGroups node selector",
+						serviceManager
+				), serviceManager
 		);
 	}
 
-	private static BackendQueueProcessor createJGroupsQueueProcessor(Object selectorInstance) {
+	private static BackendQueueProcessor createJGroupsQueueProcessor(Object selectorInstance, ServiceManager serviceManager) {
 		BackendQueueProcessor backendQueueProcessor;
 		Class<?> processorClass = ClassLoaderHelper.classForName(
 				JGROUPS_BACKEND_QUEUE_PROCESSOR,
-				BackendFactory.class.getClassLoader(),
-				"JGroups backend "
+				"JGroups backend ",
+				serviceManager
 		);
 
 		Class<?> selectorClass = ClassLoaderHelper.classForName(
 				JGROUPS_SELECTOR_BASE_TYPE,
-				BackendFactory.class.getClassLoader(),
-				"JGroups node selector "
+				"JGroups node selector ",
+				serviceManager
 		);
 
 		Constructor constructor;

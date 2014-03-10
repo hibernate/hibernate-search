@@ -26,11 +26,12 @@ package org.hibernate.search.backend.impl;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
@@ -38,8 +39,34 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  */
 public abstract class WorkerFactory {
 
-	private static Properties getProperties(SearchConfiguration cfg) {
-		Properties props = cfg.getProperties();
+	public static Worker createWorker(SearchConfiguration searchConfiguration,
+			WorkerBuildContext buildContext,
+			QueueingProcessor queueingProcessor) {
+		Properties properties = getProperties( searchConfiguration );
+		String workerImplClassName = properties.getProperty( Environment.WORKER_SCOPE );
+		Worker worker;
+		if ( StringHelper.isEmpty( workerImplClassName ) || "transaction".equalsIgnoreCase( workerImplClassName ) ) {
+			worker = new TransactionalWorker();
+		}
+		else {
+			worker = instantiateExplicitlyConfiguredWorker( buildContext, workerImplClassName );
+		}
+		worker.initialize( properties, buildContext, queueingProcessor );
+		return worker;
+	}
+
+	private static Worker instantiateExplicitlyConfiguredWorker(WorkerBuildContext buildContext, String workerImplClassName) {
+		ServiceManager serviceManager = buildContext.getServiceManager();
+		return ClassLoaderHelper.instanceFromName(
+				Worker.class,
+				workerImplClassName,
+				"worker",
+				serviceManager
+		);
+	}
+
+	private static Properties getProperties(SearchConfiguration searchConfiguration) {
+		Properties props = searchConfiguration.getProperties();
 		Properties workerProperties = new Properties();
 		for ( Map.Entry entry : props.entrySet() ) {
 			String key = (String) entry.getKey();
@@ -48,19 +75,5 @@ public abstract class WorkerFactory {
 			}
 		}
 		return workerProperties;
-	}
-
-	public static Worker createWorker(SearchConfiguration cfg, WorkerBuildContext context, QueueingProcessor queueingProcessor) {
-		Properties props = getProperties( cfg );
-		String impl = props.getProperty( Environment.WORKER_SCOPE );
-		Worker worker;
-		if ( StringHelper.isEmpty( impl ) || "transaction".equalsIgnoreCase( impl ) ) {
-			worker = new TransactionalWorker();
-		}
-		else {
-			worker = ClassLoaderHelper.instanceFromName( Worker.class, impl, WorkerFactory.class, "worker" );
-		}
-		worker.initialize( props, context, queueingProcessor );
-		return worker;
 	}
 }

@@ -45,6 +45,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.Version;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
@@ -256,9 +257,9 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ClassLoaderHelper.classForName( entity, StatisticsImpl.class.getClassLoader() );
+			clazz = ClassLoaderHelper.classForName( entity, searchFactoryImplementor.getServiceManager() );
 		}
-		catch (ClassNotFoundException e) {
+		catch (ClassLoadingException e) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );
 		}
 		return clazz;

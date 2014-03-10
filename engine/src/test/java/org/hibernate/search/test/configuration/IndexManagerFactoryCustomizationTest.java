@@ -20,14 +20,21 @@
  */
 package org.hibernate.search.test.configuration;
 
+import java.io.InputStream;
 import java.lang.annotation.ElementType;
+import java.net.URL;
+import java.util.LinkedHashSet;
+import java.util.Map;
 
 import junit.framework.Assert;
-
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -36,10 +43,12 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.util.ManualConfiguration;
 import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.impl.CollectionHelper;
 import org.junit.Test;
 
 /**
- * Test to verify pluggability of an alternative IndexManagerFactory
+ * Test to verify pluggability of an alternative {@code IndexManagerFactory}
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
@@ -55,22 +64,21 @@ public class IndexManagerFactoryCustomizationTest {
 	@Test
 	public void testOverriddenDefaultImplementation() {
 		ManualConfiguration cfg = new ManualConfiguration();
-		cfg.setIndexManagerFactory( new DefaultIndexManagerFactory() {
-			@Override
-			public IndexManager createDefaultIndexManager() {
-				return new NRTIndexManager();
-			}
-		} );
+
+		Map<Class<? extends Service>, String> fakedDiscoveredServices = CollectionHelper.newHashMap( 1 );
+		fakedDiscoveredServices.put( IndexManagerFactory.class, NRTIndexManagerFactory.class.getName() );
+		cfg.setClassLoaderService( new CustomClassLoaderService( fakedDiscoveredServices ) );
+
 		verifyIndexManagerTypeIs( NRTIndexManager.class, cfg );
 	}
 
 	private void verifyIndexManagerTypeIs(Class<? extends IndexManager> expectedIndexManagerClass, ManualConfiguration cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
-			.entity( Document.class ).indexed().indexName( "documents" )
-			.property( "id", ElementType.FIELD ).documentId()
-			.property( "title", ElementType.FIELD ).field()
-			;
+				.entity( Document.class ).indexed().indexName( "documents" )
+				.property( "id", ElementType.FIELD ).documentId()
+				.property( "title", ElementType.FIELD ).field();
+
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.addClass( Document.class );
@@ -101,8 +109,55 @@ public class IndexManagerFactoryCustomizationTest {
 
 	@Indexed(index = "dvds")
 	public static final class Dvd {
-		@DocumentId long id;
-		@Field String title;
+		@DocumentId
+		long id;
+		@Field
+		String title;
+	}
+
+	public static class CustomClassLoaderService implements ClassLoaderService {
+
+		private final ClassLoaderService defaultClassLoaderService;
+		private final Map<Class<? extends Service>, String> fakedDiscoveredServices;
+
+		public CustomClassLoaderService(Map<Class<? extends Service>, String> fakedDiscoveredServices) {
+			this.defaultClassLoaderService = new DefaultClassLoaderService();
+			this.fakedDiscoveredServices = fakedDiscoveredServices;
+		}
+
+		@Override
+		public <T> Class<T> classForName(String className) {
+			return defaultClassLoaderService.classForName( className );
+		}
+
+		@Override
+		public URL locateResource(String name) {
+			return defaultClassLoaderService.locateResource( name );
+		}
+
+		@Override
+		public InputStream locateResourceStream(String name) {
+			return defaultClassLoaderService.locateResourceStream( name );
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public <T> LinkedHashSet<T> loadJavaServices(Class<T> serviceContract) {
+			if ( fakedDiscoveredServices.containsKey( serviceContract ) ) {
+				LinkedHashSet<T> services = new LinkedHashSet<T>( 1 );
+				Class<T> clazz = classForName( fakedDiscoveredServices.get( serviceContract ) );
+				services.add( ClassLoaderHelper.instanceFromClass( serviceContract, clazz, "fake service" ) );
+				return services;
+			}
+			return defaultClassLoaderService.loadJavaServices( serviceContract );
+		}
+	}
+
+	public static class NRTIndexManagerFactory extends DefaultIndexManagerFactory {
+		@Override
+		public IndexManager createDefaultIndexManager() {
+			return new NRTIndexManager();
+		}
 	}
 
 }

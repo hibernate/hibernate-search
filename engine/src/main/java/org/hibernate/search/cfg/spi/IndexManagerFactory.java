@@ -20,17 +20,17 @@
  */
 package org.hibernate.search.cfg.spi;
 
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.indexes.spi.IndexManager;
 
 /**
- * By implementing this integration point you can customize the creation of IndexManager
- * instances.
- * Example usage it to override ClassLoaders used to resolve implementation names,
+ * By implementing this integration point you can customize the creation of IndexManager instances.
+ * Example usage is to override {@code ClassLoader}s used to resolve implementation names,
  * define new short-hand aliases, change the default implementation.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public interface IndexManagerFactory {
+public interface IndexManagerFactory extends Service {
 
 	/**
 	 * @return a new instance of the default IndexManager
@@ -39,7 +39,8 @@ public interface IndexManagerFactory {
 
 	/**
 	 * @param indexManagerImplementationName how this is resolved to an IndexManager type
-	 *   is left to the implementor.
+	 * is left to the implementor.
+	 *
 	 * @return a new IndexManager instance of the chosen type
 	 */
 	IndexManager createIndexManagerByName(String indexManagerImplementationName);

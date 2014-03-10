@@ -23,20 +23,20 @@
  */
 package org.hibernate.search.test.util;
 
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
-import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.cfg.spi.SearchConfigurationBase;
-import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.impl.DefaultIndexManagerFactory;
-import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.cfg.spi.SearchConfigurationBase;
+import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.search.spi.InstanceInitializer;
 
 /**
  * Manually defines the configuration
@@ -46,7 +46,7 @@ import org.hibernate.search.engine.service.spi.Service;
  */
 public class ManualConfiguration extends SearchConfigurationBase implements SearchConfiguration {
 
-	private final Map<String,Class<?>> classes;
+	private final Map<String, Class<?>> classes;
 	private final Properties properties;
 	private final HashMap<Class<? extends Service>, Object> providedServices;
 	private final InstanceInitializer initializer;
@@ -54,20 +54,21 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	private boolean transactionsExpected = true;
 	private boolean indexMetadataComplete = true;
 	private boolean idProvidedImplicit = false;
-	private IndexManagerFactory indexManagerFactory = new DefaultIndexManagerFactory();
+	private ClassLoaderService classLoaderService;
 
 	public ManualConfiguration() {
 		this( SimpleInitializer.INSTANCE );
 	}
 
 	public ManualConfiguration(InstanceInitializer init) {
-		initializer = init;
-		classes = new HashMap<String,Class<?>>();
-		properties = new Properties( );
-		providedServices = new HashMap<Class<? extends Service>, Object>();
+		this.initializer = init;
+		this.classes = new HashMap<String, Class<?>>();
+		this.properties = new Properties();
+		this.providedServices = new HashMap<Class<? extends Service>, Object>();
+		this.classLoaderService = new DefaultClassLoaderService();
 	}
 
-	public ManualConfiguration addProperty(String key , String value) {
+	public ManualConfiguration addProperty(String key, String value) {
 		properties.setProperty( key, value );
 		return this;
 	}
@@ -117,6 +118,10 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 		return providedServices;
 	}
 
+	public void addProvidedService(Class<? extends Service> serviceRole, Object service) {
+		providedServices.put( serviceRole, service );
+	}
+
 	@Override
 	public boolean isTransactionManagerExpected() {
 		return this.transactionsExpected;
@@ -151,12 +156,11 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	}
 
 	@Override
-	public IndexManagerFactory getIndexManagerFactory() {
-		return indexManagerFactory;
+	public ClassLoaderService getClassLoaderService() {
+		return classLoaderService;
 	}
 
-	public void setIndexManagerFactory(IndexManagerFactory indexManagerFactory) {
-		this.indexManagerFactory = indexManagerFactory;
+	public void setClassLoaderService(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
 	}
-
 }
