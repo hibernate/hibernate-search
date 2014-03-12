@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<blueprint default-activation="eager" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <bean id="integrator" class="org.hibernate.search.hcore.impl.HibernateSearchIntegrator"/>
+    <service ref="integrator" interface="org.hibernate.integrator.spi.Integrator"/>
+
+</blueprint>
