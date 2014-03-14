@@ -30,7 +30,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
 /**
@@ -43,25 +43,25 @@ public class TransactionsExpectedTest {
 
 	@Test
 	public void testDefaultImplementation() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		verifyTransactionsExpectedOption( true, cfg );
 	}
 
 	@Test
 	public void testTransactionsNotExpected() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setTransactionsExpected( false );
 		verifyTransactionsExpectedOption( false, cfg );
 	}
 
 	@Test
 	public void testTransactionsExpected() {
-		ManualConfiguration cfg = new ManualConfiguration();
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setTransactionsExpected( true );
 		verifyTransactionsExpectedOption( true, cfg );
 	}
 
-	private void verifyTransactionsExpectedOption(boolean expectation, ManualConfiguration cfg) {
+	private void verifyTransactionsExpectedOption(boolean expectation, SearchConfigurationForTest cfg) {
 		SearchMapping mapping = new SearchMapping();
 		mapping
 			.entity( Document.class ).indexed()

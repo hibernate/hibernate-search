@@ -34,7 +34,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 

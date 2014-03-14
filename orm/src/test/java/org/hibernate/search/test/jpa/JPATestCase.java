@@ -37,7 +37,7 @@ import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.util.Version;
 import org.hibernate.cfg.Environment;
 import org.hibernate.ejb.AvailableSettings;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.junit.After;
 import org.junit.Before;
 

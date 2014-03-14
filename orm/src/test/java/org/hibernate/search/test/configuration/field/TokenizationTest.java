@@ -38,8 +38,8 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.hibernate.search.test.TestConstants;
-import org.hibernate.search.test.util.BytemanHelper;
+import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.BytemanHelper;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -56,7 +56,7 @@ public class TokenizationTest {
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.util.logging.impl.Log_$logger",
 			targetMethod = "inconsistentFieldConfiguration",
-			helper = "org.hibernate.search.test.util.BytemanHelper",
+			helper = "org.hibernate.search.testsupport.BytemanHelper",
 			action = "countInvocation()",
 			name = "testWarningLoggedForInconsistentFieldConfiguration")
 	public void testWarningLoggedForInconsistentFieldConfiguration() throws Exception {

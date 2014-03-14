@@ -30,7 +30,7 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.test.SerializationTestHelper;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

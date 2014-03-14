@@ -25,7 +25,7 @@ package org.hibernate.search.test.performance.scenario;
 
 import java.util.Properties;
 
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * @author Tomas Hradec

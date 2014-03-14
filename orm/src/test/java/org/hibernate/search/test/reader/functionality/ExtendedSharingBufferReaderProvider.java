@@ -44,8 +44,8 @@ import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
-import org.hibernate.search.test.util.ManualConfiguration;
-import org.hibernate.search.test.util.TestBuildContext;
+import org.hibernate.search.testsupport.setup.BuildContextForTest;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
 /**
  * Testable extension of SharingBufferReaderProvider to make sure IndexReaders
@@ -81,7 +81,7 @@ public class ExtendedSharingBufferReaderProvider extends SharingBufferReaderProv
 		private final RAMDirectoryProvider dp = new RAMDirectoryProvider();
 
 		TestManipulatorPerDP(int seed) {
-			dp.initialize( String.valueOf( seed ), null, new TestBuildContext( new ManualConfiguration() ) );
+			dp.initialize( String.valueOf( seed ), null, new BuildContextForTest( new SearchConfigurationForTest() ) );
 		}
 
 		public void setIndexChanged() {

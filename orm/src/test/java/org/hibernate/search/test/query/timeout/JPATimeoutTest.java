@@ -54,7 +54,7 @@ public class JPATimeoutTest extends JPATestCase {
 	@Test
 	@BMRule(targetClass = "QueryHits",
 		targetMethod = "updateTopDocs",
-		helper = "org.hibernate.search.test.util.BytemanHelper",
+		helper = "org.hibernate.search.testsupport.BytemanHelper",
 		action = "sleepASecond();",
 		name = "Enable QueryHits slow down")
 	public void testQueryTimeoutException() throws Exception {

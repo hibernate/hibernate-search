@@ -51,7 +51,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.impl.MassIndexerImpl;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-import org.hibernate.search.test.util.textbuilder.SentenceInventor;
+import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

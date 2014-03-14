@@ -38,7 +38,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.LeakingLuceneBackend;
+import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
 
 /**
  * Test storing and omitting index time norms

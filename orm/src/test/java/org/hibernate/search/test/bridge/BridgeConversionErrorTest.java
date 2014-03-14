@@ -44,7 +44,7 @@ import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 
 /**
  * @author Hardy Ferentschik

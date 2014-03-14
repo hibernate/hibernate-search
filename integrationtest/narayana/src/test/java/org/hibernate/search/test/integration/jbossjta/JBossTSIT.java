@@ -48,7 +48,7 @@ import org.hibernate.engine.transaction.jta.platform.internal.JBossStandAloneJta
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.TestConstants;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.integration.jbossjta.infra.JBossTADataSourceBuilder;
 import org.hibernate.search.test.integration.jbossjta.infra.PersistenceUnitInfoBuilder;
 import org.hibernate.search.util.impl.FileHelper;

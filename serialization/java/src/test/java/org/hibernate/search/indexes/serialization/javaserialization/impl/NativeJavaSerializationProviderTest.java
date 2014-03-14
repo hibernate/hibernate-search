@@ -23,7 +23,7 @@ package org.hibernate.search.indexes.serialization.javaserialization.impl;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
-import org.hibernate.search.test.util.ManualConfiguration;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -35,7 +35,7 @@ public class NativeJavaSerializationProviderTest {
 	@Test
 	public void testCorrectSerializationProviderDetected() {
 		ServiceManager serviceManager = new StandardServiceManager(
-				new ManualConfiguration(),
+				new SearchConfigurationForTest(),
 				null
 		);
 

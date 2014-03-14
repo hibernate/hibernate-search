@@ -64,7 +64,7 @@ import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
 
 /**
  * @author Emmanuel Bernard
