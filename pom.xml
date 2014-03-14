@@ -149,7 +149,7 @@
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>4.6.1</luceneVersion>
         <infinispanVersion>7.0.0.Alpha1</infinispanVersion>
-        <jgroupsVersion>3.5.0.Alpha1</jgroupsVersion>
+        <jgroupsVersion>3.5.0.Beta1</jgroupsVersion>
         <hibernateVersion>4.3.4.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
@@ -157,7 +157,7 @@
         <jbossLoggingVersion>3.1.4.GA</jbossLoggingVersion>
         <jbossLoggingProcessorVersion>1.2.0.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>5.0.0.Final</narayanaVersion>
-        <avroVersion>1.7.5</avroVersion>
+        <avroVersion>1.7.6</avroVersion>
         <jacksonAslVersion>1.9.13</jacksonAslVersion>
         <commonsCompressVersion>1.5</commonsCompressVersion>
         <commonsIoVersion>2.1</commonsIoVersion>
