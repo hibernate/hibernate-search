@@ -47,9 +47,9 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.test.util.SearchFactoryHolder;
-import org.hibernate.search.test.util.ManualTransactionContext;
-import org.hibernate.search.test.util.TestForIssue;
+import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -105,7 +105,7 @@ public class ReadWriteParallelismTest {
 		book.id = id;
 		book.title = bookTitle;
 		Work work = new Work( book, book.id, WorkType.ADD, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		worker.performWork( work, tc );
 		tc.end();
 	}
@@ -114,7 +114,7 @@ public class ReadWriteParallelismTest {
 		Book book = new Book();
 		book.id = id;
 		Work work = new Work( book, id, WorkType.DELETE, false );
-		ManualTransactionContext tc = new ManualTransactionContext();
+		TransactionContextForTest tc = new TransactionContextForTest();
 		worker.performWork( work, tc );
 		tc.end();
 	}
