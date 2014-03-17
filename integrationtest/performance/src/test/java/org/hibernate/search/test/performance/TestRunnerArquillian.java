@@ -23,6 +23,9 @@
  */
 package org.hibernate.search.test.performance;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -62,7 +65,7 @@ public class TestRunnerArquillian {
 	public static final String TARGET_DIR_KEY = "target";
 
 	@Deployment
-	public static Archive<?> createTestArchive() {
+	public static Archive<?> createTestArchive() throws IOException {
 		WebArchive archive = ShrinkWrap
 				.create( WebArchive.class, TestRunnerArquillian.class.getSimpleName() + ".war" )
 				.addPackages( true, TestRunnerArquillian.class.getPackage() )
@@ -71,8 +74,21 @@ public class TestRunnerArquillian {
 				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.add( manifest(), "META-INF/MANIFEST.MF" )
-				.addAsWebInfResource( new StringAsset( TARGET_DIR_KEY + "=" + TestConstants.getTargetDir( TestRunnerArquillian.class ).getAbsolutePath() ), "classes/" + RUNNER_PROPERTIES );
+				.addAsWebInfResource( reportsOutputDirectory(), "classes/" + RUNNER_PROPERTIES );
 		return archive;
+	}
+
+	private static StringAsset reportsOutputDirectory() throws IOException {
+		File path = TestConstants.getTargetDir( TestRunnerArquillian.class );
+		String absolutePath = path.getAbsolutePath();
+		//Use Properties to make sure we encode the output correctly,
+		//especially tricky to deal with escaping of paths:
+		Properties runnerProperties = new Properties();
+		runnerProperties.put( TARGET_DIR_KEY, absolutePath );
+		StringWriter writer = new StringWriter();
+		runnerProperties.store( writer, "report output path" );
+		String encodedString = writer.toString();
+		return new StringAsset( encodedString );
 	}
 
 	private static Asset createPersistenceXml() {
