@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -35,9 +34,9 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.TimeoutException;
@@ -64,57 +63,107 @@ public class SyncJGroupsBackendTest {
 
 	@Rule
 	public SearchFactoryHolder slaveNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
-		.withProperty( "hibernate.search.default.worker.backend", "jgroupsSlave" )
-		.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
-		.withProperty( "hibernate.search.dvds.jgroups.delegate_backend", "blackhole" )
-		.withProperty( "hibernate.search.dvds.jgroups.messages_timeout", "200" )
-		.withProperty( "hibernate.search.books.worker.execution", "async" )
-		.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
-		.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
-		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
+			.withProperty( "hibernate.search.default.worker.backend", "jgroupsSlave" )
+			.withProperty( "hibernate.search.dvds.worker.execution", "sync" )
+			.withProperty( "hibernate.search.dvds.jgroups.delegate_backend", "blackhole" )
+			.withProperty( "hibernate.search.dvds.jgroups.messages_timeout", "200" )
+			.withProperty( "hibernate.search.books.worker.execution", "async" )
+			.withProperty( "hibernate.search.drinks.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "true" )
+			.withProperty( "hibernate.search.stars.jgroups." + JGroupsBackendQueueProcessor.BLOCK_WAITING_ACK, "false" )
+			.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
 
 	@Rule
 	public SearchFactoryHolder masterNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )
-		.withProperty( "hibernate.search.default.worker.backend", JGroupsReceivingMockBackend.class.getName() )
-		.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
+			.withProperty( "hibernate.search.default.worker.backend", JGroupsReceivingMockBackend.class.getName() )
+			.withProperty( DispatchMessageSender.CONFIGURATION_FILE, JGROUPS_CONFIGURATION );
 
 	@Test
-	public void testSynchAsConfigured() {
+	public void testSynchronousJGroupsBackendsProperlyConfigured() {
 		JGroupsBackendQueueProcessor dvdsBackend = extractJGroupsBackend( "dvds" );
-		Assert.assertTrue( "dvds index was configured with a syncronous JGroups backend", dvdsBackend.blocksForACK() );
-		JGroupsBackendQueueProcessor booksBackend = extractJGroupsBackend( "books" );
-		Assert.assertFalse( "books index was configured with an asyncronous JGroups backend", booksBackend.blocksForACK() );
-		JGroupsBackendQueueProcessor drinksBackend = extractJGroupsBackend( "drinks" );
-		Assert.assertTrue( "drinks index was configured with a syncronous JGroups backend", drinksBackend.blocksForACK() );
-		JGroupsBackendQueueProcessor starsBackend = extractJGroupsBackend( "stars" );
-		Assert.assertFalse( "stars index was configured with an asyncronous JGroups backend", starsBackend.blocksForACK() );
+		Assert.assertTrue( "dvds index was configured with a synchronous JGroups backend", dvdsBackend.blocksForACK() );
 
+		JGroupsBackendQueueProcessor drinksBackend = extractJGroupsBackend( "drinks" );
+		Assert.assertTrue(
+				"drinks index was configured with a synchronous JGroups backend",
+				drinksBackend.blocksForACK()
+		);
+	}
+
+	@Test
+	public void testAsynchronousJGroupsBackendProperlyConfigured() {
+		JGroupsBackendQueueProcessor booksBackend = extractJGroupsBackend( "books" );
+		Assert.assertFalse(
+				"books index was configured with an asynchronous JGroups backend",
+				booksBackend.blocksForACK()
+		);
+
+		JGroupsBackendQueueProcessor starsBackend = extractJGroupsBackend( "stars" );
+		Assert.assertFalse(
+				"stars index was configured with an asynchronous JGroups backend",
+				starsBackend.blocksForACK()
+		);
+	}
+
+	@Test
+	public void testSynchSerialisationWithTimeout() {
 		JGroupsReceivingMockBackend dvdBackendMock = extractMockBackend( "dvds" );
 
 		dvdBackendMock.resetThreadTrap();
 		boolean timeoutTriggered = false;
 		try {
-			//DVDs are sync operations so they will timeout:
-			final long presendTimestamp = System.nanoTime();
-			log.trace( "[PRESEND] Timestamp: " + presendTimestamp );
+			// DVDs are sync operations so they will timeout:
+			final long preSendTimestamp = System.nanoTime();
+			log.trace( "[PRESEND] Timestamp: " + preSendTimestamp );
 			storeDvd( 1, "Hibernate Search in Action" );
-			final long postsendTimestamp = System.nanoTime();
-			final long differenceInMilliseconds = TimeUnit.MILLISECONDS.convert( (postsendTimestamp - presendTimestamp), TimeUnit.NANOSECONDS );
-			log.trace( "[POSTSEND] Timestamp: " + postsendTimestamp + " Diff: " + differenceInMilliseconds + " ms." );
+			final long postSendTimestamp = System.nanoTime();
+			final long differenceInMilliseconds = TimeUnit.MILLISECONDS.convert(
+					( postSendTimestamp - preSendTimestamp ),
+					TimeUnit.NANOSECONDS
+			);
+			log.trace( "[POSTSEND] Timestamp: " + postSendTimestamp + " Diff: " + differenceInMilliseconds + " ms." );
 		}
 		catch (SearchException se) {
-			//Expected: we're inducing the RPC into timeout by blocking receiver processing
+			// Expected: we're inducing the RPC into timeout by blocking receiver processing
 			Throwable cause = se.getCause();
 			Assert.assertTrue( "Cause was not a TimeoutException but a " + cause, cause instanceof TimeoutException );
 			timeoutTriggered = true;
 		}
 		finally {
-			//release the receiver
+			// release the receiver
 			dvdBackendMock.releaseBlockedThreads();
 		}
-		Assert.assertTrue( "The backend didn't receive any message: something wrong with the test setup of network configuration", dvdBackendMock.wasSomethingReceived() );
+		Assert.assertTrue(
+				"The backend didn't receive any message: something wrong with the test setup of network configuration",
+				dvdBackendMock.wasSomethingReceived()
+		);
 		Assert.assertTrue( timeoutTriggered );
+	}
 
+	@Test
+	public void testSynchSerialisationWithInducedFailure() {
+		JGroupsReceivingMockBackend dvdBackendMock = extractMockBackend( "dvds" );
+
+		dvdBackendMock.resetThreadTrap();
+		dvdBackendMock.induceFailure();
+		boolean npeTriggered = false;
+		try {
+			storeDvd( 2, "Byteman in Action" ); //not actually needing Byteman here
+		}
+		catch (SearchException se) {
+			//Expected: we're inducing the RPC into NPE
+			Throwable cause = se.getCause().getCause();
+			Assert.assertTrue(
+					"Cause was not a NullPointerException but a " + cause,
+					cause instanceof NullPointerException
+			);
+			Assert.assertEquals( "Simulated Failure", cause.getMessage() );
+			npeTriggered = true;
+		}
+		Assert.assertTrue( npeTriggered );
+	}
+
+	@Test
+	public void testAsyncSerialisation() {
 		JGroupsReceivingMockBackend booksBackendMock = extractMockBackend( "books" );
 		booksBackendMock.resetThreadTrap();
 		//Books are async so they should not timeout
@@ -124,20 +173,6 @@ public class SyncJGroupsBackendTest {
 		//If we raced past it we would release the receiver, not bad either
 		//as it would also proof we are async.
 		booksBackendMock.countDownAndJoin();
-
-		dvdBackendMock.induceFailure();
-		boolean npeTriggered = false;
-		try {
-			storeDvd( 2, "Byteman in Action" ); //not actually needing Byteman here
-		}
-		catch (SearchException se) {
-			//Expected: we're inducing the RPC into NPE
-			Throwable cause = se.getCause().getCause();
-			Assert.assertTrue( "Cause was not a NullPointerException but a " + cause, cause instanceof NullPointerException );
-			Assert.assertEquals( "Simulated Failure", cause.getMessage() );
-			npeTriggered = true;
-		}
-		Assert.assertTrue( npeTriggered );
 	}
 
 	@Test
@@ -145,7 +180,10 @@ public class SyncJGroupsBackendTest {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, "dvds" );
 		JGroupsBackendQueueProcessor jgroupsProcessor = (JGroupsBackendQueueProcessor) backendQueueProcessor;
 		BackendQueueProcessor delegatedBackend = jgroupsProcessor.getDelegatedBackend();
-		Assert.assertTrue( "dvds backend was configured with a deleage to blackhole but it's not using it", delegatedBackend instanceof BlackHoleBackendQueueProcessor );
+		Assert.assertTrue(
+				"dvds backend was configured with a deleage to blackhole but it's not using it",
+				delegatedBackend instanceof BlackHoleBackendQueueProcessor
+		);
 	}
 
 	@Test
@@ -158,13 +196,19 @@ public class SyncJGroupsBackendTest {
 
 	private JGroupsReceivingMockBackend extractMockBackend(String indexName) {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( masterNode, indexName );
-		Assert.assertTrue( "Backend not using the configured Mock!", backendQueueProcessor instanceof JGroupsReceivingMockBackend );
+		Assert.assertTrue(
+				"Backend not using the configured Mock!",
+				backendQueueProcessor instanceof JGroupsReceivingMockBackend
+		);
 		return (JGroupsReceivingMockBackend) backendQueueProcessor;
 	}
 
 	private JGroupsBackendQueueProcessor extractJGroupsBackend(String indexName) {
 		BackendQueueProcessor backendQueueProcessor = extractBackendQueue( slaveNode, indexName );
-		Assert.assertTrue( "Backend not using JGroups!", backendQueueProcessor instanceof JGroupsBackendQueueProcessor );
+		Assert.assertTrue(
+				"Backend not using JGroups!",
+				backendQueueProcessor instanceof JGroupsBackendQueueProcessor
+		);
 		return (JGroupsBackendQueueProcessor) backendQueueProcessor;
 	}
 
@@ -190,7 +234,8 @@ public class SyncJGroupsBackendTest {
 	}
 
 	private void storeObject(Object entity, Serializable id) {
-		Work work = new Work( entity, id, WorkType.UPDATE, false );
+		@SuppressWarnings("unchecked")
+		Work<?> work = new Work( entity, id, WorkType.UPDATE, false );
 		TransactionContextForTest tc = new TransactionContextForTest();
 		slaveNode.getSearchFactory().getWorker().performWork( work, tc );
 		tc.end();
@@ -198,26 +243,38 @@ public class SyncJGroupsBackendTest {
 
 	@Indexed(index = "dvds")
 	public static final class Dvd {
-		@DocumentId long id;
-		@Field String title;
+		@DocumentId
+		long id;
+
+		@Field
+		String title;
 	}
 
 	@Indexed(index = "books")
 	public static final class Book {
-		@DocumentId long id;
-		@Field String title;
+		@DocumentId
+		long id;
+
+		@Field
+		String title;
 	}
 
 	@Indexed(index = "drinks")
 	public static final class Drink {
-		@DocumentId long id;
-		@Field String title;
+		@DocumentId
+		long id;
+
+		@Field
+		String title;
 	}
 
 	@Indexed(index = "stars")
 	public static final class Star {
-		@DocumentId long id;
-		@Field String title;
+		@DocumentId
+		long id;
+
+		@Field
+		String title;
 	}
 
 }
