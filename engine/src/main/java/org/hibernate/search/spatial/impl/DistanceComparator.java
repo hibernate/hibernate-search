@@ -22,81 +22,79 @@ package org.hibernate.search.spatial.impl;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.FieldCache.Doubles;
 import org.apache.lucene.search.FieldComparator;
-import org.apache.lucene.facet.collections.IntToDoubleMap;
 
 public final class DistanceComparator extends FieldComparator<Double> {
 
 	private final Point center;
 	private final String latitudeField;
 	private final String longitudeField;
-	private IntToDoubleMap distances;
-	private IntToDoubleMap latitudeValues;
-	private IntToDoubleMap longitudeValues;
-
+	private double[] distances;
+	private Doubles latitudeValues;
+	private Doubles longitudeValues;
 	private Double bottomDistance;
-	private int docBase = 0;
+	private Double topValue;
 
-	public DistanceComparator(Point center, int hitsCount, String fieldname) {
+	public DistanceComparator(Point center, int numHits, String fieldName) {
 		this.center = center;
-		this.distances = new IntToDoubleMap( hitsCount );
-		this.latitudeValues = new IntToDoubleMap( hitsCount );
-		this.longitudeValues = new IntToDoubleMap( hitsCount );
-		this.latitudeField = SpatialHelper.formatLatitude( fieldname );
-		this.longitudeField = SpatialHelper.formatLongitude( fieldname );
+		this.distances = new double[numHits];
+		this.latitudeField = SpatialHelper.formatLatitude( fieldName );
+		this.longitudeField = SpatialHelper.formatLongitude( fieldName );
 	}
 
 	@Override
 	public int compare(final int slot1, final int slot2) {
-		return Double.compare( distances.get( slot1 ), distances.get( slot2 ) );
+		return Double.compare( distances[slot1], distances[slot2] );
 	}
 
 	@Override
 	public void setBottom(final int slot) {
-		bottomDistance = distances.get( slot );
+		bottomDistance = distances[slot];
+	}
+
+	@Override
+	public void setTopValue(Double value) {
+		topValue = value;
 	}
 
 	@Override
 	public int compareBottom(final int doc) throws IOException {
-		return Double.compare( bottomDistance, center.getDistanceTo( latitudeValues.get( docBase + doc ), longitudeValues.get( docBase + doc ) ) );
+		return Double.compare(
+				bottomDistance,
+				center.getDistanceTo( latitudeValues.get( doc ), longitudeValues.get( doc ) )
+		);
+	}
+
+	@Override
+	public int compareTop(int doc) throws IOException {
+		if ( topValue == null ) {
+			return 1; //we consider any doc "higher" than null
+		}
+
+		final double distanceTo = center.getDistanceTo( latitudeValues.get( doc ), longitudeValues.get( doc ) );
+		return Double.compare( distanceTo, topValue );
 	}
 
 	@Override
 	public void copy(final int slot, final int doc) throws IOException {
-		distances.put( slot, center.getDistanceTo( latitudeValues.get( docBase + doc ), longitudeValues.get( docBase + doc ) ) );
+		distances[slot] = center.getDistanceTo(
+				latitudeValues.get( doc ),
+				longitudeValues.get( doc )
+		);
 	}
 
 	@Override
-	public DistanceComparator setNextReader(final AtomicReaderContext newContext) throws IOException {
-		final AtomicReader atomicReader = newContext.reader();
-		final Doubles unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
-		final Doubles unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
-		this.docBase = newContext.docBase;
-		final int numDocs = atomicReader.numDocs();
-		for ( int i = 0; i < numDocs; i++ ) {
-			//TODO avoid fully copying this structure
-			latitudeValues.put( this.docBase + i, unbasedLatitudeValues.get( i ) );
-			longitudeValues.put( this.docBase + i, unbasedLongitudeValues.get( i ) );
-		}
+	public DistanceComparator setNextReader(final AtomicReaderContext context) throws IOException {
+		latitudeValues = FieldCache.DEFAULT.getDoubles( context.reader(), latitudeField, false );
+		longitudeValues = FieldCache.DEFAULT.getDoubles( context.reader(), longitudeField, false );
 		return this;
 	}
 
 	@Override
 	public Double value(final int slot) {
-		return center.getDistanceTo( latitudeValues.get( slot ), longitudeValues.get( slot ) );
-	}
-
-	@Override
-	public int compareDocToValue(final int doc, final Double value) throws IOException {
-		if ( value == null ) {
-			return 1; //we consider any doc "higher" than null
-		}
-		//doc seems to be relative in this case
-		final double distanceTo = center.getDistanceTo( latitudeValues.get( doc ), longitudeValues.get( doc ) );
-		return Double.compare( distanceTo, value.doubleValue() );
+		return distances[slot];
 	}
 }
