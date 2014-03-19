@@ -126,12 +126,6 @@
                     <threadCount>1</threadCount>
                     <reuseForks>true</reuseForks>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <systemPropertyVariables>
-                        <!-- java.net.preferIPv4Stack and jgroups.bind_addr are needed for JGroups -->
-                        <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
-                        <jgroups.bind_addr>127.0.0.1</jgroups.bind_addr>
-                        <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
-                    </systemPropertyVariables>
                     <additionalClasspathElements>
                         <!-- Needed by Byteman to load the agent on demand -->
                         <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
