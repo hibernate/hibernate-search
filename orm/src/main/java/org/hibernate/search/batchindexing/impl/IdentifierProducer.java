@@ -62,6 +62,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
+	private final ErrorHandler errorHandler;
 
 	/**
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
@@ -84,6 +85,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 				this.indexedType = indexedType;
 				this.monitor = monitor;
 				this.objectsLimit = objectsLimit;
+				this.errorHandler = errorHandler;
 				this.idFetchSize = idFetchSize;
 				log.trace( "created" );
 	}
@@ -93,6 +95,9 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		log.trace( "started" );
 		try {
 			inTransactionWrapper( upperSession );
+		}
+		catch (Exception exception) {
+			errorHandler.handleException( log.massIndexerExceptionWhileFetchingIds(), exception );
 		}
 		finally {
 			destination.producerStopping();

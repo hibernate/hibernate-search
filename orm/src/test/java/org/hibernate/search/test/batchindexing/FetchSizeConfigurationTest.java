@@ -55,7 +55,7 @@ public class FetchSizeConfigurationTest extends SearchTestCaseJUnit4 {
 
 		getSession().close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
-		Assert.assertEquals( "HSEARCH000116: Unexpected error during MassIndexer operation", errorMessage );
+		Assert.assertEquals( "HSEARCH000211: An exception occurred while the MassIndexer was fetching the primary identifiers list", errorMessage );
 		Throwable exception = mockErrorHandler.getLastException();
 		Assert.assertTrue( exception instanceof org.hibernate.exception.GenericJDBCException );
 	}
