@@ -117,6 +117,9 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 			loadAllFromQueue( session );
 			transaction.commit();
 		}
+		catch (Exception exception) {
+			errorHandler.handleException( log.massindexerExceptionWhileTransformingIds(), exception );
+		}
 		finally {
 			producerEndSignal.countDown();
 			if ( upperSession == null ) {

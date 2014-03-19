@@ -719,4 +719,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 211, value = "MassIndexer Exception while fetching primary identifiers list")
 	String massindexerExceptionWhileFetchidIds();
 
+	@Message(id = 212, value = "MassIndexer Exception while transforming identifiers to Lucene Documents")
+	String massindexerExceptionWhileTransformingIds();
+
 }
