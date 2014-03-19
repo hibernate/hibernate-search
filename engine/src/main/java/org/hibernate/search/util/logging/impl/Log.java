@@ -716,4 +716,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 210, value = "Provided service '%s' implements '%s'. Provided services are not allowed to implement either Startable or Stoppable.")
 	SearchException providedServicesCannotImplementStartableOrStoppable(String service, String implementedInterface);
 
+	@Message(id = 211, value = "MassIndexer Exception while fetching primary identifiers list")
+	String massindexerExceptionWhileFetchidIds();
+
 }
