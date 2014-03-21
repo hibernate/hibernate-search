@@ -111,7 +111,6 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 	}
 
 	private String[] getAllCompatibleFieldNames(DocumentBuilderIndexedEntity<?> documentBuilder) {
-		// TODO does that return embedded properties?
 		Collection<DocumentFieldMetadata> allFieldMetadata = documentBuilder.getTypeMetadata().getAllDocumentFieldMetadata();
 		List<String> fieldNames = new ArrayList<String>( allFieldMetadata.size() );
 		for ( DocumentFieldMetadata fieldMetadata : allFieldMetadata ) {

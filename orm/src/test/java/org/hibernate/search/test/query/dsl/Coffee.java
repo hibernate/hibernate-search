@@ -28,9 +28,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 
@@ -43,14 +45,10 @@ public class Coffee {
 
 	@Id
 	@GeneratedValue
-	public Integer getId() {
-		return id;
-	}
-
+	public Integer getId() { return id; }
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
 	private Integer id;
 
 	@Field(termVector = TermVector.NO, store = Store.YES)
@@ -78,6 +76,12 @@ public class Coffee {
 	public String getInternalDescription() { return internalDescription; }
 	public void setInternalDescription(String internalDescription) { this.internalDescription = internalDescription; }
 	private String internalDescription;
+
+	@ManyToOne
+	@IndexedEmbedded
+	public CoffeeBrand getBrand() { return brand; }
+	public void setBrand(CoffeeBrand brand) { this.brand = brand; }
+	private CoffeeBrand brand;
 
 	@Override
 	public String toString() {
