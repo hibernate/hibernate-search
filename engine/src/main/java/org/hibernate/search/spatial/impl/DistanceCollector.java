@@ -41,16 +41,14 @@ public class DistanceCollector extends Collector {
 	private String longitudeField;
 	private int docBase = 0;
 	private IntToDoubleMap distances;
-	private IntToDoubleMap latitudeValues;
-	private IntToDoubleMap longitudeValues;
+	private Doubles unbasedLatitudeValues;
+	private Doubles unbasedLongitudeValues;
 
 	public DistanceCollector(Collector delegate, Coordinates centerCoordinates, int hitsCount, String fieldname) {
 		this.delegate = delegate;
 		this.acceptsDocsOutOfOrder = delegate.acceptsDocsOutOfOrder();
 		this.center = Point.fromCoordinates( centerCoordinates );
 		this.distances = new IntToDoubleMap( hitsCount );
-		this.latitudeValues = new IntToDoubleMap( hitsCount );
-		this.longitudeValues = new IntToDoubleMap( hitsCount );
 		this.latitudeField = SpatialHelper.formatLatitude( fieldname );
 		this.longitudeField = SpatialHelper.formatLongitude( fieldname );
 	}
@@ -64,23 +62,16 @@ public class DistanceCollector extends Collector {
 	public void collect(final int doc) throws IOException {
 		delegate.collect( doc );
 		final int absolute = docBase + doc;
-		distances.put( absolute, center.getDistanceTo( latitudeValues.get( absolute ), longitudeValues.get( absolute ) ) );
+		distances.put( absolute, center.getDistanceTo( unbasedLatitudeValues.get( doc ), unbasedLongitudeValues.get( doc ) ) );
 	}
 
 	@Override
 	public void setNextReader(AtomicReaderContext newContext) throws IOException {
 		delegate.setNextReader( newContext );
 		final AtomicReader atomicReader = newContext.reader();
-		final int numDocs = atomicReader.numDocs();
-		final Doubles unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
-		final Doubles unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
-
+		unbasedLatitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, latitudeField, false );
+		unbasedLongitudeValues = FieldCache.DEFAULT.getDoubles( atomicReader, longitudeField, false );
 		this.docBase = newContext.docBase;
-		for ( int i = 0 ; i < numDocs; i ++ ) {
-			//TODO avoid fully copying this structure - HSEARCH-1499
-			latitudeValues.put( this.docBase + i, unbasedLatitudeValues.get( i ) );
-			longitudeValues.put( this.docBase + i, unbasedLongitudeValues.get( i ) );
-		}
 	}
 
 	@Override
