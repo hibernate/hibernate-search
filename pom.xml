@@ -146,7 +146,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <slf4jVersion>1.6.1</slf4jVersion>
+        <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>4.6.1</luceneVersion>
         <infinispanVersion>7.0.0.Alpha1</infinispanVersion>
         <jgroupsVersion>3.5.0.Alpha1</jgroupsVersion>
