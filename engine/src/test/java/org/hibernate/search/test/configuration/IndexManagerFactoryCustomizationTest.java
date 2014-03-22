@@ -26,7 +26,7 @@ import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

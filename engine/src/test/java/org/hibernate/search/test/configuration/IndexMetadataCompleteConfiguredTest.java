@@ -35,7 +35,7 @@ import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 
 /**

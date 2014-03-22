@@ -22,7 +22,7 @@ package org.hibernate.search.test.backend.lucene;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;

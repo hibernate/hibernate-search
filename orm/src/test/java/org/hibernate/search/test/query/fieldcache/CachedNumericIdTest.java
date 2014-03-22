@@ -22,7 +22,7 @@ package org.hibernate.search.test.query.fieldcache;
 import java.math.BigDecimal;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;

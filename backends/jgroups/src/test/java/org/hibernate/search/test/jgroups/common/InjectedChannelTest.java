@@ -20,8 +20,6 @@
  */
 package org.hibernate.search.test.jgroups.common;
 
-import junit.framework.Assert;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
@@ -30,6 +28,7 @@ import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.JChannel;
 import org.junit.Test;
+import org.junit.Assert;
 
 /**
  * A JGroups JChannel instance can be injected in the configuration

@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hibernate.search.spi.MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -51,7 +51,7 @@ public class CustomMassIndexerFactoryTest extends SearchTestCaseJUnit4 {
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
 		MassIndexer indexer = fullTextSession.createIndexer( Clock.class );
 
-		assertThat( indexer, is( NoopMassIndexer.class ) );
+		assertThat( indexer, instanceOf( NoopMassIndexer.class ) );
 	}
 
 	@Test

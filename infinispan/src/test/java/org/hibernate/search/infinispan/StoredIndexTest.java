@@ -23,7 +23,7 @@ package org.hibernate.search.infinispan;
 import java.io.File;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;

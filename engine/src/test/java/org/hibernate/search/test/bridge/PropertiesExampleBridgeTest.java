@@ -26,7 +26,7 @@ package org.hibernate.search.test.bridge;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.spi.Work;

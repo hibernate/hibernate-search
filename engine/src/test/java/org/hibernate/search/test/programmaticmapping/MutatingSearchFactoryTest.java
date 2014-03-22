@@ -22,7 +22,7 @@ package org.hibernate.search.test.programmaticmapping;
 
 import java.lang.annotation.ElementType;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Store;

@@ -23,8 +23,6 @@ package org.hibernate.search.backend.jgroups.impl;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -43,6 +41,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.jgroups.TimeoutException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.Assert;
 
 
 /**

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.DocumentId;

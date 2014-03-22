@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;

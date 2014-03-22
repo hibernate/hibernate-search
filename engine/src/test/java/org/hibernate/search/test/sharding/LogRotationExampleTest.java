@@ -29,7 +29,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;

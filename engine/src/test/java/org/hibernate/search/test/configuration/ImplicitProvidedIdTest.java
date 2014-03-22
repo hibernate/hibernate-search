@@ -23,7 +23,7 @@ package org.hibernate.search.test.configuration;
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.SearchException;

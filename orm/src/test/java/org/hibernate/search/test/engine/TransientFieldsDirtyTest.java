@@ -29,7 +29,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
