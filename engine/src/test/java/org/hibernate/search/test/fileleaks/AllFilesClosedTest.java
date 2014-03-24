@@ -23,7 +23,7 @@ package org.hibernate.search.test.fileleaks;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.annotations.DocumentId;

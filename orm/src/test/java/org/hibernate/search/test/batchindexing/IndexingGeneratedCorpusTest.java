@@ -23,14 +23,13 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import junit.framework.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
@@ -39,6 +38,7 @@ import org.apache.lucene.store.LockFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -165,7 +165,7 @@ public class IndexingGeneratedCorpusTest {
 	public void testCreationOfTheDefaultMassIndexer() throws Exception {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		MassIndexer indexer = fullTextSession.createIndexer( Object.class );
-		assertThat( indexer, is( MassIndexerImpl.class ) );
+		assertThat( indexer, instanceOf( MassIndexerImpl.class ) );
 	}
 
 	private void reindexAll() throws InterruptedException {

@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.test.shards;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.Session;

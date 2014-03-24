@@ -25,7 +25,7 @@ package org.hibernate.search.test.jgroups.slave;
 
 import java.util.UUID;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
 import org.jgroups.Channel;

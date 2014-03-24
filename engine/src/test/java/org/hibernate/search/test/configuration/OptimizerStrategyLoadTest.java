@@ -22,7 +22,7 @@ package org.hibernate.search.test.configuration;
 
 import java.lang.annotation.ElementType;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.SearchMapping;

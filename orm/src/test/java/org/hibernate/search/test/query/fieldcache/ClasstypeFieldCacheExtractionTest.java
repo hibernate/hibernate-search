@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;

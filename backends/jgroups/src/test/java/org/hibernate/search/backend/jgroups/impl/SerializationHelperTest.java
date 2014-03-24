@@ -22,10 +22,9 @@ package org.hibernate.search.backend.jgroups.impl;
 
 import java.util.Arrays;
 
-import junit.framework.Assert;
-
 import org.hibernate.search.SearchException;
 import org.junit.Test;
+import org.junit.Assert;
 
 
 /**

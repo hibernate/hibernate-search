@@ -26,7 +26,7 @@ package org.hibernate.search.test.engine;
 import java.math.BigDecimal;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
 

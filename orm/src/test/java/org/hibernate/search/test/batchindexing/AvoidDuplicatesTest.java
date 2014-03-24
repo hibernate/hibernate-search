@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.Session;

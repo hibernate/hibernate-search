@@ -25,7 +25,7 @@ package org.hibernate.search.test.embedded.depth;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;

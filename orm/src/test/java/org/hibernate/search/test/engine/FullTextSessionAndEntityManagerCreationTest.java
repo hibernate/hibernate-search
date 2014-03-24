@@ -27,8 +27,8 @@ package org.hibernate.search.test.engine;
 import org.hibernate.search.Search;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard

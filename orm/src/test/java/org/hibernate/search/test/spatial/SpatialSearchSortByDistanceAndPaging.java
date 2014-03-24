@@ -31,7 +31,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.lucene.search.Sort;
 
