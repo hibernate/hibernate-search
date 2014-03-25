@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.spi.internals;
+package org.hibernate.search.spi.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.Worker;
