@@ -28,7 +28,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 
-import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spatial.Coordinates;
