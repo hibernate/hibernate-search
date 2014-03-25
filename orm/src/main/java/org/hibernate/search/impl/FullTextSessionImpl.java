@@ -35,7 +35,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.FullTextSharedSessionBuilder;
 import org.hibernate.search.MassIndexer;
-import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.backend.spi.Work;

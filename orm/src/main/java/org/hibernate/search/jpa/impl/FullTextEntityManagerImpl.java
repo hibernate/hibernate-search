@@ -45,7 +45,7 @@ import javax.persistence.criteria.CriteriaUpdate;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.MassIndexer;
-import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
