@@ -203,6 +203,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						new DocumentFieldMetadata.Builder( fieldName, Store.YES, index, termVector )
 								.boost( AnnotationProcessingHelper.getBoost( member, null ) )
 								.fieldBridge( fieldBridge )
+								.idInEmbedded()
 								.build();
 
 				PropertyMetadata propertyMetadata = new PropertyMetadata.Builder( member )

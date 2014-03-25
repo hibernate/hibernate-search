@@ -43,6 +43,7 @@ public class DocumentFieldMetadata {
 	private final Float boost;
 	private final Analyzer analyzer;
 	private final boolean isId;
+	private final boolean isIdInEmbedded;
 	private final String nullToken;
 	private final boolean isNumeric;
 	private final int precisionStep;
@@ -56,6 +57,7 @@ public class DocumentFieldMetadata {
 		this.boost = builder.boost;
 		this.analyzer = builder.analyzer;
 		this.isId = builder.isId;
+		this.isIdInEmbedded = builder.isIdInEmbedded;
 		this.nullToken = builder.nullToken;
 		this.isNumeric = builder.isNumeric;
 		this.precisionStep = builder.precisionStep;
@@ -65,13 +67,11 @@ public class DocumentFieldMetadata {
 		return fieldName;
 	}
 
-	public boolean isId() {
-		return isId;
-	}
+	public boolean isId() { return isId; }
 
-	public Store getStore() {
-		return store;
-	}
+	public boolean isIdInEmbedded() { return isIdInEmbedded; }
+
+	public Store getStore() { return store; }
 
 	public Field.Index getIndex() {
 		return index;
@@ -116,6 +116,7 @@ public class DocumentFieldMetadata {
 		sb.append( ", boost=" ).append( boost );
 		sb.append( ", analyzer=" ).append( analyzer );
 		sb.append( ", isId=" ).append( isId );
+		sb.append( ", isIdInEmbedded=" ).append( isIdInEmbedded );
 		sb.append( ", nullToken='" ).append( nullToken ).append( '\'' );
 		sb.append( ", numeric=" ).append( isNumeric );
 		sb.append( ", precisionStep=" ).append( precisionStep );
@@ -135,6 +136,7 @@ public class DocumentFieldMetadata {
 		private Float boost;
 		private Analyzer analyzer;
 		private boolean isId;
+		private boolean isIdInEmbedded;
 		private String nullToken;
 		private boolean isNumeric;
 		private int precisionStep = NumericField.PRECISION_STEP_DEFAULT;
@@ -167,6 +169,11 @@ public class DocumentFieldMetadata {
 
 		public Builder id() {
 			this.isId = true;
+			return this;
+		}
+
+		public Builder idInEmbedded() {
+			this.isIdInEmbedded = true;
 			return this;
 		}
 
