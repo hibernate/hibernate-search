@@ -25,6 +25,8 @@ package org.hibernate.search;
 
 import java.io.Serializable;
 
+import org.hibernate.search.engine.SearchFactory;
+
 import org.hibernate.Session;
 
 /**
