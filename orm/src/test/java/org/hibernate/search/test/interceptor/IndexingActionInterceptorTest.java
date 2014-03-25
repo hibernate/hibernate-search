@@ -29,7 +29,7 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Transaction;
 
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
