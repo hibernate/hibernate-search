@@ -34,7 +34,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.apache.lucene.document.Document;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.spi.EntityIndexBinding;

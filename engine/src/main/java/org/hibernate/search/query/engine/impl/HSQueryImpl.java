@@ -43,7 +43,7 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.ProjectionConstants;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.impl.FilterDef;

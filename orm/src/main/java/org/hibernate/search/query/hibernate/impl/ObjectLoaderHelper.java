@@ -33,7 +33,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

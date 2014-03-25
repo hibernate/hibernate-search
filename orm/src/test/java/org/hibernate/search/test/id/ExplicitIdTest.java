@@ -31,7 +31,7 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchTestCase;
 
 /**

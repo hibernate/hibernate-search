@@ -28,7 +28,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

@@ -28,7 +28,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.index.IndexWriter;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;

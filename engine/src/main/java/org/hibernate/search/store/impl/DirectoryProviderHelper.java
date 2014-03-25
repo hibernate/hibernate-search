@@ -48,7 +48,7 @@ import org.apache.lucene.util.Version;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.store.LockFactoryProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;

@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.junit.Test;
 

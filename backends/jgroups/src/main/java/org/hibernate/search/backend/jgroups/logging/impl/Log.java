@@ -25,7 +25,7 @@ package org.hibernate.search.backend.jgroups.logging.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
 import org.jboss.logging.Logger;

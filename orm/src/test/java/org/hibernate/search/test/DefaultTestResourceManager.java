@@ -40,7 +40,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;

@@ -29,7 +29,7 @@ import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.analysis.core.StopFilterFactory;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
