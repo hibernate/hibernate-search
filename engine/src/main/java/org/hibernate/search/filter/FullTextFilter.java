@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search;
+package org.hibernate.search.filter;
 
 /**
  * Represents a {@code FullTextFilter} that is about to be applied.

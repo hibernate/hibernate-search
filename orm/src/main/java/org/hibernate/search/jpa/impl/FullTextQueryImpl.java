@@ -66,7 +66,7 @@ import org.hibernate.TypeMismatchException;
 import org.hibernate.UnresolvableObjectException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
-import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.query.DatabaseRetrievalMethod;

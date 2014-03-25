@@ -45,7 +45,7 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.internal.AbstractQueryImpl;
-import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;

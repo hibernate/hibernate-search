@@ -31,6 +31,8 @@ import org.apache.lucene.search.Sort;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
