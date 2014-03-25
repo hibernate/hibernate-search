@@ -29,11 +29,12 @@ import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.Version;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
-import org.hibernate.search.jmx.IndexControl;
+import org.hibernate.search.jmx.IndexControlMBean;
+import org.hibernate.search.jmx.impl.IndexControl;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.util.StringHelper;
@@ -128,7 +129,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 				configuration.getProperties(),
 				searchFactoryImplementor.getServiceManager()
 		);
-		JMXRegistrar.registerMBean( indexCtrlBean, objectName );
+		JMXRegistrar.registerMBean( indexCtrlBean, IndexControlMBean.class, objectName );
 		indexControlMBeanName = objectName;
 	}
 }
