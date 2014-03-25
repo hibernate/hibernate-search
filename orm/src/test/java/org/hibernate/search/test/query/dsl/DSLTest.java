@@ -1012,6 +1012,19 @@ public class DSLTest extends SearchTestCase {
 			}
 			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, entityResults );
 
+			// using indexed embedded id from document
+			try {
+				qb
+						.moreLikeThis()
+						.comparingField( "brand.id" )
+						.toEntityWithId( decaffInstance.getId() )
+						.createQuery();
+			}
+			catch (SearchException e) {
+				assertThat( e.getMessage() )
+						.as( "Field cannot be used" )
+						.contains( "brand.id" );
+			}
 		}
 		finally {
 			transaction.commit();
