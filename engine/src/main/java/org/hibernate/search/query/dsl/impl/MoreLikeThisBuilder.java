@@ -38,6 +38,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
@@ -58,9 +59,11 @@ import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.PriorityQueue;
 import org.apache.lucene.util.UnicodeUtil;
 
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
+import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.AssertionFailure;
@@ -253,8 +256,20 @@ public class MoreLikeThisBuilder<T> {
 			if ( fieldBridge instanceof NumericFieldBridge ) {
 				// we probably can do something here
 				//TODO how to build the query where we don't have the value?
+				throw log.numericFieldCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getBeanClass() );
 			}
-			throw log.fieldCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getBeanClass() );
+			DocumentFieldMetadata fieldMetadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor(
+					fieldContext.getField()
+			);
+			boolean hasTermVector = fieldMetadata.getTermVector() != Field.TermVector.NO;
+			boolean isStored = fieldMetadata.getStore() != Store.NO;
+			if ( ! ( hasTermVector || isStored ) ) {
+				throw log.fieldNotStoredNorTermVectorCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getBeanClass() );
+			}
+			boolean isIdOrEmbeddedId = fieldMetadata.isId() || fieldMetadata.isIdInEmbedded();
+			if ( isIdOrEmbeddedId ) {
+				throw log.fieldIdCannotBeUsedInMoreLikeThis( fieldContext.getField(), documentBuilder.getBeanClass() );
+			}
 		}
 
 		BooleanQuery query = new BooleanQuery();

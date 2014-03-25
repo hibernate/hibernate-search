@@ -198,7 +198,17 @@ public class TypeMetadata {
 	}
 
 	public DocumentFieldMetadata getDocumentFieldMetadataFor(String fieldName) {
-		return documentFieldNameToFieldMetadata.get( fieldName );
+		DocumentFieldMetadata result = documentFieldNameToFieldMetadata.get( fieldName );
+		if ( result != null ) {
+			return result;
+		}
+		for ( EmbeddedTypeMetadata element : embeddedTypeMetadata ) {
+			result = element.getDocumentFieldMetadataFor( fieldName );
+			if ( result != null ) {
+				return result;
+			}
+		}
+		return null;
 	}
 
 	/**

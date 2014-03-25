@@ -32,6 +32,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
 
+import org.hibernate.search.annotations.Store;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -114,9 +115,10 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 		Collection<DocumentFieldMetadata> allFieldMetadata = documentBuilder.getTypeMetadata().getAllDocumentFieldMetadata();
 		List<String> fieldNames = new ArrayList<String>( allFieldMetadata.size() );
 		for ( DocumentFieldMetadata fieldMetadata : allFieldMetadata ) {
-			if ( ( fieldMetadata.getTermVector() != Field.TermVector.NO //has term vector
-				|| fieldMetadata.getStore() != org.hibernate.search.annotations.Store.NO ) //is stored
-				&& ! ( fieldMetadata.isId() || fieldMetadata.isIdInEmbedded() ) ) { //Exclude id fields as they are not meaningful for MoreLikeThis
+			boolean hasTermVector = fieldMetadata.getTermVector() != Field.TermVector.NO;
+			boolean isStored = fieldMetadata.getStore() != Store.NO;
+			boolean isIdOrEmbeddedId = fieldMetadata.isId() || fieldMetadata.isIdInEmbedded();
+			if ( ( hasTermVector || isStored ) && !isIdOrEmbeddedId ) {
 				fieldNames.add( fieldMetadata.getName() );
 			}
 		}

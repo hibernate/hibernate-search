@@ -704,8 +704,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 206, value = "MoreLikeThis queries require a TFIDFSimilarity for entity '$1%s'")
 	SearchException requireTFIDFSimilarity(Class<?> beanClass);
 
-	@Message(id = 207, value = "Field %s of entity %s cannot be used in a MoreLikeThis query. Do you store term vectors or store the value itself (prefer to tore term vectors)? Is it an id? Ids are not considered in MoreLikeThis queries.")
-	SearchException fieldCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+	@Message(id = 207, value = "Field %s of entity %s cannot be used in a MoreLikeThis query: the term vector (preferred) or the value itself need to be stored.")
+	SearchException fieldNotStoredNorTermVectorCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
 
 	@Message(id = 208, value = "ClassLoaderService cannot be provided via SearchConfiguration#getProvidedServices. Use SearchConfiguration#getClassLoaderService!")
 	SearchException classLoaderServiceContainedInProvidedServicesException();
@@ -722,4 +722,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 212, value = "An exception occurred while the MassIndexer was transforming identifiers to Lucene Documents")
 	String massIndexerExceptionWhileTransformingIds();
 
+	@Message(id = 213, value = "Field %s of entity %s cannot be used in a MoreLikeThis query. Ids and embedded ids are excluded.")
+	SearchException fieldIdCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+
+	@Message(id = 214, value = "Field %s of entity %s cannot be used in a MoreLikeThis query. Numeric fields are not considered for the moment.")
+	SearchException numericFieldCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
 }
