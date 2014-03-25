@@ -111,13 +111,12 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 	}
 
 	private String[] getAllCompatibleFieldNames(DocumentBuilderIndexedEntity<?> documentBuilder) {
-		// TODO does that return embedded properties?
 		Collection<DocumentFieldMetadata> allFieldMetadata = documentBuilder.getTypeMetadata().getAllDocumentFieldMetadata();
 		List<String> fieldNames = new ArrayList<String>( allFieldMetadata.size() );
 		for ( DocumentFieldMetadata fieldMetadata : allFieldMetadata ) {
 			if ( ( fieldMetadata.getTermVector() != Field.TermVector.NO //has term vector
 				|| fieldMetadata.getStore() != org.hibernate.search.annotations.Store.NO ) //is stored
-				&& !fieldMetadata.isId() ) { //Exclude id fields as they are not meaningful for MoreLikeThis
+				&& ! ( fieldMetadata.isId() || fieldMetadata.isIdInEmbedded() ) ) { //Exclude id fields as they are not meaningful for MoreLikeThis
 				fieldNames.add( fieldMetadata.getName() );
 			}
 		}

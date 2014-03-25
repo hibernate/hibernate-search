@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -206,8 +207,20 @@ public class TypeMetadata {
 	 * implementation reasons.
 	 */
 	public Collection<DocumentFieldMetadata> getAllDocumentFieldMetadata() {
-		//no need to wrap as unmodifiable collections, the instances are already safe.
-		return documentFieldNameToFieldMetadata.values();
+		if ( embeddedTypeMetadata.isEmpty() ) {
+			//no need to wrap as unmodifiable collections, the instances are already safe.
+			return documentFieldNameToFieldMetadata.values();
+		}
+		else {
+			Collection<DocumentFieldMetadata> allMetadata = new ArrayList<DocumentFieldMetadata>(
+					documentFieldNameToFieldMetadata.size()
+			);
+			for ( EmbeddedTypeMetadata element : embeddedTypeMetadata ) {
+				allMetadata.addAll( element.getAllDocumentFieldMetadata() );
+			}
+			allMetadata.addAll( documentFieldNameToFieldMetadata.values() );
+			return allMetadata;
+		}
 	}
 
 	public List<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
