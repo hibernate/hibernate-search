@@ -1037,6 +1037,42 @@ public class DSLTest extends SearchTestCase {
 						.get();
 	}
 
+	public void testMoreLikeThisOnCompressedFields() {
+		boolean outputLogs = true;
+		Transaction transaction = fullTextSession.beginTransaction();
+		Query mltQuery;
+		List<Object[]> entityResults;
+		try {
+			QueryBuilder qb = getCoffeeQueryBuilder();
+			Coffee decaffInstance = getDecaffInstance( qb );
+			// using compressed field
+			mltQuery = qb
+					.moreLikeThis()
+					.comparingField( "brand.description" )
+					.toEntityWithId( decaffInstance.getId() )
+					.createQuery();
+			entityResults = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+			assertThat( entityResults ).isNotEmpty();
+			Long matchingElements = (Long) fullTextSession.createQuery(
+					"select count(*) from Coffee c where c.brand.name like '%pony'"
+			).uniqueResult();
+			assertThat( entityResults ).hasSize( matchingElements.intValue() );
+			float score = -1;
+			for ( Object[] element : entityResults ) {
+				if ( score == -1 ) {
+					score = (Float) element[1];
+				}
+				assertThat( element[1] ).as( "All scores should be equal as the same brand is used" ).isEqualTo( score );
+			}
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, entityResults );
+		}
+		finally {
+			transaction.commit();
+		}
+	}
 
 	public void testMoreLikeThisOnEmbeddedFields() {
 		boolean outputLogs = true;
@@ -1165,9 +1201,11 @@ public class DSLTest extends SearchTestCase {
 
 		CoffeeBrand brandPony = new CoffeeBrand();
 		brandPony.setName( "My little pony" );
+		brandPony.setDescription( "Sells goods for horseback riding and good coffee blends" );
 		fullTextSession.persist( brandPony );
 		CoffeeBrand brandMonkey = new CoffeeBrand();
 		brandMonkey.setName( "Monkey Monkey Do" );
+		brandPony.setDescription( "Offers mover services via monkeys instead of trucks for difficult terrains. Coffees from this brand make monkeys work much faster." );
 		fullTextSession.persist( brandMonkey );
 		createCoffee(
 				"Kazaar",
