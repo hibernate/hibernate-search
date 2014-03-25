@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.junit.Test;
 
 /**

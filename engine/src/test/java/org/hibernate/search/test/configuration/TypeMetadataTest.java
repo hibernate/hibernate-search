@@ -25,7 +25,7 @@
 package org.hibernate.search.test.configuration;
 
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;

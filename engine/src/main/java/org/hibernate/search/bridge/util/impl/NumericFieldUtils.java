@@ -22,7 +22,7 @@ package org.hibernate.search.bridge.util.impl;
 
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 
 /**
  * Utility class to handle Numeric Fields

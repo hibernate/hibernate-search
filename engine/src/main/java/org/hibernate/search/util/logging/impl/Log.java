@@ -32,7 +32,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.errors.EmptyQueryException;

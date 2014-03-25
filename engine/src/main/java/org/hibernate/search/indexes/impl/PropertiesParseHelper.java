@@ -23,7 +23,7 @@ package org.hibernate.search.indexes.impl;
 import java.util.Properties;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
 import org.hibernate.search.engine.service.spi.ServiceManager;

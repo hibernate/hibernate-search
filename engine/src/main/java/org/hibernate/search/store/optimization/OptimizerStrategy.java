@@ -48,7 +48,7 @@ public interface OptimizerStrategy {
 	 *
 	 * @param writer the index writer
 	 * @return {@code true} if optimisation occurred, {@code false} otherwise
-	 * @throws org.hibernate.search.SearchException in case of IO errors on the index
+	 * @throws org.hibernate.search.exception.SearchException in case of IO errors on the index
 	 */
 	boolean performOptimization(IndexWriter writer);
 

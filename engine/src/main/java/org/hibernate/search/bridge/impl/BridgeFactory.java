@@ -371,7 +371,7 @@ public final class BridgeFactory {
 	 * @param appliedOnType the type the bridge is applied on
 	 * @param reflectionManager The reflection manager instance
 	 * @return a TwoWayFieldBridge instance if the Field Bridge is an instance of a TwoWayFieldBridge.
-	 * @throws org.hibernate.search.SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge.
+	 * @throws org.hibernate.search.exception.SearchException if the FieldBridge passed in is not an instance of a TwoWayFieldBridge.
 	 */
 	public TwoWayFieldBridge extractTwoWayType(org.hibernate.search.annotations.FieldBridge fieldBridge,
 													XClass appliedOnType,

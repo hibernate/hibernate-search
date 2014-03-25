@@ -21,7 +21,7 @@
 
 package org.hibernate.search.query.engine;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 
 /**

@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.spi.Work;

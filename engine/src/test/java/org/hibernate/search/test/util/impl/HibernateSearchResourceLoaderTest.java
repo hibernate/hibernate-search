@@ -25,10 +25,10 @@ package org.hibernate.search.test.util.impl;
 
 import java.io.InputStream;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;

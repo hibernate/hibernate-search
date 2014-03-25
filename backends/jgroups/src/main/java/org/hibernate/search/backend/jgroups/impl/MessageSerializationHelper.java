@@ -22,7 +22,7 @@ package org.hibernate.search.backend.jgroups.impl;
 
 import java.nio.charset.Charset;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 
 
 /**

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.lucene.analysis.util.ResourceLoader;
-
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.logging.impl.Log;

@@ -20,7 +20,7 @@
  */
 package org.hibernate.search.errors;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 
 
 /**
