@@ -34,7 +34,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.Version;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.backend.spi.Worker;
