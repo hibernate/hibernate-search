@@ -629,8 +629,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <showWarnings>true</showWarnings>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                     <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
                     <proc>none</proc>
@@ -767,7 +767,7 @@
                                 <processors>
                                     <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                                 </processors>
-                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.6 -target 1.6</compilerArguments>
+                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.7 -target 1.7</compilerArguments>
                             </configuration>
                         </execution>
                     </executions>
