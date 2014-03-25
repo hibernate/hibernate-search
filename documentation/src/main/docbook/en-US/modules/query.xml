@@ -531,13 +531,9 @@ List&lt;Object[]&gt; results = (List&lt;Object[]&gt;) fullTextSession
 
         <para>This first example takes a <classname>Coffee</classname> id and
         finds the matching coffees across all fields. To be fair, this is not
-        <emphasis>all</emphasis> fields:</para>
+        across <emphasis>all</emphasis> fields:</para>
 
         <itemizedlist>
-          <listitem>
-            <para>the id is excluded as it would not make much sense</para>
-          </listitem>
-
           <listitem>
             <para>fields storing term vectors are considered</para>
           </listitem>
@@ -547,8 +543,13 @@ List&lt;Object[]&gt; results = (List&lt;Object[]&gt;) fullTextSession
           </listitem>
 
           <listitem>
-            <para>numeric fields are excluded today but that might change in a
-            future version</para>
+            <para>however, numeric fields are excluded today - that might
+            change in a future version</para>
+          </listitem>
+
+          <listitem>
+            <para>id fields of the root and embedded entities are excluded as
+            it would not make much sense in a More Like This query.</para>
           </listitem>
         </itemizedlist>
 
