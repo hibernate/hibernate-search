@@ -56,7 +56,6 @@ import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
@@ -382,8 +381,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		if ( JMXRegistrar.isNameRegistered( objectName ) ) {
 			JMXRegistrar.unRegisterMBean( objectName );
 		}
-		StatisticsInfo statisticsInfo = new StatisticsInfo( statistics );
-		JMXRegistrar.registerMBean( statisticsInfo, objectName );
+		JMXRegistrar.StatisticsInfo statisticsInfo = new JMXRegistrar.StatisticsInfo( statistics );
+		JMXRegistrar.registerMBean( statisticsInfo, StatisticsInfoMBean.class, objectName );
 		return objectName;
 	}
 
