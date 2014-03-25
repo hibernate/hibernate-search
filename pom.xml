@@ -385,6 +385,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-serialization-java</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-backend-jms</artifactId>
                 <version>${project.version}</version>
             </dependency>

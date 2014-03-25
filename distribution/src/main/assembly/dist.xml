@@ -105,7 +105,7 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/clustering/infinispan</outputDirectory>
+            <outputDirectory>dist/lib/clustering/directory-infinispan</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
@@ -119,26 +119,44 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/clustering/jgroups</outputDirectory>
+            <outputDirectory>dist/lib/clustering/backend-jgroups</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
                 <include>org.hibernate:hibernate-search-backend-jgroups</include>
+                <include>org.jgroups:jgroups</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/clustering/backend-jms</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-backend-jms</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/clustering/serialization-avro</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
                 <include>org.hibernate:hibernate-search-serialization-avro</include>
                 <include>org.apache.avro:avro</include>
             </includes>
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/clustering/jms</outputDirectory>
+            <outputDirectory>dist/lib/clustering/serialization-javastandard</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.hibernate:hibernate-search-backend-jms</include>
-                <include>org.hibernate:hibernate-search-serialization-avro</include>
-                <include>org.apache.avro:avro</include>
+                <include>org.hibernate:hibernate-search-serialization-java</include>
             </includes>
         </dependencySet>
 
