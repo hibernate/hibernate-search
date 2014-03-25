@@ -795,22 +795,18 @@ public class DSLTest extends SearchTestCase {
 		}
 	}
 
-	public void testMoreLikeThis() {
+	public void testMoreLikeThisBasicBehavior() {
 		boolean outputLogs = true;
 		Transaction transaction = fullTextSession.beginTransaction();
 		try {
-			QueryBuilder qb = fullTextSession.getSearchFactory()
-					.buildQueryBuilder()
-					.forEntity( Coffee.class )
-					.get();
-			Query decaff = qb.keyword().onField( "name" ).matching( "Decaffeinato" ).createQuery();
-			Coffee decaffInstance = (Coffee) fullTextSession.createFullTextQuery( decaff, Coffee.class ).list().get( 0 );
+			QueryBuilder qb = getCoffeeQueryBuilder();
+			Coffee decaffInstance = getDecaffInstance( qb );
 			Query mltQuery = qb
 					.moreLikeThis()
-							.favorSignificantTermsWithFactor( 1 )
-						.comparingAllFields()
-						.toEntityWithId( decaffInstance.getId() )
-						.createQuery();
+					.favorSignificantTermsWithFactor( 1 )
+					.comparingAllFields()
+					.toEntityWithId( decaffInstance.getId() )
+					.createQuery();
 			List<Object[]> results = (List<Object[]>) fullTextSession
 					.createFullTextQuery( mltQuery, Coffee.class )
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
@@ -822,17 +818,19 @@ public class DSLTest extends SearchTestCase {
 			mltQuery.extractTerms( terms );
 			assertThat( terms )
 					.describedAs( "internalDescription should be ignored" )
-					.doesNotSatisfy( new Condition<Collection<?>>() {
-				@Override
-				public boolean matches(Collection<?> value) {
-					for ( Term term : (Collection<Term>) value ) {
-						if ( "internalDescription".equals( term.field() ) ) {
-							return true;
-						}
-					}
-					return false;
-				}
-			} );
+					.doesNotSatisfy(
+							new Condition<Collection<?>>() {
+								@Override
+								public boolean matches(Collection<?> value) {
+									for ( Term term : (Collection<Term>) value ) {
+										if ( "internalDescription".equals( term.field() ) ) {
+											return true;
+										}
+									}
+									return false;
+								}
+							}
+					);
 			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, results );
 
 			//custom fields
@@ -869,6 +867,31 @@ public class DSLTest extends SearchTestCase {
 						.as( "Internal description is neither stored nor store termvectors" )
 						.contains( "internalDescription" );
 			}
+		}
+		finally {
+			transaction.commit();
+		}
+	}
+
+
+	public void testMoreLikeThisToEntity() {
+		boolean outputLogs = true;
+		Transaction transaction = fullTextSession.beginTransaction();
+		Query mltQuery;
+		try {
+			QueryBuilder qb = getCoffeeQueryBuilder();
+			Coffee decaffInstance = getDecaffInstance( qb );
+			// query results to compare toEntity() results against
+			mltQuery = qb
+					.moreLikeThis()
+					.comparingField( "summary" ).boostedTo( 10f )
+					.andField( "description" )
+					.toEntityWithId( decaffInstance.getId() )
+					.createQuery();
+			List<Object[]> results = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
 
 			// pass entity itself in a managed state
 			mltQuery = qb
@@ -885,7 +908,7 @@ public class DSLTest extends SearchTestCase {
 			// query from id and from the managed entity should match
 			assertThat( entityResults ).isNotEmpty();
 			assertThat( entityResults ).hasSize( results.size() );
-			for ( int index = 0 ; index < entityResults.size() ; index++ ) {
+			for ( int index = 0; index < entityResults.size(); index++ ) {
 				Object[] real = entityResults.get( index );
 				Object[] expected = results.get( index );
 				assertThat( real[1] ).isEqualTo( expected[1] );
@@ -918,7 +941,7 @@ public class DSLTest extends SearchTestCase {
 			// query from id and from the managed entity should match
 			assertThat( entityResults ).isNotEmpty();
 			assertThat( entityResults ).hasSize( results.size() );
-			for ( int index = 0 ; index < entityResults.size() ; index++ ) {
+			for ( int index = 0; index < entityResults.size(); index++ ) {
 				Object[] real = entityResults.get( index );
 				Object[] expected = results.get( index );
 				assertThat( real[1] ).isEqualTo( expected[1] );
@@ -948,7 +971,7 @@ public class DSLTest extends SearchTestCase {
 			// query from id and from the managed entity should match
 			assertThat( entityResults ).isNotEmpty();
 			assertThat( entityResults ).hasSize( results.size() );
-			for ( int index = 0 ; index < entityResults.size() ; index++ ) {
+			for ( int index = 0; index < entityResults.size(); index++ ) {
 				Object[] real = entityResults.get( index );
 				Object[] expected = results.get( index );
 				assertThat( real[1] ).isEqualTo( expected[1] );
@@ -956,6 +979,20 @@ public class DSLTest extends SearchTestCase {
 			}
 
 			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, entityResults );
+		}
+		finally {
+			transaction.commit();
+		}
+	}
+
+	public void testMoreLikeThisExcludingEntityBeingCompared() {
+		boolean outputLogs = true;
+		Transaction transaction = fullTextSession.beginTransaction();
+		Query mltQuery;
+		List<Object[]> results;
+		try {
+			QueryBuilder qb = getCoffeeQueryBuilder();
+			Coffee decaffInstance = getDecaffInstance( qb );
 
 			// exclude comparing entity
 			mltQuery = qb
@@ -970,7 +1007,7 @@ public class DSLTest extends SearchTestCase {
 					.list();
 			mltQuery = qb
 					.moreLikeThis()
-						.excludeEntityUsedForComparison()
+					.excludeEntityUsedForComparison()
 					.comparingField( "summary" ).boostedTo( 10f )
 					.andField( "description" )
 					.toEntityWithId( decaffInstance.getId() )
@@ -980,14 +1017,35 @@ public class DSLTest extends SearchTestCase {
 					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
 					.list();
 			assertThat( resultsWoComparingEntity ).hasSize( results.size() - 1 );
-			for ( int index = 0 ; index < resultsWoComparingEntity.size() ; index++ ) {
+			for ( int index = 0; index < resultsWoComparingEntity.size(); index++ ) {
 				Object[] real = resultsWoComparingEntity.get( index );
 				Object[] expected = results.get( index + 1 );
 				assertThat( real[1] ).isEqualTo( expected[1] );
 				assertThat( ( (Coffee) real[0] ).getId() ).isEqualTo( ( (Coffee) expected[0] ).getId() );
 			}
 			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, resultsWoComparingEntity );
+		}
+		finally {
+			transaction.commit();
+		}
+	}
 
+	private QueryBuilder getCoffeeQueryBuilder() {
+		return fullTextSession.getSearchFactory()
+						.buildQueryBuilder()
+						.forEntity( Coffee.class )
+						.get();
+	}
+
+
+	public void testMoreLikeThisOnEmbeddedFields() {
+		boolean outputLogs = true;
+		Transaction transaction = fullTextSession.beginTransaction();
+		Query mltQuery;
+		List<Object[]> entityResults;
+		try {
+			QueryBuilder qb = getCoffeeQueryBuilder();
+			Coffee decaffInstance = getDecaffInstance( qb );
 			// using fields from IndexedEmbedded
 			mltQuery = qb
 					.moreLikeThis()
@@ -1029,6 +1087,13 @@ public class DSLTest extends SearchTestCase {
 		finally {
 			transaction.commit();
 		}
+	}
+
+	private Coffee getDecaffInstance(QueryBuilder qb) {
+		Query decaff = qb.keyword().onField( "name" ).matching( "Decaffeinato" ).createQuery();
+		return (Coffee) fullTextSession.createFullTextQuery( decaff, Coffee.class )
+				.list()
+				.get( 0 );
 	}
 
 	private void outputQueryAndResults(boolean outputLogs, Coffee originalInstance, Query mltQuery, List<Object[]> results) {
