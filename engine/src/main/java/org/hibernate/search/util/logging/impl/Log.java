@@ -30,6 +30,7 @@ import java.io.IOException;
 import org.apache.lucene.index.CorruptIndexException;
 
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.exception.SearchException;
@@ -322,7 +323,7 @@ public interface Log extends BasicLogger {
 	void unexpectedErrorInLuceneBackend(@Cause Throwable tw);
 
 	@LogMessage(level = WARN)
-	@Message(id = 75, value = "Configuration setting " + org.hibernate.search.Environment.LUCENE_MATCH_VERSION
+	@Message(id = 75, value = "Configuration setting " + Environment.LUCENE_MATCH_VERSION
 			+ " was not specified: using LUCENE_CURRENT.")
 	void recommendConfiguringLuceneVersion();
 

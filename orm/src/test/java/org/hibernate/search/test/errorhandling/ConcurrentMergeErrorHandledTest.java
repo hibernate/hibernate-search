@@ -28,7 +28,7 @@ import java.io.IOException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.test.SearchTestBase;

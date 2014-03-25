@@ -107,7 +107,7 @@ public class WorkPlan {
 	 * This is meant for resource control for auto flushing of large pending batches.
 	 *
 	 * @return the approximation
-	 * @see org.hibernate.search.Environment#QUEUEINGPROCESSOR_BATCHSIZE
+	 * @see org.hibernate.search.cfg.Environment#QUEUEINGPROCESSOR_BATCHSIZE
 	 */
 	public int size() {
 		return approximateWorkQueueSize;

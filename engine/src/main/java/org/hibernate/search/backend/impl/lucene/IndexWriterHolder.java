@@ -35,7 +35,7 @@ import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.impl.lucene.overrides.ConcurrentMergeScheduler;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters.ParameterSet;

@@ -27,9 +27,9 @@ import org.apache.lucene.analysis.core.SimpleAnalyzer;
 
 import org.hibernate.Transaction;
 
-import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
 import org.junit.Assert;

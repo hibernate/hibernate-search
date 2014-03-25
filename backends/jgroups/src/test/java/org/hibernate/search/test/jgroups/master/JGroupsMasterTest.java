@@ -37,7 +37,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;

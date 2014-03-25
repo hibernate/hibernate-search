@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;

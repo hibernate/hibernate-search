@@ -26,7 +26,7 @@ package org.hibernate.search.impl;
 import java.lang.reflect.Method;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.annotations.Factory;
