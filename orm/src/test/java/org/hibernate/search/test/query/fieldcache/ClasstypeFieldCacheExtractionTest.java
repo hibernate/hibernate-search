@@ -26,7 +26,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;

@@ -32,7 +32,7 @@ import org.apache.lucene.document.Document;
 import org.hibernate.Transaction;
 import org.hibernate.ScrollableResults;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.FullTextQuery;

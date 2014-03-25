@@ -26,7 +26,7 @@ package org.hibernate.search.test.errorhandling;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;

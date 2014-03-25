@@ -26,7 +26,7 @@ package org.hibernate.search.backend.impl;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.spi.ServiceManager;

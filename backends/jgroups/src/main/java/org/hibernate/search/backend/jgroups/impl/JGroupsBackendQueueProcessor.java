@@ -68,7 +68,7 @@ public class JGroupsBackendQueueProcessor implements BackendQueueProcessor {
 	 * The default value depends on the backend configuration: if it's set to async,
 	 * then block_waiting_ack defaults to false.
 	 *
-	 * @see org.hibernate.search.Environment#WORKER_EXECUTION
+	 * @see org.hibernate.search.cfg.Environment#WORKER_EXECUTION
 	 */
 	public static final String BLOCK_WAITING_ACK = "block_waiting_ack";
 

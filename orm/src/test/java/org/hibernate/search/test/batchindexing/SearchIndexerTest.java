@@ -31,7 +31,7 @@ import org.apache.lucene.search.TermQuery;
 import org.junit.Test;
 
 import org.hibernate.Transaction;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -118,7 +118,7 @@ public class SearchIndexerTest {
 	public void testIdentifierNaming() throws InterruptedException {
 		//disable automatic indexing, to test manual index creation.
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
-				.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
+				.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
 				.addAnnotatedClass( Dvd.class )
 				.addAnnotatedClass( Nation.class )
 				.addAnnotatedClass( Book.class )
@@ -177,7 +177,7 @@ public class SearchIndexerTest {
 	public void testExtendedIdentifierNaming() throws InterruptedException {
 		//disable automatic indexing, to test manual index creation.
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
-				.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
+				.setProperty( Environment.ANALYZER_CLASS, StandardAnalyzer.class.getName() )
 				.addAnnotatedClass( ExtendedIssueEntity.class )
 				.addAnnotatedClass( IssueEntity.class )
 				.setProperty( Environment.INDEXING_STRATEGY, "manual" )

@@ -22,7 +22,7 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.batchindexing.impl.Executors;
@@ -60,7 +60,7 @@ public class PropertiesParseHelper {
 	}
 
 	/**
-	 * Returns the configured value of {@link org.hibernate.search.Environment#INDEX_METADATA_COMPLETE} for this specific index.
+	 * Returns the configured value of {@link org.hibernate.search.cfg.Environment#INDEX_METADATA_COMPLETE} for this specific index.
 	 * If no value is set, the default is defined by {@link org.hibernate.search.cfg.spi.SearchConfiguration#isIndexMetadataComplete()}.
 	 *
 	 * @param indexProps The index configuration properties

@@ -40,6 +40,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -190,7 +191,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
-		cfg.setProperty( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 
 		cfg.setProperty( "hibernate.search.default.indexwriter.merge_factor", "100" );
 		cfg.setProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
