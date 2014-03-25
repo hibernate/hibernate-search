@@ -63,6 +63,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
+import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -353,9 +354,8 @@ public class MoreLikeThisBuilder<T> {
 					}
 					IndexableField[] fields = maybeDocument.getFields( fieldName );
 					for ( IndexableField field : fields ) {
-						//TODO how can I read compressed data
-						//TODO numbers?
-						final String stringValue = field.stringValue();
+						//TODO numbers
+						final String stringValue = DocumentBuilderHelper.extractStringFromFieldable( field );
 						if ( stringValue != null ) {
 							addTermFrequencies( new StringReader( stringValue ), termFreqMap, fieldContext );
 						}

@@ -24,6 +24,9 @@
 package org.hibernate.search.test.query.dsl;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -63,8 +66,13 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Emmanuel Bernard
@@ -72,7 +80,9 @@ import org.hibernate.search.testsupport.TestForIssue;
  */
 //DO NOT AUTO INDENT THIS FILE.
 //MY DSL IS BEAUTIFUL, DUMB INDENTATION IS SCREWING IT UP
-public class DSLTest extends SearchTestCase {
+public class DSLTest extends SearchTestCaseJUnit4 {
+	private static final Log log = LoggerFactory.make();
+
 	private final Calendar calendar = Calendar.getInstance();
 
 	private FullTextSession fullTextSession;
@@ -80,7 +90,7 @@ public class DSLTest extends SearchTestCase {
 	private Date february;
 	private Date march;
 
-	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -88,12 +98,13 @@ public class DSLTest extends SearchTestCase {
 		indexTestData();
 	}
 
-	@Override
+	@After
 	public void tearDown() throws Exception {
 		cleanUpTestData();
 		super.tearDown();
 	}
 
+	@Test
 	public void testUseOfFieldBridge() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -111,6 +122,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testUseOfCustomFieldBridgeInstance() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -129,6 +141,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testUseOfMultipleCustomFieldBridgeInstances() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -152,6 +165,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testTermQueryOnAnalyzer() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -185,6 +199,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testFuzzyAndWildcardQuery() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -228,6 +243,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@SuppressWarnings("unchecked")
 	public void testQueryCustomization() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -263,6 +279,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@SuppressWarnings("unchecked")
 	public void testMultipleFields() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -306,6 +323,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@SuppressWarnings("unchecked")
 	public void testBoolean() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -362,6 +380,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testRangeQueryFromTo() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -398,6 +417,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testRangeQueryBelow() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -447,6 +467,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testRangeQueryAbove() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -505,6 +526,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testPhraseQuery() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -562,6 +584,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1074")
 	public void testPhraseQueryWithNoTermsAfterAnalyzerApplication() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -582,6 +605,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testNumericRangeQueries() {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -605,6 +629,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@TestForIssue( jiraKey = "HSEARCH-1378")
 	public void testNumericRangeQueryAbove() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -637,6 +662,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@TestForIssue( jiraKey = "HSEARCH-1378")
 	public void testNumericRangeQueryBelow() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -669,6 +695,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testNumericFieldsTermQuery() {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -688,6 +715,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	public void testFieldBridge() {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
@@ -704,7 +732,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
-
+	@Test
 	public void testSpatialQueries() {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
@@ -737,6 +765,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@TestForIssue( jiraKey = "HSEARCH-703" )
 	public void testPolymorphicQueryForUnindexedSuperTypeReturnsIndexedSubType() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -755,6 +784,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@TestForIssue( jiraKey = "HSEARCH-703" )
 	public void testPolymorphicQueryWithKeywordTermForUnindexedSuperTypeReturnsIndexedSubType() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -774,6 +804,7 @@ public class DSLTest extends SearchTestCase {
 		transaction.commit();
 	}
 
+	@Test
 	@TestForIssue( jiraKey = "HSEARCH-703" )
 	public void testObtainingBuilderForUnindexedTypeWithoutIndexedSubTypesCausesException() {
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -795,6 +826,8 @@ public class DSLTest extends SearchTestCase {
 		}
 	}
 
+	@Test
+	@SuppressWarnings( "unchecked" )
 	public void testMoreLikeThisBasicBehavior() {
 		boolean outputLogs = true;
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -873,7 +906,8 @@ public class DSLTest extends SearchTestCase {
 		}
 	}
 
-
+	@Test
+	@SuppressWarnings( "unchecked" )
 	public void testMoreLikeThisToEntity() {
 		boolean outputLogs = true;
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -985,6 +1019,8 @@ public class DSLTest extends SearchTestCase {
 		}
 	}
 
+	@Test
+	@SuppressWarnings( "unchecked" )
 	public void testMoreLikeThisExcludingEntityBeingCompared() {
 		boolean outputLogs = true;
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -1030,14 +1066,47 @@ public class DSLTest extends SearchTestCase {
 		}
 	}
 
-	private QueryBuilder getCoffeeQueryBuilder() {
-		return fullTextSession.getSearchFactory()
-						.buildQueryBuilder()
-						.forEntity( Coffee.class )
-						.get();
+	@Test
+	@SuppressWarnings( "unchecked" )
+	public void testMoreLikeThisOnCompressedFields() {
+		boolean outputLogs = true;
+		Transaction transaction = fullTextSession.beginTransaction();
+		Query mltQuery;
+		List<Object[]> entityResults;
+		try {
+			QueryBuilder qb = getCoffeeQueryBuilder();
+			Coffee decaffInstance = getDecaffInstance( qb );
+			// using compressed field
+			mltQuery = qb
+					.moreLikeThis()
+					.comparingField( "brand.description" )
+					.toEntityWithId( decaffInstance.getId() )
+					.createQuery();
+			entityResults = (List<Object[]>) fullTextSession
+					.createFullTextQuery( mltQuery, Coffee.class )
+					.setProjection( ProjectionConstants.THIS, ProjectionConstants.SCORE )
+					.list();
+			assertThat( entityResults ).isNotEmpty();
+			Long matchingElements = (Long) fullTextSession.createQuery(
+					"select count(*) from Coffee c where c.brand.name like '%pony'"
+			).uniqueResult();
+			assertThat( entityResults ).hasSize( matchingElements.intValue() );
+			float score = -1;
+			for ( Object[] element : entityResults ) {
+				if ( score == -1 ) {
+					score = (Float) element[1];
+				}
+				assertThat( element[1] ).as( "All scores should be equal as the same brand is used" ).isEqualTo( score );
+			}
+			outputQueryAndResults( outputLogs, decaffInstance, mltQuery, entityResults );
+		}
+		finally {
+			transaction.commit();
+		}
 	}
 
-
+	@Test
+	@SuppressWarnings( "unchecked" )
 	public void testMoreLikeThisOnEmbeddedFields() {
 		boolean outputLogs = true;
 		Transaction transaction = fullTextSession.beginTransaction();
@@ -1089,6 +1158,13 @@ public class DSLTest extends SearchTestCase {
 		}
 	}
 
+	private QueryBuilder getCoffeeQueryBuilder() {
+		return fullTextSession.getSearchFactory()
+				.buildQueryBuilder()
+				.forEntity( Coffee.class )
+				.get();
+	}
+
 	private Coffee getDecaffInstance(QueryBuilder qb) {
 		Query decaff = qb.keyword().onField( "name" ).matching( "Decaffeinato" ).createQuery();
 		return (Coffee) fullTextSession.createFullTextQuery( decaff, Coffee.class )
@@ -1107,7 +1183,7 @@ public class DSLTest extends SearchTestCase {
 				builder.append( "    Score: " ).append( entry[1] );
 				builder.append( " | Coffee: " ).append( entry[0] ).append( "\n" );
 			}
-			System.out.println( builder.toString() );
+			log.debug( builder.toString() );
 		}
 	}
 
@@ -1165,9 +1241,11 @@ public class DSLTest extends SearchTestCase {
 
 		CoffeeBrand brandPony = new CoffeeBrand();
 		brandPony.setName( "My little pony" );
+		brandPony.setDescription( "Sells goods for horseback riding and good coffee blends" );
 		fullTextSession.persist( brandPony );
 		CoffeeBrand brandMonkey = new CoffeeBrand();
 		brandMonkey.setName( "Monkey Monkey Do" );
+		brandPony.setDescription( "Offers mover services via monkeys instead of trucks for difficult terrains. Coffees from this brand make monkeys work much faster." );
 		fullTextSession.persist( brandMonkey );
 		createCoffee(
 				"Kazaar",
@@ -1334,7 +1412,9 @@ public class DSLTest extends SearchTestCase {
 		coffee.setSummary( summary );
 		coffee.setDescription( description );
 		coffee.setIntensity( intensity );
-		coffee.setInternalDescription( "Same internal description of coffee and blend that would make things look quite the same." );
+		coffee.setInternalDescription(
+				"Same internal description of coffee and blend that would make things look quite the same."
+		);
 		coffee.setBrand( brand );
 		fullTextSession.persist( coffee );
 	}
