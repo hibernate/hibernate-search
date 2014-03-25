@@ -22,7 +22,7 @@ package org.hibernate.search.test.integration.cmp;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.Version;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;

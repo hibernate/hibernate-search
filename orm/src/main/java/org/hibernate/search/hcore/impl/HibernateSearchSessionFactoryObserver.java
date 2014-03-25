@@ -29,7 +29,7 @@ import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
-import org.hibernate.search.Version;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;

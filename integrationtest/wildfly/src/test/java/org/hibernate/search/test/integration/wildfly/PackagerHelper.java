@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.test.integration.wildfly;
 
-import org.hibernate.search.Version;
+import org.hibernate.search.engine.Version;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.strategy.RejectDependenciesStrategy;
