@@ -26,7 +26,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.errors.EmptyQueryException;
+import org.hibernate.search.exception.EmptyQueryException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;

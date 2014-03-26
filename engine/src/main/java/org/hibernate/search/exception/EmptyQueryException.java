@@ -18,10 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.errors;
-
-import org.hibernate.search.exception.SearchException;
-
+package org.hibernate.search.exception;
 
 /**
  * This Exception is thrown when an empty TermQuery (keyword query) is created,
@@ -29,8 +26,8 @@ import org.hibernate.search.exception.SearchException;
  *
  * Applications should validate user input before running such a Query;
  *
- * @see org.hibernate.search.util.AnalyzerUtils
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @see org.hibernate.search.util.AnalyzerUtils
  */
 public class EmptyQueryException extends SearchException {
 

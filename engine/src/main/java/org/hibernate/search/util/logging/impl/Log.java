@@ -36,7 +36,7 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.errors.EmptyQueryException;
+import org.hibernate.search.exception.EmptyQueryException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
