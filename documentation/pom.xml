@@ -47,14 +47,12 @@
     <!-- needed for javadocs generation -->
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-infinispan</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

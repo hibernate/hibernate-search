@@ -40,9 +40,8 @@
     <dependencies>
         <!-- For backwards compatibility: the dependency to be used is now hibernate-search-orm  -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

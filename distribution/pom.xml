@@ -38,19 +38,16 @@
         <!-- The modules to include in the distribution. Any non-optional/provided dependencies will
                      automatically be included as well -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-infinispan</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- Need to list out optional/provided dependencies here again in order to include them via assembly dependency set -->
