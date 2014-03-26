@@ -105,7 +105,7 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/clustering/infinispan</outputDirectory>
+            <outputDirectory>dist/lib/optional/clustering/directory-infinispan</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
@@ -113,29 +113,50 @@
                 <include>org.hibernate:hibernate-search-infinispan</include>
                 <include>org.infinispan:infinispan-lucene-directory</include>
             </includes>
+            <excludes>
+               <exclude>org.jboss.spec.javax.transaction:*</exclude>
+            </excludes>
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/clustering/jgroups</outputDirectory>
+            <outputDirectory>dist/lib/optional/clustering/backend-jgroups</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
                 <include>org.hibernate:hibernate-search-backend-jgroups</include>
+                <include>org.jgroups:jgroups</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/optional/clustering/backend-jms</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.hibernate:hibernate-search-backend-jms</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>dist/lib/optional/clustering/serialization-avro</outputDirectory>
+            <scope>runtime</scope>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
                 <include>org.hibernate:hibernate-search-serialization-avro</include>
                 <include>org.apache.avro:avro</include>
             </includes>
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/clustering/jms</outputDirectory>
+            <outputDirectory>dist/lib/optional/clustering/serialization-javastandard</outputDirectory>
             <scope>runtime</scope>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.hibernate:hibernate-search-backend-jms</include>
-                <include>org.hibernate:hibernate-search-serialization-avro</include>
-                <include>org.apache.avro:avro</include>
+                <include>org.hibernate:hibernate-search-serialization-java</include>
             </includes>
         </dependencySet>
 
@@ -144,10 +165,10 @@
             <outputDirectory>/dist/lib/provided</outputDirectory>
             <scope>provided</scope>
             <includes>
-                <include>javax.jms:jms</include>
-                <include>javax.annotation:jsr250-api</include>
+                <include>org.jboss.spec.javax.jms:*</include>
+                <include>org.jboss.spec.javax.annotation:*</include>
                 <include>org.hibernate.javax.persistence:*</include>
-                <include>org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec</include>
+                <include>org.jboss.spec.javax.transaction:*</include>
             </includes>
         </dependencySet>
 
