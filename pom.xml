@@ -64,7 +64,7 @@
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-search</url>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <organization>
         <name>Hibernate</name>
