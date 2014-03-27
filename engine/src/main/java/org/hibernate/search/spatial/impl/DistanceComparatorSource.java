@@ -36,8 +36,8 @@ public class DistanceComparatorSource extends FieldComparatorSource {
 	}
 
 	@Override
-	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed)
+	public FieldComparator<?> newComparator(String fieldName, int numHits, int sortPos, boolean reversed)
 			throws IOException {
-		return new DistanceComparator( center, numHits, fieldname );
+		return new DistanceComparator( center, numHits, fieldName );
 	}
 }

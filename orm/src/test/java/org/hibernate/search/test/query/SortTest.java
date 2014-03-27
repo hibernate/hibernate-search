@@ -43,6 +43,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -324,6 +325,7 @@ public class SortTest extends SearchTestCase {
 		private Ints currentReaderValuesField1;
 		private Ints currentReaderValuesField2;
 		private int bottom;
+		private Integer topValue;
 
 		public SumFieldComparator(int numHits, String field1, String field2) {
 			this.field1 = field1;
@@ -359,6 +361,11 @@ public class SortTest extends SearchTestCase {
 		}
 
 		@Override
+		public int compareTop(int doc) throws IOException {
+			return topValue - field1Values[doc] - field2Values[doc];
+		}
+
+		@Override
 		public void copy(int slot, int doc) {
 			int v1 = currentReaderValuesField1.get( doc );
 			field1Values[slot] = v1;
@@ -383,14 +390,13 @@ public class SortTest extends SearchTestCase {
 		}
 
 		@Override
-		public Integer value(int slot) {
-			return field1Values[slot] + field2Values[slot];
+		public void setTopValue(Integer value) {
+			this.topValue = value;
 		}
 
 		@Override
-		public int compareDocToValue(int doc, Integer value) throws IOException {
-			return value - field1Values[doc] - field2Values[doc];
+		public Integer value(int slot) {
+			return field1Values[slot] + field2Values[slot];
 		}
-
 	}
 }

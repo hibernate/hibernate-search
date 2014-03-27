@@ -34,8 +34,8 @@
 
     <artifactId>hibernate-search-infinispan</artifactId>
 
-    <name>Hibernate Search Infinispan Backend</name>
-    <description>Hibernate Search Infinispan Backend</description>
+    <name>Hibernate Search Infinispan Directory Provider</name>
+    <description>Hibernate Search Infinispan Directory Provider</description>
 
     <dependencies>
         <dependency>
