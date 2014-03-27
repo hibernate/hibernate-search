@@ -1573,6 +1573,23 @@ hibernate.search.default.indexwriter.ram_buffer_size = 64</programlisting>
 
               <entry>true</entry>
             </row>
+
+            <row>
+              <entry>
+                <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_thread_states</property>
+              </entry>
+
+              <entry>
+                <para>Lucene's <literal>IndexWriter</literal> can apply writes in
+                parallel, but this property controls the limit of parallelism.</para>
+
+                <para>If you have many cores and contention on the internal structures
+                of the <literal>IndexWriter</literal> becomes a bottleneck you should
+                configure an higher value, at the cost of slightly higher memory consumption.</para>
+              </entry>
+
+              <entry>8</entry>
+            </row>
           </tbody>
         </tgroup>
       </table>

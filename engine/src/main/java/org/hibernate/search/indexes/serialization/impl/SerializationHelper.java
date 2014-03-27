@@ -60,8 +60,13 @@ public final class SerializationHelper {
 	public static <T> T toInstance(byte[] data, Class<T> clazz) {
 		try {
 			ByteArrayInputStream byteIn = new ByteArrayInputStream( data );
-			ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, clazz.getClassLoader() );
-			return (T) in.readObject();
+			final ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, clazz.getClassLoader() );
+			try {
+				return (T) in.readObject();
+			}
+			finally {
+				in.close();
+			}
 		}
 		catch (IOException e) {
 			throw log.failToDeserializeObject( e );
@@ -74,8 +79,13 @@ public final class SerializationHelper {
 	public static Serializable toSerializable(byte[] data, ClassLoader loader) {
 		try {
 			ByteArrayInputStream byteIn = new ByteArrayInputStream( data );
-			ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, loader );
-			return (Serializable) in.readObject();
+			final ObjectInputStream in = new ClassLoaderAwareObjectInputStream( byteIn, loader );
+			try {
+				return (Serializable) in.readObject();
+			}
+			finally {
+				in.close();
+			}
 		}
 		catch (IOException e) {
 			throw log.failToDeserializeObject( e );

@@ -135,6 +135,15 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	},
 	/**
+	 * @see org.apache.lucene.index.IndexWriterConfig.setMaxThreadStates(int)
+	 */
+	MAX_THREAD_STATES( "max_thread_states" ) {
+		@Override
+		public void applySetting(IndexWriterConfig writerConfig, int value) {
+			writerConfig.setMaxThreadStates( value );
+		}
+	},
+	/**
 	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setUseCompoundFile(boolean)
 	 * @deprecated No longer applied.
 	 */
