@@ -25,8 +25,8 @@
 package org.hibernate.search.test.bridge.tika;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -208,14 +208,17 @@ public class TikaBridgeTest extends SearchTestCase {
 
 		@Field
 		@TikaBridge
-		Date now = new Date();
+		Bar someBar = new Bar();
 
 		public long getId() {
 			return id;
 		}
 
-		public Date getNow() {
-			return now;
+		public Bar getSomeBar() {
+			return someBar;
+		}
+
+		public static class Bar implements Serializable {
 		}
 	}
 
