@@ -32,12 +32,11 @@ import org.hibernate.search.util.impl.ReflectionHelper;
 public class ContainedInMetadata {
 
 	private final XMember containedInMember;
-	private final Integer maxDepth;
+	private Integer maxDepth;
 
-	public ContainedInMetadata(XMember containedInMember, Integer maxDepth) {
+	public ContainedInMetadata(XMember containedInMember) {
 		this.containedInMember = containedInMember;
 		ReflectionHelper.setAccessible( this.containedInMember );
-		this.maxDepth = maxDepth;
 	}
 
 	public XMember getContainedInMember() {
@@ -46,6 +45,10 @@ public class ContainedInMetadata {
 
 	public Integer getMaxDepth() {
 		return maxDepth;
+	}
+
+	public void setMaxDepth(Integer maxDepth) {
+		this.maxDepth = maxDepth;
 	}
 
 	@Override
