@@ -47,7 +47,6 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
@@ -58,7 +57,6 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.BigDecimalBridge;
 import org.hibernate.search.bridge.builtin.BigIntegerBridge;
 import org.hibernate.search.bridge.builtin.BooleanBridge;
-import org.hibernate.search.bridge.builtin.CalendarBridge;
 import org.hibernate.search.bridge.builtin.CharacterBridge;
 import org.hibernate.search.bridge.builtin.DoubleBridge;
 import org.hibernate.search.bridge.builtin.EnumBridge;
@@ -106,34 +104,6 @@ public final class BridgeFactory {
 	public final TwoWayFieldBridge Uri;
 	public final TwoWayFieldBridge UUID;
 
-	public final FieldBridge CALENDAR_YEAR;
-	public final FieldBridge CALENDAR_MONTH;
-	public final FieldBridge CALENDAR_DAY;
-	public final FieldBridge CALENDAR_HOUR;
-	public final FieldBridge CALENDAR_MINUTE;
-	public final FieldBridge CALENDAR_SECOND;
-
-	public final FieldBridge ITERABLE_CALENDAR_YEAR;
-	public final FieldBridge ITERABLE_CALENDAR_MONTH;
-	public final FieldBridge ITERABLE_CALENDAR_DAY;
-	public final FieldBridge ITERABLE_CALENDAR_HOUR;
-	public final FieldBridge ITERABLE_CALENDAR_MINUTE;
-	public final FieldBridge ITERABLE_CALENDAR_SECOND;
-
-	public final FieldBridge MAP_CALENDAR_YEAR;
-	public final FieldBridge MAP_CALENDAR_MONTH;
-	public final FieldBridge MAP_CALENDAR_DAY;
-	public final FieldBridge MAP_CALENDAR_HOUR;
-	public final FieldBridge MAP_CALENDAR_MINUTE;
-	public final FieldBridge MAP_CALENDAR_SECOND;
-
-	public final FieldBridge ARRAY_CALENDAR_YEAR;
-	public final FieldBridge ARRAY_CALENDAR_MONTH;
-	public final FieldBridge ARRAY_CALENDAR_DAY;
-	public final FieldBridge ARRAY_CALENDAR_HOUR;
-	public final FieldBridge ARRAY_CALENDAR_MINUTE;
-	public final FieldBridge ARRAY_CALENDAR_SECOND;
-
 	public final FieldBridge ITERABLE_BRIDGE;
 	public final BuiltinIterableBridge ITERABLE_BRIDGE_DOUBLE;
 	public final BuiltinIterableBridge ITERABLE_BRIDGE_FLOAT;
@@ -151,12 +121,6 @@ public final class BridgeFactory {
 	public final BuiltinMapBridge MAP_BRIDGE_FLOAT;
 	public final BuiltinMapBridge MAP_BRIDGE_INT;
 	public final BuiltinMapBridge MAP_BRIDGE_LONG;
-
-	public final TwoWayFieldBridge CALENDAR_MILLISECOND;
-
-	public final FieldBridge ARRAY_CALENDAR_MILLISECOND;
-	public final FieldBridge ITERABLE_CALENDAR_MILLISECOND;
-	public final FieldBridge MAP_CALENDAR_MILLISECOND;
 
 	public final String TIKA_BRIDGE_NAME = "org.hibernate.search.bridge.builtin.TikaBridge";
 	public final String TIKA_BRIDGE_METADATA_PROCESSOR_SETTER = "setMetadataProcessorClass";
@@ -184,34 +148,6 @@ public final class BridgeFactory {
 		Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
 		UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );
 
-		CALENDAR_YEAR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_YEAR );
-		CALENDAR_MONTH = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MONTH );
-		CALENDAR_DAY = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_DAY );
-		CALENDAR_HOUR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_HOUR );
-		CALENDAR_MINUTE = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MINUTE );
-		CALENDAR_SECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_SECOND );
-
-		ITERABLE_CALENDAR_YEAR = new BuiltinIterableBridge( CALENDAR_YEAR );
-		ITERABLE_CALENDAR_MONTH = new BuiltinIterableBridge( CALENDAR_MONTH );
-		ITERABLE_CALENDAR_DAY = new BuiltinIterableBridge( CALENDAR_DAY );
-		ITERABLE_CALENDAR_HOUR = new BuiltinIterableBridge( CALENDAR_HOUR );
-		ITERABLE_CALENDAR_MINUTE = new BuiltinIterableBridge( CALENDAR_MINUTE );
-		ITERABLE_CALENDAR_SECOND = new BuiltinIterableBridge( CALENDAR_SECOND );
-
-		MAP_CALENDAR_YEAR = new BuiltinMapBridge( CALENDAR_YEAR );
-		MAP_CALENDAR_MONTH = new BuiltinMapBridge( CALENDAR_MONTH );
-		MAP_CALENDAR_DAY = new BuiltinMapBridge( CALENDAR_DAY );
-		MAP_CALENDAR_HOUR = new BuiltinMapBridge( CALENDAR_HOUR );
-		MAP_CALENDAR_MINUTE = new BuiltinMapBridge( CALENDAR_MINUTE );
-		MAP_CALENDAR_SECOND = new BuiltinMapBridge( CALENDAR_SECOND );
-
-		ARRAY_CALENDAR_YEAR = new BuiltinArrayBridge( CALENDAR_YEAR );
-		ARRAY_CALENDAR_MONTH = new BuiltinArrayBridge( CALENDAR_MONTH );
-		ARRAY_CALENDAR_DAY = new BuiltinArrayBridge( CALENDAR_DAY );
-		ARRAY_CALENDAR_HOUR = new BuiltinArrayBridge( CALENDAR_HOUR );
-		ARRAY_CALENDAR_MINUTE = new BuiltinArrayBridge( CALENDAR_MINUTE );
-		ARRAY_CALENDAR_SECOND = new BuiltinArrayBridge( CALENDAR_SECOND );
-
 		ITERABLE_BRIDGE = new BuiltinIterableBridge();
 		ITERABLE_BRIDGE_DOUBLE = new BuiltinIterableBridge( NumericFieldBridge.DOUBLE_FIELD_BRIDGE );
 		ITERABLE_BRIDGE_FLOAT = new BuiltinIterableBridge( NumericFieldBridge.FLOAT_FIELD_BRIDGE );
@@ -229,12 +165,6 @@ public final class BridgeFactory {
 		MAP_BRIDGE_FLOAT = new BuiltinMapBridge( NumericFieldBridge.FLOAT_FIELD_BRIDGE );
 		MAP_BRIDGE_INT = new BuiltinMapBridge( NumericFieldBridge.INT_FIELD_BRIDGE );
 		MAP_BRIDGE_LONG = new BuiltinMapBridge( NumericFieldBridge.LONG_FIELD_BRIDGE );
-
-		CALENDAR_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(CalendarBridge.CALENDAR_MILLISECOND );
-
-		ARRAY_CALENDAR_MILLISECOND = new BuiltinArrayBridge( CALENDAR_MILLISECOND );
-		ITERABLE_CALENDAR_MILLISECOND = new BuiltinIterableBridge( CALENDAR_MILLISECOND );
-		MAP_CALENDAR_MILLISECOND = new BuiltinMapBridge( CALENDAR_MILLISECOND );
 
 		builtInBridges = new HashMap<String, FieldBridge>();
 		builtInBridges.put( Character.class.getName(), CHARACTER );
@@ -258,8 +188,9 @@ public final class BridgeFactory {
 		builtInBridges.put( URL.class.getName(), Url );
 		builtInBridges.put( URI.class.getName(), Uri );
 		builtInBridges.put( UUID.class.getName(), UUID );
+		// TODO can I make these references back to static?
 		builtInBridges.put( Date.class.getName(), new DateBridgeProvider().DATE_MILLISECOND );
-		builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND );
+		builtInBridges.put( Calendar.class.getName(), new CalendarBridgeProvider().CALENDAR_MILLISECOND );
 
 		numericBridges = new HashMap<String, NumericFieldBridge>();
 		numericBridges.put( Integer.class.getName(), NumericFieldBridge.INT_FIELD_BRIDGE );
@@ -463,12 +394,12 @@ public final class BridgeFactory {
 			return bridge;
 		}
 
-		if ( member.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
-			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class )
-					.resolution();
-			bridge = guessCalendarFieldBridge( member, reflectionManager, resolution );
+		bridge = getFieldBridgeFromBridgeProvider( new CalendarBridgeProvider(), containerType, returnTypeElement, annotatedElement );
+		if ( bridge != null ) {
+			return bridge;
 		}
-		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.TikaBridge.class ) ) {
+
+		if ( member.isAnnotationPresent( org.hibernate.search.annotations.TikaBridge.class ) ) {
 			org.hibernate.search.annotations.TikaBridge annotation = member.getAnnotation( org.hibernate.search.annotations.TikaBridge.class );
 			bridge = createTikaBridge( annotation, serviceManager );
 		}
@@ -646,26 +577,6 @@ public final class BridgeFactory {
 		return null;
 	}
 
-	private FieldBridge guessCalendarFieldBridge(XMember member, ReflectionManager reflectionManager, Resolution resolution) {
-		if ( isNotAnnotatedWithIndexEmbedded( member ) ) {
-			return getCalendarField( resolution );
-		}
-
-		if ( isIterable( reflectionManager, member ) ) {
-			return getIterableCalendarField( resolution );
-		}
-
-		if ( member.isArray() ) {
-			return getArrayCalendarField( resolution );
-		}
-
-		if ( isMap( member ) ) {
-			return getMapCalendarField( resolution );
-		}
-
-		return null;
-	}
-
 	private boolean isNotAnnotatedWithIndexEmbedded(XMember member) {
 		return !isAnnotatedWithIndexEmbedded( member );
 	}
@@ -734,90 +645,6 @@ public final class BridgeFactory {
 	private void populateReturnType(Class<?> appliedOnType, Class<?> bridgeType, Object bridgeInstance) {
 		if ( AppliedOnTypeAwareBridge.class.isAssignableFrom( bridgeType ) ) {
 			( (AppliedOnTypeAwareBridge) bridgeInstance ).setAppliedOnType( appliedOnType );
-		}
-	}
-
-	private FieldBridge getCalendarField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return CALENDAR_YEAR;
-			case MONTH:
-				return CALENDAR_MONTH;
-			case DAY:
-				return CALENDAR_DAY;
-			case HOUR:
-				return CALENDAR_HOUR;
-			case MINUTE:
-				return CALENDAR_MINUTE;
-			case SECOND:
-				return CALENDAR_SECOND;
-			case MILLISECOND:
-				return CALENDAR_MILLISECOND;
-			default:
-				throw LOG.unknownResolution( resolution.toString() );
-		}
-	}
-
-	private FieldBridge getArrayCalendarField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return ARRAY_CALENDAR_YEAR;
-			case MONTH:
-				return ARRAY_CALENDAR_MONTH;
-			case DAY:
-				return ARRAY_CALENDAR_DAY;
-			case HOUR:
-				return ARRAY_CALENDAR_HOUR;
-			case MINUTE:
-				return ARRAY_CALENDAR_MINUTE;
-			case SECOND:
-				return ARRAY_CALENDAR_SECOND;
-			case MILLISECOND:
-				return ARRAY_CALENDAR_MILLISECOND;
-			default:
-				throw LOG.unknownArrayBridgeForResolution( resolution.toString() );
-		}
-	}
-
-	private FieldBridge getMapCalendarField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return MAP_CALENDAR_YEAR;
-			case MONTH:
-				return MAP_CALENDAR_MONTH;
-			case DAY:
-				return MAP_CALENDAR_DAY;
-			case HOUR:
-				return MAP_CALENDAR_HOUR;
-			case MINUTE:
-				return MAP_CALENDAR_MINUTE;
-			case SECOND:
-				return MAP_CALENDAR_SECOND;
-			case MILLISECOND:
-				return MAP_CALENDAR_MILLISECOND;
-			default:
-				throw LOG.unknownMapBridgeForResolution( resolution.toString() );
-		}
-	}
-
-	private FieldBridge getIterableCalendarField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return ITERABLE_CALENDAR_YEAR;
-			case MONTH:
-				return ITERABLE_CALENDAR_MONTH;
-			case DAY:
-				return ITERABLE_CALENDAR_DAY;
-			case HOUR:
-				return ITERABLE_CALENDAR_HOUR;
-			case MINUTE:
-				return ITERABLE_CALENDAR_MINUTE;
-			case SECOND:
-				return ITERABLE_CALENDAR_SECOND;
-			case MILLISECOND:
-				return ITERABLE_CALENDAR_MILLISECOND;
-			default:
-				throw LOG.unknownIterableBridgeForResolution( resolution.toString() );
 		}
 	}
 
