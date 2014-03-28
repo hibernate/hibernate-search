@@ -462,7 +462,7 @@ public final class BridgeFactory {
 	 * @param member the {@code XMember} on which the annotation is defined on
 	 * @return Returns the {@code SpatialFieldBridge} instance
 	 */
-	public FieldBridge buildSpatialBridge(Spatial spatial, XMember member) {
+	private FieldBridge buildSpatialBridge(Spatial spatial, XMember member) {
 		FieldBridge bridge;
 		try {
 			bridge = buildSpatialBridge( spatial, null, null );
@@ -485,7 +485,7 @@ public final class BridgeFactory {
 	 * @param latitudeField a {@link java.lang.String} object.
 	 * @param longitudeField a {@link java.lang.String} object.
 	 */
-	public FieldBridge buildSpatialBridge(Spatial spatial, String latitudeField, String longitudeField) {
+	private FieldBridge buildSpatialBridge(Spatial spatial, String latitudeField, String longitudeField) {
 		FieldBridge bridge = null;
 		if ( spatial != null ) {
 			if ( spatial.spatialMode() == SpatialMode.HASH ) {
@@ -559,6 +559,7 @@ public final class BridgeFactory {
 				bridge = new TwoWayString2FieldBridgeAdaptor( enumBridge );
 			}
 			if ( bridge == null && isAnnotatedWithIndexEmbedded( member ) ) {
+				// Used to index the null representation of an @IndexedEmbedded
 				bridge = guessEmbeddedFieldBridge( member, reflectionManager );
 			}
 		}
@@ -759,7 +760,7 @@ public final class BridgeFactory {
 		}
 	}
 
-	public FieldBridge getDateField(Resolution resolution) {
+	private FieldBridge getDateField(Resolution resolution) {
 		switch ( resolution ) {
 			case YEAR:
 				return DATE_YEAR;
@@ -780,7 +781,7 @@ public final class BridgeFactory {
 		}
 	}
 
-	public FieldBridge getArrayDateField(Resolution resolution) {
+	private FieldBridge getArrayDateField(Resolution resolution) {
 		switch ( resolution ) {
 			case YEAR:
 				return ARRAY_DATE_YEAR;
@@ -801,7 +802,7 @@ public final class BridgeFactory {
 		}
 	}
 
-	public FieldBridge getMapDateField(Resolution resolution) {
+	private FieldBridge getMapDateField(Resolution resolution) {
 		switch ( resolution ) {
 			case YEAR:
 				return MAP_DATE_YEAR;
@@ -822,7 +823,7 @@ public final class BridgeFactory {
 		}
 	}
 
-	public FieldBridge getIterableDateField(Resolution resolution) {
+	private FieldBridge getIterableDateField(Resolution resolution) {
 		switch ( resolution ) {
 			case YEAR:
 				return ITERABLE_DATE_YEAR;
@@ -843,7 +844,7 @@ public final class BridgeFactory {
 		}
 	}
 
-	public FieldBridge getCalendarField(Resolution resolution) {
+	private FieldBridge getCalendarField(Resolution resolution) {
 		switch ( resolution ) {
 			case YEAR:
 				return CALENDAR_YEAR;
@@ -864,7 +865,7 @@ public final class BridgeFactory {
 		}
 	}
 
-	public FieldBridge getArrayCalendarField(Resolution resolution) {
+	private FieldBridge getArrayCalendarField(Resolution resolution) {
 		switch ( resolution ) {
 			case YEAR:
 				return ARRAY_CALENDAR_YEAR;
@@ -885,7 +886,7 @@ public final class BridgeFactory {
 		}
 	}
 
-	public FieldBridge getMapCalendarField(Resolution resolution) {
+	private FieldBridge getMapCalendarField(Resolution resolution) {
 		switch ( resolution ) {
 			case YEAR:
 				return MAP_CALENDAR_YEAR;
@@ -906,7 +907,7 @@ public final class BridgeFactory {
 		}
 	}
 
-	public FieldBridge getIterableCalendarField(Resolution resolution) {
+	private FieldBridge getIterableCalendarField(Resolution resolution) {
 		switch ( resolution ) {
 			case YEAR:
 				return ITERABLE_CALENDAR_YEAR;
@@ -957,7 +958,7 @@ public final class BridgeFactory {
 	 * @param reflectionManager The reflection manager instance
 	 * @return FieldBridge
 	 */
-	public FieldBridge extractType(org.hibernate.search.annotations.FieldBridge fieldBridgeAnnotation,
+	private FieldBridge extractType(org.hibernate.search.annotations.FieldBridge fieldBridgeAnnotation,
 										XClass appliedOnType,
 										ReflectionManager reflectionManager) {
 		FieldBridge bridge = null;
