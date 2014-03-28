@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
@@ -45,8 +46,6 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
@@ -72,8 +71,6 @@ import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
-import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
-import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -300,67 +297,13 @@ public final class BridgeFactory {
 	public FieldBridge buildSpatialBridge(Spatial spatial, XClass clazz, String latitudeField, String longitudeField) {
 		FieldBridge bridge;
 		try {
-			bridge = buildSpatialBridge( spatial, latitudeField, longitudeField );
+			bridge = SpatialBridgeProvider.buildSpatialBridge( spatial, latitudeField, longitudeField );
 		}
 		catch (Exception e) {
 			throw LOG.unableToInstantiateSpatial( clazz.getName(), e );
 		}
 		if ( bridge == null ) {
 			throw LOG.unableToInstantiateSpatial( clazz.getName(), null );
-		}
-
-		return bridge;
-	}
-
-	/**
-	 * This instantiates the SpatialFieldBridge from a {@code Spatial} annotation.
-	 *
-	 * @param spatial the {@code Spatial} annotation
-	 * @param member the {@code XMember} on which the annotation is defined on
-	 * @return Returns the {@code SpatialFieldBridge} instance
-	 */
-	private FieldBridge buildSpatialBridge(Spatial spatial, XMember member) {
-		FieldBridge bridge;
-		try {
-			bridge = buildSpatialBridge( spatial, null, null );
-		}
-		catch (Exception e) {
-			throw LOG.unableToInstantiateSpatial( member.getName(), e );
-		}
-		if ( bridge == null ) {
-			throw LOG.unableToInstantiateSpatial( member.getName(), null );
-		}
-
-		return bridge;
-	}
-
-	/**
-	 * This instantiates the SpatialFieldBridge from a {@code Spatial} annotation.
-	 *
-	 * @param spatial the {@code Spatial} annotation
-	 * @return Returns the {@code SpatialFieldBridge} instance
-	 * @param latitudeField a {@link java.lang.String} object.
-	 * @param longitudeField a {@link java.lang.String} object.
-	 */
-	private FieldBridge buildSpatialBridge(Spatial spatial, String latitudeField, String longitudeField) {
-		FieldBridge bridge = null;
-		if ( spatial != null ) {
-			if ( spatial.spatialMode() == SpatialMode.HASH ) {
-				if ( latitudeField != null && longitudeField != null ) {
-					bridge = new SpatialFieldBridgeByHash( spatial.topSpatialHashLevel(), spatial.bottomSpatialHashLevel(), latitudeField, longitudeField );
-				}
-				else {
-					bridge = new SpatialFieldBridgeByHash( spatial.topSpatialHashLevel(), spatial.bottomSpatialHashLevel() );
-				}
-			}
-			else {
-				if ( latitudeField != null && longitudeField != null ) {
-					bridge = new SpatialFieldBridgeByRange( latitudeField, longitudeField );
-				}
-				else {
-					bridge = new SpatialFieldBridgeByRange();
-				}
-			}
 		}
 
 		return bridge;
@@ -427,25 +370,33 @@ public final class BridgeFactory {
 				return bridge;
 			}
 		}
-		if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
-			Spatial spatialAnn = member.getAnnotation( org.hibernate.search.annotations.Spatial.class );
-			bridge = buildSpatialBridge( spatialAnn, member );
+
+		bridge = getFieldBridgeFromBridgeProvider(
+				new SpatialBridgeProvider(),
+				containerType,
+				returnTypeElement,
+				annotatedElement,
+				member,
+				serviceManager
+		);
+		if ( bridge != null ) {
+			return bridge;
 		}
-		else {
-			//find in built-ins
-			XClass returnType = member.getType();
-			bridge = builtInBridges.get( returnType.getName() );
-			if ( bridge == null && returnType.isEnum() ) {
-				//we return one enum type bridge instance per property as it is customized per ReturnType
-				final EnumBridge enumBridge = new EnumBridge();
-				populateReturnType( reflectionManager.toClass( member.getType() ), EnumBridge.class, enumBridge );
-				bridge = new TwoWayString2FieldBridgeAdaptor( enumBridge );
-			}
-			if ( bridge == null && isAnnotatedWithIndexEmbedded( member ) ) {
-				// Used to index the null representation of an @IndexedEmbedded
-				bridge = guessEmbeddedFieldBridge( member, reflectionManager );
-			}
+
+		//find in built-ins
+		XClass returnType = member.getType();
+		bridge = builtInBridges.get( returnType.getName() );
+		if ( bridge == null && returnType.isEnum() ) {
+			//we return one enum type bridge instance per property as it is customized per ReturnType
+			final EnumBridge enumBridge = new EnumBridge();
+			populateReturnType( reflectionManager.toClass( member.getType() ), EnumBridge.class, enumBridge );
+			bridge = new TwoWayString2FieldBridgeAdaptor( enumBridge );
 		}
+		if ( bridge == null && isAnnotatedWithIndexEmbedded( member ) ) {
+			// Used to index the null representation of an @IndexedEmbedded
+			bridge = guessEmbeddedFieldBridge( member, reflectionManager );
+		}
+
 		if ( bridge == null ) {
 			throw LOG.unableToGuessFieldBridge( member.getType().getName(), member.getName() );
 		}
