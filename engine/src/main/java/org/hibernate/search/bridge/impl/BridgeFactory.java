@@ -24,7 +24,6 @@
 package org.hibernate.search.bridge.impl;
 
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -37,7 +36,6 @@ import java.util.UUID;
 
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.bridge.spi.BridgeProvider;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -76,7 +74,6 @@ import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.spatial.SpatialFieldBridgeByHash;
 import org.hibernate.search.spatial.SpatialFieldBridgeByRange;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -121,10 +118,6 @@ public final class BridgeFactory {
 	public final BuiltinMapBridge MAP_BRIDGE_FLOAT;
 	public final BuiltinMapBridge MAP_BRIDGE_INT;
 	public final BuiltinMapBridge MAP_BRIDGE_LONG;
-
-	public final String TIKA_BRIDGE_NAME = "org.hibernate.search.bridge.builtin.TikaBridge";
-	public final String TIKA_BRIDGE_METADATA_PROCESSOR_SETTER = "setMetadataProcessorClass";
-	public final String TIKA_BRIDGE_PARSE_CONTEXT_SETTER = "setParseContextProviderClass";
 
 	private final Map<String, FieldBridge> builtInBridges;
 	private final Map<String, NumericFieldBridge> numericBridges;
@@ -411,11 +404,18 @@ public final class BridgeFactory {
 			return bridge;
 		}
 
-		if ( member.isAnnotationPresent( org.hibernate.search.annotations.TikaBridge.class ) ) {
-			org.hibernate.search.annotations.TikaBridge annotation = member.getAnnotation( org.hibernate.search.annotations.TikaBridge.class );
-			bridge = createTikaBridge( annotation, serviceManager );
+		bridge = getFieldBridgeFromBridgeProvider(
+				new TikaBridgeProvider(),
+				containerType,
+				returnTypeElement,
+				annotatedElement,
+				serviceManager
+		);
+		if ( bridge != null ) {
+			return bridge;
 		}
-		else if ( numericField != null ) {
+
+		if ( numericField != null ) {
 			bridge = guessNumericFieldBridge( member, reflectionManager );
 		}
 		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
@@ -508,50 +508,6 @@ public final class BridgeFactory {
 			bridge = doExtractType( bridgeAnn, member, reflectionManager );
 		}
 		return bridge;
-	}
-
-	private FieldBridge createTikaBridge(org.hibernate.search.annotations.TikaBridge annotation, ServiceManager serviceManager) {
-		Class<?> tikaBridgeClass;
-		FieldBridge tikaBridge;
-		try {
-			tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME, serviceManager);
-			tikaBridge = ClassLoaderHelper.instanceFromClass( FieldBridge.class, tikaBridgeClass, "Tika bridge" );
-		}
-		catch (ClassLoadingException e) {
-			throw new AssertionFailure( "Unable to find Tika bridge class: " + TIKA_BRIDGE_NAME );
-		}
-
-		Class<?> tikaMetadataProcessorClass = annotation.metadataProcessor();
-		if ( tikaMetadataProcessorClass != void.class ) {
-			configureTikaBridgeParameters(
-					tikaBridgeClass,
-					TIKA_BRIDGE_METADATA_PROCESSOR_SETTER,
-					tikaBridge,
-					tikaMetadataProcessorClass
-			);
-		}
-
-		Class<?> tikaParseContextProviderClass = annotation.parseContextProvider();
-		if ( tikaParseContextProviderClass != void.class ) {
-			configureTikaBridgeParameters(
-					tikaBridgeClass,
-					TIKA_BRIDGE_PARSE_CONTEXT_SETTER,
-					tikaBridge,
-					tikaParseContextProviderClass
-			);
-		}
-
-		return tikaBridge;
-	}
-
-	private void configureTikaBridgeParameters(Class<?> tikaBridgeClass, String setter, Object tikaBridge, Class<?> clazz) {
-		try {
-			Method m = tikaBridgeClass.getMethod( setter, Class.class );
-			m.invoke( tikaBridge, clazz );
-		}
-		catch (Exception e) {
-			throw LOG.unableToConfigureTikaBridge( TIKA_BRIDGE_NAME, e );
-		}
 	}
 
 	private FieldBridge guessEmbeddedFieldBridge(XMember member, ReflectionManager reflectionManager) {
