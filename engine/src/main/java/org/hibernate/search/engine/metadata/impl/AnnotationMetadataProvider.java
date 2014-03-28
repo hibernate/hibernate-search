@@ -39,13 +39,11 @@ import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.Analyze;
@@ -78,8 +76,10 @@ import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
@@ -655,7 +655,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
-		updateContainedInMaxDepths( member, typeMetadataBuilder );
+		ContainedInMetadataBuilder containedInMetadataBuilder = new ContainedInMetadataBuilder( member );
+		updateContainedInMaxDepths( containedInMetadataBuilder, member );
+		typeMetadataBuilder.addContainedIn( containedInMetadataBuilder.createContainedInMetadata() );
 
 		//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
 		typeMetadataBuilder.addCollectionRole(
@@ -665,18 +667,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 	}
 
-	private void updateContainedInMaxDepths(XProperty member, TypeMetadata.Builder typeMetadataBuilder) {
-		updateContainedInMaxDepth( member, typeMetadataBuilder, XClass.ACCESS_FIELD );
-		updateContainedInMaxDepth( member, typeMetadataBuilder, XClass.ACCESS_PROPERTY );
+	private void updateContainedInMaxDepths(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty member) {
+		updateContainedInMaxDepth( containedInMetadataBuilder, member, XClass.ACCESS_FIELD );
+		updateContainedInMaxDepth( containedInMetadataBuilder, member, XClass.ACCESS_PROPERTY );
 	}
 
-	private void updateContainedInMaxDepth(XMember memberWithContainedIn, TypeMetadata.Builder typeMetadataBuilder, String accessType) {
+	private void updateContainedInMaxDepth(ContainedInMetadataBuilder containedInMetadataBuilder, XMember memberWithContainedIn, String accessType) {
 		XClass memberReturnedType = memberWithContainedIn.getElementClass();
 		String mappedBy = mappedBy( memberWithContainedIn );
 		List<XProperty> returnedTypeProperties = memberReturnedType.getDeclaredProperties( accessType );
 		for ( XProperty property : returnedTypeProperties ) {
 			if ( isCorrespondingIndexedEmbedded( mappedBy, property ) ) {
-				updateDepthProperties( memberWithContainedIn, typeMetadataBuilder, property );
+				updateDepthProperties( containedInMetadataBuilder, property );
 				break;
 			}
 		}
@@ -695,11 +697,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return false;
 	}
 
-	private void updateDepthProperties(XMember memberWithContainedIn,
-			TypeMetadata.Builder typeMetadataBuilder,
-			XProperty property) {
-		int depth = property.getAnnotation( IndexedEmbedded.class ).depth();
-		typeMetadataBuilder.addContainedIn( new ContainedInMetadata( memberWithContainedIn, depth ) );
+	private void updateDepthProperties(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty property) {
+		containedInMetadataBuilder.maxDepth( property.getAnnotation( IndexedEmbedded.class ).depth() );
 	}
 
 	private String mappedBy(XMember member) {
