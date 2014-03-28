@@ -48,7 +48,7 @@ public class TikaBridgeProvider implements BridgeProvider {
 	private final String TIKA_BRIDGE_PARSE_CONTEXT_SETTER = "setParseContextProviderClass";
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, ServiceManager serviceManager) {
+	public FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, String memberName, ServiceManager serviceManager) {
 		if ( bridgedElement.isAnnotationPresent( TikaBridge.class ) ) {
 			TikaBridge tikaAnnotation = bridgedElement.getAnnotation( TikaBridge.class );
 			return createTikaBridge( tikaAnnotation, serviceManager );

@@ -65,7 +65,7 @@ public class CalendarBridgeProvider implements BridgeProvider {
 	}
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, ServiceManager serviceManager) {
+	public FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, String memberName, ServiceManager serviceManager) {
 		if ( bridgedElement.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
 			Resolution resolution = bridgedElement.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class )
 					.resolution();

@@ -64,7 +64,7 @@ public class DateBridgeProvider implements BridgeProvider {
 	}
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, ServiceManager serviceManager) {
+	public FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, String memberName, ServiceManager serviceManager) {
 		if ( bridgedElement.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
 			Resolution resolution = bridgedElement.getAnnotation( org.hibernate.search.annotations.DateBridge.class )
 					.resolution();

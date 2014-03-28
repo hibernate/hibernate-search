@@ -53,5 +53,5 @@ public interface BridgeProvider {
 	 *
 	 * The {@code ServiceManager} gives access to Hibernate Search services like the {@code ClassLoaderService}.
 	 */
-	FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, ServiceManager serviceManager);
+	FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, String memberName, ServiceManager serviceManager);
 }

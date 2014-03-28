@@ -387,6 +387,7 @@ public final class BridgeFactory {
 				containerType,
 				returnTypeElement,
 				annotatedElement,
+				member,
 				serviceManager
 		);
 		if ( bridge != null ) {
@@ -398,6 +399,7 @@ public final class BridgeFactory {
 				containerType,
 				returnTypeElement,
 				annotatedElement,
+				member,
 				serviceManager
 		);
 		if ( bridge != null ) {
@@ -409,6 +411,7 @@ public final class BridgeFactory {
 				containerType,
 				returnTypeElement,
 				annotatedElement,
+				member,
 				serviceManager
 		);
 		if ( bridge != null ) {
@@ -471,9 +474,10 @@ public final class BridgeFactory {
 			ContainerType containerType,
 			Class<?> returnTypeElement,
 			AnnotatedElement annotatedElement,
+			XMember member,
 			ServiceManager serviceManager
 	) {
-		FieldBridge bridge = bridgeProvider.returnFieldBridgeIfMatching( returnTypeElement, annotatedElement, serviceManager );
+		FieldBridge bridge = bridgeProvider.returnFieldBridgeIfMatching( returnTypeElement, annotatedElement, member.getName(), serviceManager );
 		if ( bridge == null ) {
 			return null;
 		}
