@@ -515,19 +515,11 @@ public final class BridgeFactory {
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
-		FieldBridge bridge;
-		org.hibernate.search.annotations.FieldBridge bridgeAnn;
-		//@Field bridge has priority over @FieldBridge
-		if ( field != null && void.class != field.bridge().impl() ) {
-			bridgeAnn = field.bridge();
+		FieldBridge bridge = findExplicitFieldBridge( field, member, reflectionManager );
+		if ( bridge != null ) {
+			return bridge;
 		}
-		else {
-			bridgeAnn = member.getAnnotation( org.hibernate.search.annotations.FieldBridge.class );
-		}
-		if ( bridgeAnn != null ) {
-			bridge = doExtractType( bridgeAnn, member, reflectionManager );
-		}
-		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
+		if ( member.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
 			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.DateBridge.class )
 					.resolution();
 			bridge = guessDateFieldBridge( member, reflectionManager, resolution );
@@ -565,6 +557,26 @@ public final class BridgeFactory {
 		}
 		if ( bridge == null ) {
 			throw LOG.unableToGuessFieldBridge( member.getType().getName(), member.getName() );
+		}
+		return bridge;
+	}
+
+	/**
+	 * Extract the field bridge from @Field.bridge or @FieldBridge.
+	 * Return null if none is present.
+	 */
+	private FieldBridge findExplicitFieldBridge(Field field, XMember member, ReflectionManager reflectionManager) {
+		FieldBridge bridge = null;
+		org.hibernate.search.annotations.FieldBridge bridgeAnn;
+		//@Field bridge has priority over @FieldBridge
+		if ( field != null && void.class != field.bridge().impl() ) {
+			bridgeAnn = field.bridge();
+		}
+		else {
+			bridgeAnn = member.getAnnotation( org.hibernate.search.annotations.FieldBridge.class );
+		}
+		if ( bridgeAnn != null ) {
+			bridge = doExtractType( bridgeAnn, member, reflectionManager );
 		}
 		return bridge;
 	}
