@@ -592,7 +592,7 @@ public class Person {
       return child;
    }
 
-   // ... other fields omitted</programlisting></example>
+   // ... other fields omitted
 ----
 ====
 
@@ -679,6 +679,14 @@ Having explicit control of the indexed paths might be easier if you're designing
 defining the needed queries first, as at that point you might know exactly which fields you need,
 and which other fields are unnecessary to implement your use case.
 ====
+
+==== Associated objects: building a dependency graph with +@ContainedIn+
+
+While +@ContainedIn+ is often seen as the counterpart of +@IndexedEmbedded+, it can also be used
+on its own to build an indexing dependency graph.
+
+When an entity is reindexed, all the entities pointed by +@ContainedIn+ are also going to be
+reindexed.
 
 === Boosting
 
@@ -2459,7 +2467,7 @@ public class ProductCatalog {
 
 ==== Contained In definition
 
-@ContainedIn can be define as seen in the example below:
+@ContainedIn can be defined as seen in the example below:
 
 .Programmatically defining ContainedIn
 ====

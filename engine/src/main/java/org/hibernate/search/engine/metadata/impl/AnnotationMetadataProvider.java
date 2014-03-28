@@ -734,23 +734,25 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
-		updateContainedInMaxDepths( member, typeMetadataBuilder );
+		ContainedInMetadataBuilder containedInMetadataBuilder = new ContainedInMetadataBuilder( member );
+		updateContainedInMaxDepths( containedInMetadataBuilder, member );
+		typeMetadataBuilder.addContainedIn( containedInMetadataBuilder.createContainedInMetadata() );
 
 		parseContext.collectUnqualifiedCollectionRole( member.getName() );
 	}
 
-	private void updateContainedInMaxDepths(XProperty member, TypeMetadata.Builder typeMetadataBuilder) {
-		updateContainedInMaxDepth( member, typeMetadataBuilder, XClass.ACCESS_FIELD );
-		updateContainedInMaxDepth( member, typeMetadataBuilder, XClass.ACCESS_PROPERTY );
+	private void updateContainedInMaxDepths(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty member) {
+		updateContainedInMaxDepth( containedInMetadataBuilder, member, XClass.ACCESS_FIELD );
+		updateContainedInMaxDepth( containedInMetadataBuilder, member, XClass.ACCESS_PROPERTY );
 	}
 
-	private void updateContainedInMaxDepth(XMember memberWithContainedIn, TypeMetadata.Builder typeMetadataBuilder, String accessType) {
+	private void updateContainedInMaxDepth(ContainedInMetadataBuilder containedInMetadataBuilder, XMember memberWithContainedIn, String accessType) {
 		XClass memberReturnedType = memberWithContainedIn.getElementClass();
 		String mappedBy = mappedBy( memberWithContainedIn );
 		List<XProperty> returnedTypeProperties = memberReturnedType.getDeclaredProperties( accessType );
 		for ( XProperty property : returnedTypeProperties ) {
 			if ( isCorrespondingIndexedEmbedded( mappedBy, property ) ) {
-				updateDepthProperties( memberWithContainedIn, typeMetadataBuilder, property );
+				updateDepthProperties( containedInMetadataBuilder, property );
 				break;
 			}
 		}
@@ -769,11 +771,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return false;
 	}
 
-	private void updateDepthProperties(XMember memberWithContainedIn,
-			TypeMetadata.Builder typeMetadataBuilder,
-			XProperty property) {
-		int depth = property.getAnnotation( IndexedEmbedded.class ).depth();
-		typeMetadataBuilder.addContainedIn( new ContainedInMetadata( memberWithContainedIn, depth ) );
+	private void updateDepthProperties(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty property) {
+		containedInMetadataBuilder.maxDepth( property.getAnnotation( IndexedEmbedded.class ).depth() );
 	}
 
 	private String mappedBy(XMember member) {

@@ -14,13 +14,16 @@ import java.lang.annotation.Documented;
 
 /**
  * Describe the owning entity as being part of the target entity's
- * index (to be more accurate, being part of the indexed object graph).
+ * indexed object graph.
  * <p>
- * Only necessary when an &#64;Indexed class is used as a &#64;IndexedEmbedded
+ * Often used when an &#64;Indexed class is used as a &#64;IndexedEmbedded
  * target class. &#64;ContainedIn must mark the property pointing back
- * to the &#64;IndexedEmbedded owning Entity.
+ * to the &#64;IndexedEmbedded owning Entity (not necessary if the class
+ * is an &#64;Embeddable class).
  * <p>
- * Not necessary if the class is an &#64;Embeddable class.
+ * Also used to trigger a reindex of related entities even if no
+ * &#64;IndexedEmbedded is involved, allowing to define a dependency
+ * graph.
  * <p>
  * <code>
  * &#64;Indexed<br>
