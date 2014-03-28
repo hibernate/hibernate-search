@@ -389,12 +389,24 @@ public final class BridgeFactory {
 		Class<?> returnTypeElement = reflectionManager.toClass( member.getElementClass() );
 		ContainerType containerType = getContainerType( member, reflectionManager );
 
-		bridge = getFieldBridgeFromBridgeProvider( new DateBridgeProvider(), containerType, returnTypeElement, annotatedElement );
+		bridge = getFieldBridgeFromBridgeProvider(
+				new DateBridgeProvider(),
+				containerType,
+				returnTypeElement,
+				annotatedElement,
+				serviceManager
+		);
 		if ( bridge != null ) {
 			return bridge;
 		}
 
-		bridge = getFieldBridgeFromBridgeProvider( new CalendarBridgeProvider(), containerType, returnTypeElement, annotatedElement );
+		bridge = getFieldBridgeFromBridgeProvider(
+				new CalendarBridgeProvider(),
+				containerType,
+				returnTypeElement,
+				annotatedElement,
+				serviceManager
+		);
 		if ( bridge != null ) {
 			return bridge;
 		}
@@ -452,9 +464,10 @@ public final class BridgeFactory {
 			BridgeProvider bridgeProvider,
 			ContainerType containerType,
 			Class<?> returnTypeElement,
-			AnnotatedElement annotatedElement
+			AnnotatedElement annotatedElement,
+			ServiceManager serviceManager
 	) {
-		FieldBridge bridge = bridgeProvider.returnFieldBridgeIfMatching( returnTypeElement, annotatedElement );
+		FieldBridge bridge = bridgeProvider.returnFieldBridgeIfMatching( returnTypeElement, annotatedElement, serviceManager );
 		if ( bridge == null ) {
 			return null;
 		}

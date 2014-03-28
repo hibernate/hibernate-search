@@ -31,6 +31,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.DateBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -63,7 +64,7 @@ public class DateBridgeProvider implements BridgeProvider {
 	}
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement) {
+	public FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, ServiceManager serviceManager) {
 		if ( bridgedElement.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
 			Resolution resolution = bridgedElement.getAnnotation( org.hibernate.search.annotations.DateBridge.class )
 					.resolution();

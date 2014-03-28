@@ -27,6 +27,7 @@ package org.hibernate.search.bridge.spi;
 import java.lang.reflect.AnnotatedElement;
 
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**
  * Service interface to implement to allow custom bridges to be
@@ -49,6 +50,8 @@ public interface BridgeProvider {
 	 *
 	 * The context is made of the {@code bridgedElement} evaluated and gives access to
 	 * custom annotations potentially and of the {@code returnType} the bridge is targeting.
+	 *
+	 * The {@code ServiceManager} gives access to Hibernate Search services like the {@code ClassLoaderService}.
 	 */
-	FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement);
+	FieldBridge returnFieldBridgeIfMatching(Class<?> returnType, AnnotatedElement bridgedElement, ServiceManager serviceManager);
 }
