@@ -415,10 +415,16 @@ public final class BridgeFactory {
 			return bridge;
 		}
 
+		// NumericField cannot use the BridgeProvider model because the @NumericField annotation
+		// is guessed from @NumericField.forField, and @Field
+		// TODO do we want to offer such contract to BridgeProvider? Seems not trivial to express
 		if ( numericField != null ) {
 			bridge = guessNumericFieldBridge( member, reflectionManager );
+			if ( bridge != null ) {
+				return bridge;
+			}
 		}
-		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
+		if ( member.isAnnotationPresent( org.hibernate.search.annotations.Spatial.class ) ) {
 			Spatial spatialAnn = member.getAnnotation( org.hibernate.search.annotations.Spatial.class );
 			bridge = buildSpatialBridge( spatialAnn, member );
 		}
