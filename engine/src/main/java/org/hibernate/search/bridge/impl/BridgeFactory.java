@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.bridge.impl;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -34,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
@@ -57,7 +60,6 @@ import org.hibernate.search.bridge.builtin.BigIntegerBridge;
 import org.hibernate.search.bridge.builtin.BooleanBridge;
 import org.hibernate.search.bridge.builtin.CalendarBridge;
 import org.hibernate.search.bridge.builtin.CharacterBridge;
-import org.hibernate.search.bridge.builtin.DateBridge;
 import org.hibernate.search.bridge.builtin.DoubleBridge;
 import org.hibernate.search.bridge.builtin.EnumBridge;
 import org.hibernate.search.bridge.builtin.FloatBridge;
@@ -103,34 +105,6 @@ public final class BridgeFactory {
 	public final TwoWayFieldBridge Url;
 	public final TwoWayFieldBridge Uri;
 	public final TwoWayFieldBridge UUID;
-
-	public final FieldBridge DATE_YEAR;
-	public final FieldBridge DATE_MONTH;
-	public final FieldBridge DATE_DAY;
-	public final FieldBridge DATE_HOUR;
-	public final FieldBridge DATE_MINUTE;
-	public final FieldBridge DATE_SECOND;
-
-	public final FieldBridge ITERABLE_DATE_YEAR;
-	public final FieldBridge ITERABLE_DATE_MONTH;
-	public final FieldBridge ITERABLE_DATE_DAY;
-	public final FieldBridge ITERABLE_DATE_HOUR;
-	public final FieldBridge ITERABLE_DATE_MINUTE;
-	public final FieldBridge ITERABLE_DATE_SECOND;
-
-	public final FieldBridge MAP_DATE_YEAR;
-	public final FieldBridge MAP_DATE_MONTH;
-	public final FieldBridge MAP_DATE_DAY;
-	public final FieldBridge MAP_DATE_HOUR;
-	public final FieldBridge MAP_DATE_MINUTE;
-	public final FieldBridge MAP_DATE_SECOND;
-
-	public final FieldBridge ARRAY_DATE_YEAR;
-	public final FieldBridge ARRAY_DATE_MONTH;
-	public final FieldBridge ARRAY_DATE_DAY;
-	public final FieldBridge ARRAY_DATE_HOUR;
-	public final FieldBridge ARRAY_DATE_MINUTE;
-	public final FieldBridge ARRAY_DATE_SECOND;
 
 	public final FieldBridge CALENDAR_YEAR;
 	public final FieldBridge CALENDAR_MONTH;
@@ -178,12 +152,6 @@ public final class BridgeFactory {
 	public final BuiltinMapBridge MAP_BRIDGE_INT;
 	public final BuiltinMapBridge MAP_BRIDGE_LONG;
 
-	public final TwoWayFieldBridge DATE_MILLISECOND;
-
-	public final FieldBridge ARRAY_DATE_MILLISECOND;
-	public final FieldBridge ITERABLE_DATE_MILLISECOND;
-	public final FieldBridge MAP_DATE_MILLISECOND;
-
 	public final TwoWayFieldBridge CALENDAR_MILLISECOND;
 
 	public final FieldBridge ARRAY_CALENDAR_MILLISECOND;
@@ -215,34 +183,6 @@ public final class BridgeFactory {
 		Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
 		Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
 		UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );
-
-		DATE_YEAR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
-		DATE_MONTH = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MONTH );
-		DATE_DAY = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_DAY );
-		DATE_HOUR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_HOUR );
-		DATE_MINUTE = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MINUTE );
-		DATE_SECOND = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_SECOND );
-
-		ITERABLE_DATE_YEAR = new BuiltinIterableBridge( DATE_YEAR );
-		ITERABLE_DATE_MONTH = new BuiltinIterableBridge( DATE_MONTH );
-		ITERABLE_DATE_DAY = new BuiltinIterableBridge( DATE_DAY );
-		ITERABLE_DATE_HOUR = new BuiltinIterableBridge( DATE_HOUR );
-		ITERABLE_DATE_MINUTE = new BuiltinIterableBridge( DATE_MINUTE );
-		ITERABLE_DATE_SECOND = new BuiltinIterableBridge( DATE_SECOND );
-
-		MAP_DATE_YEAR = new BuiltinMapBridge( DATE_YEAR );
-		MAP_DATE_MONTH = new BuiltinMapBridge( DATE_MONTH );
-		MAP_DATE_DAY = new BuiltinMapBridge( DATE_DAY );
-		MAP_DATE_HOUR = new BuiltinMapBridge( DATE_HOUR );
-		MAP_DATE_MINUTE = new BuiltinMapBridge( DATE_MINUTE );
-		MAP_DATE_SECOND = new BuiltinMapBridge( DATE_SECOND );
-
-		ARRAY_DATE_YEAR = new BuiltinArrayBridge( DATE_YEAR );
-		ARRAY_DATE_MONTH = new BuiltinArrayBridge( DATE_MONTH );
-		ARRAY_DATE_DAY = new BuiltinArrayBridge( DATE_DAY );
-		ARRAY_DATE_HOUR = new BuiltinArrayBridge( DATE_HOUR );
-		ARRAY_DATE_MINUTE = new BuiltinArrayBridge( DATE_MINUTE );
-		ARRAY_DATE_SECOND = new BuiltinArrayBridge( DATE_SECOND );
 
 		CALENDAR_YEAR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_YEAR );
 		CALENDAR_MONTH = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MONTH );
@@ -290,12 +230,6 @@ public final class BridgeFactory {
 		MAP_BRIDGE_INT = new BuiltinMapBridge( NumericFieldBridge.INT_FIELD_BRIDGE );
 		MAP_BRIDGE_LONG = new BuiltinMapBridge( NumericFieldBridge.LONG_FIELD_BRIDGE );
 
-		DATE_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(DateBridge.DATE_MILLISECOND );
-
-		ARRAY_DATE_MILLISECOND = new BuiltinArrayBridge( DATE_MILLISECOND );
-		ITERABLE_DATE_MILLISECOND = new BuiltinIterableBridge( DATE_MILLISECOND );
-		MAP_DATE_MILLISECOND = new BuiltinMapBridge( DATE_MILLISECOND );
-
 		CALENDAR_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(CalendarBridge.CALENDAR_MILLISECOND );
 
 		ARRAY_CALENDAR_MILLISECOND = new BuiltinArrayBridge( CALENDAR_MILLISECOND );
@@ -324,8 +258,7 @@ public final class BridgeFactory {
 		builtInBridges.put( URL.class.getName(), Url );
 		builtInBridges.put( URI.class.getName(), Uri );
 		builtInBridges.put( UUID.class.getName(), UUID );
-
-		builtInBridges.put( Date.class.getName(), DATE_MILLISECOND );
+		builtInBridges.put( Date.class.getName(), new DateBridgeProvider().DATE_MILLISECOND );
 		builtInBridges.put( Calendar.class.getName(), CALENDAR_MILLISECOND );
 
 		numericBridges = new HashMap<String, NumericFieldBridge>();
@@ -519,12 +452,18 @@ public final class BridgeFactory {
 		if ( bridge != null ) {
 			return bridge;
 		}
-		if ( member.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
-			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.DateBridge.class )
-					.resolution();
-			bridge = guessDateFieldBridge( member, reflectionManager, resolution );
+
+		AnnotatedElement annotatedElement = new XMemberToAnnotatedElementAdaptor( member );
+		// For arrays and collection, return the type of the contained elements
+		Class<?> returnTypeElement = reflectionManager.toClass( member.getElementClass() );
+		ContainerType containerType = getContainerType( member, reflectionManager );
+
+		bridge = getFieldBridgeFromBridgeProvider( new DateBridgeProvider(), containerType, returnTypeElement, annotatedElement );
+		if ( bridge != null ) {
+			return bridge;
 		}
-		else if ( member.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
+
+		if ( member.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
 			Resolution resolution = member.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class )
 					.resolution();
 			bridge = guessCalendarFieldBridge( member, reflectionManager, resolution );
@@ -559,6 +498,52 @@ public final class BridgeFactory {
 			throw LOG.unableToGuessFieldBridge( member.getType().getName(), member.getName() );
 		}
 		return bridge;
+	}
+
+	private ContainerType getContainerType(XMember member, ReflectionManager reflectionManager) {
+		if ( ! member.isAnnotationPresent( IndexedEmbedded.class ) ) {
+			return ContainerType.SINGLE;
+		}
+		if ( member.isArray() ) {
+			return ContainerType.ARRAY;
+		}
+		Class<?> typeClass = reflectionManager.toClass( member.getType() );
+		if ( Iterable.class.isAssignableFrom( typeClass ) ) {
+			return ContainerType.ITERABLE;
+		}
+		if ( member.isCollection() && Map.class.equals( member.getCollectionClass() ) ) {
+			return ContainerType.MAP;
+		}
+		return ContainerType.UNKNOWN;
+	}
+
+	private FieldBridge getFieldBridgeFromBridgeProvider(
+			BridgeProvider bridgeProvider,
+			ContainerType containerType,
+			Class<?> returnTypeElement,
+			AnnotatedElement annotatedElement
+	) {
+		FieldBridge bridge = bridgeProvider.returnFieldBridgeIfMatching( returnTypeElement, annotatedElement );
+		if ( bridge == null ) {
+			return null;
+		}
+		switch ( containerType ) {
+			case SINGLE:
+				return bridge;
+			case ITERABLE:
+				// Should we cache these per bridge instance?
+				// would make sense at least for the known built-in bridges
+				// but is that worth it?
+				return new BuiltinIterableBridge( bridge );
+			case ARRAY:
+				return new BuiltinArrayBridge( bridge );
+			case MAP:
+				return new BuiltinMapBridge( bridge );
+			case UNKNOWN:
+				return null;
+			default:
+				throw new AssertionFailure( "Unknown ContainerType " + containerType );
+		}
 	}
 
 	/**
@@ -681,26 +666,6 @@ public final class BridgeFactory {
 		return null;
 	}
 
-	private FieldBridge guessDateFieldBridge(XMember member, ReflectionManager reflectionManager, Resolution resolution) {
-		if ( isNotAnnotatedWithIndexEmbedded( member ) ) {
-			return getDateField( resolution );
-		}
-
-		if ( isIterable( reflectionManager, member ) ) {
-			return getIterableDateField( resolution );
-		}
-
-		if ( member.isArray() ) {
-			return getArrayDateField( resolution );
-		}
-
-		if ( isMap( member ) ) {
-			return getMapDateField( resolution );
-		}
-
-		return null;
-	}
-
 	private boolean isNotAnnotatedWithIndexEmbedded(XMember member) {
 		return !isAnnotatedWithIndexEmbedded( member );
 	}
@@ -769,90 +734,6 @@ public final class BridgeFactory {
 	private void populateReturnType(Class<?> appliedOnType, Class<?> bridgeType, Object bridgeInstance) {
 		if ( AppliedOnTypeAwareBridge.class.isAssignableFrom( bridgeType ) ) {
 			( (AppliedOnTypeAwareBridge) bridgeInstance ).setAppliedOnType( appliedOnType );
-		}
-	}
-
-	private FieldBridge getDateField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return DATE_YEAR;
-			case MONTH:
-				return DATE_MONTH;
-			case DAY:
-				return DATE_DAY;
-			case HOUR:
-				return DATE_HOUR;
-			case MINUTE:
-				return DATE_MINUTE;
-			case SECOND:
-				return DATE_SECOND;
-			case MILLISECOND:
-				return DATE_MILLISECOND;
-			default:
-				throw LOG.unknownResolution( resolution.toString() );
-		}
-	}
-
-	private FieldBridge getArrayDateField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return ARRAY_DATE_YEAR;
-			case MONTH:
-				return ARRAY_DATE_MONTH;
-			case DAY:
-				return ARRAY_DATE_DAY;
-			case HOUR:
-				return ARRAY_DATE_HOUR;
-			case MINUTE:
-				return ARRAY_DATE_MINUTE;
-			case SECOND:
-				return ARRAY_DATE_SECOND;
-			case MILLISECOND:
-				return ARRAY_DATE_MILLISECOND;
-			default:
-				throw LOG.unknownArrayBridgeForResolution( resolution.toString() );
-		}
-	}
-
-	private FieldBridge getMapDateField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return MAP_DATE_YEAR;
-			case MONTH:
-				return MAP_DATE_MONTH;
-			case DAY:
-				return MAP_DATE_DAY;
-			case HOUR:
-				return MAP_DATE_HOUR;
-			case MINUTE:
-				return MAP_DATE_MINUTE;
-			case SECOND:
-				return MAP_DATE_SECOND;
-			case MILLISECOND:
-				return MAP_DATE_MILLISECOND;
-			default:
-				throw LOG.unknownMapBridgeForResolution( resolution.toString() );
-		}
-	}
-
-	private FieldBridge getIterableDateField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return ITERABLE_DATE_YEAR;
-			case MONTH:
-				return ITERABLE_DATE_MONTH;
-			case DAY:
-				return ITERABLE_DATE_DAY;
-			case HOUR:
-				return ITERABLE_DATE_HOUR;
-			case MINUTE:
-				return ITERABLE_DATE_MINUTE;
-			case SECOND:
-				return ITERABLE_DATE_SECOND;
-			case MILLISECOND:
-				return ITERABLE_DATE_MILLISECOND;
-			default:
-				throw LOG.unknownIterableBridgeForResolution( resolution.toString() );
 		}
 	}
 
@@ -988,5 +869,18 @@ public final class BridgeFactory {
 		}
 
 		return bridge;
+	}
+
+	private static enum ContainerType {
+		SINGLE,
+		ARRAY,
+		ITERABLE,
+		MAP,
+		/**
+		 * UNKNOWN happens when the member is marked {@code IndexedEmbedded}
+		 * but is not a known container.
+		 * We are in trouble anyways and the traversal code should take over the exception responsibility
+		 */
+		UNKNOWN,
 	}
 }
