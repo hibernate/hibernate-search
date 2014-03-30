@@ -181,10 +181,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	 */
 	protected void applyJGroupsChannelConfiguration(Configuration cfg) {
 		cfg.setProperty( "hibernate.search.default." + DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty(
-				"hibernate.search.default." + DispatchMessageSender.CONFIGURATION_FILE,
-				TESTING_JGROUPS_CONFIGURATION_FILE
-		);
+		cfg.setProperty( DispatchMessageSender.CONFIGURATION_FILE, TESTING_JGROUPS_CONFIGURATION_FILE );
 	}
 
 	@Override
