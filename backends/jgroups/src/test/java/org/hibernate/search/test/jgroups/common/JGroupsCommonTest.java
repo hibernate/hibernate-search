@@ -43,12 +43,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * In case of running test outside Hibernate Search Maven configuration set following VM configuration:
- * <br>
- * <code>
- * -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
- * </code>
- *
  * @author Lukasz Moren
  * @author Sanne Grinovero
  */
