@@ -43,12 +43,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * In case of running test outside Hibernate Search Maven configuration set following VM configuration:
- * <br>
- * <code>
- * -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
- * </code>
- *
  * @author Lukasz Moren
  * @author Sanne Grinovero
  */
@@ -187,10 +181,7 @@ public class JGroupsCommonTest extends MultipleSessionsSearchTestCase {
 	 */
 	protected void applyJGroupsChannelConfiguration(Configuration cfg) {
 		cfg.setProperty( "hibernate.search.default." + DispatchMessageSender.CLUSTER_NAME, CHANNEL_NAME );
-		cfg.setProperty(
-				"hibernate.search.default." + DispatchMessageSender.CONFIGURATION_FILE,
-				TESTING_JGROUPS_CONFIGURATION_FILE
-		);
+		cfg.setProperty( DispatchMessageSender.CONFIGURATION_FILE, TESTING_JGROUPS_CONFIGURATION_FILE );
 	}
 
 	@Override
