@@ -23,10 +23,11 @@
   -->
 <config xmlns="urn:org:jgroups"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.4.xsd">
-	<SHARED_LOOPBACK />
+        xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.5.xsd">
 
-	<PING timeout="200" num_initial_members="2" />
+	<SHARED_LOOPBACK />
+	<SHARED_LOOPBACK_PING />
+
 	<MERGE2 max_interval="30000" min_interval="1000" />
 	<FD_SOCK />
 	<FD_ALL />
@@ -38,4 +39,5 @@
 		max_bytes="400000" />
 	<pbcast.GMS print_local_addr="true" join_timeout="500"
 		view_bundling="true" />
+	<RSVP resend_interval="2000" timeout="10000"/>
 </config>

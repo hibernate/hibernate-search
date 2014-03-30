@@ -43,12 +43,6 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 
 /**
  * Tests that the Slave node in a JGroups cluster can properly send messages to the channel.
- * <p/>
- * In case of running test outside Hibernate Search Maven configuration set following VM configuration:
- * <br><br>
- * <code>
- * -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
- * </code>
  *
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
