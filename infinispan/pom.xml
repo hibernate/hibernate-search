@@ -138,19 +138,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <threadCount>1</threadCount>
-                    <reuseForks>true</reuseForks>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <!-- MaxPermSize is needed for profiling sessions -->
-                    <argLine>-XX:MaxPermSize=256m</argLine>
-                    <systemPropertyVariables>
-                        <!-- java.net.preferIPv4Stack and jgroups.bind_addr are needed for JGroups -->
-                        <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
-                        <jgroups.bind_addr>127.0.0.1</jgroups.bind_addr>
-                        <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.bsc.maven</groupId>
