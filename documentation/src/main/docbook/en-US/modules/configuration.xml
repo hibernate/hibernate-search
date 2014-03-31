@@ -559,6 +559,22 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
         <literal>default-hibernatesearch-infinispan.xml</literal> provided in
         the <literal>hibernate-search-infinispan.jar</literal>. Several
         indexes can share the same caches.</para>
+        
+        <para>Infinispan relies on JGroups for its networking functionality, so
+        unless you are using Infinispan on a single node, an Infinispan configuration
+        file will refer to a JGroups configuration file. This coupling is not
+        always practical and we provide a property to override the used JGroups configuration file:</para>
+        
+        <programlisting>hibernate.search.infinispan.configuration.transport_override_resourcename = jgroups-ec2.xml</programlisting>
+        
+        <para>This allows to just switch the JGroups configuration while
+        keeping the rest of the Infinispan configuration.</para>
+        <para>The file <literal>jgroups-ec2.xml</literal> used in the example above is
+        one of the several JGroups configurations included in Infinispan. It is a good
+        starting point to run on Amazon EC2 networks. For more details and examples see
+        <ulink url="http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_use_one_of_the_pre_configured_jgroups_files">
+        usage of pre-configured JGroups stacks</ulink> in the Infinispan configuration guide.
+        </para>
       </section>
     </section>
   </section>
