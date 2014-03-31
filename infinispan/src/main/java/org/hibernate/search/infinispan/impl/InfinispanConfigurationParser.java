@@ -63,10 +63,11 @@ public class InfinispanConfigurationParser {
 	 * Infinispan's runtime classloader to the one of Hibernate Search.
 	 *
 	 * @param filename Infinispan configuration resource name
+	 * @param transportOverrideResource An alternative JGroups configuration file to be injected
 	 * @throws IOException
 	 * @return
 	 */
-	public ConfigurationBuilderHolder parseFile(String filename) throws IOException {
+	public ConfigurationBuilderHolder parseFile(String filename, String transportOverrideResource) throws IOException {
 		FileLookup fileLookup = FileLookupFactory.newInstance();
 		InputStream is = fileLookup.lookupFile( filename, searchConfigClassloader );
 		if ( is == null ) {
@@ -77,11 +78,25 @@ public class InfinispanConfigurationParser {
 		}
 		try {
 			ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
+			patchTransportConfiguration( builderHolder, transportOverrideResource );
 			patchInfinispanClassLoader( builderHolder );
 			return builderHolder;
 		}
 		finally {
 			Util.close( is );
+		}
+	}
+
+	/**
+	 * After having parsed the Infinispan configuration file, we might want to override the specified
+	 * JGroups configuration file.
+	 *
+	 * @param builderHolder
+	 * @param transportOverrideResource The alternative JGroups configuration file to be used, or null
+	 */
+	private void patchTransportConfiguration(ConfigurationBuilderHolder builderHolder, String transportOverrideResource) {
+		if ( transportOverrideResource != null ) {
+			builderHolder.getGlobalConfigurationBuilder().transport().addProperty( "configurationFile", transportOverrideResource );
 		}
 	}
 
