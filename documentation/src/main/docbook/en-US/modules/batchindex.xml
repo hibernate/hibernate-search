@@ -246,19 +246,21 @@ transaction.commit();</programlisting>
  .createIndexer( User.class )
  .batchSizeToLoadObjects( 25 )
  .cacheMode( CacheMode.NORMAL )
- .threadsToLoadObjects( 5 )
+ .threadsToLoadObjects( 12 )
  .idFetchSize( 150 )
- .threadsForSubsequentFetching( 20 )
  .progressMonitor( monitor ) //a MassIndexerProgressMonitor implementation
  .startAndWait();</programlisting>
       </example>
 
       <para>This will rebuild the index of all User instances (and subtypes),
-      and will create 5 parallel threads to load the User instances using
-      batches of 25 objects per query; these loaded User instances are then
-      pipelined to 20 parallel threads to load the attached lazy collections
-      of User containing some information needed for the index. The number of
-      threads working on actual index writing is defined by the backend
+      and will create 12 parallel threads to load the User instances using
+      batches of 25 objects per query; these same 12 threads will also need
+      to process indexed embedded relations and custom <classname>FieldBridge</classname>s
+      or <classname>ClassBridge</classname>s, to finally output a Lucene
+      document. In this conversion process these threads are likely going to
+      need to trigger lazyloading of additional attributes, so you will
+      probably need a high number of threads working in parallel.
+      The number of threads working on actual index writing is defined by the backend
       configuration of each index. See the option
       <literal>worker.thread_pool.size</literal> in <xref
       linkend="table-work-execution-configuration"/>.</para>
@@ -281,23 +283,22 @@ transaction.commit();</programlisting>
  .cacheMode( CacheMode.NORMAL )
  .threadsToLoadObjects( 5 )
  .idFetchSize( 150 )
- .threadsForSubsequentFetching( 20 )
  .progressMonitor( monitor ) //a MassIndexerProgressMonitor implementation
  .startAndWait();</programlisting>
       </example>
 
-      <para>It is recommended to leave cacheMode to
+      <para>Generally we suggest to leave cacheMode to
       <literal>CacheMode.IGNORE</literal> (the default), as in most reindexing
       situations the cache will be a useless additional overhead; it might be
       useful to enable some other <literal>CacheMode</literal> depending on
-      your data: it might increase performance if the main entity is relating
+      your data: it could increase performance if the main entity is relating
       to enum-like data included in the index.</para>
 
       <note>
         <para>The MassIndexer was designed for speed and is unaware of
         transactions, so there is no need to begin one or committing. Also
         because it is not transactional it is not recommended to let users use
-        the system during it's processing, as it is unlikely people will be
+        the system during its processing, as it is unlikely people will be
         able to find results and the system load might be too high
         anyway.</para>
       </note>
@@ -310,7 +311,7 @@ transaction.commit();</programlisting>
       <para>There is a simple formula to understand how the different options
       applied to the MassIndexer affect the number of used worker threads
       and connections: each thread will require a JDBC connection.</para>
-      <para><programlisting>threads = typesToIndexInParallel * (threadsToLoadObjects + threadsForSubsequentFetching + 1);
+      <para><programlisting>threads = typesToIndexInParallel * (threadsToLoadObjects + 1);
 required JDBC connections = threads;</programlisting></para>
       <para>Let's see some suggestions for a roughly sane tuning starting point:</para>
       <orderedlist>
@@ -322,17 +323,12 @@ required JDBC connections = threads;</programlisting></para>
           <para>Before tuning a parallel run, experiment with options to tune your primary indexed entities in isolation.</para>
         </listitem>
         <listitem>
-          <para>Making <literal>threadsToLoadObjects</literal> higher increases the preloading rate for the picked root entity
-          from the database, but also increases memory usage and the pressure on the threads working on subsequent fetching.</para>
+          <para>Making <literal>threadsToLoadObjects</literal> higher increases the preloading rate for the picked entities
+          from the database, but also increases memory usage and the pressure on the threads working on subsequent indexing.</para>
         </listitem>
         <listitem>
-          <para>Option <literal>threadsForSubsequentFetching</literal> should generally be higher than <literal>threadsToLoadObjects</literal>
-          as it needs to perform more work in parallel: loading all the values for relations marked <classname>@IndexedEmbedded</classname>
-          or other lazily loaded relations needed by your custom <classname>FieldBridge</classname>s.
-          You could try a lower value if the root entity doesn't have any such relation.</para>
-        </listitem>
-        <listitem>
-          <para>Increasing parallelism usually helps as the bottleneck usually is the latency to the database connection,
+          <para>Increasing parallelism usually helps as the bottleneck usually is the latency to the database connection: it's
+          probably worth it to experiment with values significantly higher than the number of actual cores available,
           but make sure your database can handle all the multiple requests.</para>
         </listitem>
         <listitem>
@@ -344,18 +340,17 @@ required JDBC connections = threads;</programlisting></para>
       <warning>
         <para>Running the MassIndexer with many threads will require many
         connections to the database. If you don't have a sufficiently large
-        connection pool, the MassIndexer itself could deadlock or your other
-        applications (or your same application) could starve being unable to serve
+        connection pool, the MassIndexer itself and/or your other
+        applications could starve being unable to serve
         other requests: make sure you size your connection pool accordingly
         to the options as explained in the above paragraph.</para>
       </warning>
       <tip>
         <para>The "sweet spot" of number of threads to achieve best
         performance is highly dependent on your overall architecture, database
-        design and even data values. To find out the best number of threads
-        for your application it is recommended to use a profiler: all internal
-        thread groups have meaningful names to be easily identified with most
-        tools.</para>
+        design and even data values. All internal thread groups have meaningful
+        names so they should be easily identified with most diagnostic tools,
+        including simply threaddumps.</para>
       </tip>
       </section>
 

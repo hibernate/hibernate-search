@@ -27,6 +27,6 @@ import org.hibernate.Session;
  */
 public interface SessionAwareRunnable {
 
-	void run(Session session);
+	void run(Session session) throws Exception;
 
 }

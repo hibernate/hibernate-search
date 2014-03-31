@@ -53,7 +53,7 @@ import org.junit.runner.RunWith;
 public class ErrorHandlingDuringDocumentCreationTest extends SearchTestCaseJUnit4 {
 
 	@Test
-	@BMRule(targetClass = "org.hibernate.search.batchindexing.impl.EntityConsumerLuceneWorkProducer",
+	@BMRule(targetClass = "org.hibernate.search.batchindexing.impl.IdentifierConsumerDocumentProducer",
 			targetMethod = "index",
 			action = "throw new RuntimeException(\"Byteman said: Error in document creation!\")",
 			name = "testErrorInBuildingLuceneDocumentGetsCaughtByErrorHandler")

@@ -61,8 +61,8 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final Class<?> indexedType;
 	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
-	private final ErrorHandler errorHandler;
 	private final int idFetchSize;
+	private final ErrorHandler errorHandler;
 
 	/**
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
@@ -91,13 +91,13 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	}
 
 	@Override
-	public void run(StatelessSession upperSession) {
+	public void run(StatelessSession upperSession) throws Exception {
 		log.trace( "started" );
 		try {
 			inTransactionWrapper( upperSession );
 		}
-		catch (Throwable e) {
-			errorHandler.handleException( log.massIndexerUnexpectedErrorMessage() , e );
+		catch (Exception exception) {
+			errorHandler.handleException( log.massIndexerExceptionWhileFetchingIds(), exception );
 		}
 		finally {
 			destination.producerStopping();

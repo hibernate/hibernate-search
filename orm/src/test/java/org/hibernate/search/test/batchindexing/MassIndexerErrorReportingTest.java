@@ -33,16 +33,14 @@ import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(BMUnitRunner.class)
 public class MassIndexerErrorReportingTest extends SearchTestCaseJUnit4 {
 
-	@Ignore // This test is occasionally failing, needs to be inspected. See HSEARCH-1278
 	@Test
-	@BMRule(targetClass = "org.hibernate.search.batchindexing.impl.IdentifierConsumerEntityProducer",
+	@BMRule(targetClass = "org.hibernate.search.batchindexing.impl.IdentifierConsumerDocumentProducer",
 			targetMethod = "loadList",
 			action = "throw new NullPointerException(\"Byteman created NPE\")",
 			name = "testMassIndexerErrorsReported")
@@ -56,7 +54,7 @@ public class MassIndexerErrorReportingTest extends SearchTestCaseJUnit4 {
 
 		getSession().close();
 		String errorMessage = mockErrorHandler.getErrorMessage();
-		Assert.assertEquals( "HSEARCH000116: Unexpected error during MassIndexer operation", errorMessage );
+		Assert.assertEquals( "HSEARCH000212: An exception occurred while the MassIndexer was transforming identifiers to Lucene Documents", errorMessage );
 		Throwable exception = mockErrorHandler.getLastException();
 		Assert.assertTrue( exception instanceof NullPointerException );
 		Assert.assertEquals( "Byteman created NPE", exception.getMessage() );
