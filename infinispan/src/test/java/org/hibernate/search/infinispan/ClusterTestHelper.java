@@ -81,6 +81,8 @@ public final class ClusterTestHelper {
 			// fragment on every 13 bytes: don't use this on a real case!
 			// only done to make sure we generate lots of small fragments.
 			node.setProperty( "hibernate.search.default.indexwriter.chunk_size", "13" );
+			//Override the JGroups configuration to use the testing loopback stack
+			node.setProperty( DefaultCacheManagerService.INFINISPAN_TRANSPORT_OVERRIDE_RESOURCENAME, "testing-flush-loopback.xml" );
 			// this schema is shared across nodes, so don't drop it on shutdown:
 			node.setProperty( Environment.HBM2DDL_AUTO, "create" );
 			// if we should allow aggressive index locking:

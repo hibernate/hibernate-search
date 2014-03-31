@@ -1,0 +1,46 @@
+<!--
+ * Hibernate, Relational Persistence for Idiomatic Java
+ * 
+ * Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * indicated by the @author tags or express copyright attribution
+ * statements applied by the authors.  All third-party contributions are
+ * distributed under license by Red Hat, Inc.
+ * 
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this distribution; if not, write to:
+ * Free Software Foundation, Inc.
+ * 51 Franklin Street, Fifth Floor
+ * Boston, MA  02110-1301  USA
+  -->
+<config xmlns="urn:org:jgroups"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.5.xsd">
+
+	<SHARED_LOOPBACK
+		bind_addr="127.0.0.1"
+		diagnostics_addr="127.0.0.1"
+		enable_diagnostics="false" />
+	<SHARED_LOOPBACK_PING />
+
+	<MERGE2 max_interval="30000" min_interval="1000" />
+	<FD_SOCK bind_addr="127.0.0.1" />
+	<FD_ALL />
+	<VERIFY_SUSPECT timeout="500" bind_addr="127.0.0.1" />
+	<pbcast.NAKACK exponential_backoff="150" use_mcast_xmit="true"
+		retransmit_timeout="100,300,600" discard_delivered_msgs="false" />
+	<UNICAST timeout="300,600,1200" />
+	<pbcast.STABLE stability_delay="1000" desired_avg_gossip="50000"
+		max_bytes="400000" />
+	<pbcast.GMS print_local_addr="true" join_timeout="500"
+		view_bundling="true" />
+	<RSVP resend_interval="20" timeout="10000"/>
+</config>
