@@ -212,7 +212,7 @@ public class PluggableSerializationLuceneWorkSerializer implements LuceneWorkSer
 					throw log.unknownFieldType( safeField.getClass() );
 				}
 			}
-			else if ( fieldable != null ) { //Today Fieldable is Serializable but for how long?
+			else if ( fieldable instanceof Serializable ) { //Today Fieldable is Serializable but for how long?
 				serializer.addFieldWithSerializableFieldable( toByteArray( fieldable ) );
 			}
 			else {
