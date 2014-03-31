@@ -75,6 +75,12 @@ public class DefaultCacheManagerService implements CacheManagerService, Startabl
 	 */
 	public static final String INFINISPAN_CONFIGURATION_RESOURCENAME = "hibernate.search.infinispan.configuration_resourcename";
 
+	/**
+	 * Configuration property to replace the Transport configuration property in Infinispan with a different value, after the
+	 * configuration file was parsed.
+	 */
+	public static final String INFINISPAN_TRANSPORT_OVERRIDE_RESOURCENAME = "hibernate.search.infinispan.configuration.transport_override_resourcename";
+
 	private EmbeddedCacheManager cacheManager;
 
 	/**
@@ -92,9 +98,10 @@ public class DefaultCacheManagerService implements CacheManagerService, Startabl
 					INFINISPAN_CONFIGURATION_RESOURCENAME,
 					DEFAULT_INFINISPAN_CONFIGURATION_RESOURCENAME
 			);
+			final String transportOverrideResource = properties.getProperty( INFINISPAN_TRANSPORT_OVERRIDE_RESOURCENAME );
 			try {
 				InfinispanConfigurationParser ispnConfiguration = new InfinispanConfigurationParser( DefaultCacheManagerService.class.getClassLoader() );
-				ConfigurationBuilderHolder configurationBuilderHolder = ispnConfiguration.parseFile( cfgName );
+				ConfigurationBuilderHolder configurationBuilderHolder = ispnConfiguration.parseFile( cfgName, transportOverrideResource );
 				cacheManager = new DefaultCacheManager( configurationBuilderHolder, true );
 				manageCacheManager = true;
 			}
