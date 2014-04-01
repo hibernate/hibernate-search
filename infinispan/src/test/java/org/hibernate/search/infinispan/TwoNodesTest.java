@@ -49,8 +49,6 @@ import org.junit.Test;
  * Then after some indexing was done we verify the index contains expected data
  * both on the other node and on a third just started node.
  *
- * Set <code>-Djava.net.preferIPv4Stack=true</code> as this is required by JGroups.
- *
  * @author Sanne Grinovero
  */
 public class TwoNodesTest {

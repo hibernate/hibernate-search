@@ -49,9 +49,6 @@ import org.junit.Assert;
  * The JGroups stack used needs to have the RSVP protocol with ack_on_delivery enabled
  * (the default configuration we use does).
  *
- * Run the test using JVM parameters:
- * -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1
- *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2013 Red Hat Inc.
  * @since 4.3
  */
@@ -59,7 +56,7 @@ import org.junit.Assert;
 public class SyncJGroupsBackendTest {
 
 	private static final Log log = LoggerFactory.make();
-	private static final String JGROUPS_CONFIGURATION = "jgroups-testing-udp.xml";
+	private static final String JGROUPS_CONFIGURATION = "testing-flush-loopback.xml";
 
 	@Rule
 	public SearchFactoryHolder slaveNode = new SearchFactoryHolder( Dvd.class, Book.class, Drink.class, Star.class )

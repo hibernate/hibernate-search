@@ -105,13 +105,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <!-- java.net.preferIPv4Stack and jgroups.bind_addr are needed for JGroups -->
-                        <java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
-                        <jgroups.bind_addr>127.0.0.1</jgroups.bind_addr>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
