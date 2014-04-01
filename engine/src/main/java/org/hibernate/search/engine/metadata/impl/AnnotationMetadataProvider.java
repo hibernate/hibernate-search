@@ -655,9 +655,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
-		ContainedInMetadata containedInMetadata = new ContainedInMetadata( member );
-		updateContainedInMaxDepths( containedInMetadata, member );
-		typeMetadataBuilder.addContainedIn( containedInMetadata );
+		ContainedInMetadataBuilder containedInMetadataBuilder = new ContainedInMetadataBuilder( member );
+		updateContainedInMaxDepths( containedInMetadataBuilder, member );
+		typeMetadataBuilder.addContainedIn( containedInMetadataBuilder.createContainedInMetadata() );
 
 		//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
 		typeMetadataBuilder.addCollectionRole(
@@ -667,18 +667,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 	}
 
-	private void updateContainedInMaxDepths(ContainedInMetadata containedInMetadata, XProperty member) {
-		updateContainedInMaxDepth( containedInMetadata, member, XClass.ACCESS_FIELD );
-		updateContainedInMaxDepth( containedInMetadata, member, XClass.ACCESS_PROPERTY );
+	private void updateContainedInMaxDepths(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty member) {
+		updateContainedInMaxDepth( containedInMetadataBuilder, member, XClass.ACCESS_FIELD );
+		updateContainedInMaxDepth( containedInMetadataBuilder, member, XClass.ACCESS_PROPERTY );
 	}
 
-	private void updateContainedInMaxDepth(ContainedInMetadata containedInMetadata, XMember memberWithContainedIn, String accessType) {
+	private void updateContainedInMaxDepth(ContainedInMetadataBuilder containedInMetadataBuilder, XMember memberWithContainedIn, String accessType) {
 		XClass memberReturnedType = memberWithContainedIn.getElementClass();
 		String mappedBy = mappedBy( memberWithContainedIn );
 		List<XProperty> returnedTypeProperties = memberReturnedType.getDeclaredProperties( accessType );
 		for ( XProperty property : returnedTypeProperties ) {
 			if ( isCorrespondingIndexedEmbedded( mappedBy, property ) ) {
-				updateDepthProperties( containedInMetadata, property );
+				updateDepthProperties( containedInMetadataBuilder, property );
 				break;
 			}
 		}
@@ -697,8 +697,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return false;
 	}
 
-	private void updateDepthProperties(ContainedInMetadata containedInMetadata, XProperty property) {
-		containedInMetadata.setMaxDepth( property.getAnnotation( IndexedEmbedded.class ).depth() );
+	private void updateDepthProperties(ContainedInMetadataBuilder containedInMetadataBuilder, XProperty property) {
+		containedInMetadataBuilder.maxDepth( property.getAnnotation( IndexedEmbedded.class ).depth() );
 	}
 
 	private String mappedBy(XMember member) {
