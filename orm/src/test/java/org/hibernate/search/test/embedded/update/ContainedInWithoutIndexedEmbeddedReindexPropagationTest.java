@@ -26,6 +26,7 @@ package org.hibernate.search.test.embedded.update;
 import java.util.List;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -40,7 +41,47 @@ import org.hibernate.search.test.util.TestForIssue;
 @TestForIssue(jiraKey = "HSEARCH-1573")
 public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends SearchTestCase {
 
-	public void testUpdatingContainedInEntityPropagatesToAllEntities() throws Exception {
+	public void testUpdatingContainedInEntityPropagatesToAllEntitiesSimpleCase() throws Exception {
+		// first operation -> save
+		FullTextSession session = Search.getFullTextSession( openSession() );
+		Transaction tx = session.beginTransaction();
+
+		SimpleParentEntity parent = new SimpleParentEntity( "name1" );
+		session.save( parent );
+
+		SimpleChildEntity child = new SimpleChildEntity( parent );
+		session.save( child );
+
+		parent.setChild( child );
+		session.update( parent );
+
+		tx.commit();
+		session.close();
+
+		// assert that everything got saved correctly
+		session = Search.getFullTextSession( openSession() );
+		tx = session.beginTransaction();
+		assertEquals( 1, getSimpleChildEntitiesFromIndex( session, parent.getName() ).size() );
+		tx.commit();
+		session.close();
+
+		// update the parent name
+		session = Search.getFullTextSession( openSession() );
+		tx = session.beginTransaction();
+		parent.setName( "newname2" );
+		session.update( parent );
+		tx.commit();
+		session.close();
+
+		// check that the SimpleChildEntity has been reindexed correctly
+		session = Search.getFullTextSession( openSession() );
+		tx = session.beginTransaction();
+		assertEquals( 1, getSimpleChildEntitiesFromIndex( session, parent.getName() ).size() );
+		tx.commit();
+		session.close();
+	}
+
+	public void testUpdatingContainedInEntityPropagatesToAllEntitiesBusinessCase() throws Exception {
 		ProductModel model = new ProductModel( "042024N" );
 
 		ProductArticle article1 = new ProductArticle( model, "02" );
@@ -90,6 +131,13 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 		session.close();
 	}
 
+	private List<SimpleChildEntity> getSimpleChildEntitiesFromIndex(FullTextSession session, String name) {
+		FullTextQuery q = session.createFullTextQuery( new TermQuery( new Term( "parentName", name ) ), SimpleChildEntity.class );
+		@SuppressWarnings("unchecked")
+		List<SimpleChildEntity> results = q.list();
+		return results;
+	}
+
 	private List<ProductShootingBrief> getShootingBriefsFromIndex(FullTextSession session, String referenceCode) {
 		FullTextQuery q = session.createFullTextQuery( new WildcardQuery( new Term( "referenceCodeCollection", referenceCode.toLowerCase() + "*" ) ),
 				ProductShootingBrief.class );
@@ -100,6 +148,7 @@ public class ContainedInWithoutIndexedEmbeddedReindexPropagationTest extends Sea
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] { ProductArticle.class, ProductModel.class, ProductReferenceCode.class, ProductShootingBrief.class };
+		return new Class[] { SimpleParentEntity.class, SimpleChildEntity.class, ProductArticle.class, ProductModel.class, ProductReferenceCode.class,
+				ProductShootingBrief.class };
 	}
 }
