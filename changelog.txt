@@ -1,6 +1,50 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Alpha3 (03-04-2014)
+------------------------
+
+** Sub-task
+    * [HSEARCH-1533] - MoreLikeThis QueryBuilder is not including fields from indexedembedded components
+    * [HSEARCH-1545] - Support compressed fields in MoreLikeThis
+
+** Bug
+    * [HSEARCH-1278] - Spodaric test failure: org.hibernate.search.test.batchindexing.MassIndexerErrorReportingTest
+    * [HSEARCH-1456] - Review classloader usage
+    * [HSEARCH-1525] - Performance tests creating reports in a directory not compatible with Windows
+    * [HSEARCH-1562] - Race condition in error reporting during MassIndexer
+    * [HSEARCH-1572] - SerializationHelper not closing object streams
+
+** Improvement
+    * [HSEARCH-1121] - Work on a proper classloader strategy
+    * [HSEARCH-1499] - Avoid eager iteration on values read from AtomicReader in DistanceCollector until an explicit collect()
+    * [HSEARCH-1508] - Tune IndexWriter options to allow for highly concurrent usage
+    * [HSEARCH-1510] - Minimize distributed dependencies related to Apache Tika
+    * [HSEARCH-1547] - Define the exact behaviour of ServiceManager#releaseAllServices
+    * [HSEARCH-1549] - Reorganize classes under org.hibernate.search.test.util
+
+** New Feature
+    * [HSEARCH-1575] - Allow to override the JGroups configuration defined by the Infinispan configuration files
+
+** Patch
+    * [HSEARCH-1551] - Test in SerializationHelperTest is ineffective
+
+** Task
+    * [HSEARCH-1516] - FetchSizeConfigurationTest occasionally fails: race condition
+    * [HSEARCH-1527] - Upgrade to Apache Lucene 4.7
+    * [HSEARCH-1558] - Upgrade JGroups to 3.5.0.Beta2
+    * [HSEARCH-1559] - Upgrade Apache Avro to 1.7.6
+    * [HSEARCH-1566] - Update to JUnit 4.11
+    * [HSEARCH-1567] - Minor dependency updates and Maven plugin versions updates
+    * [HSEARCH-1568] - Exclude dependency to lucene-sandbox
+    * [HSEARCH-1569] - Update used JavaEE APIs to JavaEE 7 definitions
+    * [HSEARCH-1570] - Reorganize distribution assembly and management of dependency versions
+    * [HSEARCH-1571] - Upgrade to Infinispan 7.0.0.Alpha2
+    * [HSEARCH-1584] - Upgrade to Apache Lucene 4.7.1
+    * [HSEARCH-1585] - Upgrade to Hibernate ORM 4.3.5.Final
+    * [HSEARCH-1586] - Remove redundant Surefire configurations
+
+
 Version 5.0.0.Alpha2 (05-03-2014)
 ------------------------
 
