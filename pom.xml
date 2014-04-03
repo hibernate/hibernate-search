@@ -150,7 +150,7 @@
         <luceneVersion>4.7.1</luceneVersion>
         <infinispanVersion>7.0.0.Alpha2</infinispanVersion>
         <jgroupsVersion>3.5.0.Beta2</jgroupsVersion>
-        <hibernateVersion>4.3.4.Final</hibernateVersion>
+        <hibernateVersion>4.3.5.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>2.1.4</bytemanVersion>
