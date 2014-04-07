@@ -20,25 +20,26 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hibernate.search.spi.MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Properties;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
+
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.spi.MassIndexerFactory;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hibernate.search.batchindexing.spi.MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Davide D'Alto <davide@hibernate.org>
