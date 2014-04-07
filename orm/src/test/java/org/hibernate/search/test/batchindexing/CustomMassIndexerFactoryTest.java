@@ -21,7 +21,7 @@
 package org.hibernate.search.test.batchindexing;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hibernate.search.spi.MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME;
+import static org.hibernate.search.batchindexing.spi.MassIndexerFactory.MASS_INDEXER_FACTORY_CLASSNAME;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -36,7 +36,7 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.spi.MassIndexerFactory;
+import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.junit.Test;
 
