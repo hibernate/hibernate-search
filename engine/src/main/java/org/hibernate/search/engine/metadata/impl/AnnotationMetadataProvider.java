@@ -403,6 +403,21 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						parseContext
 				);
 			}
+
+			// Indexed collection roles are collected in the parse context while traversing the hierarchy.
+			// We add all the collection roles of the parent classes and the current class to the current class
+			// so that we can work around the fact that for @MappedSuperClass the collection role is considered
+			// attached to the first @Entity sub class by ORM.
+			// While it is not quite right, it's the best solution we have found to fix HSEARCH-1583 as there is no
+			// reliable way to unqualify a collection role at the moment.
+			// This might change in ORM 5 and we might reconsider this decision then.
+			for ( String unqualifiedCollectionRole : parseContext.getCollectedUnqualifiedCollectionRoles() ) {
+				typeMetadataBuilder.addCollectionRole(
+						StringHelper.qualify(
+								parseContext.getCurrentClass().getName(), unqualifiedCollectionRole
+						)
+				);
+			}
 		}
 	}
 
@@ -550,12 +565,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		typeMetadataBuilder.addProperty( propertyMetadata );
 		if ( member.isCollection() ) {
-			typeMetadataBuilder.addCollectionRole(
-					StringHelper.qualify(
-							parseContext.getCurrentClass().getName(),
-							member.getName()
-					)
-			);
+			parseContext.collectUnqualifiedCollectionRole( member.getName() );
 		}
 	}
 
@@ -710,12 +720,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		updateContainedInMaxDepths( member, typeMetadataBuilder );
 
-		//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
-		typeMetadataBuilder.addCollectionRole(
-				StringHelper.qualify(
-						parseContext.getCurrentClass().getName(), member.getName()
-				)
-		);
+		parseContext.collectUnqualifiedCollectionRole( member.getName() );
 	}
 
 	private void updateContainedInMaxDepths(XProperty member, TypeMetadata.Builder typeMetadataBuilder) {
@@ -890,14 +895,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 
 		// keep track of collection role names for ORM integration optimization based on collection update events
-		if ( member.isCollection() ) {
-			typeMetadataBuilder.addCollectionRole(
-					StringHelper.qualify(
-							parseContext.getCurrentClass().getName(),
-							member.getName()
-					)
-			);
-		}
+		parseContext.collectUnqualifiedCollectionRole( member.getName() );
 	}
 
 	private String determineNullToken(org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context) {
@@ -1123,12 +1121,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return;
 		}
 
-		//collection role in Hibernate is made of the actual hosting class of the member (see HSEARCH-780)
-		typeMetadataBuilder.addCollectionRole(
-				StringHelper.qualify(
-						parseContext.getCurrentClass().getName(), member.getName()
-				)
-		);
+		parseContext.collectUnqualifiedCollectionRole( member.getName() );
+
 		int oldMaxLevel = parseContext.getMaxLevel();
 		int potentialLevel = depth( indexedEmbeddedAnnotation ) + parseContext.getLevel();
 		// This is really catching a possible int overflow. depth() can return Integer.MAX_VALUE, which then can
@@ -1441,6 +1435,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		private int level = 0;
 		private int maxLevel = Integer.MAX_VALUE;
 		private boolean explicitDocumentId = false;
+		private final Set<String> unqualifiedCollectedCollectionRoles = new HashSet<String>();
 
 		boolean hasBeenProcessed(XClass processedClass) {
 			return processedClasses.contains( processedClass );
@@ -1500,6 +1495,14 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		public void setExplicitDocumentId(boolean explicitDocumentId) {
 			this.explicitDocumentId = explicitDocumentId;
+		}
+
+		public Set<String> getCollectedUnqualifiedCollectionRoles() {
+			return unqualifiedCollectedCollectionRoles;
+		}
+
+		public void collectUnqualifiedCollectionRole(String unqualifiedCollectionRole) {
+			unqualifiedCollectedCollectionRoles.add( unqualifiedCollectionRole );
 		}
 	}
 }
