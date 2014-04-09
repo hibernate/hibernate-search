@@ -23,14 +23,15 @@
  */
 package org.hibernate.search.bridge.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -61,20 +62,26 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class BridgeFactory {
 	private static final Log LOG = LoggerFactory.make();
-	private List<BridgeProvider> annotationBasedProviders;
-	private List<BridgeProvider> regularProviders;
+	private Set<BridgeProvider> annotationBasedProviders;
+	private Set<BridgeProvider> regularProviders;
 
 	public BridgeFactory(ServiceManager serviceManager) {
-		annotationBasedProviders = new ArrayList<BridgeProvider>(5);
+		annotationBasedProviders = new HashSet<BridgeProvider>(5);
 		annotationBasedProviders.add( new CalendarBridgeProvider() );
 		annotationBasedProviders.add( new DateBridgeProvider() );
 		annotationBasedProviders.add( new NumericBridgeProvider() );
 		annotationBasedProviders.add( new SpatialBridgeProvider() );
 		annotationBasedProviders.add( new TikaBridgeProvider() );
 
-		regularProviders = new ArrayList<BridgeProvider>( 2 );
-		regularProviders.add( new EnumBridgeProvider() );
-		regularProviders.add( new DefaultBridgeProvider(serviceManager) );
+		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+		try {
+			regularProviders = classLoaderService.loadJavaServices( BridgeProvider.class );
+			regularProviders.add( new EnumBridgeProvider() );
+			regularProviders.add( new DefaultBridgeProvider( serviceManager ) );
+		}
+		finally {
+			serviceManager.releaseService( ClassLoaderService.class );
+		}
 	}
 
 	/**

@@ -23,6 +23,7 @@
  */
 package org.hibernate.search.test.configuration.integration;
 
+import java.util.LinkedHashSet;
 import java.util.Properties;
 
 import org.easymock.Capture;
@@ -37,6 +38,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.search.Environment;
+import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
@@ -155,6 +157,8 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 		// returning object.class is fair enough for testing purposes
 		expect( mockClassLoaderService.classForName( "javax.persistence.Id" ) ).andReturn( Object.class );
+
+		expect( mockClassLoaderService.loadJavaServices( BridgeProvider.class ) ).andReturn( new LinkedHashSet<BridgeProvider>(0) );
 
 		EasyMockUnitils.replay();
 
