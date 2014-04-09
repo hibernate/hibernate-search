@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.index.CorruptIndexException;
+
+import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.SearchException;
@@ -727,4 +729,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 214, value = "Field %s of entity %s cannot be used in a MoreLikeThis query. Numeric fields are not considered for the moment.")
 	SearchException numericFieldCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+
+	@Message(id = 215, value = "Multiple matching FieldBridges found for %s of return type %s: %s" )
+	SearchException multipleMatchingFieldBridges(XMember member, XClass memberType, String listOfFieldBridges);
 }

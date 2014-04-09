@@ -95,12 +95,9 @@ public class DefaultBridgeProvider implements BridgeProvider {
 		UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );
 	}
 
-	private void initialize(ServiceManager serviceManager) {
-		// possible concurrent calls to initialize are not a problem as the operation is idempotent
-		// plus we don't initialize in parallel threads
-		TwoWayFieldBridge clazz = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge( serviceManager ) );
-
-		Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
+	public DefaultBridgeProvider(ServiceManager serviceManager) {
+		clazz = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge( serviceManager ) );
+		builtInBridges = new HashMap<String, FieldBridge>();
 		builtInBridges.put( Character.class.getName(), CHARACTER );
 		builtInBridges.put( char.class.getName(), CHARACTER );
 		builtInBridges.put( Double.class.getName(), DOUBLE );
@@ -124,17 +121,10 @@ public class DefaultBridgeProvider implements BridgeProvider {
 		builtInBridges.put( Date.class.getName(), DateBridgeProvider.DATE_MILLISECOND );
 		builtInBridges.put( Calendar.class.getName(), CalendarBridgeProvider.CALENDAR_MILLISECOND );
 		builtInBridges.put( Class.class.getName(), clazz );
-
-		//swap references: clazz last as it is the initialization gate keeper
-		this.builtInBridges = builtInBridges;
-		this.clazz = clazz;
 	}
 
 	@Override
 	public FieldBridge returnFieldBridgeIfMatching(BridgeContext bridgeContext) {
-		if ( clazz == null ) {
-			initialize( bridgeContext.getServiceManager() );
-		}
 		return builtInBridges.get( bridgeContext.getReturnType().getName() );
 	}
 }

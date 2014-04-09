@@ -63,4 +63,10 @@ public class BuiltinArrayBridge extends ArrayBridge implements StringBridge {
 		return bridge.objectToString( object );
 	}
 
+	@Override
+	public String toString() {
+		return "BuiltinArrayBridge{" +
+				"bridge=" + bridge +
+				'}';
+	}
 }

@@ -58,4 +58,10 @@ public class BuiltinIterableBridge extends IterableBridge implements StringBridg
 		return bridge.objectToString( object );
 	}
 
+	@Override
+	public String toString() {
+		return "BuiltinIterableBridge{" +
+				"bridge=" + bridge +
+				'}';
+	}
 }

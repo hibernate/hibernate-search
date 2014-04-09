@@ -23,7 +23,9 @@
  */
 package org.hibernate.search.bridge.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -59,8 +61,20 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class BridgeFactory {
 	private static final Log LOG = LoggerFactory.make();
+	private List<BridgeProvider> annotationBasedProviders;
+	private List<BridgeProvider> regularProviders;
 
 	public BridgeFactory(ServiceManager serviceManager) {
+		annotationBasedProviders = new ArrayList<BridgeProvider>(5);
+		annotationBasedProviders.add( new CalendarBridgeProvider() );
+		annotationBasedProviders.add( new DateBridgeProvider() );
+		annotationBasedProviders.add( new NumericBridgeProvider() );
+		annotationBasedProviders.add( new SpatialBridgeProvider() );
+		annotationBasedProviders.add( new TikaBridgeProvider() );
+
+		regularProviders = new ArrayList<BridgeProvider>( 2 );
+		regularProviders.add( new EnumBridgeProvider() );
+		regularProviders.add( new DefaultBridgeProvider(serviceManager) );
 	}
 
 	/**
@@ -163,69 +177,57 @@ public final class BridgeFactory {
 		ExtendedBridgeProvider.ExtendedBridgeContext context = new XMemberBridgeContext( member, numericField, reflectionManager, serviceManager );
 		ContainerType containerType = getContainerType( member, reflectionManager );
 
-		bridge = getFieldBridgeFromBridgeProvider(
-				new DateBridgeProvider(),
-				context,
-				containerType
-		);
-		if ( bridge != null ) {
-			return bridge;
+		// We do annotation based providers as Tike at least needs priority over
+		// default providers because it might override the type for String
+		// TODO: introduce the notion of bridge contributor annotations to cope with this in the future
+		for ( BridgeProvider provider : annotationBasedProviders ) {
+			bridge = getFieldBridgeFromBridgeProvider(
+					provider,
+					context,
+					containerType
+			);
+			if ( bridge != null ) {
+				return bridge;
+			}
 		}
 
-		bridge = getFieldBridgeFromBridgeProvider(
-				new CalendarBridgeProvider(),
-				context,
-				containerType
-		);
-		if ( bridge != null ) {
-			return bridge;
+		// walk through all regular bridges and if multiple match
+		// raise an exception containing the conflicting bridges
+		StringBuilder multipleMatchError = null;
+		BridgeProvider initialMatchingBridgeProvider = null;
+		for ( BridgeProvider provider : regularProviders ) {
+			FieldBridge createdBridge = getFieldBridgeFromBridgeProvider(
+					provider,
+					context,
+					containerType
+			);
+			if ( createdBridge != null ) {
+				// oops we found a duplicate
+				if ( bridge != null ) {
+					// first duplicate, add the initial bridge
+					if ( multipleMatchError == null ) {
+						multipleMatchError = new StringBuilder( "\n" )
+								.append( "FieldBridge: " )
+								.append( bridge )
+								.append( " - BridgeProvider: " )
+								.append( initialMatchingBridgeProvider.getClass() );
+					}
+					multipleMatchError
+							.append( "\n" )
+							.append( "FieldBridge: ")
+							.append( createdBridge )
+							.append( " - BridgeProvider: " )
+							.append( provider.getClass() );
+				}
+				else {
+					bridge = createdBridge;
+					initialMatchingBridgeProvider = provider;
+				}
+			}
 		}
-
-		bridge = getFieldBridgeFromBridgeProvider(
-				new TikaBridgeProvider(),
-				context,
-				containerType
-		);
-		if ( bridge != null ) {
-			return bridge;
+		if ( multipleMatchError != null ) {
+			throw LOG.multipleMatchingFieldBridges( member, member.getType(), multipleMatchError.toString() );
 		}
-
-		bridge = getFieldBridgeFromBridgeProvider(
-				new NumericBridgeProvider(),
-				context,
-				containerType
-		);
-		if ( bridge != null ) {
-			return bridge;
-		}
-
-
-		bridge = getFieldBridgeFromBridgeProvider(
-				new SpatialBridgeProvider(),
-				context,
-				containerType
-
-		);
-		if ( bridge != null ) {
-			return bridge;
-		}
-
-		//find in built-ins
-		bridge = getFieldBridgeFromBridgeProvider(
-				new DefaultBridgeProvider(),
-				context,
-				containerType
-
-		);
-		if ( bridge != null ) {
-			return bridge;
-		}
-
-		bridge = getFieldBridgeFromBridgeProvider(
-				new EnumBridgeProvider(),
-				context,
-				containerType
-		);
 		if ( bridge != null ) {
 			return bridge;
 		}
