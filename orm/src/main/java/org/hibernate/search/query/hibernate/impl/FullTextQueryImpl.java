@@ -58,7 +58,7 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.util.impl.ContextHelper;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;

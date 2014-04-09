@@ -26,7 +26,7 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.util.impl.HibernateHelper;
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Criteria;

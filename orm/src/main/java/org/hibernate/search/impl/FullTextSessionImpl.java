@@ -46,8 +46,8 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.impl.ContextHelper;
-import org.hibernate.search.util.impl.HibernateHelper;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
