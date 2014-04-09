@@ -44,7 +44,7 @@ import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
-import org.hibernate.search.util.impl.ContextHelper;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.junit.Assert;
 
 /**

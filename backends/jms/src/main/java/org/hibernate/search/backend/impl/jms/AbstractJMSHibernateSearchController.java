@@ -34,7 +34,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.util.impl.ContextHelper;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Session;

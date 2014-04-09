@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.util.impl;
+package org.hibernate.search.hcore.util.impl;
 
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
