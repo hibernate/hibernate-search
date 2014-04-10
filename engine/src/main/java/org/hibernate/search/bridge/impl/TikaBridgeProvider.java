@@ -26,6 +26,8 @@ package org.hibernate.search.bridge.impl;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.sql.Blob;
 
 import org.hibernate.search.annotations.TikaBridge;
 import org.hibernate.search.bridge.FieldBridge;
@@ -50,9 +52,15 @@ public class TikaBridgeProvider extends ExtendedBridgeProvider {
 	public FieldBridge returnFieldBridgeIfMatching(ExtendedBridgeContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
 		if ( annotatedElement.isAnnotationPresent( TikaBridge.class ) ) {
+			Class<?> returnType = context.getReturnType();
+			if ( ! Blob.class.isAssignableFrom( returnType )
+					&& ! byte[].class.isAssignableFrom( returnType )
+					&& ! String.class.isAssignableFrom( returnType )
+					&& ! URI.class.isAssignableFrom( returnType ) ) {
+				throw LOG.unsupportedTikaBridgeType( returnType );
+			}
 			TikaBridge tikaAnnotation = annotatedElement.getAnnotation( TikaBridge.class );
 			return createTikaBridge( tikaAnnotation, context.getServiceManager() );
-
 		}
 		return null;
 	}

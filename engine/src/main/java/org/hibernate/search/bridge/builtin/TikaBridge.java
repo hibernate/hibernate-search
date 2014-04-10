@@ -144,7 +144,7 @@ public class TikaBridge implements FieldBridge {
 			return openInputStream( file );
 		}
 		else {
-			throw log.unsupportedTikaBridgeType();
+			throw log.unsupportedTikaBridgeType( object != null ? object.getClass() : null );
 		}
 	}
 

@@ -547,8 +547,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 150, value = "Unable to get input stream from blob data")
 	SearchException unableToGetInputStreamFromBlob(@Cause Throwable e);
 
-	@Message(id = 151, value = "Unable to get input stream from blob data")
-	SearchException unsupportedTikaBridgeType();
+	@Message(id = 151, value = "Unable to get input stream from object of type %1$s")
+	SearchException unsupportedTikaBridgeType(Class<?> objectType);
 
 	@Message(id = 152, value = "File %1$s does not exist")
 	SearchException fileDoesNotExist(String fileName);
