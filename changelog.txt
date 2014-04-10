@@ -1,6 +1,28 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.3.Final (10-04-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1260] - LazyInitializationException while indexing
+    * [HSEARCH-1447] - Failure to boot if a non-indexed entity is having a complex ID for which no appropriate TwoWayFieldBridge can be guessed
+    * [HSEARCH-1476] - Configuration property 'merge_calibrate_by_deletes' not parsed correctly
+    * [HSEARCH-1495] - Using MassIndexer leads to logged messages about unreleased service MassIndexerFactoryProvider
+    * [HSEARCH-1515] - NPE because of inverted boolean check in IdentifierConsumerDocumentProducer
+    * [HSEARCH-1532] - JGroups backend buffer handling is not considering the offset on message delivery
+    * [HSEARCH-1562] - Race condition in error reporting during MassIndexer
+    * [HSEARCH-1573] - Starting with 4.4, @ContainedIn annotations are ignored if there are no corresponding @IndexEmbedded annotations
+    * [HSEARCH-1583] - Collection fields in @MappedSuperclasses are ignored on update
+
+** Improvement
+    * [HSEARCH-1468] - Reduce amount of objects created by the FacetCollector
+    * [HSEARCH-1477] - Trivial optimization for empty results
+
+** Task
+    * [HSEARCH-1528] - Improvide compatibility of Hibernate Search 4.4 series with Hibernate ORM 4.2 series
+
+
 Version 4.4.2.Final (16-12-2013)
 ------------------------
 
