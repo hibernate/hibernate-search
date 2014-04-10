@@ -25,7 +25,7 @@ import java.util.Properties;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
