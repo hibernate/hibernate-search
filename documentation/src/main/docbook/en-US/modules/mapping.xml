@@ -3085,7 +3085,7 @@ public class Address {
     </section>
 
     <section>
-      <title>Defining bridges</title>
+      <title>Declaring bridges</title>
 
       <para>It is possible to associate bridges to programmatically defined
       fields. When you define a <methodname>field()</methodname>
@@ -3097,7 +3097,7 @@ public class Address {
       bridge:</para>
 
       <example>
-        <title>Defining field bridges programmatically</title>
+        <title>Declaring field bridges programmatically</title>
 
         <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
@@ -3120,7 +3120,7 @@ cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</programli
       next example.</para>
 
       <example>
-        <title>Defining field bridges using annotation</title>
+        <title>Declaring field bridges using annotation</title>
 
         <programlisting language="JAVA" role="JAVA">@Entity
 @Indexed
