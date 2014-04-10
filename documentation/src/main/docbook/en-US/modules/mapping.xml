@@ -2187,6 +2187,138 @@ public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
         concatenation.</para>
       </section>
     </section>
+
+    <section>
+      <title>BridgeProvider: associate a bridge to a given return type</title>
+
+      <para>Custom field bridges are very flexible, but it can be tedious and
+      error prone to apply the same custom <classname>@FieldBridge</classname>
+      annotation every time a property of a given type is present in your
+      domain model. That is what <classname>BridgeProvider</classname>s are
+      for.</para>
+
+      <para>Let's imagine that you have a type <classname>Currency</classname>
+      in your application and that you want to apply your very own
+      <classname>CurrencyFieldBridge</classname> every time an indexed
+      property returns <classname>Currency</classname>. You can do it the hard
+      way:</para>
+
+      <example>
+        <title>Applying the same @FieldBridge for a type the hard way</title>
+
+        <programlisting language="JAVA" role="JAVA">@Entity @Indexed
+public class User {
+    @FieldBridge(impl=CurrencyFieldBridge.class)
+    public Currency getDefaultCurrency();
+    [...]
+}
+
+@Entity @Indexed
+public class Account {
+    @FieldBridge(impl=CurrencyFieldBridge.class)
+    public Currency getCurrency();
+    [...]
+}
+
+// continue to add @FieldBridge(impl=CurrencyFieldBridge.class) everywhere Currency is</programlisting>
+      </example>
+
+      <para>Or you can write your own <classname>BridgeProvider</classname>
+      implementation for <classname>Currency</classname>.</para>
+
+      <example>
+        <title>Writing a BridgeProvider</title>
+
+        <programlisting language="JAVA" role="JAVA">public class CurrencyBridgeProvider implements BridgeProvider {
+
+    //needs a default no-arg constructor
+
+    @Override
+    public FieldBridge provideFieldBridge(BridgeContext bridgeProviderContext) {
+        if ( bridgeProviderContext.getReturnType().equals( Currency.class ) ) {
+            return CurrencyFieldBridge.INSTANCE;
+        }
+        return null;
+    }
+}</programlisting>
+
+        <programlisting># service file named META-INF/services/org.hibernate.search.bridge.spi.BridgeProvider
+com.acme.myapps.hibernatesearch.CurrencyBridgeProvider</programlisting>
+      </example>
+
+      <para>You need to implement <classname>BridgeProvider</classname> and
+      create a service file named
+      <filename>META-INF/services/org.hibernate.search.bridge.spi.BridgeProvider</filename>.
+      This file must contain the fully qualified class name(s) of the
+      <classname>BridgeProvider</classname> implementations. This is the
+      classic Service Loader discovery mechanism.</para>
+
+      <para>Now, any indexed property of type <classname>Currency</classname>
+      will use <classname>CurrencyFieldBridge</classname>
+      automatically.</para>
+
+      <example>
+        <title>An explicit @FieldBrige is no longer needed</title>
+
+        <programlisting language="JAVA" role="JAVA">@Entity @Indexed
+public class User {
+
+    @Field
+    public Currency getDefaultCurrency();
+    [...]
+}
+
+@Entity @Indexed
+public class Account {
+
+    @Field
+    public Currency getCurrency();
+    [...]
+}
+
+//CurrencyFieldBridge is applied automatically everywhere Currency is found on an indexed property</programlisting>
+      </example>
+
+      <para>A few more things you need to know:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>a <classname>BridgeProvider</classname> must have a no-arg
+          constructor</para>
+        </listitem>
+
+        <listitem>
+          <para>if a <classname>BridgeProvider</classname> only returns
+          <classname>FieldBridge</classname> instances if it is meaningful for
+          the calling context. Null otherwise. In our example, the return type
+          must be <classname>Currency</classname> to be meaningful to our
+          provider.</para>
+        </listitem>
+
+        <listitem>
+          <para>if two or more bridge providers return a
+          <classname>FieldBridge</classname> instance for a given return type,
+          an exception will be raised.</para>
+        </listitem>
+      </itemizedlist>
+
+      <note>
+        <title>What is a calling context</title>
+
+        <para>A calling context is represented by the
+        <classname>BridgeContext</classname> object and represents the
+        environment for which we are looking for a bridge.
+        <classname>BridgeContext</classname> gives access to the return type
+        of the indexed property as well as the
+        <classname>ServiceManager</classname> which gives access to the
+        <classname>ClassLoaderService</classname> for everything class loader
+        related.</para>
+
+        <programlisting>ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+//use the classLoaderService
+serviceManager.releaseService( ClassLoaderService.class );</programlisting>
+      </note>
+    </section>
   </section>
 
   <section id="search-mapping-indexinginterceptor">
