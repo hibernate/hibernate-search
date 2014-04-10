@@ -1,6 +1,21 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.5.1.Final (10-04-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1495] - Using MassIndexer leads to logged messages about unreleased service MassIndexerFactoryProvider
+    * [HSEARCH-1515] - NPE because of inverted boolean check in IdentifierConsumerDocumentProducer
+    * [HSEARCH-1532] - JGroups backend buffer handling is not considering the offset on message delivery
+    * [HSEARCH-1573] - Starting with 4.4, @ContainedIn annotations are ignored if there are no corresponding @IndexEmbedded annotations
+    * [HSEARCH-1583] - Collection fields in @MappedSuperclasses are ignored on update
+
+** Task
+    * [HSEARCH-1590] - Branch 4.5 Micro update of all components: Infinispan, JGroups, Avro, Jackson, Hibernate ORM 4.3.5.Final and WildFly 8.0.0.Final
+    * [HSEARCH-1591] - Branch 4.5 adapt WildFly usage documantation to reflect inclusion in WildFly
+
+
 Version 4.5.0.Final (29-01-2014)
 ------------------------
 
