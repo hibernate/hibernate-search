@@ -30,7 +30,6 @@ import java.util.concurrent.Future;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
