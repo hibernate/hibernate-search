@@ -26,4 +26,4 @@
  *
  * @author Hardy Ferentschik
  */
-package org.hibernate.search.testsupport.progessmonitor;
+package org.hibernate.search.test.util.progessmonitor;

@@ -22,12 +22,12 @@
  * Boston, MA  02110-1301  USA
  */
 
-package org.hibernate.search.testsupport.progessmonitor;
+package org.hibernate.search.test.util.progessmonitor;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.impl.SimpleIndexingProgressMonitor;
+import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
 
 import static org.junit.Assert.assertEquals;
 
