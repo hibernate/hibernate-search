@@ -1827,55 +1827,31 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
   <section id="search-configuration-deploy-on-wildfly">
     <title>Hibernate Search as a WildFly module</title>
 
-    <para>Provided you're deploying on WildFly 8 there is an additional way
-    to add the Hibernate Search dependencies to your application which introduces
-    many practical benefits.</para>
+    <para>If you are deploying your application on WildFly 8, Hibernate Search
+    is included in the application server. A benefit is that rather than including
+    Hibernate Search jars as a dependency in your application, you can activate
+    the module included in the server.</para>
 
-    <para>In WildFly class loading is based on modules. Each module defines
-    explicit dependencies on other modules. Modules allow to share the same
-    artifacts across multiple applications getting you smaller and quicker
-    deployments, but also allow you to have multiple different versions of
-    the same library in the same server, to accomodate different applications.</para>
-
-    <para>More details about modules are described in <ulink
-    url="https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+AS7">Class
-    Loading in WildFly 8</ulink>.</para>
-
-    <para>You can download the pre-packaged Hibernate Search modules
-    from:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para><ulink
-        url="https://downloads.sourceforge.net/project/hibernate/hibernate-search/&version;/hibernate-search-modules-&version;-wildfly-8-dist.zip">Sourceforge</ulink></para>
-      </listitem>
-
-      <listitem>
-        <para>Maven: <ulink
-        url="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~">org.hibernate:hibernate-search-modules-&version;-wildfly-8-dist:zip</ulink></para>
-      </listitem>
-    </itemizedlist>
-
-    <para>Unpack the modules in your WildFly <literal>modules</literal>
-    directory: this will create modules for Hibernate Search, Apache Lucene
-    and some useful Solr libraries. The Hibernate Search modules are:</para>
+    <para>We provide modules for Hibernate Search, for Apache Lucene and for
+    some useful Solr libraries. The Hibernate Search modules are:</para>
 
     <itemizedlist>
       <listitem>
         <para><emphasis>org.hibernate.search.orm:main</emphasis>, for users of
-        Hibernate Search with Hibernate; this will transitively include
-        Hibernate ORM.</para>
+        Hibernate Search with Hibernate. This will transitively include
+        Hibernate ORM, Apache Lucene and Solr in your classpath, so this is
+        all you need.</para>
       </listitem>
 
       <listitem>
         <para><emphasis>org.hibernate.search.engine:main</emphasis>, for
-        projects depending on the internal indexing engine that don't require
-        other dependencies to Hibernate.</para>
+        projects integrating with the internal indexing engine but not using
+        Hibernate ORM (experts only, not covered in this guide).</para>
       </listitem>
     </itemizedlist>
 
-    <para>There are two ways to include the dependencies in your
-    project:</para>
+    <para>There are two alternative ways to get the application server to make
+    Hibernate Search ORM module available to your deployment:</para>
 
     <variablelist>
       <varlistentry>
@@ -1904,14 +1880,13 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
       &lt;/deployment&gt;
   &lt;/jboss-deployment-structure&gt;
           </programlisting>
-
-          <para>More information about the descriptor can be found in the
-          <ulink
-          url="https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+AS7">Class
-            Loading in WildFly 8</ulink>.</para>
         </listitem>
       </varlistentry>
     </variablelist>
+
+    <para>More details about modules are described in <ulink
+    url="https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+AS7">Class
+    Loading in WildFly 8</ulink>.</para>
 
     <tip>
       <para>Modular classloading is a feature of JBoss EAP as well, but if you are using
