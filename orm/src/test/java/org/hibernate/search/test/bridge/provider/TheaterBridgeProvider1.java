@@ -34,8 +34,8 @@ import org.hibernate.search.bridge.spi.BridgeProvider;
  */
 public class TheaterBridgeProvider1 implements BridgeProvider {
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(BridgeContext bridgeContext) {
-		if ( bridgeContext.getReturnType().equals( Theater.class ) ) {
+	public FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext) {
+		if ( bridgeProviderContext.getReturnType().equals( Theater.class ) ) {
 			return new String2FieldBridgeAdaptor( new StringBridge() {
 
 				@Override

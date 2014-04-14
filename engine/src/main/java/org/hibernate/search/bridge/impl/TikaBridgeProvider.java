@@ -49,7 +49,7 @@ public class TikaBridgeProvider extends ExtendedBridgeProvider {
 	private final String TIKA_BRIDGE_PARSE_CONTEXT_SETTER = "setParseContextProviderClass";
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(ExtendedBridgeContext context) {
+	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
 		if ( annotatedElement.isAnnotationPresent( TikaBridge.class ) ) {
 			Class<?> returnType = context.getReturnType();

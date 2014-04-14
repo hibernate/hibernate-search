@@ -53,16 +53,13 @@ public class DateBridgeProvider extends ExtendedBridgeProvider {
 	public static final FieldBridge DATE_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(DateBridge.DATE_MILLISECOND );
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(ExtendedBridgeContext context) {
+	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
 		if ( annotatedElement.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
 			Resolution resolution = annotatedElement.getAnnotation( org.hibernate.search.annotations.DateBridge.class )
 					.resolution();
 			return getDateField( resolution );
 		}
-		//ideally I would handle the build-in bridge when no @DateBridge is set but it conflicts with other
-		//providers that also handle Dates like @TikaBridge
-		//It seems we need a DefaultBridgeProvider at the bottom basically
 		return null;
 	}
 

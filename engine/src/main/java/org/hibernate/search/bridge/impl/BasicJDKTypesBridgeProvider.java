@@ -58,7 +58,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DefaultBridgeProvider implements BridgeProvider {
+public class BasicJDKTypesBridgeProvider implements BridgeProvider {
 
 
 	public static final TwoWayFieldBridge CHARACTER;
@@ -95,7 +95,7 @@ public class DefaultBridgeProvider implements BridgeProvider {
 		UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );
 	}
 
-	public DefaultBridgeProvider(ServiceManager serviceManager) {
+	public BasicJDKTypesBridgeProvider(ServiceManager serviceManager) {
 		clazz = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge( serviceManager ) );
 		builtInBridges = new HashMap<String, FieldBridge>();
 		builtInBridges.put( Character.class.getName(), CHARACTER );
@@ -124,7 +124,7 @@ public class DefaultBridgeProvider implements BridgeProvider {
 	}
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(BridgeContext bridgeContext) {
-		return builtInBridges.get( bridgeContext.getReturnType().getName() );
+	public FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext) {
+		return builtInBridges.get( bridgeProviderContext.getReturnType().getName() );
 	}
 }

@@ -32,18 +32,18 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**
- * Offer a {@code XMember} based {@code BridgeContext}.
+ * Offer a {@code XMember} based {@code BridgeProviderContext}.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class XMemberBridgeContext implements ExtendedBridgeProvider.ExtendedBridgeContext {
+public class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBridgeProviderContext {
 	private final AnnotatedElement annotatedElement;
 	private final Class<?> returnTypeElement;
 	private final String memberName;
 	private final ServiceManager serviceManager;
 	private final NumericField numericField;
 
-	public XMemberBridgeContext(XMember member, NumericField numericField, ReflectionManager reflectionManager, ServiceManager serviceManager) {
+	public XMemberBridgeProviderContext(XMember member, NumericField numericField, ReflectionManager reflectionManager, ServiceManager serviceManager) {
 		this.annotatedElement = new XMemberToAnnotatedElementAdaptor( member );
 		// For arrays and collection, return the type of the contained elements
 		this.returnTypeElement = reflectionManager.toClass( member.getElementClass() );

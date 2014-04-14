@@ -53,7 +53,7 @@ public class CalendarBridgeProvider extends ExtendedBridgeProvider {
 	public static final FieldBridge CALENDAR_MILLISECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MILLISECOND );
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(ExtendedBridgeContext context) {
+	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
 		if ( annotatedElement.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
 			Resolution resolution = annotatedElement.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class )

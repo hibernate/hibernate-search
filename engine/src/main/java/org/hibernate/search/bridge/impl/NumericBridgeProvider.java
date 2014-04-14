@@ -49,7 +49,7 @@ public class NumericBridgeProvider extends ExtendedBridgeProvider {
 	}
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(ExtendedBridgeContext bridgeContext) {
+	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext bridgeContext) {
 		if ( bridgeContext.getNumericField() != null ) {
 			return numericBridges.get( bridgeContext.getReturnType().getName() );
 		}

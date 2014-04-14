@@ -36,8 +36,8 @@ import org.hibernate.search.bridge.spi.BridgeProvider;
  */
 public class EnumBridgeProvider implements BridgeProvider {
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(BridgeContext bridgeContext) {
-		if ( bridgeContext.getReturnType().isEnum() ) {
+	public FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext) {
+		if ( bridgeProviderContext.getReturnType().isEnum() ) {
 			//we return one enum type bridge instance per property as it is customized per ReturnType
 			final EnumBridge enumBridge = new EnumBridge();
 			//AppliedOnTypeAwareBridge is called in a generic way later and fills up the enum type to the bridge

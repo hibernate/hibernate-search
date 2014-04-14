@@ -40,25 +40,31 @@ import org.hibernate.search.exception.AssertionFailure;
 public abstract class ExtendedBridgeProvider implements BridgeProvider {
 
 	/**
-	 * Same as {@link org.hibernate.search.bridge.spi.BridgeProvider#returnFieldBridgeIfMatching(org.hibernate.search.bridge.spi.BridgeProvider.BridgeContext)}
+	 * Same as {@link org.hibernate.search.bridge.spi.BridgeProvider#provideFieldBridge(org.hibernate.search.bridge.spi.BridgeProvider.BridgeProviderContext)}
 	 * but accepts an extended context.
 	 */
-	public abstract FieldBridge returnFieldBridgeIfMatching(ExtendedBridgeContext bridgeContext);
+	public abstract FieldBridge provideFieldBridge(ExtendedBridgeProviderContext bridgeContext);
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(BridgeContext bridgeContext) {
-		if ( ! ( bridgeContext instanceof ExtendedBridgeContext ) ) {
-			throw new AssertionFailure( "We should always receive an ExtendedBridgeContext instance: " + bridgeContext.getClass() );
+	public FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext) {
+		if ( ! ( bridgeProviderContext instanceof ExtendedBridgeProviderContext ) ) {
+			throw new AssertionFailure( "We should always receive an ExtendedBridgeProviderContext instance: " + bridgeProviderContext
+					.getClass() );
 		}
-		return returnFieldBridgeIfMatching( (ExtendedBridgeContext) bridgeContext );
+		return provideFieldBridge( (ExtendedBridgeProviderContext) bridgeProviderContext );
 	}
 
-	interface ExtendedBridgeContext extends BridgeContext {
+	interface ExtendedBridgeProviderContext extends BridgeProviderContext {
 
 		/**
 		 * Offers access to the annotations hosted on the member seeking a bridge.
 		 */
 		AnnotatedElement getAnnotatedElement();
+
+		/**
+		 * Return the member name for log and exception report purposes.
+		 */
+		String getMemberName();
 
 		/**
 		 * Return the appropriate {@link org.hibernate.search.annotations.NumericField} annotation

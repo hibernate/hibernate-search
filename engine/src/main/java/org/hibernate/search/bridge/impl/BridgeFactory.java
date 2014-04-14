@@ -77,7 +77,7 @@ public final class BridgeFactory {
 		try {
 			regularProviders = classLoaderService.loadJavaServices( BridgeProvider.class );
 			regularProviders.add( new EnumBridgeProvider() );
-			regularProviders.add( new DefaultBridgeProvider( serviceManager ) );
+			regularProviders.add( new BasicJDKTypesBridgeProvider( serviceManager ) );
 		}
 		finally {
 			serviceManager.releaseService( ClassLoaderService.class );
@@ -181,7 +181,7 @@ public final class BridgeFactory {
 			return bridge;
 		}
 
-		ExtendedBridgeProvider.ExtendedBridgeContext context = new XMemberBridgeContext( member, numericField, reflectionManager, serviceManager );
+		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext( member, numericField, reflectionManager, serviceManager );
 		ContainerType containerType = getContainerType( member, reflectionManager );
 
 		// We do annotation based providers as Tike at least needs priority over
@@ -263,10 +263,10 @@ public final class BridgeFactory {
 
 	private FieldBridge getFieldBridgeFromBridgeProvider(
 			BridgeProvider bridgeProvider,
-			ExtendedBridgeProvider.ExtendedBridgeContext context,
+			ExtendedBridgeProvider.ExtendedBridgeProviderContext context,
 			ContainerType containerType
 	) {
-		FieldBridge bridge = bridgeProvider.returnFieldBridgeIfMatching( context );
+		FieldBridge bridge = bridgeProvider.provideFieldBridge( context );
 		if ( bridge == null ) {
 			return null;
 		}

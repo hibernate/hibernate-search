@@ -46,19 +46,14 @@ public interface BridgeProvider {
 	 * Return a {@link org.hibernate.search.bridge.FieldBridge} instance if the provider can
 	 * build a bridge for the calling context. {@code null} otherwise.
 	 */
-	FieldBridge returnFieldBridgeIfMatching(BridgeContext bridgeContext);
+	FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext);
 
-	interface BridgeContext {
+	interface BridgeProviderContext {
 
 		/**
 		 * Member return type seeking a bridge.
 		 */
 		Class<?> getReturnType();
-
-		/**
-		 * Return the member name for log and exception report purposes.
-		 */
-		String getMemberName();
 
 		/**
 		 * Provides access to the {@code ServiceManager} and gives access to

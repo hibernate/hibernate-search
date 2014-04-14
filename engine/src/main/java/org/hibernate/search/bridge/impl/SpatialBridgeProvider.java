@@ -46,7 +46,7 @@ public class SpatialBridgeProvider extends ExtendedBridgeProvider {
 	private static final Log LOG = LoggerFactory.make();
 
 	@Override
-	public FieldBridge returnFieldBridgeIfMatching(ExtendedBridgeContext context) {
+	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		FieldBridge bridge = null;
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
 		if ( annotatedElement.isAnnotationPresent( Spatial.class ) ) {
