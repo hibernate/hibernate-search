@@ -161,7 +161,7 @@
                             <expression>${project.version}</expression>
                             <targetMembers>
                                 <methodBodyReturn>
-                                    <className>org.hibernate.search.Version</className>
+                                    <className>org.hibernate.search.engine.Version</className>
                                     <methodName>getVersionString</methodName>
                                 </methodBodyReturn>
                             </targetMembers>

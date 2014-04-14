@@ -24,7 +24,7 @@
 package org.hibernate.search.test.engine.worker;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 
 /**
  * @author Emmanuel Bernard

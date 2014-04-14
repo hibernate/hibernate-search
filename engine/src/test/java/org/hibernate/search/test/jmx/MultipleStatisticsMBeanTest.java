@@ -35,9 +35,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchFactoryBuilder;
@@ -129,7 +128,7 @@ public class MultipleStatisticsMBeanTest {
 		catch (InstanceNotFoundException e) {
 			fail( "The mbean " + statisticsBeanObjectName.getCanonicalName() + " should be registered with the MBean server " );
 		}
-		assertEquals( StatisticsInfo.class.getName(), mBean.getClassName() );
+		assertEquals( JMXRegistrar.StatisticsInfo.class.getName(), mBean.getClassName() );
 	}
 
 	private SearchFactoryImplementor createSearchFactoryUsingJndiPrefix(String suffix) {

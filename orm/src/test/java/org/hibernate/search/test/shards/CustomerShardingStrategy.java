@@ -28,7 +28,7 @@ import java.util.Properties;
 
 import org.apache.lucene.document.Document;
 
-import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;

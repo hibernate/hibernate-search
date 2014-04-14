@@ -23,8 +23,8 @@
  */
 package org.hibernate.search.spi;
 
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
@@ -36,7 +36,7 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
  *
  * This contract gives access to lower level APIs of Hibernate Search for
  * frameworks integrating with it. The piece of code creating the SearchFactory should
- * use this contract. It should however pass the higher level {@link SearchFactory} contract to
+ * use this contract. It should however pass the higher level {@link org.hibernate.search.engine.SearchFactory} contract to
  * its clients.
  *
  * It also allows modification of some of the search factory internals:

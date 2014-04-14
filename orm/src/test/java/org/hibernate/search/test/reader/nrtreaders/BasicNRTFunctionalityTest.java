@@ -31,7 +31,7 @@ import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -44,7 +44,7 @@ import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
-import org.hibernate.search.util.impl.ContextHelper;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.junit.Assert;
 
 /**

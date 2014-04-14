@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,28 +21,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search;
-
 /**
- * Root of all search specific exceptions
+ * Customized progress monitors for mass indexer tests.
  *
- * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public class SearchException extends RuntimeException {
-
-	public SearchException() {
-		super();
-	}
-
-	public SearchException(String message) {
-		super( message );
-	}
-
-	public SearchException(String message, Throwable cause) {
-		super( message, cause );
-	}
-
-	public SearchException(Throwable cause) {
-		super( cause );
-	}
-}
+package org.hibernate.search.test.util.progessmonitor;

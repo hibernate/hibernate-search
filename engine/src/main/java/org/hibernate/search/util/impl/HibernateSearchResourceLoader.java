@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.lucene.analysis.util.ResourceLoader;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**

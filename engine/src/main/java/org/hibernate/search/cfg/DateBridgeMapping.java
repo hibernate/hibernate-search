@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.util.TokenizerFactory;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Resolution;
 
 public class DateBridgeMapping {

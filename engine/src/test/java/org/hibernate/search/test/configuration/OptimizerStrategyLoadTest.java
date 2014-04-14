@@ -24,7 +24,7 @@ import java.lang.annotation.ElementType;
 
 import org.junit.Assert;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;

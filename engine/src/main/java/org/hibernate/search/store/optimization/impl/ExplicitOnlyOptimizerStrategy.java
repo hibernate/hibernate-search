@@ -28,7 +28,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.index.IndexWriter;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -37,8 +37,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This OptimizerStrategy will only optimize the index when forced to,
- * using an explicit invocation to {@link org.hibernate.search.SearchFactory#optimize()} or
- * {@link org.hibernate.search.SearchFactory#optimize(Class)}
+ * using an explicit invocation to {@link org.hibernate.search.engine.SearchFactory#optimize()} or
+ * {@link org.hibernate.search.engine.SearchFactory#optimize(Class)}
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero

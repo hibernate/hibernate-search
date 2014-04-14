@@ -21,16 +21,28 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-
-package org.hibernate.search.spi.internals;
-
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+package org.hibernate.search.exception;
 
 /**
- * Search Factory implementor exposing its sharable state.
- * The state can then be extracted and used to mutate factories.
+ * Root of all search specific exceptions
  *
  * @author Emmanuel Bernard
  */
-public interface SearchFactoryImplementorWithShareableState extends SearchFactoryImplementor, SearchFactoryState {
+public class SearchException extends RuntimeException {
+
+	public SearchException() {
+		super();
+	}
+
+	public SearchException(String message) {
+		super( message );
+	}
+
+	public SearchException(String message, Throwable cause) {
+		super( message, cause );
+	}
+
+	public SearchException(Throwable cause) {
+		super( cause );
+	}
 }

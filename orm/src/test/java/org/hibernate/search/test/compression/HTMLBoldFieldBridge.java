@@ -29,7 +29,7 @@ import org.apache.lucene.document.CompressionTools;
 import org.apache.lucene.document.Document;
 
 import org.apache.lucene.index.IndexableField;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;

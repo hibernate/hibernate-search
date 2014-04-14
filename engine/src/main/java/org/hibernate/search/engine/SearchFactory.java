@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search;
+package org.hibernate.search.engine;
 
 import java.util.Set;
 
@@ -59,7 +59,7 @@ public interface SearchFactory {
 	 *
 	 * @return analyzer with the specified name
 	 *
-	 * @throws org.hibernate.search.SearchException if the definition name is unknown
+	 * @throws org.hibernate.search.exception.SearchException if the definition name is unknown
 	 */
 	Analyzer getAnalyzer(String name);
 

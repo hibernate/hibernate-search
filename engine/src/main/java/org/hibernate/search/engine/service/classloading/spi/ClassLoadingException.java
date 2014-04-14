@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.engine.service.classloading.spi;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 
 /**
  * Indicates a problem performing class loading.

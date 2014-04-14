@@ -31,7 +31,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TikaMetadataProcessor;

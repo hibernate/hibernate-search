@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Counter;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;

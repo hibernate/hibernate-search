@@ -30,7 +30,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.bridge.FieldBridge;
 

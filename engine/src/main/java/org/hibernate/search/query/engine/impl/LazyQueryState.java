@@ -36,7 +36,7 @@ import org.apache.lucene.search.similarities.Similarity;
 
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**

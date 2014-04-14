@@ -68,7 +68,7 @@ public interface IndexReaderAccessor {
 	 *
 	 * @param indexNames At least one IndexManager name.
 	 * @return an IndexReader instance.
-	 * @throws org.hibernate.search.SearchException if the index manager to which the named index belongs failed to start
+	 * @throws org.hibernate.search.exception.SearchException if the index manager to which the named index belongs failed to start
 	 */
 	IndexReader open(String... indexNames);
 

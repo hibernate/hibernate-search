@@ -42,7 +42,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.hibernate.Session;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.testsupport.TestConstants;

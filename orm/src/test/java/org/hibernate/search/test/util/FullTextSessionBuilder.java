@@ -42,7 +42,7 @@ import org.hibernate.event.spi.LoadEventListener;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
@@ -85,7 +85,7 @@ public class FullTextSessionBuilder {
 
 		//search specific:
 		cfg.setProperty(
-				org.hibernate.search.Environment.ANALYZER_CLASS,
+				org.hibernate.search.cfg.Environment.ANALYZER_CLASS,
 				StopAnalyzer.class.getName()
 		);
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
@@ -211,10 +211,10 @@ public class FullTextSessionBuilder {
 	 * @return the enabled SearchMapping. change it to define the mapping programmatically.
 	 */
 	public SearchMapping fluentMapping() {
-		SearchMapping mapping = (SearchMapping) cfg.get( org.hibernate.search.Environment.MODEL_MAPPING );
+		SearchMapping mapping = (SearchMapping) cfg.get( org.hibernate.search.cfg.Environment.MODEL_MAPPING );
 		if ( mapping == null ) {
 			mapping = new SearchMapping();
-			cfg.put( org.hibernate.search.Environment.MODEL_MAPPING, mapping );
+			cfg.put( org.hibernate.search.cfg.Environment.MODEL_MAPPING, mapping );
 		}
 		return mapping;
 	}

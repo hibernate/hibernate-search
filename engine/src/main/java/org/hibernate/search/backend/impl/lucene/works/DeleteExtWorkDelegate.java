@@ -28,7 +28,7 @@ import java.io.Serializable;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
