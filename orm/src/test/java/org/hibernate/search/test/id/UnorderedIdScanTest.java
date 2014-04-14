@@ -101,7 +101,12 @@ public class UnorderedIdScanTest {
 
 		@Override
 		public Class toClass(XClass xClazz) {
-			return class1;
+			try {
+				return super.toClass( xClazz );
+			}
+			catch (IllegalArgumentException e) {
+				return class1;
+			}
 		}
 
 		@Override

@@ -1308,17 +1308,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return null;
 		}
 
-		if ( EmbeddedTypeMetadata.Container.OBJECT == container ) {
-			return new NullEncodingFieldBridge( NULL_EMBEDDED_STRING_BRIDGE, indexNullAs );
-		}
-		else {
-			NumericField numericField = member.getAnnotation( NumericField.class );
-			FieldBridge fieldBridge = bridgeFactory.guessType( null, numericField, member, reflectionManager, configContext.getServiceManager() );
-			if ( fieldBridge instanceof StringBridge ) {
-				fieldBridge = new NullEncodingFieldBridge( (StringBridge) fieldBridge, indexNullAs );
-			}
-			return fieldBridge;
-		}
+		return new NullEncodingFieldBridge( NULL_EMBEDDED_STRING_BRIDGE, indexNullAs );
 	}
 
 	private void validateAllPathsEncountered(XProperty member, PathsContext updatedPathsContext) {
