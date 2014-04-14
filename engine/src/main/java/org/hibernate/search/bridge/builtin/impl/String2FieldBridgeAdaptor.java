@@ -24,6 +24,8 @@
 package org.hibernate.search.bridge.builtin.impl;
 
 import org.apache.lucene.document.Document;
+
+import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
@@ -34,7 +36,7 @@ import org.hibernate.search.bridge.StringBridge;
  * @author Emmanuel Bernard (C) 2011 Red Hat Inc.
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
-public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge {
+public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge, AppliedOnTypeAwareBridge {
 	private final StringBridge stringBridge;
 
 	public String2FieldBridgeAdaptor(StringBridge stringBridge) {
@@ -58,5 +60,13 @@ public class String2FieldBridgeAdaptor implements FieldBridge, StringBridge {
 	@Override
 	public String toString() {
 		return "String2FieldBridgeAdaptor [stringBridge=" + stringBridge + "]";
+	}
+
+	@Override
+	public void setAppliedOnType(Class<?> returnType) {
+		// if the underlying StringBridge accepts it, call the method
+		if ( stringBridge instanceof AppliedOnTypeAwareBridge ) {
+			( (AppliedOnTypeAwareBridge) stringBridge ).setAppliedOnType( returnType );
+		}
 	}
 }

@@ -34,6 +34,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.test.SearchTestCase;
 
 /**
@@ -104,7 +105,7 @@ public class IterableBridgeTest extends SearchTestCase {
 
 	public void testSearchNullEntry() throws Exception {
 		{
-			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", IterableBridgeTestEntity.NULL_TOKEN );
+			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", IterableBridgeTestEntity.NULL_TOKEN, true );
 
 			assertNotNull( "No result found for an indexed collection", results );
 			assertEquals( "Unexpected number of results in a collection", 1, results.size() );
@@ -113,7 +114,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 
 	public void testSearchNullEmbedded() throws Exception {
-		List<IterableBridgeTestEntity> results = findEmbeddedNullResults( "nullIndexed", IterableBridgeTestEntity.NULL_EMBEDDED );
+		List<IterableBridgeTestEntity> results = findEmbeddedNullResults( "nullIndexed", IterableBridgeTestEntity.NULL_EMBEDDED, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
@@ -121,7 +122,8 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 
 	public void testSearchNullNumericEmbedded() throws Exception {
-		List<IterableBridgeTestEntity> results = findEmbeddedNullResults( "embeddedNum", IterableBridgeTestEntity.NULL_EMBEDDED_NUMERIC );
+		List<IterableBridgeTestEntity> results =
+				findEmbeddedNullResults( "embeddedNum", IterableBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
@@ -129,7 +131,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 
 	public void testSearchNullNumericEntry() throws Exception {
-		List<IterableBridgeTestEntity> results = findResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_NUMERIC_TOKEN );
+		List<IterableBridgeTestEntity> results = findResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_NUMERIC_TOKEN, true );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Unexpected number of results in a collection", 1, results.size() );
@@ -138,7 +140,7 @@ public class IterableBridgeTest extends SearchTestCase {
 
 	public void testSearchNotNullEntry() throws Exception {
 		{
-			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", KLINGON );
+			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", KLINGON, false );
 
 			assertNotNull( "No result found for an indexed collection", results );
 			assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
@@ -146,7 +148,7 @@ public class IterableBridgeTest extends SearchTestCase {
 					.getName() );
 		}
 		{
-			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", ITALIAN );
+			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", ITALIAN, false );
 
 			assertNotNull( "No result found for an indexed collection", results );
 			assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
@@ -154,7 +156,7 @@ public class IterableBridgeTest extends SearchTestCase {
 					.getName() );
 		}
 		{
-			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", ENGLISH );
+			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", ENGLISH, false );
 
 			assertNotNull( "No result found for an indexed collection", results );
 			assertEquals( "Wrong number of results returned for an indexed collection", 2, results.size() );
@@ -163,7 +165,7 @@ public class IterableBridgeTest extends SearchTestCase {
 
 	public void testSearchEntryWhenNullEntryNotIndexed() throws Exception {
 		{
-			List<IterableBridgeTestEntity> results = findResults( "nullNotIndexed", "DaltoValue" );
+			List<IterableBridgeTestEntity> results = findResults( "nullNotIndexed", "DaltoValue", false );
 
 			assertNotNull( "No result found for an indexed array", results );
 			assertEquals( "Wrong number of results returned for an indexed array", 1, results.size() );
@@ -171,7 +173,7 @@ public class IterableBridgeTest extends SearchTestCase {
 					.getName() );
 		}
 		{
-			List<IterableBridgeTestEntity> results = findResults( "nullNotIndexed", "WorfValue" );
+			List<IterableBridgeTestEntity> results = findResults( "nullNotIndexed", "WorfValue", false );
 
 			assertNotNull( "No result found for an indexed array", results );
 			assertEquals( "Wrong number of results returned for an indexed array", 1, results.size() );
@@ -219,7 +221,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 
 	public void testDateIndexing() throws Exception {
-		List<IterableBridgeTestEntity> results = findResults( "dates", indexedDate );
+		List<IterableBridgeTestEntity> results = findResults( "dates", indexedDate, false );
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
@@ -228,21 +230,28 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<IterableBridgeTestEntity> findEmbeddedNullResults( String fieldName, Object value) {
+	private List<IterableBridgeTestEntity> findEmbeddedNullResults(String fieldName, Object value, boolean checkForNullToken) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
 				.forEntity( IterableBridgeTestEntity.class ).get();
-		Query query = queryBuilder.keyword().onField( fieldName )
+		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );
+		if ( checkForNullToken ) {
+			termMatchingContext.ignoreFieldBridge();
+		}
+		Query query = termMatchingContext
 				.ignoreAnalyzer()
 				.matching( value ).createQuery();
 		return fullTextSession.createFullTextQuery( query, IterableBridgeTestEntity.class ).list();
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<IterableBridgeTestEntity> findResults( String fieldName, Object value) {
+	private List<IterableBridgeTestEntity> findResults( String fieldName, Object value, boolean checkRawValue) {
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
 				.forEntity( IterableBridgeTestEntity.class ).get();
-		Query query = queryBuilder.keyword().onField( fieldName )
-				.matching( value ).createQuery();
+		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );
+		if ( checkRawValue ) {
+			termMatchingContext.ignoreFieldBridge();
+		}
+		Query query = termMatchingContext.matching( value ).createQuery();
 		return fullTextSession.createFullTextQuery( query, IterableBridgeTestEntity.class ).list();
 	}
 

@@ -57,4 +57,10 @@ public class BuiltinMapBridge extends MapBridge implements StringBridge {
 		return bridge.objectToString( object );
 	}
 
+	@Override
+	public String toString() {
+		return "BuiltinMapBridge{" +
+				"bridge=" + bridge +
+				'}';
+	}
 }

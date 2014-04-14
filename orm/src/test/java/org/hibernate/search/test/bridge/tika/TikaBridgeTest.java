@@ -25,8 +25,8 @@
 package org.hibernate.search.test.bridge.tika;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,7 +38,6 @@ import org.apache.lucene.search.Query;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.XMPDM;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
@@ -47,14 +46,19 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TikaBridge;
-import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
+import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Assert;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Hardy Ferentschik
@@ -102,31 +106,26 @@ public class TikaBridgeTest extends SearchTestCase {
 	}
 
 	public void testUnsupportedTypeForTikaBridge() throws Exception {
-		Session session = openSession();
-
+		SearchConfiguration conf = new HibernateManualConfiguration()
+				.addProperty( "hibernate.search.default.directory_provider", "ram" )
+				.addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() )
+				.addClass( Foo.class );
+		boolean throwException = false;
 		try {
-			Transaction tx = session.beginTransaction();
-			session.save( new Foo() );
-			tx.commit();
-			fail();
+			SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( conf ).buildSearchFactory();
+			sf.close();
 		}
-		catch (HibernateException e) {
-			// hmm, a lot of exception wrapping going on
-			assertTrue( e.getCause() instanceof BridgeException );
-			BridgeException bridgeException = (BridgeException) e.getCause();
-			assertTrue( e.getCause() instanceof SearchException );
-			SearchException searchException = (SearchException) bridgeException.getCause();
-			assertTrue( "Wrong root cause", searchException.getMessage().startsWith( "HSEARCH000151" ) );
+		catch (SearchException e) {
+			assertThat( e.getMessage() ).startsWith( "HSEARCH000151" );
+			throwException = true;
 		}
-		finally {
-			session.close();
-		}
+		assertThat( throwException ).isTrue();
 	}
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Foo.class, Song.class
+				Song.class
 		};
 	}
 
@@ -208,14 +207,17 @@ public class TikaBridgeTest extends SearchTestCase {
 
 		@Field
 		@TikaBridge
-		Date now = new Date();
+		Bar someBar = new Bar();
 
 		public long getId() {
 			return id;
 		}
 
-		public Date getNow() {
-			return now;
+		public Bar getSomeBar() {
+			return someBar;
+		}
+
+		public static class Bar implements Serializable {
 		}
 	}
 
