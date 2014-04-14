@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.spi.EntityIndexBinding;

@@ -30,7 +30,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DynamicBoost;

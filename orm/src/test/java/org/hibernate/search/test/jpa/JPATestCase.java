@@ -123,7 +123,7 @@ public abstract class JPATestCase {
 
 		//Search config
 		config.put( "hibernate.search.default.directory_provider", "ram" );
-		config.put( org.hibernate.search.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
+		config.put( org.hibernate.search.cfg.Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		config.put( AvailableSettings.ENTITY_MANAGER_FACTORY_NAME, "Test" + getClass() );
 		configure( config );
 

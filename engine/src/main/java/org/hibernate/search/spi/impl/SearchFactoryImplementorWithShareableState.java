@@ -1,7 +1,7 @@
 /*
  * Hibernate, Relational Persistence for Idiomatic Java
  *
- * Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
+ * Copyright (c) 2010, Red Hat, Inc. and/or its affiliates or third-party contributors as
  * indicated by the @author tags or express copyright attribution
  * statements applied by the authors.  All third-party contributions are
  * distributed under license by Red Hat, Inc.
@@ -21,9 +21,16 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
+
+package org.hibernate.search.spi.impl;
+
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+
 /**
- * Customized progress monitors for mass indexer tests.
+ * Search Factory implementor exposing its sharable state.
+ * The state can then be extracted and used to mutate factories.
  *
- * @author Hardy Ferentschik
+ * @author Emmanuel Bernard
  */
-package org.hibernate.search.testsupport.progessmonitor;
+public interface SearchFactoryImplementorWithShareableState extends SearchFactoryImplementor, SearchFactoryState {
+}

@@ -53,7 +53,7 @@ public interface ServiceManager {
 	 * @return the single service fulfilling the specified role.
 	 *
 	 * @throws IllegalArgumentException in case the {@code serviceRole} is {@code null}
-	 * @throws org.hibernate.search.SearchException in case no service fulfilling the role could be located
+	 * @throws org.hibernate.search.exception.SearchException in case no service fulfilling the role could be located
 	 * @throws java.lang.IllegalStateException in case this method is called after {@link #releaseService(Class)}
 	 */
 	<S extends Service> S requestService(Class<S> serviceRole);

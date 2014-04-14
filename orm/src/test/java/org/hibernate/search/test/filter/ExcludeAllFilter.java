@@ -35,7 +35,7 @@ import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.SegmentReader;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 
 /**

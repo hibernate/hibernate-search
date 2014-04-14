@@ -27,7 +27,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Similarity;
 import org.hibernate.search.test.util.FullTextSessionBuilder;

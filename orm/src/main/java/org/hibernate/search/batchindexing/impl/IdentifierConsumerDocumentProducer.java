@@ -52,7 +52,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.util.impl.HibernateHelper;
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

@@ -32,8 +32,8 @@ import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.util.logging.impl.Log;

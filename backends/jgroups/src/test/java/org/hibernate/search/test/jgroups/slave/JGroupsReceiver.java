@@ -28,7 +28,7 @@ import java.util.List;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.impl.MessageSerializationHelper;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;

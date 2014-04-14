@@ -25,7 +25,7 @@
 package org.hibernate.search.test.engine;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 
 /**
  * Verify functionality of Environment.ENABLE_DIRTY_CHECK

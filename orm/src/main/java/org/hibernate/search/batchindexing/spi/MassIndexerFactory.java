@@ -18,33 +18,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.hibernate.search.impl;
+package org.hibernate.search.batchindexing.spi;
 
 import java.util.Properties;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.spi.MassIndexerFactory;
 
 /**
- * The {@link MassIndexer} implementation used when none is specified in the configuration.
+ * Contains methods that can be used to create a {@link MassIndexer}.
  *
  * @author Davide D'Alto <davide@hibernate.org>
+ *
+ * @since 4.3
  */
-public class DefaultMassIndexerFactory implements MassIndexerFactory {
+public interface MassIndexerFactory {
+	String MASS_INDEXER_FACTORY_CLASSNAME = "hibernate.search.massindexer.factoryclass";
 
-	private static final Class<?>[] OBJECT_ARRAY = { Object.class };
+	/**
+	 * Called after the creation of the factory, can be used to read configuration parameters.
+	 *
+	 * @param properties
+	 *            configuration properties
+	 */
+	void initialize(Properties properties);
 
-	@Override
-	public void initialize(Properties properties) {
-	}
-
-	@Override
-	public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
-			Class<?>... entities) {
-		final Class<?>[] types = entities.length == 0 ? OBJECT_ARRAY : entities;
-		return new MassIndexerImpl( searchFactory, sessionFactory, types );
-	}
+	/**
+	 * Create an instance of a {@link MassIndexer}.
+	 *
+	 * @param searchFactory
+	 *            the Hibernate Search factory
+	 * @param sessionFactory
+	 *            the {@link org.hibernate.Session} factory
+	 * @param entities
+	 *            the classes of the entities that are going to be indexed
+	 * @return a new MassIndexer
+	 */
+	MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
+			Class<?>... entities);
 
 }

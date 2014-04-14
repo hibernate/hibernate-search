@@ -26,7 +26,7 @@ package org.hibernate.search.test.engine;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;

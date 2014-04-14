@@ -23,7 +23,7 @@ package org.hibernate.search.backend.jgroups.impl;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

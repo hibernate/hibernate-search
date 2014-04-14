@@ -44,9 +44,9 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
-import org.hibernate.search.spi.internals.SearchFactoryState;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.impl.SearchFactoryState;
 
 /**
  * Shared factory state

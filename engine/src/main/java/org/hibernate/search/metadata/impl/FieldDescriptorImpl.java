@@ -25,7 +25,7 @@ package org.hibernate.search.metadata.impl;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Norms;

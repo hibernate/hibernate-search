@@ -31,6 +31,9 @@ import org.apache.lucene.search.Sort;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+
+import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
@@ -134,7 +137,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 *
 	 * @param name the name of the filter to enable
 	 * @return Returns a {@code FullTextFilter} object that allows filter parameter injection
-	 * @throws SearchException in case the filter with the specified name is not defined
+	 * @throws org.hibernate.search.exception.SearchException in case the filter with the specified name is not defined
 	 */
 	FullTextFilter enableFullTextFilter(String name);
 

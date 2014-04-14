@@ -26,7 +26,7 @@ package org.hibernate.search.test.searchfactory;
 
 import java.util.Set;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;

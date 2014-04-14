@@ -24,11 +24,11 @@ import java.lang.reflect.Constructor;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.batchindexing.impl.Executors;
+import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;

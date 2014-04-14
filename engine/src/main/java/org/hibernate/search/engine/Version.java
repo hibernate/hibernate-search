@@ -21,16 +21,28 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search;
+package org.hibernate.search.engine;
+
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Represents a {@code FullTextFilter} that is about to be applied.
- * Used to inject parameters
- *
  * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
-public interface FullTextFilter {
-	FullTextFilter setParameter(String name, Object value);
+public final class Version {
 
-	Object getParameter(String name);
+	private Version() {
+		//now allowed
+	}
+
+	public static String getVersionString() {
+		return "[WORKING]";
+	}
+
+	static {
+		LoggerFactory.make().version( getVersionString() );
+	}
+
+	public static void touch() {
+	}
 }

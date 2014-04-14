@@ -25,7 +25,7 @@ package org.hibernate.search.test.util.impl;
 
 import org.junit.Test;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.FileHelper;
 
 import static org.junit.Assert.assertEquals;

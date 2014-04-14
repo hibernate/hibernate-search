@@ -27,7 +27,7 @@ import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.TransactionalWorker;

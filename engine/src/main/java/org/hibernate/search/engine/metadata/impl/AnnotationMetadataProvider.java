@@ -49,7 +49,7 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.AnalyzerDef;

@@ -32,9 +32,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.Environment;
-import org.hibernate.search.SearchException;
-import org.hibernate.search.Version;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.backend.spi.Worker;
@@ -56,7 +56,6 @@ import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.jmx.StatisticsInfo;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
@@ -69,9 +68,9 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
-import org.hibernate.search.spi.internals.SearchFactoryState;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.impl.StatisticsImpl;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
@@ -382,8 +381,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		if ( JMXRegistrar.isNameRegistered( objectName ) ) {
 			JMXRegistrar.unRegisterMBean( objectName );
 		}
-		StatisticsInfo statisticsInfo = new StatisticsInfo( statistics );
-		JMXRegistrar.registerMBean( statisticsInfo, objectName );
+		JMXRegistrar.StatisticsInfo statisticsInfo = new JMXRegistrar.StatisticsInfo( statistics );
+		JMXRegistrar.registerMBean( statisticsInfo, StatisticsInfoMBean.class, objectName );
 		return objectName;
 	}
 

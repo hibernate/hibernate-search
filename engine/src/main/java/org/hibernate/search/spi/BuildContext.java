@@ -64,7 +64,7 @@ public interface BuildContext {
 	 * Returns the configured indexing strategy (<i>event</i> vs <i>manual</i>).
 	 *
 	 * @return hte configured indexing strategy
-	 * @see org.hibernate.search.Environment#INDEXING_STRATEGY
+	 * @see org.hibernate.search.cfg.Environment#INDEXING_STRATEGY
 	 */
 	String getIndexingStrategy();
 

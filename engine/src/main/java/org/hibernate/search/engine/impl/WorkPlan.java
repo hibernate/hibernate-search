@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.spi.Work;
@@ -107,7 +107,7 @@ public class WorkPlan {
 	 * This is meant for resource control for auto flushing of large pending batches.
 	 *
 	 * @return the approximation
-	 * @see org.hibernate.search.Environment#QUEUEINGPROCESSOR_BATCHSIZE
+	 * @see org.hibernate.search.cfg.Environment#QUEUEINGPROCESSOR_BATCHSIZE
 	 */
 	public int size() {
 		return approximateWorkQueueSize;

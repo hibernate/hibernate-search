@@ -21,7 +21,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.hibernate.search.jmx;
+package org.hibernate.search.jmx.impl;
 
 import java.util.Properties;
 import javax.naming.Context;
@@ -33,10 +33,11 @@ import org.hibernate.SessionFactory;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.util.impl.JNDIHelper;
 
 /**

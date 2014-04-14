@@ -86,7 +86,7 @@ public final class ClusterTestHelper {
 			// this schema is shared across nodes, so don't drop it on shutdown:
 			node.setProperty( Environment.HBM2DDL_AUTO, "create" );
 			// if we should allow aggressive index locking:
-			node.setProperty( "hibernate.search.default." + org.hibernate.search.Environment.EXCLUSIVE_INDEX_USE,
+			node.setProperty( "hibernate.search.default." + org.hibernate.search.cfg.Environment.EXCLUSIVE_INDEX_USE,
 					String.valueOf( exclusiveIndexUse ) );
 			// share the same in-memory database connection pool
 			node.setProperty(

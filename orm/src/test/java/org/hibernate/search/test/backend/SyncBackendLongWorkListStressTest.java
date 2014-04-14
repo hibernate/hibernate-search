@@ -30,7 +30,7 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestCase;

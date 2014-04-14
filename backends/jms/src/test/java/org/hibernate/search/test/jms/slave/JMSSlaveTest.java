@@ -37,7 +37,7 @@ import org.apache.activemq.broker.BrokerService;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.jms.impl.JmsBackendQueueProcessor;
 import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.search.test.jms.master.JMSMasterTest;

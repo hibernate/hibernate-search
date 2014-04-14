@@ -26,7 +26,7 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
