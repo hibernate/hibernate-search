@@ -144,11 +144,6 @@
     <profiles>
         <profile>
             <id>docbook</id>
-            <activation>
-              <property>
-                <name>release</name>
-              </property>
-            </activation>
             <build>
               <plugins>
                   <plugin>
