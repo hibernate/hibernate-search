@@ -1,0 +1,30 @@
+<title>Hibernate Search</title>
+<subtitle>Apache <trademark class="trade">Lucene</trademark> Integration</subtitle>
+<subtitle>Reference Guide</subtitle>
+<releaseinfo>WORKING</releaseinfo>
+<authorgroup>
+    <author>
+        <firstname>Emmanuel</firstname>
+        <surname>Bernard</surname>
+    </author>
+    <author>
+        <firstname>Hardy</firstname>
+        <surname>Ferentschik</surname>
+    </author>
+    <author>
+        <firstname>Gustavo</firstname>
+        <surname>Fernandes</surname>
+    </author>
+    <author>
+        <firstname>Sanne</firstname>
+        <surname>Grinovero</surname>
+    </author>
+    <author>
+        <firstname>Nabeel Ali</firstname>
+        <surname>Memon</surname>
+    </author>
+    <author>
+        <firstname>Gunnar</firstname>
+        <surname>Morling</surname>
+    </author>
+</authorgroup>

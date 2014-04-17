@@ -1,0 +1,20 @@
+== Further reading
+
+Last but not least, a few pointers to further information. We highly recommend you to get a copy
+link:$$http://www.manning.com/bernard/$$[Hibernate Search in Action]. This excellent book covers
+Hibernate Search in much more depth than this online documentation can and has a great range of
+additional examples. If you want to increase your knowledge of Lucene we recommend
+link:$$http://www.manning.com/hatcher3/$$[Lucene in Action (Second Edition)]. Because Hibernate
+Search's functionality is tightly coupled to Hibernate Core it is a good idea to understand
+Hibernate. Start with the link:$$http://www.hibernate.org/docs$$[online documentation] or get hold
+of a copy of link:$$http://www.manning.com/bauer2/$$[Java Persistence with Hibernate].
+
+If you have any further questions regarding Hibernate Search or want to share some of your use cases
+have a look at the link:$$https://community.jboss.org/en/hibernate/search$$[Hibernate Search Wiki]
+and the link:$$https://forum.hibernate.org/viewforum.php?f=9$$[Hibernate Search Forum]. We are
+looking forward hearing from you.
+
+In case you would like to report a bug use the
+link:$$https://hibernate.atlassian.net/browse/HSEARCH$$[Hibernate Search JIRA] instance. Feedback is
+always welcome!
+
