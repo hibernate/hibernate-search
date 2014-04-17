@@ -1,0 +1,29 @@
+= Hibernate Search
+Emmanuel Bernard; Hardy Ferentschik; Gustavo Fernandes; Sanne Grinovero; Nabeel Ali Memon; Gunnar Morling
+:imagesdir: images
+:toc:
+
+include::pr01.asciidoc[]
+
+:numbered:
+include::ch01.asciidoc[]
+
+include::ch02.asciidoc[]
+
+include::ch03.asciidoc[]
+
+include::ch04.asciidoc[]
+
+include::ch05.asciidoc[]
+
+include::ch06.asciidoc[]
+
+include::ch07.asciidoc[]
+
+include::ch08.asciidoc[]
+
+include::ch09.asciidoc[]
+
+include::ch10.asciidoc[]
+
+include::ch11.asciidoc[]
