@@ -47,6 +47,7 @@
         <module>orm</module>
         <module>testing</module>
         <module>infinispan</module>
+        <module>documentation</module>
         <module>modules</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
@@ -860,6 +861,11 @@
                     </dependencies>
                 </plugin>
                 <plugin>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <version>0.1.4</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.4</version>
@@ -1020,13 +1026,6 @@
 
     <profiles>
         <profile>
-            <id>docs</id>
-            <modules>
-                <module>documentation</module>
-            </modules>
-        </profile>
-
-        <profile>
             <id>dist</id>
             <modules>
                 <module>distribution</module>
@@ -1072,7 +1071,7 @@
         <!--
             ###################################################################
             Profiles naming db instances in the Red Hat QA/QE lab
-            
+
             First, those with OSS drivers
             ###################################################################
         -->
