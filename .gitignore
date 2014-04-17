@@ -26,6 +26,9 @@ atlassian-ide-plugin.xml
 # NetBeans specific files/directories
 .nbattrs
 
+# Sublime
+*.sublime-*
+
 # Miscellaneous
 *.log
 *.sh
