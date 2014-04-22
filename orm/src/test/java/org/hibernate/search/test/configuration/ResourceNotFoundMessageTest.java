@@ -55,7 +55,7 @@ public class ResourceNotFoundMessageTest {
 		}
 		catch (SearchException initException) {
 			String message = initException.getMessage();
-			Assert.assertEquals( "Resource not found: non-existent-resourcename.file", message );
+			Assert.assertEquals( "HSEARCH000114: Could not load resource: 'non-existent-resourcename.file'", message );
 		}
 	}
 

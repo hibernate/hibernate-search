@@ -27,15 +27,21 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.lucene.analysis.util.ResourceLoader;
-import org.hibernate.search.SearchException;
+
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * Hibernate Search specific implementation of Lucene's {@code ResourceLoader} interface.
+ *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Hardy Ferentschik
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
-
+	private static final Log log = LoggerFactory.make();
 	private final ServiceManager serviceManager;
 
 	public HibernateSearchResourceLoader(ServiceManager serviceManager) {
@@ -44,9 +50,17 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 
 	@Override
 	public InputStream openResource(String resource) throws IOException {
-		InputStream inputStream = FileHelper.openResource( resource );
+		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+		InputStream inputStream;
+		try {
+			inputStream = classLoaderService.locateResourceStream( resource );
+		}
+		finally {
+			serviceManager.releaseService( ClassLoaderService.class );
+		}
+
 		if ( inputStream == null ) {
-			throw new SearchException( "Resource not found: " + resource );
+			throw log.unableToLoadResource( resource );
 		}
 		else {
 			return inputStream;
@@ -54,17 +68,27 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 	}
 
 	@Override
-	public <T> Class<? extends T> findClass(String cname, Class<T> expectedType) {
-		return ClassLoaderHelper.classForName( expectedType, cname, describeComponent( cname ), serviceManager );
+	public <T> Class<? extends T> findClass(String className, Class<T> expectedType) {
+		return ClassLoaderHelper.classForName(
+				expectedType,
+				className,
+				describeComponent( className ),
+				serviceManager
+		);
 	}
 
 	@Override
-	public <T> T newInstance(String cname, Class<T> expectedType) {
-		return ClassLoaderHelper.instanceFromName( expectedType, cname, describeComponent( cname ), serviceManager );
+	public <T> T newInstance(String className, Class<T> expectedType) {
+		return ClassLoaderHelper.instanceFromName(
+				expectedType,
+				className,
+				describeComponent( className ),
+				serviceManager
+		);
 	}
 
-	private static String describeComponent(final String classname) {
-		return "Lucene Analyzer component " + classname;
+	private static String describeComponent(final String className) {
+		return "Lucene Analyzer component " + className;
 	}
 
 }

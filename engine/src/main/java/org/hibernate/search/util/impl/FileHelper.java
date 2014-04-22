@@ -23,17 +23,10 @@
  */
 package org.hibernate.search.util.impl;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -49,12 +42,14 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public abstract class FileHelper {
+public class FileHelper {
 
 	private static final Log log = LoggerFactory.make();
 	private static final int FAT_PRECISION = 2000;
 	public static final long DEFAULT_COPY_BUFFER_SIZE = 16 * 1024 * 1024; // 16 MB
 
+	private FileHelper() {
+	}
 
 	public static boolean areInSync(File source, File destination) throws IOException {
 		if ( source.isDirectory() ) {
@@ -195,12 +190,16 @@ public abstract class FileHelper {
 	}
 
 	/**
-	 * Attempts to delete a file. If the file is a directory delete recursive all content.
+	 * Attempts to delete a file. If the file is a directory delete recursively all content.
 	 *
-	 * @param file the file or Directory to be deleted
-	 * @return false if it wasn't possible to delete it or all of the contents. A common problem on Windows systems.
+	 * @param file the file or directory to be deleted
+	 *
+	 * @return {@code false} if it wasn't possible to delete all content which is a common problem on Windows systems.
 	 */
 	public static boolean delete(File file) {
+		if ( file == null ) {
+			throw new IllegalArgumentException();
+		}
 		boolean allok = true;
 		if ( file.isDirectory() ) {
 			for ( File subFile : file.listFiles() ) {
@@ -215,90 +214,5 @@ public abstract class FileHelper {
 			}
 		}
 		return allok;
-	}
-
-	/**
-	 * Reads the provided input stream into a string
-	 *
-	 * @param inputStream the input stream to read from
-	 * @return the content of the input stream as string
-	 * @throws java.io.IOException in case an error occurs reading from the input stream
-	 */
-	public static String readInputStream(InputStream inputStream) throws IOException {
-		Writer writer = new StringWriter();
-		try {
-			char[] buffer = new char[1000];
-			Reader reader = new BufferedReader( new InputStreamReader( inputStream, "UTF-8" ) );
-			int r = reader.read( buffer );
-			while ( r != -1 ) {
-				writer.write( buffer, 0, r );
-				r = reader.read( buffer );
-			}
-			return writer.toString();
-		}
-		finally {
-			closeResource( writer );
-		}
-	}
-
-	/**
-	 * Load a resource from a specific classLoader
-	 *
-	 * @param resourceName the name of the resource
-	 * @param classLoader the classloader to use, or null to try the ContextClassloader first or the loading one second.
-	 * @return the resource contents as a String
-	 */
-	public static String readResourceAsString(String resourceName, ClassLoader classLoader) {
-		InputStream in;
-		if ( classLoader != null ) {
-			in = classLoader.getResourceAsStream( resourceName );
-		}
-		else {
-			in = openResource( resourceName );
-		}
-		if ( in == null ) {
-			throw log.unableToLoadResource( resourceName );
-		}
-		String s;
-		try {
-			s = FileHelper.readInputStream( in );
-		}
-		catch (IOException e) {
-			throw log.unableToReadFile( resourceName, e );
-		}
-		finally {
-			closeResource( in );
-		}
-		return s;
-	}
-
-	public static InputStream openResource(String resourceName) {
-		//try loading from application context first:
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		InputStream resource = classLoader.getResourceAsStream( resourceName );
-		if ( resource != null ) {
-			return resource;
-		}
-		else {
-			classLoader = FileHelper.class.getClassLoader();
-			return classLoader.getResourceAsStream( resourceName );
-		}
-	}
-
-	/**
-	 * Closes a resource without throwing IOExceptions
-	 *
-	 * @param resource the resource to close
-	 */
-	public static void closeResource(Closeable resource) {
-		if ( resource != null ) {
-			try {
-				resource.close();
-			}
-			catch (IOException e) {
-				//we don't really care if we can't close
-				log.couldNotCloseResource( e );
-			}
-		}
 	}
 }
