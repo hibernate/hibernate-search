@@ -25,9 +25,13 @@ import java.util.List;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik <hardy@hibernate.org>
@@ -37,6 +41,7 @@ public class EdgeCaseFacetTest extends AbstractFacetTest {
 	private final String indexFieldName = "cubicCapacity";
 	private final String facetName = "ccs";
 
+	@Test
 	public void testFacetingOnEmptyIndex() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )

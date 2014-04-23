@@ -44,22 +44,28 @@ import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.MetadataProvider;
 import org.hibernate.search.impl.ConfigContext;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class AnalyzerTest extends SearchTestCase {
+public class AnalyzerTest extends SearchTestBase {
 
 	public static final Log log = LoggerFactory.make();
 
+	@Test
 	public void testAnalyzerDiscriminator() throws Exception {
 		Article germanArticle = new Article();
 		germanArticle.setLanguage( "de" );
@@ -99,6 +105,7 @@ public class AnalyzerTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testMultipleAnalyzerDiscriminatorDefinitions() {
 		SearchConfigurationFromHibernateCore searchConfig = new SearchConfigurationFromHibernateCore(
 				getCfg(),
@@ -124,6 +131,7 @@ public class AnalyzerTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testScopedAnalyzers() throws Exception {
 		MyEntity en = new MyEntity();
 		en.setEntity( "Entity" );
@@ -164,6 +172,7 @@ public class AnalyzerTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testScopedAnalyzersFromSearchFactory() throws Exception {
 		FullTextSession session = Search.getFullTextSession( openSession() );
 		SearchFactory searchFactory = session.getSearchFactory();
@@ -202,6 +211,7 @@ public class AnalyzerTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testNotAnalyzedFieldAndScopedAnalyzer() throws Exception {
 		FullTextSession session = Search.getFullTextSession( openSession() );
 		SearchFactory searchFactory = session.getSearchFactory();

@@ -31,12 +31,17 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.session.Domain;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Testcase for HSEARCH-353
@@ -47,10 +52,11 @@ import org.hibernate.search.test.session.Domain;
  *
  * @author Sanne Grinovero
  */
-public class WorkSequencesTest extends SearchTestCase {
+public class WorkSequencesTest extends SearchTestBase {
 
 	private SearchFactory searchFactory;
 
+	@Test
 	public void testComplexTransactionSequence() throws IOException {
 		Session classicSession = openSession( );
 		FullTextSession session = Search.getFullTextSession( classicSession );

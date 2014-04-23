@@ -37,7 +37,7 @@ import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,7 +51,7 @@ import static org.junit.Assert.assertEquals;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 @Ignore("See HSEARCH-1478")
-public class QuerySerializationTest extends SearchTestCaseJUnit4 {
+public class QuerySerializationTest extends SearchTestBase {
 
 	@Test
 	public void testQueryObjectIsSerializable() throws IOException, ClassNotFoundException {

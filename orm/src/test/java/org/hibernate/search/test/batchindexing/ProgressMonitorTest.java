@@ -27,22 +27,26 @@ import org.hibernate.Transaction;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.progessmonitor.AssertingMassIndexerProgressMonitor;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ProgressMonitorTest extends SearchTestCase {
+public class ProgressMonitorTest extends SearchTestBase {
 	FullTextSession fullTextSession;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
 		initializeData( fullTextSession );
 	}
 
+	@Test
 	public void testAllRelevantProgressMonitoringOperationsCalled() throws InterruptedException {
 		// let mass indexer re-index the data in the db (created in initializeData())
 		AssertingMassIndexerProgressMonitor monitor = new AssertingMassIndexerProgressMonitor( 10, 10 );

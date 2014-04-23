@@ -26,6 +26,7 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
@@ -33,10 +34,11 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.backend.GatedLuceneBackend;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
+import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -45,8 +47,9 @@ import static org.fest.assertions.Assertions.assertThat;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class StrictSecondLCAndPCLookupTest extends SearchTestCase {
+public class StrictSecondLCAndPCLookupTest extends SearchTestBase {
 
+	@Test
 	public void testStaleCacheWithAsyncIndexer() {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();

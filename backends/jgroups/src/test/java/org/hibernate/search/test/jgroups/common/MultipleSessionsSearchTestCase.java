@@ -27,7 +27,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
 /**
@@ -35,7 +35,7 @@ import org.hibernate.search.testsupport.TestConstants;
  *
  * @author Lukasz Moren
  */
-public abstract class MultipleSessionsSearchTestCase extends SearchTestCaseJUnit4 {
+public abstract class MultipleSessionsSearchTestCase extends SearchTestBase {
 
 	protected static final String masterCopy = "/master/copy";
 

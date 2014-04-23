@@ -25,21 +25,28 @@ package org.hibernate.search.test.query;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * HSEARCH-162 - trying to index an entity which is not marked with @Indexed
  *
  * @author Hardy Ferentschik
  */
-public class QueryUnindexedEntityTest extends SearchTestCase {
+public class QueryUnindexedEntityTest extends SearchTestBase {
 
+	@Test
 	public void testQueryOnAllEntities() throws Exception {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );

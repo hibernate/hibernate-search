@@ -31,16 +31,21 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Session;
+
 import org.hibernate.search.Search;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
-public class RamDirectoryTest extends SearchTestCase {
+public class RamDirectoryTest extends SearchTestBase {
 
+	@Test
 	public void testMultipleEntitiesPerIndex() throws Exception {
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();

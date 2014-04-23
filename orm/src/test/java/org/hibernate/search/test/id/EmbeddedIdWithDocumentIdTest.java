@@ -23,14 +23,19 @@ package org.hibernate.search.test.id;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Related to HSEARCH-1050: check we deal nicely with weird DocumentId
@@ -38,8 +43,9 @@ import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class EmbeddedIdWithDocumentIdTest extends SearchTestCase {
+public class EmbeddedIdWithDocumentIdTest extends SearchTestBase {
 
+	@Test
 	public void testFieldBridge() throws Exception {
 		LeakingLuceneBackend.reset();
 

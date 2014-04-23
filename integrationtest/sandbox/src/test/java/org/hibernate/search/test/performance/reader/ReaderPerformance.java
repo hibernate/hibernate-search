@@ -38,13 +38,16 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import org.hibernate.search.Environment;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.impl.FileHelper;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Sanne Grinovero
  */
-public abstract class ReaderPerformance extends SearchTestCase {
+public abstract class ReaderPerformance extends SearchTestBase {
 
 	//more iterations for more reliable measures:
 	private static final int TOTAL_WORK_BATCHES = 10;
@@ -58,6 +61,7 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	private static final int WARM_UP_CYCLES = 6;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		File baseIndexDir = getBaseIndexDir();
@@ -69,11 +73,13 @@ public abstract class ReaderPerformance extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 		FileHelper.delete( getBaseIndexDir() );
 	}
 
+	@Test
 	public final void testPerformance() throws InterruptedException, IOException {
 		buildBigIndex();
 		for ( int i = 0; i < WARM_UP_CYCLES; i++ ) {

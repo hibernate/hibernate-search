@@ -34,7 +34,7 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class OptimizationTriggerTest extends SearchTestCaseJUnit4 {
+public class OptimizationTriggerTest extends SearchTestBase {
 
 	@Test
 	public void testOptimizationIsTriggered() throws InterruptedException {

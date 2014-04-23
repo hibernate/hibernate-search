@@ -28,14 +28,17 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.search.test.SearchTestCase;
+
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
 
 
 /**
  * @author Hardy Ferentschik
  */
-public class ProxyTest extends SearchTestCase {
+public class ProxyTest extends SearchTestBase {
 
+	@Test
 	public void testProxy() throws Exception {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
@@ -63,6 +66,7 @@ public class ProxyTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testDeleteProxy() throws Exception {
 		createTestData();
 

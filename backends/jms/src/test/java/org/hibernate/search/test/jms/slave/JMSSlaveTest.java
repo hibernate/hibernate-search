@@ -36,11 +36,17 @@ import org.apache.activemq.broker.BrokerService;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.jms.impl.JmsBackendQueueProcessor;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jms.master.JMSMasterTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Checks that the Slave in a JMS configuration property places index jobs onto the queue.
@@ -48,7 +54,7 @@ import org.hibernate.search.test.jms.master.JMSMasterTest;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class JMSSlaveTest extends SearchTestCase {
+public class JMSSlaveTest extends SearchTestBase {
 
 	/**
 	 * Name of the test queue as found in JNDI  (see jndi.properties).
@@ -67,6 +73,7 @@ public class JMSSlaveTest extends SearchTestCase {
 
 	private QueueSession queueSession;
 
+	@Test
 	public void testMessageSend() throws Exception {
 		registerMessageListener();
 		SearchQueueChecker.reset();
@@ -120,6 +127,7 @@ public class JMSSlaveTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		// create and start the brokerService
 		brokerService = JMSMasterTest.createTestingBrokerService();
@@ -127,6 +135,7 @@ public class JMSSlaveTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 		if ( brokerService != null ) {

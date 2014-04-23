@@ -28,6 +28,7 @@ import org.apache.lucene.index.IndexableField;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -37,16 +38,21 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test storing and omitting index time norms
  *
  * @author Hardy Ferentschik
  */
-public class StoreNormsTest extends SearchTestCase {
+public class StoreNormsTest extends SearchTestBase {
 
+	@Test
 	public void testStoreAndOmitNorms() throws Exception {
 		Session session = openSession();
 		FullTextSession fullTextSession = Search.getFullTextSession( session );

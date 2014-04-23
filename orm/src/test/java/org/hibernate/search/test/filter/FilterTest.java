@@ -33,22 +33,30 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeFilter;
 
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class FilterTest extends SearchTestCase {
+public class FilterTest extends SearchTestBase {
 	private BooleanQuery query;
 	private FullTextSession fullTextSession;
 
+	@Test
 	public void testNamedFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		assertEquals( "No filter should happen", 3, ftQuery.getResultSize() );
@@ -71,6 +79,7 @@ public class FilterTest extends SearchTestCase {
 		assertEquals( "Should not filter anymore", 3, ftQuery.getResultSize() );
 	}
 
+	@Test
 	public void testCache() {
 		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 ); // SearchFactory tests filter construction once
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
@@ -106,6 +115,7 @@ public class FilterTest extends SearchTestCase {
 //		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 ); //uncomment this when solving HSEARCH-818
 	}
 
+	@Test
 	public void testStraightFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
@@ -129,6 +139,7 @@ public class FilterTest extends SearchTestCase {
 	}
 
 	@TestForIssue(jiraKey = "HSEARCH-1513")
+	@Test
 	public void testCachedEmptyFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
@@ -142,6 +153,7 @@ public class FilterTest extends SearchTestCase {
 		assertEquals( "two filters, one is empty, should not match anything", 0, ftQuery.getResultSize() );
 	}
 
+	@Test
 	public void testMultipleFiltersOfSameTypeWithDifferentParameters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "fieldConstraintFilter-1" )
@@ -153,6 +165,7 @@ public class FilterTest extends SearchTestCase {
 		assertEquals( "Should apply both filters resulting in 0 results", 0, ftQuery.getResultSize() );
 	}
 
+	@Test
 	public void testUnknownFilterNameThrowsException() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		try {
@@ -198,6 +211,7 @@ public class FilterTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		createData();
@@ -207,6 +221,7 @@ public class FilterTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		fullTextSession.getTransaction().commit();
 		fullTextSession.close();

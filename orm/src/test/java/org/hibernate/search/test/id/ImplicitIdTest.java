@@ -30,19 +30,24 @@ import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ImplicitIdTest extends SearchTestCase {
+public class ImplicitIdTest extends SearchTestBase {
 
 	/**
 	 * Tests that @DocumentId is optional. See HSEARCH-104.
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testImplicitDocumentId() throws Exception {
 		Animal dog = new Animal();
 		dog.setName( "Dog" );

@@ -23,19 +23,22 @@
  */
 package org.hibernate.search.test.analyzer.solr;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.AnalyzerUtils;
+import org.junit.Test;
 
 import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the Solr analyzer creation framework.
@@ -47,7 +50,7 @@ import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class SolrAnalyzerTest extends SearchTestCase {
+public class SolrAnalyzerTest extends SearchTestBase {
 
 	/**
 	 * Tests that the token filters applied to <code>Team</code> are successfully created and used. Refer to
@@ -55,6 +58,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails
 	 */
+	@Test
 	public void testAnalyzerDef() throws Exception {
 		// create the test instance
 		Team team = new Team();
@@ -99,6 +103,7 @@ public class SolrAnalyzerTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testAnalyzers() throws Exception {
 		FullTextSession fts = Search.getFullTextSession( openSession() );
 

@@ -23,20 +23,24 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import org.junit.Assert;
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-public class AvoidDuplicatesTest extends SearchTestCase {
+public class AvoidDuplicatesTest extends SearchTestBase {
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -63,6 +67,7 @@ public class AvoidDuplicatesTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testReindexedOnce() throws InterruptedException {
 		Assert.assertEquals( 2, countBooksInIndex() );
 		Session session = openSession();

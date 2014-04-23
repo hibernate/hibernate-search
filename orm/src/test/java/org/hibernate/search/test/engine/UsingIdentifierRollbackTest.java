@@ -26,15 +26,18 @@ package org.hibernate.search.test.engine;
 import java.util.List;
 
 import org.hibernate.Session;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
+import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * When using hibernate.use_identifier_rollback=true special care must be applied during event processing to get a
@@ -43,8 +46,9 @@ import org.junit.Assert;
  * @author Sanne Grinovero
  * @since 3.3.1, 3.4.0
  */
-public class UsingIdentifierRollbackTest extends SearchTestCase {
+public class UsingIdentifierRollbackTest extends SearchTestBase {
 
+	@Test
 	public void testEntityDeletionWithoutIdentifier() {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
 		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
@@ -65,6 +69,7 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 		Assert.assertNull( "unexpected exception detected", errorHandler.getLastException() );
 	}
 
+	@Test
 	public void testRolledBackIdentifiersOnUnusualDocumentId() {
 		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
 		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
@@ -103,6 +108,7 @@ public class UsingIdentifierRollbackTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 		LeakingLuceneBackend.reset();

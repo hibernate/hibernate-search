@@ -66,7 +66,7 @@ import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -80,7 +80,7 @@ import org.junit.Test;
  */
 //DO NOT AUTO INDENT THIS FILE.
 //MY DSL IS BEAUTIFUL, DUMB INDENTATION IS SCREWING IT UP
-public class DSLTest extends SearchTestCaseJUnit4 {
+public class DSLTest extends SearchTestBase {
 	private static final Log log = LoggerFactory.make();
 
 	private final Calendar calendar = Calendar.getInstance();

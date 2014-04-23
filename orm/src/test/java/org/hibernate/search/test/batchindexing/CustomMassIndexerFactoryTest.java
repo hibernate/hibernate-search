@@ -37,13 +37,13 @@ import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spi.MassIndexerFactory;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
 /**
  * @author Davide D'Alto <davide@hibernate.org>
  */
-public class CustomMassIndexerFactoryTest extends SearchTestCaseJUnit4 {
+public class CustomMassIndexerFactoryTest extends SearchTestBase {
 
 	@Test
 	public void testCreationOfTheSelectedMassIndexer() throws Exception {

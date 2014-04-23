@@ -27,19 +27,25 @@ import java.util.List;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
-public class QueryLoaderTest extends SearchTestCase {
+public class QueryLoaderTest extends SearchTestBase {
 
+	@Test
 	public void testWithEagerCollectionLoad() throws Exception {
 		Session sess = openSession();
 		Transaction tx = sess.beginTransaction();

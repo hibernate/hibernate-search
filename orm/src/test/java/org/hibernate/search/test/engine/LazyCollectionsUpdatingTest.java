@@ -29,17 +29,24 @@ import java.util.List;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
 import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
 import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * TestCase for HSEARCH-178 (Search hitting HHH-2763)
@@ -51,8 +58,9 @@ import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeaki
  *
  * @author Sanne Grinovero
  */
-public class LazyCollectionsUpdatingTest extends SearchTestCase {
+public class LazyCollectionsUpdatingTest extends SearchTestBase {
 
+	@Test
 	public void testUpdatingInTransaction() {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -76,6 +84,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 		assertFindsByRoadName( "new" );
 	}
 
+	@Test
 	public void testUpdatingOutOfTransaction() {
 		assertFindsByRoadName( "buonarroti" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -118,6 +127,7 @@ public class LazyCollectionsUpdatingTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		openSession();

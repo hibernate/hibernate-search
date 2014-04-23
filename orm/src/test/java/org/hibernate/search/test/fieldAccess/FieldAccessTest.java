@@ -26,18 +26,24 @@ package org.hibernate.search.test.fieldAccess;
 import java.util.List;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
-public class FieldAccessTest extends SearchTestCase {
+public class FieldAccessTest extends SearchTestBase {
 
+	@Test
 	public void testFields() throws Exception {
 		Document doc = new Document( "Hibernate in Action", "Object/relational mapping with Hibernate",
 				"blah blah blah" );
@@ -59,6 +65,7 @@ public class FieldAccessTest extends SearchTestCase {
 
 	}
 
+	@Test
 	public void testFieldBoost() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();

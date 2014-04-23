@@ -29,17 +29,22 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ContainedInReindexPropagationTest extends SearchTestCase {
+public class ContainedInReindexPropagationTest extends SearchTestBase {
 
 	// see HSEARCH-662
+	@Test
 	public void testUpdatingContainedInEntityPropagatesToAllEntities() throws Exception {
 		// source to move dads from
 		Grandpa source = new Grandpa( "grandpaSource" );

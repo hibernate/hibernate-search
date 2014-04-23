@@ -33,7 +33,7 @@ import org.hibernate.Transaction;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-public class PurgeTest extends SearchTestCaseJUnit4 {
+public class PurgeTest extends SearchTestBase {
 
 	@Before
 	public void setUp() throws Exception {

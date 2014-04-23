@@ -210,6 +210,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		else {
 			session = null;
 		}
+		searchFactory = null;
 	}
 
 	public void setSessionFactory(SessionFactory sessionFactory) {

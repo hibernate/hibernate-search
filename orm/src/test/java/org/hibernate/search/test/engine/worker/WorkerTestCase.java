@@ -37,7 +37,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,7 +46,7 @@ import org.junit.Test;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
  */
-public class WorkerTestCase extends SearchTestCaseJUnit4 {
+public class WorkerTestCase extends SearchTestBase {
 
 	@Test
 	public void testConcurrency() throws Exception {

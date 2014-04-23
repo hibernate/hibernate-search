@@ -25,7 +25,7 @@ package org.hibernate.search.test.configuration.bootstrapfailure;
 
 import java.util.Set;
 
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-1447")
-public class BootstrapTest extends SearchTestCaseJUnit4 {
+public class BootstrapTest extends SearchTestBase {
 
 	@Test
 	public void testCreateIndexSearchEntityWithLobField() {

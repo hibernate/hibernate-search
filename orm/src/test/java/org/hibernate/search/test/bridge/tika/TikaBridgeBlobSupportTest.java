@@ -41,17 +41,21 @@ import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
  */
-public class TikaBridgeBlobSupportTest extends SearchTestCase {
+public class TikaBridgeBlobSupportTest extends SearchTestBase {
 	private static final String TEST_DOCUMENT_PDF = "/org/hibernate/search/test/bridge/tika/test-document-1.pdf";
 	private static final String PATH_TO_TEST_DOCUMENT_PDF;
 
@@ -65,6 +69,7 @@ public class TikaBridgeBlobSupportTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testDefaultTikaBridgeWithBlobData() throws Exception {
 		Session session = openSession();
 

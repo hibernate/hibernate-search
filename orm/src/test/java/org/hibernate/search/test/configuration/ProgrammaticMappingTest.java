@@ -39,8 +39,10 @@ import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
@@ -53,19 +55,25 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ProgrammaticMappingTest extends SearchTestCase {
+public class ProgrammaticMappingTest extends SearchTestBase {
 
 	private static final Log log = LoggerFactory.make();
 
+	@Test
 	public void testMapping() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "3340 Peachtree Rd NE" );
@@ -101,6 +109,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testNumeric() throws Exception {
 		Item item = new Item();
 		item.setPrice( 34.54d );
@@ -123,6 +132,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 	}
 
+	@Test
 	public void testAnalyzerDef() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "3340 Peachtree Rd NE" );
@@ -148,6 +158,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testBridgeMapping() throws Exception {
 		Address address = new Address();
 		address.setStreet1( "Peachtree Rd NE" );
@@ -176,6 +187,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testBoost() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -213,6 +225,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testAnalyzerDiscriminator() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -249,6 +262,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testDateBridgeMapping() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -298,6 +312,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testCalendarBridgeMapping() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -339,6 +354,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testProvidedIdMapping() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		SearchFactoryImplementor sf = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
@@ -384,6 +400,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertEquals( 3, hits.totalHits );
 	}
 
+	@Test
 	public void testFullTextFilterDefAtMappingLevel() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -428,6 +445,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testIndexEmbedded() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -462,6 +480,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testContainedIn() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -520,6 +539,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testClassBridgeMapping() throws Exception {
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -583,6 +603,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testDynamicBoosts() throws Exception {
 
 		Session session = openSession();
@@ -601,7 +622,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 		float lib1Score = getScore( new TermQuery( new Term( "name", "one" ) ) );
 		float lib2Score = getScore( new TermQuery( new Term( "name", "two" ) ) );
-		assertEquals( "The scores should be equal", lib1Score, lib2Score );
+		assertEquals( "The scores should be equal", lib1Score, lib2Score, 0f );
 
 		// set dynamic score and reindex!
 		session = openSession();
@@ -620,7 +641,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 
 
 		lib1Score = getScore( new TermQuery( new Term( "name", "foobar" ) ) );
-		assertEquals( "lib1score should be 0 since term is not yet indexed.", 0.0f, lib1Score );
+		assertEquals( "lib1score should be 0 since term is not yet indexed.", 0.0f, lib1Score, 0f );
 
 		// index foobar
 		session = openSession();
@@ -637,6 +658,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		assertTrue( "lib1score should be greater than lib2score", lib1Score > lib2Score );
 	}
 
+	@Test
 	public void testSpatial() {
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -757,6 +779,7 @@ public class ProgrammaticMappingTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testClassBridgeInstanceMapping() throws Exception {
 		OrderLine orderLine = new OrderLine();
 		orderLine.setName( "Sequoia" );

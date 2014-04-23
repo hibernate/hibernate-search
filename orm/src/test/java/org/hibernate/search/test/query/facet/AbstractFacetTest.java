@@ -29,17 +29,22 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.After;
+import org.junit.Before;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
  */
-public abstract class AbstractFacetTest extends SearchTestCase {
+public abstract class AbstractFacetTest extends SearchTestBase {
 	public static final String[] colors = { "red", "black", "white", "blue" };
 
 	public static final String[] makes = { "Honda", "Toyota", "BMW", "Mercedes" };
@@ -84,6 +89,7 @@ public abstract class AbstractFacetTest extends SearchTestCase {
 	protected Transaction tx;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
@@ -92,6 +98,7 @@ public abstract class AbstractFacetTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		tx.commit();
 		fullTextSession.clear();

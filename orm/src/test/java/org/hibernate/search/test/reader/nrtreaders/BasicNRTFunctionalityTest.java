@@ -28,7 +28,9 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.Environment;
@@ -42,10 +44,13 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.hibernate.search.util.impl.ContextHelper;
 import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Strongly inspired to RamDirectoryTest, verifies the searchability of unflushed
@@ -54,12 +59,13 @@ import org.junit.Assert;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class BasicNRTFunctionalityTest extends SearchTestCase {
+public class BasicNRTFunctionalityTest extends SearchTestBase {
 
 	/**
 	 * Verify it's safe to not skip deletes even when a new entity
 	 * is stored reusing a stale documentId.
 	 */
+	@Test
 	public void testEntityResurrection() {
 		final Long id = 5l;
 		Session session = getSessionFactory().openSession();
@@ -100,6 +106,7 @@ public class BasicNRTFunctionalityTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testMultipleEntitiesPerIndex() throws Exception {
 		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( (SessionFactoryImplementor) getSessionFactory() );
 		IndexManager documentsIndexManager = searchFactoryBySFI.getIndexManagerHolder().getIndexManager( "Documents" );

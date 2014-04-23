@@ -36,7 +36,7 @@ import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -45,7 +45,7 @@ import static org.junit.Assert.assertFalse;
 /**
  * @author Emmanuel Bernard
  */
-public class SimilarityTest extends SearchTestCaseJUnit4 {
+public class SimilarityTest extends SearchTestBase {
 
 	@Test
 	public void testClassLevelSimilarityOverridesDefaultSimilarity() throws Exception {

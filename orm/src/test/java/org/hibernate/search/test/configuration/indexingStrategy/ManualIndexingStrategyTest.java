@@ -35,7 +35,7 @@ import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ManualIndexingStrategyTest extends SearchTestCaseJUnit4 {
+public class ManualIndexingStrategyTest extends SearchTestBase {
 
 	@Test
 	public void testMultipleEntitiesPerIndex() throws Exception {

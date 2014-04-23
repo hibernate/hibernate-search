@@ -51,7 +51,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.hcore.impl.HibernateSessionFactoryService;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProviderTemplate;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +59,7 @@ import org.junit.Test;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DynamicShardingTest extends SearchTestCaseJUnit4 {
+public class DynamicShardingTest extends SearchTestBase {
 
 	private Animal elephant;
 	private Animal spider;

@@ -31,7 +31,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.Environment;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Assert;
@@ -54,7 +54,7 @@ import org.junit.runner.RunWith;
  * @see Environment#ERROR_HANDLER
  */
 @RunWith(BMUnitRunner.class)
-public class ConcurrentMergeErrorHandledTest extends SearchTestCaseJUnit4 {
+public class ConcurrentMergeErrorHandledTest extends SearchTestBase {
 
 	@Test
 	@BMRule(targetClass = "org.apache.lucene.index.ConcurrentMergeScheduler",

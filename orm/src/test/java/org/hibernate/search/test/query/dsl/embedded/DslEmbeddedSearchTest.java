@@ -23,22 +23,30 @@ package org.hibernate.search.test.query.dsl.embedded;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Davide D'Alto
  */
-public class DslEmbeddedSearchTest extends SearchTestCase {
+public class DslEmbeddedSearchTest extends SearchTestBase {
 
 	private Session s = null;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -57,6 +65,7 @@ public class DslEmbeddedSearchTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		s.clear();
 		deleteAll( s, ContainerEntity.class );
@@ -64,6 +73,7 @@ public class DslEmbeddedSearchTest extends SearchTestCase {
 		super.tearDown();
 	}
 
+	@Test
 	public void testSearchString() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( s );
 		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder()
@@ -76,6 +86,7 @@ public class DslEmbeddedSearchTest extends SearchTestCase {
 
 	}
 
+	@Test
 	public void testSearchNumberWithFieldBridge() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( s );
 		QueryBuilder qb = fullTextSession.getSearchFactory().buildQueryBuilder()

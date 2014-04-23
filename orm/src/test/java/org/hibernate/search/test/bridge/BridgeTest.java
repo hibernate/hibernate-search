@@ -40,8 +40,10 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
@@ -51,13 +53,19 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.builtin.CalendarBridge;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  */
-public class BridgeTest extends SearchTestCase {
+public class BridgeTest extends SearchTestBase {
+	@Test
 	public void testDefaultAndNullBridges() throws Exception {
 		Cloud cloud = new Cloud();
 		cloud.setMyDate( null );
@@ -143,6 +151,7 @@ public class BridgeTest extends SearchTestCase {
 
 	}
 
+	@Test
 	public void testCustomBridges() throws Exception {
 		Cloud cloud = new Cloud();
 		cloud.setCustomFieldBridge( "This is divided by 2" );
@@ -174,6 +183,7 @@ public class BridgeTest extends SearchTestCase {
 
 	}
 
+	@Test
 	public void testDateBridge() throws Exception {
 		Cloud cloud = new Cloud();
 		Calendar c = GregorianCalendar.getInstance();
@@ -223,6 +233,7 @@ public class BridgeTest extends SearchTestCase {
 	}
 
 
+	@Test
 	public void testCalendarBridge() throws Exception {
 		Cloud cloud = new Cloud();
 		Calendar c = GregorianCalendar.getInstance();
@@ -281,6 +292,7 @@ public class BridgeTest extends SearchTestCase {
 		assertEquals( "20001215", bridge.objectToString( c ) );
 	}
 
+	@Test
 	public void testIncorrectSetBridge() throws Exception {
 		IncorrectSet incorrect = new IncorrectSet();
 		incorrect.setSubIncorrect( new IncorrectSet.SubIncorrect() );
@@ -317,6 +329,7 @@ public class BridgeTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testIncorrectGetBridge() throws Exception {
 		IncorrectGet incorrect = new IncorrectGet();
 		incorrect.setSubIncorrect( new IncorrectGet.SubIncorrect() );
@@ -364,6 +377,7 @@ public class BridgeTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testIncorrectObjectToStringBridge() throws Exception {
 		IncorrectObjectToString incorrect = new IncorrectObjectToString();
 		incorrect.setName( "test" );

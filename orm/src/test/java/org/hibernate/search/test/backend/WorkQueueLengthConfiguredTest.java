@@ -24,7 +24,7 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class WorkQueueLengthConfiguredTest extends SearchTestCaseJUnit4 {
+public class WorkQueueLengthConfiguredTest extends SearchTestBase {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {

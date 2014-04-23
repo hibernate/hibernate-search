@@ -24,7 +24,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.hibernate.testing.RequiresDialect;
 import org.junit.Assert;
@@ -37,7 +37,7 @@ import org.junit.Test;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class FetchSizeConfigurationTest extends SearchTestCaseJUnit4 {
+public class FetchSizeConfigurationTest extends SearchTestBase {
 
 	@Test
 	@RequiresDialect(comment = "H2 does not accept negative fetch sizes",

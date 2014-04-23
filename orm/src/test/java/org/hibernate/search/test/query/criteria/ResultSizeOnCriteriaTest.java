@@ -34,7 +34,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
  * @author Julie Ingignoli
  * @author Emmanuel Bernard <emmanuel@hibernate,org>
  */
-public class ResultSizeOnCriteriaTest extends SearchTestCaseJUnit4 {
+public class ResultSizeOnCriteriaTest extends SearchTestBase {
 
 	@Test
 	public void testResultSize() {

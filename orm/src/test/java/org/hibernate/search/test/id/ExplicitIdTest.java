@@ -30,20 +30,26 @@ import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ExplicitIdTest extends SearchTestCase {
+public class ExplicitIdTest extends SearchTestBase {
 
 	/**
 	 * Tests that @DocumentId can be specified on a field other than the @Id annotated one. See HSEARCH-574.
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testExplicitDocumentIdSingleResult() throws Exception {
 		Article hello = new Article();
 		hello.setDocumentId( 1 );
@@ -69,6 +75,7 @@ public class ExplicitIdTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testExplicitDocumentIdMultipleResults() throws Exception {
 		Article hello = new Article();
 		hello.setDocumentId( 1 );
@@ -99,6 +106,7 @@ public class ExplicitIdTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testDocumentIdMustBeUnique() throws Exception {
 		Article hello = new Article();
 		hello.setDocumentId( 1 );

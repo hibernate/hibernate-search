@@ -42,7 +42,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.testing.SkipForDialect;
 import org.junit.Test;
@@ -55,7 +55,7 @@ import static org.junit.Assert.assertEquals;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-993")
-public class LobTest extends SearchTestCaseJUnit4 {
+public class LobTest extends SearchTestBase {
 
 	@Test
 	@SkipForDialect(value = { SybaseASE15Dialect.class, Sybase11Dialect.class },

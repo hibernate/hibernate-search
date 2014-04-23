@@ -33,7 +33,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.progessmonitor.AssertingMassIndexerProgressMonitor;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;
@@ -50,7 +50,7 @@ import org.junit.runner.RunWith;
  */
 @TestForIssue(jiraKey = "HSEARCH-1354")
 @RunWith(BMUnitRunner.class)
-public class ErrorHandlingDuringDocumentCreationTest extends SearchTestCaseJUnit4 {
+public class ErrorHandlingDuringDocumentCreationTest extends SearchTestBase {
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.batchindexing.impl.IdentifierConsumerDocumentProducer",

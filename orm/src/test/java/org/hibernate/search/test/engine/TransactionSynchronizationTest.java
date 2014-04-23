@@ -37,13 +37,17 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.bridge.builtin.EnumBridge;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  */
-public class TransactionSynchronizationTest extends SearchTestCase {
+public class TransactionSynchronizationTest extends SearchTestBase {
 
+	@org.junit.Test
 	public void testProperExceptionPropagation() throws Exception {
 		/**
 		 * This test relies on the fact that a bridge accepting an incompatible type raise

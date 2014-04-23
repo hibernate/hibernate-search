@@ -29,16 +29,21 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Test;
 
-public class FieldOnCollectionReindexTest extends SearchTestCase {
+import static org.junit.Assert.assertEquals;
+
+public class FieldOnCollectionReindexTest extends SearchTestBase {
 
 	@TestForIssue(jiraKey = "HSEARCH-1020")
+	@Test
 	public void testUpdatingCollectionWithFieldAnnotationReindexesEntity() {
 		Session hibernateSession = openSession();
 
@@ -119,6 +124,7 @@ public class FieldOnCollectionReindexTest extends SearchTestCase {
 
 	// Same test with @Fields annotation
 	@TestForIssue(jiraKey = "HSEARCH-1020")
+	@Test
 	public void testUpdatingCollectionWithFieldsAnnotationReindexesEntity() {
 		Session hibernateSession = openSession();
 
@@ -196,6 +202,7 @@ public class FieldOnCollectionReindexTest extends SearchTestCase {
 	}
 
 	@TestForIssue(jiraKey = "HSEARCH-1004")
+	@Test
 	public void testUpdatingElementCollectionWithFieldAnnotationReindexesEntity() {
 		Session hibernateSession = openSession();
 

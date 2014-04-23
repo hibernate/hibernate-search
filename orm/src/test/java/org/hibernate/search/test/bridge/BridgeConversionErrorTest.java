@@ -34,6 +34,7 @@ import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.annotations.ClassBridge;
@@ -43,15 +44,21 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "1045")
-public class BridgeConversionErrorTest extends SearchTestCase {
+public class BridgeConversionErrorTest extends SearchTestBase {
 
+	@Test
 	public void testClassBridgeError() throws Exception {
 		ClassBridged classBridged = new ClassBridged();
 		org.hibernate.Session s = openSession();
@@ -71,6 +78,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testFieldBridgeError() throws Exception {
 		SimpleEntity entity = new SimpleEntity( "foo" );
 		org.hibernate.Session s = openSession();
@@ -90,6 +98,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testEmbeddedBridgeError() throws Exception {
 		SimpleEntity entity = new SimpleEntity( null ); // null won't throw an exception
 		EmbeddedEntity embedded = new EmbeddedEntity( "foo" );
@@ -111,6 +120,7 @@ public class BridgeConversionErrorTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testEmbeddedEmbeddedBridgeError() throws Exception {
 		SimpleEntity entity = new SimpleEntity( null ); // null won't throw an exception
 		EmbeddedEntity embedded = new EmbeddedEntity( null ); // null won't throw an exception

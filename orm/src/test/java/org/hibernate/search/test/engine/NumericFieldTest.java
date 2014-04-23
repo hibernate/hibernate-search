@@ -26,26 +26,34 @@ package org.hibernate.search.test.engine;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.junit.Assert;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-public class NumericFieldTest extends SearchTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class NumericFieldTest extends SearchTestBase {
 
 	FullTextSession fullTextSession;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -54,12 +62,14 @@ public class NumericFieldTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		cleanData();
 		assertTrue( indexIsEmpty() );
 		super.tearDown();
 	}
 
+	@Test
 	public void testIndexAndSearchNumericField() {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -114,6 +124,7 @@ public class NumericFieldTest extends SearchTestCase {
 	}
 
 	@TestForIssue(jiraKey = "HSEARCH-1193")
+	@Test
 	public void testNumericFieldProjections() {
 		Transaction tx = fullTextSession.beginTransaction();
 		try {

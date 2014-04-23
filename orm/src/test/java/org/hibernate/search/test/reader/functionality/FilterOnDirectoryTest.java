@@ -27,19 +27,26 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.reader.Detective;
 import org.hibernate.search.test.reader.Suspect;
+import org.junit.Test;
 
-public class FilterOnDirectoryTest extends SearchTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+public class FilterOnDirectoryTest extends SearchTestBase {
+
+	@Test
 	public void testFilteredClasses() throws Exception {
 		createDoeFamily();
 		FullTextSession fts = Search.getFullTextSession( openSession() );

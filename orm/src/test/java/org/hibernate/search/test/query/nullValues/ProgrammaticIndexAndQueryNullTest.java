@@ -33,6 +33,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
@@ -40,17 +41,23 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
+import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for indexing and querying {@code null} values. See HSEARCh-115
  *
  * @author Hardy Ferentschik
  */
-public class ProgrammaticIndexAndQueryNullTest extends SearchTestCase {
+public class ProgrammaticIndexAndQueryNullTest extends SearchTestBase {
 
+	@Test
 	public void testProjectedValueGetsConvertedToNull() throws Exception {
 		ProgrammaticConfiguredValue nullValue = new ProgrammaticConfiguredValue( null );
 

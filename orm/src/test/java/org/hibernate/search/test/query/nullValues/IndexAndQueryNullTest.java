@@ -35,23 +35,31 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.query.ProjectionToMapResultTransformer;
+import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for indexing and querying {@code null} values. See HSEARCH-115
  *
  * @author Hardy Ferentschik
  */
-public class IndexAndQueryNullTest extends SearchTestCase {
+public class IndexAndQueryNullTest extends SearchTestBase {
 
+	@Test
 	public void testIndexAndSearchNull() throws Exception {
 		Value fooValue = new Value( "foo" );
 		Value nullValue = new Value( null );
@@ -72,6 +80,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testLuceneDocumentContainsNullToken() throws Exception {
 		Value nullValue = new Value( null );
 
@@ -93,6 +102,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testNullIndexingWithDSLQuery() throws Exception {
 		Value nullValue = new Value( null );
 
@@ -115,6 +125,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testNullIndexingWithDSLQueryIgnoringFieldBridge() throws Exception {
 		try {
 			QueryBuilder queryBuilder = getSearchFactory().buildQueryBuilder().forEntity( Value.class ).get();
@@ -126,6 +137,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testProjectedValueGetsConvertedToNull() throws Exception {
 		Value nullValue = new Value( null );
 
@@ -159,6 +171,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 	}
 
 
+	@Test
 	public void testConfiguredDefaultNullToken() throws Exception {
 		Value nullValue = new Value( null );
 
@@ -181,6 +194,7 @@ public class IndexAndQueryNullTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testNullIndexingWithCustomFieldBridge() throws Exception {
 		Value nullValue = new Value( null );
 

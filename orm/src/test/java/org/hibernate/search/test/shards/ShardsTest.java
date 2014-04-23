@@ -35,20 +35,25 @@ import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.indexmanager.RamIndexManager;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ShardsTest extends SearchTestCase {
+public class ShardsTest extends SearchTestBase {
 
 	@Override
 	protected void configure(Configuration cfg) {
@@ -63,6 +68,7 @@ public class ShardsTest extends SearchTestCase {
 		cfg.setProperty( "hibernate.search.Animal.0.indexName", "Animal00" );
 	}
 
+	@Test
 	public void testIdShardingStrategy() {
 		IndexManager[] dps = new IndexManager[] { RamIndexManager.makeRamDirectory(), RamIndexManager.makeRamDirectory() };
 		IdHashShardingStrategy shardingStrategy = new IdHashShardingStrategy();
@@ -73,6 +79,7 @@ public class ShardsTest extends SearchTestCase {
 		dps[1].destroy();
 	}
 
+	@Test
 	public void testBehavior() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -116,6 +123,7 @@ public class ShardsTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testInternalSharding() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();

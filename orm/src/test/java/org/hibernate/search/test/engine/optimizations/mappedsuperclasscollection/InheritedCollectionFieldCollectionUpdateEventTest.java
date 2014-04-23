@@ -34,7 +34,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertEquals;
  * Verify that updates to collections defined in a @MappedSuperclass actually trigger a re-indexing.
  */
 @TestForIssue(jiraKey = "HSEARCH-1583")
-public class InheritedCollectionFieldCollectionUpdateEventTest extends SearchTestCaseJUnit4 {
+public class InheritedCollectionFieldCollectionUpdateEventTest extends SearchTestBase {
 	private static final String FIRST_COLLECTION_VALUE = "1";
 	private static final String SECOND_COLLECTION_VALUE = "2";
 

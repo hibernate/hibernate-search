@@ -29,15 +29,20 @@ import java.util.List;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verify the engine respects the depth parameter {@link IndexedEmbedded#depth()} without indexing larger graphs than
@@ -47,8 +52,9 @@ import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
  *
  * @author Sanne Grinovero
  */
-public class RecursiveGraphTest extends SearchTestCase {
+public class RecursiveGraphTest extends SearchTestBase {
 
+	@Test
 	public void testCorrectDepthIndexed() {
 		prepareGenealogyTree();
 		verifyMatchExistsWithName( 1L, "name", "John of England" );

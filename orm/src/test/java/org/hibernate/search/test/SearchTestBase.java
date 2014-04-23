@@ -44,7 +44,7 @@ import org.junit.runner.RunWith;
  * @author Hardy Ferentschik
  */
 @RunWith(CustomRunner.class)
-public abstract class SearchTestCaseJUnit4 implements TestResourceManager {
+public abstract class SearchTestBase implements TestResourceManager {
 	// access only via getter, since instance gets lazily initalized
 	private DefaultTestResourceManager testResourceManager;
 

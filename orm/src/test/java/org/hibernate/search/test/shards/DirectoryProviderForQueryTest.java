@@ -26,19 +26,24 @@ package org.hibernate.search.test.shards;
 import java.util.List;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Chase Seibert
  */
-public class DirectoryProviderForQueryTest extends SearchTestCase {
+public class DirectoryProviderForQueryTest extends SearchTestBase {
 
 	@Override
 	protected void configure(Configuration cfg) {
@@ -51,6 +56,7 @@ public class DirectoryProviderForQueryTest extends SearchTestCase {
 	/**
 	 * Test that you can filter by shard
 	 */
+	@Test
 	public void testDirectoryProviderForQuery() throws Exception {
 
 		Session s = openSession( );

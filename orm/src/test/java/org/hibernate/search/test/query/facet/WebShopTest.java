@@ -32,6 +32,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -41,9 +42,13 @@ import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.RangeFacet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
 import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Simulate a web-shop with basic search which can be refined by facet requests.
@@ -54,6 +59,7 @@ public class WebShopTest extends AbstractFacetTest {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
+	@Test
 	public void testSimulateClient() {
 		// get hold of the search service
 		SearchService searchService = new SearchService( getSessionFactory() );

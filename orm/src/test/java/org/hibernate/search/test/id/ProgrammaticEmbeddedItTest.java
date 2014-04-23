@@ -25,13 +25,18 @@ import java.util.List;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -40,8 +45,9 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Emmanuel Bernard
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class ProgrammaticEmbeddedItTest extends SearchTestCase {
+public class ProgrammaticEmbeddedItTest extends SearchTestBase {
 
+	@Test
 	public void testFieldBridge() throws Exception {
 		PersonPK emmanuelPk = new PersonPK();
 		emmanuelPk.setFirstName( "Emmanuel" );

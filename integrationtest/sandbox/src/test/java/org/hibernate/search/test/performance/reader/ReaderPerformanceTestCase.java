@@ -40,23 +40,30 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard
  */
-public abstract class ReaderPerformanceTestCase extends SearchTestCase {
+public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 
 	private static final Log log = LoggerFactory.make();
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		forceConfigurationRebuild();
 		File sub = getBaseIndexDir();
@@ -71,6 +78,14 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 	}
 
 	@Override
+	@After
+	public void tearDown() throws Exception {
+		super.tearDown();
+		File sub = getBaseIndexDir();
+		FileHelper.delete( sub );
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
@@ -79,15 +94,9 @@ public abstract class ReaderPerformanceTestCase extends SearchTestCase {
 		};
 	}
 
-	@Override
-	public void tearDown() throws Exception {
-		super.tearDown();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
-	}
-
 	public boolean insert = true;
 
+	@Test
 	public void testConcurrency() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();

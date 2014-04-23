@@ -34,6 +34,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -47,9 +48,12 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Add test to the various ways to customize the analyzer used for
@@ -60,7 +64,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Hardy Ferentschik
  */
-public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
+public class CustomAnalyzerInClassBridgeTest extends SearchTestBase {
 
 	public static final Log log = LoggerFactory.make();
 
@@ -69,6 +73,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 		return new Class[] { Foo.class, Bar.class };
 	}
 
+	@Test
 	public void testCustomAnalyzersAppliedForFieldsAddedInClassBridge() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();
@@ -91,6 +96,7 @@ public class CustomAnalyzerInClassBridgeTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testClassBridgeWithSingleField() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		Transaction tx = fullTextSession.beginTransaction();

@@ -28,20 +28,24 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Sanne Grinovero
  */
 @TestForIssue(jiraKey = "HSEARCH-263")
-public class DoubleAnalyzerTest extends SearchTestCase {
+public class DoubleAnalyzerTest extends SearchTestBase {
 
 	public static final Log log = LoggerFactory.make();
 
@@ -50,6 +54,7 @@ public class DoubleAnalyzerTest extends SearchTestCase {
 		return new Class[] { MyEntity.class, AlarmEntity.class };
 	}
 
+	@Test
 	public void testScopedAnalyzers() throws Exception {
 		MyEntity en = new MyEntity();
 		en.setEntity( "anyNotNull" );

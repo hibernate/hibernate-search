@@ -25,24 +25,27 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.lucene.search.Sort;
-import org.junit.Assert;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Hibernate Search spatial : unit tests on indexing POIs in with Grid and Grid+Distance
  *
  * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
  */
-public class SpatialIndexingTest extends SearchTestCase {
+public class SpatialIndexingTest extends SearchTestBase {
 
+	@Test
 	public void testIndexing() throws Exception {
 		POI poi = new POI( 1, "Test", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Test2", 0.0d, -179.0d, "" );
@@ -105,6 +108,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testDistanceProjection() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
@@ -161,6 +165,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testDistanceSort() throws Exception {
 		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
 		POI poi2 = new POI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
@@ -207,6 +212,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testNonGeoDistanceSort() throws Exception {
 		NonGeoPOI poi = new NonGeoPOI( 1, "Distance to 24,32 : 0", 24.0d, null, "" );
 		NonGeoPOI poi2 = new NonGeoPOI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
@@ -253,6 +259,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 	}
 
 
+	@Test
 	public void testSpatialAnnotationOnFieldLevel() throws Exception {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("d M yyyy");
 		Date date = dateFormat.parse( "10 9 1976" );
@@ -293,6 +300,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testSpatialAnnotationWithSubAnnotationsLevel() throws Exception {
 		User user = new User( 1, 24.0d, 32.0d );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -331,6 +339,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testSpatialAnnotationWithSubAnnotationsLevelRangeMode() throws Exception {
 		UserRange user = new UserRange( 1, 24.0d, 32.0d );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -369,6 +378,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testSpatialsAnnotation() throws Exception {
 		UserEx user = new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -404,6 +414,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testSpatialAnnotationOnFieldLevelRangeMode() throws Exception {
 		SimpleDateFormat dateFormat = new SimpleDateFormat( "d M yyyy" );
 		Date date = dateFormat.parse( "10 9 1976" );
@@ -445,6 +456,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testSpatialAnnotationOnClassLevel() throws Exception {
 		Hotel hotel = new Hotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -483,6 +495,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testSpatialAnnotationOnClassLevelRangeMode() throws Exception {
 		RangeHotel hotel = new RangeHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
 		RangeHotel hotel2 = new RangeHotel( 2, "End of the world Hotel - Left", 0.0d, 179.0d, "Roots" );
@@ -543,6 +556,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testSpatialAnnotationOnEmbeddableFieldLevel() throws Exception {
 		Restaurant restaurant = new Restaurant( 1, "Al's kitchen", "42, space avenue CA8596 BYOB Street", 24.0d, 32.0d);
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
@@ -581,6 +595,7 @@ public class SpatialIndexingTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testSpatialLatLongOnGetters() throws Exception {
 		GetterUser user = new GetterUser( 1, 24.0d, 32.0d );
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );

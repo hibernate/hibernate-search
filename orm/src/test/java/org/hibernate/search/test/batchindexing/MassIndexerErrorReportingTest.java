@@ -28,7 +28,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(BMUnitRunner.class)
-public class MassIndexerErrorReportingTest extends SearchTestCaseJUnit4 {
+public class MassIndexerErrorReportingTest extends SearchTestBase {
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.batchindexing.impl.IdentifierConsumerDocumentProducer",
@@ -67,7 +67,7 @@ public class MassIndexerErrorReportingTest extends SearchTestCaseJUnit4 {
 		return mockErrorHandler;
 	}
 
-	static FullTextSession prepareSomeData(SearchTestCaseJUnit4 testCase) {
+	static FullTextSession prepareSomeData(SearchTestBase testCase) {
 		FullTextSession fullTextSession = Search.getFullTextSession( testCase.openSession() );
 		fullTextSession.beginTransaction();
 		Nation france = new Nation( "France", "FR" );

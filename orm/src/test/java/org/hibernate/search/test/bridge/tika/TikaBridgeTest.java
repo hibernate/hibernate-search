@@ -40,6 +40,7 @@ import org.apache.tika.metadata.XMPDM;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
@@ -52,19 +53,21 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Assert;
+import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class TikaBridgeTest extends SearchTestCase {
+public class TikaBridgeTest extends SearchTestBase {
 	private static final String TEST_MP3_DOCUMENT = "/org/hibernate/search/test/bridge/tika/mysong.mp3";
 	private static final String PATH_TO_TEST_MP3;
 
@@ -78,6 +81,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testIndexMp3MetaTags() throws Exception {
 		Session session = openSession();
 
@@ -87,6 +91,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testIndexMp3MetaTagsDSL() throws Exception {
 		Session session = openSession();
 
@@ -96,6 +101,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testIndexMp3MetaTagsDSLErrorMessage() throws Exception {
 		Session session = openSession();
 
@@ -105,6 +111,7 @@ public class TikaBridgeTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testUnsupportedTypeForTikaBridge() throws Exception {
 		SearchConfiguration conf = new HibernateManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )

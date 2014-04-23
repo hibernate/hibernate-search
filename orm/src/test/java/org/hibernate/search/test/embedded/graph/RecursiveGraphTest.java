@@ -25,14 +25,20 @@ package org.hibernate.search.test.embedded.graph;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+
 import org.hibernate.Session;
-import org.hibernate.search.test.SearchTestCase;
+
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * TestCase to verify proper management of saving of complex relations and collections. See HSEARCH-476
  */
-public class RecursiveGraphTest extends SearchTestCase {
+public class RecursiveGraphTest extends SearchTestBase {
 
+	@Test
 	public void testCreateParentAndChild() throws Exception {
 		Person[] people = new Person[2];
 		Person parent = new Person();

@@ -23,7 +23,6 @@ package org.hibernate.search.test.embedded.update;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,7 +32,9 @@ import javax.persistence.OneToOne;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -41,17 +42,22 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Unit test about updating an entity with collection marked with @IndexedEmbedded annotation
  *
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
-public class UpdateIndexedEmbeddedCollectionTest extends SearchTestCase {
+public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 
 	@TestForIssue(jiraKey = "HSEARCH-734")
+	@Test
 	public void testUpdateIndexedEmbeddedCollectionWithNull() throws Exception {
 
 		// load the truck with number plate "LVN 746 XD" guided by driver Mark Smith

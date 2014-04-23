@@ -20,16 +20,16 @@
  */
 package org.hibernate.search.test.query.initandlookup;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.util.List;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.fest.assertions.Condition;
+
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
@@ -38,18 +38,22 @@ import org.hibernate.search.Search;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.backend.GatedLuceneBackend;
 import org.hibernate.stat.Statistics;
 import org.hibernate.testing.cache.CachingRegionFactory;
+import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * Test second level cache and persistence context lookup methods
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SecondLCAndPCLookupTest extends SearchTestCase {
+public class SecondLCAndPCLookupTest extends SearchTestBase {
 
+	@Test
 	public void testQueryWoLookup() throws Exception {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
@@ -79,6 +83,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testQueryWith2LCLookup() throws Exception {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
@@ -109,6 +114,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testQueryWithPCLookup() throws Exception {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
@@ -145,6 +151,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testQueryWithPCAndCacheLookup() throws Exception {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
@@ -183,6 +190,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testStaleCacheWithAsyncIndexer() {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();
@@ -208,6 +216,7 @@ public class SecondLCAndPCLookupTest extends SearchTestCase {
 		assertThat( statistics.getSecondLevelCacheHitCount() ).isEqualTo( 1 );
 	}
 
+	@Test
 	public void testQueryUsingFindByIdInitialization() throws Exception {
 		Session session = openSession();
 		final Statistics statistics = session.getSessionFactory().getStatistics();

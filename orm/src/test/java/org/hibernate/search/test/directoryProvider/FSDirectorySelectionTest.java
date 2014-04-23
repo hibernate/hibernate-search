@@ -31,6 +31,7 @@ import org.apache.lucene.store.SimpleFSDirectory;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -40,28 +41,37 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
-public class FSDirectorySelectionTest extends SearchTestCase {
+public class FSDirectorySelectionTest extends SearchTestBase {
 
+	@Test
 	public void testMMapDirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "mmap" );
 		assertCorrectDirectoryType( factory, MMapDirectory.class.getName() );
 	}
 
+	@Test
 	public void testNIODirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "nio" );
 		assertCorrectDirectoryType( factory, NIOFSDirectory.class.getName() );
 	}
 
+	@Test
 	public void testSimpleDirectoryType() {
 		SessionFactory factory = createSessionFactoryUsingDirectoryType( "simple" );
 		assertCorrectDirectoryType( factory, SimpleFSDirectory.class.getName() );
 	}
 
+	@Test
 	public void testInvalidDirectoryType() {
 		try {
 			createSessionFactoryUsingDirectoryType( "foobar" );

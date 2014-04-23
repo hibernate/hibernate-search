@@ -30,17 +30,24 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.BytesRef;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author John Griffin
  * @author Sanne Grinovero
  */
-public class TermVectorTest extends SearchTestCase {
+public class TermVectorTest extends SearchTestBase {
 
+	@Test
 	public void testPositionOffsets() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		createIndex( s );
@@ -86,6 +93,7 @@ public class TermVectorTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testNoTermVector() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();

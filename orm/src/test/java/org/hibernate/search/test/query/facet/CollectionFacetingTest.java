@@ -38,7 +38,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
-import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.SearchTestBase;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,7 +48,7 @@ import static org.junit.Assert.assertEquals;
  * @author Elmer van Chastelet
  */
 
-public class CollectionFacetingTest extends SearchTestCaseJUnit4 {
+public class CollectionFacetingTest extends SearchTestBase {
 	Author voltaire;
 	Author hugo;
 	Author moliere;

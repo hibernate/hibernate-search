@@ -41,20 +41,27 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+
 import org.hibernate.Session;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.junit.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Gavin King
  * @author Sanne Grinovero
  */
-public class FSDirectoryTest extends SearchTestCase {
+public class FSDirectoryTest extends SearchTestBase {
 
+	@Test
 	public void testEventIntegration() throws Exception {
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
@@ -146,6 +153,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		return projection;
 	}
 
+	@Test
 	public void testBoost() throws Exception {
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
@@ -186,6 +194,7 @@ public class FSDirectoryTest extends SearchTestCase {
 		getSessionFactory().close(); //run the searchfactory.close() operations
 	}
 
+	@Test
 	public void testSearchOnDeletedIndex() throws Exception {
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();

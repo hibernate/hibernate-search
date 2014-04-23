@@ -29,18 +29,21 @@ import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.junit.Assert;
+import org.junit.Test;
 
-public class SyncBackendLongWorkListStressTest extends SearchTestCase {
+public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 
 	/* needs to be sensibly higher than org.hibernate.search.batchindexing.Executors.QUEUE_MAX_LENGTH */
 	private static final int NUM_SAVED_ENTITIES = 40;
 
+	@Test
 	public void testWorkLongerThanMaxQueueSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		for ( int i = 0; i < NUM_SAVED_ENTITIES; i++ ) {

@@ -26,23 +26,30 @@ package org.hibernate.search.test.bridge;
 import java.util.List;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.document.Document;
-import org.hibernate.Transaction;
+
 import org.hibernate.ScrollableResults;
+import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author John Griffin
  */
-public class ClassBridgeTest extends SearchTestCase {
+public class ClassBridgeTest extends SearchTestBase {
 
 	/**
 	 * This tests that a field created by a user-supplied
@@ -51,6 +58,7 @@ public class ClassBridgeTest extends SearchTestCase {
 	 *
 	 * @throws Exception
 	 */
+	@Test
 	public void testClassBridges() throws Exception {
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -121,6 +129,7 @@ public class ClassBridgeTest extends SearchTestCase {
 	 *
 	 * @throws Exception
 	 */
+	@Test
 	public void testClassBridgesWithProjection() throws Exception {
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();
@@ -190,6 +199,7 @@ public class ClassBridgeTest extends SearchTestCase {
 	 *
 	 * @throws Exception
 	 */
+	@Test
 	public void testClassBridge() throws Exception {
 		org.hibernate.Session s = openSession();
 		Transaction tx = s.beginTransaction();

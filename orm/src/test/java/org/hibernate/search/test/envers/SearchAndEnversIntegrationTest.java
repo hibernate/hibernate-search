@@ -36,9 +36,13 @@ import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Unit test covering proper behavior and integration between Hibernate Search and Envers.
@@ -46,7 +50,7 @@ import org.hibernate.search.testsupport.TestForIssue;
  *
  * @author Davide Di Somma <davide.disomma@gmail.com>
  */
-public class SearchAndEnversIntegrationTest extends SearchTestCase {
+public class SearchAndEnversIntegrationTest extends SearchTestBase {
 
 	private Person harryPotter;
 	private Person hermioneGranger;
@@ -58,6 +62,7 @@ public class SearchAndEnversIntegrationTest extends SearchTestCase {
 	 * for both Hibernate Search and Hibernate Envers
 	 */
 	@TestForIssue(jiraKey = "HSEARCH-1293")
+	@Test
 	public void testHibernateSearchAndEnversIntegration() {
 		atRevision1();
 		atRevision2();
