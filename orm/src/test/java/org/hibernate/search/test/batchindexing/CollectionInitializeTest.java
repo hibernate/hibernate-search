@@ -23,20 +23,22 @@ package org.hibernate.search.test.batchindexing;
 
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.lucene.search.MatchAllDocsQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class CollectionInitializeTest extends SearchTestCase {
+public class CollectionInitializeTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testMassIndexing() throws InterruptedException {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		initializeData( fullTextSession );

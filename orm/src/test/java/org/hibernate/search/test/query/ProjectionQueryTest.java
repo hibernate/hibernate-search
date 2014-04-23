@@ -26,10 +26,10 @@ package org.hibernate.search.test.query;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -37,12 +37,14 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -50,13 +52,20 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
+import org.junit.Test;
 
 import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorDisabled;
 import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.assertFieldSelectorEnabled;
 import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider.resetFieldSelector;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests several aspects of projection queries.
@@ -65,11 +74,12 @@ import static org.hibernate.search.testsupport.readerprovider.FieldSelectorLeaki
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-public class ProjectionQueryTest extends SearchTestCase {
+public class ProjectionQueryTest extends SearchTestCaseJUnit4 {
 
 	/**
 	 * HSEARCH-546
 	 */
+	@Test
 	public void testProjectionOfThisAndEAGERFetching() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 
@@ -121,6 +131,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testClassProjection() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -150,6 +161,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testLuceneObjectsProjectionWithScroll() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -219,6 +231,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testResultTransformToDelimString() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -249,6 +262,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testResultTransformMap() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -323,6 +337,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		assertEquals( "legacy ID incorrect", 1003, projection[6] );
 	}
 
+	@Test
 	public void testLuceneObjectsProjectionWithIterate() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -361,6 +376,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testLuceneObjectsProjectionWithList() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -438,6 +454,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testNonLoadedFieldOptmization() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -484,6 +501,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testProjectionInNumericFields() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 
@@ -528,6 +546,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 
 	}
 
+	@Test
 	public void testProjectionUnmappedFieldValues() throws ParseException, IOException {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -578,6 +597,7 @@ public class ProjectionQueryTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Test
 	public void testProjection() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();

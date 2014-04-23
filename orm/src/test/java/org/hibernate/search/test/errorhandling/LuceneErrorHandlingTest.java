@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Assert;
 import org.apache.lucene.index.IndexWriter;
-
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -44,7 +42,9 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test to verify the configured ErrorHandler is used in the Lucene
@@ -55,10 +55,11 @@ import org.hibernate.search.test.SearchTestCase;
  * @author Sanne Grinovero
  * @since 3.2
  */
-public class LuceneErrorHandlingTest extends SearchTestCase {
+public class LuceneErrorHandlingTest extends SearchTestCaseJUnit4 {
 
 	static final AtomicInteger WORK_COUNTER = new AtomicInteger();
 
+	@Test
 	public void testErrorHandling() {
 		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
 		EntityIndexBinding mappingForEntity = getSearchFactoryImpl().getIndexBinding( Foo.class );

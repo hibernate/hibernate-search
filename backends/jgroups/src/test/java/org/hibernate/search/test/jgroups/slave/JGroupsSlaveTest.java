@@ -25,21 +25,24 @@ package org.hibernate.search.test.jgroups.slave;
 
 import java.util.UUID;
 
-import org.junit.Assert;
-
-import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
-import org.jgroups.Channel;
-import org.jgroups.JChannel;
-import org.jgroups.blocks.MessageDispatcher;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
+import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.jgroups.impl.MessageListenerToRequestHandlerAdapter;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.jgroups.Channel;
+import org.jgroups.JChannel;
+import org.jgroups.blocks.MessageDispatcher;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests that the Slave node in a JGroups cluster can properly send messages to the channel.
@@ -47,13 +50,14 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JGroupsSlaveTest extends SearchTestCase {
+public class JGroupsSlaveTest extends SearchTestCaseJUnit4 {
 
 	private Channel channel;
 
 	/** makes sure that different tests don't join **/
 	private final String CHANNEL_NAME = UUID.randomUUID().toString();
 
+	@Test
 	public void testMessageSend() throws Exception {
 
 		JGroupsReceiver.reset();
@@ -133,12 +137,14 @@ public class JGroupsSlaveTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		prepareJGroupsChannel();
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		channel.close();
 		super.tearDown();

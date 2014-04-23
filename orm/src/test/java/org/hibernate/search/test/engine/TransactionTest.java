@@ -31,15 +31,20 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.Session;
+
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.test.Document;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
-public class TransactionTest extends SearchTestCase {
+public class TransactionTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testTransactionCommit() throws Exception {
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();

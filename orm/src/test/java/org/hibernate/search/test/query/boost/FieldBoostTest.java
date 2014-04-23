@@ -31,20 +31,25 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author John Griffin
  */
-public class FieldBoostTest extends SearchTestCase {
+public class FieldBoostTest extends SearchTestCaseJUnit4 {
 
 	private static final Log log = LoggerFactory.make();
 
+	@Test
 	public void testBoostedGetDesc() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		buildBoostedGetIndex( fullTextSession );
@@ -83,6 +88,7 @@ public class FieldBoostTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testBoostedFieldDesc() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		buildBoostedFieldIndex( fullTextSession );
@@ -121,6 +127,7 @@ public class FieldBoostTest extends SearchTestCase {
 		fullTextSession.close();
 	}
 
+	@Test
 	public void testBoostedDesc() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		buildBoostedDescIndex( fullTextSession );

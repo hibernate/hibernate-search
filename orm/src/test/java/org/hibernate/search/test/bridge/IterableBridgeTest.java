@@ -18,31 +18,39 @@
  */
 package org.hibernate.search.test.bridge;
 
-import static org.hibernate.search.test.bridge.IterableBridgeTestEntity.Language.ENGLISH;
-import static org.hibernate.search.test.bridge.IterableBridgeTestEntity.Language.ITALIAN;
-import static org.hibernate.search.test.bridge.IterableBridgeTestEntity.Language.KLINGON;
-
 import java.util.Date;
 import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.hibernate.search.test.bridge.IterableBridgeTestEntity.Language.ENGLISH;
+import static org.hibernate.search.test.bridge.IterableBridgeTestEntity.Language.ITALIAN;
+import static org.hibernate.search.test.bridge.IterableBridgeTestEntity.Language.KLINGON;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test indexing of {@link javax.persistence.ElementCollection} annotated elements.
  *
  * @author Davide D'Alto
  */
-public class IterableBridgeTest extends SearchTestCase {
+public class IterableBridgeTest extends SearchTestCaseJUnit4 {
 
 	private FullTextSession fullTextSession;
 	private IterableBridgeTestEntity withoutNull;
@@ -51,6 +59,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	private Date indexedDate;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -59,6 +68,7 @@ public class IterableBridgeTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		cleanData();
 		assertTrue( indexIsEmpty() );
@@ -103,6 +113,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Test
 	public void testSearchNullEntry() throws Exception {
 		{
 			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", IterableBridgeTestEntity.NULL_TOKEN, true );
@@ -113,6 +124,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testSearchNullEmbedded() throws Exception {
 		List<IterableBridgeTestEntity> results = findEmbeddedNullResults( "nullIndexed", IterableBridgeTestEntity.NULL_EMBEDDED, true );
 
@@ -121,6 +133,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned looking for a null in a collection", withNullEmbedded.getName(), results.get( 0 ).getName() );
 	}
 
+	@Test
 	public void testSearchNullNumericEmbedded() throws Exception {
 		List<IterableBridgeTestEntity> results =
 				findEmbeddedNullResults( "embeddedNum", IterableBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
@@ -130,6 +143,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEmbedded.getName(), results.get( 0 ).getName() );
 	}
 
+	@Test
 	public void testSearchNullNumericEntry() throws Exception {
 		List<IterableBridgeTestEntity> results = findResults( "numericNullIndexed", IterableBridgeTestEntity.NULL_NUMERIC_TOKEN, true );
 
@@ -138,6 +152,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEntry.getName(), results.get( 0 ).getName() );
 	}
 
+	@Test
 	public void testSearchNotNullEntry() throws Exception {
 		{
 			List<IterableBridgeTestEntity> results = findResults( "nullIndexed", KLINGON, false );
@@ -163,6 +178,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testSearchEntryWhenNullEntryNotIndexed() throws Exception {
 		{
 			List<IterableBridgeTestEntity> results = findResults( "nullNotIndexed", "DaltoValue", false );
@@ -182,6 +198,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testSearchNotNullNumeric() throws Exception {
 		{
 			List<IterableBridgeTestEntity> results = findNumericResults( "numericNullIndexed", 1 );
@@ -201,6 +218,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testSearchNotNullNumericEntryWhenNullEntryNotIndexed() throws Exception {
 		{
 			List<IterableBridgeTestEntity> results = findNumericResults( "numericNullNotIndexed", 3L );
@@ -220,6 +238,7 @@ public class IterableBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testDateIndexing() throws Exception {
 		List<IterableBridgeTestEntity> results = findResults( "dates", indexedDate, false );
 

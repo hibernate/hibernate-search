@@ -40,26 +40,33 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
-import org.osjava.sj.memory.MemoryContext;
-
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.osjava.sj.memory.MemoryContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
-public class IndexControlMBeanTest extends SearchTestCase {
+public class IndexControlMBeanTest extends SearchTestCaseJUnit4 {
 	MBeanServer mbeanServer;
 	ObjectName statisticsBeanObjectName;
 	ObjectName indexBeanObjectName;
 
+	@Test
 	public void testIndexCtrlMBeanRegistered() throws Exception {
 		assertTrue(
 				"With the right property set the Search MBean should be registered",
@@ -67,6 +74,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 		);
 	}
 
+	@Test
 	public void testAttributesAndOperations() throws Exception {
 		MBeanInfo info = mbeanServer.getMBeanInfo( indexBeanObjectName );
 		MBeanAttributeInfo[] attributes = info.getAttributes();
@@ -90,6 +98,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testIndexAndPurge() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -120,6 +129,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		forceConfigurationRebuild();
 		super.setUp();
@@ -129,6 +139,7 @@ public class IndexControlMBeanTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 		if ( mbeanServer.isRegistered( statisticsBeanObjectName ) ) {

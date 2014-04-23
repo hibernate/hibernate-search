@@ -27,18 +27,24 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  * @author Hardy Ferentschik
  */
-public class IndexingActionInterceptorTest extends SearchTestCase {
+public class IndexingActionInterceptorTest extends SearchTestCaseJUnit4 {
 
 	private FullTextSession fullTextSession;
 	private Blog blog;
@@ -46,12 +52,14 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 	TotalArticle totalArticle;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		createPersistAndIndexTestData();
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		if ( !fullTextSession.getTransaction().isActive() ) {
 			Transaction tx = fullTextSession.beginTransaction();
@@ -67,6 +75,7 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 		super.tearDown();
 	}
 
+	@Test
 	public void testBlogAndArticleAreNotIndexedInDraftStatus() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -76,6 +85,7 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Test
 	public void testTotalArticleIsIndexedInDraftStatus() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 		assertThat( getBlogEntriesFor( TotalArticle.class ) ).as( "TotalArticle is explicit not intercepted" )
@@ -84,6 +94,7 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 	}
 
 
+	@Test
 	public void testBlogAndArticleAreIndexedInPublishedStatus() throws Exception {
 		setAllBlogEntriesToStatus( BlogStatus.PUBLISHED );
 		Transaction tx = fullTextSession.beginTransaction();
@@ -97,6 +108,7 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 	}
 
 
+	@Test
 	public void testBlogAndArticleAreNotIndexedInRemovedStatus() throws Exception {
 		setAllBlogEntriesToStatus( BlogStatus.REMOVED );
 		Transaction tx = fullTextSession.beginTransaction();
@@ -107,6 +119,7 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Test
 	public void testTotalArticleIsIndexedInRemovedStatus() throws Exception {
 		setAllBlogEntriesToStatus( BlogStatus.REMOVED );
 		Transaction tx = fullTextSession.beginTransaction();
@@ -118,6 +131,7 @@ public class IndexingActionInterceptorTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testInterceptorWithMassIndexer() throws Exception {
 		setAllBlogEntriesToStatus( BlogStatus.PUBLISHED );
 

@@ -26,26 +26,33 @@ package org.hibernate.search.test.embedded.path.depth;
 
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Davide D'Alto
  */
-public class PathRespectDepthCaseEmbeddedTest extends SearchTestCase {
+public class PathRespectDepthCaseEmbeddedTest extends SearchTestCaseJUnit4 {
 
 	private Session s = null;
 	private EntityA entityA = null;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		EntityC indexed = new EntityC( "indexed" );
@@ -60,6 +67,7 @@ public class PathRespectDepthCaseEmbeddedTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		s.clear();
 
@@ -68,6 +76,7 @@ public class PathRespectDepthCaseEmbeddedTest extends SearchTestCase {
 		super.tearDown();
 	}
 
+	@Test
 	public void testFieldIsIndexedIfInPath() throws Exception {
 		List<EntityA> result = search( s, "b.indexed.field", "indexed" );
 
@@ -75,6 +84,7 @@ public class PathRespectDepthCaseEmbeddedTest extends SearchTestCase {
 		Assert.assertEquals( entityA.id, result.get( 0 ).id );
 	}
 
+	@Test
 	public void testFieldIsIndexedIfInsideDepthThreshold() throws Exception {
 		List<EntityA> result = search( s, "b.insideThreshold", "insideThreshold" );
 
@@ -82,6 +92,7 @@ public class PathRespectDepthCaseEmbeddedTest extends SearchTestCase {
 		Assert.assertEquals( entityA.id, result.get( 0 ).id );
 	}
 
+	@Test
 	public void testEmbeddedNotIndexedIfNotInPath() throws Exception {
 		try {
 			search( s, "b.skipped.indexed", "indexed" );
@@ -91,6 +102,7 @@ public class PathRespectDepthCaseEmbeddedTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testFieldNotIndexedIfNotInPath() throws Exception {
 		try {
 			search( s, "b.indexed.skipped", "skipped" );

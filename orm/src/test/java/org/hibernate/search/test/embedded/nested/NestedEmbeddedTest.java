@@ -27,25 +27,31 @@ import java.util.List;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class NestedEmbeddedTest extends SearchTestCase {
+public class NestedEmbeddedTest extends SearchTestCaseJUnit4 {
 
 	/**
 	 * HSEARCH-391
 	 *
 	 * @throws Exception in case the tests fails
 	 */
+	@Test
 	public void testNestedEmbeddedIndexing() throws Exception {
 		Product product = new Product();
 		Attribute attribute = new Attribute( product );
@@ -99,6 +105,7 @@ public class NestedEmbeddedTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the tests fails
 	 */
+	@Test
 	public void testNestedEmbeddedIndexingWithContainedInOnCollection() throws Exception {
 		Person john = new Person( "John Doe" );
 		Place eiffelTower = new Place( "Eiffel Tower" );

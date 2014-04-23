@@ -47,6 +47,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.Environment;
@@ -56,8 +57,13 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests  that the Master node in a JMS cluster can properly process messages placed onto the queue.
@@ -66,7 +72,7 @@ import org.hibernate.search.testsupport.TestConstants;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class JMSMasterTest extends SearchTestCase {
+public class JMSMasterTest extends SearchTestCaseJUnit4 {
 
 	/**
 	 * Name of the test queue as found in JNDI  (see jndi.properties).
@@ -85,6 +91,7 @@ public class JMSMasterTest extends SearchTestCase {
 
 	private QueueSession queueSession;
 
+	@Test
 	public void testMessageSending() throws Exception {
 
 		TShirt shirt = createObjectWithSQL();
@@ -208,6 +215,7 @@ public class JMSMasterTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		// create and start the brokerService
 		brokerService = createTestingBrokerService();
@@ -229,6 +237,7 @@ public class JMSMasterTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 		if ( brokerService != null ) {

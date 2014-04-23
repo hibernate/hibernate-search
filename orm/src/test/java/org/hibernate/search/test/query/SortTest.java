@@ -50,18 +50,26 @@ import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
-public class SortTest extends SearchTestCase {
+public class SortTest extends SearchTestCaseJUnit4 {
 
 	private static FullTextSession fullTextSession;
 	private static QueryParser queryParser;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		fullTextSession = Search.getFullTextSession( openSession() );
@@ -76,6 +84,7 @@ public class SortTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		// check for ongoing transaction which is an indicator that something went wrong
 		// don't call the cleanup methods in this case. Otherwise the original error get swallowed
@@ -88,6 +97,7 @@ public class SortTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testResultOrderedById() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -108,6 +118,7 @@ public class SortTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testResultOrderedBySummaryStringAscending() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -125,6 +136,7 @@ public class SortTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testResultOrderedBySummaryStringDescending() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -142,6 +154,7 @@ public class SortTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testResultOrderedByDateDescending() throws Exception {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -162,6 +175,7 @@ public class SortTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testCustomFieldComparatorAscendingSort() {
 		Transaction tx = fullTextSession.beginTransaction();
 
@@ -183,6 +197,7 @@ public class SortTest extends SearchTestCase {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testCustomFieldComparatorDescendingSort() {
 		Transaction tx = fullTextSession.beginTransaction();
 

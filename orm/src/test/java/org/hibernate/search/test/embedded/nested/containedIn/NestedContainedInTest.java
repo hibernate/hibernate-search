@@ -29,16 +29,22 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard
  */
-public class NestedContainedInTest extends SearchTestCase {
+public class NestedContainedInTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testAddHelpItem() {
 		openSession();
 		String tagName = "animal";
@@ -47,6 +53,7 @@ public class NestedContainedInTest extends SearchTestCase {
 		getSession().close();
 	}
 
+	@Test
 	public void testChangeTagName() {
 		openSession();
 		String tagName = "animal";

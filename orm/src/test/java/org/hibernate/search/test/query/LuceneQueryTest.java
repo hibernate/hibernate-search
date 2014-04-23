@@ -34,21 +34,30 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.FetchMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.HibernateHelper;
 import org.hibernate.stat.Statistics;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-public class LuceneQueryTest extends SearchTestCase {
+public class LuceneQueryTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testList() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -110,6 +119,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testResultSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -156,6 +166,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testFirstMax() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -208,6 +219,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testIterator() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -260,6 +272,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testScrollableResultSet() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -311,6 +324,7 @@ public class LuceneQueryTest extends SearchTestCase {
 
 	// Technically this is checked by other tests but let's do it anyway. J.G.
 
+	@Test
 	public void testDefaultFetchSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -339,6 +353,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testFetchSizeLargerThanHits() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -366,6 +381,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testFetchSizeDefaultFirstAndMax() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -405,6 +421,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testFetchSizeNonDefaultFirstAndMax() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -452,6 +469,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testFetchSizeNonDefaultFirstAndMaxNoHits() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -485,6 +503,7 @@ public class LuceneQueryTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testMaxResultZero() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -514,6 +533,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testCurrent() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -567,6 +587,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testMultipleEntityPerIndex() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -631,6 +652,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testCriteria() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -677,6 +699,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testScrollEmptyHits() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -710,6 +733,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testListEmptyHits() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );
@@ -735,6 +759,7 @@ public class LuceneQueryTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testIterateEmptyHits() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		prepEmployeeIndex( s );

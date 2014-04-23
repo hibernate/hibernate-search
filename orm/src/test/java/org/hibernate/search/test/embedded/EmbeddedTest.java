@@ -35,17 +35,22 @@ import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class EmbeddedTest extends SearchTestCase {
+public class EmbeddedTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testEmbeddedIndexing() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
@@ -112,6 +117,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 	}
 
+	@Test
 	public void testEmbeddedIndexingOneToMany() throws Exception {
 		Country country = new Country();
 		country.setName( "Germany" );
@@ -143,6 +149,7 @@ public class EmbeddedTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testContainedIn() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
@@ -203,6 +210,7 @@ public class EmbeddedTest extends SearchTestCase {
 
 	}
 
+	@Test
 	public void testIndexedEmbeddedAndCollections() throws Exception {
 		Author a = new Author();
 		a.setName( "Voltaire" );
@@ -293,6 +301,7 @@ public class EmbeddedTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails
 	 */
+	@Test
 	public void testEmbeddedObjectUpdate() throws Exception {
 
 		State state = new State();
@@ -341,6 +350,7 @@ public class EmbeddedTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testEmbeddedToManyInSuperclass() throws ParseException {
 		ProductFeature featureA = new ProductFeature();
 		featureA.setName( "featureA" );

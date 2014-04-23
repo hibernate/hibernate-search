@@ -25,18 +25,24 @@ import java.util.List;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 @TestForIssue(jiraKey = "HSEARCH-1201")
-public class FieldBridgeOnLazyFieldReindexTest extends SearchTestCase {
+public class FieldBridgeOnLazyFieldReindexTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testFieldBridgeOnLazyFieldReindexTest() throws InterruptedException {
 		prepareEntities();
 		verifyMatchExistsWithName( "name", "name" );

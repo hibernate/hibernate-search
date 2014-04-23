@@ -29,11 +29,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.junit.Assert;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -41,8 +41,10 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Verify we don't rely on dirtyness values from Hibernate ORM on fields
@@ -50,9 +52,10 @@ import org.hibernate.search.testsupport.TestForIssue;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class TransientFieldsDirtyTest extends SearchTestCase {
+public class TransientFieldsDirtyTest extends SearchTestCaseJUnit4 {
 
 	@TestForIssue(jiraKey = "HSEARCH-1096")
+	@Test
 	public void testTransientFieldsAreAlwaysDirty() {
 		Session session = openSession();
 		try {

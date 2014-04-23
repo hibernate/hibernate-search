@@ -24,32 +24,38 @@
 package org.hibernate.search.test.session;
 
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.SQLException;
-import java.util.List;
+import java.sql.Statement;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
-public class MassIndexTest extends SearchTestCase {
+public class MassIndexTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testBatchSize() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -96,6 +102,7 @@ public class MassIndexTest extends SearchTestCase {
 	}
 
 
+	@Test
 	public void testTransactional() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
@@ -178,6 +185,7 @@ public class MassIndexTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testLazyLoading() throws Exception {
 		Categorie cat = new Categorie( "Livre" );
 		Entite ent = new Entite( "Le temple des songes", cat );

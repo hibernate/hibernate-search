@@ -27,18 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Assert;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-import org.jgroups.JChannel;
-import org.jgroups.Message;
 
 import org.hibernate.Session;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
@@ -49,10 +46,18 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.backend.jgroups.impl.MessageSerializationHelper;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.jgroups.common.JGroupsCommonTest;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.jgroups.JChannel;
+import org.jgroups.Message;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests that the Master node in a JGroups cluster can properly process messages received from channel.
@@ -61,7 +66,7 @@ import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
  * @author Lukasz Moren
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class JGroupsMasterTest extends SearchTestCase {
+public class JGroupsMasterTest extends SearchTestCaseJUnit4 {
 
 	private final QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
 
@@ -72,6 +77,7 @@ public class JGroupsMasterTest extends SearchTestCase {
 
 	private JChannel channel;
 
+	@Test
 	public void testMessageSending() throws Exception {
 
 		assertEquals( 0, countByQuery( "logo:jboss" ) );
@@ -177,12 +183,14 @@ public class JGroupsMasterTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		prepareJGroupsChannel();
 		super.setUp();
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		channel.close();
 		super.tearDown();

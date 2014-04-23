@@ -27,6 +27,7 @@ package org.hibernate.search.test.bridge.provider;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
@@ -34,16 +35,18 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class BridgeProviderTest extends SearchTestCase {
+public class BridgeProviderTest extends SearchTestCaseJUnit4 {
+	@Test
 	public void testCustomBridgeProvider() {
 		Session s = openSession();
 		s.getTransaction().begin();
@@ -73,6 +76,7 @@ public class BridgeProviderTest extends SearchTestCase {
 		s.getTransaction().commit();
 	}
 
+	@Test
 	public void testMultipleMatchingFieldBridges() throws Exception {
 		SearchConfiguration conf = new HibernateManualConfiguration()
 				.addProperty( "hibernate.search.default.directory_provider", "ram" )
