@@ -27,10 +27,8 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.hibernate.testing.RequiresDialect;
-import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * Verifies that {@link org.hibernate.search.MassIndexer#idFetchSize(int)} is applied by checking for errors thrown by
@@ -39,7 +37,6 @@ import org.junit.runner.RunWith;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-@RunWith(CustomRunner.class) //needed to enable @RequiresDialect functionality
 public class FetchSizeConfigurationTest extends SearchTestCaseJUnit4 {
 
 	@Test

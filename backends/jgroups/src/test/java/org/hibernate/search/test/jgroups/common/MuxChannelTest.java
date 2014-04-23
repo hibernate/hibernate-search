@@ -33,8 +33,10 @@ import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.mux.MuxUpHandler;
-import org.junit.Test;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test injected mux supported channel.
@@ -56,15 +58,16 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		muxId = (short) new Random().nextInt();
 		channels = createChannels();
+		forceConfigurationRebuild();
 		super.setUp();
 	}
 
-	protected abstract JChannel[] createChannels() throws Exception;
-
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		try {
 			super.tearDown();
@@ -86,8 +89,6 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 		cfg.getProperties().put( DispatchMessageSender.MUX_ID, muxId );
 	}
 
-	protected abstract String getMasterBackend();
-
 	@Override
 	protected void commonConfigure(Configuration cfg) {
 		super.commonConfigure( cfg );
@@ -96,13 +97,17 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 		cfg.getProperties().put( DispatchMessageSender.MUX_ID, muxId );
 	}
 
-	protected abstract String getSlaveBackend();
-
 	protected JChannel createChannel() throws Exception {
 		JChannel channel = new JChannel( ConfigurationParseHelper.locateConfig( JGroupsCommonTest.TESTING_JGROUPS_CONFIGURATION_FILE ) );
 		channel.setUpHandler( new MuxUpHandler() );
 		channel.connect( "JGroupsCommonTest" + JGroupsCommonTest.CHANNEL_NAME );
 		return channel;
 	}
+
+	protected abstract String getMasterBackend();
+
+	protected abstract JChannel[] createChannels() throws Exception;
+
+	protected abstract String getSlaveBackend();
 
 }

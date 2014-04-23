@@ -33,14 +33,17 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
 /**
  * Base class for Hibernate Search tests using Hibernate ORM and Junit 4.
  *
  * @author Hardy Ferentschik
  */
+@RunWith(CustomRunner.class)
 public abstract class SearchTestCaseJUnit4 implements TestResourceManager {
 	// access only via getter, since instance gets lazily initalized
 	private DefaultTestResourceManager testResourceManager;
