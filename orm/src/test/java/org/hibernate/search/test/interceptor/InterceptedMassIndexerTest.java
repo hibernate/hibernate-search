@@ -25,19 +25,22 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1190")
-public class InterceptedMassIndexerTest extends SearchTestCase {
+public class InterceptedMassIndexerTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testMassIndexerSkips() throws InterruptedException {
 		storeSomeBlogs();
 		assertIndexedBooks( 2 );

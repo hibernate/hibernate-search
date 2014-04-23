@@ -26,26 +26,33 @@ package org.hibernate.search.test.embedded.path.renamed;
 
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Davide D'Alto
  */
-public class RenamedFieldPathCaseEmbeddedTest extends SearchTestCase {
+public class RenamedFieldPathCaseEmbeddedTest extends SearchTestCaseJUnit4 {
 
 	private Session s = null;
 	private EntityA entityA = null;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		EntityC indexedC = new EntityC( "indexed" );
@@ -59,6 +66,7 @@ public class RenamedFieldPathCaseEmbeddedTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		s.clear();
 
@@ -67,6 +75,7 @@ public class RenamedFieldPathCaseEmbeddedTest extends SearchTestCase {
 		super.tearDown();
 	}
 
+	@Test
 	public void testFieldIsIndexedIfInPath() throws Exception {
 		List<EntityA> result = search( s, "b.indexed.renamed", "indexed" );
 
@@ -74,6 +83,7 @@ public class RenamedFieldPathCaseEmbeddedTest extends SearchTestCase {
 		Assert.assertEquals( entityA.id, result.get( 0 ).id );
 	}
 
+	@Test
 	public void testFieldIsNotFoundIfFieldIsRenamed() throws Exception {
 		try {
 			search( s, "b.indexed.field", "indexed" );
@@ -83,6 +93,7 @@ public class RenamedFieldPathCaseEmbeddedTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testEmbeddedNotIndexedIfNotInPath() throws Exception {
 		try {
 			search( s, "b.skipped.indexed", "indexed" );
@@ -92,6 +103,7 @@ public class RenamedFieldPathCaseEmbeddedTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testFieldNotIndexedIfNotInPath() throws Exception {
 		try {
 			search( s, "b.indexed.skipped", "skipped" );

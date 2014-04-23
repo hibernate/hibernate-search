@@ -26,25 +26,28 @@ package org.hibernate.search.test.analyzer;
 
 import java.lang.annotation.ElementType;
 
-import org.apache.lucene.analysis.de.GermanStemFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.de.GermanStemFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for HSEARCH-569.
  *
  * @author Hardy Ferentschik
  */
-public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
+public class DuplicatedAnalyzerDefinitionTest extends SearchTestCaseJUnit4 {
 
 	public static final Log log = LoggerFactory.make();
 
@@ -53,6 +56,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 		return new Class[] { };
 	}
 
+	@Test
 	public void testDuplicatedAnalyzerDefinitionThrowsException() throws Exception {
 		Configuration config = new Configuration();
 		config.addAnnotatedClass( Entity1.class );
@@ -70,6 +74,7 @@ public class DuplicatedAnalyzerDefinitionTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testDuplicatedProgrammaticAnalyzerDefinitionThrowsException() throws Exception {
 		Configuration config = new Configuration();
 		config.getProperties().put( Environment.MODEL_MAPPING, createSearchMapping() );

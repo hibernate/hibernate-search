@@ -18,31 +18,39 @@
  */
 package org.hibernate.search.test.bridge;
 
-import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ENGLISH;
-import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ITALIAN;
-import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.KLINGON;
-
 import java.util.Date;
 import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ENGLISH;
+import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ITALIAN;
+import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.KLINGON;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test indexing of {@link javax.persistence.ElementCollection} annotated elements.
  *
  * @author Davide D'Alto
  */
-public class MapBridgeTest extends SearchTestCase {
+public class MapBridgeTest extends SearchTestCaseJUnit4 {
 
 	private FullTextSession fullTextSession;
 	private MapBridgeTestEntity withoutNull;
@@ -51,6 +59,7 @@ public class MapBridgeTest extends SearchTestCase {
 	private Date indexedDate;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		Session session = openSession();
@@ -59,6 +68,7 @@ public class MapBridgeTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		cleanData();
 		assertTrue( indexIsEmpty() );
@@ -103,6 +113,7 @@ public class MapBridgeTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Test
 	public void testSearchNullEntry() throws Exception {
 		List<MapBridgeTestEntity> results = findResults( "nullIndexed", MapBridgeTestEntity.NULL_TOKEN, true );
 
@@ -111,6 +122,7 @@ public class MapBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned looking for a null in a collection", withNullEntry.getName(), results.get( 0 ).getName() );
 	}
 
+	@Test
 	public void testSearchNullEmbedded() throws Exception {
 		List<MapBridgeTestEntity> results = findEmbeddedNullResults( "nullIndexed", MapBridgeTestEntity.NULL_EMBEDDED, true );
 
@@ -119,6 +131,7 @@ public class MapBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned looking for a null in a collection", withNullEmbedded.getName(), results.get( 0 ).getName() );
 	}
 
+	@Test
 	public void testSearchNullNumericEmbedded() throws Exception {
 		List<MapBridgeTestEntity> results =
 				findEmbeddedNullResults( "embeddedNum", MapBridgeTestEntity.NULL_EMBEDDED_NUMERIC, true );
@@ -128,6 +141,7 @@ public class MapBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEmbedded.getName(), results.get( 0 ).getName() );
 	}
 
+	@Test
 	public void testSearchNullNumericEntry() throws Exception {
 		List<MapBridgeTestEntity> results =
 				findResults( "numericNullIndexed", MapBridgeTestEntity.NULL_NUMERIC_TOKEN, false );
@@ -137,6 +151,7 @@ public class MapBridgeTest extends SearchTestCase {
 		assertEquals( "Wrong result returned looking for a null in a collection of numeric", withNullEntry.getName(), results.get( 0 ).getName() );
 	}
 
+	@Test
 	public void testSearchNotNullEntry() throws Exception {
 		{
 			List<MapBridgeTestEntity> results = findResults( "nullIndexed", KLINGON, false );
@@ -162,6 +177,7 @@ public class MapBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testSearchEntryWhenNullEntryNotIndexed() throws Exception {
 		{
 			List<MapBridgeTestEntity> results = findResults( "nullNotIndexed", "DaltoValue", false );
@@ -181,6 +197,7 @@ public class MapBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testSearchNotNullNumeric() throws Exception {
 		{
 			List<MapBridgeTestEntity> results = findNumericResults( "numericNullIndexed", 1 );
@@ -200,6 +217,7 @@ public class MapBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testSearchNotNullNumericEntryWhenNullEntryNotIndexed() throws Exception {
 		{
 			List<MapBridgeTestEntity> results = findNumericResults( "numericNullNotIndexed", 3L );
@@ -219,6 +237,7 @@ public class MapBridgeTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testDateIndexing() throws Exception {
 		List<MapBridgeTestEntity> results = findResults( "dates", indexedDate, false );
 

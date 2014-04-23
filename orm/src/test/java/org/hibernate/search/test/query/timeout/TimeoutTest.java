@@ -30,19 +30,28 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.testing.SkipForDialect;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  */
-public class TimeoutTest extends SearchTestCase {
+public class TimeoutTest extends SearchTestCaseJUnit4 {
 
 	private FullTextSession fts;
 	private Query allSeikoClocksQuery;
@@ -51,6 +60,7 @@ public class TimeoutTest extends SearchTestCase {
 	private Query matchAllQuery;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		fts = Search.getFullTextSession( openSession() );
@@ -63,6 +73,7 @@ public class TimeoutTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		try {
 			Transaction tx = fts.getTransaction();
@@ -79,6 +90,7 @@ public class TimeoutTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testTimeout() {
 		Transaction tx = fts.beginTransaction();
 
@@ -90,6 +102,7 @@ public class TimeoutTest extends SearchTestCase {
 		tx.commit();
 	}
 
+	@Test
 	public void testLimitFetchingTime() {
 		Transaction tx = fts.beginTransaction();
 
@@ -114,6 +127,7 @@ public class TimeoutTest extends SearchTestCase {
 	@SkipForDialect(value = PostgreSQLDialect.class,
 			jiraKey = "JBPAPP-2945",
 			comment = "PostgreSQL driver does not implement query timeout")
+	@Test
 	public void testEnoughTime() {
 		Transaction tx = fts.beginTransaction();
 

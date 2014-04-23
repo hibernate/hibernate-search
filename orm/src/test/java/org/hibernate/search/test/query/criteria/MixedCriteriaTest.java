@@ -27,23 +27,30 @@ import java.util.List;
 
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
-public class MixedCriteriaTest extends SearchTestCase {
+public class MixedCriteriaTest extends SearchTestCaseJUnit4 {
 	/**
 	 * HSEARCH-360
 	 */
+	@Test
 	public void testCriteriaWithFilteredEntity() throws Exception {
 		indexTestData();
 
@@ -68,6 +75,7 @@ public class MixedCriteriaTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testCriteriaWithoutFilteredEntity() throws Exception {
 		indexTestData();
 
@@ -92,6 +100,7 @@ public class MixedCriteriaTest extends SearchTestCase {
 		session.close();
 	}
 
+	@Test
 	public void testCriteriaWithMultipleEntities() throws Exception {
 		indexTestData();
 

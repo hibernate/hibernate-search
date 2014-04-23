@@ -31,12 +31,18 @@ import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -45,6 +51,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	private final String indexFieldName = "cubicCapacity";
 	private final String facetName = "ccs";
 
+	@Test
 	public void testSimpleFaceting() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -57,6 +64,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertEquals( "Wrong number of facets", 4, facetList.size() );
 	}
 
+	@Test
 	public void testDefaultSortOrderIsCount() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -69,6 +77,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertFacetCounts( facetList, new int[] { 5, 4, 4, 0 } );
 	}
 
+	@Test
 	public void testCountSortOrderAsc() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -82,6 +91,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertFacetCounts( facetList, new int[] { 0, 4, 4, 5 } );
 	}
 
+	@Test
 	public void testCountSortOrderDesc() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -95,6 +105,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertFacetCounts( facetList, new int[] { 5, 4, 4, 0 } );
 	}
 
+	@Test
 	public void testAlphabeticalSortOrder() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -112,6 +123,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		}
 	}
 
+	@Test
 	public void testZeroCountsExcluded() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -127,6 +139,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 	}
 
 	// see also HSEARCH-776
+	@Test
 	public void testMaxFacetCounts() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -142,6 +155,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertFacetCounts( facetList, new int[] { 5 } );
 	}
 
+	@Test
 	public void testNullFieldNameThrowsException() {
 		try {
 			queryBuilder( Car.class ).facet()
@@ -156,6 +170,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		}
 	}
 
+	@Test
 	public void testNullRequestNameThrowsException() {
 		try {
 			queryBuilder( Car.class ).facet()
@@ -170,6 +185,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		}
 	}
 
+	@Test
 	public void testUnknownFieldNameReturnsEmptyResults() {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( "foo" )
@@ -182,6 +198,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertTrue( facetList.isEmpty() );
 	}
 
+	@Test
 	public void testRangeDefinitionSortOrderThrowsExceptionForDiscreteFaceting() {
 		try {
 			queryBuilder( Car.class ).facet()
@@ -197,6 +214,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		}
 	}
 
+	@Test
 	public void testEnableDisableFacets() {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
@@ -213,6 +231,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertTrue( "We should have no facets", query.getFacetManager().getFacets( facetName ).size() == 0 );
 	}
 
+	@Test
 	public void testMultipleFacets() {
 		final String descendingOrderedFacet = "desc";
 		FacetingRequest requestDesc = queryBuilder( Car.class ).facet()

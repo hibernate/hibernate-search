@@ -23,8 +23,8 @@
  */
 package org.hibernate.search.test.inheritance;
 
-import java.util.List;
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -33,25 +33,35 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  */
-public class InheritanceTest extends SearchTestCase {
+public class InheritanceTest extends SearchTestCaseJUnit4 {
 
 	private static final Log log = LoggerFactory.make();
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 	}
 
+	@Test
 	public void testSearchUnindexClass() throws Exception {
 		createTestData();
 
@@ -79,6 +89,7 @@ public class InheritanceTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testInheritance() throws Exception {
 		createTestData();
 
@@ -117,6 +128,7 @@ public class InheritanceTest extends SearchTestCase {
 	}
 
 
+	@Test
 	public void testPolymorphicQueries() throws Exception {
 		createTestData();
 
@@ -149,6 +161,7 @@ public class InheritanceTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testSubclassInclusion() throws Exception {
 		createTestData();
 
@@ -192,6 +205,7 @@ public class InheritanceTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testPurgeIndex() throws Exception {
 		createTestData();
 		FullTextSession s = Search.getFullTextSession( openSession() );
@@ -232,6 +246,7 @@ public class InheritanceTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testPurgeUnIndexClass() throws Exception {
 		createTestData();
 		FullTextSession s = Search.getFullTextSession( openSession() );

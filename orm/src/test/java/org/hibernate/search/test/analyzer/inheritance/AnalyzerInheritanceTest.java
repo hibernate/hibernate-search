@@ -28,16 +28,19 @@ import org.apache.lucene.analysis.Token;
 import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
 
 import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test to verify HSEARCH-267.
@@ -47,7 +50,7 @@ import static org.hibernate.search.test.analyzer.AnalyzerTest.assertTokensEqual;
  *
  * @author Hardy Ferentschik
  */
-public class AnalyzerInheritanceTest extends SearchTestCase {
+public class AnalyzerInheritanceTest extends SearchTestCaseJUnit4 {
 
 	public static final Log log = LoggerFactory.make();
 
@@ -56,6 +59,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testBySearch() throws Exception {
 		SubClass testClass = new SubClass();
 		testClass.setName( "Proca\u00EFne" );
@@ -90,6 +94,7 @@ public class AnalyzerInheritanceTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testByAnalyzerRetrieval() throws Exception {
 
 		FullTextSession s = Search.getFullTextSession( openSession() );

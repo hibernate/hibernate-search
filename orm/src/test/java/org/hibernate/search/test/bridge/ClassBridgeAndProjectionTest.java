@@ -30,17 +30,24 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ClassBridgeAndProjectionTest extends SearchTestCase {
+public class ClassBridgeAndProjectionTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testClassBridgeProjection() throws Exception {
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();

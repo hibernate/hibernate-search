@@ -26,12 +26,14 @@ package org.hibernate.search.test.engine;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * See HSEARCH-361 and HSEARCH-5 : avoid reindexing objects for which
@@ -39,8 +41,9 @@ import org.junit.Assert;
  *
  * @author Sanne Grinovero
  */
-public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCase {
+public class SkipIndexingWorkForUnaffectingChangesTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testUnindexedFieldsDontTriggerEngine() {
 		// first, normal storage of new indexed graph:
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );

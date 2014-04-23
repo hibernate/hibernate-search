@@ -32,15 +32,21 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Hardy Ferentschik
  */
-public class NoMBeansEnabledTest extends SearchTestCase {
+public class NoMBeansEnabledTest extends SearchTestCaseJUnit4 {
 	MBeanServer mbeanServer;
 
+	@Test
 	public void testMBeanNotRegisteredWithoutExplicitProperty() throws Exception {
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
 
@@ -73,6 +79,7 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		// make sure that no MBean is registered before the test runs
 		mbeanServer = ManagementFactory.getPlatformMBeanServer();
@@ -91,6 +98,7 @@ public class NoMBeansEnabledTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 	}

@@ -40,24 +40,32 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class CompressionTest extends SearchTestCase {
+public class CompressionTest extends SearchTestCaseJUnit4 {
 
 	/**
 	 * Verifies the fields are really stored in compressed format
 	 *
 	 * @throws Exception in case the test fails
 	 */
+	@Test
 	public void testFieldWasCompressed() throws Exception {
 		IndexReader indexReader = getSearchFactory().getIndexReaderAccessor().open( LargeDocument.class );
 		try {
@@ -107,6 +115,7 @@ public class CompressionTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails
 	 */
+	@Test
 	public void testCompressedFieldSearch() throws Exception {
 		assertFindsN( 1, "title:third" );
 		assertFindsN( 1, "abstract:jpa2" );
@@ -140,6 +149,7 @@ public class CompressionTest extends SearchTestCase {
 	/**
 	 * Verify that projection is able to inflate stored data
 	 */
+	@Test
 	public void testProjectionOnCompressedFields() {
 		openSession().beginTransaction();
 		try {
@@ -194,6 +204,7 @@ public class CompressionTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		Session s = openSession();

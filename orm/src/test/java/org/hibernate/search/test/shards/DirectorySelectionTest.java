@@ -20,33 +20,38 @@
  */
 package org.hibernate.search.test.shards;
 
-import org.junit.Assert;
 import org.apache.lucene.index.IndexReader;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.indexes.IndexReaderAccessor;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test to retrieve specific IndexReader instances by index name.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class DirectorySelectionTest extends SearchTestCase {
+public class DirectorySelectionTest extends SearchTestCaseJUnit4 {
 	private IndexReaderAccessor indexReaderAccessor;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		FullTextSession fts = indexData();
 		indexReaderAccessor = fts.getSearchFactory().getIndexReaderAccessor();
 	}
 
+	@Test
 	public void testDirectoryProviderForQuery() throws Exception {
 		IndexReader indexReader = indexReaderAccessor.open( Product.class );
 		try {
@@ -73,6 +78,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testOpeningIndexReaderByUnknownNameThrowsException() throws Exception {
 		try {
 			indexReaderAccessor.open( "Products.1", "hoa?" );
@@ -83,6 +89,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testOpeningIndexReaderUsingEmptyStringArrayThrowsException() throws Exception {
 		try {
 			indexReaderAccessor.open( new String[]{} );
@@ -93,6 +100,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testOpeningIndexReaderUsingNullAsNameThrowsException() throws Exception {
 		try {
 			indexReaderAccessor.open( (String) null );
@@ -103,6 +111,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testOpeningIndexReaderByUnknownEntityThrowsException() throws Exception {
 		try {
 			indexReaderAccessor.open( this.getClass() );
@@ -116,6 +125,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testOpeningIndexReaderUsingEmptyClassArrayThrowsException() throws Exception {
 		try {
 			indexReaderAccessor.open( new Class<?>[]{} );
@@ -126,6 +136,7 @@ public class DirectorySelectionTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testOpeningIndexReaderUsingNullAsClassThrowsException() throws Exception {
 		try {
 			indexReaderAccessor.open( (Class<?>) null );

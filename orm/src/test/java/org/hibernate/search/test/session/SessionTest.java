@@ -28,6 +28,7 @@ import java.lang.reflect.Proxy;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SharedSessionContract;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.context.internal.ThreadLocalSessionContext;
 import org.hibernate.criterion.DetachedCriteria;
@@ -37,12 +38,15 @@ import org.hibernate.engine.transaction.spi.TransactionContext;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  */
-public class SessionTest extends SearchTestCase {
+public class SessionTest extends SearchTestCaseJUnit4 {
 
 	//EventSource, org.hibernate.Session, TransactionContext, LobCreationContext
 	private static final Class[] SESS_PROXY_INTERFACES = new Class[] {
@@ -54,6 +58,7 @@ public class SessionTest extends SearchTestCase {
 			SharedSessionContract.class
 	};
 
+	@Test
 	public void testSessionWrapper() throws Exception {
 		Session s = openSession();
 		DelegationWrapper wrapper = new DelegationWrapper( s );
@@ -72,6 +77,7 @@ public class SessionTest extends SearchTestCase {
 		wrapped.close();
 	}
 
+	@Test
 	public void testDetachedCriteria() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		DetachedCriteria dc = DetachedCriteria.forClass( Email.class );
@@ -86,6 +92,7 @@ public class SessionTest extends SearchTestCase {
 		s.close();
 	}
 
+	@Test
 	public void testThreadBoundSessionWrappingOutOfTransaction() throws Exception {
 		final Session session = getSessionFactory().getCurrentSession();
 		try {

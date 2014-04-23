@@ -29,15 +29,22 @@ import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
 public class FacetFilteringTest extends AbstractFacetTest {
+
+	@Test
 	public void testDiscreteFacetDrillDown() throws Exception {
 		final String indexFieldName = "cubicCapacity";
 		final String facetName = "ccs";
@@ -70,6 +77,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		assertFacetCounts( newFacetList, new int[] { 5, 4, 0, 0 } );
 	}
 
+	@Test
 	public void testMultipleFacetDrillDown() throws Exception {
 		final String ccsFacetName = "ccs";
 		final String ccsFacetFieldName = "cubicCapacity";
@@ -124,6 +132,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		assertFacetCounts( facetManager.getFacets( ccsFacetName ), new int[] { 17, 16, 16, 1 } );
 	}
 
+	@Test
 	public void testRangeFacetDrillDown() {
 		final String indexFieldName = "price";
 		final String priceRange = "priceRange";

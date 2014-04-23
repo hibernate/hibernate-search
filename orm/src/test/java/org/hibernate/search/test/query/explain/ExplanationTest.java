@@ -23,23 +23,29 @@
  */
 package org.hibernate.search.test.query.explain;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.hibernate.search.test.SearchTestCase;
-import org.hibernate.search.testsupport.TestConstants;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.search.Query;
+
+import org.hibernate.Transaction;
+
+import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.Transaction;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ExplanationTest extends SearchTestCase {
+public class ExplanationTest extends SearchTestCaseJUnit4 {
+	@Test
 	public void testExplanation() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();

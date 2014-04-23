@@ -30,17 +30,23 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.ProjectionConstants;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.Test;
 
-public class DynamicBoostingTest extends SearchTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class DynamicBoostingTest extends SearchTestCaseJUnit4 {
 
 	private static final Log log = LoggerFactory.make();
 
+	@Test
 	public void testDynamicBoosts() throws Exception {
 
 		Session session = openSession();
@@ -59,7 +65,7 @@ public class DynamicBoostingTest extends SearchTestCase {
 
 		float lib1Score = getScore( new TermQuery( new Term( "name", "one" ) ) );
 		float lib2Score = getScore( new TermQuery( new Term( "name", "two" ) ) );
-		assertEquals( "The scores should be equal", lib1Score, lib2Score );
+		assertEquals( "The scores should be equal", lib1Score, lib2Score, 0f );
 
 		// set dynamic score and reindex!
 		session = openSession();
@@ -78,7 +84,7 @@ public class DynamicBoostingTest extends SearchTestCase {
 
 
 		lib1Score = getScore( new TermQuery( new Term( "name", "foobar" ) ) );
-		assertEquals( "lib1score should be 0 since term is not yet indexed.", 0.0f, lib1Score );
+		assertEquals( "lib1score should be 0 since term is not yet indexed.", 0.0f, lib1Score, 0f );
 
 		// index foobar
 		session = openSession();

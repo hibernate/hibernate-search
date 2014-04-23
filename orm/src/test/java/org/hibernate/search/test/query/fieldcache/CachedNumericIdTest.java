@@ -22,38 +22,44 @@ package org.hibernate.search.test.query.fieldcache;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.hibernate.search.test.engine.Country;
 import org.hibernate.search.test.engine.Location;
 import org.hibernate.search.test.engine.PinPoint;
-import org.hibernate.search.test.engine.Country;
 import org.hibernate.search.testsupport.readerprovider.FieldSelectorLeakingReaderProvider;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class CachedNumericIdTest extends SearchTestCase {
+public class CachedNumericIdTest extends SearchTestCaseJUnit4 {
 
 	private static final int NUM_LOCATIONS = 50;
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		prepareData();
 	}
 
+	@Test
 	public void testLocationLoading() {
 		Session session = openSession();
 		Transaction tx = session.beginTransaction();
@@ -96,6 +102,7 @@ public class CachedNumericIdTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		cleanData();
 		super.tearDown();

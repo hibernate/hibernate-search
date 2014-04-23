@@ -24,6 +24,7 @@
 package org.hibernate.search.test.configuration;
 
 import org.hibernate.HibernateException;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -31,27 +32,31 @@ import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.configuration.impl.IndexWriterSetting;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Before;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Contains some utility methods to simplify coding of test cases about configuration parsing.
  *
  * @author Sanne Grinovero
  */
-public abstract class ConfigurationReadTestCase extends SearchTestCase {
-
-	private SearchFactoryImplementor searchFactory;
+public abstract class ConfigurationReadTestCase extends SearchTestCaseJUnit4 {
 
 	public ConfigurationReadTestCase() {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
 		fullTextSession.close();
 	}
 
@@ -75,13 +80,8 @@ public abstract class ConfigurationReadTestCase extends SearchTestCase {
 				(int) getParameter( shard, setting, testEntity ) );
 	}
 
-	@Override
-	public final SearchFactoryImplementor getSearchFactory() {
-		return searchFactory;
-	}
-
 	private Integer getParameter(int shard, IndexWriterSetting setting, Class testEntity) {
-		EntityIndexBinding mappingForEntity = searchFactory.getIndexBinding( testEntity );
+		EntityIndexBinding mappingForEntity = getSearchFactoryImpl().getIndexBinding( testEntity );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) mappingForEntity.getIndexManagers()[shard];
 		LuceneIndexingParameters luceneIndexingParameters = indexManager.getIndexingParameters();
 		return luceneIndexingParameters.getIndexParameters().getCurrentValueFor( setting );

@@ -23,21 +23,25 @@
  */
 package org.hibernate.search.test.configuration;
 
-import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_BUFFERED_DOCS;
-import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_MERGE_DOCS;
-import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MERGE_FACTOR;
-import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.RAM_BUFFER_SIZE;
-
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.query.Author;
 import org.hibernate.search.test.query.Book;
+import org.junit.Test;
+
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_BUFFERED_DOCS;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MAX_MERGE_DOCS;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.MERGE_FACTOR;
+import static org.hibernate.search.backend.configuration.impl.IndexWriterSetting.RAM_BUFFER_SIZE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Sanne Grinovero
@@ -70,25 +74,28 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		//cfg.setProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
 	}
 
+	@Test
 	public void testCorrectNumberOfShardsDetected() {
-		EntityIndexBinding indexBindingForDocument = getSearchFactory().getIndexBinding( Document.class );
+		EntityIndexBinding indexBindingForDocument = getSearchFactoryImpl().getIndexBinding( Document.class );
 		IndexManager[] documentManagers = indexBindingForDocument.getIndexManagers();
 		assertNotNull( documentManagers);
 		assertEquals( 4, documentManagers.length );
-		EntityIndexBinding indexBindingForBooks = getSearchFactory().getIndexBinding( Book.class );
+		EntityIndexBinding indexBindingForBooks = getSearchFactoryImpl().getIndexBinding( Book.class );
 		IndexManager[] bookManagers = indexBindingForBooks.getIndexManagers();
 		assertNotNull( bookManagers );
 		assertEquals( 2, bookManagers.length );
 	}
 
+	@Test
 	public void testSelectionOfShardingStrategy() {
-		IndexShardingStrategy shardingStrategy = getSearchFactory().getIndexBinding( Document.class ).getSelectionStrategy();
+		IndexShardingStrategy shardingStrategy = getSearchFactoryImpl().getIndexBinding( Document.class ).getSelectionStrategy();
 		assertNotNull( shardingStrategy );
 		assertEquals( shardingStrategy.getClass(), UselessShardingStrategy.class );
 	}
 
+	@Test
 	public void testShardingSettingsInherited() {
-		IndexManager[] indexManagers = getSearchFactory().getIndexBindings().get( Document.class ).getIndexManagers();
+		IndexManager[] indexManagers = getSearchFactoryImpl().getIndexBindings().get( Document.class ).getIndexManagers();
 		assertTrue( getDirectoryProvider( indexManagers[0] ) instanceof RAMDirectoryProvider );
 		assertTrue( getDirectoryProvider( indexManagers[1] ) instanceof FSDirectoryProvider );
 		assertTrue( getDirectoryProvider( indexManagers[2] ) instanceof RAMDirectoryProvider );
@@ -96,11 +103,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertValueIsSet( Document.class, 1, MAX_BUFFERED_DOCS, 12 );
 	}
 
-	private static DirectoryProvider getDirectoryProvider(IndexManager indexManager) {
-		DirectoryBasedIndexManager dpBasedManager = (DirectoryBasedIndexManager) indexManager;
-		return dpBasedManager.getDirectoryProvider();
-	}
-
+	@Test
 	public void testShardN2UsesDefaults() {
 		assertValueIsSet( Document.class, 2, MAX_BUFFERED_DOCS, 4 );
 		assertValueIsSet( Document.class, 2, MERGE_FACTOR, 100 );
@@ -110,6 +113,7 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 		assertValueIsDefault( Document.class, 2, RAM_BUFFER_SIZE );
 	}
 
+	@Test
 	public void testShardN1_ExplicitParams() {
 		assertValueIsSet( Document.class, 1, MAX_BUFFERED_DOCS, 12 );
 		assertValueIsSet( Document.class, 1, MAX_MERGE_DOCS, 11 );
@@ -122,5 +126,10 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 				Author.class,
 				Document.class
 		};
+	}
+
+	private static DirectoryProvider getDirectoryProvider(IndexManager indexManager) {
+		DirectoryBasedIndexManager dpBasedManager = (DirectoryBasedIndexManager) indexManager;
+		return dpBasedManager.getDirectoryProvider();
 	}
 }

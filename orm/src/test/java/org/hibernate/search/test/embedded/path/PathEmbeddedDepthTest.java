@@ -26,16 +26,22 @@ package org.hibernate.search.test.embedded.path;
 
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * John of England Genealogy
@@ -57,10 +63,11 @@ import org.hibernate.search.test.SearchTestCase;
  *
  * @author Davide D'Alto
  */
-public class PathEmbeddedDepthTest extends SearchTestCase {
+public class PathEmbeddedDepthTest extends SearchTestCaseJUnit4 {
 
 	private Session session = null;
 
+	@Test
 	public void testShouldIndexFieldInPath() throws Exception {
 		List<Human> result = search( session, "parents.parents.parents.name", "Philippa" );
 
@@ -70,6 +77,7 @@ public class PathEmbeddedDepthTest extends SearchTestCase {
 				"John of England", result.get( 0 ).getFullname() );
 	}
 
+	@Test
 	public void testIndexFieldIfInsideDepth() throws Exception {
 		List<Human> result = search( session, "parents.parents.name", "Empress" );
 
@@ -79,6 +87,7 @@ public class PathEmbeddedDepthTest extends SearchTestCase {
 				"John of England", result.get( 0 ).getFullname() );
 	}
 
+	@Test
 	public void testShouldNotIndexFieldOutsidePathAndOverDepth() throws Exception {
 		try {
 			search( session, "parents.parents.parents.surname", "de Montfort" );
@@ -88,6 +97,7 @@ public class PathEmbeddedDepthTest extends SearchTestCase {
 		}
 	}
 
+	@Test
 	public void testShouldIndexFieldNotInPathButInsideDepthThreshold() throws Exception {
 		List<Human> result = search( session, "parents.parents.surname", "de Châtellerault" );
 
@@ -97,6 +107,7 @@ public class PathEmbeddedDepthTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		session = openSession();
@@ -139,6 +150,7 @@ public class PathEmbeddedDepthTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		session.clear();
 

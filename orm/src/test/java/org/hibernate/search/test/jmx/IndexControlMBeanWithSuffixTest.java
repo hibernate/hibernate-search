@@ -32,18 +32,25 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.Environment;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-1026")
-public class IndexControlMBeanWithSuffixTest extends SearchTestCase {
+public class IndexControlMBeanWithSuffixTest extends SearchTestCaseJUnit4 {
 	MBeanServer mbeanServer;
 	ObjectName indexBeanObjectName;
 
+	@Test
 	public void testIndexCtrlMBeanRegistered() throws Exception {
 		assertTrue(
 				"With the right property set the Search MBean should be registered",
@@ -52,6 +59,7 @@ public class IndexControlMBeanWithSuffixTest extends SearchTestCase {
 	}
 
 	@Override
+	@Before
 	public void setUp() throws Exception {
 		forceConfigurationRebuild();
 		super.setUp();
@@ -66,6 +74,7 @@ public class IndexControlMBeanWithSuffixTest extends SearchTestCase {
 	}
 
 	@Override
+	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
 		assertFalse(

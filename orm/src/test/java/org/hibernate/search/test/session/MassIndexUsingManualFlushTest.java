@@ -28,22 +28,28 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.queryparser.classic.QueryParser;
+
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
+import org.hibernate.Transaction;
+
 import org.hibernate.jdbc.Work;
+import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.Environment;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.Transaction;
-import org.hibernate.ScrollableResults;
-import org.hibernate.ScrollMode;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
  */
-public class MassIndexUsingManualFlushTest extends SearchTestCase {
+public class MassIndexUsingManualFlushTest extends SearchTestCaseJUnit4 {
+	@Test
 	public void testManualIndexFlush() throws Exception {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();

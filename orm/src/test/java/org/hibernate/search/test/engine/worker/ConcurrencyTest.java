@@ -23,14 +23,17 @@
  */
 package org.hibernate.search.test.engine.worker;
 
-import org.hibernate.search.test.SearchTestCase;
 import org.hibernate.Session;
+
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Test;
 
 /**
  * @author Emmanuel Bernard
  */
-public class ConcurrencyTest extends SearchTestCase {
+public class ConcurrencyTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testMultipleEntitiesInSameIndex() throws Exception {
 		Session s = openSession( );
 		s.getTransaction().begin();

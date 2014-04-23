@@ -32,22 +32,27 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.impl.WorkQueue;
+import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Testcase for HSEARCH-257.
  */
-public class WorkDuplicationTest extends SearchTestCase {
+public class WorkDuplicationTest extends SearchTestCaseJUnit4 {
 
 	/**
 	 * This test assures that HSEARCH-257. Before the fix Search would issue another <code>AddLuceneWork</code> after
@@ -56,6 +61,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testNoWorkDuplication() throws Exception {
 
 		FullTextSession s = org.hibernate.search.Search.getFullTextSession( openSession() );
@@ -117,6 +123,7 @@ public class WorkDuplicationTest extends SearchTestCase {
 	 *
 	 * @throws Exception in case the test fails.
 	 */
+	@Test
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
 		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();

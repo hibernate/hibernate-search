@@ -31,11 +31,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import org.junit.Assert;
-
 import org.apache.lucene.search.Sort;
 
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -48,8 +47,10 @@ import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
 import org.hibernate.testing.TestForIssue;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Spatial search with sort by distance and paging orders entities
@@ -57,7 +58,7 @@ import org.hibernate.testing.TestForIssue;
  * @author PB
  */
 @TestForIssue(jiraKey = "HSEARCH-1267")
-public class SpatialSearchSortByDistanceAndPaging extends SearchTestCase {
+public class SpatialSearchSortByDistanceAndPaging extends SearchTestCaseJUnit4 {
 
 	private static final int EXPECTED_RESULTS_COUNT = 37;
 	private static final double CENTER_LAT = 54.0;
@@ -66,10 +67,12 @@ public class SpatialSearchSortByDistanceAndPaging extends SearchTestCase {
 	private Map<Long, Integer> entitiesIdsSet;
 	private int idx;
 
+	@Test
 	public void testSortWithoutPaging_isOk() {
 		Assert.assertEquals( EXPECTED_RESULTS_COUNT, doSearch( SEARCH_DISTANCE, 50, true ) );
 	}
 
+	@Test
 	public void testSortWithPageSize5_notOk() {
 		Assert.assertEquals(
 				"sorting by distance and paging error",
@@ -77,6 +80,7 @@ public class SpatialSearchSortByDistanceAndPaging extends SearchTestCase {
 		);
 	}
 
+	@Test
 	public void testSortWithPageSize10_notOk() {
 		Assert.assertEquals(
 				"sorting by distance and paging error",
@@ -84,10 +88,12 @@ public class SpatialSearchSortByDistanceAndPaging extends SearchTestCase {
 		);
 	}
 
+	@Test
 	public void testNoSortWithPageSize5_isOk() {
 		Assert.assertEquals( EXPECTED_RESULTS_COUNT, doSearch( SEARCH_DISTANCE, 5, false ) );
 	}
 
+	@Test
 	public void testNoSortWithPageSize10_isOk() {
 		Assert.assertEquals( EXPECTED_RESULTS_COUNT, doSearch( SEARCH_DISTANCE, 10, false ) );
 	}

@@ -25,12 +25,17 @@ package org.hibernate.search.test.engine;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
+
 import org.hibernate.Transaction;
+
 import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.test.SearchTestCase;
+import org.hibernate.search.test.SearchTestCaseJUnit4;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Verify index changes queued during a transaction are canceled
@@ -38,8 +43,9 @@ import org.hibernate.search.test.SearchTestCase;
  *
  * @author Sanne Grinovero
  */
-public class RollbackTransactionTest extends SearchTestCase {
+public class RollbackTransactionTest extends SearchTestCaseJUnit4 {
 
+	@Test
 	public void testTransactionBehaviour() {
 		assertEquals( 0, countBusLinesByFullText() );
 		assertEquals( 0, countBusLineByDatabaseCount() );
