@@ -20,19 +20,20 @@
  */
 package org.hibernate.search.indexes.serialization.avro.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.avro.Protocol;
-
 import org.hibernate.search.engine.service.spi.Startable;
+import org.hibernate.search.indexes.serialization.avro.logging.impl.Log;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.impl.FileHelper;
-import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.impl.StreamHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -64,13 +65,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class AvroSerializationProvider implements SerializationProvider, Startable {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log log = LoggerFactory.make( Log.class );
 	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1_0/";
 	private static final String AVRO_SCHEMA_FILE_SUFFIX = ".avro";
 	private static final String AVRO_PROTOCOL_FILE_SUFFIX = ".avpr";
 
-	private Map<String, String> schemas = new HashMap<String, String>();
-	private Protocol protocol;
+	private final Map<String, String> schemas = new HashMap<String, String>();
+	private final Protocol protocol;
 
 	public static byte MAJOR_VERSION = (byte) ( -128 + 1 );
 	public static byte MINOR_VERSION = (byte) ( -128 + 0 );
@@ -85,22 +86,6 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 
 	public static int getMinorVersion() {
 		return MINOR_VERSION + 128; //rebase to 0
-	}
-
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		serializer = new AvroSerializer( protocol );
-		deserializer = new AvroDeserializer( protocol );
-	}
-
-	@Override
-	public Serializer getSerializer() {
-		return serializer;
-	}
-
-	@Override
-	public Deserializer getDeserializer() {
-		return deserializer;
 	}
 
 	public AvroSerializationProvider() {
@@ -137,17 +122,33 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 		this.protocol = parseProtocol( "Works" );
 	}
 
+	@Override
+	public void start(Properties properties, BuildContext context) {
+		serializer = new AvroSerializer( protocol );
+		deserializer = new AvroDeserializer( protocol );
+	}
+
+	@Override
+	public Serializer getSerializer() {
+		return serializer;
+	}
+
+	@Override
+	public Deserializer getDeserializer() {
+		return deserializer;
+	}
+
 	private void parseSchema(String filename) {
 		String fullFileName = V1_PATH + filename + AVRO_SCHEMA_FILE_SUFFIX;
-		String messageSchemaAsString = FileHelper.readResourceAsString( fullFileName, AvroSerializationProvider.class.getClassLoader() );
-		schemas.put( filename, messageSchemaAsString );
+		String schema = avroResourceAsString( fullFileName );
+		schemas.put( filename, schema );
 	}
 
 	public Protocol parseProtocol(String name) {
-		String filename = V1_PATH + name + AVRO_PROTOCOL_FILE_SUFFIX;
-		String protocolSkeleton = FileHelper.readResourceAsString( filename, AvroSerializationProvider.class.getClassLoader() );
-		String protocolString = inlineSchemas( protocolSkeleton );
-		return Protocol.parse( protocolString );
+		String fullFileName = V1_PATH + name + AVRO_PROTOCOL_FILE_SUFFIX;
+		String protocolSkeleton = avroResourceAsString( fullFileName );
+		String protocol = inlineSchemas( protocolSkeleton );
+		return Protocol.parse( protocol );
 	}
 
 	public String inlineSchemas(String protocolSkeleton) {
@@ -178,5 +179,26 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 	@Override
 	public String toString() {
 		return "Avro SerializationProvider v" + getMajorVersion() + "." + getMinorVersion();
+	}
+
+	private String avroResourceAsString(String resourceName) {
+		// using class loader of AvroSerializationProvider, because we load resources included in the same artifact.
+		// Besides we cannot request the class loader service during start-up of this provider ;-) )(HF)
+		InputStream inputStream = AvroSerializationProvider.class.getClassLoader().getResourceAsStream( resourceName );
+		if ( inputStream == null ) {
+			throw log.unableToLoadAvroSchema( resourceName );
+		}
+
+		String resource;
+		try {
+			resource = StreamHelper.readInputStream( inputStream );
+		}
+		catch (IOException e) {
+			throw log.unableToLoadResource( resourceName );
+		}
+		finally {
+			StreamHelper.closeResource( inputStream );
+		}
+		return resource;
 	}
 }

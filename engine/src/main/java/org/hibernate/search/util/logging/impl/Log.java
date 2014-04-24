@@ -59,6 +59,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 public interface Log extends BasicLogger {
 
 	int JGROUPS_BACKEND_MESSAGES_START_ID = 200000;
+	int AVRO_SERIALIZATION_MESSAGES_START_ID = 300000;
 
 	@LogMessage(level = WARN)
 	@Message(id = 1, value = "initialized \"blackhole\" backend. Index changes will be prepared but discarded!")
@@ -732,4 +733,5 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 215, value = "Multiple matching FieldBridges found for %s of return type %s: %s" )
 	SearchException multipleMatchingFieldBridges(XMember member, XClass memberType, String listOfFieldBridges);
+
 }
