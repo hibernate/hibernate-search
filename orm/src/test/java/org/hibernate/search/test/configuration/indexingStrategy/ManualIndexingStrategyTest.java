@@ -33,7 +33,7 @@ import org.apache.lucene.index.IndexReader;
 import org.hibernate.Session;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;

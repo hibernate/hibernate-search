@@ -22,7 +22,9 @@
   ~  51 Franklin Street, Fifth Floor
   ~  Boston, MA  02110-1301  USA
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -35,7 +37,7 @@
     <artifactId>hibernate-search-engine</artifactId>
 
     <name>Hibernate Search Engine</name>
-    <description>the core of the Object/Lucene mapper, query engine and index management</description>
+    <description>Core of the Object/Lucene mapper, query engine and index management</description>
 
     <dependencies>
         <dependency>
@@ -132,8 +134,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
-            <plugin> 
-                <groupId>org.apache.maven.plugins</groupId> 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
             <plugin>
@@ -161,13 +163,100 @@
                             <expression>${project.version}</expression>
                             <targetMembers>
                                 <methodBodyReturn>
-                                    <className>org.hibernate.search.Version</className>
+                                    <className>org.hibernate.search.engine.Version</className>
                                     <methodName>getVersionString</methodName>
                                 </methodBodyReturn>
                             </targetMembers>
                         </bytecodeInjection>
                     </bytecodeInjections>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Import-Package>
+                            org.hibernate.annotations.common.*;version="[4,5)",
+                            org.apache.lucene.*;version="[${luceneVersion},4.8.0)",
+                            org.jboss.logging.*;version="[3.1,4.0.0)",
+                            org.apache.tika.*;version="[${tikaVersion}, 1.5)";resolution:=optional,
+                            javax.transaction.*;version="0";resolution:=optional
+                        </Import-Package>
+                        <Export-Package>
+                            org.hibernate.search.analyzer;version="${project.version}",
+                            org.hibernate.search.annotations;version="${project.version}",
+                            org.hibernate.search.backend;version="${project.version}",
+                            org.hibernate.search.backend.spi;version="${project.version}",
+                            org.hibernate.search.backend.impl.batch;version="${project.version}",
+                            org.hibernate.search.batchindexing;version="${project.version}",
+                            org.hibernate.search.bridge;version="${project.version}",
+                            org.hibernate.search.bridge.builtin;version="${project.version}",
+                            org.hibernate.search.bridge.spi;version="${project.version}",
+                            org.hibernate.search.bridge.util.impl;version="${project.version}",
+                            org.hibernate.search.cfg;version="${project.version}",
+                            org.hibernate.search.cfg.spi;version="${project.version}",
+                            org.hibernate.search.engine;version="${project.version}",
+                            org.hibernate.search.engine.spi;version="${project.version}",
+                            org.hibernate.search.engine.service.classloading.spi;version="${project.version}",
+                            org.hibernate.search.engine.service.classloading.impl;version="${project.version}",
+                            org.hibernate.search.engine.service.spi;version="${project.version}",
+                            org.hibernate.search.errors;version="${project.version}",
+                            org.hibernate.search.exception;version="${project.version}",
+                            org.hibernate.search.filter;version="${project.version}",
+                            org.hibernate.search.indexes;version="${project.version}",
+                            org.hibernate.search.indexes.interceptor;version="${project.version}",
+                            org.hibernate.search.indexes.serialization.spi;version="${project.version}",
+                            org.hibernate.search.indexes.spi;version="${project.version}",
+                            org.hibernate.search.jmx;version="${project.version}",
+                            org.hibernate.search.metadata;version="${project.version}",
+                            org.hibernate.search.query;version="${project.version}",
+                            org.hibernate.search.query.collector;version="${project.version}",
+                            org.hibernate.search.query.dsl;version="${project.version}",
+                            org.hibernate.search.query.engine;version="${project.version}",
+                            org.hibernate.search.query.engine.spi;version="${project.version}",
+                            org.hibernate.search.query.facet;version="${project.version}",
+                            org.hibernate.search.query.fieldcache;version="${project.version}",
+                            org.hibernate.search.spatial;version="${project.version}",
+                            org.hibernate.search.spatial.impl;version="${project.version}",
+                            org.hibernate.search.spi;version="${project.version}",
+                            org.hibernate.search.stat;version="${project.version}",
+                            org.hibernate.search.stat.spi;version="${project.version}",
+                            org.hibernate.search.store;version="${project.version}",
+                            org.hibernate.search.store.optimization;version="${project.version}",
+                            org.hibernate.search.util;version="${project.version}",
+                            org.hibernate.search.util.impl;version="${project.version}",
+                            org.hibernate.search.util.logging.impl;version="${project.version}"
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

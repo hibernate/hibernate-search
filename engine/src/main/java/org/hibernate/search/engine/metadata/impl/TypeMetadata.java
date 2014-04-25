@@ -38,7 +38,7 @@ import org.apache.lucene.document.Field;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;

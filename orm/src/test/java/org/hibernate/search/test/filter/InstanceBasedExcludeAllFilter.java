@@ -31,7 +31,7 @@ import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.util.Bits;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.impl.AndDocIdSet;
 
 /**

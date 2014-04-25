@@ -35,7 +35,7 @@ import org.hibernate.transform.ResultTransformer;
 
 /**
  * Implementation of the {@code Loader} interface used for loading entities which are projected via
- * {@link org.hibernate.search.ProjectionConstants#THIS}.
+ * {@link org.hibernate.search.engine.ProjectionConstants#THIS}.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

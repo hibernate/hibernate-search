@@ -23,8 +23,6 @@
  */
 package org.hibernate.search.filter;
 
-import org.hibernate.search.FullTextFilter;
-
 /**
  * @author Emmanuel Bernard
  */

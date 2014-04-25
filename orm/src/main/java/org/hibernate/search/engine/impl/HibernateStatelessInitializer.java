@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.util.impl.HibernateHelper;
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
 
 /**
  * To be used for Hibernate initializations which don't need a specific Session.

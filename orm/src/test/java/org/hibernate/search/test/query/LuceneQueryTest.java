@@ -40,7 +40,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.HibernateHelper;
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.stat.Statistics;
 import org.junit.Test;
 

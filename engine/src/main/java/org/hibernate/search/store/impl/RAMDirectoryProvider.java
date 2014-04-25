@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.store.RAMDirectory;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;

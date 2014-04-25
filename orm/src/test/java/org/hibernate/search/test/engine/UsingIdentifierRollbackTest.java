@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import org.hibernate.search.Environment;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;

@@ -44,7 +44,7 @@ import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.Session;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;

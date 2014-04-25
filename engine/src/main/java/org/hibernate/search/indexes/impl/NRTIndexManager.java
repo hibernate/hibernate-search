@@ -22,7 +22,7 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.NRTWorkspaceImpl;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;

@@ -26,7 +26,7 @@ package org.hibernate.search.filter.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 
 /**

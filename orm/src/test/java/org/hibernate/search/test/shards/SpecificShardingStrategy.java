@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.test.shards;
 
-import org.hibernate.search.FullTextFilter;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;

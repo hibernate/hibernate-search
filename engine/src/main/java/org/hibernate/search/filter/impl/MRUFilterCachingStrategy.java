@@ -26,7 +26,7 @@ package org.hibernate.search.filter.impl;
 import java.util.Properties;
 
 import org.apache.lucene.search.Filter;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;

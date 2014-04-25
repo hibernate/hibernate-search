@@ -35,7 +35,7 @@ import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;

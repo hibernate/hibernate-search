@@ -28,7 +28,7 @@ import java.net.MalformedURLException;
 
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 
 /**
  * Bridge for <code>URL</code>s.

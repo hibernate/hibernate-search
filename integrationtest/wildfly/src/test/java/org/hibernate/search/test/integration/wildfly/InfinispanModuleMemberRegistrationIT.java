@@ -23,7 +23,7 @@ package org.hibernate.search.test.integration.wildfly;
 import java.util.List;
 import javax.inject.Inject;
 
-import org.hibernate.search.Version;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;

@@ -54,6 +54,7 @@ import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.performance.task.AbstractTask;
 import org.hibernate.search.test.performance.util.CheckerLuceneIndex;
 import org.hibernate.search.test.performance.util.CheckerUncaughtExceptions;
+import org.hibernate.search.engine.Version;
 
 /**
  * @author Tomas Hradec
@@ -157,7 +158,7 @@ public class TestReporter {
 
 		out.println( "" );
 		out.println( "VERSIONS" );
-		out.println( "    org.hibernate.search : " + org.hibernate.search.Version.getVersionString() );
+		out.println( "    org.hibernate.search : " + Version.getVersionString() );
 		out.println( "    org.hibernate        : " + org.hibernate.Version.getVersionString() );
 		out.println( "" );
 	}

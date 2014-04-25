@@ -32,7 +32,7 @@ import javax.jms.QueueConnection;
 import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.search.backend.LuceneWork;

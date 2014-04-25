@@ -26,14 +26,14 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.util.impl.HibernateHelper;
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

@@ -24,7 +24,7 @@
 package org.hibernate.search.test.backend;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 
 public class AsyncBackendLongWorkListStressTest extends SyncBackendLongWorkListStressTest {
 

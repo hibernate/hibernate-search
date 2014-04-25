@@ -24,7 +24,7 @@
 
 package org.hibernate.search.bridge;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 
 /**
  * Exceptions thrown in a bridge are wrapped in BridgeException

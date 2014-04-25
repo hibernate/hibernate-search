@@ -25,7 +25,7 @@ package org.hibernate.search.test.integration.jms;
 
 import java.io.File;
 
-import org.hibernate.search.Version;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;

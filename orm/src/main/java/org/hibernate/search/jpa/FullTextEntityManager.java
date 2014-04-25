@@ -27,7 +27,7 @@ import java.io.Serializable;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.MassIndexer;
-import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactory;
 
 /**
  * Extends an EntityManager with Full-Text operations

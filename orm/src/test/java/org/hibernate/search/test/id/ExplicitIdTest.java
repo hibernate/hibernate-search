@@ -32,12 +32,13 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
 
 /**
  * @author Hardy Ferentschik

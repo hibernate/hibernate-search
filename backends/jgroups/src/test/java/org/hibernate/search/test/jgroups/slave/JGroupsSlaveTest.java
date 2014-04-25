@@ -29,7 +29,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.backend.jgroups.impl.JGroupsBackendQueueProcessor;
 import org.hibernate.search.backend.jgroups.impl.MessageListenerToRequestHandlerAdapter;

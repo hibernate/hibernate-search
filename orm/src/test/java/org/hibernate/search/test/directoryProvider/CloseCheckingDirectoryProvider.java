@@ -22,7 +22,7 @@ package org.hibernate.search.test.directoryProvider;
 import java.util.Properties;
 
 import org.apache.lucene.store.RAMDirectory;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;

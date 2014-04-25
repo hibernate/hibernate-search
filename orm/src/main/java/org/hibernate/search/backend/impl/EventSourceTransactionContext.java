@@ -40,7 +40,7 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.event.spi.FlushEventListener;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;

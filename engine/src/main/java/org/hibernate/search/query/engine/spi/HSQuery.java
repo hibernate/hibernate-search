@@ -28,8 +28,8 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 
-import org.hibernate.search.FullTextFilter;
-import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.filter.FullTextFilter;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.spatial.Coordinates;
 
@@ -176,7 +176,7 @@ public interface HSQuery extends ProjectionConstants {
 
 	/**
 	 * Execute the Lucene query and return the list of {@code EntityInfo}s populated with
-	 * metadata and projection. {@link org.hibernate.search.ProjectionConstants#THIS} if projected is <br>not</br> populated.
+	 * metadata and projection. {@link org.hibernate.search.engine.ProjectionConstants#THIS} if projected is <br>not</br> populated.
 	 * It is the responsibility of the object source integration.
 	 *
 	 * @return list of {@code EntityInfo}s populated with metadata and projection
@@ -186,7 +186,7 @@ public interface HSQuery extends ProjectionConstants {
 	/**
 	 * Execute the Lucene query and return a traversable object over the results.
 	 * Results are lazily fetched.
-	 * {@link org.hibernate.search.ProjectionConstants#THIS} if projected is <br>not</br> populated. It is the responsibility
+	 * {@link org.hibernate.search.engine.ProjectionConstants#THIS} if projected is <br>not</br> populated. It is the responsibility
 	 * of the object source integration.
 	 * The returned {@code DocumentExtractor} <br>must</br> be closed by the caller to release Lucene resources.
 	 *
