@@ -23,7 +23,7 @@
  */
 package org.hibernate.search.testsupport.setup;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;

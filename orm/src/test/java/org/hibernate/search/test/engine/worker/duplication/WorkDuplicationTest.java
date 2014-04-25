@@ -35,7 +35,7 @@ import org.hibernate.Transaction;
 
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.WorkQueue;

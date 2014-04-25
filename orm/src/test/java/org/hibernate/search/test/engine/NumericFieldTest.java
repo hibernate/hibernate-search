@@ -34,9 +34,9 @@ import org.hibernate.Transaction;
 
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
+import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;

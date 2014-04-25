@@ -54,8 +54,8 @@ import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.internals.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.internals.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
+import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 

@@ -36,7 +36,7 @@ import org.apache.lucene.document.Document;
 import org.hibernate.Transaction;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

@@ -37,7 +37,7 @@ import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;

@@ -26,11 +26,11 @@ package org.hibernate.search.backend.impl.lucene.works;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 
-import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

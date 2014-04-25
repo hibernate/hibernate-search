@@ -38,7 +38,7 @@ import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.internals.SearchFactoryState;
+import org.hibernate.search.spi.impl.SearchFactoryState;
 
 /**
  * @author Emmanuel Bernard

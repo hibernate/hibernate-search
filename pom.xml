@@ -52,6 +52,8 @@
         <module>integrationtest/spring</module>
         <module>integrationtest/wildfly</module>
         <module>integrationtest/performance</module>
+        <module>integrationtest/osgi/karaf-features</module>
+        <module>integrationtest/osgi/karaf-it</module>
     </modules>
 
     <issueManagement>
@@ -946,6 +948,12 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <extensions>true</extensions>
+                    <version>2.3.7</version>
                 </plugin>
                 <plugin>
                     <!-- This plugin's configuration is used in m2e only. -->

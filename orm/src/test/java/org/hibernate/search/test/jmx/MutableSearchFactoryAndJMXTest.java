@@ -25,7 +25,7 @@ package org.hibernate.search.test.jmx;
 
 import java.io.File;
 
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.util.HibernateManualConfiguration;

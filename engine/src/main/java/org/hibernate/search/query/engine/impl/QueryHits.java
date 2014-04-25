@@ -45,7 +45,7 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.util.Counter;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.collector.impl.FacetCollector;
 import org.hibernate.search.query.collector.impl.FieldCacheCollector;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;

@@ -29,7 +29,7 @@ import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.FieldCache.Doubles;
 import org.apache.lucene.search.Scorer;
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spatial.Coordinates;
 
 /**

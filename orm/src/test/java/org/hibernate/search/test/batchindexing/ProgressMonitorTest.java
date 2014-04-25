@@ -28,9 +28,10 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.progessmonitor.AssertingMassIndexerProgressMonitor;
+import org.hibernate.search.test.util.progessmonitor.AssertingMassIndexerProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
+
 
 /**
  * @author Hardy Ferentschik

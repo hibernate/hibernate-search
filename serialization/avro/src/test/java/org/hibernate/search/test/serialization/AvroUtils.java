@@ -32,7 +32,7 @@ import java.util.Map;
 
 import org.apache.avro.Protocol;
 
-import org.hibernate.search.SearchException;
+import org.hibernate.search.exception.SearchException;
 
 /**
  * Comes from http://www.infoq.com/articles/ApacheAvro

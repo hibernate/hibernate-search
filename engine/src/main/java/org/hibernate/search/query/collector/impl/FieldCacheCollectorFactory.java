@@ -21,7 +21,7 @@ package org.hibernate.search.query.collector.impl;
 
 import org.apache.lucene.search.Collector;
 
-import org.hibernate.search.ProjectionConstants;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.builtin.StringBridge;
 import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
