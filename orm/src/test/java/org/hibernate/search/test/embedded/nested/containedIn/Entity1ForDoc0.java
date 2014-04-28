@@ -8,7 +8,6 @@
 package org.hibernate.search.test.embedded.nested.containedIn;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -37,7 +36,7 @@ public class Entity1ForDoc0 implements Serializable {
 	private int optlock;
 
 	@javax.persistence.OneToMany(mappedBy = "entity1", cascade = { })
-	@org.hibernate.search.annotations.IndexedEmbedded
+	@org.hibernate.search.annotations.IndexedEmbedded(includeEmbeddedObjectId = true)
 	private java.util.List<Entity2ForDoc0> entities2 = new java.util.ArrayList<Entity2ForDoc0>();
 
 

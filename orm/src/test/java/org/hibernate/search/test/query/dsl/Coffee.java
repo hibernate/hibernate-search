@@ -61,7 +61,7 @@ public class Coffee {
 	private String internalDescription;
 
 	@ManyToOne
-	@IndexedEmbedded
+	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	public CoffeeBrand getBrand() { return brand; }
 	public void setBrand(CoffeeBrand brand) { this.brand = brand; }
 	private CoffeeBrand brand;

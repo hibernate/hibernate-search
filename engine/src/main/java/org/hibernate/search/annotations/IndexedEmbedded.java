@@ -6,19 +6,18 @@
  */
 package org.hibernate.search.annotations;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Documented;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 /**
- * Specifies that an association (@*To*, @Embedded, @CollectionOfEmbedded) is to be indexed
- * in the root entity index
- * It allows queries involving associated objects restrictions
+ * Specifies that an association (@*To*, @Embedded, @CollectionOfEmbedded) is to be indexed* in the root entity index.
+ * This allows queries involving associated objects properties.
  */
 public @interface IndexedEmbedded {
 
@@ -33,8 +32,7 @@ public @interface IndexedEmbedded {
 	String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
 
 	/**
-	 * Field name prefix
-	 * Default to 'propertyname.'
+	 * Field name prefix, defaults to {@code propertyname.}.
 	 */
 	String prefix() default ".";
 
@@ -51,8 +49,8 @@ public @interface IndexedEmbedded {
 	String[] includePaths() default { };
 
 	/**
-	 * <p>Stop indexing embedded elements when depth is reached
-	 * depth=1 means the associated element is indexed, but not its embedded elements.</p>
+	 * Stop indexing embedded elements when {@code depth} is reached.
+	 * {@code depth=1} means the associated element is indexed, but not its embedded elements.
 	 *
 	 * <p>The default value depends on the value of the {@code includePaths} attribute: if no paths
 	 * are defined, the default is {@code Integer.MAX_VALUE}; if any {@code includePaths} are
@@ -65,7 +63,7 @@ public @interface IndexedEmbedded {
 	int depth() default Integer.MAX_VALUE;
 
 	/**
-	 * Overrides the type of an association. If a collection, overrides the type of the collection generics
+	 * Overrides the target type of an association, in case a collection overrides the type of the collection generics.
 	 */
 	Class<?> targetElement() default void.class;
 
@@ -75,4 +73,18 @@ public @interface IndexedEmbedded {
 	 *         returned indicating that null values are not indexed.
 	 */
 	String indexNullAs() default DO_NOT_INDEX_NULL;
+
+	/**
+	 * Returns {@code true}, if the id of the embedded object should be included into the index,
+	 * {@code false} otherwise. The default is {@code false}.
+	 *
+	 * <p><b>Note</b></br>:
+	 * If the id property is explicitly listed via {@link #includePaths()}, then the id is included even if this value
+	 * is {@code false}.
+	 * </p>
+	 *
+	 * @return Returns {@code true}, if the id of the embedded object should be included into the index,
+	 * {@code false} otherwise.
+	 */
+	boolean includeEmbeddedObjectId() default false;
 }

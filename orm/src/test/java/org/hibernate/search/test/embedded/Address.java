@@ -17,7 +17,6 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.Target;
 import org.hibernate.search.annotations.ContainedIn;
-import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -31,7 +30,6 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 public class Address {
 	@Id
 	@GeneratedValue
-	@DocumentId
 	private Long id;
 
 	@Field

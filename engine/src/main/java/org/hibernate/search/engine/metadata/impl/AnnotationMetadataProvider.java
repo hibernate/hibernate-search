@@ -10,13 +10,10 @@ package org.hibernate.search.engine.metadata.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
@@ -131,85 +128,121 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			PathsContext pathsContext,
 			ParseContext parseContext) {
 		Annotation idAnnotation = getIdAnnotation( member, typeMetadataBuilder, configContext );
-		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
-		if ( idAnnotation != null ) {
-			String attributeName = getIdAttributeName( member, idAnnotation );
-			if ( pathsContext != null ) {
-				pathsContext.markEncounteredPath( prefix + attributeName );
-			}
-			if ( isRoot ) {
-				if ( parseContext.isExplicitDocumentId() ) {
-					if ( idAnnotation instanceof DocumentId ) {
-						throw log.duplicateDocumentIdFound( typeMetadataBuilder.getIndexedType().getName() );
-					}
-					else {
-						//If it's not a DocumentId it's a JPA @Id: ignore it as we already have a @DocumentId
-						return;
-					}
-				}
-				if ( idAnnotation instanceof DocumentId ) {
-					parseContext.setExplicitDocumentId( true );
-				}
+		if ( idAnnotation == null ) {
+			return;
+		}
 
-				FieldBridge idBridge = bridgeFactory.guessType( null, numericFieldAnn, member, reflectionManager, configContext.getServiceManager() );
-				if ( !( idBridge instanceof TwoWayFieldBridge ) ) {
-					throw new SearchException(
-							"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName()
-					);
-				}
-
-				Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
-				DocumentFieldMetadata fieldMetadata =
-						new DocumentFieldMetadata.Builder(
-								prefix + attributeName,
-								Store.YES,
-								Field.Index.NOT_ANALYZED_NO_NORMS,
-								termVector
-						)
-								.id()
-								.boost( AnnotationProcessingHelper.getBoost( member, null ) )
-								.fieldBridge( idBridge )
-								.build();
-				PropertyMetadata idPropertyMetadata = new PropertyMetadata.Builder( member )
-						.addDocumentField( fieldMetadata )
-						.build();
-				typeMetadataBuilder.idProperty( idPropertyMetadata );
-			}
-			else {
-				//component should index their document id
-				String fieldName = prefix + attributeName;
-				Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
-				Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
-				FieldBridge fieldBridge = bridgeFactory.guessType( null, null, member, reflectionManager, configContext.getServiceManager() );
-
-				DocumentFieldMetadata fieldMetadata =
-						new DocumentFieldMetadata.Builder( fieldName, Store.YES, index, termVector )
-								.boost( AnnotationProcessingHelper.getBoost( member, null ) )
-								.fieldBridge( fieldBridge )
-								.idInEmbedded()
-								.build();
-
-				PropertyMetadata propertyMetadata = new PropertyMetadata.Builder( member )
-						.addDocumentField( fieldMetadata )
-						.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) )
-						.build();
-
-				typeMetadataBuilder.addProperty( propertyMetadata );
-
-				// property > entity analyzer (no field analyzer)
-				Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer(
-						member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
-						configContext
-				);
-				if ( analyzer == null ) {
-					analyzer = typeMetadataBuilder.getAnalyzer();
-				}
-				if ( analyzer == null ) {
-					throw new AssertionFailure( "Analyzer should not be undefined" );
-				}
-				typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
+		String attributeName = getIdAttributeName( member, idAnnotation );
+		String path = prefix + attributeName;
+		if ( isRoot ) {
+			createIdPropertyMetadata(
+					member,
+					typeMetadataBuilder,
+					configContext,
+					parseContext,
+					idAnnotation,
+					path
+			);
+		}
+		else {
+			if ( parseContext.includeEmbeddedObjectId() || pathsContext.containsPath( path ) ) {
+				createPropertyMetadataForEmbeddedId( member, typeMetadataBuilder, configContext, path );
 			}
 		}
+
+		if ( pathsContext != null ) {
+			pathsContext.markEncounteredPath( path );
+		}
+	}
+
+	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, ConfigContext configContext, String fieldName) {
+		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
+		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
+		FieldBridge fieldBridge = bridgeFactory.guessType(
+				null,
+				null,
+				member,
+				reflectionManager,
+				configContext.getServiceManager()
+		);
+
+		DocumentFieldMetadata fieldMetadata =
+				new DocumentFieldMetadata.Builder( fieldName, Store.YES, index, termVector )
+						.boost( AnnotationProcessingHelper.getBoost( member, null ) )
+						.fieldBridge( fieldBridge )
+						.idInEmbedded()
+						.build();
+
+		PropertyMetadata propertyMetadata = new PropertyMetadata.Builder( member )
+				.addDocumentField( fieldMetadata )
+				.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) )
+				.build();
+
+		typeMetadataBuilder.addProperty( propertyMetadata );
+
+		// property > entity analyzer (no field analyzer)
+		Analyzer analyzer = AnnotationProcessingHelper.getAnalyzer(
+				member.getAnnotation( org.hibernate.search.annotations.Analyzer.class ),
+				configContext
+		);
+		if ( analyzer == null ) {
+			analyzer = typeMetadataBuilder.getAnalyzer();
+		}
+		if ( analyzer == null ) {
+			throw new AssertionFailure( "Analyzer should not be undefined" );
+		}
+		typeMetadataBuilder.addToScopedAnalyzer( fieldName, analyzer, index );
+	}
+
+	private void createIdPropertyMetadata(XProperty member,
+			TypeMetadata.Builder typeMetadataBuilder,
+			ConfigContext configContext,
+			ParseContext parseContext,
+			Annotation idAnnotation,
+			String path) {
+		if ( parseContext.isExplicitDocumentId() ) {
+			if ( idAnnotation instanceof DocumentId ) {
+				throw log.duplicateDocumentIdFound( typeMetadataBuilder.getIndexedType().getName() );
+			}
+			else {
+				// If it's not a DocumentId it's a JPA @Id: ignore it as we already have a @DocumentId
+				return;
+			}
+		}
+		if ( idAnnotation instanceof DocumentId ) {
+			parseContext.setExplicitDocumentId( true );
+		}
+
+		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
+		FieldBridge idBridge = bridgeFactory.guessType(
+				null,
+				numericFieldAnn,
+				member,
+				reflectionManager,
+				configContext.getServiceManager()
+		);
+		if ( !( idBridge instanceof TwoWayFieldBridge ) ) {
+			throw new SearchException(
+					"Bridge for document id does not implement TwoWayFieldBridge: " + member.getName()
+			);
+		}
+
+		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
+		DocumentFieldMetadata fieldMetadata =
+				new DocumentFieldMetadata.Builder(
+						path,
+						Store.YES,
+						Field.Index.NOT_ANALYZED_NO_NORMS,
+						termVector
+				)
+						.id()
+						.boost( AnnotationProcessingHelper.getBoost( member, null ) )
+						.fieldBridge( idBridge )
+						.build();
+		PropertyMetadata idPropertyMetadata = new PropertyMetadata.Builder( member )
+				.addDocumentField( fieldMetadata )
+				.build();
+		typeMetadataBuilder.idProperty( idPropertyMetadata );
 	}
 
 	/**
@@ -1178,8 +1211,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				typeMetadataBuilder.blacklistForOptimization( elementClass );
 			}
 
+			// about to do a recursion, keep parse state which needs resetting
 			XClass previousClass = parseContext.getCurrentClass();
 			parseContext.setCurrentClass( elementClass );
+			boolean previousIncludeEmbeddedObjectId = parseContext.includeEmbeddedObjectId();
+			parseContext.setIncludeEmbeddedObjectId( indexedEmbeddedAnnotation.includeEmbeddedObjectId() );
 			initializeClass(
 					embeddedTypeMetadataBuilder,
 					false,
@@ -1189,7 +1225,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					disableOptimizations,
 					updatedPathsContext
 			);
+
+			// reset the context state
 			parseContext.setCurrentClass( previousClass );
+			parseContext.setIncludeEmbeddedObjectId( previousIncludeEmbeddedObjectId );
 
 			final String indexNullAs = embeddedNullToken( configContext, indexedEmbeddedAnnotation );
 			if ( indexNullAs != null ) {
@@ -1217,7 +1256,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		parseContext.setMaxLevel( oldMaxLevel ); //set back the the old max level
 
 		if ( pathsCreatedAtThisLevel ) {
-			validateAllPathsEncountered( member, updatedPathsContext );
+			validateAllPathsEncountered( member, updatedPathsContext, indexedEmbeddedAnnotation );
 		}
 	}
 
@@ -1235,7 +1274,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private boolean isInPath(String localPrefix, PathsContext pathsContext, IndexedEmbedded embeddedAnn) {
 		if ( pathsContext != null ) {
 			boolean defaultPrefix = isDefaultPrefix( embeddedAnn );
-			for ( String path : pathsContext.pathsEncounteredState.keySet() ) {
+			for ( String path : pathsContext.getEncounteredPaths() ) {
 				String app = path;
 				if ( defaultPrefix ) {
 					app += ".";
@@ -1248,12 +1287,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return false;
 	}
 
-	private PathsContext updatePaths(String localPrefix, PathsContext pathsContext, IndexedEmbedded embeddedAnn) {
+	private PathsContext updatePaths(String localPrefix, PathsContext pathsContext, IndexedEmbedded indexedEmbeddedAnnotation) {
 		if ( pathsContext != null ) {
 			return pathsContext;
 		}
-		PathsContext newPathsContext = new PathsContext( embeddedAnn );
-		for ( String path : embeddedAnn.includePaths() ) {
+		PathsContext newPathsContext = new PathsContext();
+		for ( String path : indexedEmbeddedAnnotation.includePaths() ) {
 			newPathsContext.addPath( localPrefix + path );
 		}
 		return newPathsContext;
@@ -1282,11 +1321,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return localPrefix;
 	}
 
-	private void validateAllPathsEncountered(XProperty member, PathsContext updatedPathsContext) {
-		Set<String> unEncounteredPaths = updatedPathsContext.getUnencounteredPaths();
+	private void validateAllPathsEncountered(XProperty member, PathsContext updatedPathsContext, IndexedEmbedded indexedEmbeddedAnnotation) {
+		Set<String> unEncounteredPaths = updatedPathsContext.getUnEncounteredPaths();
 		if ( unEncounteredPaths.size() > 0 ) {
 			StringBuilder sb = new StringBuilder( );
-			String prefix = updatedPathsContext.embeddedAnn.prefix();
+			String prefix = indexedEmbeddedAnnotation.prefix();
 			for ( String path : unEncounteredPaths ) {
 				sb.append( removeLeadingPrefixFromPath( path, prefix ) );
 				sb.append( ',' );
@@ -1315,47 +1354,6 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	}
 
 	/**
-	 * Container class for information about the current set of paths as
-	 * well as tracking which paths have been encountered to validate the
-	 * existence of all configured paths.
-	 */
-	static class PathsContext {
-
-		private final IndexedEmbedded embeddedAnn;
-		private final Map<String, Boolean> pathsEncounteredState = new HashMap<String, Boolean>();
-
-		public PathsContext(IndexedEmbedded embeddedAnn) {
-			this.embeddedAnn = embeddedAnn;
-		}
-
-		public boolean containsPath(String path) {
-			return pathsEncounteredState.keySet().contains( path );
-		}
-
-		public void addPath(String path) {
-			pathsEncounteredState.put( path, Boolean.FALSE );
-		}
-
-		public void markEncounteredPath(String path) {
-			pathsEncounteredState.put( path, Boolean.TRUE );
-		}
-
-		public Set<String> getUnencounteredPaths() {
-			Set<String> unencounteredPaths = new HashSet<String>();
-			for ( String path : pathsEncounteredState.keySet() ) {
-				if ( notEncountered( path ) ) {
-					unencounteredPaths.add( path );
-				}
-			}
-			return unencounteredPaths;
-		}
-
-		private boolean notEncountered(String path) {
-			return !pathsEncounteredState.get( path );
-		}
-	}
-
-	/**
 	 * Verifies entity level preconditions to know if it's safe to skip index updates based
 	 * on specific field or collection updates.
 	 *
@@ -1381,84 +1379,5 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			return false; // as with class bridge: might be affected by any field
 		}
 		return true;
-	}
-
-	public static final class ParseContext {
-		private final Set<XClass> processedClasses = new HashSet<XClass>();
-		private final Set<String> spatialNames = new TreeSet<String>();
-
-		private XClass currentClass;
-		private int level = 0;
-		private int maxLevel = Integer.MAX_VALUE;
-		private boolean explicitDocumentId = false;
-		private final Set<String> unqualifiedCollectedCollectionRoles = new HashSet<String>();
-
-		boolean hasBeenProcessed(XClass processedClass) {
-			return processedClasses.contains( processedClass );
-		}
-
-		void processingClass(XClass processedClass) {
-			processedClasses.add( processedClass );
-		}
-
-		void removeProcessedClass(XClass processedClass) {
-			processedClasses.remove( processedClass );
-		}
-
-		boolean isSpatialNameUsed(String name) {
-			return spatialNames.contains( name );
-		}
-
-		void markSpatialNameAsUsed(String name) {
-			spatialNames.add( name );
-		}
-
-		public XClass getCurrentClass() {
-			return currentClass;
-		}
-
-		public void setCurrentClass(XClass currentClass) {
-			this.currentClass = currentClass;
-		}
-
-		boolean isMaxLevelReached() {
-			return level > maxLevel;
-		}
-
-		public int getMaxLevel() {
-			return maxLevel;
-		}
-
-		public void setMaxLevel(int newMaxLevel) {
-			this.maxLevel = newMaxLevel;
-		}
-
-		public int getLevel() {
-			return level;
-		}
-
-		public void incrementLevel() {
-			this.level++;
-		}
-
-		public void decrementLevel() {
-			this.level--;
-		}
-
-		public boolean isExplicitDocumentId() {
-			return explicitDocumentId;
-		}
-
-		public void setExplicitDocumentId(boolean explicitDocumentId) {
-			this.explicitDocumentId = explicitDocumentId;
-		}
-
-		public Set<String> getCollectedUnqualifiedCollectionRoles() {
-			return unqualifiedCollectedCollectionRoles;
-		}
-
-		public void collectUnqualifiedCollectionRole(String unqualifiedCollectionRole) {
-			unqualifiedCollectedCollectionRoles.add( unqualifiedCollectionRole );
-		}
 	}
 }

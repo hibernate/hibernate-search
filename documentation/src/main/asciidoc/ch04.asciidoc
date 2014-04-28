@@ -19,7 +19,6 @@ If you want to contribute the XML mapping implementation, see
 link:$$https://hibernate.onjira.com/browse/HSEARCH-210$$[HSEARCH-210].
 ====
 
-
 [[basic-mapping]]
 ==== Basic mapping
 
@@ -322,11 +321,21 @@ See below for more information about analyzers and field bridges.
 ==== Embedded and associated objects
 
 Associated objects as well as embedded objects can be indexed as part of the root entity index. This
-is useful if you expect to search a given entity based on properties of associated objects. In
-<<example-indexing-associations>>t the aim is to return places where the associated city is Atlanta
-(In the Lucene query parser language, it would translate into address.city:Atlanta). The place
-fields will be indexed in the +Place+ index. The +Place+ index documents will also contain the
-fields +address.id+, +address.street+, and +address.city+ which you will be able to query.
+is useful if you expect to search a given entity based on properties of the associated objects.
+
+In the example <<example-indexing-associations>> the aim is to return places where the associated
+city is Atlanta (in Lucene query parser language, it would translate into +address.city:Atlanta+).
+All place fields are added to the +Place+ index, but also the address related fields +address.street+,
+and +address.city+ will be added and made queryable. The embedded object id,
++address.id+, is not added per default. To include it you need to also set
++@IndexedEmbedded(includeEmbeddedObjectId=true, ...)+.
+
+[TIP]
+====
+Only actual indexed fields (properties annotated with +@Field+) are added to the root entity index
+when embedded objects are indexed. The embedded object identifiers are treated differently and need to
+be included explicitly.
+====
 
 [[example-indexing-associations]]
 .Indexing associations
@@ -338,7 +347,6 @@ fields +address.id+, +address.street+, and +address.city+ which you will be able
 public class Place {
     @Id
     @GeneratedValue
-    @DocumentId
     private Long id;
 
     @Field
@@ -373,12 +381,11 @@ public class Address {
 ----
 ====
 
-Be careful. Because the data is de-normalized in the Lucene index when using the @IndexedEmbedded
-technique, Hibernate Search needs to be aware of any change in the Place object and any change in
-the Address object to keep the index up to date. To make sure the +Place+ Lucene document is updated
-when it's Address changes, you need to mark the other side of the bidirectional relationship with
-@ContainedIn.
-
+Be careful. Because the data is de-normalized in the Lucene index when using the +@IndexedEmbedded+
+technique, Hibernate Search needs to be aware of any change in the +Place+ object and any change in
+the +Address+ object to keep the index up to date. To make sure the +Place+ Lucene document is updated
+when it's +Address+ changes, you need to mark the other side of the bidirectional relationship with
++@ContainedIn+.
 
 [TIP]
 ====
@@ -386,7 +393,7 @@ when it's Address changes, you need to mark the other side of the bidirectional 
 objects.
 ====
 
-Let's make <<example-indexing-associations>> a bit more complex by nesting @IndexedEmbedded as seen
+Let's make <<example-indexing-associations>> a bit more complex by nesting +@IndexedEmbedded+ as seen
 in <<example-nested-index-embedded>>.
 
 [[example-nested-index-embedded]]
@@ -399,7 +406,6 @@ in <<example-nested-index-embedded>>.
 public class Place {
     @Id
     @GeneratedValue
-    @DocumentId
     private Long id;
 
     @Field
@@ -449,7 +455,7 @@ public class Owner {
 ----
 ====
 
-As you can see, any +@*ToMany, @*ToOne+ and +@Embedded+ attribute can be annotated with
+As you can see, any +@*ToMany+, +@*ToOne+ or +@Embedded+ attribute can be annotated with
 +@IndexedEmbedded+. The attributes of the associated class will then be added to the main entity
 index. In <<example-nested-index-embedded>> the index will contain the following fields
 
@@ -462,17 +468,16 @@ index. In <<example-nested-index-embedded>> the index will contain the following
 The default prefix is +propertyName.+, following the traditional object navigation convention. You
 can override it using the +prefix+ attribute as it is shown on the +ownedBy+ property.
 
-
 [NOTE]
 ====
 The prefix cannot be set to the empty string.
 ====
 
 The +depth+ property is necessary when the object graph contains a cyclic dependency of classes (not
-instances). For example, if Owner points to Place. Hibernate Search will stop including Indexed
+instances). For example, if +Owner+ points to +Place+. Hibernate Search will stop including indexed
 embedded attributes after reaching the expected depth (or the object graph boundaries are reached).
 A class having a self reference is an example of cyclic dependency. In our example, because +depth+
-is set to 1, any +@IndexedEmbedded+ attribute in Owner (if any) will be ignored.
+is set to 1, any +@IndexedEmbedded+ attribute in +Owner+ (if any) will be ignored.
 
 Using +@IndexedEmbedded+ for object associations allows you to express queries (using Lucene's query
 syntax) such as:
@@ -498,15 +503,15 @@ benefiting from the full text index speed and feature richness.
 An associated object can itself (but does not have to) be +@Indexed+
 ====
 
-When @IndexedEmbedded points to an entity, the association has to be directional and the other side
-has to be annotated +@ContainedIn+ (as seen in the previous example). If not, Hibernate Search has
+When +@IndexedEmbedded+ points to an entity, the association has to be directional and the other side
+has to be annotated with +@ContainedIn+. If not, Hibernate Search has
 no way to update the root index when the associated entity is updated (in our example, a +Place+
-index document has to be updated when the associated Address instance is updated).
+index document has to be updated when the associated +Address+ instance is updated).
 
-Sometimes, the object type annotated by @IndexedEmbedded is not the object type targeted by
+Sometimes, the object type annotated by +@IndexedEmbedded+ is not the object type targeted by
 Hibernate and Hibernate Search. This is especially the case when interfaces are used in lieu of
 their implementation. For this reason you can override the object type targeted by Hibernate Search
-using the targetElement parameter.
+using the +targetElement+ parameter.
 
 .Using the +targetElement+ property of +@IndexedEmbedded
 ====
@@ -517,7 +522,6 @@ using the targetElement parameter.
 public class Address {
     @Id
     @GeneratedValue
-    @DocumentId
     private Long id;
 
     @Field
@@ -541,10 +545,10 @@ public class Owner implements Person { ... }
 [[search-mapping-associated-viapaths]]
 ===== Limiting object embedding to specific paths
 
-The @IndexedEmbedded annotation provides also an attribute includePaths which can be used as an
-alternative to depth, or be combined with it.
+The +@IndexedEmbedded+ annotation provides also an attribute +includePaths+ which can be used as an
+alternative to +depth+, or in combination with it.
 
-When using only depth all indexed fields of the embedded type will be added recursively at the same
+When using only +depth+ all indexed fields of the embedded type will be added recursively at the same
 depth; this makes it harder to pick only a specific path without adding all other fields as well,
 which might not be needed.
 
@@ -592,14 +596,14 @@ public class Person {
 ----
 ====
 
-Using a mapping as in <<indexedembedded-includePath>>, you would be able to search on a Person by
+Using a mapping as in <<indexedembedded-includePath>>, you would be able to search on a +Person+ by
 +name+ and/or +surname+, and/or the +name+ of the parent. It will not index the +surname+ of the
 parent, so searching on parent's surnames will not be possible but speeds up indexing, saves space
 and improve overall performance.
 
-The @IndexedEmbedded includePaths will include the specified paths _in addition to_ what you would
-index normally specifying a limited value for depth. When using includePaths, and leaving depth
-undefined, behavior is equivalent to setting depth++=0++: only the included paths are indexed.
+The +@IndexedEmbedded.includePaths+ will include the specified paths _in addition to_ what you would
+index normally specifying a limited value for depth. Using +includePaths+ with a undefined (default)
+value for +depth+ is equivalent to setting +depth=0+: only the included paths are indexed.
 
 [[indexedembedded-includePathsAndDepth]]
 .Using the +includePaths+ property of +@IndexedEmbedded+
@@ -650,7 +654,7 @@ level but only the name, not the surname.
 This results in the following fields in the index:
 
 * +id+ - as primary key
-* +$$_hibernate_class$$+ - stores entity type
+* +_hibernate_class+ - stores entity type
 * +name+ - as direct field
 * +surname+ - as direct field
 * +parents.name+ - as embedded field at depth 1
@@ -660,9 +664,21 @@ This results in the following fields in the index:
 * +parents.parents.parents.name+ - as additional path as specified by includePaths. The first
 +parents.+ is inferred from the field name, the remaining path is the attribute of includePaths
 
+
+[TIP]
+====
+You can explicitly include the id of the embedded object using +includePath+, for example
++@IndexedEmbedded(includePaths = { "parents.id" })+. This will work regardless of the
++includeEmbeddedObjectId+ attribute. However, it is recommended to just set
++includeEmbeddedObjectId=true+.
+====
+
+[TIP]
+====
 Having explicit control of the indexed paths might be easier if you're designing your application by
 defining the needed queries first, as at that point you might know exactly which fields you need,
 and which other fields are unnecessary to implement your use case.
+====
 
 === Boosting
 

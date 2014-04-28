@@ -158,7 +158,8 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		public void setLastName(String lastName) { this.lastName = lastName; }
 		private String lastName;
 
-		@IndexedEmbedded @OneToOne(cascade = CascadeType.ALL)
+		@IndexedEmbedded(includeEmbeddedObjectId = true)
+		@OneToOne(cascade = CascadeType.ALL)
 		public Truck getTruck() { return truck; }
 		public void setTruck(Truck truck) { this.truck = truck; }
 		private Truck truck;
@@ -176,7 +177,8 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		public Truck() {
 		}
 
-		@Id @GeneratedValue @DocumentId
+		@Id
+		@GeneratedValue
 		public Long getId() { return id; }
 		public void setId(Long id) { this.id = id; }
 		private Long id;
