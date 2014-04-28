@@ -8,11 +8,11 @@
 package org.hibernate.search.test.configuration;
 
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -42,6 +43,7 @@ public class TypeMetadataTest {
 	public void testMultipleDocumentIdsCauseException() {
 		try {
 			metadataProvider.getTypeMetadataFor( Foo.class );
+			fail( "An exception should have been thrown" );
 		}
 		catch (SearchException e) { // getting a HibernateException here, because the listener registration fails
 			assertEquals(
@@ -58,7 +60,6 @@ public class TypeMetadataTest {
 
 		@DocumentId
 		private String name;
-
 
 		public Integer getId() {
 			return id;

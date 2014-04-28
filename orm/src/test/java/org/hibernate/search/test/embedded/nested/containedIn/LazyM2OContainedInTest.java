@@ -19,6 +19,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.Test;
 
@@ -29,8 +30,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class LazyM2OContainedInTest extends SearchTestBase {
 
-	//HSEARCH-385
 	@Test
+	@TestForIssue( jiraKey = "HSEARCH-385")
 	public void testDocumentsAt0() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Transaction tx = fts.beginTransaction();
@@ -71,8 +72,8 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		tx.commit();
 	}
 
-	//HSEARCH-386
 	@Test
+	@TestForIssue( jiraKey = "HSEARCH-386")
 	public void testContainedInAndLazy() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Entity1ForUnindexed ent1_0 = new Entity1ForUnindexed();

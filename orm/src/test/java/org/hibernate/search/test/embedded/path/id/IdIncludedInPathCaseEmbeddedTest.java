@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -88,6 +89,7 @@ public class IdIncludedInPathCaseEmbeddedTest extends SearchTestBase {
 			fail( "Should not index embedded property if not in path and not in depth limit" );
 		}
 		catch (SearchException e) {
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "Unable to find field" ) );
 		}
 	}
 
