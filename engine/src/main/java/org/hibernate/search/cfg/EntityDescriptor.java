@@ -40,7 +40,6 @@ import org.hibernate.search.bridge.FieldBridge;
 public class EntityDescriptor {
 	private Map<String, Object> indexed;
 	private final Map<PropertyKey, PropertyDescriptor> properties = new HashMap<PropertyKey, PropertyDescriptor>();
-	private Map<String, Object> similarity;
 	private Map<String, Object> boost;
 	private Map<String, Object> analyzerDiscriminator;
 	private final Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
@@ -85,14 +84,6 @@ public class EntityDescriptor {
 
 	public PropertyDescriptor getPropertyDescriptor(String name, ElementType type) {
 		return properties.get( new PropertyKey( name, type ) );
-	}
-
-	public void setSimilariy(Map<String, Object> similarity) {
-		this.similarity = similarity;
-	}
-
-	public Map<String, Object> getSimilarity() {
-		return similarity;
 	}
 
 	public Map<String, Object> getCacheInMemory() {

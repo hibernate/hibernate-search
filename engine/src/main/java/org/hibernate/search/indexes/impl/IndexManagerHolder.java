@@ -21,7 +21,6 @@
 package org.hibernate.search.indexes.impl;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,9 +30,8 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
@@ -42,6 +40,7 @@ import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -55,7 +54,6 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -402,29 +400,6 @@ public class IndexManagerHolder {
 			Properties indexProperties,
 			XClass clazz,
 			WorkerBuildContext buildContext) {
-		// first check on class level
-		Similarity classLevelSimilarity = null;
-
-		// TODO - the processing of the @Similarity annotation is temporary here. The annotation should be removed in Search 5 (HF)
-		List<XClass> hierarchyClasses = ReflectionHelper.createXClassHierarchy( clazz );
-		Class<?> similarityClass = null;
-		for ( XClass hierarchyClass : hierarchyClasses ) {
-			org.hibernate.search.annotations.Similarity similarityAnnotation = hierarchyClass.getAnnotation( org.hibernate.search.annotations.Similarity.class );
-			if ( similarityAnnotation != null ) {
-				Class<?> tmpSimilarityClass = similarityAnnotation.impl();
-				if ( similarityClass != null && !similarityClass.equals( tmpSimilarityClass ) ) {
-					throw log.getMultipleInconsistentSimilaritiesInClassHierarchyException( clazz.getName() );
-				}
-				else {
-					similarityClass = tmpSimilarityClass;
-				}
-				classLevelSimilarity = ClassLoaderHelper.instanceFromClass(
-						Similarity.class,
-						similarityClass,
-						"Similarity class for index " + directoryProviderName
-				);
-			}
-		}
 
 		// now we check the config
 		Similarity configLevelSimilarity = getConfiguredPerIndexSimilarity(
@@ -433,16 +408,7 @@ public class IndexManagerHolder {
 				buildContext
 		);
 
-		if ( classLevelSimilarity != null && configLevelSimilarity != null ) {
-			throw log.getInconsistentSimilaritySettingBetweenAnnotationsAndConfigPropertiesException(
-					classLevelSimilarity.getClass().getName(),
-					configLevelSimilarity.getClass().getCanonicalName()
-			);
-		}
-		else if ( classLevelSimilarity != null ) {
-			return classLevelSimilarity;
-		}
-		else if ( configLevelSimilarity != null ) {
+		if ( configLevelSimilarity != null ) {
 			return configLevelSimilarity;
 		}
 		else {

@@ -25,7 +25,6 @@ package org.hibernate.search.test.configuration;
 
 import java.lang.annotation.ElementType;
 
-import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.analysis.de.GermanStemFilterFactory;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.ngram.NGramFilterFactory;
@@ -62,7 +61,6 @@ public class ProgrammaticSearchMappingFactory {
 					.filter( GermanStemFilterFactory.class )
 				.entity( Address.class )
 					.indexed()
-					.similarity( DefaultSimilarity.class )
 					.boost( 2 )
 					.classBridge( AddressClassBridge.class )
 					.analyzer( "english" )
@@ -94,7 +92,6 @@ public class ProgrammaticSearchMappingFactory {
 						.property( "age", ElementType.FIELD )
 							.field().name( "providedidentry.age" ).analyzer( "en" ).index( Index.YES ).store( Store.YES )
 				.entity( ProductCatalog.class ).indexed()
-					.similarity( DefaultSimilarity.class )
 					.boost( 2 )
 					.property( "id", ElementType.FIELD ).documentId().name( "id" )
 					.property( "name", ElementType.FIELD )

@@ -42,7 +42,6 @@ import org.hibernate.annotations.common.reflection.AnnotationReader;
 import org.hibernate.annotations.common.reflection.Filter;
 import org.hibernate.annotations.common.reflection.MetadataProvider;
 import org.hibernate.annotations.common.reflection.ReflectionUtil;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
@@ -68,7 +67,6 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.NumericFields;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.ProvidedId;
-import org.hibernate.search.annotations.Similarity;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.TokenFilterDef;
@@ -76,6 +74,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.PropertyDescriptor;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.exception.SearchException;
 
 /**
  * @author Emmanuel Bernard
@@ -580,15 +579,6 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 				}
 			}
 			{
-				if ( entity.getSimilarity() != null ) {
-					AnnotationDescriptor annotation = new AnnotationDescriptor( Similarity.class );
-					for ( Map.Entry<String, Object> entry : entity.getSimilarity().entrySet() ) {
-						annotation.setValue( entry.getKey(), entry.getValue() );
-					}
-					annotations.put( Similarity.class, createAnnotation( annotation ) );
-				}
-			}
-			{
 				if ( entity.getCacheInMemory() != null ) {
 					AnnotationDescriptor annotation = new AnnotationDescriptor( CacheFromIndex.class );
 					for ( Map.Entry<String, Object> entry : entity.getCacheInMemory().entrySet() ) {
@@ -673,7 +663,8 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		private void configureClassBridgeInstances(EntityDescriptor entity) {
 			Map<org.hibernate.search.bridge.FieldBridge, Map<String, Object>> classBridges = entity.getClassBridgeInstanceDefs();
 
-			for ( Entry<org.hibernate.search.bridge.FieldBridge, Map<String, Object>> classBridgeInstanceDef : classBridges.entrySet() ) {
+			for ( Entry<org.hibernate.search.bridge.FieldBridge, Map<String, Object>> classBridgeInstanceDef : classBridges
+					.entrySet() ) {
 				Map<String, Object> configuration = classBridgeInstanceDef.getValue();
 				org.hibernate.search.bridge.FieldBridge instance = classBridgeInstanceDef.getKey();
 

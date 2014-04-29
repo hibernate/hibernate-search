@@ -64,13 +64,6 @@ public class IndexedMapping {
 		return this;
 	}
 
-	public IndexedMapping similarity(Class<?> impl) {
-		Map<String, Object> similarity = new HashMap<String, Object>( 1 );
-		similarity.put( "impl", impl );
-		entity.setSimilariy( similarity );
-		return this;
-	}
-
 	public IndexedMapping boost(float boost) {
 		final Map<String, Object> boostAnn = new HashMap<String, Object>();
 		boostAnn.put( "value", boost );

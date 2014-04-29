@@ -53,13 +53,6 @@ public class EntityMapping {
 		return new EntitySpatialMapping( mapping, entity );
 	}
 
-	public EntityMapping similarity(Class<?> impl) {
-		Map<String, Object> similarity = new HashMap<String, Object>( 1 );
-		similarity.put( "impl", impl );
-		entity.setSimilariy( similarity );
-		return this;
-	}
-
 	public EntityMapping boost(float boost) {
 		final Map<String, Object> boostAnn = new HashMap<String, Object>();
 		boostAnn.put( "value", boost );

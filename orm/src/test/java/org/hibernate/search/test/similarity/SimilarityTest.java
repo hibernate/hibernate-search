@@ -32,10 +32,10 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
@@ -46,40 +46,6 @@ import static org.junit.Assert.assertFalse;
  * @author Emmanuel Bernard
  */
 public class SimilarityTest extends SearchTestBase {
-
-	@Test
-	public void testClassLevelSimilarityOverridesDefaultSimilarity() throws Exception {
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-
-		Trash trash = new Trash();
-		trash.setName( "Green trash" );
-		s.persist( trash );
-
-		trash = new Trash();
-		trash.setName( "Green Green Green trash" );
-		s.persist( trash );
-
-		tx.commit();
-		s.clear();
-
-		tx = s.beginTransaction();
-		TermQuery termQuery = new TermQuery( new Term( "name", "green" ) );
-		FullTextSession fullTextSession = Search.getFullTextSession( s );
-		List results = fullTextSession.createFullTextQuery( termQuery, Trash.class )
-				.setProjection( FullTextQuery.SCORE, FullTextQuery.THIS )
-				.list();
-		assertEquals( 2, results.size() );
-		assertEquals(
-				"Similarity not overridden at the class level",
-				( (Object[]) results.get( 0 ) )[0],
-				( (Object[]) results.get( 1 ) )[0]
-		);
-		assertEquals( "Similarity not overridden", 1.0f, ( (Object[]) results.get( 0 ) )[0] );
-
-		tx.commit();
-		s.close();
-	}
 
 	@Test
 	public void testConfiguredDefaultSimilarityGetsApplied() throws Exception {
@@ -121,7 +87,6 @@ public class SimilarityTest extends SearchTestBase {
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
-				Trash.class,
 				Can.class
 		};
 	}
