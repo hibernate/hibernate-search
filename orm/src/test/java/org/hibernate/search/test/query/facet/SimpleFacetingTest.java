@@ -205,7 +205,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 					.name( facetName )
 					.onField( indexFieldName )
 					.discrete()
-					.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
+					.orderedBy( FacetSortOrder.RANGE_DEFINITION_ORDER )
 					.createFacetingRequest();
 			fail( "RANGE_DEFINITION_ODER not allowed on discrete faceting" );
 		}

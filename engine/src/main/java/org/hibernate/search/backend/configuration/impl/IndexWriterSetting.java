@@ -28,8 +28,6 @@ import java.io.Serializable;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Represents possible options to be applied to an
@@ -135,31 +133,17 @@ public enum IndexWriterSetting implements Serializable {
 		}
 	},
 	/**
-	 * @see org.apache.lucene.index.IndexWriterConfig.setMaxThreadStates(int)
+	 * @see org.apache.lucene.index.IndexWriterConfig#setMaxThreadStates(int)
 	 */
 	MAX_THREAD_STATES( "max_thread_states" ) {
 		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
 			writerConfig.setMaxThreadStates( value );
 		}
-	},
-	/**
-	 * @see org.apache.lucene.index.LogByteSizeMergePolicy#setUseCompoundFile(boolean)
-	 * @deprecated No longer applied.
-	 */
-	@Deprecated
-	USE_COMPOUND_FILE( "use_compound_file" ) {
-		@Override
-		public Integer parseVal(String value) {
-			log.deprecatedPropertyIgnored( "use_compound_file" );
-			return IndexWriterSetting.FALSE;
-		}
 	};
 
 	private static final Integer TRUE = 1;
 	private static final Integer FALSE = 0;
-
-	private static final Log log = LoggerFactory.make();
 
 	private final String cfgKey;
 
@@ -192,7 +176,7 @@ public enum IndexWriterSetting implements Serializable {
 	 *
 	 * @param value the string value as in configuration file
 	 * @return the integer value going to be set as parameter
-	 * @throws SearchException for unrecognized values
+	 * @throws org.hibernate.search.exception.SearchException for unrecognized values
 	 */
 	public Integer parseVal(String value) {
 		return ConfigurationParseHelper.parseInt(

@@ -28,10 +28,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 
@@ -157,8 +157,7 @@ class FacetBuildingContext<T> {
 			request = new RangeFacetRequest<T>( name, fieldName, rangeList, documentBuilder );
 		}
 		else {
-			if ( FacetSortOrder.RANGE_DEFINITION_ODER.equals( sort )
-					|| FacetSortOrder.RANGE_DEFINITION_ORDER.equals( sort ) ) {
+			if ( FacetSortOrder.RANGE_DEFINITION_ORDER.equals( sort ) ) {
 				throw new SearchException(
 						"RANGE_DEFINITION_ORDER is not a valid sort order for a discrete faceting request."
 				);

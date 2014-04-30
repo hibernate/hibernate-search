@@ -282,7 +282,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
 				.includeZeroCounts( false )
-				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
+				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ORDER )
 				.maxFacetCount( 5 )
 				.createFacetingRequest();
 
@@ -308,7 +308,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.below( "S" ).excludeLimit()
 				.from( "S" ).to( "U" )
 				.above( "U" ).excludeLimit()
-				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
+				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ORDER )
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
 		FacetManager facetManager = query.getFacetManager();
@@ -336,7 +336,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( formatter.parse( "1980" ) ).to( formatter.parse( "1989" ) )
 				.from( formatter.parse( "1990" ) ).to( formatter.parse( "1999" ) )
 				.above( formatter.parse( "2000" ) ).excludeLimit()
-				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ODER )
+				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ORDER )
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Cd.class );
 		FacetManager facetManager = query.getFacetManager();

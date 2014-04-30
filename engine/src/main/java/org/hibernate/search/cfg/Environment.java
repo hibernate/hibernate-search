@@ -185,13 +185,6 @@ public final class Environment {
 	public static final String DEFAULT_NULL_TOKEN = "hibernate.search.default_null_token";
 
 	/**
-	 * Tokenizer or filter parameter describing the charset used to load associated resources if needed.
-	 * @deprecated No longer applied. Will be removed!
-	 */
-	@Deprecated
-	public static final String RESOURCE_CHARSET = "resource_charset";
-
-	/**
 	 * When enabled reindexing of an entity is skipped if the updates affect only non-indexed fields.
 	 * Enabled by default as it should be safe and should improve performance, disable it to force updates
 	 * skipping value checks.

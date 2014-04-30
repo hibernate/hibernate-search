@@ -26,20 +26,19 @@ package org.hibernate.search.infinispan.impl;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.infinispan.Cache;
-import org.infinispan.lucene.directory.DirectoryBuilder;
-import org.infinispan.manager.EmbeddedCacheManager;
 import org.apache.lucene.store.Directory;
-
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.CacheManagerService;
 import org.hibernate.search.infinispan.InfinispanIntegration;
-import org.hibernate.search.store.impl.DirectoryProviderHelper;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.store.impl.DirectoryProviderHelper;
+import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.infinispan.Cache;
+import org.infinispan.lucene.directory.DirectoryBuilder;
+import org.infinispan.manager.EmbeddedCacheManager;
 
 /**
  * A DirectoryProvider using Infinispan to store the Index. This depends on the
@@ -50,24 +49,6 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class InfinispanDirectoryProvider implements org.hibernate.search.store.DirectoryProvider<Directory> {
 
 	private static final Log log = LoggerFactory.make( Log.class );
-
-	/**
-	 * Use {@link InfinispanIntegration#DEFAULT_LOCKING_CACHENAME} instead.
-	 */
-	@Deprecated
-	public static final String DEFAULT_LOCKING_CACHENAME = InfinispanIntegration.DEFAULT_LOCKING_CACHENAME;
-
-	/**
-	 * Use {@link InfinispanIntegration#DEFAULT_INDEXESDATA_CACHENAME} instead.
-	 */
-	@Deprecated
-	public static final String DEFAULT_INDEXESDATA_CACHENAME = InfinispanIntegration.DEFAULT_INDEXESDATA_CACHENAME;
-
-	/**
-	 * Use {@link InfinispanIntegration#DEFAULT_LOCKING_CACHENAME} instead.
-	 */
-	@Deprecated
-	public static final String DEFAULT_INDEXESMETADATA_CACHENAME = InfinispanIntegration.DEFAULT_LOCKING_CACHENAME;
 
 	private ServiceManager serviceManager;
 	private String directoryProviderName;
