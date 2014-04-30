@@ -20,9 +20,9 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.util.Properties;
+
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -32,10 +32,8 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import java.util.Properties;
-
 /**
- * Build the expected {@link EntityIndexBinding} depending in the configuration.
+ * Build the expected {@link org.hibernate.search.engine.spi.EntityIndexBinding} depending in the configuration.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
@@ -48,16 +46,16 @@ public final class EntityIndexBindingFactory {
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public static <T,U> MutableEntityIndexBinding<T> buildEntityIndexBinder(Class<T> type, IndexManager[] providers,
-																			IndexShardingStrategy shardingStrategy,
-																			ShardIdentifierProvider shardIdentifierProvider,
-																			Similarity similarity,
-																			EntityIndexingInterceptor<U> interceptor,
-																			boolean isDynamicSharding,
-																			Properties properties,
-																			String rootDirectoryProviderName,
-																			WorkerBuildContext context,
-																			IndexManagerHolder indexManagerHolder) {
+	public static <T, U> MutableEntityIndexBinding<T> buildEntityIndexBinding(Class<T> type, IndexManager[] providers,
+			IndexShardingStrategy shardingStrategy,
+			ShardIdentifierProvider shardIdentifierProvider,
+			Similarity similarity,
+			EntityIndexingInterceptor<U> interceptor,
+			boolean isDynamicSharding,
+			Properties properties,
+			String rootDirectoryProviderName,
+			WorkerBuildContext context,
+			IndexManagerHolder indexManagerHolder) {
 		if ( !isDynamicSharding && providers.length == 0 ) {
 			throw log.entityWithNoShard( type );
 		}
@@ -74,27 +72,5 @@ public final class EntityIndexBindingFactory {
 		else {
 			return new DefaultMutableEntityIndexBinding<T>( shardingStrategy, similarity, providers, safeInterceptor );
 		}
-	}
-
-	@SuppressWarnings( "unchecked" )
-	public static <T> MutableEntityIndexBinding<T> copyEntityIndexBindingReplacingSimilarity(EntityIndexBinding entityMapping, Similarity entitySimilarity) {
-		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) entityMapping.getEntityIndexingInterceptor();
-		boolean isDynamicSharding = entityMapping instanceof DynamicShardingEntityIndexBinding;
-		MutableEntityIndexBinding<T> newMapping;
-		if ( isDynamicSharding ) {
-			newMapping = ( (DynamicShardingEntityIndexBinding<T>) entityMapping ).cloneWithSimilarity( entitySimilarity );
-
-		}
-		else {
-			newMapping = new DefaultMutableEntityIndexBinding<T>(
-					entityMapping.getSelectionStrategy(),
-					entitySimilarity,
-					entityMapping.getIndexManagers(),
-					interceptor
-			);
-		}
-		DocumentBuilderIndexedEntity<T> documentBuilder = (DocumentBuilderIndexedEntity<T>) entityMapping.getDocumentBuilder();
-		newMapping.setDocumentBuilderIndexedEntity( documentBuilder );
-		return newMapping;
 	}
 }

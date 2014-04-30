@@ -25,7 +25,6 @@ package org.hibernate.search.spi;
 
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.SearchFactory;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -46,12 +45,6 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
  * @experimental
  */
 public interface SearchFactoryIntegrator extends SearchFactory {
-
-	/**
-	 * @deprecated since 4.4. Use {@link #getIndexBinding(Class)}
-	 */
-	@Deprecated
-	EntityIndexBinder getIndexBindingForEntity(Class<?> entityType);
 
 	/**
 	 * Returns the entity to index binding for the given type.

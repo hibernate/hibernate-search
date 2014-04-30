@@ -60,7 +60,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
  * Stores references to {@code IndexManager} instances, and starts or stops them.
  *
- * Starting {@code IndexManager}s happens by creating new {@code EntityIndexBinder} instances. {@code IndexManager}s are
+ * Starting {@code IndexManager}s happens by creating new {@code EntityIndexBinding} instances. {@code IndexManager}s are
  * started successively as they are needed (for example based on the sharding strategy).
  *
  * Stopping {@code IndexManager}s can currently only happen all at once.
@@ -125,7 +125,7 @@ public class IndexManagerHolder {
 
 		EntityIndexingInterceptor<?> interceptor = createEntityIndexingInterceptor( entity );
 
-		return EntityIndexBindingFactory.buildEntityIndexBinder(
+		return EntityIndexBindingFactory.buildEntityIndexBinding(
 				entity.getClass(),
 				indexManagers,
 				shardingStrategy,

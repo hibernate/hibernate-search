@@ -23,7 +23,6 @@
  */
 package org.hibernate.search.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -31,26 +30,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.engine.Version;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.engine.spi.TimingSource;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.DefaultIndexReaderAccessor;
@@ -220,26 +218,6 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public Map<Class<?>, EntityIndexBinding> getIndexBindings() {
 		return indexBindingForEntities;
-	}
-
-	@Override
-	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
-		Map<Class<?>, EntityIndexBinder> tmpMap = new HashMap<Class<?>, EntityIndexBinder>();
-		for ( Map.Entry<Class<?>, EntityIndexBinding> entry : indexBindingForEntities.entrySet() ) {
-			tmpMap.put( entry.getKey(), new EntityIndexBindingWrapper( entry.getValue() ) );
-		}
-		return tmpMap;
-	}
-
-	@Override
-	public EntityIndexBinder getIndexBindingForEntity(Class<?> entityType) {
-		final EntityIndexBinding entityIndexBinding = indexBindingForEntities.get( entityType );
-		if ( entityIndexBinding == null ) {
-			return null;
-		}
-		else {
-			return new EntityIndexBindingWrapper( entityIndexBinding );
-		}
 	}
 
 	@Override
@@ -442,7 +420,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			EntityIndexBinding indexBinder = indexBindingForEntities.get( entityType );
 			IndexedTypeDescriptor indexedTypeDescriptor;
 			if ( indexBinder == null ) {
-				indexedTypeDescriptor = new IndexedTypeDescriptorForUnindexedType(entityType);
+				indexedTypeDescriptor = new IndexedTypeDescriptorForUnindexedType( entityType );
 			}
 			else {
 				indexedTypeDescriptor = new IndexedTypeDescriptorImpl(

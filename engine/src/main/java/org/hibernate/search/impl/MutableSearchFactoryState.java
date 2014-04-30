@@ -24,7 +24,6 @@
 
 package org.hibernate.search.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -33,10 +32,9 @@ import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
-import org.hibernate.search.engine.spi.EntityIndexBinder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
@@ -114,15 +112,6 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	@Override
 	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
-	}
-
-	@Override
-	public Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity() {
-		Map<Class<?>, EntityIndexBinder> tmpMap = new HashMap<Class<?>, EntityIndexBinder>();
-		for ( Map.Entry<Class<?>, EntityIndexBinding> entry : indexBindingsPerEntity.entrySet() ) {
-			tmpMap.put( entry.getKey(), new EntityIndexBindingWrapper( entry.getValue() ) );
-		}
-		return tmpMap;
 	}
 
 	@Override

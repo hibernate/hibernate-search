@@ -50,12 +50,6 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 */
 	Map<Class<?>, EntityIndexBinding> getIndexBindings();
 
-	/**
-	 * @deprecated since 4.4. Use {@link #getIndexBindings()}
-	 */
-	@Deprecated
-	Map<Class<?>, EntityIndexBinder> getIndexBindingForEntity();
-
 	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
 
 	FilterCachingStrategy getFilterCachingStrategy();

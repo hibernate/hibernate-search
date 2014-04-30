@@ -35,6 +35,7 @@ import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -49,10 +50,10 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -74,7 +75,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 	private final CacheMode cacheMode;
 	private final Class<?> type;
 	private final MassIndexerProgressMonitor monitor;
-	private final Map<Class<?>, EntityIndexBinding> entityIndexBinders;
+	private final Map<Class<?>, EntityIndexBinding> entityIndexBindings;
 	private final String idName;
 	private final ErrorHandler errorHandler;
 	private final BatchBackend backend;
@@ -97,7 +98,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 		this.backend = backend;
 		this.errorHandler = errorHandler;
 		this.producerEndSignal = producerEndSignal;
-		this.entityIndexBinders = searchFactory.getIndexBindings();
+		this.entityIndexBindings = searchFactory.getIndexBindings();
 		log.trace( "created" );
 	}
 
@@ -217,7 +218,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 			throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
-		EntityIndexBinding entityIndexBinding = entityIndexBinders.get( clazz );
+		EntityIndexBinding entityIndexBinding = entityIndexBindings.get( clazz );
 		if ( entityIndexBinding == null ) {
 			// it might be possible to receive not-indexes subclasses of the currently indexed type;
 			// being not-indexed, we skip them.

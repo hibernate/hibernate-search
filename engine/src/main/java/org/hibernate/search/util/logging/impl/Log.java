@@ -28,16 +28,14 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.index.CorruptIndexException;
-
-import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.search.exception.SearchException;
+import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.EmptyQueryException;
-
+import org.hibernate.search.exception.SearchException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -641,7 +639,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 185, value = "Cannot set a sharding strategy when using dynamic sharding on '%1$s'")
 	SearchException illegalStrategyWhenUsingDynamicSharding(Class<?> type);
 
-	@Message(id = 186, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinder is not assignable to WorkerBuilderContext. Actual class is %1$s")
+	@Message(id = 186, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinding is not assignable to WorkerBuilderContext. Actual class is %1$s")
 	SearchException assertionFailureCannotCastToWorkerBuilderContext(Class<?> type);
 
 	@Message(id = 187, value = "Multiple inconsistent similarities defined in the class hierarchy of %s")
