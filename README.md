@@ -4,13 +4,14 @@
 
 ## Description
 
-Full text search engines like Apache Lucene are very powerful technologies to add efficient free text search
-capabilities to applications. However, Lucene suffers several mismatches when dealing with object domain models.
-Amongst other things indexes have to be kept up to date and mismatches between index structure and domain model
-as well as query mismatches have to be avoided.
+Full text search engines like Apache Lucene are very powerful technologies to add efficient free
+text search capabilities to applications. However, Lucene suffers several mismatches when dealing
+with object domain models. Amongst other things indexes have to be kept up to date and mismatches
+between index structure and domain model as well as query mismatches have to be avoided.
 
-Hibernate Search addresses these shortcomings - it indexes your domain model with the help of a few annotations,
-takes care of database/index synchronization and brings back regular managed objects from free text queries.
+Hibernate Search addresses these shortcomings - it indexes your domain model with the help of a few
+annotations, takes care of database/index synchronization and brings back regular managed objects
+from free text queries.
 
 Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the cover.
 
@@ -23,7 +24,7 @@ This version of Hibernate Search requires:
 
 ## Instructions
 
-### Maven 
+### Maven
 
 Include the following to your dependency list:
 
@@ -35,7 +36,9 @@ Include the following to your dependency list:
 
 ### Sourceforge Bundle
 
-Download the distribution bundle from [SourceForge](http://sourceforge.net/projects/hibernate/files/hibernate-search) and unzip to installation directory. Then read the documentation available in *docs/reference*.
+Download the distribution bundle from
+[SourceForge](http://sourceforge.net/projects/hibernate/files/hibernate-search) and unzip to
+installation directory. Then read the documentation available in *docs/reference*.
 
 ### Building from source
 
@@ -45,65 +48,51 @@ Download the distribution bundle from [SourceForge](http://sourceforge.net/proje
 
 #### Build options (profiles)
 
-Per default the documentation is not built. To include it in the full build, run:
+The documentation is based on [AsciiDoctor](http://asciidoctor.org/). Per default only the html
+output is enabled. To also generate the docbok output and build the documentation from there use:
 
-    > mvn clean install -Pdocs -s settings-example.xml
+    > mvn clean install -Pdocbook -s settings-example.xml
 
 To build the distribution bundle run:
 
-    > mvn clean install -Pdist -s settings-example.xml
+    > mvn clean install -Pdocbook,dist -s settings-example.xml
 
-If you want to run the performance test under _integration/performance_:
-
-    > mvn clean install -Pperf -s settings-example.xml
-
-You can also build the above mentioned modules directly by changing into these directories and executing maven in the
-module directory.
+You can also build the above mentioned modules directly by changing into these directories and
+executing maven in the module directory.
 
 ### Contributing
-    
-If you want to contribute, you find all you need to know in [Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
+
+If you want to contribute, you find all you need to know in
+[Contributing to Hibernate Search](http://community.jboss.org/wiki/ContributingtoHibernateSearch)
 
 ### Source code structure
 
-The project is split in several Maven modules.
+The project is split in several Maven modules:
 
-backends:
-Remote backends receiving an indexing job and executing it via different
-protocols.
+* _backends_: Remote backends receiving an indexing job and executing it via different protocols.
 
-build-config:
-Code related artefacts like checkstyle rules.
+* _build-config_: Code related artefacts like checkstyle rules.
 
-distribution:
-Builds the distribution package.
+* _distribution_: Builds the distribution package.
 
-documentation:
-The project documentation.
+* _documentation_: The project documentation.
 
-engine:
-Engine of the project. Most of the beef is here.
+* _engine_: The engine of the project. Most of the beef is here.
 
-infinispan:
-Backend storing indexes in Infinispan.
+* _infinispan_: Backend storing indexes in [Infinispan](http://infinispan.org/).
 
-integrationtest:
-Integration tests with various technologies like WildFly, Spring. Also include performance tests.
+* _integrationtest_: Integration tests with various technologies like WildFly, Spring or Karaf.
+Also includes performance tests.
 
-legacy:
-Old Maven GAV kept for backward compatibility.
+* _legacy_: Old Maven GAV kept for backward compatibility.
 
-modules:
-Integration with containers like WildFly.
+* _modules_: Integration with [WildFly](http://www.wildfly.org/) using JBoss Modules.
 
-orm:
-Native integration offering Hibernate Search for Hibernate ORM.
+* _orm_: Native integration for [Hibernate ORM](http://hibernate.org/orm/).
 
-serialization:
-Serialization code used by remote backends.
+* serialization: Serialization code used by remote backends.
 
-testing:
-Various helper classes to write tests using Hibernate Search. This module is
+* testing: Various helper classes to write tests using Hibernate Search. This module is
 semi private.
 
 ## Contact
@@ -123,5 +112,6 @@ semi private.
 
 ## License
 
-This software and its documentation are distributed under the terms of the FSF Lesser GNU Public License (see lgpl.txt).
+This software and its documentation are distributed under the terms of the FSF Lesser GNU Public
+License (see lgpl.txt).
 
