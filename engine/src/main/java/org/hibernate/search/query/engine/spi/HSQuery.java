@@ -27,10 +27,9 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-
-import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
@@ -40,8 +39,8 @@ import org.hibernate.search.spatial.Coordinates;
  *
  * This object is not meant to be thread safe.
  * The typical usage is as follow
- * <code>
- * //get query object
+ * <pre>
+ * {@code  //get query object
  * HSQuery query = searchFactoryIngegrator.createHSQuery();
  * //configure query object
  * query
@@ -60,7 +59,8 @@ import org.hibernate.search.spatial.Coordinates;
  *
  * //done with the core of the query
  * query.getTimeoutManager().stop();
- * </code>
+ * }
+ * </pre>
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
