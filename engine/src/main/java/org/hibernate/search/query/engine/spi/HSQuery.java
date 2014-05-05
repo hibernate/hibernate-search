@@ -233,8 +233,8 @@ public interface HSQuery extends ProjectionConstants {
 	 * <p>getSearchFactoryImplementor.</p>
 	 *
 	 * @return the {@code SearchFactoryImplementor} instance
-	 * @deprecated should be at most SearchFactoryIntegrator, preferably removed altogether
 	 */
+	// TODO should be at most SearchFactoryIntegrator, preferably removed altogether
 	SearchFactoryImplementor getSearchFactoryImplementor();
 
 	/**
