@@ -125,12 +125,6 @@ public class CustomMassIndexerFactoryTest extends SearchTestBase {
 		}
 
 		@Override
-		@Deprecated
-		public MassIndexer threadsForIndexWriter(int numberOfThreads) {
-			return null;
-		}
-
-		@Override
 		public MassIndexer progressMonitor(MassIndexerProgressMonitor monitor) {
 			return null;
 		}

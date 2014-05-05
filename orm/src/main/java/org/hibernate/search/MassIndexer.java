@@ -26,6 +26,7 @@ package org.hibernate.search;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
+
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 
 /**
@@ -68,14 +69,6 @@ public interface MassIndexer {
 	 */
 	@Deprecated
 	MassIndexer threadsForSubsequentFetching(int numberOfThreads);
-
-	/**
-	 * Deprecated: value is ignored.
-	 * To have more threads working on the IndexWriter, use the worker.thread_pool.size
-	 * option.
-	 */
-	@Deprecated
-	MassIndexer threadsForIndexWriter(int numberOfThreads);
 
 	/**
 	 * Override the default <code>MassIndexerProgressMonitor</code>.

@@ -28,14 +28,15 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.hibernate.CacheMode;
+
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.MassIndexer;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.CacheMode;
-import org.hibernate.search.MassIndexer;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -168,13 +169,6 @@ public class MassIndexerImpl implements MassIndexer {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
 		//currently a no-op
-		return this;
-	}
-
-	@Override
-	@Deprecated
-	public MassIndexer threadsForIndexWriter(int numberOfThreads) {
-		log.massIndexerIndexWriterThreadsIgnored();
 		return this;
 	}
 
