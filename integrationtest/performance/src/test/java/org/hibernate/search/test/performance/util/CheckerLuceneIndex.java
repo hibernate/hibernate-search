@@ -23,9 +23,6 @@
  */
 package org.hibernate.search.test.performance.util;
 
-import static org.hibernate.search.test.performance.scenario.TestContext.CHECK_INDEX_STATE;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
@@ -33,7 +30,9 @@ import java.util.Collection;
 import org.apache.lucene.index.CheckIndex;
 import org.apache.lucene.index.CheckIndex.Status;
 import org.apache.lucene.store.Directory;
+
 import org.hibernate.Session;
+
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -41,6 +40,9 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.performance.scenario.TestContext;
+
+import static org.hibernate.search.test.performance.scenario.TestContext.CHECK_INDEX_STATE;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Tomas Hradec
@@ -62,7 +64,7 @@ public class CheckerLuceneIndex {
 		Session s = ctx.sf.openSession();
 		FullTextSession fts = Search.getFullTextSession( s );
 		SearchFactoryImplementor sfi = (SearchFactoryImplementor) fts.getSearchFactory();
-		Collection<IndexManager> indexManagers = sfi.getAllIndexesManager().getIndexManagers();
+		Collection<IndexManager> indexManagers = sfi.getIndexManagerHolder().getIndexManagers();
 
 		for ( IndexManager indexManager : indexManagers ) {
 			DirectoryBasedIndexManager directoryBasedIndexManager = (DirectoryBasedIndexManager) indexManager;

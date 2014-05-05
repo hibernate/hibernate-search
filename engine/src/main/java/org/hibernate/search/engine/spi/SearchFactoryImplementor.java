@@ -80,14 +80,6 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	boolean isDirtyChecksEnabled();
 
 	/**
-	 * @return the {@code IndexManagerHolder} which gives access to all index managers known to this factory
-	 *
-	 * @deprecated As of Search 4.4, replaced by {@link #getIndexManagerHolder}
-	 */
-	@Deprecated
-	IndexManagerHolder getAllIndexesManager();
-
-	/**
 	 * @return Returns the {@code IndexManagerHolder} which gives access to all index managers known to this factory
 	 */
 	IndexManagerHolder getIndexManagerHolder();
