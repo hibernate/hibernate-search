@@ -54,7 +54,14 @@ public final class MultiReaderFactory {
 			readers[index] = openIndexReader;
 			managers[index] = indexReaderManager;
 		}
-		return ReaderProviderHelper.buildMultiReader( length, readers, managers );
+
+		if ( length == 0 ) {
+			return null;
+		}
+		else {
+			//everything should be the same so wrap in an MultiReader
+			return new ManagedMultiReader( readers, managers );
+		}
 	}
 
 	public static void closeReader(IndexReader multiReader) {

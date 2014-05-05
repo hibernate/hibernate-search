@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.CompositeReaderContext;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.BitsFilteredDocIdSet;
@@ -47,17 +47,16 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.reader.impl.ManagedMultiReader;
-import org.hibernate.search.reader.impl.ReaderProviderHelper;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.testsupport.TestForIssue;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * Verified filters don't get stale IndexReader instances after a change is applied.
- * Note that filters operate on per-segment subreaders, while we usually expose
+ * Note that filters operate on per-segment sub-readers, while we usually expose
  * top level (recursive) global IndexReader views: this usually should not affect
  * their usage but is relevant to how we test them.
  *
@@ -80,7 +79,7 @@ public class FreshReadersProvidedTest {
 			lastDwarf.id = 13l;
 			lastDwarf.name = "Thorin Oakenshield";
 
-			Work work = new Work( lastDwarf, lastDwarf.id, WorkType.ADD, false );
+			Work<Guest> work = new Work<Guest>( lastDwarf, lastDwarf.id, WorkType.ADD, false );
 			TransactionContextForTest tc = new TransactionContextForTest();
 			searchFactory.getWorker().performWork( work, tc );
 			tc.end();
@@ -117,7 +116,7 @@ public class FreshReadersProvidedTest {
 			balin.id = 7l;
 			balin.name = "Balin";
 
-			Work work = new Work( balin, balin.id, WorkType.ADD, false );
+			Work<Guest> work = new Work<Guest>( balin, balin.id, WorkType.ADD, false );
 			TransactionContextForTest tc = new TransactionContextForTest();
 			searchFactory.getWorker().performWork( work, tc );
 			tc.end();
@@ -156,13 +155,13 @@ public class FreshReadersProvidedTest {
 	 * Verifies that the current RecordingFilter has been fed all the same sub-readers
 	 * which would be obtained from a freshly checked out IndexReader.
 	 *
-	 * @param filter
+	 * @param filter test filter instance
 	 */
 	private void checkFilterInspectedAllSegments(RecordingFilter filter) {
 		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
 		IndexReader currentIndexReader = searchFactory.getIndexReaderAccessor().open( Guest.class );
 		try {
-			List<IndexReader> allSubReaders = ReaderProviderHelper.getSubIndexReaders( (ManagedMultiReader) currentIndexReader );
+			List<IndexReader> allSubReaders = getSubIndexReaders( (MultiReader) currentIndexReader );
 			for ( IndexReader ir : allSubReaders ) {
 				Assert.assertTrue( filter.visitedReaders.contains( ir ) );
 			}
@@ -173,6 +172,17 @@ public class FreshReadersProvidedTest {
 		finally {
 			searchFactory.getIndexReaderAccessor().close( currentIndexReader );
 		}
+	}
+
+	public static List<IndexReader> getSubIndexReaders(MultiReader compositeReader) {
+		CompositeReaderContext compositeReaderContext = compositeReader.getContext();
+		ArrayList<IndexReader> segmentReaders = new ArrayList<IndexReader>( 20 );
+
+		for ( AtomicReaderContext readerContext : compositeReaderContext.leaves() ) {
+			segmentReaders.add( readerContext.reader() );
+		}
+
+		return segmentReaders;
 	}
 
 	/**
