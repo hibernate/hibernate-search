@@ -34,11 +34,11 @@ import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
-import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.StringHelper;
 
 /**
  * A wrapper class for Lucene parameters needed for indexing.
@@ -67,13 +67,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	private final Index indexMode;
 	private final TermVector termVector;
 	private final Store storeType;
-	private final int precisionStep;
 	private final String indexNullAs;
-
-	@Deprecated
-	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata) {
-		this( fieldMetadata, 1f, 1f );
-	}
 
 	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float fieldLevelBoost, float documentLevelBoost) {
 		this.documentLevelBoost = documentLevelBoost;
@@ -84,7 +78,6 @@ public class LuceneOptionsImpl implements LuceneOptions {
 		this.storeCompressed = this.storeType.equals( Store.COMPRESS );
 		this.storeUncompressed = this.storeType.equals( Store.YES );
 		this.indexNullAs = fieldMetadata.indexNullAs();
-		this.precisionStep = fieldMetadata.getPrecisionStep();
 	}
 
 	@Override
