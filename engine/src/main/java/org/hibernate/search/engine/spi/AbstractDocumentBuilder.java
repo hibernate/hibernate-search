@@ -382,14 +382,6 @@ public abstract class AbstractDocumentBuilder<T> {
 		return this.typeMetadata.containsCollectionRole( collectionRoleName );
 	}
 
-
-	/**
-	 * @deprecated Use {@link #collectionChangeRequiresIndexUpdate(String)} instead
-	 */
-	public boolean isCollectionRoleExcluded(String collectionRole) {
-		return !collectionChangeRequiresIndexUpdate( collectionRole );
-	}
-
 	/**
 	 * Verifies entity level preconditions to know if it's safe to skip index updates based
 	 * on specific field or collection updates.
@@ -422,7 +414,7 @@ public abstract class AbstractDocumentBuilder<T> {
 	 * Makes sure isCollectionRoleExcluded will always return false, so that
 	 * collection update events are always processed.
 	 *
-	 * @see #isCollectionRoleExcluded(String)
+	 * @see #collectionChangeRequiresIndexUpdate(String)
 	 */
 	public void forceStateInspectionOptimizationsDisabled() {
 		typeMetadata.disableStateInspectionOptimizations();
