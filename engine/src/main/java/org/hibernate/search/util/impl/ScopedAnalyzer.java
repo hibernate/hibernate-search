@@ -31,9 +31,10 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
 
 /**
- * A <code>ScopedAnalyzer</code> is a wrapper class containing all analyzers for a given class.
- * <code>ScopedAnalyzer</code> behaves similar to <code>PerFieldAnalyzerWrapper</code> by delegating requests for
- * <code>TokenStream</code>s to the underlying <code>Analyzer</code> depending on the requested field name.
+ * A {@code ScopedAnalyzer} is a wrapper class containing all analyzers for a given class.
+ *
+ * {@code ScopedAnalyzer} behaves similar to {@link org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper}
+ * by delegating requests for {@code TokenStream}s to the underlying {@code Analyzer} depending on the requested field name.
  *
  * @author Emmanuel Bernard
  * @author Sanne Grinovero
@@ -42,14 +43,6 @@ public final class ScopedAnalyzer extends AnalyzerWrapper {
 
 	private Analyzer globalAnalyzer;
 	private final Map<String, Analyzer> scopedAnalyzers = new HashMap<String, Analyzer>();
-
-	/**
-	 * @deprecated let's try to make at least the default analyzer mandatory
-	 */
-	@Deprecated
-	public ScopedAnalyzer() {
-		this( null );
-	}
 
 	public ScopedAnalyzer(Analyzer globalAnalyzer) {
 		this( globalAnalyzer, Collections.<String, Analyzer>emptyMap() );

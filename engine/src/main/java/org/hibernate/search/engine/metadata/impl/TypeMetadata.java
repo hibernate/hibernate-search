@@ -38,11 +38,11 @@ import org.apache.lucene.document.Field;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -420,10 +420,10 @@ public class TypeMetadata {
 		private XProperty jpaProperty;
 
 		public Builder(Class<?> indexedType, ConfigContext configContext) {
-			this( indexedType, configContext, new ScopedAnalyzer() );
+			this( indexedType, new ScopedAnalyzer( configContext.getDefaultAnalyzer() ) );
 		}
 
-		public Builder(Class<?> indexedType, ConfigContext configContext, ScopedAnalyzer scopedAnalyzer) {
+		public Builder(Class<?> indexedType, ScopedAnalyzer scopedAnalyzer) {
 			this.indexedType = indexedType;
 			this.scopedAnalyzer = scopedAnalyzer;
 			this.passThroughAnalyzer = PassThroughAnalyzer.INSTANCE;

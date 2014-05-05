@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 
@@ -103,8 +102,8 @@ public class EmbeddedTypeMetadata extends TypeMetadata {
 		private String embeddedNullToken;
 		private FieldBridge embeddedNullFieldBridge;
 
-		public Builder(Class<?> indexedType, XMember embeddedGetter, ConfigContext configContext, ScopedAnalyzer scopedAnalyzer) {
-			super( indexedType, configContext, scopedAnalyzer );
+		public Builder(Class<?> indexedType, XMember embeddedGetter, ScopedAnalyzer scopedAnalyzer) {
+			super( indexedType, scopedAnalyzer );
 			ReflectionHelper.setAccessible( embeddedGetter );
 			this.embeddedFieldName = embeddedGetter.getName();
 			this.embeddedGetter = embeddedGetter;
