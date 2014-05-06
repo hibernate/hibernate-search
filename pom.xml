@@ -724,7 +724,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <goals>deploy</goals>
-                    <releaseProfiles>docs,dist,perf</releaseProfiles>
+                    <releaseProfiles>docbook,dist,perf</releaseProfiles>
                     <arguments>-DskipTests</arguments>
                     <pushChanges>false</pushChanges>
                     <localCheckout>true</localCheckout>
