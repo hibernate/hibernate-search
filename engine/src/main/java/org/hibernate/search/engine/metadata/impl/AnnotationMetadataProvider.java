@@ -1193,8 +1193,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 			final String indexNullAs = embeddedNullToken( configContext, indexedEmbeddedAnnotation );
 			if ( indexNullAs != null ) {
-				EmbeddedTypeMetadata.Container container = embeddedTypeMetadataBuilder.getEmbeddedContainerType();
-				FieldBridge fieldBridge = guessNullEmbeddedBridge( member, container, indexNullAs );
+				FieldBridge fieldBridge = new NullEncodingFieldBridge( NULL_EMBEDDED_STRING_BRIDGE, indexNullAs );
 				embeddedTypeMetadataBuilder.indexNullToken(
 						indexNullAs,
 						embeddedNullField( localPrefix ),
@@ -1283,32 +1282,17 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		return localPrefix;
 	}
 
-	private FieldBridge guessNullEmbeddedBridge(XProperty member,
-			EmbeddedTypeMetadata.Container container,
-			final String indexNullAs) {
-		if ( indexNullAs == null ) {
-			return null;
-		}
-
-		return new NullEncodingFieldBridge( NULL_EMBEDDED_STRING_BRIDGE, indexNullAs );
-	}
-
 	private void validateAllPathsEncountered(XProperty member, PathsContext updatedPathsContext) {
 		Set<String> unEncounteredPaths = updatedPathsContext.getUnencounteredPaths();
 		if ( unEncounteredPaths.size() > 0 ) {
-			StringBuilder sb = new StringBuilder( "Found invalid @IndexedEmbedded->paths configured on class " );
-			sb.append( member.getType().getName() );
-			sb.append( ", member " );
-			sb.append( member.getName() );
-			sb.append( ": " );
-
+			StringBuilder sb = new StringBuilder( );
 			String prefix = updatedPathsContext.embeddedAnn.prefix();
 			for ( String path : unEncounteredPaths ) {
 				sb.append( removeLeadingPrefixFromPath( path, prefix ) );
 				sb.append( ',' );
 			}
-			String message = sb.substring( 0, sb.length() - 1 );
-			throw new SearchException( message );
+			String invalidPaths = sb.substring( 0, sb.length() - 1 );
+			throw log.invalidIncludePathConfiguration( member.getName(), member.getDeclaringClass().getName(), invalidPaths );
 		}
 	}
 

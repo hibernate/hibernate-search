@@ -25,9 +25,6 @@ import org.hibernate.annotations.common.reflection.MetadataProviderInjector;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
-import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.engine.Version;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.Factory;
@@ -38,8 +35,10 @@ import org.hibernate.search.annotations.Key;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
@@ -53,6 +52,7 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.EntityState;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
@@ -333,7 +333,7 @@ public class SearchFactoryBuilder {
 
 			if ( mappedXClass.isAnnotationPresent( Indexed.class ) ) {
 				if ( mappedXClass.isAbstract() ) {
-					log.abstractClassesCannotInsertDocuments();
+					log.abstractClassesCannotInsertDocuments( mappedXClass.getName() );
 					continue;
 				}
 
