@@ -35,8 +35,15 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 
 /**
+ * Static helper class to retrieve the instance of the current {@code SearchFactory} / {@code SearchFactoryImplementor}.
+ *
+ * <p>
+ * <b>Note</b>:<br/>
+ * The use of this class is discouraged. If possible should {@link org.hibernate.search.FullTextSession#getSearchFactory()}
+ * be used. However, this is not always possible, for example in FullTextSessionImpl itself.
+ * </p>
+ *
  * @author Emmanuel Bernard
- * @deprecated Use {@link org.hibernate.search.FullTextSession#getSearchFactory()} instead.
  */
 public class ContextHelper {
 
