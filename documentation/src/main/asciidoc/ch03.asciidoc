@@ -119,7 +119,7 @@ annotation. If the index property is not specified the fully qualified name of t
 will be used as name (recommended).
 
 Knowing the index name, you can configure the directory provider and any additional options by using
-the prefix hibernate.search._++&lt;indexname&gt;++_. The name default (hibernate.search.default) is
+the prefix hibernate.search._++<indexname>++_. The name default (hibernate.search.default) is
 reserved and can be used to define properties which apply to all indexes.
 <<example-configuring-directory-providers>> shows how hibernate.search.default.directory_provider
 is used to set the default directory provider to be the filesystem one. hibernate.search.default.indexBase
@@ -172,88 +172,118 @@ provider and base directory, and override those defaults later on on a per index
 
 [[directory-provider-table]]
 .List of built-in DirectoryProvider
-[options="header"]
+[cols="2*", options="header"]
 |===============
-|Name and description|Properties
-|ram: Memory based directory, the
-            directory will be uniquely identified (in the same deployment
-            unit) by the +@Indexed.index+ element|none
-|filesystem: File system based
-            directory. The directory used will be &lt;indexBase&gt;/&lt;
-            indexName &gt;|+indexBase+ : base directory
+|Name and description
+|Properties
 
-++indexName++: override @Indexed.index (useful for sharded indexes)
+|ram: Memory based directory.
 
-+$$locking_strategy$$+ : optional, see <<search-configuration-directory-lockfactories>>
+The directory will be uniquely identified (in the same deployment unit) by the +@Indexed.index+ element
+|none
 
-++$$filesystem_access_type$$++: allows to determine the exact type of FSDirectory implementation used by this DirectoryProvider. Allowed values are +auto+ (the default value, selects NIOFSDirectory on non Windows systems, SimpleFSDirectory on Windows), +simple+ (SimpleFSDirectory), ++nio++ (NIOFSDirectory), ++mmap++ (MMapDirectory). Make sure to refer to Javadocs of these Directory implementations before changing this setting. Even though NIOFSDirectory or MMapDirectory can bring substantial performace boosts they also have their issues.
-|filesystem-master: File system based directory. Like +filesystem+. It also copies the index to a source directory (aka copy directory) on a regular basis.
+|filesystem: File system based directory.
 
-The recommended value for the refresh period is (at least) 50% higher that the time to copy the information (default 3600 seconds - 60 minutes).
+The directory used will be <indexBase>/<indexName>
+|+indexBase+ : base directory +
++indexName+: override @Indexed.index (useful for sharded indexes) +
++locking_strategy+ : optional, see <<search-configuration-directory-lockfactories>> +
++filesystem_access_type+: allows to determine the exact type of FSDirectory implementation used
+by this DirectoryProvider. Allowed values are +auto+ (the default value, selects NIOFSDirectory on
+non Windows systems, SimpleFSDirectory on Windows), +simple+ (SimpleFSDirectory),
+++nio++ (NIOFSDirectory), ++mmap++ (MMapDirectory). Make sure to refer to Javadocs of these Directory
+implementations before changing this setting. Even though NIOFSDirectory or MMapDirectory can bring
+substantial performace boosts they also have their issues.
+
+|filesystem-master: File system based directory.
+
+Like +filesystem+. It also copies the index to a source directory (aka copy directory) on a regular
+basis.
+
+The recommended value for the refresh period is (at least) 50% higher that the time to copy the
+information (default 3600 seconds - 60 minutes).
 
 Note that the copy is based on an incremental copy mechanism reducing the average copy time.
 
 DirectoryProvider typically used on the master node in a JMS back end cluster.
 
-The +$$ buffer_size_on_copy$$+ optimum depends on your operating system and available RAM; most
-people reported good results using values between 16 and 64MB.|++indexBase++: base directory
+The +buffer_size_on_copy+ optimum depends on your operating system and available RAM; most
+people reported good results using values between 16 and 64MB.
+|+indexBase+: base directory +
++indexName+: override @Indexed.index (useful for sharded indexes) +
++sourceBase+: source (copy) base directory. +
++source+: source directory suffix (default to ++@Indexed.index++). The actual source directory name
+being _<sourceBase>/<source>_ +
++refresh+: refresh period in seconds (the copy will take place every refresh seconds). If a copy
+is still in progress when the following refresh period elapses, the second copy operation will be
+skipped. +
++buffer_size_on_copy+: The amount of MegaBytes to move in a single low level copy instruction;
+defaults to 16MB. +
++locking_strategy+ : optional, see <<search-configuration-directory-lockfactories>> +
++filesystem_access_type+: allows to determine the exact type of FSDirectory implementation used by
+this DirectoryProvider. Allowed values are +auto+ (the default value, selects NIOFSDirectory on non
+Windows systems, SimpleFSDirectory on Windows), +simple+ (SimpleFSDirectory),
+++nio++ (NIOFSDirectory), ++mmap++ (MMapDirectory). Make sure to refer to Javadocs of these
+Directory implementations before changing this setting. Even though NIOFSDirectory or MMapDirectory
+can bring substantial performace boosts they also have their issues.
 
-++indexName++: override @Indexed.index (useful for sharded indexes)
+|filesystem-slave: File system based directory.
 
-++sourceBase++: source (copy) base directory.
+Like +filesystem+, but retrieves a master version
+(source) on a regular basis. To avoid locking and inconsistent search results, 2 local copies are kept.
 
-++source++: source directory suffix (default to ++@Indexed.index++). The actual source directory name being _&lt;sourceBase&gt;/&lt;source&gt;_
+The recommended value for the refresh period is (at least) 50% higher that the time to copy the
+information (default 3600 seconds - 60 minutes).
 
-++refresh++: refresh period in seconds (the copy will take place every refresh seconds). If a copy is still in progress when the following refresh period elapses, the second copy operation will be skipped.
-
-++$$buffer_size_on_copy$$++: The amount of MegaBytes to move in a single low level copy instruction; defaults to 16MB.
-
-+$$locking_strategy$$+ : optional, see <<search-configuration-directory-lockfactories>>
-
-++$$filesystem_access_type$$++: allows to determine the exact type of FSDirectory implementation used by this DirectoryProvider. Allowed values are +auto+ (the default value, selects NIOFSDirectory on non Windows systems, SimpleFSDirectory on Windows), +simple+ (SimpleFSDirectory), ++nio++ (NIOFSDirectory), ++mmap++ (MMapDirectory). Make sure to refer to Javadocs of these Directory implementations before changing this setting. Even though NIOFSDirectory or MMapDirectory can bring substantial performace boosts they also have their issues.
-|filesystem-slave: File system based directory. Like +filesystem+, but retrieves a master version (source) on a regular basis. To avoid locking and inconsistent search results, 2 local copies are kept.
-
-The recommended value for the refresh period is (at least) 50% higher that the time to copy the information (default 3600 seconds - 60 minutes).
-
-Note that the copy is based on an incremental copy mechanism reducing the average copy time. If a copy is still in progress when refresh period elapses, the second copy operation will be skipped.
+Note that the copy is based on an incremental copy mechanism reducing the average copy time.
+If a copy is still in progress when refresh period elapses, the second copy operation will be skipped.
 
 DirectoryProvider typically used on slave nodes using a JMS back end.
 
-The +$$ buffer_size_on_copy$$+ optimum depends on your operating system and available RAM; most people reported good results using values between 16 and 64MB.|++indexBase++: Base directory
+The +buffer_size_on_copy+ optimum depends on your operating system and available RAM; most
+people reported good results using values between 16 and 64MB.
 
-++indexName++: override @Indexed.index (useful for sharded indexes)
-
-++sourceBase++: Source (copy) base directory.
-
-++source++: Source directory suffix (default to ++@Indexed.index++). The actual source directory name being _&lt;sourceBase&gt;/&lt;source&gt;_
-
-++refresh++: refresh period in second (the copy will take place every refresh seconds).
-
-++$$buffer_size_on_copy$$++: The amount of MegaBytes to move in a single low level copy instruction; defaults to 16MB.
-
-+$$locking_strategy$$+ : optional, see <<search-configuration-directory-lockfactories>>
-
-+$$retry_marker_lookup$$+ : optional, default to 0. Defines how many times we look for the marker files in the source directory before failing. Waiting 5 seconds between each try.
-
-+$$retry_initialize_period$$+ : optional, set an integer value in seconds to enable the retry initialize feature: if the slave can't find the master index it will try again until it's found in background, without preventing the application to start: fullText queries performed before the index is initialized are not blocked but will return empty results. When not enabling the option or explicitly setting it to zero it will fail with an exception instead of scheduling a retry timer. To prevent the application from starting without an invalid index but still control an initialization timeout, see +$$retry_marker_lookup$$+ instead.
-
-++$$filesystem_access_type$$++: allows to determine the exact type of FSDirectory implementation
+|+indexBase+: Base directory +
++indexName+: override @Indexed.index (useful for sharded indexes) +
++sourceBase+: Source (copy) base directory. +
++source+: Source directory suffix (default to ++@Indexed.index++). The actual source directory
+name being _<sourceBase>/<source>_ +
++refresh+: refresh period in second (the copy will take place every refresh seconds). +
++buffer_size_on_copy+: The amount of MegaBytes to move in a single low level copy instruction;
+defaults to 16MB. +
++locking_strategy+ : optional, see <<search-configuration-directory-lockfactories>> +
++retry_marker_lookup+ : optional, default to 0. Defines how many times we look for the marker files
+in the source directory before failing. Waiting 5 seconds between each try. +
++retry_initialize_period+ : optional, set an integer value in seconds to enable the retry initialize
+feature: if the slave can't find the master index it will try again until it's found in background,
+without preventing the application to start: fullText queries performed before the index is
+initialized are not blocked but will return empty results. When not enabling the option or
+explicitly setting it to zero it will fail with an exception instead of scheduling a retry timer.
+To prevent the application from starting without an invalid index but still control an
+initialization timeout, see +retry_marker_lookup+ instead. +
++filesystem_access_type+: allows to determine the exact type of FSDirectory implementation
 used by this DirectoryProvider. Allowed values are +auto+ (the default value, selects NIOFSDirectory
 on non Windows systems, SimpleFSDirectory on Windows), +simple+ (SimpleFSDirectory), ++nio++
 (NIOFSDirectory), ++mmap++ (MMapDirectory). Make sure to refer to Javadocs of these Directory
 implementations before changing this setting. Even though NIOFSDirectory or MMapDirectory can bring
-substantial performace boosts they also have their issues. |infinispan: Infinispan based directory.
-Use it to store the index in a distributed grid, making index changes visible to all elements of the
-cluster very quickly. Also see <<infinispan-directories>> for additional requirements and
-configuration settings. Infinispan needs a global configuration and additional dependencies; the
-settings defined here apply to each different index.|++$$locking_cachename$$++: name of the
-Infinispan cache to use to store locks.
+substantial performace boosts they also have their issues.
 
-+$$data_cachename$$+ : name of the Infinispan cache to use to store the largest data chunks; this area will contain the largest objects, use replication if you have enough memory or switch to distribution.
+|infinispan: Infinispan based directory.
 
-++$$metadata_cachename$$++: name of the Infinispan cache to use to store the metadata relating to the index; this data is rather small and read very often, it's recommended to have this cache setup using replication.
-
-++$$chunk_size$$++: large files of the index are split in smaller chunks, you might want to set the highest value efficiently handled by your network. Networking tuning might be useful.
+Use it to store the index in a distributed grid, making
+index changes visible to all elements of the cluster very quickly. Also see
+<<infinispan-directories>> for additional requirements and configuration settings.
+Infinispan needs a global configuration and additional dependencies; the
+settings defined here apply to each different index.
+|+locking_cachename+: name of the Infinispan cache to use to store locks. +
++data_cachename+ : name of the Infinispan cache to use to store the largest data chunks; this area
+will contain the largest objects, use replication if you have enough memory or switch to
+distribution. +
++metadata_cachename+: name of the Infinispan cache to use to store the metadata relating to the
+index; this data is rather small and read very often, it's recommended to have this cache setup
+using replication. +
++chunk_size+: large files of the index are split in smaller chunks, you might want to set the
+highest value efficiently handled by your network. Networking tuning might be useful.
 
 |===============
 
@@ -262,7 +292,7 @@ Infinispan cache to use to store locks.
 If the built-in directory providers do not fit your needs, you can write your own directory provider
 by implementing the org.hibernate.store.DirectoryProvider interface. In this case, pass the fully
 qualified class name of your provider into the +$$directory_provider$$+ property. You can pass any
-additional properties using the prefix hibernate.search._++&lt;indexname&gt;++_.
+additional properties using the prefix hibernate.search._++<indexname>++_.
 ====
 
 
@@ -456,14 +486,14 @@ The following options can be different on each index; in fact they need the inde
 .Execution configuration
 |===============
 |*Property*|*Description*
-|hibernate.search.&lt;indexName&gt;.​worker.execution|++sync++: synchronous execution (default)
+|hibernate.search.<indexName>.​worker.execution|++sync++: synchronous execution (default)
 
 ++async++: asynchronous execution
-|hibernate.search.&lt;indexName&gt;.​worker.thread_pool.size|The backend can apply updates from the same transaction
+|hibernate.search.<indexName>.​worker.thread_pool.size|The backend can apply updates from the same transaction
             context (or batch) in parallel, using a threadpool. The default
             value is 1. You can experiment with larger values if you have many
             operations per transaction.
-|hibernate.search.&lt;indexName&gt;.​worker.buffer_queue.max|Defines the maximal number of work queue if the thread poll
+|hibernate.search.<indexName>.​worker.buffer_queue.max|Defines the maximal number of work queue if the thread poll
             is starved. Useful only for asynchronous execution. Default to
             infinite. If the limit is reached, the work is done by the main
             thread.
@@ -482,7 +512,7 @@ configured differently for each index.
 
 |===============
 |*Property*|*Description*
-|hibernate.search.&lt;indexName&gt;.​worker.backend|++lucene++: The default backend which runs index updates in the same VM. Also used when the property is undefined or empty.
+|hibernate.search.<indexName>.​worker.backend|++lucene++: The default backend which runs index updates in the same VM. Also used when the property is undefined or empty.
 
 ++jms++: JMS backend. Index updates are send to a JMS queue to be processed by an indexing master. See <<table-jms-backend-configuration>> for additional configuration options and <<jms-backend>> for a more detailed description of this setup.
 
@@ -500,18 +530,18 @@ You can also specify the fully qualified name of a class implementing BackendQue
 
 |===============
 |*Property*|*Description*
-|hibernate.search.&lt;indexName&gt;.​worker.jndi.*|Defines the JNDI properties to initiate the InitialContext
+|hibernate.search.<indexName>.​worker.jndi.*|Defines the JNDI properties to initiate the InitialContext
             (if needed). JNDI is only used by the JMS back end.
-|hibernate.search.&lt;indexName&gt;.​worker.jms.connection_factory|Mandatory for the JMS back end. Defines the JNDI name to
+|hibernate.search.<indexName>.​worker.jms.connection_factory|Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS connection factory from
             (++/ConnectionFactory++ by default in JBoss
             AS)
-|hibernate.search.&lt;indexName&gt;.​worker.jms.queue|Mandatory for the JMS back end. Defines the JNDI name to
+|hibernate.search.<indexName>.​worker.jms.queue|Mandatory for the JMS back end. Defines the JNDI name to
             lookup the JMS queue from. The queue will be used to post work
             messages.
-|hibernate.search.&lt;indexName&gt;.​worker.jms.login|Optional for the JMS slaves. Use it when your queue
+|hibernate.search.<indexName>.​worker.jms.login|Optional for the JMS slaves. Use it when your queue
             requires login credentials to define your login.
-|hibernate.search.&lt;indexName&gt;.​worker.jms.login|Optional for the JMS slaves. Use it when your queue
+|hibernate.search.<indexName>.​worker.jms.login|Optional for the JMS slaves. Use it when your queue
             requires login credentials to define your password.
 
 |===============
@@ -692,18 +722,18 @@ from their defaults.
 
 |===============
 |*Property*|*Description*
-|hibernate.search.&lt;indexName&gt;.jgroups.block_waiting_ack|Set to either +true+ or
+|hibernate.search.<indexName>.jgroups.block_waiting_ack|Set to either +true+ or
               +false+. False is more efficient but will not
               wait for the operation to be delivered to the peers. Defaults to
               +true+ when the backend is synchronous, to
               +false+ when the backend is
               +async+.
-|hibernate.search.&lt;indexName&gt;.jgroups.​messages_timeout|The timeout of waiting for a single command to be
+|hibernate.search.<indexName>.jgroups.​messages_timeout|The timeout of waiting for a single command to be
               acknowledged and executed when
               +$$block_waiting_ack$$+ is +true+,
               or just acknowledged otherwise. Value in milliseconds, defaults
               to +20000+.
-|hibernate.search.&lt;indexName&gt;.jgroups.delegate_backend|The master node receiving indexing operations forwards
+|hibernate.search.<indexName>.jgroups.delegate_backend|The master node receiving indexing operations forwards
               them to a standard backend to be performed. Defaults to
               +lucene+. See also <<table-backend-configuration>> for other options, but
               probably the only useful option is +blackhole+,
@@ -931,6 +961,7 @@ applying for all indexes, on a per index basis, or even per shard.
 
 There are several low level +IndexWriter+ settings which can be tuned for different use cases. 
 These parameters are grouped by the +indexwriter+ keyword:
+
 ====
 ----
 hibernate.search.[default|<indexname>].indexwriter.<parameter_name>
@@ -955,7 +986,6 @@ hibernate.search.default.indexwriter.ram_buffer_size = 64
 The configuration in <<example-performamce-option-configuration>> will result in these settings
 applied on the second shard of the Animal index:
 
-
 * +$$max_merge_docs$$+ = 10
 * +$$merge_factor$$+ = 20
 * +$$ram_buffer_size$$+ = 64MB
@@ -968,57 +998,106 @@ performance-parameters>> depend for this reason on the version of Lucene you are
 shown are relative to version +2.4+. For more information about Lucene indexing performance, please
 refer to the Lucene documentation.
 
-
-        Previous versions of Search had the notion of +batch+ and +transaction+ properties. This is no longer the case as the backend will always perform work using the same settings.
-
-
 [[table-performance-parameters]]
 .List of indexing performance and behavior properties
-[options="header"]
+[cols="2,2,1", options="header"]
 |===============
-|Property|Description|Default Value
-|hibernate.search.​[default|&lt;indexname&gt;].​exclusive_index_use|Set to +true+ when no other process will need to write to the same index. This will enable Hibernate Search to work in exclusive mode on the index and improve performance when writing changes to the index.|+true+ (improved performance, releases
-              locks only at shutdown)|hibernate.search.​[default|&lt;indexname&gt;].​max_queue_length|Each index has a separate "pipeline" which contains the updates to be applied to the index. When this queue is full adding more operations to the queue becomes a blocking operation. Configuring this setting doesn't make much sense unless the +worker.execution+ is configured as +async+.|+1000+|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_buffered_delete_terms|Determines the minimal number of delete terms required before the buffered in-memory delete terms are applied and flushed. If there are documents buffered in memory at the time, they are merged and a new segment is created.|Disabled (flushes by RAM usage)|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_buffered_docs|Controls the amount of documents buffered in memory during indexing. The bigger the more RAM is consumed.|Disabled (flushes by RAM usage)|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_merge_docs|Defines the largest number of documents allowed in a segment. Smaller values perform better on frequently changing indexes, larger values provide better search performance if the index does not change often.|Unlimited (Integer.MAX_VALUE)|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_factor|Controls segment merge frequency and size.
+|Property
+|Description
+|Default Value
 
-Determines how often segment indexes are merged when insertion occurs. With smaller values, less RAM is used while indexing, and searches on unoptimized indexes are faster, but indexing speed is slower. With larger values, more RAM is used during indexing, and while searches on unoptimized indexes are slower, indexing is faster. Thus larger values (&gt; 10) are best for batch index creation, and smaller values (&lt; 10) for indexes that are interactively maintained. The value must not be lower than 2.|10|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_min_size|Controls segment merge frequency and size.
+|hibernate.search.​[default\|<indexname>].​exclusive_index_use
+|Set to +true+ when no other process will need to write to the same index. This will enable
+Hibernate Search to work in exclusive mode on the index and improve performance when writing changes
+to the index.
+|+true+ (improved performance, releases locks only at shutdown)
 
-Segments smaller than this size (in MB) are always considered for the next segment merge operation.
+|hibernate.search.​[default\|<indexname>].​max_queue_length
+|Each index has a separate "pipeline" which contains the updates to be applied to the index.
+When this queue is full adding more operations to the queue becomes a blocking operation. Configuring
+this setting doesn't make much sense unless the +worker.execution+ is configured as +async+.
+|+1000+
 
+|hibernate.search.​[default\|<indexname>].​indexwriter.max_buffered_delete_terms
+|Determines the minimal number of delete terms required before the buffered in-memory delete terms
+are applied and flushed. If there are documents buffered in memory at the time, they are merged and
+a new segment is created.
+|Disabled (flushes by RAM usage)
+
+|hibernate.search.​[default\|<indexname>].​indexwriter.max_buffered_docs
+|Controls the amount of documents buffered in memory during indexing. The bigger the more RAM is
+consumed.
+|Disabled (flushes by RAM usage)
+
+|hibernate.search.​[default\|<indexname>].​indexwriter.max_merge_docs
+|Defines the largest number of documents allowed in a segment. Smaller values perform better on
+frequently changing indexes, larger values provide better search performance if the index does not
+change often.
+|Unlimited (Integer.MAX_VALUE)
+
+|hibernate.search.​[default\|<indexname>].​indexwriter.merge_factor
+|Controls segment merge frequency and size. Determines how often segment indexes are merged when
+insertion occurs. With smaller values, less RAM is used while indexing, and searches on unoptimized
+indexes are faster, but indexing speed is slower. With larger values, more RAM is used during
+indexing, and while searches on unoptimized indexes are slower, indexing is faster. Thus larger
+values (> 10) are best for batch index creation, and smaller values (< 10) for indexes that are
+interactively maintained. The value must not be lower than 2.
+|10
+
+|hibernate.search.​[default\|<indexname>].​indexwriter.merge_min_size
+|Controls segment merge frequency and size. Segments smaller than this size (in MB) are always
+considered for the next segment merge operation. +
 Setting this too large might result in expensive merge operations, even tough they are less frequent.
+See also +org.apache.lucene.index.LogDocMergePolicy.minMergeSize+.
+|0 MB (actually ~1K)
 
-See also org.apache.lucene.index.LogDocMergePolicy. +minMergeSize+.|0 MB (actually ~1K)|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_max_size|Controls segment merge frequency and size.
+|hibernate.search.​[default\|<indexname>].​indexwriter.merge_max_size
+|Controls segment merge frequency and size. Segments larger than this size (in MB) are never merged
+in bigger segments. This helps reduce memory requirements and avoids some merging operations at the
+cost of optimal search speed. When optimizing an index this value is ignored. +
+See also +org.apache.lucene.index.LogDocMergePolicy.maxMergeSize+.
+|Unlimited
 
-Segments larger than this size (in MB) are never merged in bigger segments.
+|hibernate.search.​[default\|<indexname>].​indexwriter.merge_max_optimize_size
+|Controls segment merge frequency and size. Segments larger than this size (in MB) are not merged
+in bigger segments even when optimizing the index (see +$$merge_max_size$$+ setting as well).
+Applied to +org.apache.lucene.index.LogDocMergePolicy.maxMergeSizeForOptimize+.
+|Unlimited
 
-This helps reduce memory requirements and avoids some merging operations at the cost of optimal search speed. When optimizing an index this value is ignored.
+|hibernate.search.​[default\|<indexname>].​indexwriter.merge_calibrate_by_deletes
+|Controls segment merge frequency and size. Set to +false+ to not consider deleted documents when
+estimating the merge policy. Applied to +org.apache.lucene.index.LogMergePolicy.calibrateSizeByDeletes+.
+|+true+
 
-See also org.apache.lucene.index.LogDocMergePolicy. +maxMergeSize+.|Unlimited|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_max_optimize_size|Controls segment merge frequency and size.
+|hibernate.search.​[default\|<indexname>].​indexwriter.ram_buffer_size
+|Controls the amount of RAM in MB dedicated to document buffers. When used together max_buffered_docs
+a flush occurs for whichever event happens first. +
+Generally for faster indexing performance it's best to flush by RAM usage instead of document count
+and use as large a RAM buffer as you can.
+|16 MB
 
-Segments larger than this size (in MB) are not merged in bigger segments even when optimizing the index (see +$$merge_max_size$$+ setting as well).
+|hibernate.search.​[default\|<indexname>].​indexwriter.term_index_interval
+|Expert: Set the interval between indexed terms. +
+Large values cause less memory to be used by IndexReader, but slow random-access to terms.
+Small values cause more memory to be used by an IndexReader, and speed random-access to terms.
+See Lucene documentation for more details.
+|128
 
-Applied to org.apache.lucene.index.LogDocMergePolicy. +maxMergeSizeForOptimize+.|Unlimited|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.merge_calibrate_by_deletes|Controls segment merge frequency and size.
+|hibernate.search.​enable_dirty_check
+|Not all entity changes require an update of the Lucene index. If all of the updated entity
+properties (dirty properties) are not indexed Hibernate Search will skip the re-indexing work.
+Disable this option if you use a custom ++FieldBridge++ which need to be invoked at each update
+event (even though the property for which the field bridge is configured has not changed). +
+This optimization will not be applied on classes using a +@ClassBridge+ or a +@DynamicBoost+. +
+Boolean parameter, use "true" or "false".
+|true
 
-Set to +false+ to not consider deleted documents when estimating the merge policy.
-
-Applied to org.apache.lucene.index.LogMergePolicy. +calibrateSizeByDeletes+.|+true+|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.ram_buffer_size|Controls the amount of RAM in MB dedicated to document buffers. When used together max_buffered_docs a flush occurs for whichever event happens first.
-
-Generally for faster indexing performance it's best to flush by RAM usage instead of document count and use as large a RAM buffer as you can.|16 MB|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.term_index_interval|Expert: Set the interval between indexed terms.
-
-Large values cause less memory to be used by IndexReader, but slow random-access to terms. Small values cause more memory to be used by an IndexReader, and speed random-access to terms. See Lucene documentation for more details.|128|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.use_compound_file|The advantage of using the compound file format is that
-              less file descriptors are used. The disadvantage is that
-              indexing takes more time and temporary disk space. You can set
-              this parameter to +false+ in an attempt to
-              improve the indexing time, but you could run out of file
-              descriptors if +mergeFactor+ is also
-              large.Boolean parameter, use "++true++" or "++false++". The default value for this option is ++true++.|true|hibernate.search.​enable_dirty_check|Not all entity changes require an update of the Lucene index. If all of the updated entity properties (dirty properties) are not indexed Hibernate Search will skip the re-indexing work.
-
-Disable this option if you use custom ++FieldBridge++s which need to be invoked at each update event (even though the property for which the field bridge is configured has not changed).
-
-This optimization will not be applied on classes using a +@ClassBridge+ or a +@DynamicBoost+.
-
-Boolean parameter, use "++true++" or "++false++". The default value for this option is ++true++.|true|hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_thread_states|Lucene's +IndexWriter+ can apply writes in parallel, but this property controls the limit of parallelism.
-
-If you have many cores and contention on the internal structures of the +IndexWriter+ becomes a bottleneck you should configure an higher value, at the cost of slightly higher memory consumption.|8
+|hibernate.search.​[default\|<indexname>].​indexwriter.max_thread_states
+|Lucene's +IndexWriter+ can apply writes in parallel, but this property controls the limit of
+parallelism. If you have many cores and contention on the internal structures of the +IndexWriter+
+becomes a bottleneck you should configure an higher value, at the cost of slightly higher memory
+consumption.
+|8
 |===============
 
 
@@ -1100,7 +1179,7 @@ indexes, this combination is valid but in this case the +indexBase+ configuratio
 needed only for filesystem based Directory instances must be specified to point to a filesystem
 location where to store the lock marker files.
 
-To select a locking factory, set the +$$hibernate.search.&lt;index&gt;.locking_strategy$$+ option to
+To select a locking factory, set the +$$hibernate.search.<index>.locking_strategy$$+ option to
 one of +simple+, +native+, +single+ or +none+. Alternatively set it to the fully qualified name of
 an implementation of +org.hibernate.search.store.LockFactoryProvider+.
 
