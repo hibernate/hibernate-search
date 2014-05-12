@@ -84,15 +84,6 @@
                 </execution>
               </executions>
             </plugin>
-            <plugin>
-                <groupId>org.zanata</groupId>
-                <artifactId>zanata-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <configuration>
-                    <srcDir>${basedir}/src/main/docbook</srcDir>
-                    <srcDirPot>${basedir}/src/main/docbook/pot</srcDirPot>
-                </configuration>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -162,6 +153,27 @@
                               </configuration>
                           </execution>
                       </executions>
+                  </plugin>
+                  <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <executions>
+                      <execution>
+                        <id>copy-docbook-images-to-staging</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                          <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                          <outputDirectory>${basedir}/target/docbook/staging/images/images</outputDirectory>
+                          <resources>
+                            <resource>
+                              <directory>${basedir}/src/main/asciidoc/images</directory>
+                            </resource>
+                          </resources>
+                        </configuration>
+                      </execution>
+                    </executions>
                   </plugin>
                   <plugin>
                       <groupId>org.jboss.maven.plugins</groupId>
