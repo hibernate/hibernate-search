@@ -54,6 +54,7 @@ import static org.jboss.logging.Logger.Level.WARN;
  * @author Davide D'Alto
  * @since 4.0
  */
+@SuppressWarnings( "deprecation" )
 @MessageLogger(projectCode = "HSEARCH")
 public interface Log extends BasicLogger {
 
@@ -67,15 +68,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = 2, value = "closed \"blackhole\" backend.")
 	void closedBlackholeBackend();
-
-	@LogMessage(level = WARN)
-	@Message(id = 3,
-			value = "update DirectoryProviders \"blackhole\" backend. Index changes will be prepared but discarded!")
-	void updatedDirectoryProviders();
-
-	@LogMessage(level = ERROR)
-	@Message(id = 4, value = "Exception attempting to instantiate Similarity '%1$s' set for %2$s")
-	void similarityInstantiationException(String similarityName, String beanXClassName);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 16, value = "Incorrect message type: %1$s")
@@ -246,11 +238,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 56, value = "Unable to un-register existing MBean: %1$s")
 	void unableToUnregisterExistingMBean(String name, @Cause Exception e);
 
-	@LogMessage(level = WARN)
-	@Message(id = 57, value = "Property hibernate.search.autoregister_listeners is set to false." +
-			" No attempt will be made to register Hibernate Search event listeners.")
-	void eventListenerWontBeRegistered();
-
 	@LogMessage(level = ERROR)
 	@Message(id = 58, value = "%1$s")
 	void exceptionOccurred(String errorMsg, @Cause Throwable exceptionThatOccurred);
@@ -260,24 +247,8 @@ public interface Log extends BasicLogger {
 	void workerException(@Cause Exception e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 60, value = "ReaderProvider raises an exception on destroy()")
-	void readerProviderExceptionOnDestroy(@Cause Exception e);
-
-	@LogMessage(level = ERROR)
-	@Message(id = 61, value = "DirectoryProvider raises an exception on stop() ")
-	void directoryProviderExceptionOnStop(@Cause Exception e);
-
-	@LogMessage(level = ERROR)
 	@Message(id = 62, value = "Batch indexing was interrupted")
 	void interruptedBatchIndexing();
-
-	@LogMessage(level = ERROR)
-	@Message(id = 63, value = "Error during batch indexing: ")
-	void errorDuringBatchIndexing(@Cause Throwable e);
-
-	@LogMessage(level = ERROR)
-	@Message(id = 64, value = "Error while executing runnable wrapped in a JTA transaction")
-	void errorExecutingRunnableInTransaction(@Cause Throwable e);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 65, value = "Error while rolling back transaction after %1$s")
@@ -300,14 +271,6 @@ public interface Log extends BasicLogger {
 	void illegalObjectRetrievedFromMessage(@Cause Exception e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = 70, value = "Terminating batch work! Index might end up in inconsistent state.")
-	void terminatingBatchWorkCanCauseInconsistentState();
-
-	@LogMessage(level = ERROR)
-	@Message(id = 71, value = "Unable to properly shut down asynchronous indexing work")
-	void unableToShutdownAsynchronousIndexing(@Cause Exception e);
-
-	@LogMessage(level = ERROR)
 	@Message(id = 72,
 			value = "Couldn't open the IndexWriter because of previous error: operation skipped, index ouf of sync!")
 	void cannotOpenIndexWriterCausePreviousError();
@@ -315,10 +278,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = ERROR)
 	@Message(id = 73, value = "Error in backend")
 	void backendError(@Cause Exception e);
-
-	@LogMessage(level = ERROR)
-	@Message(id = 74, value = "Unexpected error in Lucene Backend:")
-	void unexpectedErrorInLuceneBackend(@Cause Throwable tw);
 
 	@LogMessage(level = WARN)
 	@Message(id = 75, value = "Configuration setting " + Environment.LUCENE_MATCH_VERSION
@@ -347,9 +306,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 81,
 			value = "The index '%1$s' is using a non-recommended combination of backend and directoryProvider implementations")
 	void warnSuspiciousBackendDirectoryCombination(String indexName);
-
-	@Message(id = 82, value = "Unable to start serialization layer")
-	SearchException unableToStartSerializationLayer(@Cause Throwable e);
 
 	@Message(id = 83, value = "Unable to serialize List<LuceneWork>")
 	SearchException unableToSerializeLuceneWorks(@Cause Throwable e);
@@ -393,9 +349,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 96, value = "Fail to deserialize object")
 	SearchException failToDeserializeObject(@Cause Throwable e);
-
-	@Message(id = 97, value = "Unable to read file %1$s")
-	SearchException unableToReadFile(String filename, @Cause Throwable e);
 
 	@Message(id = 98, value = "Unable to parse message from protocol version %1$d.%2$d. "
 			+ "Current protocol version: %3$d.%4$d")
@@ -479,10 +432,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 120, value = "There are multiple properties indexed against the same field name '%1$s', but with different indexing settings. The behaviour is undefined.")
 	void inconsistentFieldConfiguration(String fieldName);
 
-	@LogMessage(level = WARN)
-	@Message(id = 124, value = "The option 'threadsForIndexWriter' of the MassIndexer is deprecated and is being ignored! Control the size of worker.thread_pool.size for each index instead.")
-	void massIndexerIndexWriterThreadsIgnored();
-
 	@LogMessage(level = TRACE)
 	@Message(id = 125, value = "Interceptor enforces skip index operation %2$s on instance of class %1$s")
 	void forceSkipIndexOperationViaInterception(Class<?> entityClass, WorkType type);
@@ -522,20 +471,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 140, value = "Unknown Resolution: %1$s")
 	AssertionFailure unknownResolution(String resolution);
 
-	@Message(id = 141, value = "Unknown ArrayBridge for resolution: %1$s")
-	AssertionFailure unknownArrayBridgeForResolution(String resolution);
-
-	@Message(id = 142, value = "Unknown MapBridge for resolution: %1$s")
-	AssertionFailure unknownMapBridgeForResolution(String resolution);
-
-	@Message(id = 143, value = "Unknown IterableBridge for resolution: %1$s")
-	AssertionFailure unknownIterableBridgeForResolution(String resolution);
-
 	@Message(id = 144, value = "FieldBridge passed in is not an instance of %1$s")
 	SearchException fieldBridgeNotAnInstanceof(String className);
-
-	@Message(id = 145, value = "Spatial field name not defined for class level annotation on class %1$s")
-	SearchException spatialFieldNameNotDefined(String className);
 
 	@Message(id = 146, value = "The query string '%2$s' applied on field '%1$s' has no meaningfull tokens to be matched. Validate the query input " +
 			"against the Analyzer applied on this field.")
@@ -591,9 +528,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 164, value = "Unable to lookup Search queue '%1$s' and connection factory '%2$s' for index '%3$s'")
 	SearchException jmsLookupException(String jmsQueueName, String jmsConnectionFactoryName, String indexName, @Cause Throwable e);
 
-	@Message(id = 165, value = "Illegal state for service initialization")
-	SearchException illegalServiceBuildPhase();
-
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 166, value = "IndexManager factory resolved alias '%1$s' to '%2$s'.")
 	void indexManagerAliasResolved(String alias, Class im);
@@ -636,17 +570,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 184, value = "Cannot define an entity with 0 shard on '%1$s'")
 	SearchException entityWithNoShard(Class<?> type);
 
-	@Message(id = 185, value = "Cannot set a sharding strategy when using dynamic sharding on '%1$s'")
-	SearchException illegalStrategyWhenUsingDynamicSharding(Class<?> type);
-
 	@Message(id = 186, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinding is not assignable to WorkerBuilderContext. Actual class is %1$s")
 	SearchException assertionFailureCannotCastToWorkerBuilderContext(Class<?> type);
-
-	@Message(id = 187, value = "Multiple inconsistent similarities defined in the class hierarchy of %s")
-	SearchException getMultipleInconsistentSimilaritiesInClassHierarchyException(String className);
-
-	@Message(id = 188, value = "Inconsistent similarities defined via annotations (%s) and configuration (%s)")
-	SearchException getInconsistentSimilaritySettingBetweenAnnotationsAndConfigPropertiesException(String annotationBasedSimilarity, String configLevelSimilarity);
 
 	@Message(id = 189, value = "Multiple entities are sharing the same index but are declaring an " +
 			"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
@@ -684,10 +609,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 199, value = "Configuration property '%s' should not be empty: illegal format.")
 	SearchException configurationPropertyCantBeEmpty(String key);
 
-	@LogMessage(level = Level.WARN)
-	@Message(id = 200, value = "Configuration property '%s' is deprecated and will be ignored.")
-	void deprecatedPropertyIgnored(String propertyName);
-
 	@Message(id = 201, value = "The edit distance must be either 1 or 2")
 	SearchException incorrectEditDistance();
 
@@ -696,9 +617,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 203, value = "No field from %s can be used for More Like This queries. They are neither stored or including the term vectors.")
 	SearchException noFieldCompatibleForMoreLikeThis(Class<?> entityType);
-
-	@Message(id = 204, value = "Field '$1%s' for class '$2%s' is unknown by Hibernate Search. Cannot be used in MoreLikeThis for now.")
-	SearchException fieldUnknownByHibernateSearchCannotBeUsedInMlt(Class<?> beanClass, String fieldName);
 
 	@Message(id = 205, value = "An IOException happened while accessing the Lucene indexes related to '%1$s'")
 	SearchException ioExceptionOnIndexOfEntity(@Cause IOException e, Class<?> entityType);

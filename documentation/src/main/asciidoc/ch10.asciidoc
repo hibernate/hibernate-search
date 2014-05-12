@@ -442,9 +442,3 @@ occurrences. In this case your custom implementation of the method +tf(float fre
 ====
 When two entities share the same index they must declare the same Similarity implementation.
 ====
-
-[NOTE]
-====
-The use of @Similarity which was used to configure the similarity on a class level is deprecated
-since Hibernate Search 4.4. Instead of using the annotation use the configuration property.
-====
