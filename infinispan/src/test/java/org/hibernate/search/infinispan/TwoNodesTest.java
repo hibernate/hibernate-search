@@ -108,8 +108,12 @@ public class TwoNodesTest {
 
 	@After
 	public void tearDown() throws Exception {
-		nodea.close();
-		nodeb.close();
+		if ( nodea != null ) {
+			nodea.close();
+		}
+		if ( nodeb != null ) {
+			nodeb.close();
+		}
 	}
 
 	@BeforeClass
