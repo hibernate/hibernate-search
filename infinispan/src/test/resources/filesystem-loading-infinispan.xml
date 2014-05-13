@@ -6,57 +6,55 @@
  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
   -->
 <infinispan
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="urn:infinispan:config:6.0 http://www.infinispan.org/schemas/infinispan-config-6.0.xsd"
-      xmlns="urn:infinispan:config:6.0">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:infinispan:config:7.0 http://www.infinispan.org/schemas/infinispan-config-7.0.xsd"
+    xmlns="urn:infinispan:config:7.0">
 
-  <global>
-    <globalJmxStatistics enabled="false" />
-    <!-- <transport clusterName="storage-test-cluster" /> -->
-    <shutdown hookBehavior="DONT_REGISTER" />
-  </global>
+    <cache-container name="HibernateSearch" default-cache="default" statistics="false" shutdown-hook="DONT_REGISTER">
 
-  <default>
-    <storeAsBinary
-      enabled="false" />
-    <locking
-      isolationLevel="READ_COMMITTED"
-      lockAcquisitionTimeout="20000"
-      writeSkewCheck="false"
-      concurrencyLevel="5000"
-      useLockStriping="false" />
-    <invocationBatching
-      enabled="false" />
-  </default>
+        <!-- Duplicate domains are allowed so that multiple deployments with default configuration
+            of Hibernate Search applications work - if possible it would be better to use JNDI to share
+            the CacheManager across applications -->
+        <jmx duplicate-domains="true" />
 
-  <namedCache name="LuceneIndexesMetadata">
-    <persistence passivation="false">
-       <singleFile
-         fetchPersistentState="true"
-         preload="true"
-         purgeOnStartup="false"
-         shared="true"
-         ignoreModifications="false"
-         location="${project.build.directory}">
-       </singleFile>
-     </persistence>
-  </namedCache>
+         <!-- *************************************** -->
+         <!--  Cache to store Lucene's file metadata  -->
+         <!-- *************************************** -->
+         <local-cache name="LuceneIndexesMetadata" batching="false" >
+            <transaction mode="NONE"/>
+            <indexing index="NONE" />
+            <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
+            <eviction max-entries="-1" strategy="NONE"/>
+            <expiration max-idle="-1"/>
+            <persistence>
+                <file-store shared="false" preload="true" fetch-state="true" read-only="false" purge="false" path="${project.build.directory}" />
+            </persistence>
+         </local-cache>
 
-  <namedCache name="LuceneIndexesData">
-    <persistence passivation="false">
-       <singleFile
-         fetchPersistentState="true"
-         preload="true"
-         purgeOnStartup="false"
-         shared="true"
-         ignoreModifications="false"
-         location="${project.build.directory}">
-       </singleFile>
-     </persistence>
-  </namedCache>
+         <!-- **************************** -->
+         <!--  Cache to store Lucene data  -->
+         <!-- **************************** -->
+         <local-cache name="LuceneIndexesData" batching="false">
+            <transaction mode="NONE"/>
+            <indexing index="NONE" />
+            <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
+            <eviction max-entries="-1" strategy="NONE"/>
+            <expiration max-idle="-1"/>
+            <persistence>
+                <file-store shared="false" preload="true" fetch-state="true" read-only="false" purge="false" path="${project.build.directory}" />
+            </persistence>
+         </local-cache>
 
-  <namedCache name="LuceneIndexesLocking">
-    <!-- No CacheLoader configured here -->
-  </namedCache>
+         <!-- ***************************** -->
+         <!--  Cache to store Lucene locks  -->
+         <!-- ***************************** -->
+        <local-cache name="LuceneIndexesLocking" batching="false">
+            <transaction mode="NONE"/>
+            <indexing index="NONE" />
+            <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
+            <eviction max-entries="-1" strategy="NONE"/>
+            <expiration max-idle="-1"/>
+        </local-cache>
+    </cache-container>
 
 </infinispan>
