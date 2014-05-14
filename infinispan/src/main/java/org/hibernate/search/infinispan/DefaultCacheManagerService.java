@@ -83,7 +83,7 @@ public class DefaultCacheManagerService implements CacheManagerService, Startabl
 			);
 			final String transportOverrideResource = properties.getProperty( INFINISPAN_TRANSPORT_OVERRIDE_RESOURCENAME );
 			try {
-				InfinispanConfigurationParser ispnConfiguration = new InfinispanConfigurationParser( DefaultCacheManagerService.class.getClassLoader() );
+				InfinispanConfigurationParser ispnConfiguration = new InfinispanConfigurationParser();
 				ConfigurationBuilderHolder configurationBuilderHolder = ispnConfiguration.parseFile( cfgName, transportOverrideResource );
 				cacheManager = new DefaultCacheManager( configurationBuilderHolder, true );
 				manageCacheManager = true;

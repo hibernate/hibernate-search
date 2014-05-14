@@ -83,7 +83,7 @@ public class InfinispanModuleMemberRegistrationIT {
 	public static Asset manifest() {
 		final String currentVersion = Version.getVersionString();
 		// here is where we tell Wildfly which Search module to use
-		String dependencyDef = "org.hibernate.search.orm:" + currentVersion + " services";
+		String dependencyDef = "org.hibernate.search.orm:" + "5.0.0-SNAPSHOT" + " services";
 		String manifest = Descriptors.create( ManifestDescriptor.class )
 				.attribute( "Dependencies", dependencyDef )
 				.exportAsString();

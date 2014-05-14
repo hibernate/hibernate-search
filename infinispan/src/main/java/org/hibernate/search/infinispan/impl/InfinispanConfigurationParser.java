@@ -9,7 +9,6 @@ package org.hibernate.search.infinispan.impl;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.hibernate.search.util.impl.AggregatedClassLoader;
 import org.infinispan.commons.util.FileLookup;
 import org.infinispan.commons.util.Util;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
@@ -26,15 +25,13 @@ import org.infinispan.configuration.parsing.ParserRegistry;
 public class InfinispanConfigurationParser {
 
 	private final ParserRegistry configurationParser;
-	private final ClassLoader compositeClassLoader;
+	private final ClassLoader userDeploymentClassloader;
+	private final ClassLoader ispnClassLoadr;
 
-	public InfinispanConfigurationParser(ClassLoader searchConfigClassloader) {
-		//The parser itself loads extensions from the Infinispan modules so
-		//needs to be pointed to the Infinispan module.
-		final ClassLoader ispnClassLoadr = ParserRegistry.class.getClassLoader();
-		final ClassLoader userDeploymentClassloader = Thread.currentThread().getContextClassLoader();
-		compositeClassLoader = new AggregatedClassLoader( searchConfigClassloader, userDeploymentClassloader, ispnClassLoadr );
-		configurationParser = new ParserRegistry( compositeClassLoader );
+	public InfinispanConfigurationParser() {
+		ispnClassLoadr = ParserRegistry.class.getClassLoader();
+		userDeploymentClassloader = Thread.currentThread().getContextClassLoader();
+		configurationParser = new ParserRegistry( ispnClassLoadr );
 	}
 
 	/**
@@ -49,15 +46,22 @@ public class InfinispanConfigurationParser {
 	 */
 	public ConfigurationBuilderHolder parseFile(String filename, String transportOverrideResource) throws IOException {
 		FileLookup fileLookup = new FileLookup();
-		InputStream is = fileLookup.lookupFileStrict( filename, compositeClassLoader );
+		InputStream is = fileLookup.lookupFileStrict( filename, userDeploymentClassloader );
 		try {
 			ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
+			//Workaround Infinispan's ClassLoader strategies to bend to our will:
+			fixClassLoaders( builderHolder );
 			patchTransportConfiguration( builderHolder, transportOverrideResource );
 			return builderHolder;
 		}
 		finally {
 			Util.close( is );
 		}
+	}
+
+	private void fixClassLoaders(ConfigurationBuilderHolder builderHolder) {
+		//Global section:
+		builderHolder.getGlobalConfigurationBuilder().classLoader( ispnClassLoadr );
 	}
 
 	/**
