@@ -7,7 +7,7 @@
 package org.hibernate.search.test.performance.reader;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.Environment;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
 
 /**
