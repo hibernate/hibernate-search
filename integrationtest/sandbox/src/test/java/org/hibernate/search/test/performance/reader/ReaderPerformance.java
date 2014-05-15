@@ -21,6 +21,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.junit.After;
 import org.junit.Before;
@@ -31,16 +32,20 @@ import org.junit.Test;
  */
 public abstract class ReaderPerformance extends SearchTestBase {
 
+
+	private static final Boolean PERFORMANCE_ENABLED = TestConstants.arePerformanceTestsEnabled();
+
 	//more iterations for more reliable measures:
-	private static final int TOTAL_WORK_BATCHES = 10;
+	private static final int TOTAL_WORK_BATCHES = PERFORMANCE_ENABLED ? 10 : 0;
 	//the next 3 define the kind of workload mix to test on:
-	private static final int SEARCHERS_PER_BATCH = 10;
+	private static final int SEARCHERS_PER_BATCH = PERFORMANCE_ENABLED ? 10 : 1;
 	private static final int UPDATES_PER_BATCH = 2;
 	private static final int INSERTIONS_PER_BATCH = 1;
+	private static final int INDEX_ELEMENTS = PERFORMANCE_ENABLED ? 5000000 : 2;
 
-	private static final int WORKER_THREADS = 20;
+	private static final int WORKER_THREADS = PERFORMANCE_ENABLED ? 20 : 1;
 
-	private static final int WARM_UP_CYCLES = 6;
+	private static final int WARM_UP_CYCLES = PERFORMANCE_ENABLED ? 6 : 1;
 
 	@Override
 	@Before
@@ -77,7 +82,7 @@ public abstract class ReaderPerformance extends SearchTestBase {
 		IndexWriter iw = new IndexWriter( directory, cfg );
 		IndexFillRunnable filler = new IndexFillRunnable( iw );
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
-		for ( int batch = 0; batch <= 5000000; batch++ ) {
+		for ( int batch = 0; batch <= INDEX_ELEMENTS; batch++ ) {
 			executor.execute( filler );
 		}
 		executor.shutdown();

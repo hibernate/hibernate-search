@@ -35,13 +35,16 @@ import org.hibernate.search.test.performance.task.UpdateBookRatingTask;
 import org.hibernate.search.test.performance.task.UpdateBookTotalSoldTask;
 import org.hibernate.search.test.performance.util.BatchCallback;
 import org.hibernate.search.test.performance.util.BatchSupport;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * @author Tomas Hradec
  */
 public abstract class TestScenario {
 
-	public final long initialOffset = 1000 * 1000;
+	private static final Boolean PERFORMANCE_ENABLED = TestConstants.arePerformanceTestsEnabled();
+
+	public final long initialOffset;
 	public final long initialAutorCount;
 	public final long initialBookCount;
 	public final long warmupCyclesCount;
@@ -52,10 +55,20 @@ public abstract class TestScenario {
 	public final StopWatch warmupStopWatch = new StopWatch();
 
 	public TestScenario() {
-		this.initialAutorCount = 10 * 1000;
-		this.initialBookCount = 1000 * 1000;
-		this.warmupCyclesCount = 100;
-		this.measuredCyclesCount = 1000;
+		if ( PERFORMANCE_ENABLED ) {
+			this.initialAutorCount = 10 * 1000;
+			this.initialBookCount = 1000 * 1000;
+			this.warmupCyclesCount = 100;
+			this.measuredCyclesCount = 1000;
+			initialOffset = 1000 * 1000;
+		}
+		else {
+			this.initialAutorCount = 10;
+			this.initialBookCount = 100;
+			this.warmupCyclesCount = 1;
+			this.measuredCyclesCount = 1;
+			this.initialOffset = 100;
+		}
 	}
 
 	public TestScenario(long initialAutorCount, long initialBookCount, long warmupCyclesCount, long measuredCyclesCount) {
@@ -64,6 +77,7 @@ public abstract class TestScenario {
 		this.initialBookCount = initialBookCount;
 		this.warmupCyclesCount = warmupCyclesCount;
 		this.measuredCyclesCount = measuredCyclesCount;
+		this.initialOffset = 1000 * 1000;
 	}
 
 	public Properties getHibernateProperties() {

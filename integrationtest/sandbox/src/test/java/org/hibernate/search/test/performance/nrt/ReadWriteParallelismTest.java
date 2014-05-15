@@ -27,6 +27,7 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
@@ -41,14 +42,16 @@ import org.junit.Assert;
 @TestForIssue(jiraKey = "HSEARCH-1317")
 public class ReadWriteParallelismTest {
 
-	private static final int THREAD_NUMBER = 30;
+	private static final Boolean PERFORMANCE_ENABLED = TestConstants.arePerformanceTestsEnabled();
+
+	private static final int THREAD_NUMBER = PERFORMANCE_ENABLED ? 30 : 1;
 
 	/**
 	 * The values below (as committed in source code) are not right for measurement!
 	 * We keep them reasonably low for a reasonably quick feedback from test builds.
 	 */
-	private static final int WARM_UP_SECONDS = 20;
-	private static final int FULL_RUN_SECONDS = 240;
+	private static final int WARM_UP_SECONDS = PERFORMANCE_ENABLED ? 20 : 0;
+	private static final int FULL_RUN_SECONDS = PERFORMANCE_ENABLED ? 240 : 0;
 
 	private static final AtomicBoolean failures = new AtomicBoolean( false );
 	private static final AtomicBoolean running = new AtomicBoolean( true );

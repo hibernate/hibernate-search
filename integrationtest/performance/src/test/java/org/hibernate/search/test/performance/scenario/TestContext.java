@@ -19,19 +19,22 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.test.performance.task.AbstractTask;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * @author Tomas Hradec
  */
 public class TestContext {
 
-	public static final boolean VERBOSE = true;
-	public static final boolean MEASURE_MEMORY = true;
-	public static final boolean MEASURE_TASK_TIME = true;
+	private static final Boolean PERFORMANCE_ENABLED = TestConstants.arePerformanceTestsEnabled();
+
+	public static final boolean VERBOSE = PERFORMANCE_ENABLED;
+	public static final boolean MEASURE_MEMORY = PERFORMANCE_ENABLED;
+	public static final boolean MEASURE_TASK_TIME = PERFORMANCE_ENABLED;
 	public static final boolean ASSERT_QUERY_RESULTS = true;
 	public static final boolean CHECK_INDEX_STATE = true;
 	public static final int MAX_AUTHORS = 1000;
-	public static final int THREADS_COUNT = 10;
+	public static final int THREADS_COUNT = PERFORMANCE_ENABLED ? 10 : 2;
 
 	public final SessionFactory sf;
 	public final TestScenario scenario;

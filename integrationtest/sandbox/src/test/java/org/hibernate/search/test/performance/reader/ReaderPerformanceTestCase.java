@@ -79,9 +79,10 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 
 	@Test
 	public void testConcurrency() throws Exception {
+		final int numberDetectives = PERFORMANCE_TESTS_ENABLED ? 5000 : 5;
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		for ( int index = 0; index < 5000; index++ ) {
+		for ( int index = 0; index < numberDetectives; index++ ) {
 			Detective detective = new Detective();
 			detective.setName( "John Doe " + index );
 			detective.setBadge( "123455" + index );
@@ -103,14 +104,12 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 		tx.commit();
 		s.close();
 
-		Thread.sleep( 1000 );
-
-		int nThreads = 15;
+		int nThreads = PERFORMANCE_TESTS_ENABLED ? 15 : 1;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
 		Work work = new Work( getSessionFactory() );
 		ReverseWork reverseWork = new ReverseWork( getSessionFactory() );
 		long start = System.nanoTime();
-		int iteration = 100;
+		int iteration = PERFORMANCE_TESTS_ENABLED ? 100 : 1;
 		log.info( "Starting worker threads." );
 		for ( int i = 0; i < iteration; i++ ) {
 			es.execute( work );

@@ -58,12 +58,12 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 
 	@Test
 	public void testConcurrency() throws Exception {
-		int nThreads = 15;
+		int nThreads = PERFORMANCE_TESTS_ENABLED ? 15 : 1;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
 		Work work = new Work( getSessionFactory() );
 		ReverseWork reverseWork = new ReverseWork( getSessionFactory() );
 		long start = System.nanoTime();
-		int iteration = 100;
+		int iteration = PERFORMANCE_TESTS_ENABLED ? 100 : 1;
 		for ( int i = 0; i < iteration; i++ ) {
 			es.execute( work );
 			es.execute( reverseWork );
