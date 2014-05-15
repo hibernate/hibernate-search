@@ -7,13 +7,13 @@
 
 package org.hibernate.search.test.embedded.path.validation;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author zkurey
@@ -50,7 +50,7 @@ public class TestInvalidPaths {
 		}
 		catch (SearchException se) {
 			assertTrue( "Should contain information about invalid path b.c.dne (message: <" + se.getMessage() + ">)" ,
-					se.getMessage().matches( ".*\\sb.c.dne.*" ) );
+					se.getMessage().matches( ".*\\[b.c.dne\\].*" ) );
 			assertFalse( "Should NOT contain information about invalid path prefix: notJustA (message: <" + se.getMessage() + ">)",
 					se.getMessage().contains( "notJustA" ) );
 		}

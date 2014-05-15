@@ -169,8 +169,8 @@ public interface Log extends BasicLogger {
 	void foundCurrentMarker();
 
 	@LogMessage(level = WARN)
-	@Message(id = 44, value = "Abstract classes can never insert index documents. Remove @Indexed.")
-	void abstractClassesCannotInsertDocuments();
+	@Message(id = 44, value = "Abstract classes cannot be indexed directly. Only concrete subclasses can be indexed. @Indexed on '%s' is superfluous and should be removed.")
+	void abstractClassesCannotInsertDocuments(String clazz);
 
 	@LogMessage(level = WARN)
 	@Message(id = 45, value = "@ContainedIn is pointing to an entity having @ProvidedId: %1$s. " +
@@ -633,5 +633,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 215, value = "Multiple matching FieldBridges found for %s of return type %s: %s" )
 	SearchException multipleMatchingFieldBridges(XMember member, XClass memberType, String listOfFieldBridges);
+
+	@Message(id = 216, value = "Found invalid @IndexedEmbedded->paths elements configured for member '%s' of class '%s'. The invalid paths are [%s]" )
+	SearchException invalidIncludePathConfiguration(String member, String clazz, String invalidPaths);
 
 }
