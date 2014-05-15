@@ -12,6 +12,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.testsupport.BytemanHelper;
@@ -46,7 +47,8 @@ public class IndexedEmbeddedWithAbstractClassTest {
 				.addClass( AbstractA.class )
 				.addClass( D.class );
 
-		new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		SearchFactoryImplementor searchFactory = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		searchFactory.close();
 		Assert.assertEquals( "Wrong invocation count", 1, BytemanHelper.getAndResetInvocationCount() );
 	}
 
