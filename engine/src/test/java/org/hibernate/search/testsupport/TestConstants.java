@@ -76,4 +76,8 @@ public final class TestConstants {
 		log.debugf( "Using %s as index directory.", indexDirPath );
 		return indexDirPath;
 	}
+
+	public static boolean arePerformanceTestsEnabled() {
+		return Boolean.getBoolean( "org.hibernate.search.enable_performance_tests" );
+	}
 }

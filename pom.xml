@@ -38,6 +38,7 @@
         <module>integrationtest/performance</module>
         <module>integrationtest/osgi/karaf-features</module>
         <module>integrationtest/osgi/karaf-it</module>
+        <module>integrationtest/sandbox</module>
     </modules>
 
     <issueManagement>
@@ -707,7 +708,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <goals>deploy</goals>
-                    <releaseProfiles>docbook,dist,perf</releaseProfiles>
+                    <releaseProfiles>docbook,dist</releaseProfiles>
                     <arguments>-DskipTests</arguments>
                     <pushChanges>false</pushChanges>
                     <localCheckout>true</localCheckout>
@@ -822,6 +823,7 @@
                             <!-- See HSEARCH-1444 -->
                             <hibernate.service.allow_crawling>false</hibernate.service.allow_crawling>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
+                            <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                         </systemPropertyVariables>
                         <additionalClasspathElements>
                             <!-- Needed by Byteman to load the agent on demand -->
@@ -979,6 +981,32 @@
                                         <ignore />
                                     </action>
                                 </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.felix</groupId>
+                                        <artifactId>maven-bundle-plugin</artifactId>
+                                        <versionRange>[2.3.7,)</versionRange>
+                                        <goals>
+                                            <goal>manifest</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.servicemix.tooling</groupId>
+                                        <artifactId>depends-maven-plugin</artifactId>
+                                        <versionRange>[1.2,)</versionRange>
+                                        <goals>
+                                            <goal>generate-depends-file</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
@@ -1018,9 +1046,9 @@
 
         <profile>
             <id>perf</id>
-            <modules>
-                <module>integrationtest/sandbox</module>
-            </modules>
+            <properties>
+                <org.hibernate.search.enable_performance_tests>true</org.hibernate.search.enable_performance_tests>
+            </properties>
         </profile>
 
         <!-- =============================== -->

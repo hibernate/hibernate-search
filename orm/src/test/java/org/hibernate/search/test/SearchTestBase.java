@@ -16,6 +16,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -28,6 +29,9 @@ import org.junit.runner.RunWith;
  */
 @RunWith(CustomRunner.class)
 public abstract class SearchTestBase implements TestResourceManager {
+
+	protected static final Boolean PERFORMANCE_TESTS_ENABLED = TestConstants.arePerformanceTestsEnabled();
+
 	// access only via getter, since instance gets lazily initalized
 	private DefaultTestResourceManager testResourceManager;
 

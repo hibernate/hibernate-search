@@ -15,13 +15,11 @@ import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
-import org.hibernate.search.Environment;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
@@ -60,12 +58,12 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 
 	@Test
 	public void testConcurrency() throws Exception {
-		int nThreads = 15;
+		int nThreads = PERFORMANCE_TESTS_ENABLED ? 15 : 1;
 		ExecutorService es = Executors.newFixedThreadPool( nThreads );
 		Work work = new Work( getSessionFactory() );
 		ReverseWork reverseWork = new ReverseWork( getSessionFactory() );
 		long start = System.nanoTime();
-		int iteration = 100;
+		int iteration = PERFORMANCE_TESTS_ENABLED ? 100 : 1;
 		for ( int i = 0; i < iteration; i++ ) {
 			es.execute( work );
 			es.execute( reverseWork );

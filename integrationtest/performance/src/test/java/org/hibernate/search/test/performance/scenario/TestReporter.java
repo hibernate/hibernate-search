@@ -119,6 +119,7 @@ public class TestReporter {
 	private static void printEnvInfo(TestContext ctx, PrintWriter out) {
 		out.println( "" );
 		out.println( "TEST CONFIGURATION" );
+		out.println( "    measure performance : " + TestConstants.arePerformanceTestsEnabled() );
 		out.println( "    threads             : " + THREADS_COUNT );
 		out.println( "    measured cycles     : " + ctx.scenario.measuredCyclesCount );
 		out.println( "    warmup cycles       : " + ctx.scenario.warmupCyclesCount );
