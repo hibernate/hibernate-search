@@ -9,7 +9,8 @@ package org.hibernate.search.infinispan.impl;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.infinispan.commons.util.FileLookup;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.infinispan.commons.util.Util;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
@@ -25,12 +26,10 @@ import org.infinispan.configuration.parsing.ParserRegistry;
 public class InfinispanConfigurationParser {
 
 	private final ParserRegistry configurationParser;
-	private final ClassLoader userDeploymentClassloader;
 	private final ClassLoader ispnClassLoadr;
 
 	public InfinispanConfigurationParser() {
 		ispnClassLoadr = ParserRegistry.class.getClassLoader();
-		userDeploymentClassloader = Thread.currentThread().getContextClassLoader();
 		configurationParser = new ParserRegistry( ispnClassLoadr );
 	}
 
@@ -41,12 +40,22 @@ public class InfinispanConfigurationParser {
 	 *
 	 * @param filename Infinispan configuration resource name
 	 * @param transportOverrideResource An alternative JGroups configuration file to be injected
+	 * @param serviceManager the ServiceManager to load resources
 	 * @throws IOException
 	 * @return
 	 */
-	public ConfigurationBuilderHolder parseFile(String filename, String transportOverrideResource) throws IOException {
-		FileLookup fileLookup = new FileLookup();
-		InputStream is = fileLookup.lookupFileStrict( filename, userDeploymentClassloader );
+	public ConfigurationBuilderHolder parseFile(String filename, String transportOverrideResource, ServiceManager serviceManager) throws IOException {
+		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+		try {
+			return parseFile( classLoaderService, filename, transportOverrideResource );
+		}
+		finally {
+			serviceManager.releaseService( ClassLoaderService.class );
+		}
+	}
+
+	private ConfigurationBuilderHolder parseFile(ClassLoaderService classLoaderService, String filename, String transportOverrideResource) {
+		InputStream is = classLoaderService.locateResourceStream( filename );
 		try {
 			ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
 			//Workaround Infinispan's ClassLoader strategies to bend to our will:
