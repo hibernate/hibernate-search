@@ -134,9 +134,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>4.7.1</luceneVersion>
-        <infinispanVersion>7.0.0.Alpha2</infinispanVersion>
-        <jgroupsVersion>3.5.0.Beta2</jgroupsVersion>
+        <luceneVersion>4.8.0</luceneVersion>
+        <infinispanVersion>7.0.0.Alpha4</infinispanVersion>
+        <jgroupsVersion>3.5.0.Beta5</jgroupsVersion>
         <hibernateVersion>4.3.5.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
@@ -159,7 +159,7 @@
         <!-- Integration tests -->
         <arquillianVersion>1.1.2.Final</arquillianVersion>
         <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
-        <wildflyVersion>8.0.0.Final</wildflyVersion>
+        <wildflyVersion>8.1.0.CR2</wildflyVersion>
     </properties>
 
     <dependencyManagement>
@@ -629,8 +629,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <showWarnings>true</showWarnings>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                     <!-- needed because of compiler bug: http://bugs.sun.com/view_bug.do?bug_id=6512707 -->
                     <proc>none</proc>
@@ -718,26 +718,6 @@
                     <tagNameFormat>@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>animal-sniffer-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>check-java-api-signature</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <signature>
-                                <groupId>org.codehaus.mojo.signature</groupId>
-                                <artifactId>java16</artifactId>
-                                <version>1.0</version>
-                            </signature>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -787,7 +767,7 @@
                                 <processors>
                                     <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
                                 </processors>
-                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.6 -target 1.6</compilerArguments>
+                                <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources/ -source 1.7 -target 1.7</compilerArguments>
                             </configuration>
                         </execution>
                     </executions>
@@ -799,11 +779,6 @@
                             <scope>compile</scope>
                         </dependency>
                     </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>animal-sniffer-maven-plugin</artifactId>
-                    <version>1.10</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>

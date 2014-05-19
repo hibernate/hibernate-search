@@ -20,6 +20,7 @@ import org.hibernate.service.ServiceRegistryBuilder;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMRules;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,7 +33,8 @@ import static org.junit.Assert.fail;
 @RunWith(BMUnitRunner.class)
 public class HibernateSearchSessionFactoryObserverTest {
 
-	@Test
+	//Disabled: see HSEARCH-1600
+	@Test @Ignore
 	@BMRules(rules = {
 			@BMRule(targetClass = "org.hibernate.internal.SessionFactoryImpl",
 					targetMethod = "close",

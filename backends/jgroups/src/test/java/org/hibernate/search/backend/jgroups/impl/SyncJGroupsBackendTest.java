@@ -114,7 +114,7 @@ public class SyncJGroupsBackendTest {
 		}
 		catch (SearchException se) {
 			//Expected: we're inducing the RPC into NPE
-			Throwable cause = se.getCause().getCause();
+			Throwable cause = se.getCause().getCause().getCause();
 			Assert.assertTrue( "Cause was not a NullPointerException but a " + cause, cause instanceof NullPointerException );
 			Assert.assertEquals( "Simulated Failure", cause.getMessage() );
 			npeTriggered = true;
