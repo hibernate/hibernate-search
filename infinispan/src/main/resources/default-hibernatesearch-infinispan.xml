@@ -7,145 +7,64 @@
   -->
 <infinispan
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="urn:infinispan:config:6.0 http://www.infinispan.org/schemas/infinispan-config-6.0.xsd"
-    xmlns="urn:infinispan:config:6.0">
+    xsi:schemaLocation="urn:infinispan:config:7.0 http://www.infinispan.org/schemas/infinispan-config-7.0.xsd"
+    xmlns="urn:infinispan:config:7.0">
 
     <!-- *************************** -->
     <!-- System-wide global settings -->
     <!-- *************************** -->
+    <jgroups>
+        <!-- Note that the JGroups transport uses sensible defaults if no configuration
+            property is defined. See the JGroupsTransport javadocs for more flags.
+            jgroups-udp.xml is the default stack bundled in the Infinispan core jar: integration
+            and tuning are tested by Infinispan. -->
+      <stack-file name="default-jgroups-udp" path="jgroups-udp.xml" />
+    </jgroups>
 
-    <global>
+    <cache-container name="HibernateSearch" default-cache="default" statistics="false" shutdown-hook="DONT_REGISTER">
+
+        <transport stack="default-jgroups-udp"/>
 
         <!-- Duplicate domains are allowed so that multiple deployments with default configuration
             of Hibernate Search applications work - if possible it would be better to use JNDI to share
             the CacheManager across applications -->
-        <globalJmxStatistics
-            enabled="false"
-            cacheManagerName="HibernateSearch"
-            allowDuplicateDomains="true" />
+        <jmx duplicate-domains="true" />
 
-        <!-- If the transport is omitted, there is no way to create distributed or clustered
-            caches. There is no added cost to defining a transport but not creating a cache that uses one,
-            since the transport is created and initialized lazily. -->
-        <transport
-            clusterName="HibernateSearch-Infinispan-cluster"
-            >
+         <!-- *************************************** -->
+         <!--  Cache to store Lucene's file metadata  -->
+         <!-- *************************************** -->
+         <replicated-cache name="LuceneIndexesMetadata" mode="SYNC" remote-timeout="25000" batching="false" >
+            <transaction mode="NONE"/>
+            <state-transfer enabled="true" timeout="480000" await-initial-transfer="true" />
+            <indexing index="NONE" />
+            <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
+            <eviction max-entries="-1" strategy="NONE"/>
+            <expiration max-idle="-1"/>
+         </replicated-cache>
 
-            <!-- Note that the JGroups transport uses sensible defaults if no configuration
-                property is defined. See the JGroupsTransport javadocs for more flags.
-                jgroups-udp.xml is the default stack bundled in the Infinispan core jar: integration
-                and tuning are tested by Infinispan. -->
-                <properties>
-                    <property name="configurationFile" value="jgroups-udp.xml" />
-                </properties>
-        </transport>
+         <!-- **************************** -->
+         <!--  Cache to store Lucene data  -->
+         <!-- **************************** -->
+         <distributed-cache name="LuceneIndexesData" mode="SYNC" remote-timeout="25000" batching="false">
+            <transaction mode="NONE"/>
+            <state-transfer enabled="true" timeout="480000" await-initial-transfer="true" />
+            <indexing index="NONE" />
+            <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
+            <eviction max-entries="-1" strategy="NONE"/>
+            <expiration max-idle="-1"/>
+         </distributed-cache>
 
-        <!-- Note that the JGroups transport uses sensible defaults if no configuration property
-            is defined. See the Infinispan wiki for more JGroups settings:
-            http://community.jboss.org/wiki/ClusteredConfigurationQuickStart -->
-
-        <!-- Used to register JVM shutdown hooks. hookBehavior: DEFAULT, REGISTER, DONT_REGISTER.
-            Hibernate Search takes care to stop the CacheManager so registering is not needed -->
-        <shutdown
-            hookBehavior="DONT_REGISTER" />
-
-    </global>
-
-    <!-- *************************** -->
-    <!-- Default "template" settings -->
-    <!-- *************************** -->
-
-    <default>
-
-        <locking
-            lockAcquisitionTimeout="20000"
-            writeSkewCheck="false"
-            concurrencyLevel="500"
-            useLockStriping="false" />
-
-        <invocationBatching
-            enabled="false" />
-
-        <!-- This element specifies that the cache is clustered. modes supported: distribution
-            (d), replication (r) or invalidation (i). Don't use invalidation to store Lucene indexes (as
-            with Hibernate Search DirectoryProvider). Replication is recommended for best performance of
-            Lucene indexes, but make sure you have enough memory to store the index in your heap.
-            Also distribution scales much better than replication on high number of nodes in the cluster. -->
-        <clustering
-            mode="replication">
-
-            <!-- Prefer loading all data at startup than later -->
-            <stateTransfer
-                timeout="480000"
-                fetchInMemoryState="true" />
-
-            <!-- Network calls are synchronous by default -->
-            <sync
-                replTimeout="20000" />
-        </clustering>
-
-        <jmxStatistics
-            enabled="true" />
-
-        <eviction
-            maxEntries="-1"
-            strategy="NONE" />
-
-        <expiration
-            maxIdle="-1" />
-
-    </default>
-
-    <!-- ******************************************************************************* -->
-    <!-- Individually configured "named" caches.                                         -->
-    <!--                                                                                 -->
-    <!-- While default configuration happens to be fine with similar settings across the -->
-    <!-- three caches, they should generally be different in a production environment.   -->
-    <!--                                                                                 -->
-    <!-- Current settings could easily lead to OutOfMemory exception as a CacheStore     -->
-    <!-- should be enabled, and maybe distribution is desired.                           -->
-    <!-- ******************************************************************************* -->
-
-    <!-- *************************************** -->
-    <!--  Cache to store Lucene's file metadata  -->
-    <!-- *************************************** -->
-    <namedCache
-        name="LuceneIndexesMetadata">
-        <clustering
-            mode="replication">
-            <stateTransfer
-                fetchInMemoryState="true" />
-            <sync
-                replTimeout="25000" />
-        </clustering>
-    </namedCache>
-
-    <!-- **************************** -->
-    <!--  Cache to store Lucene data  -->
-    <!-- **************************** -->
-    <namedCache
-        name="LuceneIndexesData">
-        <clustering
-            mode="replication">
-            <stateTransfer
-                fetchInMemoryState="true" />
-            <sync
-                replTimeout="25000" />
-        </clustering>
-    </namedCache>
-
-    <!-- ***************************** -->
-    <!--  Cache to store Lucene locks  -->
-    <!-- ***************************** -->
-    <namedCache
-        name="LuceneIndexesLocking">
-        <clustering
-            mode="replication">
-            <stateTransfer
-                fetchInMemoryState="true" />
-            <sync
-                replTimeout="25000" />
-        </clustering>
-    </namedCache>
+         <!-- ***************************** -->
+         <!--  Cache to store Lucene locks  -->
+         <!-- ***************************** -->
+        <replicated-cache name="LuceneIndexesLocking" mode="SYNC" remote-timeout="25000" batching="false">
+            <transaction mode="NONE"/>
+            <state-transfer enabled="true" timeout="480000" await-initial-transfer="true" />
+            <indexing index="NONE" />
+            <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
+            <eviction max-entries="-1" strategy="NONE"/>
+            <expiration max-idle="-1"/>
+        </replicated-cache>
+    </cache-container>
 
 </infinispan>

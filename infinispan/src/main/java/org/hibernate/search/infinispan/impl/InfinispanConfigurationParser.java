@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.infinispan.impl;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.infinispan.commons.util.FileLookup;
-import org.infinispan.commons.util.FileLookupFactory;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.infinispan.commons.util.Util;
-import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
 
@@ -28,16 +26,11 @@ import org.infinispan.configuration.parsing.ParserRegistry;
 public class InfinispanConfigurationParser {
 
 	private final ParserRegistry configurationParser;
-	private final ClassLoader searchConfigClassloader;
-	private final ClassLoader userDeploymentClassloader;
+	private final ClassLoader ispnClassLoadr;
 
-	public InfinispanConfigurationParser(ClassLoader searchConfigClassloader) {
-		this.searchConfigClassloader = searchConfigClassloader;
-		//The parser itself loads extensions from the Infinispan modules so
-		//needs to be pointed to the Infinispan module.
-		ClassLoader ispnClassLoadr = ParserRegistry.class.getClassLoader();
+	public InfinispanConfigurationParser() {
+		ispnClassLoadr = ParserRegistry.class.getClassLoader();
 		configurationParser = new ParserRegistry( ispnClassLoadr );
-		this.userDeploymentClassloader = Thread.currentThread().getContextClassLoader();
 	}
 
 	/**
@@ -47,27 +40,37 @@ public class InfinispanConfigurationParser {
 	 *
 	 * @param filename Infinispan configuration resource name
 	 * @param transportOverrideResource An alternative JGroups configuration file to be injected
+	 * @param serviceManager the ServiceManager to load resources
 	 * @throws IOException
 	 * @return
 	 */
-	public ConfigurationBuilderHolder parseFile(String filename, String transportOverrideResource) throws IOException {
-		FileLookup fileLookup = FileLookupFactory.newInstance();
-		InputStream is = fileLookup.lookupFile( filename, searchConfigClassloader );
-		if ( is == null ) {
-			is = fileLookup.lookupFile( filename, userDeploymentClassloader );
-			if ( is == null ) {
-				throw new FileNotFoundException( filename );
-			}
+	public ConfigurationBuilderHolder parseFile(String filename, String transportOverrideResource, ServiceManager serviceManager) throws IOException {
+		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+		try {
+			return parseFile( classLoaderService, filename, transportOverrideResource );
 		}
+		finally {
+			serviceManager.releaseService( ClassLoaderService.class );
+		}
+	}
+
+	private ConfigurationBuilderHolder parseFile(ClassLoaderService classLoaderService, String filename, String transportOverrideResource) {
+		InputStream is = classLoaderService.locateResourceStream( filename );
 		try {
 			ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
+			//Workaround Infinispan's ClassLoader strategies to bend to our will:
+			fixClassLoaders( builderHolder );
 			patchTransportConfiguration( builderHolder, transportOverrideResource );
-			patchInfinispanClassLoader( builderHolder );
 			return builderHolder;
 		}
 		finally {
 			Util.close( is );
 		}
+	}
+
+	private void fixClassLoaders(ConfigurationBuilderHolder builderHolder) {
+		//Global section:
+		builderHolder.getGlobalConfigurationBuilder().classLoader( ispnClassLoadr );
 	}
 
 	/**
@@ -80,17 +83,6 @@ public class InfinispanConfigurationParser {
 	private void patchTransportConfiguration(ConfigurationBuilderHolder builderHolder, String transportOverrideResource) {
 		if ( transportOverrideResource != null ) {
 			builderHolder.getGlobalConfigurationBuilder().transport().addProperty( "configurationFile", transportOverrideResource );
-		}
-	}
-
-	/**
-	 * Changes the state of the passed configuration Builder to apply specific classloader needs
-	 */
-	private void patchInfinispanClassLoader(ConfigurationBuilderHolder configurationBuilderHolder) {
-		configurationBuilderHolder.getGlobalConfigurationBuilder().classLoader( searchConfigClassloader );
-		configurationBuilderHolder.getDefaultConfigurationBuilder().classLoader( searchConfigClassloader );
-		for ( ConfigurationBuilder cfg : configurationBuilderHolder.getNamedConfigurationBuilders().values() ) {
-			cfg.classLoader( searchConfigClassloader );
 		}
 	}
 

@@ -156,6 +156,11 @@ public class FileMonitoringDirectory extends RAMDirectory {
 			delegate.writeStringSet( set );
 		}
 
+		@Override
+		public long getChecksum() throws IOException {
+			return delegate.getChecksum();
+		}
+
 	}
 
 	private class IndexInputDelegate extends IndexInput {

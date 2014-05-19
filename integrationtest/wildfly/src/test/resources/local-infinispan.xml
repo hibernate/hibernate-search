@@ -7,18 +7,13 @@
   -->
 <infinispan
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="urn:infinispan:config:6.0 http://www.infinispan.org/schemas/infinispan-config-6.0.xsd"
-    xmlns="urn:infinispan:config:6.0">
+    xsi:schemaLocation="urn:infinispan:config:7.0 http://www.infinispan.org/schemas/infinispan-config-7.0.xsd"
+    xmlns="urn:infinispan:config:7.0">
 
-    <global>
-        <globalJmxStatistics enabled="false" />
-        <shutdown hookBehavior="DONT_REGISTER" />
-    </global>
-
-    <default />
-
-    <namedCache name="LuceneIndexesMetadata" />
-    <namedCache name="LuceneIndexesData"     />
-    <namedCache name="LuceneIndexesLocking"  />
+    <cache-container name="HibernateSearch" default-cache="default" statistics="false" shutdown-hook="DONT_REGISTER">
+        <local-cache name="LuceneIndexesMetadata" />
+        <local-cache name="LuceneIndexesData"     />
+        <local-cache name="LuceneIndexesLocking"  />
+    </cache-container>
 
 </infinispan>
