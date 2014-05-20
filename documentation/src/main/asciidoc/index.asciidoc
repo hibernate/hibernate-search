@@ -1,7 +1,8 @@
 = Hibernate Search
 Emmanuel Bernard; Hardy Ferentschik; Gustavo Fernandes; Sanne Grinovero; Nabeel Ali Memon; Gunnar Morling
-:imagesdir: images
+:revdate: {hibernateSearchVersion}
 :toc:
+:docinfo:
 
 include::pr01.asciidoc[]
 

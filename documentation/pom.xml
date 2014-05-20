@@ -74,10 +74,10 @@
                     <groupId>org.asciidoctor</groupId>
                     <artifactId>asciidoctor-maven-plugin</artifactId>
                     <configuration>
-                        <sourceDocumentName>master.asciidoc</sourceDocumentName>
+                        <sourceDocumentName>index.asciidoc</sourceDocumentName>
                         <doctype>book</doctype>
                         <attributes>
-                            <version>${project.version}</version>
+                            <hibernateSearchVersion>${project.version}</hibernateSearchVersion>
                             <hibernateVersion>${hibernateVersion}</hibernateVersion>
                             <luceneVersion>${luceneVersion}</luceneVersion>
                             <infinispanVersion>${infinispanVersion}</infinispanVersion>
@@ -101,7 +101,6 @@
                                         <goals>
                                             <goal>resources</goal>
                                             <goal>generate</goal>
-                                            <goal>translate</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
@@ -163,7 +162,7 @@
                       <artifactId>maven-jdocbook-plugin</artifactId>
                       <configuration>
                           <sourceDirectory>${basedir}/target/asciidoc-docbook</sourceDirectory>
-                          <sourceDocumentName>master.xml</sourceDocumentName>
+                          <sourceDocumentName>index.xml</sourceDocumentName>
                           <masterTranslation>en-US</masterTranslation>
                           <imageResource>
                               <directory>${basedir}/src/main/asciidoc/images</directory>

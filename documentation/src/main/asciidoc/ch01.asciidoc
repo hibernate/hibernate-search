@@ -13,7 +13,7 @@ Hibernate new timer we recommend you start link:$$http://hibernate.org/quick-sta
 |===============
 |Java Runtime|A JDK or JRE version _6_ or greater. You
             can download a Java Runtime for Windows/Linux/Solaris link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[here].
-|Hibernate Search|+hibernate-search-{version}.jar+ and all
+|Hibernate Search|+hibernate-search-{hibernateSearchVersion}.jar+ and all
             runtime dependencies. You can get the jar artifacts either from
             the +dist/lib+ directory of the link:$$http://sourceforge.net/projects/hibernate/files/hibernate-search/$$[Hibernate Search distribution] or you can download them from the
             link:$$http://repository.jboss.org/nexus/content/groups/public-jboss/ $$[JBoss maven repository].
@@ -41,7 +41,7 @@ All you have to add to your pom.xml is:
 <dependency>
    <groupId>org.hibernate</groupId>
    <artifactId>hibernate-search</artifactId>
-   <version>{version}</version>
+   <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
 ====
@@ -62,7 +62,7 @@ All you have to add to your pom.xml is:
 <dependency>
    <groupId>org.hibernate</groupId>
    <artifactId>hibernate-search-infinispan</artifactId>
-   <version>{version}</version>
+   <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
 ====
