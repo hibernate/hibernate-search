@@ -7,8 +7,8 @@
 package org.hibernate.search.indexes.serialization.avro.logging.impl;
 
 import org.hibernate.search.exception.SearchException;
-import org.jboss.logging.Message;
-import org.jboss.logging.MessageLogger;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageLogger;
 
 /**
  * Hibernate Search Avro Serialization log abstraction.

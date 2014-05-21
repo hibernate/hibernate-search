@@ -172,6 +172,10 @@
             <property name="illegalClassnames" value="org.hibernate.annotations.common.AssertionFailure" />
             <property name="message" value="Stop using the AssertionFailure from commons-annotations." />
         </module>
+        <module name="org.hibernate.checkstyle.checks.regexp.IllegalImport">
+            <property name="illegalClassnames" value="org.jboss.logging.Cause, org.jboss.logging.LogMessage, org.jboss.logging.Message, org.jboss.logging.MessageLogger" />
+            <property name="message" value="Stop using the deprecated annotations for JBoss Logger: migrate to org.jboss.logging.annotations.*" />
+        </module>
 
     </module>
 

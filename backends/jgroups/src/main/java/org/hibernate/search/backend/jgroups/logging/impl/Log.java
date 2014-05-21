@@ -9,11 +9,11 @@ package org.hibernate.search.backend.jgroups.logging.impl;
 import java.util.Properties;
 
 import org.hibernate.search.exception.SearchException;
-import org.jboss.logging.Cause;
-import org.jboss.logging.LogMessage;
 import org.jboss.logging.Logger;
-import org.jboss.logging.Message;
-import org.jboss.logging.MessageLogger;
+import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageLogger;
 import org.jgroups.Address;
 import org.jgroups.SuspectedException;
 import org.jgroups.TimeoutException;
