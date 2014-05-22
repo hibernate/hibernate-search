@@ -24,7 +24,7 @@ public interface Loader {
 	void init(
 			Session session,
 			SearchFactoryImplementor searchFactoryImplementor,
-			ObjectsInitializer objectsInitializer,
+			ObjectInitializer objectInitializer,
 			TimeoutManager timeoutManager);
 
 	Object load(EntityInfo entityInfo);

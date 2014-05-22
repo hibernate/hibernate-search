@@ -15,9 +15,9 @@ import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 
@@ -29,20 +29,20 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
 public class MultiClassesQueryLoader extends AbstractLoader {
 	private Session session;
 	private SearchFactoryImplementor searchFactoryImplementor;
-	private List<RootEntityMetadata> entityMatadata;
+	private List<RootEntityMetadata> entityMetadata;
 	private TimeoutManager timeoutManager;
-	private ObjectsInitializer objectsInitializer;
+	private ObjectInitializer objectInitializer;
 
 	@Override
 	public void init(Session session,
 					SearchFactoryImplementor searchFactoryImplementor,
-					ObjectsInitializer objectsInitializer,
+					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {
 		super.init( session, searchFactoryImplementor );
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.timeoutManager = timeoutManager;
-		this.objectsInitializer = objectsInitializer;
+		this.objectInitializer = objectInitializer;
 	}
 
 	@Override
@@ -51,9 +51,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 	}
 
 	public void setEntityTypes(Set<Class<?>> entityTypes) {
-		List<Class<?>> safeEntityTypes = new ArrayList<Class<?>>();
-		//TODO should we go find the root entity for a given class rather than just checking for it's root status?
-		//     root entity could lead to quite inefficient queries in Hibernate when using table per class
+		List<Class<?>> safeEntityTypes = new ArrayList<>();
+		// TODO should we go find the root entity for a given class rather than just checking for it's root status?
+		// root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.size() == 0 ) {
 			//support all classes
 			for ( Map.Entry<Class<?>, EntityIndexBinding> entry : searchFactoryImplementor.getIndexBindings().entrySet() ) {
@@ -66,9 +66,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		else {
 			safeEntityTypes.addAll( entityTypes );
 		}
-		entityMatadata = new ArrayList<RootEntityMetadata>( safeEntityTypes.size() );
+		entityMetadata = new ArrayList<>( safeEntityTypes.size() );
 		for ( Class clazz : safeEntityTypes ) {
-			entityMatadata.add( new RootEntityMetadata( clazz, searchFactoryImplementor ) );
+			entityMetadata.add( new RootEntityMetadata( clazz, searchFactoryImplementor ) );
 		}
 	}
 
@@ -90,23 +90,21 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 				return Collections.EMPTY_LIST;
 			}
 			else {
-				final List<Object> list = Collections.singletonList( entity );
-				return list;
+				return Collections.singletonList( entity );
 			}
 		}
 
-		//split EntityInfo per root entity
-		Map<RootEntityMetadata, List<EntityInfo>> entityinfoBuckets =
-				new HashMap<RootEntityMetadata, List<EntityInfo>>( entityMatadata.size());
+		// split EntityInfo per root entity
+		Map<RootEntityMetadata, List<EntityInfo>> entityInfoBuckets = new HashMap<>( entityMetadata.size() );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			boolean found = false;
 			final Class<?> clazz = entityInfo.getClazz();
-			for ( RootEntityMetadata rootEntityInfo : entityMatadata ) {
+			for ( RootEntityMetadata rootEntityInfo : entityMetadata ) {
 				if ( rootEntityInfo.rootEntity == clazz || rootEntityInfo.mappedSubclasses.contains( clazz ) ) {
-					List<EntityInfo> bucket = entityinfoBuckets.get( rootEntityInfo );
+					List<EntityInfo> bucket = entityInfoBuckets.get( rootEntityInfo );
 					if ( bucket == null ) {
-						bucket = new ArrayList<EntityInfo>();
-						entityinfoBuckets.put( rootEntityInfo, bucket );
+						bucket = new ArrayList<>();
+						entityInfoBuckets.put( rootEntityInfo, bucket );
 					}
 					bucket.add( entityInfo );
 					found = true;
@@ -118,13 +116,13 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			}
 		}
 
-		//initialize objects by bucket
-		for ( Map.Entry<RootEntityMetadata, List<EntityInfo>> entry : entityinfoBuckets.entrySet() ) {
+		// initialize objects by bucket
+		for ( Map.Entry<RootEntityMetadata, List<EntityInfo>> entry : entityInfoBuckets.entrySet() ) {
 			final RootEntityMetadata key = entry.getKey();
 			final List<EntityInfo> value = entry.getValue();
 			final EntityInfo[] bucketEntityInfos = value.toArray( new EntityInfo[value.size()] );
 
-			objectsInitializer.initializeObjects(
+			objectInitializer.initializeObjects(
 					bucketEntityInfos,
 					key.criteria,
 					key.rootEntity,
@@ -134,6 +132,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			timeoutManager.isTimedOut();
 
 		}
+
 		return ObjectLoaderHelper.returnAlreadyLoadedObjectsInCorrectOrder( entityInfos, session );
 	}
 

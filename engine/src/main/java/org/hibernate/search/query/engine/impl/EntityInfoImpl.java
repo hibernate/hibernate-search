@@ -89,4 +89,13 @@ public class EntityInfoImpl implements EntityInfo {
 			this.projection = null;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "EntityInfoImpl{" +
+				"idName='" + idName + '\'' +
+				", id=" + id +
+				", clazz=" + clazz +
+				'}';
+	}
 }

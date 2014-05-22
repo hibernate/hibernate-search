@@ -23,6 +23,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,28 +34,66 @@ import static org.junit.Assert.assertEquals;
  */
 public class MultiClassesQueryLoaderTest extends SearchTestBase {
 
-	@Test
-	public void testObjectNotFound() throws Exception {
-		Session sess = openSession();
-		Transaction tx = sess.beginTransaction();
+	private Query luceneQuery;
+
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
+
+		// used for the filtering tests
 		Author author = new Author();
 		author.setName( "Moo Cow" );
-		sess.persist( author );
+		Music music = new Music();
+		music.addAuthor( author );
+		music.setTitle( "The moo moo mooing under the stars" );
+		Book book = new Book();
+		book.setBody( "This is the story of the Moo Cow, who sang the moo moo moo at night" );
+		book.setId( 1 );
+		session.persist( book );
+		session.persist( author );
+		session.persist( music );
+
+		// used for the not found test
+		Author charles = new Author();
+		charles.setName( "Charles Dickens" );
+		session.persist( charles );
 
 		tx.commit();
-		sess.clear();
-		sess.doWork( new Work() {
-			@Override
-			public void execute(Connection connection) throws SQLException {
-				Statement statement = connection.createStatement();
-				statement.executeUpdate( "DELETE FROM Author" );
-				statement.close();
-			}
-		} );
-		FullTextSession s = Search.getFullTextSession( sess );
-		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.keywordAnalyzer );
-		Query query = parser.parse( "name:moo" );
+		session.clear();
+
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				"title",
+				TestConstants.keywordAnalyzer
+		);
+		luceneQuery = parser.parse( "name:moo OR title:moo OR body:moo" );
+	}
+
+	@Test
+	public void testObjectNotFound() throws Exception {
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
+
+		session.doWork(
+				new Work() {
+					@Override
+					public void execute(Connection connection) throws SQLException {
+						Statement statement = connection.createStatement();
+						statement.executeUpdate( "DELETE FROM Author where name = 'Charles Dickens'" );
+						statement.close();
+					}
+				}
+		);
+
+		FullTextSession s = Search.getFullTextSession( session );
+		QueryParser parser = new QueryParser(
+				TestConstants.getTargetLuceneVersion(),
+				"title",
+				TestConstants.keywordAnalyzer
+		);
+		Query query = parser.parse( "name:charles" );
 		FullTextQuery hibQuery = s.createFullTextQuery( query, Author.class, Music.class );
 		List result = hibQuery.list();
 		assertEquals( "Should have returned no author", 0, result.size() );
@@ -64,42 +103,67 @@ public class MultiClassesQueryLoaderTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testObjectTypeFiltering() throws Exception {
-		Session sess = openSession();
-		Transaction tx = sess.beginTransaction();
-		Author author = new Author();
-		author.setName( "Moo Cow" );
-		Music music = new Music();
-		music.addAuthor( author );
-		music.setTitle( "The moo moo mooing under the stars" );
-		Book book = new Book();
-		book.setBody( "This is the story of the Moo Cow, who sang the moo moo moo at night" );
-		book.setId( 1 );
-		sess.persist( book );
-		sess.persist( author );
-		sess.persist( music );
-		tx.commit();
-		sess.clear();
+	public void testObjectTypeFilteringSingleClass() throws Exception {
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
 
-		FullTextSession s = Search.getFullTextSession( sess );
-		tx = s.beginTransaction();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.keywordAnalyzer );
-		Query query = parser.parse( "name:moo OR title:moo OR body:moo" );
-		FullTextQuery hibQuery = s.createFullTextQuery( query, Music.class );
-		List result = hibQuery.list();
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Music.class );
+		List result = fullTextQuery.list();
 		assertEquals( "Should match the music only", 1, result.size() );
-		hibQuery = s.createFullTextQuery( query, Author.class, Music.class );
-		result = hibQuery.list();
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testObjectTypeFilteringTwoClasses() throws Exception {
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
+
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Author.class, Music.class );
+		List result = fullTextQuery.list();
 		assertEquals( "Should match the author and music only", 2, result.size() );
-		hibQuery = s.createFullTextQuery( query, Author.class, Music.class, Book.class );
-		result = hibQuery.list();
+
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testObjectTypeFilteringThreeClasses() throws Exception {
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
+
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(
+				luceneQuery,
+				Author.class,
+				Music.class,
+				Book.class
+		);
+		List result = fullTextQuery.list();
+
 		assertEquals( "Should match the author, music and book", 3, result.size() );
-		hibQuery = s.createFullTextQuery( query );
-		result = hibQuery.list();
+		fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
+		result = fullTextQuery.list();
 		assertEquals( "Should match all types", 3, result.size() );
 
 		tx.commit();
-		s.close();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testImplicitObjectTypeFiltering() throws Exception {
+		Session session = openSession();
+		Transaction tx = session.beginTransaction();
+
+		FullTextSession fullTextSession = Search.getFullTextSession( session );
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
+		List result = fullTextQuery.list();
+		assertEquals( "Should match all types", 3, result.size() );
+
+		tx.commit();
+		fullTextSession.close();
 	}
 
 	@Override

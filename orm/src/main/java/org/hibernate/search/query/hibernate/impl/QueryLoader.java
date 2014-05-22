@@ -29,19 +29,19 @@ public class QueryLoader extends AbstractLoader {
 	private Criteria criteria;
 	private boolean isExplicitCriteria;
 	private TimeoutManager timeoutManager;
-	private ObjectsInitializer objectsInitializer;
+	private ObjectInitializer objectInitializer;
 	private boolean sizeSafe = true;
 
 	@Override
 	public void init(Session session,
 					SearchFactoryImplementor searchFactoryImplementor,
-					ObjectsInitializer objectsInitializer,
+					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {
 		super.init( session, searchFactoryImplementor );
 		this.session = session;
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.timeoutManager = timeoutManager;
-		this.objectsInitializer = objectsInitializer;
+		this.objectInitializer = objectInitializer;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class QueryLoader extends AbstractLoader {
 			throw new AssertionFailure( "EntityType not defined" );
 		}
 
-		objectsInitializer.initializeObjects(
+		objectInitializer.initializeObjects(
 				entityInfos,
 				criteria,
 				entityType,
@@ -89,8 +89,8 @@ public class QueryLoader extends AbstractLoader {
 			sizeSafe = true;
 			if ( criteria instanceof CriteriaImpl ) {
 				CriteriaImpl impl = (CriteriaImpl) criteria;
-				//restriction of subcriteria => suspect
-				//TODO some subcriteria might be ok (outer joins)
+				//restriction of sub criteria => suspect
+				//TODO some sub criteria might be ok (outer joins)
 				sizeSafe = !impl.iterateExpressionEntries().hasNext() && !impl.iterateSubcriteria().hasNext();
 			}
 		}
