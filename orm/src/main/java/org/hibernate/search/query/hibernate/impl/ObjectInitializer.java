@@ -17,10 +17,11 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface ObjectsInitializer {
+public interface ObjectInitializer {
 	void initializeObjects(EntityInfo[] entityInfos,
-										Criteria criteria, Class<?> entityType,
-										SearchFactoryImplementor searchFactoryImplementor,
-										TimeoutManager timeoutManager,
-										Session session);
+						   Criteria criteria,
+						   Class<?> entityType,
+						   SearchFactoryImplementor searchFactoryImplementor,
+						   TimeoutManager timeoutManager,
+						   Session session);
 }

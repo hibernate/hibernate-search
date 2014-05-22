@@ -366,7 +366,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		@Override
 		public void init(Session session,
 						SearchFactoryImplementor searchFactoryImplementor,
-						ObjectsInitializer objectsInitializer,
+						ObjectInitializer objectInitializer,
 						TimeoutManager timeoutManager) {
 		}
 

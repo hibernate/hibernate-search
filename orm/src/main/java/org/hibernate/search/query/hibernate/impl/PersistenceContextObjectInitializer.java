@@ -9,76 +9,69 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.Criteria;
-import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
+import org.hibernate.engine.spi.EntityKey;
+import org.hibernate.engine.spi.PersistenceContext;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Check if the entity is available in the second level cache and load it if there
- * before falling back to the delegate method.
- *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SecondLevelCacheObjectsInitializer implements ObjectsInitializer {
+public class PersistenceContextObjectInitializer implements ObjectInitializer {
 	private static final Log log = LoggerFactory.make();
-	private final ObjectsInitializer delegate;
+	private final ObjectInitializer delegate;
 
-	public SecondLevelCacheObjectsInitializer(ObjectsInitializer delegate) {
+	public PersistenceContextObjectInitializer(ObjectInitializer delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
 	public void initializeObjects(EntityInfo[] entityInfos,
-										Criteria criteria, Class<?> entityType,
-										SearchFactoryImplementor searchFactoryImplementor,
-										TimeoutManager timeoutManager,
-										Session session) {
-		boolean traceEnabled = log.isTraceEnabled();
+								  Criteria criteria,
+								  Class<?> entityType,
+								  SearchFactoryImplementor searchFactoryImplementor,
+								  TimeoutManager timeoutManager,
+								  Session session) {
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
-			if ( traceEnabled ) {
+			if ( log.isTraceEnabled() ) {
 				log.tracef( "No object to initialize", maxResults );
 			}
 			return;
 		}
 
-		//check the second-level cache
-		List<EntityInfo> remainingEntityInfos = new ArrayList<EntityInfo>( entityInfos.length );
+		SessionImplementor sessionImplementor = (SessionImplementor) session;
+		String entityName = session.getSessionFactory().getClassMetadata( entityType ).getEntityName();
+		EntityPersister persister = sessionImplementor.getFactory().getEntityPersister( entityName );
+		PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
+
+		//check the persistence context
+		List<EntityInfo> remainingEntityInfos = new ArrayList<>( maxResults );
 		for ( EntityInfo entityInfo : entityInfos ) {
 			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
-				final boolean isIn2LCache = session.getSessionFactory().getCache().containsEntity( entityInfo.getClazz(), entityInfo.getId() );
-				if ( isIn2LCache ) {
-					try {
-						//load the object from the second level cache
-						session.get( entityInfo.getClazz(), entityInfo.getId() );
-					}
-					catch (ObjectNotFoundException onfe) {
-						// Unlikely but needed: an index might be out of sync, and the cache might be as well
-						remainingEntityInfos.add( entityInfo );
-					}
-				}
-				else {
+				EntityKey entityKey = sessionImplementor.generateEntityKey( entityInfo.getId(), persister );
+				final boolean isInitialized = persistenceContext.containsEntity( entityKey );
+				if ( !isInitialized ) {
 					remainingEntityInfos.add( entityInfo );
 				}
 			}
 			else {
-				//if document id !=  entity id we can't use 2LC
+				//if document id !=  entity id we can't use PC lookup
 				remainingEntityInfos.add( entityInfo );
 			}
-
 		}
 		//update entityInfos to only contains the remaining ones
 		final int remainingSize = remainingEntityInfos.size();
-
-		if ( traceEnabled ) {
-			log.tracef( "Initialized %d objects out of %d in the second level cache", maxResults - remainingSize, maxResults );
+		if ( log.isTraceEnabled() ) {
+			log.tracef( "Initialized %d objects out of %d in the persistence context", maxResults - remainingSize, maxResults );
 		}
 		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(

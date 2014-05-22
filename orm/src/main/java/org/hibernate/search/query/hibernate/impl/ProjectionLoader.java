@@ -34,7 +34,7 @@ public class ProjectionLoader implements Loader {
 	@Override
 	public void init(Session session,
 					SearchFactoryImplementor searchFactoryImplementor,
-					ObjectsInitializer objectsInitializer,
+					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {
 	}
 

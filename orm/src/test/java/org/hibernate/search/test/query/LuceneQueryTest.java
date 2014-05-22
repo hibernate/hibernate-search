@@ -25,6 +25,7 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
 import org.hibernate.stat.Statistics;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,244 +41,202 @@ import static org.junit.Assert.assertTrue;
  */
 public class LuceneQueryTest extends SearchTestBase {
 
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		indexTestData();
+	}
+
 	@Test
 	public void testList() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		Clock clock = new Clock( 1, "Seiko" );
-		s.save( clock );
-		clock = new Clock( 2, "Festina" );
-		s.save( clock );
-		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
-		);
-		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
-		s.save( book );
-		tx.commit();
-		s.clear();
-		tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( 0, result.size() );
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit class filter", 2, result.size() );
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = s.createFullTextQuery( query, Clock.class );
+		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with one class filter", 1, result.size() );
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = s.createFullTextQuery( query );
+		hibQuery = fullTextSession.createFullTextQuery( query );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with no class filter", 2, result.size() );
 		for ( Object element : result ) {
 			assertTrue( HibernateHelper.isInitialized( element ) );
-			s.delete( element );
+			fullTextSession.delete( element );
 		}
-		s.flush();
+		fullTextSession.flush();
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = s.createFullTextQuery( query );
+		hibQuery = fullTextSession.createFullTextQuery( query );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with delete objects", 0, result.size() );
 
-		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testResultSize() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		Clock clock = new Clock( 1, "Seiko" );
-		s.save( clock );
-		clock = new Clock( 2, "Festina" );
-		s.save( clock );
-		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
-		);
-		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
-		s.save( book );
-		tx.commit();
-		s.clear();
-		tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
-		Statistics stats = s.getSessionFactory().getStatistics();
+		Statistics stats = fullTextSession.getSessionFactory().getStatistics();
 		stats.clear();
 		boolean enabled = stats.isStatisticsEnabled();
 		if ( !enabled ) {
 			stats.setStatisticsEnabled( true );
 		}
-		FullTextQuery hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		assertEquals( "Exection of getResultSize without actual results", 2, hibQuery.getResultSize() );
 		assertEquals( "No entity should be loaded", 0, stats.getEntityLoadCount() );
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = s.createFullTextQuery( query );
+		hibQuery = fullTextSession.createFullTextQuery( query );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "2 entities should be loaded", 2, stats.getEntityLoadCount() );
 		if ( !enabled ) {
 			stats.setStatisticsEnabled( false );
 		}
-		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
-			s.delete( element );
-		}
+
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
-	public void testFirstMax() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		Clock clock = new Clock( 1, "Seiko" );
-		s.save( clock );
-		clock = new Clock( 2, "Festina" );
-		s.save( clock );
-		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
-		);
-		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
-		s.save( book );
-		tx.commit();
-		s.clear();
-		tx = s.beginTransaction();
+	public void testResultSizeWithOffset() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		hibQuery.setFirstResult( 1 );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "first result no max result", 1, result.size() );
 
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testMaxResultLessThanTotalNumberOfHits() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+
+		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		hibQuery.setFirstResult( 0 );
 		hibQuery.setMaxResults( 1 );
-		result = hibQuery.list();
+		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "max result set", 1, result.size() );
 
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testMaxResultMoreThanTotalNumberOfHits() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+
+		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		hibQuery.setFirstResult( 0 );
 		hibQuery.setMaxResults( 3 );
-		result = hibQuery.list();
+		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "max result out of limit", 2, result.size() );
 
+		tx.commit();
+		fullTextSession.close();
+	}
+
+	@Test
+	public void testMaxResultWithOffset() throws Exception {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
+
+		Query query = parser.parse( "summary:Festina Or brand:Seiko" );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
+
 		hibQuery.setFirstResult( 2 );
 		hibQuery.setMaxResults( 3 );
-		result = hibQuery.list();
+		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "first result out of limit", 0, result.size() );
 
-		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testIterator() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		Clock clock = new Clock( 1, "Seiko" );
-		s.save( clock );
-		clock = new Clock( 2, "Festina" );
-		s.save( clock );
-		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
-		);
-		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
-		s.save( book );
-		tx.commit();//post commit events for lucene
-		s.clear();
-		tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		Iterator result = hibQuery.iterate();
 		assertNotNull( result );
 		assertFalse( result.hasNext() );
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		result = hibQuery.iterate();
 		assertNotNull( result );
 		int index = 0;
 		while ( result.hasNext() ) {
 			index++;
-			s.delete( result.next() );
+			fullTextSession.delete( result.next() );
 		}
 		assertEquals( 2, index );
 
-		s.flush();
+		fullTextSession.flush();
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		result = hibQuery.iterate();
 		assertNotNull( result );
 		assertFalse( result.hasNext() );
 
-		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testScrollableResultSet() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		Clock clock = new Clock( 1, "Seiko" );
-		s.save( clock );
-		clock = new Clock( 2, "Festina" );
-		s.save( clock );
-		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
-		);
-		s.save( book );
-		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
-		s.save( book );
-		tx.commit();//post commit events for lucene
-		s.clear();
-		tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:noword" );
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		ScrollableResults result = hibQuery.scroll();
 		assertNotNull( result );
 		assertEquals( -1, result.getRowNumber() );
@@ -285,7 +244,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		result.close();
 
 		query = parser.parse( "summary:Festina Or brand:Seiko" );
-		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		result = hibQuery.scroll();
 		assertEquals( -1, result.getRowNumber() );
 		result.beforeFirst();
@@ -294,30 +253,21 @@ public class LuceneQueryTest extends SearchTestBase {
 		assertTrue( result.scroll( 1 ) );
 		assertTrue( result.isLast() );
 		assertFalse( result.scroll( 1 ) );
-		result.beforeFirst();
-		while ( result.next() ) {
-			s.delete( result.get()[0] );
-		}
-		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
-			s.delete( element );
-		}
+
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	// Technically this is checked by other tests but let's do it anyway. J.G.
 
 	@Test
 	public void testDefaultFetchSize() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 
 		ScrollableResults projections = hibQuery.scroll();
@@ -328,25 +278,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		projections.next();
 		assertTrue( projections.isFirst() );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testFetchSizeLargerThanHits() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 6 );
 
@@ -356,25 +299,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		Object[] result = results.get();
 		assertEquals( "incorrect entityInfo returned", 1000, result[0] );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testFetchSizeDefaultFirstAndMax() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
@@ -396,25 +332,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		result = results.get();
 		assertEquals( "incorrect entityInfo returned", 1002, result[0] );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testFetchSizeNonDefaultFirstAndMax() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
 		hibQuery.setFirstResult( 1 );
@@ -444,25 +373,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		result = results.get();
 		assertNull( result );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testFetchSizeNonDefaultFirstAndMaxNoHits() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:XXX" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 		hibQuery.setFetchSize( 3 );
 		hibQuery.setFirstResult( 1 );
@@ -473,12 +395,8 @@ public class LuceneQueryTest extends SearchTestBase {
 		Object[] result = results.get();
 		assertNull( "non-null entity infos returned", result );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	/**
@@ -488,14 +406,11 @@ public class LuceneQueryTest extends SearchTestBase {
 	 */
 	@Test
 	public void testMaxResultZero() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 		Query query = parser.parse( "dept:foo" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setFirstResult( 0 );
 		hibQuery.setMaxResults( 0 );
 
@@ -508,25 +423,18 @@ public class LuceneQueryTest extends SearchTestBase {
 		result = hibQuery.list();
 		assertTrue( "We should get the empty result list", result.isEmpty() );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testCurrent() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:ITech" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		hibQuery.setProjection( "id", "lastname", "dept" );
 
 
@@ -562,50 +470,38 @@ public class LuceneQueryTest extends SearchTestBase {
 		result = results.get();
 		assertEquals( 1004, result[0] );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testMultipleEntityPerIndex() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		Clock clock = new Clock( 1, "Seiko" );
-		s.save( clock );
-		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
-		);
-		s.save( book );
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		AlternateBook alternateBook = new AlternateBook(
 				1, "La chute de la petite reine a travers les yeux de Festina"
 		);
-		s.save( alternateBook );
+		fullTextSession.save( alternateBook );
 		tx.commit();
-		s.clear();
-		tx = s.beginTransaction();
+		fullTextSession.clear();
+		tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina" );
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit class filter", 1, result.size() );
 
 		query = parser.parse( "summary:Festina" );
-		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		Iterator it = hibQuery.iterate();
 		assertTrue( it.hasNext() );
 		assertNotNull( it.next() );
 		assertFalse( it.hasNext() );
 
 		query = parser.parse( "summary:Festina" );
-		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		ScrollableResults sr = hibQuery.scroll();
 		assertTrue( sr.first() );
 		assertNotNull( sr.get() );
@@ -613,86 +509,60 @@ public class LuceneQueryTest extends SearchTestBase {
 		sr.close();
 
 		query = parser.parse( "summary:Festina OR brand:seiko" );
-		hibQuery = s.createFullTextQuery( query, Clock.class, Book.class );
+		hibQuery = fullTextSession.createFullTextQuery( query, Clock.class, Book.class );
 		hibQuery.setMaxResults( 2 );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit class filter and limit", 2, result.size() );
 
 		query = parser.parse( "summary:Festina" );
-		hibQuery = s.createFullTextQuery( query );
+		hibQuery = fullTextSession.createFullTextQuery( query );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with no class filter", 2, result.size() );
 		for ( Object element : result ) {
 			assertTrue( HibernateHelper.isInitialized( element ) );
-			s.delete( element );
 		}
-		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
-			s.delete( element );
-		}
+
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testCriteria() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		Transaction tx = s.beginTransaction();
-		Book book = new Book(
-				1,
-				"La chute de la petite reine a travers les yeux de Festina",
-				"La chute de la petite reine a travers les yeux de Festina, blahblah"
-		);
-		s.save( book );
-		Author emmanuel = new Author();
-		emmanuel.setName( "Emmanuel" );
-		s.save( emmanuel );
-		book.getAuthors().add( emmanuel );
-		tx.commit();
-		s.clear();
-		tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
 
 		Query query = parser.parse( "summary:Festina" );
-		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Book.class );
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Query with no explicit criteria", 1, result.size() );
-		book = (Book) result.get( 0 );
-		assertFalse( "Association should not be inintialized", HibernateHelper.isInitialized( book.getAuthors() ) );
+		Book book = (Book) result.get( 0 );
+		assertFalse( "Association should not be initialized", HibernateHelper.isInitialized( book.getAuthors() ) );
 
-		result = s.createFullTextQuery( query ).setCriteriaQuery(
-				s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN )
+		result = fullTextSession.createFullTextQuery( query ).setCriteriaQuery(
+				fullTextSession.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN )
 		).list();
 		assertNotNull( result );
 		assertEquals( "Query with explicit criteria", 1, result.size() );
 		book = (Book) result.get( 0 );
-		assertTrue( "Association should be inintialized", HibernateHelper.isInitialized( book.getAuthors() ) );
+		assertTrue( "Association should be initialized", HibernateHelper.isInitialized( book.getAuthors() ) );
 		assertEquals( 1, book.getAuthors().size() );
 
-		//cleanup
-		Author author = book.getAuthors().iterator().next();
-		book.getAuthors().remove( author );
-
-		for ( Object element : s.createQuery( "from java.lang.Object" ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testScrollEmptyHits() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:XXX" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 
 		ScrollableResults projections = hibQuery.scroll();
 		projections.beforeFirst();
@@ -700,7 +570,7 @@ public class LuceneQueryTest extends SearchTestBase {
 		Object[] projection = projections.get();
 		assertNull( projection );
 
-		hibQuery = s.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
+		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
 
 		projections = hibQuery.scroll();
 		projections.beforeFirst();
@@ -708,74 +578,80 @@ public class LuceneQueryTest extends SearchTestBase {
 		projection = projections.get();
 		assertNull( projection );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testListEmptyHits() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:XXX" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		List result = hibQuery.list();
 		assertEquals( 0, result.size() );
 
-		hibQuery = s.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
+		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
 		result = hibQuery.list();
 		assertEquals( 0, result.size() );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
 	@Test
 	public void testIterateEmptyHits() throws Exception {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		prepEmployeeIndex( s );
-
-		s.clear();
-		Transaction tx = s.beginTransaction();
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "dept", TestConstants.standardAnalyzer );
 
 		Query query = parser.parse( "dept:XXX" );
-		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		org.hibernate.search.FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Employee.class );
 		Iterator iter = hibQuery.iterate();
 		assertFalse( iter.hasNext() );
 
-		hibQuery = s.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
+		hibQuery = fullTextSession.createFullTextQuery( query, Employee.class ).setFirstResult( 10 ).setMaxResults( 20 );
 		iter = hibQuery.iterate();
 		assertFalse( iter.hasNext() );
 
-		//cleanup
-		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
-			s.delete( element );
-		}
 		tx.commit();
-		s.close();
+		fullTextSession.close();
 	}
 
-	private void prepEmployeeIndex(FullTextSession s) {
-		Transaction tx = s.beginTransaction();
-		s.save( new Employee( 1000, "Griffin", "ITech" ) );
-		s.save( new Employee( 1001, "Jackson", "Accounting" ) );
-		s.save( new Employee( 1002, "Jimenez", "ITech" ) );
-		s.save( new Employee( 1003, "Stejskal", "ITech" ) );
-		s.save( new Employee( 1004, "Whetbrook", "ITech" ) );
+	private void indexTestData() {
+		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
+		Transaction tx = fullTextSession.beginTransaction();
+
+		Clock clock = new Clock( 1, "Seiko" );
+		fullTextSession.save( clock );
+		clock = new Clock( 2, "Festina" );
+		fullTextSession.save( clock );
+
+		Book book = new Book(
+				1,
+				"La chute de la petite reine a travers les yeux de Festina",
+				"La chute de la petite reine a travers les yeux de Festina, blahblah"
+		);
+		fullTextSession.save( book );
+
+		Author emmanuel = new Author();
+		emmanuel.setName( "Emmanuel" );
+		fullTextSession.save( emmanuel );
+		book.getAuthors().add( emmanuel );
+
+		book = new Book( 2, "La gloire de mon père", "Les deboires de mon père en vélo" );
+		fullTextSession.save( book );
+
+		fullTextSession.save( new Employee( 1000, "Griffin", "ITech" ) );
+		fullTextSession.save( new Employee( 1001, "Jackson", "Accounting" ) );
+		fullTextSession.save( new Employee( 1002, "Jimenez", "ITech" ) );
+		fullTextSession.save( new Employee( 1003, "Stejskal", "ITech" ) );
+		fullTextSession.save( new Employee( 1004, "Whetbrook", "ITech" ) );
+
 		tx.commit();
+		fullTextSession.close();
 	}
 
 	@Override

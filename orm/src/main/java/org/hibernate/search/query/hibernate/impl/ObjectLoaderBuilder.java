@@ -139,7 +139,7 @@ public class ObjectLoaderBuilder {
 		return this;
 	}
 
-	private ObjectsInitializer getObjectInitializer() {
+	private ObjectInitializer getObjectInitializer() {
 		log.tracef(
 				"ObjectsInitializer: Use lookup method %s and database retrieval method %s",
 				lookupMethod,
@@ -148,13 +148,13 @@ public class ObjectLoaderBuilder {
 		if ( criteria != null && retrievalMethod != DatabaseRetrievalMethod.QUERY ) {
 			throw new SearchException( "Cannot mix custom criteria query and " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
 		}
-		final ObjectsInitializer initializer;
+		final ObjectInitializer initializer;
 		if ( retrievalMethod == DatabaseRetrievalMethod.FIND_BY_ID ) {
 			//return early as this method does naturally 2lc + session lookup
-			return LookupObjectsInitializer.INSTANCE;
+			return LookupObjectInitializer.INSTANCE;
 		}
 		else if ( retrievalMethod == DatabaseRetrievalMethod.QUERY ) {
-			initializer = CriteriaObjectsInitializer.INSTANCE;
+			initializer = CriteriaObjectInitializer.INSTANCE;
 		}
 		else {
 			throw new AssertionFailure( "Unknown " + DatabaseRetrievalMethod.class.getSimpleName() + "." + retrievalMethod );
@@ -163,11 +163,11 @@ public class ObjectLoaderBuilder {
 			return initializer;
 		}
 		else if ( lookupMethod == ObjectLookupMethod.PERSISTENCE_CONTEXT ) {
-			return new PersistenceContextObjectsInitializer( initializer );
+			return new PersistenceContextObjectInitializer( initializer );
 		}
 		else if ( lookupMethod == ObjectLookupMethod.SECOND_LEVEL_CACHE ) {
 			//we want to check the PC first, that's cheaper
-			return new PersistenceContextObjectsInitializer( new SecondLevelCacheObjectsInitializer( initializer ) );
+			return new PersistenceContextObjectInitializer( new SecondLevelCacheObjectInitializer( initializer ) );
 		}
 		else {
 			throw new AssertionFailure( "Unknown " + ObjectLookupMethod.class.getSimpleName() + "." + lookupMethod );

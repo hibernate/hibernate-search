@@ -28,23 +28,24 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class CriteriaObjectsInitializer implements ObjectsInitializer {
+public class CriteriaObjectInitializer implements ObjectInitializer {
 
 	private static final Log log = LoggerFactory.make();
 	private static final int MAX_IN_CLAUSE = 500;
 
-	public static final CriteriaObjectsInitializer INSTANCE = new CriteriaObjectsInitializer();
+	public static final CriteriaObjectInitializer INSTANCE = new CriteriaObjectInitializer();
 
-	private CriteriaObjectsInitializer() {
+	private CriteriaObjectInitializer() {
 		// use INSTANCE instead of constructor
 	}
 
 	@Override
 	public void initializeObjects(EntityInfo[] entityInfos,
-										Criteria criteria, Class<?> entityType,
-										SearchFactoryImplementor searchFactoryImplementor,
-										TimeoutManager timeoutManager,
-										Session session) {
+								  Criteria criteria,
+								  Class<?> entityType,
+								  SearchFactoryImplementor searchFactoryImplementor,
+								  TimeoutManager timeoutManager,
+								  Session session) {
 		//Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( log.isTraceEnabled() ) {
