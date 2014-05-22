@@ -160,6 +160,7 @@
         <arquillianVersion>1.1.2.Final</arquillianVersion>
         <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
         <wildflyVersion>8.1.0.CR2</wildflyVersion>
+        <m2e.apt.activation>jdt_apt</m2e.apt.activation>
     </properties>
 
     <dependencyManagement>
