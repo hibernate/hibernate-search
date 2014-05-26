@@ -8,19 +8,23 @@ package org.hibernate.search.query.hibernate.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.Criteria;
-import org.hibernate.Session;
+
+import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -41,12 +45,9 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 
 	@Override
 	public void initializeObjects(EntityInfo[] entityInfos,
-								  Criteria criteria,
-								  Class<?> entityType,
-								  SearchFactoryImplementor searchFactoryImplementor,
-								  TimeoutManager timeoutManager,
-								  Session session) {
-		//Do not call isTimeOut here as the caller might be the last biggie on the list.
+			LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap,
+			ObjectInitializationContext objectInitializationContext) {
+		// Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( log.isTraceEnabled() ) {
 			log.tracef( "Load %d objects using criteria queries", maxResults );
@@ -56,16 +57,63 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 			return;
 		}
 
-		//criteria query not overridden, define one
+		// no explicitly user specified criteria query, define one
+		Criteria criteria = objectInitializationContext.getCriteria();
 		if ( criteria == null ) {
-			criteria = session.createCriteria( entityType );
+			criteria = objectInitializationContext.getSession()
+					.createCriteria( objectInitializationContext.getEntityType() );
 		}
+		buildUpCriteria( entityInfos, criteria, maxResults, objectInitializationContext );
+		setCriteriaTimeout( criteria, objectInitializationContext.getTimeoutManager() );
 
-		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
-		DocumentBuilderIndexedEntity<?> builder = searchFactoryImplementor.getIndexBinding(
-				indexedEntities.iterator().next()
-		).getDocumentBuilder();
-		String idName = builder.getIdentifierName();
+		@SuppressWarnings("unchecked")
+		List<Object> queryResultList = criteria.list();
+		InstanceInitializer instanceInitializer = objectInitializationContext.getSearchFactoryImplementor()
+				.getInstanceInitializer();
+		for ( Object o : queryResultList ) {
+			Class<?> loadedType = instanceInitializer.getClass( o );
+			DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder(
+					loadedType,
+					objectInitializationContext.getSearchFactoryImplementor()
+			);
+			if ( documentBuilder == null ) {
+				// the query result can contain entities which are not indexed. This can for example happen if
+				// the targeted entity type is a superclass with indexed and un-indexed sub classes
+				// entities which don't have an document builder can be ignores (HF)
+				continue;
+			}
+			XMember idProperty = documentBuilder.getIdGetter();
+			Object id = ReflectionHelper.getMemberValue( o, idProperty );
+			EntityInfoLoadKey key = new EntityInfoLoadKey( loadedType, id );
+			Object previousValue = idToObjectMap.put( key, o );
+			if ( previousValue == null ) {
+				throw new AssertionFailure( "An entity got loaded even though it was not part of the EntityInfo list" );
+			}
+		}
+	}
+
+	private void setCriteriaTimeout(Criteria criteria, TimeoutManager timeoutManager) {
+		// not best effort so fail fast
+		if ( timeoutManager.getType() != TimeoutManager.Type.LIMIT ) {
+			Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
+			if ( timeLeftInSecond != null ) {
+				if ( timeLeftInSecond == 0 ) {
+					timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting( null );
+				}
+				criteria.setTimeout( timeLeftInSecond.intValue() );
+			}
+		}
+	}
+
+	private void buildUpCriteria(EntityInfo[] entityInfos,
+			Criteria criteria,
+			int maxResults,
+			ObjectInitializationContext objectInitializationContext) {
+		DocumentBuilderIndexedEntity<?> documentBuilder = getDocumentBuilder(
+				objectInitializationContext.getEntityType(),
+				objectInitializationContext.getSearchFactoryImplementor()
+		);
+		String idName = documentBuilder.getIdentifierName();
 		Disjunction disjunction = Restrictions.disjunction();
 
 		int loop = maxResults / MAX_IN_CLAUSE;
@@ -77,23 +125,24 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 			int max = index * MAX_IN_CLAUSE + MAX_IN_CLAUSE <= maxResults ?
 					index * MAX_IN_CLAUSE + MAX_IN_CLAUSE :
 					maxResults;
-			List<Serializable> ids = new ArrayList<Serializable>( max - index * MAX_IN_CLAUSE );
+			List<Serializable> ids = new ArrayList<>( max - index * MAX_IN_CLAUSE );
 			for ( int entityInfoIndex = index * MAX_IN_CLAUSE; entityInfoIndex < max; entityInfoIndex++ ) {
 				ids.add( entityInfos[entityInfoIndex].getId() );
 			}
 			disjunction.add( Restrictions.in( idName, ids ) );
 		}
 		criteria.add( disjunction );
-		//not best effort so fail fast
-		if ( timeoutManager.getType() != TimeoutManager.Type.LIMIT ) {
-			Long timeLeftInSecond = timeoutManager.getTimeoutLeftInSeconds();
-			if ( timeLeftInSecond != null ) {
-				if ( timeLeftInSecond == 0 ) {
-					timeoutManager.reactOnQueryTimeoutExceptionWhileExtracting( null );
-				}
-				criteria.setTimeout( timeLeftInSecond.intValue() );
-			}
+	}
+
+	private DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<?> entityType, SearchFactoryImplementor searchFactoryImplementor) {
+		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
+		if ( indexedEntities.size() > 0 ) {
+			return searchFactoryImplementor.getIndexBinding(
+					indexedEntities.iterator().next()
+			).getDocumentBuilder();
 		}
-		criteria.list(); //load all objects
+		else {
+			return null;
+		}
 	}
 }

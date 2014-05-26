@@ -6,19 +6,17 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.logging.impl.Log;
+import java.util.LinkedHashMap;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Initializes objects using lookup by it.
- * This approach is useful is a batch size has been set on the entity.
- * Hibernate Session will load objects by batch reducing the number of database roundtrip.
+ * Initializes objects using lookup by id.
+ *
+ * This approach is useful if a batch size has been set on the entity. Hibernate Session will load objects by batch
+ * reducing the number of database round trips.
  *
  * Note that the second level cache is naturally first checked in this approach.
  *
@@ -35,14 +33,10 @@ public class LookupObjectInitializer implements ObjectInitializer {
 	}
 
 	@Override
-	public void initializeObjects(EntityInfo[] entityInfos,
-								  Criteria criteria,
-								  Class<?> entityType,
-								  SearchFactoryImplementor searchFactoryImplementor,
-								  TimeoutManager timeoutManager,
-								  Session session) {
+	public void initializeObjects(EntityInfo[] entityInfos, LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap, ObjectInitializationContext objectInitializationContext) {
 		boolean traceEnabled = log.isTraceEnabled();
-		//Do not call isTimeOut here as the caller might be the last biggie on the list.
+
+		// Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
 			if ( traceEnabled ) {
@@ -51,9 +45,12 @@ public class LookupObjectInitializer implements ObjectInitializer {
 			return;
 		}
 
-		//TODO should we do time out check between each object call?
 		for ( EntityInfo entityInfo : entityInfos ) {
-			ObjectLoaderHelper.load( entityInfo, session );
+			Object o = ObjectLoaderHelper.load( entityInfo, objectInitializationContext.getSession() );
+			if ( o != null ) {
+				EntityInfoLoadKey key = new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() );
+				idToObjectMap.put( key, o );
+			}
 		}
 		if ( traceEnabled ) {
 			log.tracef( "Initialized %d objects by lookup method.", maxResults );
