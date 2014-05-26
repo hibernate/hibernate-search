@@ -7,16 +7,13 @@
 package org.hibernate.search.query.hibernate.impl;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.logging.impl.Log;
-
-import org.hibernate.Criteria;
 import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Session;
+
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.TimeoutManager;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -34,14 +31,10 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 	}
 
 	@Override
-	public void initializeObjects(EntityInfo[] entityInfos,
-										Criteria criteria,
-										Class<?> entityType,
-										SearchFactoryImplementor searchFactoryImplementor,
-										TimeoutManager timeoutManager,
-										Session session) {
+	public void initializeObjects(EntityInfo[] entityInfos, LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap, ObjectInitializationContext objectInitializationContext) {
 		boolean traceEnabled = log.isTraceEnabled();
-		//Do not call isTimeOut here as the caller might be the last biggie on the list.
+
+		// Do not call isTimeOut here as the caller might be the last biggie on the list.
 		final int maxResults = entityInfos.length;
 		if ( maxResults == 0 ) {
 			if ( traceEnabled ) {
@@ -50,15 +43,20 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 			return;
 		}
 
-		//check the second-level cache
+		// check the second-level cache
 		List<EntityInfo> remainingEntityInfos = new ArrayList<>( entityInfos.length );
 		for ( EntityInfo entityInfo : entityInfos ) {
-			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
-				final boolean isIn2LCache = session.getSessionFactory().getCache().containsEntity( entityInfo.getClazz(), entityInfo.getId() );
+			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, objectInitializationContext.getSession() ) ) {
+				final boolean isIn2LCache = objectInitializationContext.getSession()
+						.getSessionFactory().getCache().containsEntity( entityInfo.getClazz(), entityInfo.getId() );
 				if ( isIn2LCache ) {
 					try {
-						//load the object from the second level cache
-						session.get( entityInfo.getClazz(), entityInfo.getId() );
+						// load the object from the second level cache
+						Object o = objectInitializationContext.getSession().get( entityInfo.getClazz(), entityInfo.getId() );
+						if ( o != null ) {
+							EntityInfoLoadKey key = new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() );
+							idToObjectMap.put( key, o );
+						}
 					}
 					catch (ObjectNotFoundException onfe) {
 						// Unlikely but needed: an index might be out of sync, and the cache might be as well
@@ -70,11 +68,12 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 				}
 			}
 			else {
-				//if document id !=  entity id we can't use 2LC
+				// if document id !=  entity id we can't use 2LC
 				remainingEntityInfos.add( entityInfo );
 			}
 
 		}
+
 		//update entityInfos to only contains the remaining ones
 		final int remainingSize = remainingEntityInfos.size();
 
@@ -84,11 +83,8 @@ public class SecondLevelCacheObjectInitializer implements ObjectInitializer {
 		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(
 					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
-					criteria,
-					entityType,
-					searchFactoryImplementor,
-					timeoutManager,
-					session
+					idToObjectMap,
+					objectInitializationContext
 			);
 		}
 	}

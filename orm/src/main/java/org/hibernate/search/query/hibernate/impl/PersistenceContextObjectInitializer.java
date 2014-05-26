@@ -7,17 +7,14 @@
 package org.hibernate.search.query.hibernate.impl;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -34,53 +31,58 @@ public class PersistenceContextObjectInitializer implements ObjectInitializer {
 
 	@Override
 	public void initializeObjects(EntityInfo[] entityInfos,
-								  Criteria criteria,
-								  Class<?> entityType,
-								  SearchFactoryImplementor searchFactoryImplementor,
-								  TimeoutManager timeoutManager,
-								  Session session) {
-		//Do not call isTimeOut here as the caller might be the last biggie on the list.
-		final int maxResults = entityInfos.length;
-		if ( maxResults == 0 ) {
+			LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap,
+			ObjectInitializationContext objectInitializationContext) {
+		// Do not call isTimeOut here as the caller might be the last biggie on the list.
+		final int numberOfObjectsToInitialize = entityInfos.length;
+
+		if ( numberOfObjectsToInitialize == 0 ) {
 			if ( log.isTraceEnabled() ) {
-				log.tracef( "No object to initialize", maxResults );
+				log.tracef( "No object to initialize", numberOfObjectsToInitialize );
 			}
 			return;
 		}
 
-		SessionImplementor sessionImplementor = (SessionImplementor) session;
-		String entityName = session.getSessionFactory().getClassMetadata( entityType ).getEntityName();
+		SessionImplementor sessionImplementor = (SessionImplementor) objectInitializationContext.getSession();
+		String entityName = objectInitializationContext.getSession()
+				.getSessionFactory().getClassMetadata( objectInitializationContext.getEntityType() ).getEntityName();
 		EntityPersister persister = sessionImplementor.getFactory().getEntityPersister( entityName );
 		PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
 
 		//check the persistence context
-		List<EntityInfo> remainingEntityInfos = new ArrayList<>( maxResults );
+		List<EntityInfo> remainingEntityInfos = new ArrayList<>( numberOfObjectsToInitialize );
 		for ( EntityInfo entityInfo : entityInfos ) {
-			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, session ) ) {
+			if ( ObjectLoaderHelper.areDocIdAndEntityIdIdentical( entityInfo, objectInitializationContext.getSession() ) ) {
 				EntityKey entityKey = sessionImplementor.generateEntityKey( entityInfo.getId(), persister );
-				final boolean isInitialized = persistenceContext.containsEntity( entityKey );
-				if ( !isInitialized ) {
+				Object o = persistenceContext.getEntity( entityKey );
+				if ( o == null ) {
 					remainingEntityInfos.add( entityInfo );
+				}
+				else {
+					EntityInfoLoadKey key = new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() );
+					idToObjectMap.put( key, o );
 				}
 			}
 			else {
-				//if document id !=  entity id we can't use PC lookup
+				// if document id !=  entity id we can't use PC lookup
 				remainingEntityInfos.add( entityInfo );
 			}
 		}
+
 		//update entityInfos to only contains the remaining ones
 		final int remainingSize = remainingEntityInfos.size();
 		if ( log.isTraceEnabled() ) {
-			log.tracef( "Initialized %d objects out of %d in the persistence context", maxResults - remainingSize, maxResults );
+			log.tracef(
+					"Initialized %d objects out of %d in the persistence context",
+					numberOfObjectsToInitialize - remainingSize, numberOfObjectsToInitialize
+			);
 		}
+
 		if ( remainingSize > 0 ) {
 			delegate.initializeObjects(
 					remainingEntityInfos.toArray( new EntityInfo[remainingSize] ),
-					criteria,
-					entityType,
-					searchFactoryImplementor,
-					timeoutManager,
-					session
+					idToObjectMap,
+					objectInitializationContext
 			);
 		}
 	}

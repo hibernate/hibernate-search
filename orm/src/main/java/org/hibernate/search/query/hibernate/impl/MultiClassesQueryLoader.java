@@ -9,12 +9,14 @@ package org.hibernate.search.query.hibernate.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.AssertionFailure;
@@ -84,6 +86,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		if ( entityInfos.length == 0 ) {
 			return Collections.EMPTY_LIST;
 		}
+
 		if ( entityInfos.length == 1 ) {
 			final Object entity = load( entityInfos[0] );
 			if ( entity == null ) {
@@ -93,6 +96,8 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 				return Collections.singletonList( entity );
 			}
 		}
+
+		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.length / 0.75 ) + 1 );
 
 		// split EntityInfo per root entity
 		Map<RootEntityMetadata, List<EntityInfo>> entityInfoBuckets = new HashMap<>( entityMetadata.size() );
@@ -108,6 +113,10 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 					}
 					bucket.add( entityInfo );
 					found = true;
+					idToObjectMap.put(
+							new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() ),
+							ObjectInitializer.ENTITY_NOT_YET_INITIALIZED
+					);
 					break; //we stop looping for the right bucket
 				}
 			}
@@ -123,17 +132,26 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 			final EntityInfo[] bucketEntityInfos = value.toArray( new EntityInfo[value.size()] );
 
 			objectInitializer.initializeObjects(
-					bucketEntityInfos,
-					key.criteria,
-					key.rootEntity,
-					searchFactoryImplementor,
-					timeoutManager,
-					session);
+					bucketEntityInfos, idToObjectMap, new ObjectInitializationContext(
+							key.criteria,
+							key.rootEntity,
+							searchFactoryImplementor,
+							timeoutManager,
+							session
+					)
+			);
 			timeoutManager.isTimedOut();
-
 		}
 
-		return ObjectLoaderHelper.returnAlreadyLoadedObjectsInCorrectOrder( entityInfos, session );
+		ArrayList<Object> result = new ArrayList<>( idToObjectMap.size() );
+		for ( Object o : idToObjectMap.values() ) {
+			// is the value is null, we had a hit in the Lucene index, but the underlying entity had already been
+			// removed w/i ORM (HF)
+			if ( o != ObjectInitializer.ENTITY_NOT_YET_INITIALIZED ) {
+				result.add( o );
+			}
+		}
+		return result;
 	}
 
 	private static class RootEntityMetadata {

@@ -6,22 +6,28 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import java.util.LinkedHashMap;
+
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.TimeoutManager;
 
 /**
- * Initializes a set of objects from EntityInfos
+ * Initializes the objects specified by an array of {@code EntityInfo} instances.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Hardy Ferentschik
  */
 public interface ObjectInitializer {
+
+	Object ENTITY_NOT_YET_INITIALIZED = new Object();
+
+	/**
+	 * Given a array of {@code}
+	 *
+	 * @param entityInfos the {@code EntityInfo} instances to initialize
+	 * @param idToObjectMap map keeping to store the loaded entities in
+	 * @param objectInitializationContext gives access to the resources needed in the context of entity initialization
+	 */
 	void initializeObjects(EntityInfo[] entityInfos,
-						   Criteria criteria,
-						   Class<?> entityType,
-						   SearchFactoryImplementor searchFactoryImplementor,
-						   TimeoutManager timeoutManager,
-						   Session session);
+			LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap,
+			ObjectInitializationContext objectInitializationContext);
 }

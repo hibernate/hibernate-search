@@ -6,14 +6,17 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.search.exception.AssertionFailure;
+
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 
@@ -66,21 +69,35 @@ public class QueryLoader extends AbstractLoader {
 
 	@Override
 	public final List executeLoad(EntityInfo... entityInfos) {
-		if ( entityInfos.length == 0 ) {
-			return Collections.EMPTY_LIST;
-		}
 		if ( entityType == null ) {
 			throw new AssertionFailure( "EntityType not defined" );
 		}
 
+		if ( entityInfos.length == 0 ) {
+			return Collections.EMPTY_LIST;
+		}
+
+		LinkedHashMap<EntityInfoLoadKey, Object> idToObjectMap = new LinkedHashMap<>( (int) ( entityInfos.length / 0.75 ) + 1 );
+		for ( EntityInfo entityInfo : entityInfos ) {
+			idToObjectMap.put(
+					new EntityInfoLoadKey( entityInfo.getClazz(), entityInfo.getId() ),
+					ObjectInitializer.ENTITY_NOT_YET_INITIALIZED
+			);
+		}
+
 		objectInitializer.initializeObjects(
 				entityInfos,
-				criteria,
-				entityType,
-				searchFactoryImplementor,
-				timeoutManager,
-				session);
-		return ObjectLoaderHelper.returnAlreadyLoadedObjectsInCorrectOrder( entityInfos, session );
+				idToObjectMap,
+				new ObjectInitializationContext( criteria, entityType, searchFactoryImplementor, timeoutManager, session )
+		);
+
+		ArrayList<Object> result = new ArrayList<>( idToObjectMap.size() );
+		for ( Object o : idToObjectMap.values() ) {
+			if ( o != ObjectInitializer.ENTITY_NOT_YET_INITIALIZED ) {
+				result.add( o );
+			}
+		}
+		return result;
 	}
 
 	public void setCriteria(Criteria criteria) {
