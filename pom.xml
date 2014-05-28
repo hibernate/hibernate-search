@@ -136,7 +136,7 @@
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>4.8.1</luceneVersion>
         <infinispanVersion>7.0.0.Alpha4</infinispanVersion>
-        <jgroupsVersion>3.5.0.Beta5</jgroupsVersion>
+        <jgroupsVersion>3.5.0.Beta7</jgroupsVersion>
         <hibernateVersion>4.3.5.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
