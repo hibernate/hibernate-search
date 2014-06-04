@@ -16,6 +16,8 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.query.DatabaseRetrievalMethod;
+import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
@@ -88,4 +90,24 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 * @return Returns the service manager.
 	 */
 	ServiceManager getServiceManager();
+
+	/**
+	 * Returns the default {@code DatabaseRetrievalMethod}.
+	 *
+	 * This is either the system default or the default specified via the configuration property
+	 * {@link org.hibernate.search.cfg.Environment#DATABASE_RETRIEVAL_METHOD}.
+	 *
+	 * @return returns the default {@code DatabaseRetrievalMethod}.
+	 */
+	DatabaseRetrievalMethod getDefaultDatabaseRetrievalMethod();
+
+	/**
+	 * Returns the default {@code ObjectLookupMethod}.
+	 *
+	 * This is either the system default or the default specified via the configuration property
+	 * {@link org.hibernate.search.cfg.Environment#OBJECT_LOOKUP_METHOD}.
+	 *
+	 * @return returns the default {@code OBJECT_LOOKUP_METHOD}.
+	 */
+	ObjectLookupMethod getDefaultObjectLookupMethod();
 }

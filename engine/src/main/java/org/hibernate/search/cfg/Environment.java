@@ -20,6 +20,22 @@ import org.hibernate.search.util.impl.CollectionHelper;
 public final class Environment {
 
 	/**
+	 * Property name to set the default object lookup method during object initialization. As value lower or upper
+	 * cased enum names are allowed.
+	 *
+	 * @see org.hibernate.search.query.ObjectLookupMethod
+	 */
+	public static final String OBJECT_LOOKUP_METHOD = "hibernate.search.query.object_lookup_method";
+
+	/**
+	 * Property name to set the default database retrieval method during object initialization. As value lower or upper
+	 * cased enum names are allowed.
+	 *
+	 * @see org.hibernate.search.query.DatabaseRetrievalMethod
+	 */
+	public static final String DATABASE_RETRIEVAL_METHOD = "hibernate.search.query.database_retrieval_method";
+
+	/**
 	 * Enable listeners auto registration in Hibernate Annotations and EntityManager. Default to true.
 	 */
 	public static final String AUTOREGISTER_LISTENERS = "hibernate.search.autoregister_listeners";
@@ -168,7 +184,7 @@ public final class Environment {
 	public static final String DEFAULT_NULL_TOKEN = "hibernate.search.default_null_token";
 
 	/**
-	 * When enabled reindexing of an entity is skipped if the updates affect only non-indexed fields.
+	 * When enabled re-indexing of an entity is skipped if the updates affect only non-indexed fields.
 	 * Enabled by default as it should be safe and should improve performance, disable it to force updates
 	 * skipping value checks.
 	 * Affect semantics of entity updates only.

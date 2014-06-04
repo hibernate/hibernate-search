@@ -939,14 +939,13 @@ query.initializeObjectWith(
 ----
 ====
 
-ObjectLookupMethod defines the strategy used to check if an object is easily accessible (without
++ObjectLookupMethod+ defines the strategy used to check if an object is easily accessible (without
 database round trip). Other options are:
 
-
-* ++$$ObjectLookupMethod.PERSISTENCE_CONTEXT$$++: useful if most of the matching entities are
+* +ObjectLookupMethod.PERSISTENCE_CONTEXT+: useful if most of the matching entities are
 already in the persistence context (ie loaded in the Session or EntityManager)
 
-* ++$$ObjectLookupMethod.SECOND_LEVEL_CACHE$$++: check first the persistence context and then
+* +ObjectLookupMethod.SECOND_LEVEL_CACHE+: check first the persistence context and then
 the second-level cache.
 
 
@@ -962,20 +961,35 @@ read access (ie +CacheMode.NORMAL+ in Hibernate native APIs or +CacheRetrieveMod
 
 [WARNING]
 ====
-Avoid using +$$ObjectLookupMethod.SECOND_LEVEL_CACHE$$+ unless your second level cache
+Avoid using +ObjectLookupMethod.SECOND_LEVEL_CACHE+ unless your second level cache
 implementation is either EHCache or Infinispan; other second level cache providers don't currently
 implement this operation efficiently.
 ====
 
 You can also customize how objects are loaded from the database (if not found before). Use
-DatabaseRetrievalMethod for that:
++DatabaseRetrievalMethod+ for that:
 
-* QUERY (default): use a (set of) queries to load several objects in batch. This is usually the
+* +QUERY+ (default): use a (set of) queries to load several objects in batch. This is usually the
 best approach.
 
-* FIND_BY_ID: load objects one by one using the Session.get or EntityManager.find semantic. This
-might be useful if batch-size is set on the entity (in which case, entities will be loaded in batch
-by Hibernate Core). QUERY should be preferred almost all the time.
+* +FIND_BY_ID+: load objects one by one using the +Session.get+ or +EntityManager.find+ semantic.
+This might be useful if batch-size is set on the entity (in which case, entities will be loaded in
+batch by Hibernate Core). QUERY should be preferred almost all the time.
+
+The defaults for both methods, the object lookup as well as the database retrieval can also be
+configured via configuration properties. This way you don't have to specify your preferred methods on
+each query creation. The property names are +hibernate.search.query.object_lookup_method+
+and +hibernate.search.query.database_retrieval_method+ respectively. As value use the name of the 
+method (upper- or lowercase). For example:
+
+.Setting object lookup and database retrieval methods via configuration properties
+====
+[source]
+----
+hibernate.search.query.object_lookup_method = second_level_cache
+hibernate.search.query.database_retrieval_method = query
+----
+====
 
 ===== Limiting the time of a query
 

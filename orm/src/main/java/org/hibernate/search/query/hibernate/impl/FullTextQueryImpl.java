@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.query.hibernate.impl;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -25,23 +24,24 @@ import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionImplementor;
+
 import org.hibernate.engine.query.spi.ParameterMetadata;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.AbstractQueryImpl;
-import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.filter.FullTextFilter;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.Point;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
@@ -55,11 +55,13 @@ import org.hibernate.transform.ResultTransformer;
 public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuery {
 
 	private static final Log log = LoggerFactory.make();
+
+	private ObjectLookupMethod objectLookupMethod;
+	private DatabaseRetrievalMethod databaseRetrievalMethod;
+
 	private Criteria criteria;
 	private ResultTransformer resultTransformer;
 	private int fetchSize = 1;
-	private ObjectLookupMethod lookupMethod = ObjectLookupMethod.SKIP; //default
-	private DatabaseRetrievalMethod retrievalMethod = DatabaseRetrievalMethod.QUERY; //default
 	private final HSQuery hSearchQuery;
 
 	/**
@@ -70,10 +72,17 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	 * @param session Access to the Hibernate session.
 	 * @param parameterMetadata Additional query metadata.
 	 */
-	public FullTextQueryImpl(org.apache.lucene.search.Query query, Class<?>[] classes, SessionImplementor session,
-							ParameterMetadata parameterMetadata) {
+	public FullTextQueryImpl(org.apache.lucene.search.Query query,
+			Class<?>[] classes,
+			SessionImplementor session,
+			ParameterMetadata parameterMetadata) {
 		//TODO handle flushMode
 		super( query.toString(), null, session, parameterMetadata );
+
+		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
+		this.objectLookupMethod = searchFactoryImplementor.getDefaultObjectLookupMethod();
+		this.databaseRetrievalMethod = searchFactoryImplementor.getDefaultDatabaseRetrievalMethod();
+
 		//TODO get a factory on searchFactoryImplementor
 		hSearchQuery = getSearchFactoryImplementor().createHSQuery();
 		hSearchQuery
@@ -82,18 +91,12 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				.targetedEntities( Arrays.asList( classes ) );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public FullTextQuery setSort(Sort sort) {
 		hSearchQuery.sort( sort );
 		return this;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public FullTextQuery setFilter(Filter filter) {
 		hSearchQuery.filter( filter );
@@ -115,7 +118,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		final List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
 		//stop timeout manager, the iterator pace is in the user's hands
 		hSearchQuery.getTimeoutManager().stop();
-		//TODO is this noloader optimization really needed?
+		//TODO is this no-loader optimization really needed?
 		final Iterator<Object> iterator;
 		if ( entityInfos.size() == 0 ) {
 			iterator = new IteratorImpl( entityInfos, noLoader );
@@ -146,8 +149,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				.session( session )
 				.searchFactory( hSearchQuery.getSearchFactoryImplementor() )
 				.timeoutManager( hSearchQuery.getTimeoutManager() )
-				.lookupMethod( lookupMethod )
-				.retrievalMethod( retrievalMethod );
+				.lookupMethod( objectLookupMethod )
+				.retrievalMethod( databaseRetrievalMethod );
 		if ( hSearchQuery.getProjectedFields() != null ) {
 			return getProjectionLoader( loaderBuilder );
 		}
@@ -353,8 +356,8 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 	@Override
 	public FullTextQuery initializeObjectsWith(ObjectLookupMethod lookupMethod, DatabaseRetrievalMethod retrievalMethod) {
-		this.lookupMethod = lookupMethod;
-		this.retrievalMethod = retrievalMethod;
+		this.objectLookupMethod = lookupMethod;
+		this.databaseRetrievalMethod = retrievalMethod;
 		return this;
 	}
 
@@ -395,7 +398,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 
 		@Override
 		public RuntimeException createTimeoutException(String message, String queryDescription) {
-			return new QueryTimeoutException( message, (SQLException) null, queryDescription );
+			return new QueryTimeoutException( message, null, queryDescription );
 		}
 
 	};

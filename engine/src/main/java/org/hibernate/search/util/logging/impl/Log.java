@@ -636,4 +636,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 216, value = "Found invalid @IndexedEmbedded->paths elements configured for member '%s' of class '%s'. The invalid paths are [%s]" )
 	SearchException invalidIncludePathConfiguration(String member, String clazz, String invalidPaths);
 
+	@Message(id = 217, value = "Invalid value '%s' for setting '%s'. Check the documentation for allowed values." )
+	SearchException invalidPropertyValue(String value, String property);
+
 }
