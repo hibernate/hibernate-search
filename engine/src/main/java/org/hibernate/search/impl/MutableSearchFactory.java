@@ -29,6 +29,8 @@ import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
+import org.hibernate.search.query.DatabaseRetrievalMethod;
+import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
@@ -165,6 +167,16 @@ public class MutableSearchFactory
 	@Override
 	public ServiceManager getServiceManager() {
 		return delegate.getServiceManager();
+	}
+
+	@Override
+	public DatabaseRetrievalMethod getDefaultDatabaseRetrievalMethod() {
+		return delegate.getDefaultDatabaseRetrievalMethod();
+	}
+
+	@Override
+	public ObjectLookupMethod getDefaultObjectLookupMethod() {
+		return delegate.getDefaultObjectLookupMethod();
 	}
 
 	@Override

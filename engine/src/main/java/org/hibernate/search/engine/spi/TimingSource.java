@@ -8,7 +8,8 @@ package org.hibernate.search.engine.spi;
 
 /**
  * Lucene delegates responsibility for efficient time tracking to an external service;
- * this is needed for example by the {@link org.apache.lucene.search.TimeLimitingCollector#TimeLimitingCollector(Collector, Counter, long)}
+ * this is needed for example by the
+ * {@link org.apache.lucene.search.TimeLimitingCollector#TimeLimitingCollector(org.apache.lucene.search.Collector, org.apache.lucene.util.Counter, long)}
  * used by Hibernate Search when time limits are enabled on fulltext queries.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.

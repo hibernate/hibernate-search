@@ -10,7 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.search.impl.FullTextSessionImpl;
 
 /**
- * Helper class to get a FullTextSession out of a regular session.
+ * Helper class to get a {@code FullTextSession} from a regular ORM session.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik

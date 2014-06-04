@@ -42,6 +42,8 @@ import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorForUnindexedType;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
+import org.hibernate.search.query.DatabaseRetrievalMethod;
+import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.impl.HSQueryImpl;
@@ -102,6 +104,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final boolean isIdProvidedImplicit;
 	private final String statisticsMBeanName;
 	private final IndexManagerFactory indexManagerFactory;
+	private final ObjectLookupMethod defaultObjectLookupMethod;
+	private final DatabaseRetrievalMethod defaultDatabaseRetrievalMethod;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
 		this.analyzers = state.getAnalyzers();
@@ -143,7 +147,40 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		}
 
 		this.indexReaderAccessor = new DefaultIndexReaderAccessor( this );
-		this.indexedTypeDescriptors = new ConcurrentHashMap<Class<?>, IndexedTypeDescriptor>();
+		this.indexedTypeDescriptors = new ConcurrentHashMap<>();
+
+		this.defaultObjectLookupMethod = determineDefaultObjectLookupMethod();
+		this.defaultDatabaseRetrievalMethod = determineDefaultDatabaseRetrievalMethod();
+	}
+
+	private ObjectLookupMethod determineDefaultObjectLookupMethod() {
+		String objectLookupMethod = configurationProperties.getProperty( Environment.OBJECT_LOOKUP_METHOD );
+		if ( objectLookupMethod == null ) {
+			return ObjectLookupMethod.SKIP; // default
+		}
+		else {
+			try {
+				return Enum.valueOf( ObjectLookupMethod.class, objectLookupMethod.toUpperCase() );
+			}
+			catch (IllegalArgumentException e) {
+				throw log.invalidPropertyValue( objectLookupMethod, Environment.OBJECT_LOOKUP_METHOD );
+			}
+		}
+	}
+
+	private DatabaseRetrievalMethod determineDefaultDatabaseRetrievalMethod() {
+		String databaseRetrievalMethod = configurationProperties.getProperty( Environment.DATABASE_RETRIEVAL_METHOD );
+		if ( databaseRetrievalMethod == null ) {
+			return DatabaseRetrievalMethod.QUERY; // default
+		}
+		else {
+			try {
+				return Enum.valueOf( DatabaseRetrievalMethod.class, databaseRetrievalMethod.toUpperCase() );
+			}
+			catch (IllegalArgumentException e) {
+				throw log.invalidPropertyValue( databaseRetrievalMethod, Environment.OBJECT_LOOKUP_METHOD );
+			}
+		}
 	}
 
 	@Override
@@ -318,6 +355,16 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public ServiceManager getServiceManager() {
 		return serviceManager;
+	}
+
+	@Override
+	public DatabaseRetrievalMethod getDefaultDatabaseRetrievalMethod() {
+		return defaultDatabaseRetrievalMethod;
+	}
+
+	@Override
+	public ObjectLookupMethod getDefaultObjectLookupMethod() {
+		return defaultObjectLookupMethod;
 	}
 
 	@Override
