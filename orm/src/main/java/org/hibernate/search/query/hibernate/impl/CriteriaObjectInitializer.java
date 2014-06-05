@@ -72,6 +72,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 				.getInstanceInitializer();
 		for ( Object o : queryResultList ) {
 			Class<?> loadedType = instanceInitializer.getClass( o );
+			Object unproxiedObject = instanceInitializer.unproxy( o );
 			DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder(
 					loadedType,
 					objectInitializationContext.getSearchFactoryImplementor()
@@ -83,9 +84,9 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 				continue;
 			}
 			XMember idProperty = documentBuilder.getIdGetter();
-			Object id = ReflectionHelper.getMemberValue( o, idProperty );
+			Object id = ReflectionHelper.getMemberValue( unproxiedObject, idProperty );
 			EntityInfoLoadKey key = new EntityInfoLoadKey( loadedType, id );
-			Object previousValue = idToObjectMap.put( key, o );
+			Object previousValue = idToObjectMap.put( key, unproxiedObject );
 			if ( previousValue == null ) {
 				throw new AssertionFailure( "An entity got loaded even though it was not part of the EntityInfo list" );
 			}
