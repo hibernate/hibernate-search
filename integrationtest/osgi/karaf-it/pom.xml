@@ -25,10 +25,8 @@
     <properties>
         <enforcer.skip>true</enforcer.skip>
 
-        <karaf.version>3.0.0</karaf.version>
-        <pax.exam.version>3.4.0</pax.exam.version>
-        <servicemix.version>4.5.3</servicemix.version>
-        <osgi.compendium.version>4.3.1</osgi.compendium.version>
+        <karaf.version>3.0.1</karaf.version>
+        <pax.exam.version>4.0.0</pax.exam.version>
 
         <osgi.package.exports>!*</osgi.package.exports>
         <osgi.package.imports>*</osgi.package.imports>
@@ -61,13 +59,12 @@
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>standard</artifactId>
-            <version>3.0.0</version>
+            <version>${karaf.version}</version>
             <classifier>features</classifier>
             <type>xml</type>
         </dependency>
@@ -107,7 +104,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -66,7 +66,7 @@ public class HibernateSearchWithKarafIT {
 		MavenArtifactUrlReference karafUrl = maven()
 				.groupId( "org.apache.karaf" )
 				.artifactId( "apache-karaf" )
-				.version( "3.0.0" )
+				.version( "3.0.1" )
 				.type( "tar.gz" );
 
 		MavenUrlReference karafStandardRepo = maven()
