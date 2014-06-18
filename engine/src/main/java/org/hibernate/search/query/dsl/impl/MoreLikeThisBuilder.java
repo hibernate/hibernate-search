@@ -245,6 +245,12 @@ public class MoreLikeThisBuilder<T> {
 			DocumentFieldMetadata fieldMetadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor(
 					fieldContext.getField()
 			);
+			if ( fieldMetadata == null ) {
+				throw log.unknownFieldNameForMoreLikeThisQuery(
+						fieldContext.getField(),
+						documentBuilder.getBeanClass().getName()
+				);
+			}
 			boolean hasTermVector = fieldMetadata.getTermVector() != Field.TermVector.NO;
 			boolean isStored = fieldMetadata.getStore() != Store.NO;
 			if ( ! ( hasTermVector || isStored ) ) {
