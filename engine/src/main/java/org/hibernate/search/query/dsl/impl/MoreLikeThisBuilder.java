@@ -41,7 +41,6 @@ import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.PriorityQueue;
 import org.apache.lucene.util.UnicodeUtil;
-
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
@@ -57,8 +56,8 @@ import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ID;
 import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ENTITY;
+import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ID;
 
 /**
  * Class inspired and code copied from Apache Lucene MoreLikeThis class.
@@ -163,7 +162,7 @@ public class MoreLikeThisBuilder<T> {
 		findById = new TermQuery( new Term( documentBuilder.getIdKeywordName(), id ) );
 		HSQuery query = queryContext.getFactory().createHSQuery();
 		//can't use Arrays.asList for some obscure capture reason
-		List<Class<?>> classes = new ArrayList<Class<?>>(1);
+		List<Class<?>> classes = new ArrayList<>(1);
 		classes.add( queryContext.getEntityType() );
 		List<EntityInfo> entityInfos = query
 				.luceneQuery( findById )
@@ -245,6 +244,12 @@ public class MoreLikeThisBuilder<T> {
 			DocumentFieldMetadata fieldMetadata = documentBuilder.getTypeMetadata().getDocumentFieldMetadataFor(
 					fieldContext.getField()
 			);
+			if ( fieldMetadata == null ) {
+				throw log.unknownFieldNameForMoreLikeThisQuery(
+						fieldContext.getField(),
+						documentBuilder.getBeanClass().getName()
+				);
+			}
 			boolean hasTermVector = fieldMetadata.getTermVector() != Field.TermVector.NO;
 			boolean isStored = fieldMetadata.getStore() != Store.NO;
 			if ( ! ( hasTermVector || isStored ) ) {

@@ -639,4 +639,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 217, value = "Invalid value '%s' for setting '%s'. Check the documentation for allowed values." )
 	SearchException invalidPropertyValue(String value, String property);
 
+	@Message(id = 218, value = "More like this query cannot be created, because the index does not contain a field '%s' for the type '%s" )
+	SearchException unknownFieldNameForMoreLikeThisQuery(String field, String type);
+
 }
