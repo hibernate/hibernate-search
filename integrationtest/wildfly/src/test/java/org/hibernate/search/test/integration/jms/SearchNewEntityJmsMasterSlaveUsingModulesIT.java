@@ -13,7 +13,6 @@ import org.hibernate.search.test.integration.wildfly.ModuleMemberRegistrationIT;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
 /**
@@ -24,7 +23,6 @@ import org.junit.runner.RunWith;
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
-@Ignore("Need to figure out how to configure WildFly: HSEARCH-1440")
 public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends SearchNewEntityJmsMasterSlave {
 
 	private static final File tmpDir = RegistrationConfiguration.createTempDir();
