@@ -215,7 +215,7 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/src/as7config</directory>
+                                    <directory>${basedir}/src/wildflyConfig</directory>
                                 </resource>
                             </resources>
                         </configuration>
