@@ -32,6 +32,7 @@
         <module>infinispan</module>
         <module>documentation</module>
         <module>modules</module>
+        <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
         <module>integrationtest/wildfly</module>
