@@ -16,6 +16,8 @@
         <module name="org.hibernate.search.engine" export="true" services="import" slot="${hibernate.search.module.slot}" />
         <module name="org.jboss.logging" />
         <module name="javax.persistence.api" />
-        <module name="javax.jms.api" />
+
+        <!-- Used directly by applications using the JMS backend -->
+        <module name="javax.jms.api" optional="true" />
     </dependencies>
 </module>
