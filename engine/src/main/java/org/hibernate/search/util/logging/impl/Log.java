@@ -507,8 +507,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 163, value = "Unable to send Search work to JMS queue '%2$s' for index '%1$s'")
 	SearchException unableToSendJMSWork(String indexName, String jmsQueueName, @Cause Throwable e);
 
-	@Message(id = 164, value = "Unable to lookup Search queue '%1$s' and connection factory '%2$s' for index '%3$s'")
-	SearchException jmsLookupException(String jmsQueueName, String jmsConnectionFactoryName, String indexName, @Cause Throwable e);
+	@Message(id = 164, value = "Unable to lookup Search queue '%1$s' for index '%2$s'")
+	SearchException jmsQueueLookupException(String jmsQueueName, String indexName, @Cause Throwable e);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 166, value = "IndexManager factory resolved alias '%1$s' to '%2$s'.")
@@ -641,5 +641,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 218, value = "More like this query cannot be created, because the index does not contain a field '%s' for the type '%s" )
 	SearchException unknownFieldNameForMoreLikeThisQuery(String field, String type);
+
+	@Message(id = 219, value = "Could not lookup initial JNDI context for the JMS ConnectionFactory named '%s' for the index '%s" )
+	SearchException jmsInitialContextException(String jmsConnectionFactoryName, String indexName, @Cause Exception e);
+
+	@Message(id = 220, value = "Could not lookup JMS ConnectionFactory named '%1s' for the index '%2s" )
+	SearchException jmsQueueFactoryLookupException(String jmsConnectionFactoryName, String indexName, @Cause Exception e);
 
 }

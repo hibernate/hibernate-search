@@ -31,23 +31,23 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 	@Override
 	protected QueueConnectionFactory initializeJMSQueueConnectionFactory(Properties properties) {
 		this.jmsConnectionFactoryName = properties.getProperty( JMS_CONNECTION_FACTORY );
+		final InitialContext initialContext = getJMSInitialContext( properties );
 		try {
-			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
 			return (QueueConnectionFactory) initialContext.lookup( jmsConnectionFactoryName );
 		}
 		catch (NamingException e) {
-			throw log.jmsLookupException( getJmsQueueName(), jmsConnectionFactoryName, getIndexName(), e );
+			throw log.jmsQueueFactoryLookupException( jmsConnectionFactoryName, getIndexName(), e );
 		}
 	}
 
 	@Override
 	protected Queue initializeJMSQueue(QueueConnectionFactory factory, Properties properties) {
+		final InitialContext initialContext = getJMSInitialContext( properties );
 		try {
-			InitialContext initialContext = JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
 			return (Queue) initialContext.lookup( getJmsQueueName() );
 		}
 		catch (NamingException e) {
-			throw log.jmsLookupException( getJmsQueueName(), jmsConnectionFactoryName, getIndexName(), e );
+			throw log.jmsQueueLookupException( getJmsQueueName(), getIndexName(), e );
 		}
 	}
 
@@ -65,6 +65,15 @@ public class JndiJMSBackendQueueProcessor extends JmsBackendQueueProcessor {
 		}
 		catch (JMSException e) {
 			throw log.unableToOpenJMSConnection( getIndexName(), getJmsQueueName(), e );
+		}
+	}
+
+	private InitialContext getJMSInitialContext(final Properties properties) {
+		try {
+			return JNDIHelper.getInitialContext( properties, JNDI_PREFIX );
+		}
+		catch (NamingException e) {
+			throw log.jmsInitialContextException( jmsConnectionFactoryName, getIndexName(), e );
 		}
 	}
 
