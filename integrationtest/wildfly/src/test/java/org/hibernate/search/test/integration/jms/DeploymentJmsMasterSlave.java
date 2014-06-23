@@ -72,7 +72,7 @@ public final class DeploymentJmsMasterSlave {
 					//we actually want to verify we're able to authenticate
 					.createProperty()
 						.name( "hibernate.search.default.worker.jms.connection_factory" )
-						.value( "RemoteConnectionFactory" )
+						.value( "jboss/exported/jms/RemoteConnectionFactory" )
 						.up()
 					.createProperty()
 						.name( "hibernate.search.default.worker.jms.queue" )

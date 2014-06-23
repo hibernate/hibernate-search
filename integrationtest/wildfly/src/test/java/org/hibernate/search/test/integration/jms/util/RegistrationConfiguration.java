@@ -8,8 +8,6 @@ package org.hibernate.search.test.integration.jms.util;
 
 import java.io.File;
 
-import org.hibernate.search.util.logging.impl.Log;
-
 /**
  * @author Davide D'Alto
  * @author Sanne Grinovero
@@ -17,7 +15,6 @@ import org.hibernate.search.util.logging.impl.Log;
  */
 public final class RegistrationConfiguration {
 
-	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 	public static final String DESTINATION_QUEUE = "jms/queue/hsearch";
 	private static final int MAX_ATTEMPTS = 3;
 
@@ -33,7 +30,6 @@ public final class RegistrationConfiguration {
 			String baseName = System.currentTimeMillis() + "_" + attempts;
 			File tempDir = new File( baseDir, baseName );
 			if ( tempDir.mkdir() ) {
-				log.info( "Created tmp directory: " + tempDir.getAbsolutePath() );
 				tempDir.deleteOnExit(); // delete the JVM exit, this way we don't have to bother about it
 				return tempDir;
 			}

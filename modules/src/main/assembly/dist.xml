@@ -30,6 +30,11 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>${module.xml.basedir}/search/backend-jms/module.xml</source>
+            <outputDirectory>/org/hibernate/search/backend-jms/${hibernate.search.module.slot}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
             <source>${module.xml.basedir}/infinispan/lucene-directory/module.xml</source>
             <outputDirectory>/org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
             <filtered>true</filtered>
@@ -67,6 +72,16 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-orm</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/backend-jms/${hibernate.search.module.slot}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-search-backend-jms</include>
             </includes>
         </dependencySet>
 
