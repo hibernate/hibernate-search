@@ -16,8 +16,6 @@ import org.junit.Test;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.easymock.EasyMockUnitils;
 import org.unitils.easymock.annotation.Mock;
-
-import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.cfg.Configuration;
@@ -28,6 +26,7 @@ import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.hcore.impl.HibernateSearchIntegrator;
+import org.hibernate.search.hcore.impl.SearchFactoryReference;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
 import static org.easymock.EasyMock.eq;
@@ -49,9 +48,6 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 	@Mock
 	private SessionFactoryImplementor mockSessionFactoryImplementor;
-
-	@Mock
-	private SessionFactory mockSessionFactory;
 
 	@Mock
 	private EventListenerRegistry mockEventListenerRegistry;
@@ -101,6 +97,9 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 		expect( mockSessionFactoryServiceRegistry.getService( EventListenerRegistry.class ) ).andReturn(
 				mockEventListenerRegistry
 		);
+		expect( mockSessionFactoryServiceRegistry.getService( SearchFactoryReference.class ) ).andReturn(
+				new SearchFactoryReference()
+		);
 
 		mockEventListenerRegistry.addDuplicationStrategy( isA( HibernateSearchIntegrator.DuplicationStrategyImpl.class ) );
 
@@ -137,6 +136,10 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 				mockClassLoaderService
 		);
 
+		expect( mockSessionFactoryImplementor.getServiceRegistry() ).andReturn(
+				mockSessionFactoryServiceRegistry
+		);
+
 		// returning object.class is fair enough for testing purposes
 		expect( mockClassLoaderService.classForName( "javax.persistence.Id" ) ).andReturn( Object.class );
 
@@ -150,7 +153,7 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 		integratorUnderTest.integrate( cfg, mockSessionFactoryImplementor, mockSessionFactoryServiceRegistry );
 
-		capturedSessionFactoryObserver.getValue().sessionFactoryCreated( mockSessionFactory );
+		capturedSessionFactoryObserver.getValue().sessionFactoryCreated( mockSessionFactoryImplementor );
 	}
 
 	private static Configuration makeConfiguration(Boolean enableSearch) {
