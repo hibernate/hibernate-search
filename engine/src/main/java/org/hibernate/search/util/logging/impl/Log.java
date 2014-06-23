@@ -650,4 +650,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 221, value = "Circular reference. Duplicate use of %1s in root entity %2s#%3s Set the @IndexedEmbedded.depth value explicitly to fix the problem.")
 	SearchException detectInfiniteTypeLoopInIndexedEmbedded(String elementClass, String rootEntity, String path);
+
+	@Message(id = 222, value = "The SearchFactory was not initialized" )
+	SearchException searchFactoryNotInitialized();
+
+	@Message(id = 223, value = "The Service org.hibernate.search.hcore.impl.SearchFactoryReference was not found in the Hibernate ORM Service Registry."
+			+ " This might be caused by the Hibernate ORM classloader not having visibility on Hibernate Search" )
+	SearchException searchFactoryReferenceServiceNotFound();
+
 }

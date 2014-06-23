@@ -8,9 +8,9 @@ package org.hibernate.search.hcore.impl;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
-
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.Version;
@@ -57,7 +57,9 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 	@Override
 	public void sessionFactoryCreated(SessionFactory factory) {
+		boolean failedBoot = true;
 		try {
+			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
 			configuration.getProperties().put( SESSION_FACTORY_PROPERTY_KEY, factory );
 			if ( searchFactoryImplementor == null ) {
 				searchFactoryImplementor = new SearchFactoryBuilder()
@@ -71,10 +73,14 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			}
 			configuration = null; //free up some memory as we no longer need it
 			listener.initialize( searchFactoryImplementor );
+			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
+			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( searchFactoryImplementor );
+			failedBoot = false;
 		}
-		catch (RuntimeException e) {
-			factory.close();
-			throw e;
+		finally {
+			if ( failedBoot ) {
+				factory.close();
+			}
 		}
 	}
 
