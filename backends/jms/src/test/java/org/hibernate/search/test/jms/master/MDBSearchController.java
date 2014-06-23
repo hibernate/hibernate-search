@@ -7,27 +7,22 @@
 package org.hibernate.search.test.jms.master;
 
 import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.SearchFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 public class MDBSearchController extends AbstractJMSHibernateSearchController {
 
-	SessionFactory sessionFactory;
+	final SearchFactory searchFactory;
 
-	MDBSearchController( SessionFactory sessionFactory ) {
-		this.sessionFactory = sessionFactory;
+	MDBSearchController( SearchFactory searchFactory ) {
+		this.searchFactory = searchFactory;
 	}
 
 	@Override
-	protected Session getSession() {
-		return sessionFactory.openSession( );
+	protected SearchFactory getSearchFactory() {
+		return searchFactory;
 	}
 
-	@Override
-	protected void cleanSessionIfNeeded(Session session) {
-		session.close();
-	}
 }

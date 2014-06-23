@@ -12,8 +12,10 @@ import javax.jms.MessageListener;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.hibernate.Session;
 import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
+import org.hibernate.search.engine.SearchFactory;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.Search;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 @MessageDriven(activationConfig = {
@@ -25,12 +27,9 @@ public class RegistrationMdb extends AbstractJMSHibernateSearchController implem
 	private EntityManager em;
 
 	@Override
-	protected Session getSession() {
-		return (Session) em.getDelegate();
-	}
-
-	@Override
-	protected void cleanSessionIfNeeded(Session session) {
+	protected SearchFactory getSearchFactory() {
+		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
+		return fullTextEntityManager.getSearchFactory();
 	}
 
 }

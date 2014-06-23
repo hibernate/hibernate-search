@@ -664,20 +664,17 @@ and set up to process the index works queue through JMS.
       @ActivationConfigProperty(propertyName="destinationType",
                                 propertyValue="javax.jms.Queue"),
       @ActivationConfigProperty(propertyName="destination",
-                                propertyValue="queue/hibernatesearch"),
-      @ActivationConfigProperty(propertyName="DLQMaxResent", propertyValue="1")
+                                propertyValue="queue/hibernatesearch")
    } )
 public class MDBSearchController extends AbstractJMSHibernateSearchController
                                  implements MessageListener {
+
     @PersistenceContext EntityManager em;
 
-    //method retrieving the appropriate session
-    protected Session getSession() {
-        return (Session) em.getDelegate();
-    }
-
-    //potentially close the session opened in #getSession(), not needed here
-    protected void cleanSessionIfNeeded(Session session)
+    @Override
+    protected SearchFactory getSearchFactory() {
+        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
+        return fullTextEntityManager.getSearchFactory();
     }
 }
 ----
@@ -686,9 +683,11 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
 
 This example inherits from the abstract JMS controller class available in the Hibernate Search
 source code and implements a JavaEE MDB. This implementation is given as an example and can be
-adjusted to make use of non Java EE Message Driven Beans. For more information about the
-getSession() and cleanSessionIfNeeded(), please check AbstractJMSHibernateSearchController's
-javadoc.
+adjusted to make use of non Java EE Message Driven Beans.
+Essentially what you need to do is to connect the specific JMS Queue with the +SearchFactory+
+instance of the EntityManager.
+As an advanced alternative, you can implement your own logic by not extending +AbstractJMSHibernateSearchController+
+but rather to use it as an implementation example.
 
 [[jgroups-backend]]
 ==== JGroups Master/Slave back end

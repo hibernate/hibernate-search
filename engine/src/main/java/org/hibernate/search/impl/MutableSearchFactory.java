@@ -309,4 +309,14 @@ public class MutableSearchFactory
 		return delegate.getIndexManagerFactory();
 	}
 
+	@Override
+	public <T> T unwrap(Class<T> cls) {
+		if ( SearchFactoryIntegrator.class.equals( cls ) || SearchFactoryImplementor.class.equals( cls ) ) {
+			return (T) this;
+		}
+		else {
+			return delegate.unwrap( cls );
+		}
+	}
+
 }

@@ -95,4 +95,7 @@ public interface SearchFactory {
 	 * @return the set of currently indexed types. If no types are indexed the empty set is returned.
 	 */
 	Set<Class<?>> getIndexedTypes();
+
+	<T> T unwrap(Class<T> cls);
+
 }

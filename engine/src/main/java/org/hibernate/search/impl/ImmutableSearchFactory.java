@@ -50,6 +50,7 @@ import org.hibernate.search.query.engine.impl.HSQueryImpl;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
@@ -502,6 +503,17 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public IndexManagerFactory getIndexManagerFactory() {
 		return indexManagerFactory;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T unwrap(Class<T> cls) {
+		if ( SearchFactoryIntegrator.class.isAssignableFrom( cls ) || SearchFactoryImplementor.class.isAssignableFrom( cls ) ) {
+			return (T) this;
+		}
+		else {
+			throw new SearchException( "Can not unwrap an ImmutableSearchFactory into a '" + cls + "'" );
+		}
 	}
 
 }
