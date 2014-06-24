@@ -135,12 +135,12 @@
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
         <hibernate.search.module.slot>5.0</hibernate.search.module.slot>
         <infinispan.module.slot>ispn-7.0</infinispan.module.slot>
-        <lucene.module.slot>4.8</lucene.module.slot>
+        <lucene.module.slot>4.9</lucene.module.slot>
         <jgroups.module.slot>3.5</jgroups.module.slot>
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>4.8.1</luceneVersion>
+        <luceneVersion>4.9.0</luceneVersion>
         <infinispanVersion>7.0.0.CR1</infinispanVersion>
         <jgroupsVersion>3.5.0.Final</jgroupsVersion>
         <hibernateVersion>4.3.6.Final</hibernateVersion>
