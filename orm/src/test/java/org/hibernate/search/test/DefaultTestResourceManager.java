@@ -7,9 +7,9 @@
 package org.hibernate.search.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.UUID;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.store.Directory;
@@ -31,9 +31,9 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
-import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Test utility class for managing ORM and Search test resources.
@@ -46,6 +46,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private static final Log log = LoggerFactory.make();
 
 	private final Class<?>[] annotatedClasses;
+	private final TemporaryFolder storageManagement = new TemporaryFolder();
 	private final File baseIndexDir;
 
 	private Configuration cfg;
@@ -54,10 +55,12 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private SearchFactoryImplementor searchFactory;
 	private boolean needsConfigurationRebuild;
 
-	public DefaultTestResourceManager(Class<?>[] annotatedClasses) {
+
+	public DefaultTestResourceManager(Class<?>[] annotatedClasses) throws IOException {
 		this.annotatedClasses = annotatedClasses;
 		this.cfg = new Configuration();
-		this.baseIndexDir = createBaseIndexDir();
+		storageManagement.create();
+		this.baseIndexDir = storageManagement.newFolder();
 		this.needsConfigurationRebuild = true;
 	}
 
@@ -126,7 +129,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			log.debug( "JMS based test. Skipping index emptying" );
 			return;
 		}
-		FileHelper.delete( getBaseIndexDir() );
+		storageManagement.delete();
 	}
 
 	@Override
@@ -220,18 +223,6 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 			throw new RuntimeException( e );
 		}
 		needsConfigurationRebuild = false;
-	}
-
-	private File createBaseIndexDir() {
-		// Make sure no directory is ever reused across the test suite as Windows might not be able
-		// to delete the files after usage. See also
-		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
-		String shortTestName = this.getClass().getSimpleName() + "-" + UUID.randomUUID().toString().substring( 0, 8 );
-
-		// the constructor File(File, String) is broken too, see :
-		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5066567
-		// So make sure to use File(String, String) in this case as TestConstants works with absolute paths!
-		return new File( TestConstants.getIndexDirectory( this.getClass() ), shortTestName );
 	}
 
 	private static class RollbackWork implements Work {

@@ -7,6 +7,7 @@
 package org.hibernate.search.test;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.lucene.store.Directory;
 
@@ -124,7 +125,12 @@ public abstract class SearchTestBase implements TestResourceManager {
 	// synchronized due to lazy initialization
 	private synchronized DefaultTestResourceManager getTestResourceManager() {
 		if ( testResourceManager == null ) {
-			testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
+			try {
+				testResourceManager = new DefaultTestResourceManager( getAnnotatedClasses() );
+			}
+			catch (IOException e) {
+				new RuntimeException( e );
+			}
 		}
 		return testResourceManager;
 	}
