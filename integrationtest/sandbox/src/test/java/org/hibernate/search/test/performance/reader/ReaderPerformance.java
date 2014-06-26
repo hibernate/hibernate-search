@@ -51,9 +51,10 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		File baseIndexDir = getBaseIndexDir();
-		baseIndexDir.mkdirs();
-		File[] files = baseIndexDir.listFiles();
+		String indexBase = getIndexBaseDir();
+		File indexDir = new File( indexBase );
+		indexDir.mkdirs();
+		File[] files = indexDir.listFiles();
 		for ( File file : files ) {
 			FileHelper.delete( file );
 		}
@@ -63,7 +64,7 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		FileHelper.delete( getBaseIndexDir() );
+		FileHelper.delete( new File( getIndexBaseDir() ) );
 	}
 
 	@Test
@@ -76,7 +77,10 @@ public abstract class ReaderPerformance extends SearchTestBase {
 
 	private void buildBigIndex() throws InterruptedException, IOException {
 		System.out.println( "Going to create fake index..." );
-		FSDirectory directory = FSDirectory.open( new File( getBaseIndexDir(), Detective.class.getCanonicalName() ) );
+
+		FSDirectory directory = FSDirectory.open(
+				new File( getIndexBaseDir(), Detective.class.getCanonicalName() )
+		);
 		SimpleAnalyzer analyzer = new SimpleAnalyzer( Version.LUCENE_CURRENT );
 		IndexWriterConfig cfg = new IndexWriterConfig(Version.LUCENE_CURRENT, analyzer);
 		IndexWriter iw = new IndexWriter( directory, cfg );
@@ -107,7 +111,7 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
+		cfg.setProperty( "hibernate.search.default.indexBase", getIndexBaseDir() );
 		cfg.setProperty(
 				"hibernate.search.default.optimizer.transaction_limit.max", "10"
 		); // workaround too many open files
@@ -117,6 +121,8 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	}
 
 	protected abstract String getReaderStrategyName();
+
+	protected abstract String getIndexBaseDir();
 
 	private void timeMs() throws InterruptedException {
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool( WORKER_THREADS );
