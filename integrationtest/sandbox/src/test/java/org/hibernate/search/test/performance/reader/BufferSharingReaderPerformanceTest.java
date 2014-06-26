@@ -7,6 +7,7 @@
 package org.hibernate.search.test.performance.reader;
 
 import org.hibernate.search.indexes.impl.SharingBufferReaderProvider;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * @author Sanne Grinovero
@@ -15,5 +16,10 @@ public class BufferSharingReaderPerformanceTest extends ReaderPerformance {
 	@Override
 	protected String getReaderStrategyName() {
 		return SharingBufferReaderProvider.class.getName();
+	}
+
+	@Override
+	protected String getIndexBaseDir() {
+		return TestConstants.getIndexDirectory( BufferSharingReaderPerformanceTest.class ) + "BufferSharingReaderPerformanceTest";
 	}
 }

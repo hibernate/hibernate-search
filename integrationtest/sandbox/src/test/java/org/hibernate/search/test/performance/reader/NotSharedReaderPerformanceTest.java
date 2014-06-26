@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.test.performance.reader;
 
+import org.hibernate.search.testsupport.TestConstants;
+
 /**
  * @author Sanne Grinovero
  */
@@ -14,6 +16,11 @@ public class NotSharedReaderPerformanceTest extends ReaderPerformance {
 	@Override
 	protected String getReaderStrategyName() {
 		return "not-shared";
+	}
+
+	@Override
+	protected String getIndexBaseDir() {
+		return TestConstants.getIndexDirectory( NotSharedReaderPerformanceTest.class ) + "NotSharedReaderPerformanceTest";
 	}
 
 }

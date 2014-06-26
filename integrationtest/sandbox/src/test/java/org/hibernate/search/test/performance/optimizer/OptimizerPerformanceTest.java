@@ -36,10 +36,11 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		forceConfigurationRebuild();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
-		sub.mkdirs();
-		File[] files = sub.listFiles();
+		String indexBase = TestConstants.getIndexDirectory( OptimizerPerformanceTest.class );
+		File indexDir = new File(indexBase);
+		FileHelper.delete( indexDir );
+		indexDir.mkdirs();
+		File[] files = indexDir.listFiles();
 		for ( File file : files ) {
 			if ( file.isDirectory() ) {
 				FileHelper.delete( file );
@@ -52,8 +53,9 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
+		String indexBase = TestConstants.getIndexDirectory( OptimizerPerformanceTest.class );
+		File indexDir = new File(indexBase);
+		FileHelper.delete( indexDir );
 	}
 
 	@Test
@@ -195,8 +197,7 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+		cfg.setProperty( "hibernate.search.default.indexBase", TestConstants.getIndexDirectory( OptimizerPerformanceTest.class ) );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}

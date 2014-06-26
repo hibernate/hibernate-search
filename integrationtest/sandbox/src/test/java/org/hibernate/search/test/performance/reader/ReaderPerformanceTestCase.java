@@ -19,9 +19,11 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
@@ -47,9 +49,10 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@Before
 	public void setUp() throws Exception {
 		forceConfigurationRebuild();
-		File sub = getBaseIndexDir();
-		sub.mkdir();
-		File[] files = sub.listFiles();
+		String indexBase = TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class );
+		File indexDir = new File(indexBase);
+		indexDir.mkdir();
+		File[] files = indexDir.listFiles();
 		for ( File file : files ) {
 			if ( file.isDirectory() ) {
 				FileHelper.delete( file );
@@ -62,8 +65,9 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
-		File sub = getBaseIndexDir();
-		FileHelper.delete( sub );
+		String indexBase = TestConstants.getIndexDirectory( SearchTestBase.class );
+		File indexDir = new File(indexBase);
+		FileHelper.delete( indexDir );
 	}
 
 	@Override
@@ -274,8 +278,10 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
+		cfg.setProperty(
+				"hibernate.search.default.indexBase",
+				TestConstants.getIndexDirectory( ReaderPerformanceTestCase.class )
+		);
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
