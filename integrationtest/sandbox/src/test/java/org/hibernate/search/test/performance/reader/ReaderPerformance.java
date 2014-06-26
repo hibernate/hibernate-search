@@ -22,9 +22,6 @@ import org.apache.lucene.util.Version;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.util.impl.FileHelper;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -46,25 +43,6 @@ public abstract class ReaderPerformance extends SearchTestBase {
 	private static final int WORKER_THREADS = PERFORMANCE_ENABLED ? 20 : 1;
 
 	private static final int WARM_UP_CYCLES = PERFORMANCE_ENABLED ? 6 : 1;
-
-	@Override
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-		File baseIndexDir = getBaseIndexDir();
-		baseIndexDir.mkdirs();
-		File[] files = baseIndexDir.listFiles();
-		for ( File file : files ) {
-			FileHelper.delete( file );
-		}
-	}
-
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-		FileHelper.delete( getBaseIndexDir() );
-	}
 
 	@Test
 	public final void testPerformance() throws InterruptedException, IOException {
