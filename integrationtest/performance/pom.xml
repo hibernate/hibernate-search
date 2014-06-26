@@ -110,6 +110,14 @@
             <artifactId>wildfly-arquillian-container-managed</artifactId>
             <version>${wildflyVersion}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- This exclusion is needed to be able to setup the project in Windows:
+                     it otherwise includes transitive dependency to the JDK JConsole -->
+                <exclusion>
+                    <artifactId>wildfly-patching</artifactId>
+                    <groupId>org.wildfly</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
