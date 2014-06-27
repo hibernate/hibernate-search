@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.FlagsAttribute;
-import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.FlagsAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.KeywordAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.PayloadAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttributeImpl;
+import org.apache.lucene.analysis.tokenattributes.TypeAttributeImpl;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
@@ -33,9 +33,7 @@ import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
-import org.apache.lucene.util.AttributeSource;
 import org.apache.lucene.util.BytesRef;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -285,64 +283,50 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addCharTermAttribute(CharSequence sequence) {
-		AttributeImpl attr = AttributeSource.AttributeFactory
-				.DEFAULT_ATTRIBUTE_FACTORY
-				.createAttributeInstance( CharTermAttribute.class );
-		( (CharTermAttribute) attr ).append( sequence );
+		CharTermAttributeImpl attr = new CharTermAttributeImpl();
+		attr.append( sequence );
 		getAttributes().add( attr );
 	}
 
 	@Override
 	public void addPayloadAttribute(byte[] payloads) {
-		AttributeImpl attr = AttributeSource.AttributeFactory
-				.DEFAULT_ATTRIBUTE_FACTORY
-				.createAttributeInstance( PayloadAttribute.class );
-		( (PayloadAttribute) attr ).setPayload( new BytesRef( payloads ) );
+		PayloadAttributeImpl attr = new PayloadAttributeImpl();
+		attr.setPayload( new BytesRef( payloads ) );
 		getAttributes().add( attr );
 	}
 
 	@Override
 	public void addKeywordAttribute(boolean isKeyword) {
-		AttributeImpl attr = AttributeSource.AttributeFactory
-				.DEFAULT_ATTRIBUTE_FACTORY
-				.createAttributeInstance( KeywordAttribute.class );
-		( (KeywordAttribute) attr ).setKeyword( isKeyword );
+		KeywordAttributeImpl attr = new KeywordAttributeImpl();
+		attr.setKeyword( isKeyword );
 		getAttributes().add( attr );
 	}
 
 	@Override
 	public void addPositionIncrementAttribute(int positionIncrement) {
-		AttributeImpl attr = AttributeSource.AttributeFactory
-				.DEFAULT_ATTRIBUTE_FACTORY
-				.createAttributeInstance( PositionIncrementAttribute.class );
-		( (PositionIncrementAttribute) attr ).setPositionIncrement( positionIncrement );
+		PositionIncrementAttributeImpl attr = new PositionIncrementAttributeImpl();
+		attr.setPositionIncrement( positionIncrement );
 		getAttributes().add( attr );
 	}
 
 	@Override
 	public void addFlagsAttribute(int flags) {
-		AttributeImpl attr = AttributeSource.AttributeFactory
-				.DEFAULT_ATTRIBUTE_FACTORY
-				.createAttributeInstance( FlagsAttribute.class );
-		( (FlagsAttribute) attr ).setFlags( flags );
+		FlagsAttributeImpl attr = new FlagsAttributeImpl();
+		attr.setFlags( flags );
 		getAttributes().add( attr );
 	}
 
 	@Override
 	public void addTypeAttribute(String type) {
-		AttributeImpl attr = AttributeSource.AttributeFactory
-				.DEFAULT_ATTRIBUTE_FACTORY
-				.createAttributeInstance( TypeAttribute.class );
-		( (TypeAttribute) attr ).setType( type );
+		TypeAttributeImpl attr = new TypeAttributeImpl();
+		attr.setType( type );
 		getAttributes().add( attr );
 	}
 
 	@Override
 	public void addOffsetAttribute(int startOffset, int endOffset) {
-		AttributeImpl attr = AttributeSource.AttributeFactory
-				.DEFAULT_ATTRIBUTE_FACTORY
-				.createAttributeInstance( OffsetAttribute.class );
-		( (OffsetAttribute) attr ).setOffset( startOffset, endOffset );
+		OffsetAttributeImpl attr = new OffsetAttributeImpl();
+		attr.setOffset( startOffset, endOffset );
 		getAttributes().add( attr );
 	}
 
