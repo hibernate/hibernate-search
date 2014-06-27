@@ -45,10 +45,6 @@ class IndexWriterHolder {
 	 */
 	private static final Analyzer SIMPLE_ANALYZER = new SimpleAnalyzer( Environment.DEFAULT_LUCENE_MATCH_VERSION );
 
-	private final IndexWriterConfig writerConfig = new IndexWriterConfig(
-			Environment.DEFAULT_LUCENE_MATCH_VERSION,
-			SIMPLE_ANALYZER
-	);
 	private final ErrorHandler errorHandler;
 	private final ParameterSet indexParameters;
 	private final DirectoryProvider directoryProvider;
@@ -66,19 +62,21 @@ class IndexWriterHolder {
 	 */
 	private final ReentrantLock writerInitializationLock = new ReentrantLock();
 
+	/**
+	 * The Similarity strategy needs to be applied on each new IndexWriter
+	 */
+	private final Similarity similarity;
+
+	private final LuceneIndexingParameters luceneParameters;
+
 
 	IndexWriterHolder(ErrorHandler errorHandler, DirectoryBasedIndexManager indexManager) {
 		this.errorHandler = errorHandler;
 		this.indexName = indexManager.getIndexName();
-		LuceneIndexingParameters luceneParameters = indexManager.getIndexingParameters();
+		this.luceneParameters = indexManager.getIndexingParameters();
 		this.indexParameters = luceneParameters.getIndexParameters();
 		this.directoryProvider = indexManager.getDirectoryProvider();
-		luceneParameters.applyToWriter( writerConfig );
-		Similarity similarity = indexManager.getSimilarity();
-		if ( similarity != null ) {
-			writerConfig.setSimilarity( similarity );
-		}
-		writerConfig.setOpenMode( OpenMode.APPEND ); //More efficient to open
+		this.similarity = indexManager.getSimilarity();
 	}
 
 	/**
@@ -125,12 +123,22 @@ class IndexWriterHolder {
 	 * Also each new IndexWriter needs a new MergePolicy.
 	 */
 	private IndexWriter createNewIndexWriter() throws IOException {
-		final IndexWriterConfig indexWriterConfig = writerConfig.clone(); //Each writer config can be attached only once to an IndexWriter
+		final IndexWriterConfig indexWriterConfig = createWriterConfig(); //Each writer config can be attached only once to an IndexWriter
 		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO make it possible to configure a different policy?
 		indexWriterConfig.setMergePolicy( newMergePolicy );
 		MergeScheduler mergeScheduler = new ConcurrentMergeScheduler( this.errorHandler, this.indexName );
 		indexWriterConfig.setMergeScheduler( mergeScheduler );
 		return new IndexWriter( directoryProvider.getDirectory(), indexWriterConfig );
+	}
+
+	private IndexWriterConfig createWriterConfig() {
+		final IndexWriterConfig writerConfig = new IndexWriterConfig( Environment.DEFAULT_LUCENE_MATCH_VERSION, SIMPLE_ANALYZER );
+		luceneParameters.applyToWriter( writerConfig );
+		if ( similarity != null ) {
+			writerConfig.setSimilarity( similarity );
+		}
+		writerConfig.setOpenMode( OpenMode.APPEND ); //More efficient to open
+		return writerConfig;
 	}
 
 	/**
