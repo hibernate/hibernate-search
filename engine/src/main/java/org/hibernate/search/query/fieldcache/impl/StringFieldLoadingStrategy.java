@@ -39,9 +39,8 @@ public final class StringFieldLoadingStrategy implements FieldLoadingStrategy {
 	}
 
 	@Override
-	public String collect(int relativeDocId) {
-		final BytesRef term = new BytesRef();
-		currentCache.get( relativeDocId, term );
+	public String collect(final int relativeDocId) {
+		BytesRef term = currentCache.get( relativeDocId );
 		return term.utf8ToString();
 	}
 

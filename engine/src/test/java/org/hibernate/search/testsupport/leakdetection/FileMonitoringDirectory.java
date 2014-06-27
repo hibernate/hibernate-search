@@ -107,18 +107,8 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		}
 
 		@Override
-		public void seek(long pos) throws IOException {
-			delegate.seek( pos );
-		}
-
-		@Override
 		public long length() throws IOException {
 			return delegate.length();
-		}
-
-		@Override
-		public void setLength(long length) throws IOException {
-			delegate.setLength( length );
 		}
 
 		@Override
@@ -254,6 +244,11 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		@Override
 		public Set<String> readStringSet() throws IOException {
 			return delegate.readStringSet();
+		}
+
+		@Override
+		public IndexInput slice(String sliceDescription, long offset, long length) throws IOException {
+			return delegate.slice( sliceDescription, offset, length );
 		}
 
 	}

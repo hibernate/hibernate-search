@@ -44,10 +44,10 @@ public final class MultiStringFieldLoadingStrategy implements FieldLoadingStrate
 		sortedSetDocValues.setDocument( relativeDocId );
 		List<String> values = new ArrayList<String>();
 
-		BytesRef bytesRef = new BytesRef();
 		long ordinal = sortedSetDocValues.nextOrd();
 		while ( ordinal != SortedSetDocValues.NO_MORE_ORDS ) {
-			sortedSetDocValues.lookupOrd( ordinal, bytesRef );
+			BytesRef bytesRef = sortedSetDocValues.lookupOrd( ordinal );
+			sortedSetDocValues.lookupOrd( ordinal );
 			values.add( bytesRef.utf8ToString() );
 			ordinal = sortedSetDocValues.nextOrd();
 		}
