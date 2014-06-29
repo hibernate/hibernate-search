@@ -1163,11 +1163,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		if ( parseContext.getMaxLevel() == Integer.MAX_VALUE //infinite
 				&& parseContext.hasBeenProcessed( elementClass ) ) {
-			throw new SearchException(
-					"Circular reference. Duplicate use of "
-							+ elementClass.getName()
-							+ " in root entity " + typeMetadataBuilder.getClass().getName()
-							+ "#" + buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member )
+			throw log.detectInfiniteTypeLoopInIndexedEmbedded(
+					elementClass.getName(),
+					typeMetadataBuilder.getIndexedType().getName(),
+					buildEmbeddedPrefix( prefix, indexedEmbeddedAnnotation, member )
 			);
 		}
 
