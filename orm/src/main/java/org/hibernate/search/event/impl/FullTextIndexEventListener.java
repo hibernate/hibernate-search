@@ -29,11 +29,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
+
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.Session;
-
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.EntityEntry;
 import org.hibernate.event.spi.AbstractCollectionEvent;
@@ -61,7 +61,7 @@ import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.impl.WeakIdentityHashMap;
+import org.hibernate.search.util.impl.Maps;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -92,12 +92,10 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
 	// transient because it's not serializable (and state doesn't need to live longer than a flush).
-	// final because it's initialization should be published to other threads.
+	// final because its initialization should be published to other threads.
 	// ! update the readObject() method in case of name changes !
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
-	private final transient Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>(
-			0
-	);
+	private final transient Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
@@ -306,7 +304,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		Class<FullTextIndexEventListener> cl = FullTextIndexEventListener.class;
 		Field f = cl.getDeclaredField( "flushSynch" );
 		ReflectionHelper.setAccessible( f );
-		Map<Session, Synchronization> flushSynch = new WeakIdentityHashMap<Session, Synchronization>( 0 );
+		Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 		// setting a final field by reflection during a readObject is considered as safe as in a constructor:
 		f.set( this, flushSynch );
 	}
