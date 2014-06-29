@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.Properties;
-import javax.transaction.Synchronization;
+import java.util.concurrent.ConcurrentMap;
 
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.backend.spi.Work;
@@ -17,13 +17,12 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
+import org.hibernate.search.util.impl.Maps;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.impl.WeakIdentityHashMap;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -43,7 +42,7 @@ public class TransactionalWorker implements Worker {
 
 	//this is being used from different threads, but doesn't need a
 	//synchronized map since for a given transaction, we have not concurrent access
-	protected final WeakIdentityHashMap<Object, Synchronization> synchronizationPerTransaction = new WeakIdentityHashMap<Object, Synchronization>();
+	protected final ConcurrentMap<Object, PostTransactionWorkQueueSynchronization> synchronizationPerTransaction = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 	private QueueingProcessor queueingProcessor;
 	private SearchFactoryImplementor factory;
 	private InstanceInitializer instanceInitializer;
@@ -64,11 +63,10 @@ public class TransactionalWorker implements Worker {
 			return;
 		}
 		if ( transactionContext.isTransactionInProgress() ) {
-			Object transactionIdentifier = transactionContext.getTransactionIdentifier();
-			PostTransactionWorkQueueSynchronization txSync = (PostTransactionWorkQueueSynchronization)
-					synchronizationPerTransaction.get( transactionIdentifier );
+			final Object transactionIdentifier = transactionContext.getTransactionIdentifier();
+			PostTransactionWorkQueueSynchronization txSync = synchronizationPerTransaction.get( transactionIdentifier );
 			if ( txSync == null || txSync.isConsumed() ) {
-				txSync = new PostTransactionWorkQueueSynchronization(
+				txSync = new PostTransactionWorkQueueSynchronization( transactionIdentifier,
 						queueingProcessor, synchronizationPerTransaction, factory
 				);
 				transactionContext.registerSynchronization( txSync );
