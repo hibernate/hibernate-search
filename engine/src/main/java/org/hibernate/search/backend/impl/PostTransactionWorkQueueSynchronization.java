@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.backend.impl;
 
+import java.util.concurrent.ConcurrentMap;
+
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.util.impl.WeakIdentityHashMap;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -33,14 +34,17 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	private final QueueingProcessor queueingProcessor;
 	private boolean consumed;
 	private boolean prepared;
-	private final WeakIdentityHashMap queuePerTransaction;
+	private final ConcurrentMap<Object, PostTransactionWorkQueueSynchronization> queuePerTransaction;
 	private final WorkQueue queue;
+	private final Object transactionIdentifier;
 
 	/**
 	 * in transaction work
 	 */
-	public PostTransactionWorkQueueSynchronization(QueueingProcessor queueingProcessor, WeakIdentityHashMap queuePerTransaction,
+	public PostTransactionWorkQueueSynchronization(Object transactionIdentifier, QueueingProcessor queueingProcessor,
+			ConcurrentMap<Object, PostTransactionWorkQueueSynchronization> queuePerTransaction,
 			SearchFactoryImplementor searchFactoryImplementor) {
+		this.transactionIdentifier = transactionIdentifier;
 		this.queueingProcessor = queueingProcessor;
 		this.queuePerTransaction = queuePerTransaction;
 		queue = new WorkQueue( searchFactoryImplementor );
@@ -99,7 +103,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 			//clean the Synchronization per Transaction
 			//not needed stricto sensus but a cleaner approach and faster than the GC
 			if ( queuePerTransaction != null ) {
-				queuePerTransaction.removeValue( this );
+				queuePerTransaction.remove( transactionIdentifier );
 			}
 		}
 	}
