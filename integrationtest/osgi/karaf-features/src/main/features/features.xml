@@ -1,13 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
  ~ Hibernate Search, full-text search for your domain model
  ~
  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
 -->
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
+          name="hibernate-search-osgiintegrationtests-${project.version}"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 ">
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0">
+
     <feature name="hibernate-search" version="${project.version}">
 
         <!-- JTA -->

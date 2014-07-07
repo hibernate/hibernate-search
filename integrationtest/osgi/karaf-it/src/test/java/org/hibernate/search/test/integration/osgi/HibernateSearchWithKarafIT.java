@@ -44,10 +44,18 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+//import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
 
 /**
  * A basic integration test that executes Hibernate Search in Apache Karaf using
  * PaxExam (see <a href="https://ops4j1.jira.com/wiki/display/PAXEXAM3/Pax+Exam">online docs</a>).
+ *
+ * To replicate  this on a Karaf console, type:
+ * feature:repo-add mvn:org.hibernate/hibernate-search-integrationtest-osgi-features/5.0.0-SNAPSHOT/xml/features
+ * feature:install hibernate-search
+ *
+ * You can then verify the bundle with command:
+ * list
  *
  * @author Hardy Ferentschik
  */
