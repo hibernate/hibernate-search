@@ -39,21 +39,31 @@ import org.hibernate.search.engine.Version;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 /**
  * A basic integration test that executes Hibernate Search in Apache Karaf using
  * PaxExam (see <a href="https://ops4j1.jira.com/wiki/display/PAXEXAM3/Pax+Exam">online docs</a>).
+ *
+ * To replicate  this on a Karaf console, type:
+ * feature:repo-add mvn:org.hibernate/hibernate-search-integrationtest-osgi-features/<version>/xml/features
+ * feature:install hibernate-search
+ *
+ * You can then verify the bundle with command:
+ * list
  *
  * @author Hardy Ferentschik
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class HibernateSearchWithKarafIT {
+
+	/**
+	 * Switch to simplify debugging of this test
+	 * when it fails
+	 */
+	private static final boolean DEBUG = false;
+
 	private String currentVersion = Version.getVersionString();
 
 	@Inject
@@ -66,8 +76,8 @@ public class HibernateSearchWithKarafIT {
 		MavenArtifactUrlReference karafUrl = maven()
 				.groupId( "org.apache.karaf" )
 				.artifactId( "apache-karaf" )
-				.version( "3.0.1" )
-				.type( "tar.gz" );
+				.type( "tar.gz" )
+				.versionAsInProject();
 
 		MavenUrlReference karafStandardRepo = maven()
 				.groupId( "org.apache.karaf.features" )
@@ -79,13 +89,16 @@ public class HibernateSearchWithKarafIT {
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
 		return new Option[] {
-//				debugConfiguration( "5005", true ),
+				DEBUG ? debugConfiguration( "5005", true ) : null,
 				logLevel( LogLevelOption.LogLevel.WARN ),
 				karafDistributionConfiguration()
 						.frameworkUrl( karafUrl )
 						.unpackDirectory( examDir )
 						.useDeployFolder( false ),
-				keepRuntimeFolder(),
+				DEBUG ? keepRuntimeFolder() : null,
+				configureConsole()
+					.ignoreRemoteShell()
+					.ignoreLocalConsole() ,
 				features( karafStandardRepo, "scr" ),
 				features(
 						"mvn:org.hibernate/hibernate-search-integrationtest-osgi-features/" + currentVersion + "/xml/features",
