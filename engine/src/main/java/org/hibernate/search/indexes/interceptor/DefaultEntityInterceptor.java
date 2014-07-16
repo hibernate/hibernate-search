@@ -15,7 +15,7 @@ package org.hibernate.search.indexes.interceptor;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DefaultEntityInterceptor implements EntityIndexingInterceptor<Object> {
+public class DefaultEntityInterceptor implements EntityIndexingInterceptor {
 
 	String EXCEPTION_MESSAGE = "The default interceptor must not be called. This is an Hibernate Search bug.";
 

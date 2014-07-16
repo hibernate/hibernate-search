@@ -41,7 +41,7 @@ public interface EntityIndexBinding {
 	/**
 	 * @return the document builder for this binding
 	 */
-	DocumentBuilderIndexedEntity<?> getDocumentBuilder();
+	DocumentBuilderIndexedEntity getDocumentBuilder();
 
 	/**
 	 * @return factory for the field caches
@@ -63,5 +63,5 @@ public interface EntityIndexBinding {
 	/**
 	 * @return the interceptor for indexing operations. Can be {@code null}
 	 */
-	EntityIndexingInterceptor<?> getEntityIndexingInterceptor();
+	EntityIndexingInterceptor getEntityIndexingInterceptor();
 }

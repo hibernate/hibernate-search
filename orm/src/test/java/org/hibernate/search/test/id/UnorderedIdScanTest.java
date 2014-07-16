@@ -66,7 +66,7 @@ public class UnorderedIdScanTest {
 				typeMetadata,
 				context,
 				reflectionManager,
-				Collections.emptySet(),
+				Collections.<XClass>emptySet(),
 				SimpleInitializer.INSTANCE );
 	}
 

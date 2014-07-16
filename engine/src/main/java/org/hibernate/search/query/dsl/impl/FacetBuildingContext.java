@@ -50,7 +50,7 @@ class FacetBuildingContext<T> {
 	private T rangeEnd;
 	private boolean includeRangeEnd = true;
 	private int maxFacetCount = -1;
-	private DocumentBuilderIndexedEntity<?> documentBuilder;
+	private DocumentBuilderIndexedEntity documentBuilder;
 
 	public FacetBuildingContext(SearchFactoryImplementor factory, Class<?> entityType) {
 		this.factory = factory;

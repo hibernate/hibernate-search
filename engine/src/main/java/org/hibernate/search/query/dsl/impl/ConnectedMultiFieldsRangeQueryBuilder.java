@@ -79,7 +79,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		final String fieldName = fieldContext.getField();
 		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
 
-		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
 
 		final FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
 

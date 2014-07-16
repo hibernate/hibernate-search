@@ -31,7 +31,7 @@ import org.hibernate.search.spi.InstanceInitializer;
  * @author Emmanuel Bernard
  */
 public interface SearchFactoryState {
-	Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities();
+	Map<Class<?>, DocumentBuilderContainedEntity> getDocumentBuildersContainedEntities();
 
 	Map<Class<?>, EntityIndexBinding> getIndexBindings();
 

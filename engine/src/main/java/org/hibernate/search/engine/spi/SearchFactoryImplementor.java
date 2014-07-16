@@ -38,7 +38,7 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	 */
 	Map<Class<?>, EntityIndexBinding> getIndexBindings();
 
-	<T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType);
+	DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(Class<?> entityType);
 
 	FilterCachingStrategy getFilterCachingStrategy();
 

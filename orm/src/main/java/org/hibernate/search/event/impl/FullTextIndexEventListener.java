@@ -253,7 +253,7 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		else {
 			collectionRole = null;
 		}
-		AbstractDocumentBuilder<?> documentBuilder = getDocumentBuilder( entity );
+		AbstractDocumentBuilder documentBuilder = getDocumentBuilder( entity );
 
 		if ( documentBuilder != null && documentBuilder.collectionChangeRequiresIndexUpdate( collectionRole ) ) {
 			Serializable id = getId( entity, event );

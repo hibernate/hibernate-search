@@ -110,7 +110,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 			Criteria criteria,
 			int maxResults,
 			ObjectInitializationContext objectInitializationContext) {
-		DocumentBuilderIndexedEntity<?> documentBuilder = getDocumentBuilder(
+		DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder(
 				objectInitializationContext.getEntityType(),
 				objectInitializationContext.getSearchFactoryImplementor()
 		);
@@ -135,7 +135,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 		criteria.add( disjunction );
 	}
 
-	private DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<?> entityType, SearchFactoryImplementor searchFactoryImplementor) {
+	private DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entityType, SearchFactoryImplementor searchFactoryImplementor) {
 		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
 		if ( indexedEntities.size() > 0 ) {
 			return searchFactoryImplementor.getIndexBinding(

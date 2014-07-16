@@ -52,7 +52,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		final Class<?> entityType = work.getEntityClass();
 		final Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by query.", entityType, id );
-		DocumentBuilderIndexedEntity<?> builder = workspace.getDocumentBuilder( entityType );
+		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( entityType );
 
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
@@ -80,7 +80,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		workspace.notifyWorkApplied( work );
 	}
 
-	protected static boolean isIdNumeric(DocumentBuilderIndexedEntity<?> documentBuilder) {
+	protected static boolean isIdNumeric(DocumentBuilderIndexedEntity documentBuilder) {
 		TwoWayFieldBridge idBridge = documentBuilder.getIdBridge();
 		return idBridge instanceof NumericFieldBridge;
 	}

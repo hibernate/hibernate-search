@@ -109,7 +109,7 @@ public class IndexManagerHolder {
 			);
 		}
 
-		EntityIndexingInterceptor<?> interceptor = createEntityIndexingInterceptor( entity );
+		EntityIndexingInterceptor interceptor = createEntityIndexingInterceptor( entity );
 
 		return EntityIndexBindingFactory.buildEntityIndexBinding(
 				entity.getClass(),
@@ -359,9 +359,9 @@ public class IndexManagerHolder {
 		return shardIdentifierProvider;
 	}
 
-	private EntityIndexingInterceptor<?> createEntityIndexingInterceptor(XClass entity) {
+	private EntityIndexingInterceptor createEntityIndexingInterceptor(XClass entity) {
 		Indexed indexedAnnotation = entity.getAnnotation( Indexed.class );
-		EntityIndexingInterceptor<?> interceptor = null;
+		EntityIndexingInterceptor interceptor = null;
 		if ( indexedAnnotation != null ) {
 			Class<? extends EntityIndexingInterceptor> interceptorClass = getInterceptorClassFromHierarchy(
 					entity,

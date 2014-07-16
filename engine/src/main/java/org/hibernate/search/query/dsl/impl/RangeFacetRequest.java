@@ -17,9 +17,9 @@ import org.hibernate.search.query.facet.Facet;
  */
 public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	private final List<FacetRange<T>> facetRangeList;
-	private final DocumentBuilderIndexedEntity<?> documentBuilder;
+	private final DocumentBuilderIndexedEntity documentBuilder;
 
-	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges, DocumentBuilderIndexedEntity<?> documentBuilder) {
+	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges, DocumentBuilderIndexedEntity documentBuilder) {
 		super( name, fieldName );
 		if ( facetRanges == null || facetRanges.isEmpty() ) {
 			throw new IllegalArgumentException( "At least one facet range must be specified" );
@@ -65,7 +65,7 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 
 	private int findFacetRangeIndex(String value) {
 		int index = 0;
-		for ( FacetRange<T> facetRange : facetRangeList ) {
+		for ( FacetRange facetRange : facetRangeList ) {
 			if ( facetRange.getRangeString().equals( value ) ) {
 				return index;
 			}

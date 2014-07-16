@@ -27,7 +27,7 @@ import org.hibernate.search.spi.InstanceInitializer;
  * @author Richard Hallier
  * @author Hardy Ferentschik
  */
-public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T> {
+public class DocumentBuilderContainedEntity extends AbstractDocumentBuilder {
 	/**
 	 * Constructor used on contained entities not annotated with {@code @Indexed} themselves.
 	 *
@@ -51,8 +51,8 @@ public class DocumentBuilderContainedEntity<T> extends AbstractDocumentBuilder<T
 	}
 
 	@Override
-	public void addWorkToQueue(Class<T> entityClass,
-			T entity,
+	public void addWorkToQueue(Class<?> entityClass,
+			Object entity,
 			Serializable id,
 			boolean delete,
 			boolean add,

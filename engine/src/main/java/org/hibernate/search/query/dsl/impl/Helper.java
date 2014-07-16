@@ -90,7 +90,7 @@ final class Helper {
 		return terms;
 	}
 
-	static DocumentBuilderIndexedEntity<?> getDocumentBuilder(QueryBuildingContext queryContext) {
+	static DocumentBuilderIndexedEntity getDocumentBuilder(QueryBuildingContext queryContext) {
 		final SearchFactoryImplementor factory = queryContext.getFactory();
 		final Class<?> type = queryContext.getEntityType();
 		EntityIndexBinding indexBinding = factory.getIndexBinding( type );

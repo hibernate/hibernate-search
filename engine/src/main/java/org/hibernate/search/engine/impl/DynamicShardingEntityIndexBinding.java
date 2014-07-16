@@ -23,7 +23,7 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexBinding<T> {
+public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBinding {
 
 	private final DynamicShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
@@ -32,14 +32,14 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 	private final SearchFactoryImplementor searchFactory;
 	private final IndexManagerHolder indexManagerHolder;
 	private final String rootDirectoryProviderName;
-	private DocumentBuilderIndexedEntity<T> documentBuilder;
+	private DocumentBuilderIndexedEntity documentBuilder;
 	private final EntityIndexingInterceptor entityIndexingInterceptor;
 	private IndexManagerFactory indexManagerFactory;
 
 	public DynamicShardingEntityIndexBinding(
 			ShardIdentifierProvider shardIdentityProvider,
 			Similarity similarityInstance,
-			EntityIndexingInterceptor<? super T> entityIndexingInterceptor,
+			EntityIndexingInterceptor entityIndexingInterceptor,
 			Properties properties,
 			SearchFactoryImplementor searchFactoryImplementor,
 			IndexManagerHolder indexManagerHolder,
@@ -62,7 +62,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 	}
 
 	@Override
-	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder) {
+	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity documentBuilder) {
 		this.documentBuilder = documentBuilder;
 	}
 
@@ -82,7 +82,7 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 	}
 
 	@Override
-	public DocumentBuilderIndexedEntity<T> getDocumentBuilder() {
+	public DocumentBuilderIndexedEntity getDocumentBuilder() {
 		return documentBuilder;
 	}
 
@@ -119,8 +119,8 @@ public class DynamicShardingEntityIndexBinding<T> implements MutableEntityIndexB
 		return indexManagerFactory;
 	}
 
-	public <T> MutableEntityIndexBinding<T> cloneWithSimilarity(Similarity entitySimilarity) {
-		return new DynamicShardingEntityIndexBinding<T>(
+	public MutableEntityIndexBinding cloneWithSimilarity(Similarity entitySimilarity) {
+		return new DynamicShardingEntityIndexBinding(
 				shardIdentityProvider,
 				entitySimilarity,
 				entityIndexingInterceptor,

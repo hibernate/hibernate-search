@@ -35,9 +35,9 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 	/**
 	 * The document builder.
 	 */
-	private final DocumentBuilderIndexedEntity<?> documentBuilder;
+	private final DocumentBuilderIndexedEntity documentBuilder;
 
-	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index, DocumentBuilderIndexedEntity<?> documentBuilder) {
+	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index, DocumentBuilderIndexedEntity documentBuilder) {
 		super( facetingName, fieldName, range.getRangeString(), count );
 		this.range = range;
 		this.rangeIndex = index;

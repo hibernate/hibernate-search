@@ -18,7 +18,7 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
  */
 public interface Workspace {
 
-	<T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity);
+	DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entity);
 
 	Analyzer getAnalyzer(String name);
 

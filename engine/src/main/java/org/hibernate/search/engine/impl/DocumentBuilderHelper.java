@@ -46,7 +46,7 @@ public final class DocumentBuilderHelper {
 	private DocumentBuilderHelper() {
 	}
 
-	public static Class getDocumentClass(String className, ServiceManager serviceManager) {
+	public static Class<?> getDocumentClass(String className, ServiceManager serviceManager) {
 		try {
 			return ClassLoaderHelper.classForName( className, serviceManager );
 		}
@@ -56,7 +56,7 @@ public final class DocumentBuilderHelper {
 	}
 
 	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, ConversionContext conversionContext) {
-		final DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder(
+		final DocumentBuilderIndexedEntity builderIndexedEntity = getDocumentBuilder(
 				searchFactoryImplementor,
 				clazz
 		);
@@ -75,12 +75,12 @@ public final class DocumentBuilderHelper {
 	}
 
 	public static String getDocumentIdName(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		DocumentBuilderIndexedEntity<?> documentBuilder = getDocumentBuilder( searchFactoryImplementor, clazz );
+		DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder( searchFactoryImplementor, clazz );
 		return documentBuilder.getIdentifierName();
 	}
 
 	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields, ConversionContext conversionContext) {
-		DocumentBuilderIndexedEntity<?> builderIndexedEntity = getDocumentBuilder( searchFactoryImplementor, clazz );
+		DocumentBuilderIndexedEntity builderIndexedEntity = getDocumentBuilder( searchFactoryImplementor, clazz );
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
 		Arrays.fill( result, NOT_SET );
@@ -255,7 +255,7 @@ public final class DocumentBuilderHelper {
 		return -1;
 	}
 
-	private static DocumentBuilderIndexedEntity<?> getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
+	private static DocumentBuilderIndexedEntity getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
 		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding(
 				clazz
 		);

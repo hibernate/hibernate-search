@@ -12,7 +12,8 @@ package org.hibernate.search.indexes.interceptor;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DontInterceptEntityInterceptor implements EntityIndexingInterceptor<Object> {
+public class DontInterceptEntityInterceptor implements EntityIndexingInterceptor {
+
 	@Override
 	public IndexingOverride onAdd(Object entity) {
 		return IndexingOverride.APPLY_DEFAULT;

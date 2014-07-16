@@ -76,11 +76,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private static final Log log = LoggerFactory.make();
 
 	private final Map<Class<?>, EntityIndexBinding> indexBindingForEntities;
-	private final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
+	private final Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities;
 	/**
 	 * Lazily populated map of type descriptors
 	 */
-	private final ConcurrentHashMap<Class<?>, IndexedTypeDescriptor> indexedTypeDescriptors;
+	private final ConcurrentHashMap<Class, IndexedTypeDescriptor> indexedTypeDescriptors;
 	private final Worker worker;
 	private final Map<String, FilterDef> filterDefinitions;
 	private final FilterCachingStrategy filterCachingStrategy;
@@ -212,7 +212,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 			for ( Analyzer an : this.analyzers.values() ) {
 				an.close();
 			}
-			for ( AbstractDocumentBuilder<?> documentBuilder : this.documentBuildersContainedEntities.values() ) {
+			for ( AbstractDocumentBuilder documentBuilder : this.documentBuildersContainedEntities.values() ) {
 				documentBuilder.close();
 			}
 			for ( EntityIndexBinding entityIndexBinding : this.indexBindingForEntities.values() ) {
@@ -232,7 +232,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	@Override
-	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
+	public Map<Class<?>, DocumentBuilderContainedEntity> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
 	}
 
@@ -248,8 +248,8 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {
-		return (DocumentBuilderContainedEntity<T>) documentBuildersContainedEntities.get( entityType );
+	public DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(Class entityType) {
+		return documentBuildersContainedEntities.get( entityType );
 	}
 
 	@Override
@@ -289,7 +289,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
 		EntityIndexBinding entityIndexBinding = getSafeIndexBindingForEntity( clazz );
-		DocumentBuilderIndexedEntity<?> builder = entityIndexBinding.getDocumentBuilder();
+		DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
 		return builder.getAnalyzer();
 	}
 

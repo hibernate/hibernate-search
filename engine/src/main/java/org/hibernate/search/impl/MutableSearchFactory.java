@@ -50,8 +50,7 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  *
  * @author Emmanuel Bernard
  */
-public class MutableSearchFactory
-		implements SearchFactoryImplementorWithShareableState, SearchFactoryIntegrator, WorkerBuildContext {
+public class MutableSearchFactory implements SearchFactoryImplementorWithShareableState, SearchFactoryIntegrator, WorkerBuildContext {
 	// Implements WorkerBuilderContext for the dynamic sharding approach which build IndexManager lazily
 
 	//a reference to the same instance of this class is help by clients and various HSearch services
@@ -82,7 +81,7 @@ public class MutableSearchFactory
 	}
 
 	@Override
-	public <T> DocumentBuilderContainedEntity<T> getDocumentBuilderContainedEntity(Class<T> entityType) {
+	public DocumentBuilderContainedEntity getDocumentBuilderContainedEntity(Class<?> entityType) {
 		return delegate.getDocumentBuilderContainedEntity( entityType );
 	}
 
@@ -210,7 +209,7 @@ public class MutableSearchFactory
 	}
 
 	@Override
-	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
+	public Map<Class<?>, DocumentBuilderContainedEntity> getDocumentBuildersContainedEntities() {
 		return delegate.getDocumentBuildersContainedEntities();
 	}
 

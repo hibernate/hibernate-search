@@ -39,7 +39,7 @@ public class FacetRange<T> {
 					boolean includeMin,
 					boolean includeMax,
 					String fieldName,
-					DocumentBuilderIndexedEntity<?> documentBuilder) {
+					DocumentBuilderIndexedEntity documentBuilder) {
 		if ( max == null && min == null ) {
 			throw new IllegalArgumentException( "At least one end of the range has to be specified" );
 		}

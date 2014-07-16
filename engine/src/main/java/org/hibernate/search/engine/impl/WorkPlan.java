@@ -47,7 +47,7 @@ public class WorkPlan {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final HashMap<Class<?>, PerClassWork<?>> byClass = new HashMap<Class<?>, PerClassWork<?>>();
+	private final HashMap<Class<?>, PerClassWork> byClass = new HashMap<Class<?>, PerClassWork>();
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
 
@@ -67,12 +67,11 @@ public class WorkPlan {
 	/**
 	 * Adds a work to be performed as part of the final plan.
 	 *
-	 * @param <T> the type of the work, or of the affected entity
 	 * @param work The work instance to add to the work plan
 	 */
-	public <T> void addWork(Work<T> work) {
+	public void addWork(Work work) {
 		approximateWorkQueueSize++;
-		Class<T> entityClass = instanceInitializer.getClassFromWork( work );
+		Class<?> entityClass = instanceInitializer.getClassFromWork( work );
 		PerClassWork classWork = getClassWork( entityClass );
 		classWork.addWork( work );
 	}
@@ -101,7 +100,7 @@ public class WorkPlan {
 	 *
 	 * @return returns (and creates if needed) the {@code PerClassWork} from the {@link #byClass} map.
 	 */
-	private <T> PerClassWork getClassWork(Class<T> entityClass) {
+	private PerClassWork getClassWork(Class<?> entityClass) {
 		PerClassWork classWork = byClass.get( entityClass );
 		if ( classWork == null ) {
 			classWork = new PerClassWork( entityClass );
@@ -153,7 +152,7 @@ public class WorkPlan {
 	/**
 	 * {@code PerClassWork} organizes work per entity type.
 	 */
-	class PerClassWork<T> {
+	class PerClassWork {
 
 		/**
 		 * We further organize work per entity identifier so that we can cancel or adapt work being done
@@ -162,7 +161,7 @@ public class WorkPlan {
 		 * is annotated with @ProvidedId, otherwise it uses the value pointed to by
 		 * {@link org.hibernate.search.annotations.DocumentId} or as last attempt {@code javax.persistence.Id}.
 		 */
-		private final Map<Serializable, PerEntityWork<T>> entityById = new HashMap<Serializable, PerEntityWork<T>>();
+		private final Map<Serializable, PerEntityWork> entityById = new HashMap<Serializable, PerEntityWork>();
 
 		/**
 		 * When a PurgeAll operation is send on the type, we can remove all previously scheduled work
@@ -173,12 +172,12 @@ public class WorkPlan {
 		/**
 		 * The type of all classes being managed
 		 */
-		private final Class<T> entityClass;
+		private final Class<?> entityClass;
 
 		/**
 		 * The DocumentBuilder relative to the type being managed
 		 */
-		private final AbstractDocumentBuilder<T> documentBuilder;
+		private final AbstractDocumentBuilder documentBuilder;
 
 		/**
 		 * The entity {@link #entityClass} does not have its own index, but is only used in contained scenarios
@@ -188,7 +187,7 @@ public class WorkPlan {
 		/**
 		 * @param clazz The type of entities being managed by this instance
 		 */
-		PerClassWork(Class<T> clazz) {
+		PerClassWork(Class<?> clazz) {
 			this.entityClass = clazz;
 			this.documentBuilder = getEntityBuilder( searchFactoryImplementor, clazz );
 			this.containedInOnly = documentBuilder instanceof DocumentBuilderContainedEntity;
@@ -200,16 +199,16 @@ public class WorkPlan {
 		 *
 		 * @param work the {@code Work} instance to add to the plan
 		 */
-		public void addWork(Work<T> work) {
+		public void addWork(Work work) {
 			if ( work.getType() == WorkType.PURGE_ALL ) {
 				entityById.clear();
 				purgeAll = true;
 			}
 			else {
 				Serializable id = extractProperId( work );
-				PerEntityWork<T> entityWork = entityById.get( id );
+				PerEntityWork entityWork = entityById.get( id );
 				if ( entityWork == null ) {
-					entityWork = new PerEntityWork<T>( work );
+					entityWork = new PerEntityWork( work );
 					entityById.put( id, entityWork );
 				}
 				entityWork.addWork( work );
@@ -224,13 +223,13 @@ public class WorkPlan {
 		 *
 		 * @return the appropriate id to use for this work
 		 */
-		private Serializable extractProperId(Work<T> work) {
+		private Serializable extractProperId(Work work) {
 			// see HSEARCH-662
 			if ( containedInOnly ) {
 				return work.getId();
 			}
 
-			T entity = work.getEntity();
+			Object entity = work.getEntity();
 			// 1) entity is null for purge operation, which requires to trust the work id
 			// 2) types mapped as provided id require to use the work id
 			// 3) when Hibernate identifier rollback is used && this identifier is our same id source, we need to get the value from work id
@@ -251,14 +250,14 @@ public class WorkPlan {
 		 * @param luceneQueue work will be appended to this list
 		 */
 		public void enqueueLuceneWork(List<LuceneWork> luceneQueue) {
-			final Set<Entry<Serializable, PerEntityWork<T>>> entityInstances = entityById.entrySet();
+			final Set<Entry<Serializable, PerEntityWork>> entityInstances = entityById.entrySet();
 			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 			if ( purgeAll ) {
 				luceneQueue.add( new PurgeAllLuceneWork( entityClass ) );
 			}
-			for ( Entry<Serializable, PerEntityWork<T>> entry : entityInstances ) {
+			for ( Entry<Serializable, PerEntityWork> entry : entityInstances ) {
 				Serializable indexingId = entry.getKey();
-				PerEntityWork<T> perEntityWork = entry.getValue();
+				PerEntityWork perEntityWork = entry.getValue();
 				perEntityWork.enqueueLuceneWork( entityClass, indexingId, documentBuilder, luceneQueue, conversionContext );
 			}
 		}
@@ -271,10 +270,10 @@ public class WorkPlan {
 		 * system. The processing might recursively add more work to the plan.
 		 */
 		public void processContainedInAndPrepareExecution() {
-			Entry<String, PerEntityWork<T>>[] entityInstancesFrozenView = new Entry[entityById.size()];
+			Entry<String, PerEntityWork>[] entityInstancesFrozenView = new Entry[entityById.size()];
 			entityInstancesFrozenView = entityById.entrySet().toArray( entityInstancesFrozenView );
-			for ( Entry<String, PerEntityWork<T>> entry : entityInstancesFrozenView ) {
-				PerEntityWork<T> perEntityWork = entry.getValue();
+			for ( Entry<String, PerEntityWork> entry : entityInstancesFrozenView ) {
+				PerEntityWork perEntityWork = entry.getValue();
 				perEntityWork.processContainedIn( documentBuilder, WorkPlan.this );
 			}
 		}
@@ -285,16 +284,16 @@ public class WorkPlan {
 		 *
 		 * @param value the instance to be processed
 		 */
-		void recurseContainedIn(T value, DepthValidator depth) {
+		void recurseContainedIn(Object value, DepthValidator depth) {
 			if ( documentBuilder.requiresProvidedId() ) {
 				log.containedInPointsToProvidedId( instanceInitializer.getClass( value ) );
 			}
 			else {
 				Serializable extractedId = documentBuilder.getId( value );
 				if ( extractedId != null ) {
-					PerEntityWork<T> entityWork = entityById.get( extractedId );
+					PerEntityWork entityWork = entityById.get( extractedId );
 					if ( entityWork == null ) {
-						EntityIndexingInterceptor<? super T> entityInterceptor = getEntityInterceptor();
+						EntityIndexingInterceptor entityInterceptor = getEntityInterceptor();
 						IndexingOverride operation;
 						if ( entityInterceptor != null ) {
 							operation = entityInterceptor.onUpdate( value );
@@ -316,7 +315,7 @@ public class WorkPlan {
 								break;
 							case REMOVE:
 								log.forceRemoveOnIndexOperationViaInterception( entityClass, WorkType.UPDATE );
-								Work<T> work = new Work<T>(value, extractedId, WorkType.DELETE);
+								Work work = new Work(value, extractedId, WorkType.DELETE);
 								entityWork = new PerEntityWork( work );
 								entityById.put( extractedId, entityWork );
 								break;
@@ -336,13 +335,11 @@ public class WorkPlan {
 			}
 		}
 
-		private EntityIndexingInterceptor<? super T> getEntityInterceptor() {
+		private EntityIndexingInterceptor getEntityInterceptor() {
 			EntityIndexBinding indexBindingForEntity = searchFactoryImplementor.getIndexBinding(
 					entityClass
 			);
-			return indexBindingForEntity != null ?
-					(EntityIndexingInterceptor<? super T>) indexBindingForEntity.getEntityIndexingInterceptor() :
-					null;
+			return indexBindingForEntity != null ? indexBindingForEntity.getEntityIndexingInterceptor() : null;
 		}
 	}
 
@@ -351,9 +348,9 @@ public class WorkPlan {
 	 * Each entity might need to be deleted from the index, added to the index,
 	 * or both; in this case delete will be performed first.
 	 */
-	private static class PerEntityWork<T> {
+	private static class PerEntityWork {
 
-		private T entity;
+		private Object entity;
 
 		/**
 		 * When true, the Lucene Document representing this entity will be deleted
@@ -379,7 +376,7 @@ public class WorkPlan {
 		 *
 		 * @param entity the instance which needs to be updated in the index
 		 */
-		private PerEntityWork(T entity) {
+		private PerEntityWork(Object entity) {
 			// for updates only
 			this.entity = entity;
 			this.delete = true;
@@ -393,7 +390,7 @@ public class WorkPlan {
 		 *
 		 * @param work the work instance
 		 */
-		private PerEntityWork(Work<T> work) {
+		private PerEntityWork(Work work) {
 			entity = work.getEntity();
 			WorkType type = work.getType();
 			// sets the initial state:
@@ -431,7 +428,7 @@ public class WorkPlan {
 		 *
 		 * @param work the work instance to add
 		 */
-		public void addWork(Work<T> work) {
+		public void addWork(Work work) {
 			entity = work.getEntity();
 			WorkType type = work.getType();
 			switch ( type ) {
@@ -483,7 +480,7 @@ public class WorkPlan {
 		 * @param entityBuilder the DocumentBuilder for this type
 		 * @param luceneQueue the queue collecting all changes
 		 */
-		public void enqueueLuceneWork(Class<T> entityClass, Serializable indexingId, AbstractDocumentBuilder<T> entityBuilder,
+		public void enqueueLuceneWork(Class entityClass, Serializable indexingId, AbstractDocumentBuilder entityBuilder,
 				List<LuceneWork> luceneQueue, ConversionContext conversionContext) {
 			if ( add || delete ) {
 				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue, conversionContext );
@@ -499,7 +496,7 @@ public class WorkPlan {
 		 *
 		 * @see org.hibernate.search.annotations.ContainedIn
 		 */
-		public void processContainedIn(AbstractDocumentBuilder<T> entityBuilder, WorkPlan workplan) {
+		public void processContainedIn(AbstractDocumentBuilder entityBuilder, WorkPlan workplan) {
 			if ( entity != null && !containedInProcessed ) {
 				containedInProcessed = true;
 				if ( add || delete ) {
@@ -518,7 +515,7 @@ public class WorkPlan {
 	 *
 	 * @return the DocumentBuilder for this type
 	 */
-	private static <T> AbstractDocumentBuilder<T> getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> entityClass) {
+	private static AbstractDocumentBuilder getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> entityClass) {
 		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding( entityClass );
 		if ( entityIndexBinding == null ) {
 			DocumentBuilderContainedEntity entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity(
@@ -535,7 +532,7 @@ public class WorkPlan {
 			}
 		}
 		else {
-			return (AbstractDocumentBuilder<T>) entityIndexBinding.getDocumentBuilder();
+			return entityIndexBinding.getDocumentBuilder();
 		}
 	}
 }

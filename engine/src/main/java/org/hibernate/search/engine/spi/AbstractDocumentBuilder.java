@@ -40,7 +40,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
-public abstract class AbstractDocumentBuilder<T> {
+public abstract class AbstractDocumentBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	private final XClass beanXClass;
@@ -80,8 +80,8 @@ public abstract class AbstractDocumentBuilder<T> {
 		optimizationBlackList.addAll( typeMetadata.getOptimizationBlackList() );
 	}
 
-	public abstract void addWorkToQueue(Class<T> entityClass,
-			T entity, Serializable id,
+	public abstract void addWorkToQueue(Class<?> entityClass,
+			Object entity, Serializable id,
 			boolean delete,
 			boolean add,
 			List<LuceneWork> queue,
@@ -184,13 +184,13 @@ public abstract class AbstractDocumentBuilder<T> {
 
 			if ( member.isArray() ) {
 				@SuppressWarnings("unchecked")
-				T[] array = (T[]) value;
-				for ( T arrayValue : array ) {
+				Object[] array = (Object[]) value;
+				for ( Object arrayValue : array ) {
 					processSingleContainedInInstance( workPlan, arrayValue, depth );
 				}
 			}
 			else if ( member.isCollection() ) {
-				Collection<T> collection = null;
+				Collection<?> collection = null;
 				try {
 					collection = getActualCollection( member, value );
 					collection.size(); //load it
@@ -207,7 +207,7 @@ public abstract class AbstractDocumentBuilder<T> {
 					}
 				}
 				if ( collection != null ) {
-					for ( T collectionValue : collection ) {
+					for ( Object collectionValue : collection ) {
 						processSingleContainedInInstance( workPlan, collectionValue, depth );
 					}
 				}

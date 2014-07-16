@@ -543,7 +543,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 
 			for ( EntityIndexBinding entityIndexBinding : builders.values() ) {
-				DocumentBuilderIndexedEntity<?> builder = entityIndexBinding.getDocumentBuilder();
+				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
@@ -561,7 +561,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			for ( Class<?> clazz : indexedTargetedEntities ) {
 				EntityIndexBinding indexBinder = builders.get( clazz );
 				if ( indexBinder != null ) {
-					DocumentBuilderIndexedEntity<?> builder = indexBinder.getDocumentBuilder();
+					DocumentBuilderIndexedEntity builder = indexBinder.getDocumentBuilder();
 					involvedClasses.addAll( builder.getMappedSubclasses() );
 				}
 			}
@@ -572,7 +572,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				if ( entityIndexBinding == null ) {
 					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
 				}
-				DocumentBuilderIndexedEntity<?> builder = entityIndexBinding.getDocumentBuilder();
+				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
 				if ( builder.getIdKeywordName() != null ) {
 					idFieldNames.add( builder.getIdKeywordName() );
 					allowFieldSelectionInProjection = allowFieldSelectionInProjection && builder.allowFieldSelectionInProjection();

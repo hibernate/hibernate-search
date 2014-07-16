@@ -36,7 +36,7 @@ import org.hibernate.search.spi.impl.SearchFactoryState;
  */
 public class MutableSearchFactoryState implements SearchFactoryState {
 
-	private Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities;
+	private Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities;
 	private Map<Class<?>, EntityIndexBinding> indexBindingsPerEntity;
 	private String indexingStrategy;
 	private Worker worker;
@@ -93,7 +93,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	@Override
-	public Map<Class<?>, DocumentBuilderContainedEntity<?>> getDocumentBuildersContainedEntities() {
+	public Map<Class<?>, DocumentBuilderContainedEntity> getDocumentBuildersContainedEntities() {
 		return documentBuildersContainedEntities;
 	}
 
@@ -146,7 +146,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return indexHierarchy;
 	}
 
-	public void setDocumentBuildersContainedEntities(Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities) {
+	public void setDocumentBuildersContainedEntities(Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities) {
 		this.documentBuildersContainedEntities = documentBuildersContainedEntities;
 	}
 

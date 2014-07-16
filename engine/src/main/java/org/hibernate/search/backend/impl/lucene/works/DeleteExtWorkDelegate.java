@@ -31,7 +31,7 @@ import org.hibernate.search.util.logging.impl.Log;
 public final class DeleteExtWorkDelegate extends DeleteWorkDelegate {
 
 	private final Class<?> managedType;
-	private final DocumentBuilderIndexedEntity<?> builder;
+	private final DocumentBuilderIndexedEntity builder;
 	private static final Log log = LoggerFactory.make();
 	private final boolean idIsNumeric;
 

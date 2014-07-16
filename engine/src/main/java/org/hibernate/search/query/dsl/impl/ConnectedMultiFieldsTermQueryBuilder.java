@@ -74,7 +74,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 
 	private Query createQuery(FieldContext fieldContext, ConversionContext conversionContext) {
 		final Query perFieldQuery;
-		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
 		final FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
 		if ( fieldBridge instanceof NumericFieldBridge ) {
 			return NumericFieldUtils.createExactMatchQuery( fieldContext.getField(), value );
@@ -108,7 +108,7 @@ public class ConnectedMultiFieldsTermQueryBuilder implements TermTermination {
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
 	}
 
-	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity<?> documentBuilder, ConversionContext conversionContext) {
+	private String buildSearchTerm(FieldContext fieldContext, DocumentBuilderIndexedEntity documentBuilder, ConversionContext conversionContext) {
 		if ( fieldContext.isIgnoreFieldBridge() ) {
 			if ( value == null ) {
 				throw new SearchException(

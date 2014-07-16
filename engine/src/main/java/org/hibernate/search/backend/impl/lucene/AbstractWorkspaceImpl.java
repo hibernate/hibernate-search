@@ -54,7 +54,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public <T> DocumentBuilderIndexedEntity<?> getDocumentBuilder(Class<T> entity) {
+	public DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entity) {
 		return indexManager.getIndexBinding( entity ).getDocumentBuilder();
 	}
 

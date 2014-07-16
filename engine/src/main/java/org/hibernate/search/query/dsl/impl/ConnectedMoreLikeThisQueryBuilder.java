@@ -67,7 +67,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 	public Query createQuery() {
 		Query query;
 		final SearchFactoryImplementor searchFactory = queryContext.getFactory();
-		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
 		IndexReader indexReader = searchFactory.getIndexReaderAccessor().open( queryContext.getEntityType() );
 		// retrieving the docId and building the more like this query form the term vectors must be using the same index reader
 		try {
@@ -94,7 +94,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 		return queryCustomizer.setWrappedQuery( query ).createQuery();
 	}
 
-	private String[] getAllCompatibleFieldNames(DocumentBuilderIndexedEntity<?> documentBuilder) {
+	private String[] getAllCompatibleFieldNames(DocumentBuilderIndexedEntity documentBuilder) {
 		Collection<DocumentFieldMetadata> allFieldMetadata = documentBuilder.getTypeMetadata().getAllDocumentFieldMetadata();
 		List<String> fieldNames = new ArrayList<String>( allFieldMetadata.size() );
 		for ( DocumentFieldMetadata fieldMetadata : allFieldMetadata ) {

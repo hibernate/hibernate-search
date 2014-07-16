@@ -163,8 +163,8 @@ public class SearchFactoryBuilder {
 		}
 
 		//not really necessary today
-		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
-		for ( DocumentBuilderContainedEntity<?> builder : documentBuildersContainedEntities.values() ) {
+		final Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
+		for ( DocumentBuilderContainedEntity builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 
@@ -178,7 +178,7 @@ public class SearchFactoryBuilder {
 
 	private void removeClassesAlreadyManaged() {
 		Set<Class<?>> remove = new HashSet<Class<?>>();
-		final Map<Class<?>, DocumentBuilderContainedEntity<?>> containedEntities = rootFactory.getDocumentBuildersContainedEntities();
+		final Map<Class<?>, DocumentBuilderContainedEntity> containedEntities = rootFactory.getDocumentBuildersContainedEntities();
 		final Map<Class<?>, EntityIndexBinding> indexedEntities = rootFactory.getIndexBindings();
 		for ( Class<?> entity : classes ) {
 			if ( indexedEntities.containsKey( entity ) || containedEntities.containsKey( entity ) ) {
@@ -214,8 +214,8 @@ public class SearchFactoryBuilder {
 		}
 
 		// not really necessary today
-		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
-		for ( DocumentBuilderContainedEntity<?> builder : documentBuildersContainedEntities.values() ) {
+		final Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
+		for ( DocumentBuilderContainedEntity builder : documentBuildersContainedEntities.values() ) {
 			builder.postInitialize( indexedClasses );
 		}
 
@@ -283,7 +283,7 @@ public class SearchFactoryBuilder {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
 			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinding>() );
-			factoryState.setDocumentBuildersContainedEntities( new ConcurrentHashMap<Class<?>, DocumentBuilderContainedEntity<?>>() );
+			factoryState.setDocumentBuildersContainedEntities( new ConcurrentHashMap<Class<?>, DocumentBuilderContainedEntity>() );
 			factoryState.setFilterDefinitions( new ConcurrentHashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
@@ -315,7 +315,7 @@ public class SearchFactoryBuilder {
 		initProgrammaticallyDefinedFilterDef( searchConfiguration.getReflectionManager() );
 		final PolymorphicIndexHierarchy indexingHierarchy = factoryState.getIndexHierarchy();
 		final Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
-		final Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
+		final Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
 		final Set<XClass> optimizationBlackListedTypes = new HashSet<XClass>();
 		final Map<XClass, Class<?>> classMappings = initializeClassMappings(
 				searchConfiguration,
@@ -345,7 +345,7 @@ public class SearchFactoryBuilder {
 				//XClass unfortunately is not (yet) genericized: TODO?
 
 				TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( mappedClass );
-				final DocumentBuilderContainedEntity<?> documentBuilder = new DocumentBuilderContainedEntity(
+				final DocumentBuilderContainedEntity documentBuilder = new DocumentBuilderContainedEntity(
 						mappedXClass,
 						typeMetadata,
 						searchConfiguration.getReflectionManager(),
@@ -382,7 +382,7 @@ public class SearchFactoryBuilder {
 			// FIXME DocumentBuilderIndexedEntity needs to be built by a helper method receiving Class<T> to infer T properly
 			// XClass unfortunately is not (yet) genericized: TODO ?
 			TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( mappedClass );
-			final DocumentBuilderIndexedEntity<?> documentBuilder =
+			final DocumentBuilderIndexedEntity documentBuilder =
 					new DocumentBuilderIndexedEntity(
 							mappedXClass,
 							typeMetadata,
@@ -414,7 +414,7 @@ public class SearchFactoryBuilder {
 	private void disableBlackListedTypesOptimization(Map<XClass, Class<?>> classMappings,
 			Set<XClass> optimizationBlackListX,
 			Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities,
-			Map<Class<?>, DocumentBuilderContainedEntity<?>> documentBuildersContainedEntities) {
+			Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities) {
 		for ( XClass xClass : optimizationBlackListX ) {
 			Class<?> type = classMappings.get( xClass );
 			if ( type != null ) {
@@ -423,7 +423,7 @@ public class SearchFactoryBuilder {
 					log.tracef( "Dirty checking optimizations disabled for class %s", type );
 					entityIndexBinding.getDocumentBuilder().forceStateInspectionOptimizationsDisabled();
 				}
-				DocumentBuilderContainedEntity<?> documentBuilderContainedEntity = documentBuildersContainedEntities.get(
+				DocumentBuilderContainedEntity documentBuilderContainedEntity = documentBuildersContainedEntities.get(
 						type
 				);
 				if ( documentBuilderContainedEntity != null ) {

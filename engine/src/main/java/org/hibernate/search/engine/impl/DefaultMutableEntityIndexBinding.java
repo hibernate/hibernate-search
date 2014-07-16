@@ -19,11 +19,11 @@ import org.hibernate.search.store.ShardIdentifierProvider;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class DefaultMutableEntityIndexBinding<T> implements MutableEntityIndexBinding<T> {
+public class DefaultMutableEntityIndexBinding implements MutableEntityIndexBinding {
 
 	private final IndexShardingStrategy shardingStrategy;
 	private final Similarity similarityInstance;
-	private DocumentBuilderIndexedEntity<T> documentBuilder;
+	private DocumentBuilderIndexedEntity documentBuilder;
 	private final IndexManager[] indexManagers;
 	private final EntityIndexingInterceptor entityIndexingInterceptor;
 
@@ -31,7 +31,7 @@ public class DefaultMutableEntityIndexBinding<T> implements MutableEntityIndexBi
 			IndexShardingStrategy shardingStrategy,
 			Similarity similarityInstance,
 			IndexManager[] providers,
-			EntityIndexingInterceptor<? super T> entityIndexingInterceptor) {
+			EntityIndexingInterceptor entityIndexingInterceptor) {
 				this.shardingStrategy = shardingStrategy;
 				this.similarityInstance = similarityInstance;
 				this.indexManagers = providers;
@@ -39,7 +39,7 @@ public class DefaultMutableEntityIndexBinding<T> implements MutableEntityIndexBi
 	}
 
 	@Override
-	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder) {
+	public void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity documentBuilder) {
 		this.documentBuilder = documentBuilder;
 	}
 
@@ -59,7 +59,7 @@ public class DefaultMutableEntityIndexBinding<T> implements MutableEntityIndexBi
 	}
 
 	@Override
-	public DocumentBuilderIndexedEntity<T> getDocumentBuilder() {
+	public DocumentBuilderIndexedEntity getDocumentBuilder() {
 		return documentBuilder;
 	}
 

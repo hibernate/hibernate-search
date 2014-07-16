@@ -38,7 +38,7 @@ public final class UpdateExtWorkDelegate extends UpdateWorkDelegate {
 
 	private final AddWorkDelegate addDelegate;
 	private final Class<?> managedType;
-	private final DocumentBuilderIndexedEntity<?> builder;
+	private final DocumentBuilderIndexedEntity builder;
 	private final boolean idIsNumeric;
 	private final Workspace workspace;
 

@@ -75,7 +75,7 @@ public class MoreLikeThisBuilder<T> {
 	private int maxNumTokensParsed = MoreLikeThis.DEFAULT_MAX_NUM_TOKENS_PARSED;
 	private int maxWordLen = MoreLikeThis.DEFAULT_MAX_WORD_LENGTH;
 	private Set<?> stopWords = MoreLikeThis.DEFAULT_STOP_WORDS;
-	private DocumentBuilderIndexedEntity<T> documentBuilder;
+	private DocumentBuilderIndexedEntity documentBuilder;
 	// We lower the min defaults to 1 because we don't merge the freq of *all* fields unlike the original MoreLikeThis
 	// TODO: is that hurting performance? Could we guess "small fields" and ony lower these?
 	private int minTermFreq = 1; //MoreLikeThis.DEFAULT_MIN_TERM_FREQ;
@@ -95,7 +95,7 @@ public class MoreLikeThisBuilder<T> {
 	private ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE inputType;
 	private TermQuery findById;
 
-	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity<T> documentBuilder, SearchFactoryImplementor searchFactory ) {
+	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity documentBuilder, SearchFactoryImplementor searchFactory ) {
 		this.documentBuilder = documentBuilder;
 		Similarity configuredSimilarity = searchFactory.getIndexBindings().get( documentBuilder.getBeanClass() ).getSimilarity();
 		if ( configuredSimilarity instanceof TFIDFSimilarity ) {
@@ -139,7 +139,7 @@ public class MoreLikeThisBuilder<T> {
 	/**
 	 * Try and retrieve the document id from the input. If failing and a backup approach exists, returns null.
 	 */
-	private Integer getLuceneDocumentIdFromIdAsTermOrNull(DocumentBuilderIndexedEntity<?> documentBuilder) {
+	private Integer getLuceneDocumentIdFromIdAsTermOrNull(DocumentBuilderIndexedEntity documentBuilder) {
 		String id;
 		if ( inputType == ID ) {
 			id = documentBuilder.getIdBridge().objectToString( input );

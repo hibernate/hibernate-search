@@ -58,7 +58,7 @@ public class FieldContext {
 		return fieldBridge;
 	}
 
-	public String objectToString(DocumentBuilderIndexedEntity<?> documentBuilder, Object value, ConversionContext conversionContext) {
+	public String objectToString(DocumentBuilderIndexedEntity documentBuilder, Object value, ConversionContext conversionContext) {
 		if ( isIgnoreFieldBridge() ) {
 			return value == null ? null : value.toString();
 		}

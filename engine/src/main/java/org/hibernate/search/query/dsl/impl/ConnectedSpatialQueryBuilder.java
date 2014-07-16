@@ -39,7 +39,7 @@ public class ConnectedSpatialQueryBuilder implements SpatialTermination {
 	}
 
 	private Query createSpatialQuery() {
-		final DocumentBuilderIndexedEntity<?> documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
 		//FIXME that will have to change probably but today, if someone uses latitude / longitude
 		//      we use boolean style spatial queries
 		//      and on coordinates field, use spatial hash query

@@ -12,11 +12,11 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface MutableEntityIndexBinding<T> extends EntityIndexBinding {
+public interface MutableEntityIndexBinding extends EntityIndexBinding {
 	/**
 	 * Allows to set the document builder for this {@code EntityIndexBinding}.
 	 *
 	 * @param documentBuilder the new document builder instance
 	 */
-	void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity<T> documentBuilder);
+	void setDocumentBuilderIndexedEntity(DocumentBuilderIndexedEntity documentBuilder);
 }

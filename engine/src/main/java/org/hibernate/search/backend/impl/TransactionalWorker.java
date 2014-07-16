@@ -91,7 +91,7 @@ public class TransactionalWorker implements Worker {
 		if ( indexBindingForEntity == null ) {
 			return work;
 		}
-		EntityIndexingInterceptor<? super T> interceptor = (EntityIndexingInterceptor<? super T>) indexBindingForEntity.getEntityIndexingInterceptor();
+		EntityIndexingInterceptor interceptor = indexBindingForEntity.getEntityIndexingInterceptor();
 		if ( interceptor == null ) {
 			return work;
 		}
