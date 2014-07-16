@@ -50,7 +50,7 @@ public class TransactionalWorker implements Worker {
 	private boolean transactionExpected;
 
 	@Override
-	public void performWork(Work<?> work, TransactionContext transactionContext) {
+	public void performWork(Work work, TransactionContext transactionContext) {
 		final Class<?> entityType = instanceInitializer.getClassFromWork( work );
 		EntityIndexBinding indexBindingForEntity = factory.getIndexBinding( entityType );
 		if ( indexBindingForEntity == null
@@ -87,7 +87,7 @@ public class TransactionalWorker implements Worker {
 		}
 	}
 
-	private <T> Work<T> interceptWork(EntityIndexBinding indexBindingForEntity, Work<T> work) {
+	private Work interceptWork(EntityIndexBinding indexBindingForEntity, Work work) {
 		if ( indexBindingForEntity == null ) {
 			return work;
 		}
@@ -117,8 +117,8 @@ public class TransactionalWorker implements Worker {
 			default:
 				throw new AssertionFailure( "Unknown work type: " + work.getType() );
 		}
-		Work<T> result = work;
-		Class<T> entityClass = work.getEntityClass();
+		Work result = work;
+		Class<?> entityClass = work.getEntityClass();
 		switch ( operation ) {
 			case APPLY_DEFAULT:
 				break;
@@ -127,13 +127,13 @@ public class TransactionalWorker implements Worker {
 				log.forceSkipIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			case UPDATE:
-				result = new Work<T>( work.getEntity(), work.getId(), WorkType.UPDATE );
+				result = new Work( work.getEntity(), work.getId(), WorkType.UPDATE );
 				log.forceUpdateOnIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			case REMOVE:
 				//This works because other Work constructors are never used from WorkType ADD, UPDATE, REMOVE, COLLECTION
 				//TODO should we force isIdentifierRollback to false if the operation is not a delete?
-				result = new Work<T>( work.getEntity(), work.getId(), WorkType.DELETE, work.isIdentifierWasRolledBack() );
+				result = new Work( work.getEntity(), work.getId(), WorkType.DELETE, work.isIdentifierWasRolledBack() );
 				log.forceRemoveOnIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			default:

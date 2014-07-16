@@ -123,7 +123,7 @@ public class WorkDuplicationTest extends SearchTestBase {
 
 		WorkQueue plannerEngine = new WorkQueue( searchFactory );
 
-		plannerEngine.add( new Work<SpecialPerson>( person, 1, WorkType.ADD ) );
+		plannerEngine.add( new Work( person, 1, WorkType.ADD ) );
 
 		plannerEngine.prepareWorkPlan();
 		List<LuceneWork> sealedQueue = plannerEngine.getSealedQueue();
@@ -131,7 +131,7 @@ public class WorkDuplicationTest extends SearchTestBase {
 		assertEquals( "There should only be one job in the queue", 1, sealedQueue.size() );
 		assertTrue( "Wrong job type", sealedQueue.get( 0 ) instanceof AddLuceneWork );
 
-		plannerEngine.add( new Work<SpecialPerson>( person, 1, WorkType.DELETE ) );
+		plannerEngine.add( new Work( person, 1, WorkType.DELETE ) );
 		plannerEngine.prepareWorkPlan();
 		sealedQueue = plannerEngine.getSealedQueue();
 

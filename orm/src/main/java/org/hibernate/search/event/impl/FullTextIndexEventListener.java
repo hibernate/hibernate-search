@@ -222,8 +222,8 @@ public class FullTextIndexEventListener implements PostDeleteEventListener,
 		this.flushSynch.put( eventSource, synchronization );
 	}
 
-	protected <T> void processWork(T entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {
-		Work<T> work = new Work<T>( entity, id, workType, identifierRollbackEnabled );
+	protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {
+		Work work = new Work( entity, id, workType, identifierRollbackEnabled );
 		final EventSourceTransactionContext transactionContext = new EventSourceTransactionContext( event.getSession() );
 		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 	}

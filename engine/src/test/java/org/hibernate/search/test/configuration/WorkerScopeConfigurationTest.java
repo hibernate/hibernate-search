@@ -111,7 +111,7 @@ public class WorkerScopeConfigurationTest {
 
 	public static final class CustomWorker implements Worker {
 		@Override
-		public void performWork(Work<?> work, TransactionContext transactionContext) {
+		public void performWork(Work work, TransactionContext transactionContext) {
 		}
 
 		@Override
@@ -132,7 +132,7 @@ public class WorkerScopeConfigurationTest {
 		public static final String BAR = "hibernate.search.worker.bar";
 
 		@Override
-		public void performWork(Work<?> work, TransactionContext transactionContext) {
+		public void performWork(Work work, TransactionContext transactionContext) {
 		}
 
 		@Override

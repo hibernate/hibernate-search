@@ -34,7 +34,7 @@ public final class HibernateHelper {
 		return Hibernate.isInitialized( entity );
 	}
 
-	public static <T> Class<T> getClassFromWork(Work<T> work) {
+	public static Class<?> getClassFromWork(Work work) {
 		return work.getEntityClass() != null ?
 				work.getEntityClass() :
 				getClass( work.getEntity() );

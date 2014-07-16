@@ -65,7 +65,7 @@ public class FreshReadersProvidedTest {
 			lastDwarf.id = 13l;
 			lastDwarf.name = "Thorin Oakenshield";
 
-			Work<Guest> work = new Work<Guest>( lastDwarf, lastDwarf.id, WorkType.ADD, false );
+			Work work = new Work( lastDwarf, lastDwarf.id, WorkType.ADD, false );
 			TransactionContextForTest tc = new TransactionContextForTest();
 			searchFactory.getWorker().performWork( work, tc );
 			tc.end();
@@ -102,7 +102,7 @@ public class FreshReadersProvidedTest {
 			balin.id = 7l;
 			balin.name = "Balin";
 
-			Work<Guest> work = new Work<Guest>( balin, balin.id, WorkType.ADD, false );
+			Work work = new Work( balin, balin.id, WorkType.ADD, false );
 			TransactionContextForTest tc = new TransactionContextForTest();
 			searchFactory.getWorker().performWork( work, tc );
 			tc.end();

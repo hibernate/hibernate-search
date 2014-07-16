@@ -108,9 +108,8 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 		}
 	}
 
-	private <T> void createAndPerformWork(Class<T> clazz, Serializable id, WorkType workType) {
-		Work<T> work;
-		work = new Work<>( clazz, id, workType );
+	private void createAndPerformWork(Class<?> clazz, Serializable id, WorkType workType) {
+		Work work = new Work( clazz, id, workType );
 		getSearchFactoryImplementor().getWorker().performWork( work, transactionContext );
 	}
 
@@ -137,7 +136,7 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 			throw new IllegalArgumentException( msg );
 		}
 		Serializable id = session.getIdentifier( entity );
-		Work<T> work = new Work<>( entity, id, WorkType.INDEX );
+		Work work = new Work( entity, id, WorkType.INDEX );
 		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
 
 		//TODO

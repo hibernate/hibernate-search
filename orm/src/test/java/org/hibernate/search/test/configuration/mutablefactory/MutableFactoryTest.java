@@ -166,7 +166,7 @@ public class MutableFactoryTest {
 	}
 
 	private static void doIndexWork(Object entity, Integer id, SearchFactoryIntegrator sfi, TransactionContextForTest tc) {
-		Work<?> work = new Work<Object>( entity, id, WorkType.INDEX );
+		Work work = new Work( entity, id, WorkType.INDEX );
 		sfi.getWorker().performWork( work, tc );
 	}
 

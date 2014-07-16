@@ -41,7 +41,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 		Foo foo = new Foo( 0l );
 
-		Work<Foo> work = new Work<Foo>( foo, foo.getId(), WorkType.ADD, false );
+		Work work = new Work( foo, foo.getId(), WorkType.ADD, false );
 		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
@@ -53,7 +53,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 		Bar bar = new Bar( 0l );
 
-		Work<Bar> work = new Work<Bar>( bar, bar.getId(), WorkType.ADD, false );
+		Work work = new Work( bar, bar.getId(), WorkType.ADD, false );
 		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();
@@ -65,7 +65,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 		Snafu snafu = new Snafu( 0l );
 
-		Work<Snafu> work = new Work<Snafu>( snafu, snafu.getId(), WorkType.ADD, false );
+		Work work = new Work( snafu, snafu.getId(), WorkType.ADD, false );
 		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
 		tc.end();

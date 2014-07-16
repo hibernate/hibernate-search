@@ -31,7 +31,7 @@ public final class SimpleInitializer implements InstanceInitializer {
 	}
 
 	@Override
-	public <T> Class<T> getClassFromWork(Work<T> work) {
+	public Class<?> getClassFromWork(Work work) {
 		return work.getEntityClass() != null ?
 				work.getEntityClass() :
 				getClass( work.getEntity() );

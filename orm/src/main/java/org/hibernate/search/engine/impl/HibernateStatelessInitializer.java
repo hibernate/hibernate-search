@@ -59,7 +59,7 @@ public class HibernateStatelessInitializer implements InstanceInitializer {
 	}
 
 	@Override
-	public <T> Class<T> getClassFromWork(Work<T> work) {
+	public Class<?> getClassFromWork(Work work) {
 		return HibernateHelper.getClassFromWork( work );
 	}
 

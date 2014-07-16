@@ -14,30 +14,30 @@ import java.io.Serializable;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class Work<T> {
-	private final T entity;
-	private final Class<T> entityClass;
+public class Work {
+	private final Object entity;
+	private final Class<?> entityClass;
 	private final Serializable id;
 	private final WorkType type;
 	private final boolean identifierWasRolledBack;
 
-	public Work(T entity, Serializable id, WorkType type) {
+	public Work(Object entity, Serializable id, WorkType type) {
 		this( entity, null, id, type, false );
 	}
 
-	public Work(T entity, Serializable id, WorkType type, boolean identifierRollbackEnabled) {
+	public Work(Object entity, Serializable id, WorkType type, boolean identifierRollbackEnabled) {
 		this( entity, null, id, type, identifierRollbackEnabled );
 	}
 
-	public Work(Class<T> entityType, Serializable id, WorkType type) {
+	public Work(Class<?> entityType, Serializable id, WorkType type) {
 		this( null, entityType, id, type, false );
 	}
 
-	public Work(T entity, WorkType type) {
+	public Work(Object entity, WorkType type) {
 		this( entity, null, null, type, false );
 	}
 
-	private Work(T entity, Class<T> entityClass, Serializable id,
+	private Work(Object entity, Class<?> entityClass, Serializable id,
 			WorkType type, boolean identifierWasRolledBack) {
 		this.entity = entity;
 		this.entityClass = entityClass;
@@ -46,11 +46,11 @@ public class Work<T> {
 		this.identifierWasRolledBack = identifierWasRolledBack;
 	}
 
-	public Class<T> getEntityClass() {
+	public Class<?> getEntityClass() {
 		return entityClass;
 	}
 
-	public T getEntity() {
+	public Object getEntity() {
 		return entity;
 	}
 

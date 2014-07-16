@@ -71,11 +71,11 @@ public class ProvidedIdTest {
 
 		TransactionContextForTest tc = new TransactionContextForTest();
 
-		Work<ProvidedIdPerson> work = new Work<ProvidedIdPerson>( person1, 1, WorkType.INDEX );
+		Work work = new Work( person1, 1, WorkType.INDEX );
 		sf.getWorker().performWork( work, tc );
-		work = new Work<ProvidedIdPerson>( person2, 2, WorkType.INDEX );
+		work = new Work( person2, 2, WorkType.INDEX );
 		sf.getWorker().performWork( work, tc );
-		Work<ProvidedIdPersonSub> work2 = new Work<ProvidedIdPersonSub>( person3, 3, WorkType.INDEX );
+		Work work2 = new Work( person3, 3, WorkType.INDEX );
 		sf.getWorker().performWork( work2, tc );
 
 		tc.end();

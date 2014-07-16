@@ -22,7 +22,7 @@ import org.hibernate.search.backend.spi.Work;
  */
 public interface InstanceInitializer {
 
-	<T> Class<T> getClassFromWork(Work<T> work);
+	Class<?> getClassFromWork(Work work);
 
 	/**
 	 * @param entity an instance or proxy of T
