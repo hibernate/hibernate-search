@@ -1,6 +1,45 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Alpha5 (23-07-2014)
+------------------------
+
+** Sub-task
+    * [HSEARCH-1556] - Configure maven-bundle-plugin to add OSGi metadata to manifest
+    * [HSEARCH-1557] - Write Karaf integration test
+    * [HSEARCH-1560] - Refactor packages to avoid split packages
+
+** Bug
+    * [HSEARCH-1312] - Conflicting warning and error on abstract class @Indexed
+    * [HSEARCH-1583] - Collection fields in @MappedSuperclasses are ignored on update
+    * [HSEARCH-1601] - The WildFly modules should not reuse the Infinispan core version provided by WildFly
+
+** Improvement
+    * [HSEARCH-1002] - Consolidate SearchTestCase with Hibernate's Core CustomRunner
+    * [HSEARCH-1594] - Support Apache Lucene 4.8
+    * [HSEARCH-1607] - Depend on a version range as OSGi dependency to Apache Lucene
+
+** New Feature
+    * [HSEARCH-1465] - Support running in OSGi containers
+    * [HSEARCH-1552] - Allow loading of additional "built-in bridges" via autodiscovery
+
+** Remove Feature
+    * [HSEARCH-1564] - Drop support for Java 6 and move builds to Java 7
+
+** Task
+    * [HSEARCH-1455] - Remove deprecated method and classes
+    * [HSEARCH-1471] - Migrate documentation to asciidoc
+    * [HSEARCH-1553] - Remove SearchConfiguration#getIndexManagerFactory and make index manager factory a service
+    * [HSEARCH-1593] - Update README in root with new build instructions
+    * [HSEARCH-1598] - Upgrade to JGroups 3.5.0.Beta5
+    * [HSEARCH-1599] - Upgrade to Infinispan 7.0.0.Alpha4
+    * [HSEARCH-1602] - Change license headers
+    * [HSEARCH-1603] - Improve importing of project in Eclipse
+    * [HSEARCH-1604] - Make sure all modules are at least always compiled
+    * [HSEARCH-1605] - Upgrade to WildFly 8.1.0.CR2
+    * [HSEARCH-1606] - Upgrade to Apache Lucene 4.8.1
+
+
 Version 5.0.0.Alpha4 (20-05-2014)
 ------------------------
 
