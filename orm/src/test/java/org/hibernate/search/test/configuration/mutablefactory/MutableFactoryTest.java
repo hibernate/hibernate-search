@@ -178,47 +178,49 @@ public class MutableFactoryTest {
 				TestConstants.standardAnalyzer
 		);
 		SearchConfigurationForTest configuration = getTestConfiguration();
-		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
-		List<DoAddClasses> runnables = new ArrayList<DoAddClasses>( 10 );
-		final int nbrOfThread = 10;
-		final int nbrOfClassesPerThread = 10;
-		for ( int i = 0; i < nbrOfThread; i++ ) {
-			runnables.add( new DoAddClasses( sf, i, nbrOfClassesPerThread ) );
-		}
-		final ThreadPoolExecutor poolExecutor = Executors.newFixedThreadPool( nbrOfThread, "SFI classes addition" );
-		poolExecutor.prestartAllCoreThreads();
-		for ( Runnable runnable : runnables ) {
-			poolExecutor.execute( runnable );
-		}
-		poolExecutor.shutdown();
-
-		boolean inProgress;
-		do {
-			Thread.sleep( 100 );
-			inProgress = false;
-			for ( DoAddClasses runnable : runnables ) {
-				inProgress = inProgress || runnable.isFailure() == null;
+		final SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		try {
+			List<DoAddClasses> runnables = new ArrayList<DoAddClasses>( 10 );
+			final int nbrOfThread = 10;
+			final int nbrOfClassesPerThread = 10;
+			for ( int i = 0; i < nbrOfThread; i++ ) {
+				runnables.add( new DoAddClasses( sf, i, nbrOfClassesPerThread ) );
 			}
-		} while ( inProgress );
+			final ThreadPoolExecutor poolExecutor = Executors.newFixedThreadPool( nbrOfThread, "SFI classes addition" );
+			poolExecutor.prestartAllCoreThreads();
+			for ( Runnable runnable : runnables ) {
+				poolExecutor.execute( runnable );
+			}
+			poolExecutor.shutdown();
 
-		for ( DoAddClasses runnable : runnables ) {
-			assertNotNull( "Threads not run # " + runnable.getWorkNumber(), runnable.isFailure() );
-			assertFalse(
-					"thread failed #" + runnable.getWorkNumber() + " Failure: " + runnable.getFailureInfo(),
-					runnable.isFailure()
-			);
+			boolean inProgress;
+			do {
+				Thread.sleep( 100 );
+				inProgress = false;
+				for ( DoAddClasses runnable : runnables ) {
+					inProgress = inProgress || runnable.isFailure() == null;
+				}
+			} while ( inProgress );
+
+			for ( DoAddClasses runnable : runnables ) {
+				assertNotNull( "Threads not run # " + runnable.getWorkNumber(), runnable.isFailure() );
+				assertFalse( "thread failed #" + runnable.getWorkNumber() + " Failure: " + runnable.getFailureInfo(), runnable.isFailure() );
+			}
+
+			poolExecutor.awaitTermination( 1, TimeUnit.MINUTES );
+
+			for ( int i = 0; i < nbrOfThread * nbrOfClassesPerThread; i++ ) {
+				Query luceneQuery = parser.parse( "Emmanuel" + i );
+				final Class<?> classByNumber = getClassByNumber( i, sf.getServiceManager() );
+				IndexReader indexReader = sf.getIndexReaderAccessor().open( classByNumber );
+				IndexSearcher searcher = new IndexSearcher( indexReader );
+				TopDocs hits = searcher.search( luceneQuery, 1000 );
+				assertEquals( 1, hits.totalHits );
+				sf.getIndexReaderAccessor().close( indexReader );
+			}
 		}
-
-		poolExecutor.awaitTermination( 1, TimeUnit.MINUTES );
-
-		for ( int i = 0; i < nbrOfThread * nbrOfClassesPerThread; i++ ) {
-			Query luceneQuery = parser.parse( "Emmanuel" + i );
-			final Class<?> classByNumber = getClassByNumber( i, sf.getServiceManager() );
-			IndexReader indexReader = sf.getIndexReaderAccessor().open( classByNumber );
-			IndexSearcher searcher = new IndexSearcher( indexReader );
-			TopDocs hits = searcher.search( luceneQuery, 1000 );
-			assertEquals( 1, hits.totalHits );
-			sf.getIndexReaderAccessor().close( indexReader );
+		finally {
+			sf.close();
 		}
 	}
 
