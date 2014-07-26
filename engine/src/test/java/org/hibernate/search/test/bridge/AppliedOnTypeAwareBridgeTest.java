@@ -74,7 +74,6 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	private SearchFactoryImplementor createSearchFactory(Class<?> clazz) {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addClass( clazz );
 
 		return new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();

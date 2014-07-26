@@ -48,7 +48,6 @@ public class ImplicitProvidedIdTest {
 			.property( "text", ElementType.FIELD ).field()
 			;
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
-			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			.addClass( Book.class );
 		exceptions.expect( SearchException.class );
@@ -66,7 +65,6 @@ public class ImplicitProvidedIdTest {
 			.property( "text", ElementType.FIELD ).field()
 			;
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
-			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			.setIdProvidedImplicit( true )
 			.addClass( Book.class );
@@ -84,7 +82,6 @@ public class ImplicitProvidedIdTest {
 			.property( "text", ElementType.FIELD ).field()
 			;
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
-			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			.setIdProvidedImplicit( true )
 			.addClass( Book.class );
@@ -102,7 +99,6 @@ public class ImplicitProvidedIdTest {
 			.property( "text", ElementType.FIELD ).field()
 			;
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
-			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			.setIdProvidedImplicit( false ) //DEFAULT
 			.addClass( Book.class );
@@ -120,7 +116,6 @@ public class ImplicitProvidedIdTest {
 			.property( "text", ElementType.FIELD ).field()
 			;
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
-			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			//.setIdProvidedImplicit( false ) //Test it's the default
 			.addClass( Book.class );
@@ -136,7 +131,6 @@ public class ImplicitProvidedIdTest {
 				.property( "text", ElementType.FIELD ).field()
 			;
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
-			.addProperty( "hibernate.search.default.directory_provider", "ram" )
 			.setProgrammaticMapping( mapping )
 			//.setIdProvidedImplicit( false ) //Test it's the default
 			.addClass( Book.class );

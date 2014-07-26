@@ -120,11 +120,9 @@ public class SearchFactoryTest {
 	}
 
 	private SearchConfigurationForTest getManualConfiguration() {
-		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
-		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.addClass( Foo.class );
-		cfg.addClass( Bar.class );
-		return cfg;
+		return new SearchConfigurationForTest()
+			.addClass( Foo.class )
+			.addClass( Bar.class );
 	}
 
 	public static class Foo {

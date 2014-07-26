@@ -45,7 +45,6 @@ public class WorkerScopeConfigurationTest {
 				.property( "id", ElementType.FIELD ).documentId()
 				.property( "title", ElementType.FIELD ).field();
 		manualConfiguration.setProgrammaticMapping( searchMapping );
-		manualConfiguration.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		manualConfiguration.addClass( Document.class );
 	}
 

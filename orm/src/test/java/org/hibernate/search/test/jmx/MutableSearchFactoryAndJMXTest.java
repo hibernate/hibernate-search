@@ -28,7 +28,6 @@ public class MutableSearchFactoryAndJMXTest {
 		simpleJndiDir.mkdir();
 
 		SearchConfigurationForTest configuration = new HibernateManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
 				.addProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" )
 				.addProperty( "hibernate.jndi.org.osjava.sj.root", simpleJndiDir.getAbsolutePath() )

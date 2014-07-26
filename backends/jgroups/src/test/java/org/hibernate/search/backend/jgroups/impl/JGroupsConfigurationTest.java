@@ -70,7 +70,6 @@ public class JGroupsConfigurationTest {
 	 */
 	private static void bootConfiguration(SearchConfigurationForTest cfg) throws Throwable {
 		cfg.addClass( Dvd.class );
-		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		SearchFactoryImplementor buildSearchFactory = null;
 		try {
 			buildSearchFactory = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();

@@ -20,7 +20,6 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
-import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -62,8 +61,6 @@ public class BridgeProviderTest extends SearchTestBase {
 	@Test
 	public void testMultipleMatchingFieldBridges() throws Exception {
 		SearchConfiguration conf = new HibernateManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" )
-				.addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() )
 				.addClass( Theater.class )
 				.addClass( Chain.class );
 		boolean throwException = false;

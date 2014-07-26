@@ -51,7 +51,6 @@ public class ProvidedIdTest {
 		final SearchConfigurationForTest configuration = new HibernateManualConfiguration()
 				.addClass( ProvidedIdPerson.class )
 				.addClass( ProvidedIdPersonSub.class )
-				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() )
 				.addProperty( "hibernate.search.default.indexwriter.merge_factor", "100" )
 				.addProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );

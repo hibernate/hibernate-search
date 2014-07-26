@@ -40,8 +40,6 @@ public class SearchFactoryHolder extends ExternalResource {
 		this.buildMappingDefinition = buildMappingDefinition;
 		this.entities = entities;
 		this.configuration = new Properties();
-		this.configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		this.configuration.setProperty( "hibernate.search.lucene_version", "LUCENE_CURRENT" );
 	}
 
 	public SearchFactoryImplementor getSearchFactory() {

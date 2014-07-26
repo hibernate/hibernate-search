@@ -316,9 +316,7 @@ public class MutableFactoryTest {
 	}
 
 	private static SearchConfigurationForTest getTestConfiguration() {
-		return new HibernateManualConfiguration()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" )
-				.addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
+		return new HibernateManualConfiguration();
 	}
 
 }
