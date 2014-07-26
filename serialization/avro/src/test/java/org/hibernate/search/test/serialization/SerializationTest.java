@@ -107,7 +107,7 @@ public class SerializationTest {
 		}
 	}
 
-	private List<LuceneWork> buildWorks() throws Exception {
+	public static List<LuceneWork> buildWorks() throws Exception {
 		List<LuceneWork> works = new ArrayList<LuceneWork>();
 		works.add( OptimizeLuceneWork.INSTANCE );
 		works.add( OptimizeLuceneWork.INSTANCE );
@@ -189,7 +189,7 @@ public class SerializationTest {
 		return works;
 	}
 
-	private List<List<AttributeImpl>> buildTokenSteamWithAttributes() {
+	private static List<List<AttributeImpl>> buildTokenSteamWithAttributes() {
 		List<List<AttributeImpl>> tokens = new ArrayList<List<AttributeImpl>>();
 		tokens.add( new ArrayList<AttributeImpl>() );
 
