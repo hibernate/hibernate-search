@@ -42,7 +42,6 @@ public class IndexedEmbeddedWithAbstractClassTest {
 			name = "testAbstractClassAnnotatedWithIndexedLogsWarning")
 	public void testAbstractClassAnnotatedWithIndexedLogsWarning() {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-				.addProperty( "hibernate.search.default.directory_provider", "ram" )
 				.addClass( A.class )
 				.addClass( AbstractA.class )
 				.addClass( D.class );
@@ -61,7 +60,6 @@ public class IndexedEmbeddedWithAbstractClassTest {
 	public void testInvalidConfiguredPathThrowsException() {
 		try {
 			SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-					.addProperty( "hibernate.search.default.directory_provider", "ram" )
 					.addClass( B.class )
 					.addClass( AbstractB.class )
 					.addClass( D.class );
@@ -84,7 +82,6 @@ public class IndexedEmbeddedWithAbstractClassTest {
 	public void testInvalidConfiguredPathThrowsExceptionAndIndexedAbstractClassLogsWarning() {
 		try {
 			SearchConfigurationForTest configuration = new SearchConfigurationForTest()
-					.addProperty( "hibernate.search.default.directory_provider", "ram" )
 					.addClass( C.class )
 					.addClass( AbstractC.class )
 					.addClass( D.class );

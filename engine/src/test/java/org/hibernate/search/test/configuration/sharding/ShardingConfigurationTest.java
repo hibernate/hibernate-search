@@ -252,7 +252,6 @@ public class ShardingConfigurationTest {
 
 	private MutableSearchFactory getSearchFactory(Map<String, String> shardingProperties) {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest();
-		configuration.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		for ( Map.Entry<String, String> entry : shardingProperties.entrySet() ) {
 			configuration.addProperty( entry.getKey(), entry.getValue() );
 		}

@@ -74,7 +74,6 @@ public class OptimizerStrategyLoadTest {
 			.property( "title", ElementType.FIELD ).field()
 			;
 		cfg.setProgrammaticMapping( mapping );
-		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.addClass( Document.class );
 		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 		try {

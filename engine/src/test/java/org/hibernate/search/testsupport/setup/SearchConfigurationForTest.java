@@ -20,6 +20,7 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.impl.SimpleInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
+import org.hibernate.search.testsupport.TestConstants;
 
 /**
  * Manually defines the configuration.
@@ -50,6 +51,8 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 		this.properties = new Properties();
 		this.providedServices = new HashMap<Class<? extends Service>, Object>();
 		this.classLoaderService = new DefaultClassLoaderService();
+		addProperty( "hibernate.search.default.directory_provider", "ram" );
+		addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
 	}
 
 	public SearchConfigurationForTest addProperty(String key, String value) {

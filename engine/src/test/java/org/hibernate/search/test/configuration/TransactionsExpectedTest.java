@@ -55,7 +55,6 @@ public class TransactionsExpectedTest {
 			.property( "title", ElementType.FIELD ).field()
 			;
 		cfg.setProgrammaticMapping( mapping );
-		cfg.addProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.addClass( Document.class );
 		MutableSearchFactory sf = (MutableSearchFactory) new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 		try {

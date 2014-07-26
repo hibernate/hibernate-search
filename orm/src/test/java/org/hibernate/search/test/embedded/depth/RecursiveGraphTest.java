@@ -77,8 +77,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 	@Test(expected = SearchException.class)
 	public void testAgainstInfiniteTypeLoop() throws Exception {
 		final SearchConfigurationForTest configuration = new HibernateManualConfiguration()
-				.addClass( BrokenMammal.class )
-				.addProperty( "hibernate.search.default.directory_provider", "ram" );
+				.addClass( BrokenMammal.class );
 		try {
 			SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration )
 					.buildSearchFactory();
