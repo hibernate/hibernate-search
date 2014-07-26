@@ -62,10 +62,6 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 	public static byte MAJOR_VERSION = (byte) ( -128 + 1 );
 	public static byte MINOR_VERSION = (byte) ( -128 + 0 );
 
-	private Serializer serializer;
-	private Deserializer deserializer;
-
-
 	public static int getMajorVersion() {
 		return MAJOR_VERSION + 128; //rebase to 0
 	}
@@ -110,18 +106,16 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
-		serializer = new AvroSerializer( protocol );
-		deserializer = new AvroDeserializer( protocol );
 	}
 
 	@Override
 	public Serializer getSerializer() {
-		return serializer;
+		return new AvroSerializer( protocol );
 	}
 
 	@Override
 	public Deserializer getDeserializer() {
-		return deserializer;
+		return new AvroDeserializer( protocol );
 	}
 
 	private void parseSchema(String filename) {

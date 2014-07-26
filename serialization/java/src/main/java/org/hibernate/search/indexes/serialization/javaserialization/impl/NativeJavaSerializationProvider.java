@@ -20,16 +20,16 @@ import org.hibernate.search.spi.BuildContext;
  */
 public class NativeJavaSerializationProvider implements SerializationProvider, Startable {
 
-	private Serializer serializer;
+	private Deserializer deserializerInstance;
 
 	@Override
 	public Serializer getSerializer() {
-		return serializer;
+		return new NativeJavaSerializer();
 	}
 
 	@Override
 	public Deserializer getDeserializer() {
-		return new JavaSerializationDeserializer();
+		return deserializerInstance;
 	}
 
 	@Override
@@ -39,6 +39,7 @@ public class NativeJavaSerializationProvider implements SerializationProvider, S
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
-		serializer = new NativeJavaSerializer();
+		//The Deserializer is threadsafe and can be reused, the Serializer is not
+		this.deserializerInstance = new JavaSerializationDeserializer();
 	}
 }

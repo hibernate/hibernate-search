@@ -23,8 +23,24 @@ import org.hibernate.search.engine.service.spi.Service;
  */
 public interface SerializationProvider extends Service {
 
+	/**
+	 * This method will be invoked when any thread needs a Serializer:
+	 * implementors of this Service can return the same instance multiple
+	 * times if the Serializer implementation is threadsafe.
+	 * In all other cases return a new instance.
+	 * An obtained Serializer should not be shared across threads.
+	 * @return the initialized Serializer ready for usage
+	 */
 	Serializer getSerializer();
 
+	/**
+	 * This method will be invoked when any thread needs a Deserializer:
+	 * implementors of this Service can return the same instance multiple
+	 * times if the Deserializer implementation is threadsafe.
+	 * In all other cases return a new instance.
+	 * An obtained Deserializer should not be shared across threads.
+	 * @return the initialized Deserializer ready for usage
+	 */
 	Deserializer getDeserializer();
 
 }

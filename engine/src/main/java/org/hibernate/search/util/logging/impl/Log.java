@@ -658,4 +658,7 @@ public interface Log extends BasicLogger {
 			+ " This might be caused by the Hibernate ORM classloader not having visibility on Hibernate Search" )
 	SearchException searchFactoryReferenceServiceNotFound();
 
+	@Message(id = 224, value = "Non optional parameter named '%s' was null" )
+	AssertionFailure parametersShouldNotBeNull(String parameterNAme);
+
 }

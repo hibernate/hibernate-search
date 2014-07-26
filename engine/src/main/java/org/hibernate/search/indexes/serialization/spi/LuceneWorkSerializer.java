@@ -13,6 +13,7 @@ import org.hibernate.search.backend.LuceneWork;
 /**
  * For clustering we need some way to serialize the {@code LuceneWork} instances.
  * to the other nodes.
+ * Implementations need to be threadsafe.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */

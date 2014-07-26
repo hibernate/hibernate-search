@@ -44,11 +44,17 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 	private static Log log = LoggerFactory.make();
 
 	private final SearchFactoryImplementor searchFactory;
-	private SerializationProvider provider;
+	private final SerializationProvider provider;
 
 	public LuceneWorkSerializerImpl(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
 		this.provider = provider;
 		this.searchFactory = searchFactory;
+		if ( provider == null ) {
+			throw log.parametersShouldNotBeNull( "provider" );
+		}
+		if ( searchFactory == null ) {
+			throw log.parametersShouldNotBeNull( "searchFactory" );
+		}
 	}
 
 	/**
