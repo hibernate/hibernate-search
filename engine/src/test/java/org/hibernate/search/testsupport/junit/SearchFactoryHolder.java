@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.testsupport.junit;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.junit.Assert;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -30,6 +34,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	private final SearchMapping buildMappingDefinition;
 	private final Class<?>[] entities;
 	private final Properties configuration;
+	private final Map<Class<? extends Service>,Service> providedServices = new HashMap<>();
 	private SearchFactoryImplementor sf;
 
 	public SearchFactoryHolder(Class<?>... entities) {
@@ -50,6 +55,9 @@ public class SearchFactoryHolder extends ExternalResource {
 	protected void before() throws Throwable {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setProgrammaticMapping( buildMappingDefinition );
+		for ( Entry<Class<? extends Service>, Service> entry : providedServices.entrySet() ) {
+			cfg.addProvidedService( entry.getKey(), entry.getValue() );
+		}
 		for ( String key : configuration.stringPropertyNames() ) {
 			cfg.addProperty( key, configuration.getProperty( key ) );
 		}
@@ -67,6 +75,11 @@ public class SearchFactoryHolder extends ExternalResource {
 	public SearchFactoryHolder withProperty(String key, Object value) {
 		Assert.assertNull( "SessionFactory already initialized", sf );
 		configuration.put( key, value );
+		return this;
+	}
+
+	public <T extends Service> SearchFactoryHolder withService(Class<T> serviceType, T serviceInstance) {
+		providedServices.put( serviceType, serviceInstance );
 		return this;
 	}
 
