@@ -43,7 +43,7 @@ import org.hibernate.testing.cache.CachingRegionFactory;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class FullTextSessionBuilder {
+public class FullTextSessionBuilder implements AutoCloseable {
 
 	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 

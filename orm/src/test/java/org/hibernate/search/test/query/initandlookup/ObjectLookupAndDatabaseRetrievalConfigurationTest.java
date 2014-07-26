@@ -6,51 +6,38 @@
  */
 package org.hibernate.search.test.query.initandlookup;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
-
-import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * A bunch of indirect tests to verify that object lookup method and database retrieval method are configurable.
  * Assertions are via Byteman determining that the appropriate object initializer was used.
  *
- * author Hardy Ferentschik
+ * @author Hardy Ferentschik
+ * @author Sanne Grinovero
  */
 @TestForIssue(jiraKey = "HSEARCH-1119")
 @RunWith(BMUnitRunner.class)
-public class ObjectLookupAndDatabaseRetrievalConfigurationTest extends SearchTestBase {
-	private String objectLookUpMethod;
-	private String databaseRetrievalMethod;
-
-	@After
-	public void tearDown() {
-		objectLookUpMethod = null;
-		databaseRetrievalMethod = null;
-	}
+public class ObjectLookupAndDatabaseRetrievalConfigurationTest {
 
 	@Test
 	@BMRule(targetClass = "org.hibernate.search.query.hibernate.impl.CriteriaObjectInitializer",
@@ -59,21 +46,19 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest extends SearchTes
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testDefaultLookupMethod() throws Exception {
-		// need to re-setup in the actual test method in order to bootstrap with different configuration setting
-		closeSessionFactory();
-		forceConfigurationRebuild();
-		setUp();
-		indexTestData();
+		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( null, null ) ) {
+			indexTestData( builder );
+			FullTextSession fullTextSession = builder.openFullTextSession();
+			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
+			query.list();
+			fullTextSession.close();
 
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
-		query.list();
-
-		Assert.assertEquals(
-				"CriteriaObjectInitializer should have been used as object initializer",
-				1,
-				BytemanHelper.getAndResetInvocationCount()
-		);
+			Assert.assertEquals(
+					"CriteriaObjectInitializer should have been used as object initializer",
+					1,
+					BytemanHelper.getAndResetInvocationCount()
+			);
+		}
 	}
 
 	@Test
@@ -83,22 +68,19 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest extends SearchTes
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testSetLookupMethodPersistenceContextUpperCase() throws Exception {
-		// need to re-setup in the actual test method in order to bootstrap with different configuration setting
-		closeSessionFactory();
-		forceConfigurationRebuild();
-		objectLookUpMethod = "PERSISTENCE_CONTEXT";
-		setUp();
-		indexTestData();
+		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( "PERSISTENCE_CONTEXT", null ) ) {
+			indexTestData( builder );
+			FullTextSession fullTextSession = builder.openFullTextSession();
+			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
+			query.list();
+			fullTextSession.close();
 
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
-		query.list();
-
-		Assert.assertEquals(
-				"PersistenceContextObjectInitializer should have been used as object initializer",
-				1,
-				BytemanHelper.getAndResetInvocationCount()
-		);
+			Assert.assertEquals(
+					"PersistenceContextObjectInitializer should have been used as object initializer",
+					1,
+					BytemanHelper.getAndResetInvocationCount()
+			);
+		}
 	}
 
 	@Test
@@ -108,22 +90,19 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest extends SearchTes
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testSetLookupMethodPersistenceContextLowerCase() throws Exception {
-		// need to re-setup in the actual test method in order to bootstrap with different configuration setting
-		closeSessionFactory();
-		forceConfigurationRebuild();
-		objectLookUpMethod = "persistence_context";
-		setUp();
-		indexTestData();
+		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( "persistence_context", null ) ) {
+			indexTestData( builder );
+			FullTextSession fullTextSession = builder.openFullTextSession();
+			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
+			query.list();
+			fullTextSession.close();
 
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
-		query.list();
-
-		Assert.assertEquals(
-				"PersistenceContextObjectInitializer should have been used as object initializer",
-				1,
-				BytemanHelper.getAndResetInvocationCount()
-		);
+			Assert.assertEquals(
+					"PersistenceContextObjectInitializer should have been used as object initializer",
+					1,
+					BytemanHelper.getAndResetInvocationCount()
+			);
+		}
 	}
 
 	@Test
@@ -133,22 +112,19 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest extends SearchTes
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testSetDatabaseRetrievalMethodUpperCase() throws Exception {
-		// need to re-setup in the actual test method in order to bootstrap with different configuration setting
-		closeSessionFactory();
-		forceConfigurationRebuild();
-		databaseRetrievalMethod = "FIND_BY_ID";
-		setUp();
-		indexTestData();
+		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( null, "FIND_BY_ID" ) ) {
+			indexTestData( builder );
+			FullTextSession fullTextSession = builder.openFullTextSession();
+			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
+			query.list();
+			fullTextSession.close();
 
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
-		query.list();
-
-		Assert.assertEquals(
-				"LookupObjectInitializer should have been used as object initializer",
-				1,
-				BytemanHelper.getAndResetInvocationCount()
-		);
+			Assert.assertEquals(
+					"LookupObjectInitializer should have been used as object initializer",
+					1,
+					BytemanHelper.getAndResetInvocationCount()
+			);
+		}
 	}
 
 	@Test
@@ -158,33 +134,27 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest extends SearchTes
 			action = "countInvocation()",
 			name = "testSetLookupMethodPersistenceContext")
 	public void testSetDatabaseRetrievalMethodLoweCase() throws Exception {
-		// need to re-setup in the actual test method in order to bootstrap with different configuration setting
-		closeSessionFactory();
-		forceConfigurationRebuild();
-		databaseRetrievalMethod = "find_by_id";
-		setUp();
-		indexTestData();
+		try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( null, "find_by_id" ) ) {
+			indexTestData( builder );
+			FullTextSession fullTextSession = builder.openFullTextSession();
+			FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
+			query.list();
+			fullTextSession.close();
 
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery() );
-		query.list();
-
-		Assert.assertEquals(
-				"LookupObjectInitializer should have been used as object initializer",
-				1,
-				BytemanHelper.getAndResetInvocationCount()
-		);
+			Assert.assertEquals(
+					"LookupObjectInitializer should have been used as object initializer",
+					1,
+					BytemanHelper.getAndResetInvocationCount()
+			);
+		}
 	}
-
 
 	@Test
 	public void testSetInvalidLookupMethodThrowsException() throws Exception {
-		closeSessionFactory();
-		forceConfigurationRebuild();
-		objectLookUpMethod = "foo";
 		try {
-			setUp();
-			fail( "The setup of the search factory should have failed due to invalid value." );
+			try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( "foo", null ) ) {
+				fail( "The setup of the search factory should have failed due to invalid value." );
+			}
 		}
 		catch (SearchException e) {
 			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000217" ) );
@@ -193,36 +163,30 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest extends SearchTes
 
 	@Test
 	public void testSetInvalidRetrievalMethodThrowsException() throws Exception {
-		closeSessionFactory();
-		forceConfigurationRebuild();
-		databaseRetrievalMethod = "foo";
 		try {
-			setUp();
-			fail( "The setup of the search factory should have failed due to invalid value." );
+			try ( FullTextSessionBuilder builder = buildFullTextSessionBuilder( null, "foo" ) ) {
+				fail( "The setup of the search factory should have failed due to invalid value." );
+			}
 		}
 		catch (SearchException e) {
 			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000217" ) );
 		}
 	}
 
-	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
+	private FullTextSessionBuilder buildFullTextSessionBuilder(String objectLookUpMethod, String databaseRetrievalMethod) {
+		FullTextSessionBuilder fullTextSessionBuilder = new FullTextSessionBuilder()
+				.addAnnotatedClass( Foo.class );
 		if ( objectLookUpMethod != null ) {
-			cfg.setProperty( "hibernate.search.query.object_lookup_method", objectLookUpMethod );
+			fullTextSessionBuilder.setProperty( "hibernate.search.query.object_lookup_method", objectLookUpMethod );
 		}
 		if ( databaseRetrievalMethod != null ) {
-			cfg.setProperty( "hibernate.search.query.database_retrieval_method", databaseRetrievalMethod );
+			fullTextSessionBuilder.setProperty( "hibernate.search.query.database_retrieval_method", databaseRetrievalMethod );
 		}
+		return fullTextSessionBuilder.build();
 	}
 
-	@Override
-	protected Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { Foo.class };
-	}
-
-	private void indexTestData() {
-		Session session = openSession();
+	private void indexTestData(FullTextSessionBuilder builder) {
+		FullTextSession session = builder.openFullTextSession();
 		Transaction transaction = session.beginTransaction();
 
 		// need to index at least two instances. In the single instance case a search will not go via the object initializer
@@ -232,6 +196,7 @@ public class ObjectLookupAndDatabaseRetrievalConfigurationTest extends SearchTes
 		session.persist( snafu );
 
 		transaction.commit();
+		session.close();
 	}
 
 	@Indexed
