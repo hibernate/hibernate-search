@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -21,8 +20,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
-
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -32,12 +29,10 @@ import org.hibernate.search.query.engine.impl.LazyQueryState;
 import org.hibernate.search.query.engine.impl.QueryHits;
 import org.hibernate.search.query.engine.impl.TimeoutManagerImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
-import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.test.util.HibernateManualConfiguration;
-import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -46,15 +41,12 @@ import org.junit.Test;
  */
 public class ProvidedIdTest {
 
+	@Rule
+	public SearchFactoryHolder configuration = new SearchFactoryHolder( ProvidedIdPerson.class, ProvidedIdPersonSub.class );
+
 	@Test
 	public void testProvidedId() throws Exception {
-		final SearchConfigurationForTest configuration = new HibernateManualConfiguration()
-				.addClass( ProvidedIdPerson.class )
-				.addClass( ProvidedIdPersonSub.class )
-				.addProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() )
-				.addProperty( "hibernate.search.default.indexwriter.merge_factor", "100" )
-				.addProperty( "hibernate.search.default.indexwriter.max_buffered_docs", "1000" );
-		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		SearchFactoryImplementor sf = (SearchFactoryImplementor) configuration.getSearchFactory();
 
 		ProvidedIdPerson person1 = new ProvidedIdPerson();
 		person1.setName( "Big Goat" );
