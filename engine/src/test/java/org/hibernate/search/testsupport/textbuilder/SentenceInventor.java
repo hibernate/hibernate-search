@@ -14,9 +14,10 @@ import java.util.TreeSet;
  * Test utility meant to produce sentences of a randomly generated language,
  * having some properties of natural languages.
  * The goal is to produce sentences which look like a western text,
- * but are not.
+ * but without needing an actual resource to read from so we can create unlimited
+ * garbage. We also get a chance to produce some novel poetry.
  * All sentences from the same SentenceInventor will share
- * a limited dictionary, making the frequencies suitable to test
+ * a limited dictionary, making the frequencies somehow repeatable, suitable to test
  * with Lucene.
  * Sentences produced depend from the constructor arguments,
  * making the output predictable for testing purposes.
@@ -29,6 +30,8 @@ public class SentenceInventor {
 	private final WordDictionary dictionary;
 	//array contains repeated object for probability distribution (more chance for a ",")
 	private final char[] sentenceSeparators = new char[] { ',', ',', ',' , ';', ':', ':' };
+	//same as above, but favour the "full stop" char as a more likely end for periods.
+	private final char[] periodSeparators = new char[] { '.', '.', '.' , '.', '.', '?', '?', '!' };
 
 	/**
 	 * @param randomSeed the seed to use for random generator
@@ -136,7 +139,9 @@ public class SentenceInventor {
 	 * @return
 	 */
 	public String nextPeriod() {
-		int periodLengthSentences = r.nextInt( 7 ) - 2;
+		//Combine two random values to make extreme long/short less likely,
+		//But still make the "one statement" period more likely than other shapes.
+		int periodLengthSentences = r.nextInt( 6 ) + r.nextInt( 4 ) - 3;
 		periodLengthSentences = ( periodLengthSentences < 1 ) ? 1 : periodLengthSentences;
 		String firstsentence = nextSentence();
 		StringBuilder sb = new StringBuilder()
@@ -149,14 +154,16 @@ public class SentenceInventor {
 				.append( ' ' )
 				.append( nextSentence() );
 		}
-		sb.append( ".\n" );
+		int periodSeparatorCharIndex = r.nextInt( periodSeparators.length );
+		sb.append( periodSeparators[periodSeparatorCharIndex] );
+		sb.append( "\n" );
 		return sb.toString();
 	}
 
 	//run it to get an idea of what this class is going to produce
 	public static void main(String[] args) {
 		SentenceInventor wi = new SentenceInventor( 7L, 10000 );
-		for ( int i = 0; i < 30; i++ ) {
+		for ( int i = 0; i < 3000; i++ ) {
 			System.out.print( wi.nextPeriod() );
 		}
 	}
