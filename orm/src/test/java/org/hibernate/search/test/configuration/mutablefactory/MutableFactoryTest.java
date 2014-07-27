@@ -32,11 +32,8 @@ import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.configuration.mutablefactory.generated.Generated;
-import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -48,20 +45,15 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MutableFactoryTest {
 
-	public static final Log log = LoggerFactory.make();
-
 	@Test
 	public void testCreateEmptyFactory() throws Exception {
-		final SearchConfigurationForTest configuration = getTestConfiguration();
-		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
 		sf.close();
 	}
 
 	@Test
 	public void testAddingClassFullModel() throws Exception {
-		SearchConfigurationForTest configuration = getTestConfiguration();
-		//FIXME downcasting of MSF. create a getDelegate() ?
-		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
 		sf = builder.currentFactory( sf )
 				.addClass( A.class )
@@ -111,8 +103,7 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testAddingClassSimpleAPI() throws Exception {
-		SearchConfigurationForTest configuration = getTestConfiguration();
-		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
 
 		sf.addClasses( A.class );
 
@@ -177,8 +168,7 @@ public class MutableFactoryTest {
 				"name",
 				TestConstants.standardAnalyzer
 		);
-		SearchConfigurationForTest configuration = getTestConfiguration();
-		final SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		final SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
 		try {
 			List<DoAddClasses> runnables = new ArrayList<DoAddClasses>( 10 );
 			final int nbrOfThread = 10;
@@ -315,10 +305,6 @@ public class MutableFactoryTest {
 				failureInfo = "failure: Emmanuel" + factorOfClassesPerThread + " exception: " + e.toString();
 			}
 		}
-	}
-
-	private static SearchConfigurationForTest getTestConfiguration() {
-		return new HibernateManualConfiguration();
 	}
 
 }
