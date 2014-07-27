@@ -18,11 +18,10 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.Lock;
 import org.apache.lucene.store.LockFactory;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.Assert;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
@@ -49,27 +48,25 @@ public class IndexingGeneratedCorpusTest {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final int BOOK_NUM = 140;
-	private final int ANCIENTBOOK_NUM = 120;
-	private final int SECRETBOOK_NUM = 20;
-	private final int DVD_NUM = 200;
+	private static final int BOOK_NUM = 140;
+	private static final int ANCIENTBOOK_NUM = 120;
+	private static final int SECRETBOOK_NUM = 20;
+	private static final int DVD_NUM = 200;
 
-	private SentenceInventor sentenceInventor = new SentenceInventor( 7L, 4000 );
-	private FullTextSessionBuilder builder;
-	private int totalEntitiesInDB = 0;
+	private static final SentenceInventor sentenceInventor = new SentenceInventor( 7L, 4000 );
 
-	@Before
-	public void setUp() throws Exception {
-		builder = new FullTextSessionBuilder();
-		builder
-				.addAnnotatedClass( Book.class )
-				.addAnnotatedClass( Dvd.class )
-				.addAnnotatedClass( AncientBook.class )
-				.addAnnotatedClass( Nation.class )
-				.addAnnotatedClass( SecretBook.class )
-				.setProperty( "hibernate.search.DVDS.exclusive_index_use", "false" ) // to test lock release
-				.setProperty( "hibernate.search.default.worker.thread_pool.size", "4" )
-				.build();
+	@ClassRule
+	public static FullTextSessionBuilder builder = new FullTextSessionBuilder()
+			.addAnnotatedClass( Book.class )
+			.addAnnotatedClass( Dvd.class )
+			.addAnnotatedClass( AncientBook.class )
+			.addAnnotatedClass( Nation.class )
+			.addAnnotatedClass( SecretBook.class )
+			.setProperty( "hibernate.search.DVDS.exclusive_index_use", "false" ) // to test lock release
+			.setProperty( "hibernate.search.default.worker.thread_pool.size", "4" );
+
+	@BeforeClass
+	public static void setUp() throws Exception {
 		createMany( Book.class, BOOK_NUM );
 		createMany( Dvd.class, DVD_NUM );
 		createMany( AncientBook.class, ANCIENTBOOK_NUM );
@@ -77,14 +74,10 @@ public class IndexingGeneratedCorpusTest {
 		storeAllBooksInNation();
 	}
 
-	@After
-	public void tearDown() {
-		builder.close();
-	}
-
-	private void createMany(Class<? extends TitleAble> entityType, int amount)
+	private static void createMany(Class<? extends TitleAble> entityType, int amount)
 			throws InstantiationException, IllegalAccessException {
 		FullTextSession fullTextSession = builder.openFullTextSession();
+		int totalEntitiesInDB = 0;
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
 			fullTextSession.persist( new Nation( "Italy", "IT" ) );
@@ -116,7 +109,7 @@ public class IndexingGeneratedCorpusTest {
 	 * Adds all stored books to the Nation.
 	 * Needed to test for HSEARCH-534 and makes the dataset to index quite bigger.
 	 */
-	private void storeAllBooksInNation() {
+	private static void storeAllBooksInNation() {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		try {
 			Transaction tx = fullTextSession.beginTransaction();
