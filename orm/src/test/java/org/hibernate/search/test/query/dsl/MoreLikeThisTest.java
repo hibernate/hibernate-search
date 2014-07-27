@@ -19,7 +19,6 @@ import org.fest.assertions.Condition;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.ProjectionConstants;
@@ -407,11 +406,6 @@ public class MoreLikeThisTest extends SearchTestBase {
 				Coffee.class,
 				CoffeeBrand.class
 		};
-	}
-
-	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
 	}
 
 	private QueryBuilder getCoffeeQueryBuilder() {

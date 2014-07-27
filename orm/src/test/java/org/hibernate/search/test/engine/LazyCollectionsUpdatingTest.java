@@ -153,7 +153,6 @@ public class LazyCollectionsUpdatingTest extends SearchTestBase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration configuration) {
 		super.configure( configuration );
-		configuration.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		configuration.setProperty( "hibernate.search.default." + Environment.READER_STRATEGY, FieldSelectorLeakingReaderProvider.class.getName() );
 		configuration.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}

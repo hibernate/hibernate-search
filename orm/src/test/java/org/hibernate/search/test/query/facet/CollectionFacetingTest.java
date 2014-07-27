@@ -30,7 +30,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Elmer van Chastelet
  */
-
 public class CollectionFacetingTest extends SearchTestBase {
 	Author voltaire;
 	Author hugo;
@@ -102,10 +101,6 @@ public class CollectionFacetingTest extends SearchTestBase {
 		assertFacet( facets.get( 2 ), voltaire, 1 );
 
 		fullTextSession.close();
-	}
-
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
 	}
 
 	protected Class<?>[] getAnnotatedClasses() {
