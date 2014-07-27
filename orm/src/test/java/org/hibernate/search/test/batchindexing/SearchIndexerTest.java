@@ -20,6 +20,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.batchindexing.impl.MassIndexerImpl;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
+import org.hibernate.search.testsupport.TestForIssue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -96,8 +97,9 @@ public class SearchIndexerTest {
 
 
 	// Test to verify that the identifier loading works even when
-	// the property is not called "id" - see HSEARCH-901
+	// the property is not called "id"
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-901")
 	public void testIdentifierNaming() throws InterruptedException {
 		//disable automatic indexing, to test manual index creation.
 		FullTextSessionBuilder ftsb = new FullTextSessionBuilder()
@@ -193,6 +195,7 @@ public class SearchIndexerTest {
 			assertEquals( 1, countResults( new Term( "jiraDescription", "freezes" ), ftsb, ExtendedIssueEntity.class ) );
 			assertEquals( 1, countResults( new Term( "id", "1" ), ftsb, ExtendedIssueEntity.class ) );
 		}
+		ftsb.close();
 	}
 
 	//helper method
