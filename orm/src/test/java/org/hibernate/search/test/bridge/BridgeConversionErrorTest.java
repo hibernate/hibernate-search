@@ -13,13 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 
 import org.hibernate.Transaction;
 
-import org.hibernate.cfg.Configuration;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -134,12 +131,6 @@ public class BridgeConversionErrorTest extends SearchTestBase {
 				EmbeddedEntity.class,
 				EmbeddedEmbeddedEntity.class
 		};
-	}
-
-	@Override
-	protected void configure(Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( Environment.ANALYZER_CLASS, SimpleAnalyzer.class.getName() );
 	}
 
 	public static class ExceptionThrowingBridge implements FieldBridge {

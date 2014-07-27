@@ -11,14 +11,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
@@ -200,15 +198,6 @@ public class WorkerTestCase extends SearchTestBase {
 				t.printStackTrace();
 			}
 		}
-	}
-
-	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		cfg.setProperty( "hibernate.show_sql", "false" );
-		cfg.setProperty( "hibernate.format_sql", "false" );
 	}
 
 	@Override

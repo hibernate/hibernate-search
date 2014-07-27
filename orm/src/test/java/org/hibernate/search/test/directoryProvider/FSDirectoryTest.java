@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.DirectoryReader;
@@ -27,7 +26,6 @@ import org.apache.lucene.store.FSDirectory;
 
 import org.hibernate.Session;
 
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
@@ -210,10 +208,7 @@ public class FSDirectoryTest extends SearchTestBase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		File baseIndexDir = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", baseIndexDir.getAbsolutePath() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
 }

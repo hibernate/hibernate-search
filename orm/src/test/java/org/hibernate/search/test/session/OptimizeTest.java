@@ -6,21 +6,15 @@
  */
 package org.hibernate.search.test.session;
 
-import java.io.File;
+import static org.junit.Assert.assertEquals;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.queryparser.classic.QueryParser;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Emmanuel Bernard
@@ -57,15 +51,6 @@ public class OptimizeTest extends SearchTestBase {
 		s.createQuery( "delete " + Email.class.getName() ).executeUpdate();
 		tx.commit();
 		s.close();
-	}
-
-	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
-		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
-		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 	}
 
 	@Override

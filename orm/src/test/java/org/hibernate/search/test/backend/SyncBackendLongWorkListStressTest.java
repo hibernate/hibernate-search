@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.backend;
 
-import java.io.File;
-
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.search.MatchAllDocsQuery;
 
@@ -67,14 +65,10 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 	@Override
 	protected void configure(org.hibernate.cfg.Configuration cfg) {
 		super.configure( cfg );
-		File sub = getBaseIndexDir();
-		cfg.setProperty( "hibernate.search.default.indexBase", sub.getAbsolutePath() );
 		//needs FSDirectory to have the index contents survive the SessionFactory close
 		cfg.setProperty( "hibernate.search.default.directory_provider", "filesystem" );
 		cfg.setProperty( "hibernate.search.default.max_queue_length", "5" );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
-		cfg.setProperty( "hibernate.show_sql", "false" );
-		cfg.setProperty( "hibernate.format_sql", "false" );
 	}
 
 }

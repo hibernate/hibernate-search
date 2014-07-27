@@ -67,7 +67,6 @@ public class IndexingGeneratedCorpusTest {
 				.addAnnotatedClass( AncientBook.class )
 				.addAnnotatedClass( Nation.class )
 				.addAnnotatedClass( SecretBook.class )
-				.setProperty( "hibernate.show_sql", "false" ) // too verbose for this test
 				.setProperty( "hibernate.search.DVDS.exclusive_index_use", "false" ) // to test lock release
 				.setProperty( "hibernate.search.default.worker.thread_pool.size", "4" )
 				.build();
