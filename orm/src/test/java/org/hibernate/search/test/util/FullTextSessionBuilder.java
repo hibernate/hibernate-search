@@ -14,11 +14,10 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
-
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.LoadEventListener;
@@ -26,6 +25,7 @@ import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.SearchFactory;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
@@ -34,6 +34,9 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.testing.cache.CachingRegionFactory;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * Use the builder pattern to provide a SessionFactory.
@@ -43,14 +46,14 @@ import org.hibernate.testing.cache.CachingRegionFactory;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public class FullTextSessionBuilder implements AutoCloseable {
+public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 
 	private static final Log log = org.hibernate.search.util.logging.impl.LoggerFactory.make();
 
 	private File indexRootDirectory;
 	private final Properties cfg = new Properties();
 	private final Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
-	private SessionFactory sessionFactory;
+	private SessionFactoryImplementor sessionFactory;
 	private boolean usingFileSystem = false;
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
 
@@ -179,13 +182,10 @@ public class FullTextSessionBuilder implements AutoCloseable {
 	 * @return the SearchFactory
 	 */
 	public SearchFactory getSearchFactory() {
-		FullTextSession fullTextSession = openFullTextSession();
-		try {
-			return fullTextSession.getSearchFactory();
+		if ( sessionFactory == null ) {
+			build();
 		}
-		finally {
-			fullTextSession.close();
-		}
+		return ContextHelper.getSearchFactoryBySFI( sessionFactory );
 	}
 
 	/**
@@ -209,6 +209,22 @@ public class FullTextSessionBuilder implements AutoCloseable {
 	public FullTextSessionBuilder addLoadEventListener(LoadEventListener additionalLoadEventListener) {
 		additionalLoadEventListeners.add( additionalLoadEventListener );
 		return this;
+	}
+
+	@Override
+	public Statement apply(final Statement base, Description description) {
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				build();
+				try {
+					base.evaluate();
+				}
+				finally {
+					close();
+				}
+			}
+		};
 	}
 
 }
