@@ -659,6 +659,6 @@ public interface Log extends BasicLogger {
 	SearchException searchFactoryReferenceServiceNotFound();
 
 	@Message(id = 224, value = "Non optional parameter named '%s' was null" )
-	AssertionFailure parametersShouldNotBeNull(String parameterNAme);
+	AssertionFailure parametersShouldNotBeNull(String parameterName);
 
 }
