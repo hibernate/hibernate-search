@@ -146,12 +146,12 @@
         <luceneVersion>3.6.2</luceneVersion>
         <infinispanVersion>6.0.2.Final</infinispanVersion>
         <jgroupsVersion>3.4.3.Final</jgroupsVersion>
-        <hibernateVersion>4.3.5.Final</hibernateVersion>
-        <hibernateCommonsAnnotationVersion>4.0.4.Final</hibernateCommonsAnnotationVersion>
+        <hibernateVersion>4.3.6.Final</hibernateVersion>
+        <hibernateCommonsAnnotationVersion>4.0.5.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>2.1.4</bytemanVersion>
         <jbossLoggingVersion>3.1.4.GA</jbossLoggingVersion>
-        <jbossLoggingProcessorVersion>1.1.0.Final</jbossLoggingProcessorVersion>
+        <jbossLoggingProcessorVersion>1.2.0.Final</jbossLoggingProcessorVersion>
         <narayanaVersion>5.0.0.Final</narayanaVersion>
         <avroVersion>1.7.6</avroVersion>
         <jacksonAslVersion>1.9.13</jacksonAslVersion>
