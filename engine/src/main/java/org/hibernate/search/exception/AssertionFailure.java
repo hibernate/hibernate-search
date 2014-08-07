@@ -7,17 +7,19 @@
 package org.hibernate.search.exception;
 
 /**
- * Temporarily extending org.hibernate.annotations.common.AssertionFailure
- * for backwards compatibility. The parent class is going to be removed!
+ * Indicates failure of an assertion: a possible bug in Hibernate Search.
+ *
+ * @author Gavin King
+ * @author Emmanuel Bernard
  */
-public class AssertionFailure extends org.hibernate.annotations.common.AssertionFailure {
-
-	public AssertionFailure(String s, Throwable t) {
-		super( s, t );
-	}
+public class AssertionFailure extends RuntimeException {
 
 	public AssertionFailure(String s) {
 		super( s );
+	}
+
+	public AssertionFailure(String s, Throwable t) {
+		super( s, t );
 	}
 
 }
