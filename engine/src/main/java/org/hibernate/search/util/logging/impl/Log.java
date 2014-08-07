@@ -661,4 +661,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 224, value = "Non optional parameter named '%s' was null" )
 	AssertionFailure parametersShouldNotBeNull(String parameterName);
 
+	@LogMessage(level = Level.ERROR)
+	@Message(id = 225, value = "An assertion failure occurred (this may indicate a bug in Hibernate)" )
+	void assertionFailure(@Cause Throwable assertionFailure);
+
 }
