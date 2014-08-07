@@ -2,7 +2,7 @@
 == Getting started
 
 Welcome to Hibernate Search. The following chapter will guide you through the initial steps required
-to integrate Hibernate Search into an existing Hibernate enabled application. In case you are a
+to integrate Hibernate Search into an existing Hibernate ORM enabled application. In case you are a
 Hibernate new timer we recommend you start link:$$http://hibernate.org/quick-start.html$$[here].
 
 
@@ -11,25 +11,39 @@ Hibernate new timer we recommend you start link:$$http://hibernate.org/quick-sta
 .System requirements
 
 |===============
-|Java Runtime|A JDK or JRE version _6_ or greater. You
+|Java Runtime|Requires Java version _7_ or greater. You
             can download a Java Runtime for Windows/Linux/Solaris link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[here].
 |Hibernate Search|+hibernate-search-{hibernateSearchVersion}.jar+ and all
             runtime dependencies. You can get the jar artifacts either from
             the +dist/lib+ directory of the link:$$http://sourceforge.net/projects/hibernate/files/hibernate-search/$$[Hibernate Search distribution] or you can download them from the
-            link:$$http://repository.jboss.org/nexus/content/groups/public-jboss/ $$[JBoss maven repository].
+            link:$$http://repository.jboss.org/nexus/content/groups/public-jboss/org/hibernate/ $$[JBoss maven repository].
 |Hibernate Core|You will need
             +hibernate-core-{hibernateVersion}.jar+ and its
-            transitive dependencies (either from the link:$$http://sourceforge.net/projects/hibernate/files/hibernate3/$$[distribution bundle] or the maven repository).
-|JPA 2.1|Even though Hibernate Search can be used without JPA
-            annotations the following instructions will use them for basic
-            entity configuration (__@Entity, @Id, @OneToMany,...__). This part of the configuration could
-            also be expressed in XML or code. Hibernate Search, however, has also its own set of annotations (__@Indexed, @DocumentId, @Field,...__) for which there exists so far no XML based alternative; a better option is the <<hsearch-mapping-programmaticapi>>.
-
+            dependencies (either from the link:$$http://sourceforge.net/projects/hibernate/files/hibernate4/$$[distribution bundle] or the maven repository).
+|JPA 2.1|Hibernate Search can be used without JPA but the following instructions will use JPA annotations for basic
+            entity configuration (+@Entity+, +@Id+, +@OneToMany+,...).
 |===============
 
-=== Using Maven
+=== Get the required libraries
 
-The Hibernate Search artifacts can be found in Maven's central repository but are released first in the link:$$http://repository.jboss.org/nexus/content/groups/public-jboss/ $$[JBoss maven repository]. So it's not a requirement but we recommend to add this repository to your _settings.xml file_ (see also link:$$http://community.jboss.org/wiki/MavenGettingStarted-Users$$[Maven Getting Started] for more details).
+The Hibernate Search library is split in several modules to allow you to pick the minimal set of
+dependencies you need.
+It requires Apache Lucene, Hibernate ORM and some standard APIs such as the Java Persistence API
+and the Java Transactions API. Other dependencies are optional, providing additional integration
+points.
+To get the correct jar files on your classpath we highly recommend to use a dependency manager such
+as http://maven.apache.org/[Maven], or similar tools such as http://www.gradle.org/[Gradle] or
+http://ant.apache.org/ivy/[Ivy].
+These alternatives are also able to consume the artifacts from the <<search-download-via-maven>> section.
+
+
+[[search-download-via-maven]]
+==== Using Maven
+
+The Hibernate Search artifacts can be found in Maven's http://central.sonatype.org/[Central Repository]
+but are released first in the http://repository.jboss.org/nexus/content/groups/public-jboss/[JBoss Maven Repository].
+See also the https://community.jboss.org/wiki/MavenGettingStarted-Users[Maven Getting Started wiki page] to use
+the JBoss repository.
 
 All you have to add to your pom.xml is:
 
@@ -40,7 +54,7 @@ All you have to add to your pom.xml is:
 ----
 <dependency>
    <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-search</artifactId>
+   <artifactId>hibernate-search-orm</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 ----
@@ -50,9 +64,8 @@ All you have to add to your pom.xml is:
 ====
 [source, XML]
 [subs="verbatim,attributes"]
-----
 <dependency>
-<!-- If using JPA (2), add: -->
+<!-- If using JPA, add: -->
 <dependency>
    <groupId>org.hibernate</groupId>
    <artifactId>hibernate-entitymanager</artifactId>
@@ -64,28 +77,43 @@ All you have to add to your pom.xml is:
    <artifactId>hibernate-search-infinispan</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
-----
 ====
 
-Only the _hibernate-search_ dependency is mandatory.__hibernate-entitymanager__ is only required if
-you want to use Hibernate Search in conjunction with JPA.
+Only the _hibernate-search-orm_ dependency is mandatory. _hibernate-entitymanager_ is only required
+if you want to use Hibernate Search in conjunction with JPA.
 
-To use _hibernate-search-infinispan_, adding the JBoss Maven repository is mandatory, because it
-contains the needed Infinispan dependencies which are currently not mirrored by +central+.
+==== Not using a Maven repository
 
+You can download zip bundles containing all needed dependencies from the
+http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/[Hibernate Search section on Sourceforge].
+This includes - among others - the latest version of Hibernate ORM compatible with the version
+of Hibernate Search you're downloading, but only the essential parts you need to start experimenting
+with Hibernate Search. You will probably need to combine this from downloads from the other
+projects, for example the
+http://sourceforge.net/projects/hibernate/files/hibernate4/{hibernateVersion}/[Hibernate ORM distribution on Sourceforge]
+also provides the modules to enable caching or use a connection pool.
+
+=== Deploying on WildFly
+
+If you are creating an application to be deployed on WildFly you're lucky:
+Hibernate Search is included in the application server.
+This means that you don't need to package it along with your application but remember that you need
+to activate the module, see <<search-configuration-deploy-on-wildfly>> for details.
+
+Due to he modular design of WildFly, you can also bundle a more more recent version of
+Hibernate Search than the one included in the popular application server.
+This is also explained further in <<search-configuration-deploy-on-wildfly>>.
 
 === Configuration
 
-Once you have downloaded and added all required dependencies to your application you have to add a
-couple of properties to your hibernate configuration file. If you are using Hibernate directly this
-can be done in +hibernate.properties+ or +hibernate.cfg.xml+. If you are using Hibernate via JPA you
-can also add the properties to +persistence.xml+. The good news is that for standard use most
-properties offer a sensible default. An example _persistence.xml_ configuration could look like
-this:
+Once you have added all required dependencies to your application you have to add a couple of
+properties to your Hibernate configuration file.
+If you are using Hibernate directly this can be done in +hibernate.properties+ or +hibernate.cfg.xml+.
+If you are using Hibernate via JPA you can also add the properties to +persistence.xml+.
+The good news is that for standard use most properties offer a sensible default.
+An example _persistence.xml_ configuration could look like this:
 
-.Basic configuration options to be added to +_hibernateproperties_+, +_hibernatecfgxml_+ or
-._persistencexml_
-
+.Basic configuration options to be added to +hibernate.properties+, +hibernate.cfg.xml+ or +persistence.xml+
 ====
 [source, XML]
 ----
@@ -104,14 +132,15 @@ setting the +$$hibernate.search.default.directory_provider$$+ property. Apache L
 of a +Directory+ to store the index files. Hibernate Search handles the initialization and
 configuration of a Lucene +Directory+ instance via a +DirectoryProvider+. In this tutorial we will
 use a a directory provider storing the index in the file system. This will give us the ability to
-physically inspect the Lucene indexes created by Hibernate Search (eg via
+inspect the Lucene indexes created by Hibernate Search (eg via
 link:$$http://code.google.com/p/luke/$$[Luke]). Once you have a working configuration you can start
-experimenting with other directory providers (see <<search-configuration-directory>>). Next to the
-directory provider you also have to specify the default base directory for all indexes via
-+hibernate.search.default.indexBase+.
+experimenting with other directory providers (see <<search-configuration-directory>>).
+You also have to specify the default base directory for all indexes via
++hibernate.search.default.indexBase+: this defines the path where you want to store indexes,
+as this +DirectoryProvider+ is the one used to store indexes on filesystem.
 
-Lets assume that your application contains the Hibernate managed classes example.Book and
-example.Author and you want to add free text search capabilities to your application in order to
+Let's assume that your application contains the Hibernate managed classes +example.Book+ and
++example.Author+ and you want to add free text search capabilities to your application in order to
 search the books contained in your database.
 
 .Example entities Book and Author before adding Hibernate Search specific annotations
@@ -138,7 +167,7 @@ public class Book {
 
   public Book() {}
 
-  // standard getters/setters follow here
+  // standard getters/setters follow
   ...
 }
 ----
@@ -159,28 +188,28 @@ public class Author {
 
   public Author() {}
 
-  // standard getters/setters follow here
+  // standard getters/setters follow
   ...
 }
 ----
 ====
 
 To achieve this you have to add a few annotations to the Book and Author class. The first annotation
-+@Indexed+ marks Book as indexable. By design Hibernate Search needs to store an untokenized id in
-the index to ensure index unicity for a given entity. +@DocumentId+ marks the property to use for
-this purpose and is in most cases the same as the database primary key. The +@DocumentId+ annotation
-is optional in the case where an @Id annotation exists.
++@Indexed+ marks Book as indexable. By design Hibernate Search needs to store an _untokenized_ id in
+the index to ensure index uniqueness for a given entity (for now don't worry if you don't know what
+_untokenized_ means, it will soon be clear).
 
 Next you have to mark the fields you want to make searchable. Let's start with +title+ and
 +subtitle+ and annotate both with +@Field+. The parameter +index=Index.YES+ will ensure that the
 text will be indexed, while +analyze=Analyze.YES+ ensures that the text will be analyzed using the
-default Lucene analyzer. Usually, analyzing means chunking a sentence into individual words and
-potentially excluding common words like +$$'a'$$+ or '++the++'. We will talk more about analyzers a
-little later on. The third parameter we specify within ++@Field++,++ store=Store.NO++, ensures that
-the actual data will not be stored in the index. Whether this data is stored in the index or not has
-nothing to do with the ability to search for it. From Lucene's perspective it is not necessary to
-keep the data once the index is created. The benefit of storing it is the ability to retrieve it via
-projections ( see <<projections>>).
+default Lucene analyzer. Usually, analyzing or tokenizing means chunking a sentence into individual
+words and potentially excluding common words like +$$'a'$$+ or '++the++'. We will talk more about analyzers a
+little later on.
+The third parameter we specify within ++@Field++,++ store=Store.NO++, ensures that the actual data
+will not be stored in the index.
+Whether this data is stored in the index or not has nothing to do with the ability to search for it.
+It is not necessary to store fields in the index to allow Lucene to search for them: the benefit of
+storing it is the ability to retrieve them via projections (see <<projections>>).
 
 Without projections, Hibernate Search will per default execute a Lucene query in order to find the
 database identifiers of the entities matching the query criteria and use these identifiers to
@@ -193,18 +222,19 @@ these parameters and could be omitted.
 
 After this short look under the hood let's go back to annotating the Book class. Another annotation
 we have not yet discussed is +@DateBridge+. This annotation is one of the built-in field bridges in
-Hibernate Search. The Lucene index is purely string based. For this reason Hibernate Search must
-convert the data types of the indexed fields to strings and vice versa. A range of predefined
-bridges are provided, including the DateBridge which will convert a java.util.Date into a String
-with the specified resolution. For more details see <<search-mapping-bridge>>.
+Hibernate Search. The Lucene index is mostly string based, with limited support for encoding numbers.
+For this reason Hibernate Search must convert the data types of the indexed fields to strings and vice versa.
+A range of predefined bridges are provided, including the DateBridge which will convert a
++java.util.Date+ into a +String+ with the specified resolution. For more details see <<search-mapping-bridge>>.
 
-This leaves us with ++@IndexedEmbedded. ++This annotation is used to index associated entities
-(++@ManyToMany++, ++@\*ToOne++, ++@Embedded++ and ++@ElementCollection++) as part of the owning
-entity. This is needed since a Lucene index document is a flat data structure which does not know
-anything about object relations. To ensure that the authors' name will be searchable you have to
-make sure that the names are indexed as part of the book itself. On top of ++@IndexedEmbedded++ you
-will also have to mark all fields of the associated entity you want to have included in the index
-with ++@Indexed++. For more details see <<search-mapping-associated>>.
+This leaves us with ++@IndexedEmbedded++.
+This annotation is used to index associated entities (++@ManyToMany++, ++@\*ToOne++, ++@Embedded++ and ++@ElementCollection++)
+as part of the owning entity.
+This is needed since a Lucene index document is a flat data structure which does not know anything about object relations.
+To ensure that the author's name will be searchable you have to make sure that the names are indexed as part of the book itself.
+On top of ++@IndexedEmbedded++ you will also have to mark all fields of the associated entity you want
+to have included in the index with ++@Indexed++.
+For more details see <<search-mapping-associated>>.
 
 These settings should be sufficient for now. For more details on entity mapping refer to
 <<search-mapping-entity>>.
@@ -268,7 +298,7 @@ public class Author {
 === Indexing
 
 Hibernate Search will transparently index every entity persisted, updated or removed through
-Hibernate Core. However, you have to create an initial Lucene index for the data already present in
+Hibernate ORM. However, you have to create an initial Lucene index for the data already present in
 your database. Once you have added the above properties and annotations it is time to trigger an
 initial batch index of your books. You can achieve this by using one of the following code snippets
 (see also <<search-batchindex>>):
@@ -292,10 +322,10 @@ fullTextEntityManager.createIndexer().startAndWait();
 ----
 ====
 
-After executing the above code, you should be able to see a Lucene index under
-+/var/lucene/indexes/example.Book+. Go ahead an inspect this index with
-link:$$http://code.google.com/p/luke/$$[Luke]. It will help you to understand how Hibernate Search
-works.
+After executing the above code, you should be able to see a Lucene index under +/var/lucene/indexes/example.Book+
+(or based on a different path depending how you configured the property +$$hibernate.search.default.directory_provider$$+)
+Go ahead an inspect this index with link:$$http://code.google.com/p/luke/$$[Luke]:
+it will help you to understand how Hibernate Search works.
 
 === Searching
 
@@ -395,7 +425,8 @@ link:$$http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters$$[Solr Wiki].
 Why the reference to the Apache Solr wiki?
 
 Apache Solr was historically an indepedent sister project of Apache Lucene and the analyzer factory
-framework was originally developed within it. By now, Lucene and Solr have merged, but the
+framework was originally created in Solr.
+Since then the Apache Lucene and Solr projects have merged, but the
 documentation for these additional analyzers can still be found in the Solr Wiki. You might find
 other documentation referring to the "Solr Analyzer Framework" - just remember you don't need to
 depend on Apache Solr anymore to use it. The required classes are part of the core Lucene
