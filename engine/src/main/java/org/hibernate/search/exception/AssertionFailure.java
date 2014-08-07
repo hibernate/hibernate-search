@@ -6,18 +6,27 @@
  */
 package org.hibernate.search.exception;
 
-/**
- * Temporarily extending org.hibernate.annotations.common.AssertionFailure
- * for backwards compatibility. The parent class is going to be removed!
- */
-public class AssertionFailure extends org.hibernate.annotations.common.AssertionFailure {
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-	public AssertionFailure(String s, Throwable t) {
-		super( s, t );
-	}
+/**
+ * Indicates failure of an assertion: a possible bug in Hibernate Search.
+ *
+ * @author Gavin King
+ * @auhor Emmanuel Bernard
+ */
+public class AssertionFailure extends RuntimeException {
+
+	private static final Log log = LoggerFactory.make();
 
 	public AssertionFailure(String s) {
 		super( s );
+		log.assertionFailure( this );
+	}
+
+	public AssertionFailure(String s, Throwable t) {
+		super( s, t );
+		log.assertionFailure( this );
 	}
 
 }
