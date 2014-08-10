@@ -1277,67 +1277,102 @@ configuration.
 ====
 
 
-
-
 [[search-configuration-deploy-on-wildfly]]
 === Hibernate Search as a WildFly module
 
-Provided you're deploying on WildFly 8 there is an additional way to add the Hibernate Search
-dependencies to your application which introduces many practical benefits.
+Hibernate Search is included in the WildFly 8 application server, but you need to activate the module
+for your deployment to be able to take advantage of it.
 
-In WildFly class loading is based on modules. Each module defines explicit dependencies on other
-modules. Modules allow to share the same artifacts across multiple applications getting you smaller
-and quicker deployments, but also allow you to have multiple different versions of the same library
-in the same server, to accommodate different applications.
+You can either activate the modules already included in your WildFly distribution, or download and
+unzip a different version of the modules. The modules system in WildFly understands versions of dependencies,
+so you can safely have multiple different versions of Hibernate ORM and Hibernate Search in WildFly, and
+pick the one you need to use independently for each deployment.
 
-More details about modules are described in
-link:$$https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+AS7$$[Class Loading in WildFly
-8].
+==== Use the Hibernate Search version included in WildFly
 
-You can download the pre-packaged Hibernate Search modules from:
+To activate the Hibernate Search modules in wildfly, you have to declare the dependency by
+either adding a line in the +MANIFEST.MF+ of your deployment archive, or by including a
+resource named +jboss-deployment-structure.xml+.
+This resource should be placed in the top level deployment, in META-INF (or WEB-INF for web deployments).
 
-* link:$$https://downloads.sourceforge.net/project/hibernate/hibernate-search/WORKING/hibernate-search-modules-WORKING-wildfly-8-dist.zip$$[Sourceforge]
-* Maven: link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~$$[org.hibernate:hibernate-search-modules-WORKING-wildfly-8-dist:zip]. +
-Unpack the modules in your WildFly +modules+ directory: this will create modules for Hibernate Search and Apache Lucene. The Hibernate Search modules are:
-* _org.hibernate.search.orm:main_, for users of Hibernate Search with Hibernate; this will transitively include Hibernate ORM.
-* _org.hibernate.search.engine:main_, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.
 
-There are two ways to include the dependencies in your project:
-
-Using the manifest:: Add this entry to the MANIFEST.MF in your archive:
+Using the manifest:: Add the following entry to the +MANIFEST.MF+ in your archive:
 
 ====
-----
+[source]
+[subs="verbatim,attributes"]
 Dependencies: org.hibernate.search.orm services
-----
 ====
 
-Using jboss-deployment-structure.xml:: This is a proprietary JBoss AS descriptor, add a WEB-INF/jboss-deployment-structure.xml in your archive with content:
+
+Using jboss-deployment-structure.xml:: add a resource named +jboss-deployment-structure.xml+ in your top
+level deployment, in META-INF (or WEB-INF for web deployments).
 
 ====
 [source, XML]
-----
+[subs="verbatim,attributes"]
 <jboss-deployment-structure>
-      <deployment>
-          <dependencies>
-              <module name="org.hibernate.search.orm" services="export" />
-          </dependencies>
-      </deployment>
-  </jboss-deployment-structure>
-
-----
+    <deployment>
+        <dependencies>
+            <module name="org.hibernate.search.orm" services="export" />
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>
 ====
 
-More information about the descriptor can be found in the
-link:$$https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+AS7$$[Class Loading in WildFly
-8].
+==== Update and activate latest Hibernate Search version in WildFly
 
+This is often the best approach as you will benefit from all the latest improvements of
+Hibernate Search. Because of the modular design in WildFly, these additional modules can
+coexist with the embedded modules and won't affect any other application, unless you
+explicitly reconfigure it to use the newer module.
+
+You can download the latest pre-packaged Hibernate Search modules from
+http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist.zip/download[Sourceforge].
+As a convenience these zip files are also distributed as Maven artifacts:
+link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~$$[org.hibernate:hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist:zip].
+
+Unpack the modules in your WildFly +modules+ directory: this will create modules for Hibernate Search and Apache Lucene.
+The Hibernate Search modules are:
+
+* _org.hibernate.search.orm_, for users of Hibernate Search with Hibernate; this will transitively include Hibernate ORM.
+* _org.hibernate.search.engine_, for projects depending on the internal indexing engine that don't require other dependencies to Hibernate.
+* _org.hibernate.search.backend-jms_, in case you want to use the JMS backend described in <<search-architecture-jms, JMS Architecture>>.
+
+
+Using the manifest:: Add the following entry to the +MANIFEST.MF+ in your archive:
+
+====
+[source]
+[subs="verbatim,attributes"]
+Dependencies: org.hibernate.search.orm:{hibernateSearchVersion} services
+====
+
+
+Using jboss-deployment-structure.xml:: add a resource named +jboss-deployment-structure.xml+ in your top
+level deployment, in META-INF (or WEB-INF for web deployments).
+
+====
+[source, XML]
+[subs="verbatim,attributes"]
+<jboss-deployment-structure>
+    <deployment>
+        <dependencies>
+            <module name="org.hibernate.search.orm" slot="{hibernateSearchVersion}" services="export" />
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>
+====
 
 [TIP]
 ====
-Modular classloading is a feature of JBoss EAP as well, but if you are using JBoss EAP, you're
+Modular classloading is a feature of JBoss EAP 6 as well, but if you are using JBoss EAP, you're
 reading the wrong version of the user guide! JBoss EAP subscriptions include official support for
 Hibernate Search (as part of the WFK) and come with a different edition of this guide specifically
 tailored for EAP users.
 ====
+
+
+More information about the modules configuration in WildFly can be found in the
+link:$$https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+WildFly$$[Class Loading in WildFly 8] wiki.
 

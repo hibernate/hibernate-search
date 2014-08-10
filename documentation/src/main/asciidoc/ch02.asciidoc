@@ -91,6 +91,7 @@ requirement in some applications).
 An alternative back end viable for non-clustered and non-shared index configurations is the near-
 real-time backend.
 
+[[search-architecture-jms]]
 ==== JMS
 
 All index update operations applied on a given node are sent to a JMS queue. A unique reader will
