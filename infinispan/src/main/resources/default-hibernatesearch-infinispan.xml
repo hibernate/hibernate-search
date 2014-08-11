@@ -18,7 +18,7 @@
             property is defined. See the JGroupsTransport javadocs for more flags.
             jgroups-udp.xml is the default stack bundled in the Infinispan core jar: integration
             and tuning are tested by Infinispan. -->
-      <stack-file name="default-jgroups-udp" path="jgroups-udp.xml" />
+      <stack-file name="default-jgroups-udp" path="default-configs/default-jgroups-udp.xml" />
     </jgroups>
 
     <cache-container name="HibernateSearch" default-cache="default" statistics="false" shutdown-hook="DONT_REGISTER">
