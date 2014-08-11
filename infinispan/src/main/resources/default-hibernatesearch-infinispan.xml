@@ -33,7 +33,7 @@
          <!-- *************************************** -->
          <!--  Cache to store Lucene's file metadata  -->
          <!-- *************************************** -->
-         <replicated-cache name="LuceneIndexesMetadata" mode="SYNC" remote-timeout="25000" batching="false" >
+         <replicated-cache name="LuceneIndexesMetadata" mode="SYNC" remote-timeout="25000">
             <transaction mode="NONE"/>
             <state-transfer enabled="true" timeout="480000" await-initial-transfer="true" />
             <indexing index="NONE" />
@@ -45,7 +45,7 @@
          <!-- **************************** -->
          <!--  Cache to store Lucene data  -->
          <!-- **************************** -->
-         <distributed-cache name="LuceneIndexesData" mode="SYNC" remote-timeout="25000" batching="false">
+         <distributed-cache name="LuceneIndexesData" mode="SYNC" remote-timeout="25000">
             <transaction mode="NONE"/>
             <state-transfer enabled="true" timeout="480000" await-initial-transfer="true" />
             <indexing index="NONE" />
@@ -57,7 +57,7 @@
          <!-- ***************************** -->
          <!--  Cache to store Lucene locks  -->
          <!-- ***************************** -->
-        <replicated-cache name="LuceneIndexesLocking" mode="SYNC" remote-timeout="25000" batching="false">
+        <replicated-cache name="LuceneIndexesLocking" mode="SYNC" remote-timeout="25000">
             <transaction mode="NONE"/>
             <state-transfer enabled="true" timeout="480000" await-initial-transfer="true" />
             <indexing index="NONE" />

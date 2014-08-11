@@ -20,7 +20,7 @@
          <!-- *************************************** -->
          <!--  Cache to store Lucene's file metadata  -->
          <!-- *************************************** -->
-         <local-cache name="LuceneIndexesMetadata" batching="false" >
+         <local-cache name="LuceneIndexesMetadata">
             <transaction mode="NONE"/>
             <indexing index="NONE" />
             <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
@@ -34,7 +34,7 @@
          <!-- **************************** -->
          <!--  Cache to store Lucene data  -->
          <!-- **************************** -->
-         <local-cache name="LuceneIndexesData" batching="false">
+         <local-cache name="LuceneIndexesData">
             <transaction mode="NONE"/>
             <indexing index="NONE" />
             <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
@@ -48,7 +48,7 @@
          <!-- ***************************** -->
          <!--  Cache to store Lucene locks  -->
          <!-- ***************************** -->
-        <local-cache name="LuceneIndexesLocking" batching="false">
+        <local-cache name="LuceneIndexesLocking">
             <transaction mode="NONE"/>
             <indexing index="NONE" />
             <locking striping="false" acquire-timeout="10000" concurrency-level="500" write-skew="false" />
