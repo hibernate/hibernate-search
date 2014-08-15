@@ -33,6 +33,9 @@ public class JavaSerializationDeserializer implements Deserializer {
 				PurgeAll safeOperation = (PurgeAll) operation;
 				hydrator.addPurgeAllLuceneWork( safeOperation.getClass().getName() );
 			}
+			else if ( operation instanceof Flush ) {
+				hydrator.addFlush();
+			}
 			else if ( operation instanceof Delete ) {
 				Delete safeOperation = (Delete) operation;
 				hydrator.addId( safeOperation.getId() );

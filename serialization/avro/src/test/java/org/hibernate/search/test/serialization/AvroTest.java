@@ -66,6 +66,7 @@ public class AvroTest {
 		parseSchema( root + "operation/Id.avro", "operation/Id" );
 		parseSchema( root + "operation/OptimizeAll.avro", "operation/OptimizeAll" );
 		parseSchema( root + "operation/PurgeAll.avro", "operation/PurgeAll" );
+		parseSchema( root + "operation/Flush.avro", "operation/Flush" );
 		parseSchema( root + "operation/Delete.avro", "operation/Delete" );
 		parseSchema( root + "operation/Add.avro", "operation/Add" );
 		parseSchema( root + "operation/Update.avro", "operation/Update" );
@@ -91,6 +92,7 @@ public class AvroTest {
 		final Schema idSchema = protocol.getType( "Id" );
 		final Schema optimizeAllSchema = protocol.getType( "OptimizeAll" );
 		final Schema purgeAllSchema = protocol.getType( "PurgeAll" );
+		final Schema flushSchema = protocol.getType( "Flush" );
 		final Schema deleteSchema = protocol.getType( "Delete" );
 		final Schema addSchema = protocol.getType( "Add" );
 		final Schema updateSchema = protocol.getType( "Update" );
@@ -188,9 +190,12 @@ public class AvroTest {
 		purgeAll.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		GenericRecord optimizeAll = new GenericData.Record( optimizeAllSchema );
 
+		GenericRecord flush = new GenericData.Record( flushSchema );
+
 		List<GenericRecord> operations = new ArrayList<GenericRecord>( 1 );
 		operations.add( purgeAll );
 		operations.add( optimizeAll );
+		operations.add( flush );
 		operations.add( delete );
 		operations.add( add );
 
@@ -214,19 +219,24 @@ public class AvroTest {
 				//operations
 				assertThat( result.get( "operations" ) ).isNotNull().isInstanceOf( List.class );
 				List<?> ops = (List<?>) result.get( "operations" );
-				assertThat( ops ).hasSize( 4 );
+				assertThat( ops ).hasSize( 5 );
+
+				//Flush
+				assertThat( ops.get( 2 ) ).isInstanceOf( GenericRecord.class );
+				GenericRecord flushOp = (GenericRecord) ops.get( 2 );
+				assertThat( flushOp.getSchema().getName() ).isEqualTo( "Flush" );
 
 				//Delete
-				assertThat( ops.get( 2 ) ).isInstanceOf( GenericRecord.class );
-				GenericRecord deleteOp = (GenericRecord) ops.get( 2 );
+				assertThat( ops.get( 3 ) ).isInstanceOf( GenericRecord.class );
+				GenericRecord deleteOp = (GenericRecord) ops.get( 3 );
 				assertThat( deleteOp.getSchema().getName() ).isEqualTo( "Delete" );
 				Object actual = ( (GenericRecord) deleteOp.get( "id" ) ).get( "value" );
 				assertThat( actual ).isInstanceOf( Long.class );
 				assertThat( actual ).isEqualTo( Long.valueOf( 30 ) );
 
 				//Add
-				assertThat( ops.get( 3 ) ).isInstanceOf( GenericRecord.class );
-				GenericRecord addOp = (GenericRecord) ops.get( 3 );
+				assertThat( ops.get( 4 ) ).isInstanceOf( GenericRecord.class );
+				GenericRecord addOp = (GenericRecord) ops.get( 4 );
 				assertThat( addOp.getSchema().getName() ).isEqualTo( "Add" );
 				actual = ( (GenericRecord) addOp.get( "id" ) ).get( "value" );
 				assertThat( actual ).isInstanceOf( ByteBuffer.class );

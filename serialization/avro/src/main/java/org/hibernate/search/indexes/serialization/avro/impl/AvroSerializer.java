@@ -72,6 +72,11 @@ public class AvroSerializer implements Serializer {
 	}
 
 	@Override
+	public void addFlush() {
+		operations.add( new GenericData.Record( protocol.getType( "Flush" ) ) );
+	}
+
+	@Override
 	public void addPurgeAll(String entityClassName) {
 		int classRef = getClassReference( entityClassName );
 		GenericRecord purgeAll = new GenericData.Record( protocol.getType( "PurgeAll" ) );
