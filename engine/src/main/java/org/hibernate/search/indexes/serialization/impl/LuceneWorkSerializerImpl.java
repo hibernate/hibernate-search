@@ -18,6 +18,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
@@ -72,6 +73,9 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 				}
 				else if (work instanceof PurgeAllLuceneWork) {
 					serializer.addPurgeAll( work.getEntityClass().getName() );
+				}
+				else if (work instanceof FlushLuceneWork) {
+					serializer.addFlush();
 				}
 				else if (work instanceof DeleteLuceneWork) {
 					processId( work, serializer );

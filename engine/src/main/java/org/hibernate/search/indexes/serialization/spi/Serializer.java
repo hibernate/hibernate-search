@@ -26,6 +26,8 @@ public interface Serializer {
 
 	void addOptimizeAll();
 
+	void addFlush();
+
 	void addPurgeAll(String entityClassName);
 
 	void addIdSerializedInJava(byte[] id);

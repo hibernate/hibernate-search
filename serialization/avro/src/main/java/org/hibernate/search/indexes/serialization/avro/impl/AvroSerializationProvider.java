@@ -95,6 +95,7 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 		parseSchema( "Document" );
 		parseSchema( "operation/Id" );
 		parseSchema( "operation/OptimizeAll" );
+		parseSchema( "operation/Flush" );
 		parseSchema( "operation/PurgeAll" );
 		parseSchema( "operation/Delete" );
 		parseSchema( "operation/Add" );
