@@ -90,6 +90,9 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "PurgeAll".equals( schema ) ) {
 				hydrator.addPurgeAllLuceneWork( asClass( operation, "class" ) );
 			}
+			else if ( "Flush".equals( schema ) ) {
+				hydrator.addFlush();
+			}
 			else if ( "Delete".equals( schema ) ) {
 				processId( operation, hydrator );
 				hydrator.addDeleteLuceneWork(

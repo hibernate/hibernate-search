@@ -33,6 +33,7 @@
 
         `operation/OptimizeAll`,
         `operation/PurgeAll`,
+        `operation/Flush`,
         `operation/Delete`,
         `operation/Add`,
         `operation/Update`,

@@ -34,6 +34,7 @@ import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -82,6 +83,11 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	@Override
 	public void addOptimizeAll() {
 		results.add( OptimizeLuceneWork.INSTANCE );
+	}
+
+	@Override
+	public void addFlush() {
+		results.add( FlushLuceneWork.INSTANCE );
 	}
 
 	@Override

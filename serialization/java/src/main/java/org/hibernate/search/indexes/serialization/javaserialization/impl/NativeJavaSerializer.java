@@ -39,6 +39,11 @@ public class NativeJavaSerializer implements Serializer {
 	}
 
 	@Override
+	public void addFlush() {
+		ops.add( new Flush() );
+	}
+
+	@Override
 	public void addPurgeAll(String entityClassName) {
 		ops.add( new PurgeAll( entityClassName ) );
 	}
