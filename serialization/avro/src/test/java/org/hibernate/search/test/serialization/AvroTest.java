@@ -41,7 +41,7 @@ public class AvroTest {
 
 	@Test
 	public void experimentWithAvro() throws Exception {
-		String root = "org/hibernate/search/remote/codex/avro/v1_0/";
+		String root = "org/hibernate/search/remote/codex/avro/v1_1/";
 		parseSchema( root + "attribute/TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
 		parseSchema( root + "attribute/CharTermAttribute.avro", "attribute/CharTermAttribute" );
 		parseSchema( root + "attribute/PayloadAttribute.avro", "attribute/PayloadAttribute" );

@@ -52,7 +52,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class AvroSerializationProvider implements SerializationProvider, Startable {
 
 	private static final Log log = LoggerFactory.make( Log.class );
-	private static String V1_PATH = "org/hibernate/search/remote/codex/avro/v1_0/";
+	private static String V1_1_PATH = "org/hibernate/search/remote/codex/avro/v1_1/";
 	private static final String AVRO_SCHEMA_FILE_SUFFIX = ".avro";
 	private static final String AVRO_PROTOCOL_FILE_SUFFIX = ".avpr";
 
@@ -60,7 +60,7 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 	private final Protocol protocol;
 
 	public static byte MAJOR_VERSION = (byte) ( -128 + 1 );
-	public static byte MINOR_VERSION = (byte) ( -128 + 0 );
+	public static byte MINOR_VERSION = (byte) ( -128 + 1 );
 
 	public static int getMajorVersion() {
 		return MAJOR_VERSION + 128; //rebase to 0
@@ -119,13 +119,13 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 	}
 
 	private void parseSchema(String filename) {
-		String fullFileName = V1_PATH + filename + AVRO_SCHEMA_FILE_SUFFIX;
+		String fullFileName = V1_1_PATH + filename + AVRO_SCHEMA_FILE_SUFFIX;
 		String schema = avroResourceAsString( fullFileName );
 		schemas.put( filename, schema );
 	}
 
 	public Protocol parseProtocol(String name) {
-		String fullFileName = V1_PATH + name + AVRO_PROTOCOL_FILE_SUFFIX;
+		String fullFileName = V1_1_PATH + name + AVRO_PROTOCOL_FILE_SUFFIX;
 		String protocolSkeleton = avroResourceAsString( fullFileName );
 		String protocol = inlineSchemas( protocolSkeleton );
 		return Protocol.parse( protocol );
