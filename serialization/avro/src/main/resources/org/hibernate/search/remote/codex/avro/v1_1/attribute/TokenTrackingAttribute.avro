@@ -1,0 +1,10 @@
+{
+    "name": "TokenTrackingAttribute",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "positions",
+            "type": { "type": "array", "items": "int" }
+        }
+    ]
+}

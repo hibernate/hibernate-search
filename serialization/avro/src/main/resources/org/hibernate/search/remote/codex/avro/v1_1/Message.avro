@@ -1,0 +1,20 @@
+{
+    "name": "Message",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "classReferences",
+            "type": {
+                "type": "array",
+                "items": "string"
+            }
+        },
+        {
+            "name": "operations",
+            "type": {
+                "type": "array",
+                "items": ["OptimizeAll", "PurgeAll", "Delete", "Add", "Update"]
+            }
+        }
+    ]
+}
