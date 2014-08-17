@@ -1,0 +1,10 @@
+{
+    "name": "PurgeAll",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "class",
+            "type": "int"
+        }
+    ]
+}

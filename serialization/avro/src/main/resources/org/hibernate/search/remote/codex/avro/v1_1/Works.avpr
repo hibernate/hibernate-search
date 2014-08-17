@@ -1,0 +1,42 @@
+{
+    "protocol": "Works",
+    "doc": "Hibernate Search exchange protocol for List of LuceneWork",
+    "types": [
+        `attribute/TokenTrackingAttribute`,
+        `attribute/CharTermAttribute`,
+        `attribute/PayloadAttribute`,
+        `attribute/KeywordAttribute`,
+        `attribute/PositionIncrementAttribute`,
+        `attribute/FlagsAttribute`,
+        `attribute/TypeAttribute`,
+        `attribute/OffsetAttribute`,
+
+        `field/Index`,
+        `field/Store`,
+        `field/TermVector`,
+
+        `field/BinaryField`,
+        `field/ReaderField`,
+        `field/StringField`,
+        `field/TokenStreamField`,
+
+        `field/NumericIntField`,
+        `field/NumericLongField`,
+        `field/NumericFloatField`,
+        `field/NumericDoubleField`,
+
+        `field/CustomFieldable`,
+
+        `Document`,
+
+        `operation/Id`,
+
+        `operation/OptimizeAll`,
+        `operation/PurgeAll`,
+        `operation/Delete`,
+        `operation/Add`,
+        `operation/Update`,
+
+        `Message`
+    ]
+}

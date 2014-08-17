@@ -1,0 +1,17 @@
+{
+    "name": "Id",
+    "type": "record", //this is a record as it's the only type that can be named in Avro
+    "fields": [
+        {
+            "name": "value",
+            "type": [
+                "bytes", //serialized form
+                "string",
+                "int",
+                "long",
+                "float",
+                "double"
+            ]
+        }
+    ]
+}

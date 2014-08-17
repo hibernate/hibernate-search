@@ -1,0 +1,38 @@
+{
+    "name": "StringField",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "value",
+            "type": "string"
+        },
+        {
+            "name": "store",
+            "type": "Store"
+        },
+        {
+            "name": "index",
+            "type": "Index"
+        },
+        {
+            "name": "termVector",
+            "type": "TermVector"
+        },
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "boost",
+            "type": "float"
+        },
+        {
+            "name": "omitNorms",
+            "type": "boolean"
+        },
+        {
+            "name": "omitTermFreqAndPositions",
+            "type": "boolean"
+        }
+    ]
+}
