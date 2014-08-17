@@ -37,37 +37,19 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 public class AvroDeserializer implements Deserializer {
 
 	private static final Log log = LoggerFactory.make();
-	private final Protocol protocol;
+	private final KnownProtocols protocols;
 	private List<Utf8> classReferences;
 
-	public AvroDeserializer(Protocol protocol) {
-		this.protocol = protocol;
+	public AvroDeserializer(KnownProtocols protocols) {
+		this.protocols = protocols;
 	}
 
 	@Override
 	public void deserialize(byte[] data, LuceneWorksBuilder hydrator) {
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-		int majorVersion = inputStream.read();
-		int minorVersion = inputStream.read();
-		if ( AvroSerializationProvider.getMajorVersion() != majorVersion ) {
-			throw log.incompatibleProtocolVersion(
-					majorVersion,
-					minorVersion,
-					AvroSerializationProvider.getMajorVersion(),
-					AvroSerializationProvider.getMinorVersion()
-			);
-		}
-		if ( AvroSerializationProvider.getMinorVersion() < minorVersion ) {
-			//TODO what to do about it? Log each time? Once?
-			if ( log.isTraceEnabled() ) {
-				log.tracef( "Parsing message from a future protocol version. Some feature might not be propagated. Message version: "
-								+ majorVersion + "." + minorVersion
-								+ ". Current protocol version: "
-								+ AvroSerializationProvider.getMajorVersion()
-								+ "." + AvroSerializationProvider.getMinorVersion()
-				);
-			}
-		}
+		final ByteArrayInputStream inputStream = new ByteArrayInputStream( data );
+		final int majorVersion = inputStream.read();
+		final int minorVersion = inputStream.read();
+		final Protocol protocol = protocols.getProtocol( majorVersion, minorVersion );
 
 		Decoder decoder = DecoderFactory.get().binaryDecoder( inputStream, null );
 		GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>( protocol.getType( "Message" ) );
