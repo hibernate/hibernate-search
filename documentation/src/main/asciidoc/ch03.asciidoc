@@ -457,13 +457,13 @@ shown in <<table-worker-configuration>>.
 
 |===============
 |*Property*|*Description*
-|hibernate.search.worker.scope|The fully qualified class name of the
+|hibernate.search.default.worker.scope|The fully qualified class name of the
             Worker implementation to use. If this
             property is not set, empty or +transaction+ the
             default TransactionalWorker is
             used.
-|hibernate.search.worker.*|All configuration properties prefixed with
-            +hibernate.search.worker+ are passed to the
+|hibernate.search.default.worker.*|All configuration properties prefixed with
+            +hibernate.search.default.worker+ are passed to the
             Worker during initialization. This allows adding custom, worker
             specific parameters.
 
@@ -504,7 +504,7 @@ The following options can be different on each index; in fact they need the inde
 So far all work is done within the same Virtual Machine (VM), no matter which execution mode. The
 total amount of work has not changed for the single VM. Luckily there is a better approach, namely
 delegation. It is possible to send the indexing work to a different server by configuring
-hibernate.search.worker.backend - see <<table-backend-configuration>>. Again this option can be
+hibernate.search.default.worker.backend - see <<table-backend-configuration>>. Again this option can be
 configured differently for each index.
 
 [[table-backend-configuration]]
@@ -694,7 +694,7 @@ but rather to use it as an implementation example.
 
 This section describes how to configure the JGroups Master/Slave back end. The master and slave
 roles are similar to what is illustrated in <<jms-backend>>, only a different backend
-(hibernate.search.worker.backend) needs to be set.
+(hibernate.search.default.worker.backend) needs to be set.
 
 A specific backend can be configured to act either as a slave using +jgroupsSlave+, as a master
 using +jgroupsMaster+, or can automatically switch between the roles as needed by using +jgroups+.
