@@ -1,0 +1,10 @@
+{
+    "name": "PayloadAttribute",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "payload",
+            "type": "bytes"
+        }
+    ]
+}

@@ -19,6 +19,8 @@ import org.hibernate.search.bridge.spi.ConversionContext;
 public interface LuceneWorksBuilder {
 	void addOptimizeAll();
 
+	void addFlush();
+
 	void addPurgeAllLuceneWork(String entityClassName);
 
 	void addIdAsJavaSerialized(byte[] idAsByte);

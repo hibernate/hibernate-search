@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.indexes.serialization.avro.logging.impl;
 
+import static org.jboss.logging.Logger.Level.WARN;
+
 import org.hibernate.search.exception.SearchException;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
@@ -20,4 +23,10 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 
 	@Message(id = AVRO_SERIALIZATION_MESSAGES_START_ID + 1, value = "Unable to find Avro schema '%s'")
 	SearchException unableToLoadAvroSchema(String avroSchemaFile);
+
+	@LogMessage(level = WARN)
+	@Message(id = AVRO_SERIALIZATION_MESSAGES_START_ID + 2, value = "Parsing message from a future protocol version."
+			+ " Some feature might not be propagated. Message version: %1$d.%2$d. Current protocol version: %1$d.%3$d")
+	void unexpectedMinorProtocolVersion(int majorVersion, int minorVersion, int latestKnownMinor);
+
 }
