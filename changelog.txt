@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Alpha6 (18-08-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1637] - Non-Threadsafe usage of SerializationService implementations
+    * [HSEARCH-1650] - LuceneWorkSerializerImpl ignores FlushLuceneWork
+    * [HSEARCH-1651] - Backend configuration property name is documented incorrectly
+
+** Task
+    * [HSEARCH-1638] - Some tests leak resources, do some cleanup and review
+    * [HSEARCH-1644] - Improve the quickstart and WildFly modules section of the documentation
+    * [HSEARCH-1646] - Remove dependency on AssertionFailure from HCANN
+    * [HSEARCH-1648] - Upgrade to Infinispan 7.0.0.Beta1
+    * [HSEARCH-1652] - Introduce tests for backwards serialization compatibility for Avro
+    * [HSEARCH-1653] - Revision Avro based serialization Protocol to v1.1 to allow for protocol changes
+
+
 Version 5.0.0.Alpha5 (23-07-2014)
 ------------------------
 
