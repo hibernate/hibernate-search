@@ -674,7 +674,7 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
     matter which execution mode. The total amount of work has not changed for
     the single VM. Luckily there is a better approach, namely delegation. It
     is possible to send the indexing work to a different server by configuring
-    hibernate.search.worker.backend - see <xref
+    hibernate.search.default.worker.backend - see <xref
     linkend="table-backend-configuration"/>. Again this option can be
     configured differently for each index.</para>
 
@@ -926,7 +926,7 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController
       <para>This section describes how to configure the JGroups Master/Slave
       back end. The master and slave roles are similar to what is illustrated
       in <xref linkend="jms-backend"/>, only a different backend
-      (<constant>hibernate.search.worker.backend</constant>) needs to be
+      (<constant>hibernate.search.default.worker.backend</constant>) needs to be
       set.</para>
 
       <para>A specific backend can be configured to act either as a slave
