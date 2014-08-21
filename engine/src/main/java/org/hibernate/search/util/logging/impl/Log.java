@@ -411,8 +411,8 @@ public interface Log extends BasicLogger {
 	void optimizationSkippedStillBusy(String indexName);
 
 	@LogMessage(level = Level.WARN)
-	@Message(id = 120, value = "There are multiple properties indexed against the same field name '%1$s', but with different indexing settings. The behaviour is undefined.")
-	void inconsistentFieldConfiguration(String fieldName);
+	@Message(id = 120, value = "There are multiple properties indexed against the same field name '%1$s.%2$s', but with different indexing settings. The behaviour is undefined.")
+	void inconsistentFieldConfiguration(String className, String fieldName);
 
 	@LogMessage(level = TRACE)
 	@Message(id = 125, value = "Interceptor enforces skip index operation %2$s on instance of class %1$s")

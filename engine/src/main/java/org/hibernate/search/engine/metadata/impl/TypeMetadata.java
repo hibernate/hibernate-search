@@ -352,7 +352,9 @@ public class TypeMetadata {
 				);
 				if ( oldFieldMetadata != null ) {
 					if ( !documentFieldMetadata.getIndex().equals( oldFieldMetadata.getIndex() ) ) {
-						log.inconsistentFieldConfiguration( documentFieldMetadata.getName() );
+						log.inconsistentFieldConfiguration(
+								propertyMetadata.getPropertyAccessor().getDeclaringClass().getName(),
+								documentFieldMetadata.getName() );
 					}
 				}
 			}
