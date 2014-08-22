@@ -666,4 +666,8 @@ public interface Log extends BasicLogger {
 			+ "If you experience errors on this index you might need to remove the lock, or rebuild the index." )
 	void lockingFailureDuringInitialization(String directoryDescription);
 
+	@LogMessage(level = TRACE)
+	@Message(id = 226, value = "%s: %s" )
+	void logInfoStreamMessage(String componentName, String message);
+
 }
