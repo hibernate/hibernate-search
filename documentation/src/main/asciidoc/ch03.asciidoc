@@ -1097,6 +1097,11 @@ parallelism. If you have many cores and contention on the internal structures of
 becomes a bottleneck you should configure an higher value, at the cost of slightly higher memory
 consumption.
 |8
+
+|hibernate.search.​[default\|<indexname>].​indexwriter.infostream
+|Enable low level trace information about Lucene's internal components.
+Causes performance degradation, should only be used for troubleshooting purposes
+|false
 |===============
 
 
