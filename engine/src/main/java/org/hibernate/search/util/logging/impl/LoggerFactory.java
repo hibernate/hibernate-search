@@ -30,4 +30,9 @@ public final class LoggerFactory {
 		StackTraceElement directCaller = t.getStackTrace()[1];
 		return Logger.getMessageLogger( logClass, directCaller.getClassName() );
 	}
+
+	public static Log make(String categoryName) {
+		return Logger.getMessageLogger( Log.class, categoryName );
+	}
+
 }

@@ -64,7 +64,7 @@ public class LoggerInfoStreamTest {
 		indexWriter.commit();
 		indexWriter.close();
 
-		List<LoggingEvent> loggingEvents = testAppender.searchByLoggerAndMessage( LoggerInfoStream.class.getName(), "IW:" );
+		List<LoggingEvent> loggingEvents = testAppender.searchByLoggerAndMessage( LoggerInfoStream.INFOSTREAM_LOGGER_CATEGORY, "IW:" );
 
 		assertFalse( loggingEvents.isEmpty() );
 	}

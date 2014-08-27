@@ -16,7 +16,9 @@ import java.io.IOException;
  */
 public class LoggerInfoStream extends InfoStream {
 
-	private final Log logger = LoggerFactory.make();
+	public static final String INFOSTREAM_LOGGER_CATEGORY = "org.hibernate.search.backend.lucene.infostream";
+
+	private final Log logger = LoggerFactory.make( INFOSTREAM_LOGGER_CATEGORY );
 
 	@Override
 	public void message(String component, String message) {
@@ -25,7 +27,7 @@ public class LoggerInfoStream extends InfoStream {
 
 	@Override
 	public boolean isEnabled(String component) {
-		return true;
+		return logger.isTraceEnabled();
 	}
 
 	@Override
