@@ -1100,7 +1100,7 @@ consumption.
 
 |hibernate.search.​[default\|<indexname>].​indexwriter.infostream
 |Enable low level trace information about Lucene's internal components.
-Causes performance degradation, should only be used for troubleshooting purposes
+Will cause significant performance degradation: should only be used for troubleshooting purposes.
 |false
 |===============
 
@@ -1169,6 +1169,19 @@ the +$$chunk_size$$+ so that you avoid fragmenting segments in the grid. Note th
 +$$chunk_size$$+ of the Infinispan Directory is expressed in bytes, while the index tuning options
 are in MB.
 ====
+
+
+[[lucene-infostream]]
+===== Troubleshooting: enable Lucene's Infostream
+
+Apache Lucene allows to log a very detailed trace log from its internals using a feature called "infostream".
+To access these details, Hibernate Search can be configured to capture this internal trace from Apache Lucene and redirect it to your logger.
+
+* Enable +TRACE+ level logging for the category +org.hibernate.search.backend.lucene.infostream+
+* Activate the feature on the index you want to inspect: +hibernate.search.​[default|<indexname>].​indexwriter.infostream=true+
+
+Keep in mind that this feature has a performance cost, and although most logger frameworks allow the +TRACE+ level to be reconfigured at runtime,
+enabling the +infostream+ property will slow you down even if the logger is disabled.
 
 
 [[search-configuration-directory-lockfactories]]
