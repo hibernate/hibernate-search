@@ -46,7 +46,7 @@
         <enforcer.skip>true</enforcer.skip>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.jboss.as>7.2.0.Alpha1-redhat-4</version.jboss.as>
+        <version.jboss.as>7.4.0.Final-redhat-4</version.jboss.as>
         <version.arquillian>1.0.3.Final</version.arquillian>
         <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
     </properties>
@@ -206,10 +206,10 @@
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-search-modules</artifactId>
                                     <version>${project.version}</version>
-                                    <classifier>jbossas-72-dist</classifier>
+                                    <classifier>jbossas-74-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/jboss-eap-6.1/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/jboss-eap-6.3/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -228,7 +228,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/jboss-eap-6.1</outputDirectory>
+                            <outputDirectory>${basedir}/target/jboss-eap-6.3</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>

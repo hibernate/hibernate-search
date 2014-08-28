@@ -1827,7 +1827,7 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
   <section id="search-configuration-deploy-on-AS7">
     <title>Hibernate Search as JBoss AS module</title>
 
-    <para>Provided you're deploying on JBoss AS 7.2.x or JBoss EAP 6.1, there
+    <para>Provided you're deploying on JBoss AS 7.x or JBoss EAP 6.x, there
     is an additional way to add the search dependencies to your
     application.</para>
 
@@ -1846,12 +1846,12 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
     <itemizedlist>
       <listitem>
         <para><ulink
-        url="https://downloads.sourceforge.net/project/hibernate/hibernate-search/&version;/hibernate-search-modules-&version;-jbossas-72-dist.zip">Sourceforge</ulink></para>
+        url="https://downloads.sourceforge.net/project/hibernate/hibernate-search/&version;/hibernate-search-modules-&version;-jbossas-74-dist.zip">Sourceforge</ulink></para>
       </listitem>
 
       <listitem>
         <para>Maven: <ulink
-        url="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~">org.hibernate:hibernate-search-modules-&version;-jbossas-72-dist:zip</ulink></para>
+        url="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~">org.hibernate:hibernate-search-modules-&version;-jbossas-74-dist:zip</ulink></para>
       </listitem>
     </itemizedlist>
 
