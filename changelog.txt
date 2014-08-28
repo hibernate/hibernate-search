@@ -1,6 +1,17 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.4.Final (28-08-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1623] - Concurrency problem with WeakIdentityHashMap in FullTextIndexEventListener
+    * [HSEARCH-1651] - Backend configuration property name is documented incorrectly
+
+** Task
+    * [HSEARCH-1659] - Upgrade 4.4 branch to run integration tests with JBoss EAP 6.3
+
+
 Version 4.4.3.Final (10-04-2014)
 ------------------------
 
