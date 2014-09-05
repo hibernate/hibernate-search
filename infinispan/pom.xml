@@ -157,7 +157,7 @@
                             org.infinispan.lucene.*;version="[${infinispanVersion},7.1.0)"
                         </Import-Package>
                         <Export-Package>
-                            org.hibernate.search.infinispan;version="${project.version}"
+                            org.hibernate.search.infinispan.*;version="${project.version}"
                         </Export-Package>
                     </instructions>
                 </configuration>
