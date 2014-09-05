@@ -32,7 +32,8 @@ public class IndexWriterTuningAppliedTest {
 	@Rule
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Dvd.class, Book.class )
 		.withProperty( "hibernate.search.default.indexwriter.max_thread_states", "23" )
-		.withProperty( "hibernate.search.index2.indexwriter.max_thread_states", "7" );
+		.withProperty( "hibernate.search.index2.indexwriter.max_thread_states", "7" )
+		.withProperty( "hibernate.search.index2.indexwriter.infostream", "true" );
 
 	@Test
 	public void testIndexWriterTuningApplied() throws IOException {
@@ -42,6 +43,22 @@ public class IndexWriterTuningAppliedTest {
 			Assert.assertEquals( 23, dvdsIndexWriter.getConfig().getMaxThreadStates() );
 		}
 		finally {
+			dvdsIndexWriter.close( false );
+		}
+	}
+
+	@Test
+	public void testInfoStream() throws IOException {
+		AbstractWorkspaceImpl dvdsWorkspace = sfHolder.extractWorkspace( Dvd.class );
+		AbstractWorkspaceImpl booksWorkspace = sfHolder.extractWorkspace( Book.class );
+		IndexWriter dvdsIndexWriter = dvdsWorkspace.getIndexWriter();
+		IndexWriter booksIndexWriter = booksWorkspace.getIndexWriter();
+		try {
+			Assert.assertFalse( dvdsIndexWriter.getConfig().getInfoStream().isEnabled( "IW" ) );
+			Assert.assertTrue( booksIndexWriter.getConfig().getInfoStream().isEnabled( "IW" ) );
+		}
+		finally {
+			booksIndexWriter.close( false );
 			dvdsIndexWriter.close( false );
 		}
 	}

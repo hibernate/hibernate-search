@@ -11,6 +11,7 @@ import java.io.Serializable;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
+import org.hibernate.search.util.logging.impl.LoggerInfoStream;
 
 /**
  * Represents possible options to be applied to an
@@ -122,6 +123,22 @@ public enum IndexWriterSetting implements Serializable {
 		@Override
 		public void applySetting(IndexWriterConfig writerConfig, int value) {
 			writerConfig.setMaxThreadStates( value );
+		}
+	},
+	/**
+	 * @see org.apache.lucene.index.IndexWriterConfig#setInfoStream(org.apache.lucene.util.InfoStream)
+	 */
+	INFOSTREAM ( "infostream" ) {
+		@Override
+		public Integer parseVal(String value) {
+			return INFOSTREAM.parseBoolean( value );
+		}
+		@Override
+		public void applySetting(IndexWriterConfig writerConfig, int value) {
+			boolean enableInfoStream = intToBoolean( value );
+			if ( enableInfoStream ) {
+				writerConfig.setInfoStream( new LoggerInfoStream() );
+			}
 		}
 	};
 

@@ -661,4 +661,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 224, value = "Non optional parameter named '%s' was null" )
 	AssertionFailure parametersShouldNotBeNull(String parameterName);
 
+	@LogMessage(level = TRACE)
+	@Message(id = 225, value = "%s: %s" )
+	void logInfoStreamMessage(String componentName, String message);
+
 }
