@@ -764,4 +764,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 195, value = "Configuration property '%s' should not be empty: illegal format.")
 	SearchException configuratioPropertyCantBeEmpty(String key);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 225, value = "An index locking error occurred during initialization of Directory '%s'. This might indicate a concurrent initialization; "
+			+ "If you experience errors on this index you might need to remove the lock, or rebuild the index." )
+	void lockingFailureDuringInitialization(String directoryDescription);
+
 }
