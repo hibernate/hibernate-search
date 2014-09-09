@@ -661,4 +661,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 224, value = "Non optional parameter named '%s' was null" )
 	AssertionFailure parametersShouldNotBeNull(String parameterName);
 
+	@LogMessage(level = Level.WARN)
+	@Message(id = 225, value = "An index locking error happened during initialization for Directory '%s'. This might indicate a concurrent initialization; "
+			+ "If you experience errors on this index you might need to remove the lock, or need to rebuild the index." )
+	void lockingFailureDuringInitialization(String directoryDescription);
+
 }

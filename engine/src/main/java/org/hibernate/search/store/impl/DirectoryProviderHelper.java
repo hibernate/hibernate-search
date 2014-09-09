@@ -20,6 +20,7 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.NativeFSLockFactory;
@@ -137,9 +138,17 @@ public final class DirectoryProviderHelper {
 		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
 		try {
 			if ( ! DirectoryReader.indexExists( directory ) ) {
-				IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE );
-				IndexWriter iw = new IndexWriter( directory, iwriterConfig );
-				iw.close();
+				try {
+					IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE );
+					//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
+					//for distributed indexes (Infinispan but probably also NFS and similar)
+					iwriterConfig.setWriteLockTimeout( 2000 );
+					IndexWriter iw = new IndexWriter( directory, iwriterConfig );
+					iw.close();
+				}
+				catch (LockObtainFailedException lofe) {
+					log.lockingFailureDuringInitialization( directory.toString() );
+				}
 			}
 		}
 		catch (IOException e) {
