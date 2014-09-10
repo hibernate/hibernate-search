@@ -994,6 +994,11 @@
                         </lifecycleMappingMetadata>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>com.buschmais.jqassistant.scm</groupId>
+                    <artifactId>jqassistant-maven-plugin</artifactId>
+                    <version>1.0.0-M3</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -1305,6 +1310,31 @@
                 <jdbc.pass>searctru</jdbc.pass>
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
+        </profile>
+        <profile>
+            <id>jqassistant</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.buschmais.jqassistant.scm</groupId>
+                        <artifactId>jqassistant-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>scan</id>
+                                <goals>
+                                    <goal>scan</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>analyze</id>
+                                <goals>
+                                    <goal>analyze</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
