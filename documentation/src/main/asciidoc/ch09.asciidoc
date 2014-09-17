@@ -15,8 +15,8 @@ The spatial support of Hibernate Search has a few goals:
 For example, you might search for that Italian place named approximately "Il Ciociaro" and is
 somewhere in the 2 km area around your office.
 
-To be able to filter an indexed entity on a distance criteria you need to add the +@Spatial+
-annotation (+org.hibernate.search.annotations.Spatial+) and specify one or more sets of coordinates.
+To be able to filter an indexed entity on a distance criteria you need to add the `@Spatial`
+annotation (`org.hibernate.search.annotations.Spatial`) and specify one or more sets of coordinates.
 
 [[spatial-indexing]]
 === Enable indexing of Spatial Coordinates
@@ -29,12 +29,12 @@ offers a choice between two strategies:
 
 We will now describe both methods so you can make a suitable choice; of course you can pick
 different strategies for each set of coordinates. These strategies are selected by specifying
-+spatialMode+, an attribute of the +@Spatial+ annotation.
+`spatialMode`, an attribute of the `@Spatial` annotation.
 
 [[spatial-indexing-range]]
 ==== Indexing coordinates for Double Range Queries
 
-When setting the +@Spatial.spatialMode+ attribute to +SpatialMode.RANGE+ (which is the default)
+When setting the `@Spatial.spatialMode` attribute to `SpatialMode.RANGE` (which is the default)
 coordinates are indexed as numeric fields, so that range queries can be performed to narrow down the
 initial area of interest.
 
@@ -55,9 +55,9 @@ cross checked with those returned by the longitude range).
 To index your entities for range querying you have to:
 
 
-* add the +@Spatial+ annotation on your entity
-* add the @Latitude and @Longitude annotations on your properties representing the coordinates;
-these must be of type Double
+* add the `@Spatial` annotation on your entity
+* add the `@Latitude` and `@Longitude` annotations on your properties representing the coordinates;
+these must be of type `Double`
 
 .Sample Spatial indexing: Hotel class
 ====
@@ -81,10 +81,10 @@ public class Hotel {
 [[spatial-indexing-spatialHash]]
 ==== Indexing coordinates in a grid with spatial hashes
 
-When setting +@Spatial.spatialMode+ to +SpatialMode.HASH+ the coordinates are encoded in several fields
+When setting `@Spatial.spatialMode` to `SpatialMode.HASH` the coordinates are encoded in several fields
 representing different zoom levels. Each box for each level is labeled so coordinates are assigned
-matching labels for each zoom level. This results in a grid encoding of labels called ++spatial
-hashes++.
+matching labels for each zoom level. This results in a grid encoding of labels called `spatial
+hashes`.
 
 Pros :
 
@@ -97,10 +97,10 @@ Cons :
 
 To index your entities you have to:
 
-* add the +@Spatial+ annotation on the entity with the +SpatialMode+ set to GRID :
+* add the `@Spatial` annotation on the entity with the `SpatialMode` set to GRID :
 @Spatial(spatialMode = SpatialMode.HASH)
-* add the +@Latitude+ and +@Longitude+ annotations on the properties representing your coordinates;
-these must be of type +Double+
+* add the `@Latitude` and `@Longitude` annotations on the properties representing your coordinates;
+these must be of type `Double`
 
 .Indexing coordinates in a grid using spatial hashes
 ====
@@ -125,8 +125,8 @@ public class Hotel {
 
 ==== Implementing the Coordinates interface
 
-Instead of using the +@Latitude+ and +@Longitue+ annotations you can choose to implement the
-+org.hibernate.search.spatial.Coordinates+ interface.
+Instead of using the `@Latitude` and `@Longitue` annotations you can choose to implement the
+`org.hibernate.search.spatial.Coordinates` interface.
 
 .Implementing the Coordinates interface
 ====
@@ -158,11 +158,11 @@ public class Song implements Coordinates {
 ----
 ====
 
-As we will see in the section <<spatial-multiplecoordinates>>, a +@Spatial+ +@Indexed+ +@Entity+ can
-have multiple +@Spatial+ annotations; when having the entity implement Coordinates, the implemented
+As we will see in the section <<spatial-multiplecoordinates>>, a `@Spatial` `@Indexed` `@Entity` can
+have multiple `@Spatial` annotations; when having the entity implement Coordinates, the implemented
 methods refer to the default Spatial name: the default pair of coordinates.
 
-An alternative is to use properties implementing the +Coordinates+ interface; this way you can have
+An alternative is to use properties implementing the `Coordinates` interface; this way you can have
 multiple Spatial instances:
 
 .Using attributes of type Coordinates
@@ -200,7 +200,7 @@ public class Event {
 ----
 ====
 
-When using this form the +@Spatial.name+ automatically defaults to the property name.
+When using this form the `@Spatial.name` automatically defaults to the property name.
 
 [[spatial-queries]]
 === Performing Spatial Queries
@@ -212,10 +212,10 @@ Coordinates interface.
 As with any fulltext queries, also for Spatial queries you:
 
 
-* retrieve a +QueryBuilder+ from the +SearchFactory+ as a starting point
+* retrieve a `QueryBuilder` from the `SearchFactory` as a starting point
 * use the DSL to build a spatial query with your search center and radius
 * optionally combine the resulting Query with other filters
-* call the +createFullTextQuery()+ and use run it as any standard Hibernate or JPA Query
+* call the `createFullTextQuery()` and use run it as any standard Hibernate or JPA Query
 
 [[spatial-example-firstquery]]
 .Search for an Hotel by distance
@@ -239,10 +239,10 @@ List results = hibQuery.list();
 ====
 
 A fully working example can be found in the source code, in the test-suite. See
-+SpatialIndexingTest.testSpatialAnnotationOnClassLevel()+ and in the +Hotel+ class.
+`SpatialIndexingTest.testSpatialAnnotationOnClassLevel()` and in the `Hotel` class.
 
 As an alternative to passing separate values for latitude and longitude values, you can also pass an
-object implementing the +Coordinates+ interface:
+object implementing the `Coordinates` interface:
 
 .DSL example with Coordinates
 ====
@@ -291,8 +291,8 @@ List results = hibQuery.list();
 ----
 ====
 
-* Use +FullTextQuery.setProjection+ with +FullTextQuery.SPATIAL_DISTANCE+ as one of the projected fields.
-* Call +FullTextQuery.setSpatialParameters+ with the latitude, longitude and the name of the
+* Use `FullTextQuery.setProjection` with `FullTextQuery.SPATIAL_DISTANCE` as one of the projected fields.
+* Call `FullTextQuery.setSpatialParameters` with the latitude, longitude and the name of the
 spatial field used to build the spatial query. Note that using coordinates different than the
 center used for the query will have unexpected results.
 
@@ -300,12 +300,12 @@ center used for the query will have unexpected results.
 [NOTE]
 .Distance projection and null values
 ====
-Using distance projection on non +@Spatial+ enabled entities and/or with a non spatial Query will have
+Using distance projection on non `@Spatial` enabled entities and/or with a non spatial Query will have
 unexpected results as entities not spatially indexed and/or having null values for latitude or
 longitude will be considered to be at (0,0)/(lat,0)/(0,long).
 
 Using distance projection with a spatial query on spatially indexed entities having, eventually,
-+null+ values for latitude and/or longitude is safe as they will not be found by the spatial query
+`null` values for latitude and/or longitude is safe as they will not be found by the spatial query
 and won't have distance calculated.
 ====
 
@@ -314,7 +314,7 @@ and won't have distance calculated.
 ===== Sorting by distance
 
 To sort the results by distance to the center of the search you will have to build a Sort object
-using a +DistanceSortField+:
+using a `DistanceSortField`:
 
 .Distance sort example
 ====
@@ -339,7 +339,7 @@ hibQuery.setSort(distanceSort);
 ----
 ====
 
-The +DistanceSortField+ must be constructed using the same coordinates on the same spatial field used
+The `DistanceSortField` must be constructed using the same coordinates on the same spatial field used
 to build the spatial query otherwise the sorting will occur with another center than the query. This
 repetition is needed to allow you to define Queries with any tool.
 
@@ -347,11 +347,11 @@ repetition is needed to allow you to define Queries with any tool.
 [NOTE]
 .Sorting and null values
 ====
-Using distance sort on non +@Spatial+ enabled entities and/or with a non spatial Query will have also
+Using distance sort on non `@Spatial` enabled entities and/or with a non spatial Query will have also
 unexpected results as entities non spatially indexed and/or with null values for latitude or
 longitude will be considered to be at (0,0)/(lat,0)/(0,long)
 
-Using distance sort with a spatial query on spatially indexed entities having, potentially, +null+
+Using distance sort with a spatial query on spatially indexed entities having, potentially, `null`
 values for latitude and/or longitude is safe as they will not be found by the spatial query and so
 won't be sorted
 ====
@@ -360,8 +360,8 @@ won't be sorted
 === Multiple Coordinate pairs
 
 You can associate multiple pairs of coordinates to the same entity, as long as each pair is
-uniquely identified by using a different name. This is achieved by stacking multiple +@Spatial+
-annotations in a +@Spatials+ annotation, and specifying the +name+ attribute on the +@Spatial+
+uniquely identified by using a different name. This is achieved by stacking multiple `@Spatial`
+annotations in a `@Spatials` annotation, and specifying the `name` attribute on the `@Spatial`
 annotation.
 
 .Multiple sets of coordinates
@@ -396,11 +396,11 @@ public class UserEx {
 ----
 ====
 
-In the example <<spatial-example-firstquery>> we used +onDefaultCoordinates()+ which points to the
-coordinates defined by a +@Spatial+ annotation whose +name+ attribute was not specified.
+In the example <<spatial-example-firstquery>> we used `onDefaultCoordinates()` which points to the
+coordinates defined by a `@Spatial` annotation whose `name` attribute was not specified.
 
 To target an alternative pair of coordinates at query time, we need to specify the pair by name
-using onCoordinates +(String)+ instead of onDefaultCoordinates():
+using onCoordinates `(String)` instead of onDefaultCoordinates():
 
 .Querying on non-default coordinate set
 ====
@@ -430,8 +430,8 @@ coordinates are mapped to the index and how queries are implemented.
 
 ==== At indexing level
 
-When Hibernate Search indexes the entity annotated with +@Spatial+, it instantiates a
-+SpatialFieldBridge+ to transform the latitude and longitude fields accessed via the Coordinates
+When Hibernate Search indexes the entity annotated with `@Spatial`, it instantiates a
+`SpatialFieldBridge` to transform the latitude and longitude fields accessed via the Coordinates
 interface to the multiple index fields stored in the Lucene index.
 
 Principle of the spatial index: the spatial index used in Hibernate Search is a grid based spatial
@@ -514,21 +514,21 @@ overhead is minimal.
 Now that we have chosen the optimal level, we can compute the ids of the boxes covering the search
 discus (which is not a discus in projected space anymore).
 
-This is done by +org.hibernate.search.spatial.impl.SpatialHelper.getSpatialHashCellsIds(Point center,
-double radius, int spatialHashLevel)+
+This is done by `org.hibernate.search.spatial.impl.SpatialHelper.getSpatialHashCellsIds(Point center,
+double radius, int spatialHashLevel)`
 
 It will calculate the bounding box of the search discus and then call
-+org.hibernate.search.spatial.impl.SpatialHelper.getSpatialHashCellsIds(Point lowerLeft, Point
-upperRight, int spatialHashLevel)+ that will do the actual computation. If the bounding box crosses
-the meridian line it will cut the search in two and make two calls to +getSpatialHashCellsIds(Point
-lowerLeft, Point upperRight, int spatialHashLevel)+ with left and right parts of the box.
+`org.hibernate.search.spatial.impl.SpatialHelper.getSpatialHashCellsIds(Point lowerLeft, Point
+upperRight, int spatialHashLevel)` that will do the actual computation. If the bounding box crosses
+the meridian line it will cut the search in two and make two calls to `getSpatialHashCellsIds(Point
+lowerLeft, Point upperRight, int spatialHashLevel)` with left and right parts of the box.
 
 There are some geo related hacks (search radius too large, search radius crossing the poles) that
-are handled in bounding box computations done by +Rectangle.fromBoundingCircle(Coordinates center,
-double radius)+ (see http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates for reference on
+are handled in bounding box computations done by `Rectangle.fromBoundingCircle(Coordinates center,
+double radius)` (see http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates for reference on
 those subjects).
 
-The +SpatialHelper.getSpatialHashCellsIds(Point lowerLeft, Point upperRight, int spatialHashLevel)+
+The `SpatialHelper.getSpatialHashCellsIds(Point lowerLeft, Point upperRight, int spatialHashLevel)`
 project the defining points of the bounding box and compute the boxes they belong to. It returns all
 the box Ids between the lower left to the upper right corners, thus covering the area.
 
@@ -537,7 +537,7 @@ the box Ids between the lower left to the upper right corners, thus covering the
 The Query is build with theses Ids to lookup for documents having a [spatial index fields
 name]_HSSI_[n] (n the level found at Step 1) field valued with one of the ids of Step 2.
 
-See also the implementation of +org.hibernate.search.spatial.impl.SpatialHashFilter+.
+See also the implementation of `org.hibernate.search.spatial.impl.SpatialHashFilter`.
 
 This Query will return all documents in the boxes covering the projected bounding box of the search
 discus. So it is too large and needs refining. But we have narrowed the distance calculation
@@ -549,6 +549,6 @@ problems to a subset of our data.
 A distance calculation filter is set after the Lucene index lookup query of Step 3 to exclude false
 candidates from the result list.
 
-See +SpatialQueryBuilderFromCoordinates.buildSpatialQuery(Coordinates center, double radius, String
-fieldName)+
+See `SpatialQueryBuilderFromCoordinates.buildSpatialQuery(Coordinates center, double radius, String
+fieldName)`
 

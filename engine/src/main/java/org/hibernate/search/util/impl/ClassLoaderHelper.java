@@ -244,7 +244,7 @@ public class ClassLoaderHelper {
 		catch (NoSuchMethodException e) {
 			throw new SearchException(
 					classToLoad.getName() + " defined for component " + componentDescription
-							+ " is missing a no-arguments constructor"
+							+ " is missing a public no-arguments constructor"
 			);
 		}
 	}
