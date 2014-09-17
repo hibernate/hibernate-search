@@ -68,7 +68,7 @@ pattern aka. atomic conversation.
 Hibernate Search offers the ability to let the batched work being processed by different back ends.
 Several back ends are provided out of the box and you have the option to plugin your own. It is
 important to understand that in this context back end encompasses more than just the configuration
-option +hibernate.search.default.worker.backend+. This property just specifies a implementation of
+option `hibernate.search.default.worker.backend`. This property just specifies a implementation of
 the BackendQueueProcessor interface which is a part of a back end configuration. In most cases,
 however, additional configuration settings are needed to successfully configure a specific backend
 setup, like for example the JMS back end.
@@ -138,7 +138,7 @@ strategy. Choosing a reader strategy will depend on the profile of the applicati
 updates, read mostly, asynchronous index update etc). See also <<configuration-reader-strategy>>
 
 
-==== +shared+
+==== shared
 
 With this strategy, Hibernate Search will share the same IndexReader, for a given Lucene index,
 across multiple queries and threads provided that the IndexReader is still up-to-date. If the
@@ -147,14 +147,14 @@ SegmentReaders. This strategy only reopens segments that have been modified or c
 opening and shares the already loaded segments from the previous instance. This strategy is the
 default.
 
-The name of this strategy is +shared+.
+The name of this strategy is `shared`.
 
-==== +not-shared+
+==== not-shared
 
 Every time a query is executed, a Lucene IndexReader is opened. This strategy is not the most
 efficient since opening and warming up an IndexReader can be a relatively expensive operation.
 
-The name of this strategy is +not-shared+.
+The name of this strategy is `not-shared`.
 
 
 ==== Custom

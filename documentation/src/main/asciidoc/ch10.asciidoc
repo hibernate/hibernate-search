@@ -7,7 +7,7 @@ you dive deeper and deeper into Hibernate Search.
 === Accessing the SearchFactory
 
 The SearchFactory object keeps track of the underlying Lucene resources for Hibernate Search. It is
-a convenient way to access Lucene natively. The +SearchFactory+ can be accessed from a
+a convenient way to access Lucene natively. The `SearchFactory` can be accessed from a
 FullTextSession:
 
 .Accessing the SearchFactory
@@ -43,11 +43,11 @@ finally {
 
 In this example the SearchFactory figures out which indexes are needed to query this entity. Using
 the configured ReaderProvider (described in <<search-architecture-readerstrategy>>) on each index,
-it returns a compound +IndexReader+ on top of all involved indexes. Because this IndexReader is
+it returns a compound `IndexReader` on top of all involved indexes. Because this IndexReader is
 shared amongst several clients, you must adhere to the following rules:
 
 
-* Never call +indexReader.close()+, but always call +readerProvider.closeReader(reader)+, using a
+* Never call `indexReader.close()`, but always call `readerProvider.closeReader(reader)`, using a
 finally block.
 * Don't use this IndexReader for modification operations: it's a read-only IndexReader, you would
 get an exception).
@@ -78,7 +78,7 @@ IndexManager: an index does not necessarily need to be implemented by a Director
 
 If you are certain that your index is represented as a Directory and need to access it, you can get
 a reference to the Directory via the IndexManager. You will have to cast the IndexManager instance
-to a DirectoryBasedIndexManager and then use +getDirectoryProvider().getDirectory()+ to get a
+to a DirectoryBasedIndexManager and then use `getDirectoryProvider().getDirectory()` to get a
 reference to the underlying Directory. This is not recommended, if you need low level access to the
 index using Lucene APIs we suggest to see <<IndexReaders>> instead.
 
@@ -179,28 +179,28 @@ public static class AnimalShardIdentifierProvider extends ShardIdentifierProvide
 ----
 ====
 
-The are several things happening in +AnimalShardIdentifierProvider+. First off its purpose is to
+The are several things happening in `AnimalShardIdentifierProvider`. First off its purpose is to
 create one shard per animal type (e.g. mammal, insect, etc.). It does so by inspecting the class
-type and the Lucene document passed to the +getShardIdentifier()+ method. It extracts the type field
-from the document and uses it as shard name. +getShardIdentifier()+ is called for every addition to
+type and the Lucene document passed to the `getShardIdentifier()` method. It extracts the type field
+from the document and uses it as shard name. `getShardIdentifier()` is called for every addition to
 the index and a new shard will be created with every new animal type encountered. The base class
-+ShardIdentifierProviderTemplate+ maintains a set with all known shards to which any identifier must
-be added by calling +addShard()+.
+`ShardIdentifierProviderTemplate` maintains a set with all known shards to which any identifier must
+be added by calling `addShard()`.
 
 It is important to understand that Hibernate Search cannot know which shards already exist when the
-application starts. When using +ShardIdentifierProviderTemplate+ as base class of a
-+ShardIdentifierProvider+ implementation, the initial set of shard identifiers must be returned by the
-+loadInitialShardNames()+ method. How this is done will depend on the use case. However, a common case
+application starts. When using `ShardIdentifierProviderTemplate` as base class of a
+`ShardIdentifierProvider` implementation, the initial set of shard identifiers must be returned by the
+`loadInitialShardNames()` method. How this is done will depend on the use case. However, a common case
 in combination with Hibernate ORM is that the initial shard set is defined by the the distinct
 values of a given database column. <<example-custom-shard-identifier-provider>> shows how to handle
-such a case. +AnimalShardIdentifierProvider+ makes in its +loadInitialShardNames()+ implementation use
-of a service called +HibernateSessionFactoryServiceProvider+ (see also <<section-services>>) which is
-available within an ORM environment. It allows to request a Hibernate +SessionFactory+ instance which
+such a case. `AnimalShardIdentifierProvider` makes in its `loadInitialShardNames()` implementation use
+of a service called `HibernateSessionFactoryServiceProvider` (see also <<section-services>>) which is
+available within an ORM environment. It allows to request a Hibernate `SessionFactory` instance which
 can be used to run a Criteria query in order to determine the initial set of shard identifiers.
 
-Last but not least, the +ShardIdentifierProvider+ also allows for optimizing searches by selecting
+Last but not least, the `ShardIdentifierProvider` also allows for optimizing searches by selecting
 which shard to run a query against. By activating a filter (see <<query-filter-shard>>), a sharding
-strategy can select a subset of the shards used to answer a query (+getShardIdentifiersForQuery()+,
+strategy can select a subset of the shards used to answer a query (`getShardIdentifiersForQuery()`,
 not shown in the example) and thus speed up the query execution.
 
 
@@ -220,10 +220,10 @@ index. There are two ways to accomplish this:
 
 
 * Configuring the underlying directory providers to point to the same physical index directory.
-In practice, you set the property +hibernate.search.[fully qualified entity name].indexName+ to the
-same value. As an example, let's use the same index (directory) for the +Furniture+ and +Animal+
-entities. We just set +indexName+ for both entities to "Animal". Both entities will then be stored
-in the Animal directory:+
+In practice, you set the property `hibernate.search.[fully qualified entity name].indexName` to the
+same value. As an example, let's use the same index (directory) for the `Furniture` and `Animal`
+entities. We just set `indexName` for both entities to "Animal". Both entities will then be stored
+in the Animal directory:
 ====
 ----
 hibernate.search.org.hibernate.search.test.shards.Furniture.indexName = Animal
@@ -258,7 +258,7 @@ notable example being the DirectoryProvider. The full list is:
 Some of these components need to access a service which is either available in the environment or
 whose life-cycle is bound to the SearchFactory. Sometimes, you even want the same service to be
 shared amongst several instances of these contract. One example is the ability the share an
-Infinispan cache instance between several directory providers running in different ++JVM++s to store
+Infinispan cache instance between several directory providers running in different `JVM`s to store
 the various indexes using the same underlying infrastructure; this provides real-time replication of
 indexes across nodes.
 
@@ -423,7 +423,7 @@ First you can set the default similarity by specifying the fully specified class
 Similarity implementation using the property hibernate.search.similarity. The default value is
 org.apache.lucene.search.similarities.DefaultSimilarity.
 
-Secondly, you can override the similarity used for a specific index by setting the +similarity+
+Secondly, you can override the similarity used for a specific index by setting the `similarity`
 property for this index (see <<search-configuration-directory>> for more information about index
 configuration):
 
@@ -435,7 +435,7 @@ hibernate.search.[default|<indexname>].similarity = my.custom.Similarity
 
 As an example, let's assume it is not important how often a term appears in a document. Documents
 with a single occurrence of the term should be scored the same as documents with multiple
-occurrences. In this case your custom implementation of the method +tf(float freq)+ should return 1.0.
+occurrences. In this case your custom implementation of the method `tf(float freq)` should return 1.0.
 
 
 [NOTE]
