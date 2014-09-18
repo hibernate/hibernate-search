@@ -52,7 +52,7 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 		this.providedServices = new HashMap<Class<? extends Service>, Object>();
 		this.classLoaderService = new DefaultClassLoaderService();
 		addProperty( "hibernate.search.default.directory_provider", "ram" );
-		addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
+		addProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
 	}
 
 	public SearchConfigurationForTest addProperty(String key, String value) {

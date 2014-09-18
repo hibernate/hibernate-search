@@ -667,4 +667,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 227, value = "A BooleanQuery is not valid without at least one clause. Use at least one of should(Query) or must(Query)." )
 	SearchException booleanQueryWithoutClauses();
 
+	@Message(id = 228, value = "Property " + Environment.LUCENE_MATCH_VERSION + " set to value '%s' is not in a valid format to express a Lucene version: %s" )
+	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage);
+
 }

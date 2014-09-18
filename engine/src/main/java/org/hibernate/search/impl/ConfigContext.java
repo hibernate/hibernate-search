@@ -241,20 +241,13 @@ public final class ConfigContext {
 		}
 		else {
 			try {
-				version = Version.valueOf( tmp );
+				version = Version.parseLeniently( tmp );
 				if ( log.isDebugEnabled() ) {
-					log.debug( "Setting Lucene compatibility to Version " + version.name() );
+					log.debug( "Setting Lucene compatibility to Version " + version );
 				}
 			}
 			catch (IllegalArgumentException e) {
-				StringBuilder msg = new StringBuilder( tmp );
-				msg.append( " is an invalid value for the Lucene match version. Possible values are: " );
-				for ( Version v : Version.values() ) {
-					msg.append( v.toString() );
-					msg.append( ", " );
-				}
-				msg.delete( msg.lastIndexOf( "," ), msg.length() - 1 );
-				throw new SearchException( msg.toString() );
+				throw log.illegalLuceneVersionFormat( tmp, e.getMessage() );
 			}
 		}
 		return version;

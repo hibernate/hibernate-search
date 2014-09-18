@@ -86,9 +86,9 @@ public class FileMonitoringDirectory extends RAMDirectory {
 			delegate.writeByte( b );
 		}
 
-		@Override
+		@Override @Deprecated
 		public void flush() throws IOException {
-			delegate.flush();
+			throw new IllegalStateException( "should never be called" );
 		}
 
 		@Override
@@ -249,6 +249,11 @@ public class FileMonitoringDirectory extends RAMDirectory {
 		@Override
 		public IndexInput slice(String sliceDescription, long offset, long length) throws IOException {
 			return delegate.slice( sliceDescription, offset, length );
+		}
+
+		@Override
+		public void skipBytes(final long numBytes) throws IOException {
+			delegate.skipBytes( numBytes );
 		}
 
 	}

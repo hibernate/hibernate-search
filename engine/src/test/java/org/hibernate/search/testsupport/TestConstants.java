@@ -26,9 +26,9 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public final class TestConstants {
 
-	public static final Analyzer standardAnalyzer = new StandardAnalyzer( TestConstants.getTargetLuceneVersion() );
-	public static final Analyzer stopAnalyzer = new StopAnalyzer( TestConstants.getTargetLuceneVersion() );
-	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer( TestConstants.getTargetLuceneVersion() );
+	public static final Analyzer standardAnalyzer = new StandardAnalyzer();
+	public static final Analyzer stopAnalyzer = new StopAnalyzer();
+	public static final Analyzer simpleAnalyzer = new SimpleAnalyzer();
 	public static final Analyzer keywordAnalyzer = new KeywordAnalyzer();
 
 	private static final Log log = LoggerFactory.make();
@@ -38,7 +38,7 @@ public final class TestConstants {
 	}
 
 	public static Version getTargetLuceneVersion() {
-		return Version.LUCENE_CURRENT;
+		return Version.LATEST;
 	}
 
 	/**

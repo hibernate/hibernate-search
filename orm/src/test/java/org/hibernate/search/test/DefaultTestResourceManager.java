@@ -171,7 +171,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	}
 
 	public void applyDefaultConfiguration(Configuration cfg) {
-		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
+		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
 		cfg.setProperty( "hibernate.search.default.directory_provider", "ram" );
 		cfg.setProperty( "hibernate.search.default.indexBase", getBaseIndexDir().getAbsolutePath() );
 		cfg.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );

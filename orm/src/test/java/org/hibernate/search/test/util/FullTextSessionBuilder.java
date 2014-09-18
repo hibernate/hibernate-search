@@ -58,7 +58,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 	private final List<LoadEventListener> additionalLoadEventListeners = new ArrayList<LoadEventListener>();
 
 	public FullTextSessionBuilder() {
-		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().name() );
+		cfg.setProperty( "hibernate.search.lucene_version", TestConstants.getTargetLuceneVersion().toString() );
 		cfg.setProperty( Environment.HBM2DDL_AUTO, "create-drop" );
 
 		//cache:
