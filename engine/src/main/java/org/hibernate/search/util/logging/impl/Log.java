@@ -761,6 +761,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 194, value = "Unable to load configured class '%s' as 'sharding_strategy'")
 	SearchException getUnableToLoadShardingStrategyClassException(String className);
 
+	@Message(id = 195, value = "Configuration property '%s' should not be empty: illegal format.")
+	SearchException configurationPropertyCantBeEmpty(String key);
+
 	@Message(id = 211, value = "An exception occurred while the MassIndexer was fetching the primary identifiers list")
 	String massIndexerExceptionWhileFetchingIds();
 
