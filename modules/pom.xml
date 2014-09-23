@@ -20,6 +20,7 @@
 
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
+        <aliases.xml.basedir>src/main/aliases</aliases.xml.basedir>
         <hibernate.search.version>${project.version}</hibernate.search.version>
     </properties>
 

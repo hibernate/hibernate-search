@@ -21,16 +21,31 @@
         </file>
         <file>
             <source>${module.xml.basedir}/search/engine/module.xml</source>
+            <outputDirectory>/org/hibernate/search/engine/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${aliases.xml.basedir}/search/engine/module.xml</source>
             <outputDirectory>/org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/orm/module.xml</source>
+            <outputDirectory>/org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${aliases.xml.basedir}/search/orm/module.xml</source>
             <outputDirectory>/org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
             <source>${module.xml.basedir}/search/backend-jms/module.xml</source>
+            <outputDirectory>/org/hibernate/search/backend-jms/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${aliases.xml.basedir}/search/backend-jms/module.xml</source>
             <outputDirectory>/org/hibernate/search/backend-jms/${hibernate.search.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
@@ -39,7 +54,7 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/engine/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>org/hibernate/search/engine/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
@@ -62,7 +77,7 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/orm/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>org/hibernate/search/orm/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
@@ -72,7 +87,7 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/backend-jms/${hibernate.search.module.slot}</outputDirectory>
+            <outputDirectory>org/hibernate/search/backend-jms/${hibernate.search.version}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
