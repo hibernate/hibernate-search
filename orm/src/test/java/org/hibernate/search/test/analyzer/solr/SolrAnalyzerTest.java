@@ -93,12 +93,12 @@ public class SolrAnalyzerTest extends SearchTestBase {
 		Analyzer analyzer = fts.getSearchFactory().getAnalyzer( "standard_analyzer" );
 		String text = "This is just FOOBAR's";
 		Token[] tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		assertTokensEqual( tokens, new String[] { "This", "is", "just", "FOOBAR" } );
+		assertTokensEqual( tokens, new String[] { "This", "is", "just", "FOOBAR's" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "html_standard_analyzer" );
 		text = "This is <b>foo</b><i>bar's</i>";
 		tokens = AnalyzerUtils.tokensFromAnalysis( analyzer, "name", text );
-		assertTokensEqual( tokens, new String[] { "This", "is", "foobar" } );
+		assertTokensEqual( tokens, new String[] { "This", "is", "foobar's" } );
 
 		analyzer = fts.getSearchFactory().getAnalyzer( "html_whitespace_analyzer" );
 		text = "This is <b>foo</b><i>bar's</i>";
