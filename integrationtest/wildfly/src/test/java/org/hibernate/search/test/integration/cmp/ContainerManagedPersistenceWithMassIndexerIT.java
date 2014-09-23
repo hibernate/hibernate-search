@@ -8,7 +8,6 @@ package org.hibernate.search.test.integration.cmp;
 
 import javax.inject.Inject;
 
-import org.hibernate.search.engine.Version;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -29,6 +28,7 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.hibernate.search.test.integration.VersionTestHelper.addDependencyToSearchModule;
 
 /**
  * @author Hardy Ferentschik
@@ -44,9 +44,10 @@ public class ContainerManagedPersistenceWithMassIndexerIT {
 	// as in the original test case for HSEARCH-640 we are using a full ear archive for testing
 	@Deployment
 	public static EnterpriseArchive createTestEAR() {
-		JavaArchive ejb = ShrinkWrap.create( JavaArchive.class, EJB_ARCHIVE_NAME )
-				.addClasses( Singer.class, SingersSingleton.class )
-				.addAsResource( ejbManifest(), "META-INF/MANIFEST.MF" );
+		JavaArchive ejb = ShrinkWrap
+				.create( JavaArchive.class, EJB_ARCHIVE_NAME )
+				.addClasses( Singer.class, SingersSingleton.class );
+		addDependencyToSearchModule( ejb );
 
 		WebArchive war = ShrinkWrap
 				.create( WebArchive.class, WAR_ARCHIVE_NAME )
@@ -89,14 +90,6 @@ public class ContainerManagedPersistenceWithMassIndexerIT {
 				.up().up()
 				.exportAsString();
 		return new StringAsset( applicationXml );
-	}
-
-	private static Asset ejbManifest() {
-		String wildflySearchModuleDependency = "org.hibernate.search.orm:" + Version.getVersionString() + " services";
-		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", wildflySearchModuleDependency )
-				.exportAsString();
-		return new StringAsset( manifest );
 	}
 
 	private static Asset warManifest() {

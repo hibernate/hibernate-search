@@ -132,8 +132,13 @@
     </prerequisites>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
+        <hibernate.search.module.slot>5.0</hibernate.search.module.slot>
+        <infinispan.module.slot>ispn-7.0</infinispan.module.slot>
+        <lucene.module.slot>4.8</lucene.module.slot>
+        <jgroups.module.slot>3.5</jgroups.module.slot>
+
+        <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>4.8.1</luceneVersion>
         <infinispanVersion>7.0.0.Beta1</infinispanVersion>
@@ -161,6 +166,12 @@
         <arquillianVersion>1.1.2.Final</arquillianVersion>
         <shrinkwrapResolverVersion>2.0.0</shrinkwrapResolverVersion>
         <wildflyVersion>8.1.0.Final</wildflyVersion>
+
+        <!-- character encoding -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Eclipse plugin options -->
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
     </properties>
 

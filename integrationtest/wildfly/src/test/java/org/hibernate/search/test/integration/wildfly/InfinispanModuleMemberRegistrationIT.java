@@ -7,9 +7,10 @@
 package org.hibernate.search.test.integration.wildfly;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
-import org.hibernate.search.engine.Version;
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
@@ -23,7 +24,6 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,7 +47,7 @@ public class InfinispanModuleMemberRegistrationIT {
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "local-infinispan.xml", "local-infinispan.xml" )
-				.add( manifest(), "META-INF/MANIFEST.MF" )
+				.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -78,16 +78,6 @@ public class InfinispanModuleMemberRegistrationIT {
 				.up()
 				.exportAsString();
 		return new StringAsset( persistenceXml );
-	}
-
-	public static Asset manifest() {
-		final String currentVersion = Version.getVersionString();
-		// here is where we tell Wildfly which Search module to use
-		String dependencyDef = "org.hibernate.search.orm:" + "5.0.0-SNAPSHOT" + " services";
-		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", dependencyDef )
-				.exportAsString();
-		return new StringAsset( manifest );
 	}
 
 	@Inject
