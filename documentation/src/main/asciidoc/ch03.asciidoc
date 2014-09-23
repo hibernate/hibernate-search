@@ -1348,7 +1348,7 @@ explicitly reconfigure it to use the newer module.
 You can download the latest pre-packaged Hibernate Search modules from
 http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist.zip/download[Sourceforge].
 As a convenience these zip files are also distributed as Maven artifacts:
-link:https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~~~[org.hibernate:hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist:zip].
+link:$$https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate~hibernate-search-modules~{hibernateSearchVersion}~~$$[org.hibernate:hibernate-search-modules-{hibernateSearchVersion}-wildfly-8-dist:zip].
 
 Unpack the modules in your WildFly `modules` directory: this will create modules for Hibernate Search and Apache Lucene.
 The Hibernate Search modules are:
