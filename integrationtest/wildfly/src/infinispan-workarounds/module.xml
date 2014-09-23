@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ This is a patched version of the module definition of Infinispan 7.0 for the
+ Infinispan Query module.
+ The relevant change is that the dependency
+   org.hibernate.search.engine
+ is changed to use slot "5.0", as otherwise we get a second (and wrong) copy of the
+ Hibernate Search engine module into the classpath.
+
+ See also https://issues.jboss.org/browse/ISPN-4754
+ -->
+
+<module xmlns="urn:jboss:module:1.1" name="org.infinispan.query" slot="ispn-7.0">
+    <resources>
+        <resource-root path="infinispan-query.jar"/>
+        <!-- Insert resources here -->
+    </resources>
+
+    <dependencies>
+        <module name="javax.api" />
+        <module name="javax.transaction.api" />
+        <module name="org.apache.lucene" slot="4.8"/>
+        <module name="org.hibernate.hql.parser" slot="ispn-7.0"/>
+        <module name="org.hibernate.hql.lucene" slot="ispn-7.0"/>
+        <module name="org.hibernate.search.engine" slot="5.0" export="true"/>
+        <module name="org.infinispan" slot="ispn-7.0"/>
+        <module name="org.infinispan.objectfilter" slot="ispn-7.0"/>
+        <module name="org.infinispan.lucene-directory" slot="ispn-7.0" services="export" />
+        <module name="org.jboss.logging" />
+    </dependencies>
+</module>
