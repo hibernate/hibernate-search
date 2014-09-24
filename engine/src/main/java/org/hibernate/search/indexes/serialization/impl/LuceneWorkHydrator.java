@@ -27,8 +27,7 @@ import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StoredField;
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
@@ -214,9 +213,10 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		FieldType type = Field.translateFieldType( getStore( store ), getIndex( index ), getTermVector( termVector ) );
-		//type.setOmitNorms( omitNorms );
-		//type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
+		FieldType type = identifyFieldType( store == SerializableStore.YES, //if stored
+				index != SerializableIndex.NO, //if indexed
+				index == SerializableIndex.ANALYZED || index == SerializableIndex.ANALYZED_NO_NORMS, //if analyzed
+				termVector, omitNorms, omitTermFreqAndPositions );
 		Field luceneField = new Field( name, value, type );
 		luceneField.setBoost( boost );
 		getLuceneDocument().add( luceneField );
@@ -224,9 +224,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addFieldWithTokenStreamData(String name, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		FieldType type = Field.translateFieldType( Store.NO, Index.ANALYZED, getTermVector( termVector ) );
-		//type.setOmitNorms( omitNorms );
-		//type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
+		FieldType type = identifyFieldType( false, true, true, termVector, omitNorms, omitTermFreqAndPositions );
 		Field luceneField = new Field( name, new CopyTokenStream( tokens ), type );
 		luceneField.setBoost( boost );
 		getLuceneDocument().add( luceneField );
@@ -239,9 +237,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addFieldWithSerializableReaderData(String name, byte[] valueAsByte, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		FieldType type = Field.translateFieldType( Store.NO, Index.ANALYZED, getTermVector( termVector ) );
-		//type.setOmitNorms( omitNorms );
-		//type.setStoreTermVectorPositions( ! omitTermFreqAndPositions );
+		FieldType type = identifyFieldType( false, true, true, termVector, omitNorms, omitTermFreqAndPositions );
 		Reader value = (Reader) toSerializable( valueAsByte, loader );
 		Field luceneField = new Field( name, value, type );
 		luceneField.setBoost( boost );
@@ -339,41 +335,21 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		return documentBuilder.objectToString( documentBuilder.getIdKeywordName(), id, conversionContext );
 	}
 
-	private static Field.TermVector getTermVector(SerializableTermVector termVector) {
-		switch ( termVector ) {
-			case NO:
-				return Field.TermVector.NO;
-			case WITH_OFFSETS:
-				return Field.TermVector.WITH_OFFSETS;
-			case WITH_POSITIONS:
-				return Field.TermVector.WITH_POSITIONS;
-			case WITH_POSITIONS_OFFSETS:
-				return Field.TermVector.WITH_POSITIONS_OFFSETS;
-			case YES:
-				return Field.TermVector.YES;
-			default:
-				throw log.unableToConvertSerializableTermVectorToLuceneTermVector( termVector.toString() );
-		}
+	private FieldType identifyFieldType(boolean stored, boolean indexed, boolean analyzed, SerializableTermVector termVector, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		final FieldType type = new FieldType();
+		type.setStored( stored );
+		type.setIndexed( indexed );
+		type.setTokenized( analyzed );
+		type.setStoreTermVectors( termVector != SerializableTermVector.NO );
+		type.setStoreTermVectorOffsets( termVector == SerializableTermVector.WITH_OFFSETS || termVector == SerializableTermVector.WITH_POSITIONS_OFFSETS );
+		type.setStoreTermVectorPayloads( termVector == SerializableTermVector.YES );
+		type.setStoreTermVectorPositions( termVector == SerializableTermVector.WITH_POSITIONS || termVector == SerializableTermVector.WITH_POSITIONS_OFFSETS );
+		type.setOmitNorms( omitNorms );
+		type.setIndexOptions( omitTermFreqAndPositions ? IndexOptions.DOCS_ONLY : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
+		return type	;
 	}
 
-	private static Field.Index getIndex(SerializableIndex index) {
-		switch ( index ) {
-			case ANALYZED:
-				return Field.Index.ANALYZED;
-			case ANALYZED_NO_NORMS:
-				return Field.Index.ANALYZED_NO_NORMS;
-			case NO:
-				return Field.Index.NO;
-			case NOT_ANALYZED:
-				return Field.Index.NOT_ANALYZED;
-			case NOT_ANALYZED_NO_NORMS:
-				return Field.Index.NOT_ANALYZED_NO_NORMS;
-			default:
-				throw log.unableToConvertSerializableIndexToLuceneIndex( index.toString() );
-		}
-	}
-
-	private static Field.Store getStore(SerializableStore store) {
+	private Field.Store getStore(SerializableStore store) {
 		switch ( store ) {
 			case NO:
 				return Field.Store.NO;
