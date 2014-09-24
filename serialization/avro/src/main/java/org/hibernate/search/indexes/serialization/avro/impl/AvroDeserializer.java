@@ -204,10 +204,7 @@ public class AvroDeserializer implements Deserializer {
 							asString( field, "name" ),
 							asByteArray( field, "value" ),
 							asInt( field, "offset" ),
-							asInt( field, "length" ),
-							asFloat( field, "boost" ),
-							asBoolean( field, "omitNorms" ),
-							asBoolean( field, "omitTermFreqAndPositions" )
+							asInt( field, "length" )
 				);
 			}
 			else if ( "StringField".equals( schema ) ) {

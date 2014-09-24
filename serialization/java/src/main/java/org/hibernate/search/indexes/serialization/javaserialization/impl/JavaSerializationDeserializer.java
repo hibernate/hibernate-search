@@ -136,10 +136,7 @@ public class JavaSerializationDeserializer implements Deserializer {
 							reallySafeField.getName(),
 							reallySafeField.getValue(),
 							reallySafeField.getOffset(),
-							reallySafeField.getLength(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
+							reallySafeField.getLength()
 					);
 				}
 				else if ( field instanceof SerializableStringField ) {
