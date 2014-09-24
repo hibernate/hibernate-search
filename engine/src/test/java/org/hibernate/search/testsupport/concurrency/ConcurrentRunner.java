@@ -25,14 +25,15 @@ import org.junit.Assert;
  */
 public class ConcurrentRunner {
 
-	public static final int DEFAULT_THREADS = 300;
+	public static final int DEFAULT_REPEAT = 300;
+	public static final int DEFAULT_THREADS = 30;
 
 	private final AtomicBoolean somethingFailed = new AtomicBoolean( false );
-	private final int threads;
 	private final ExecutorService executor;
 	private final CountDownLatch startLatch = new CountDownLatch( 1 );
 	private final CountDownLatch endLatch;
 	private final TaskFactory factory;
+	private final int repetitions;
 
 	/**
 	 * Provide a source for {@link Runnable} instances to run concurrently.
@@ -40,21 +41,22 @@ public class ConcurrentRunner {
 	 * @param factory the source of Runnable instances to run
 	 */
 	public ConcurrentRunner(TaskFactory factory) {
-		this( DEFAULT_THREADS, factory );
+		this( DEFAULT_REPEAT, DEFAULT_THREADS, factory );
 	}
 
 	/**
 	 * /**
 	 * Provide a source for {@link Runnable} instances to run concurrently.
 	 * This is meant to simplify collection and creation of such tasks.
-	 * @param threads the number of threads (and tasks) to create and run.
+	 * @param repetitions the amount of times the task should be repeated
+	 * @param threads the number of threads used to run the task in parallel
 	 * @param factory the source of Runnable instances to run.
 	 */
-	public ConcurrentRunner(int threads, TaskFactory factory) {
-		this.threads = threads;
+	public ConcurrentRunner(int repetitions, int threads, TaskFactory factory) {
+		this.repetitions = repetitions;
 		this.factory = factory;
 		executor = Executors.newFixedThreadPool( threads );
-		endLatch = new CountDownLatch( threads );
+		endLatch = new CountDownLatch( repetitions );
 	}
 
 	/**
@@ -64,7 +66,7 @@ public class ConcurrentRunner {
 	 * or any exception is thrown during the creation of tasks.
 	 */
 	public void execute() throws Exception {
-		for ( int i = 0; i < threads; i++ ) {
+		for ( int i = 0; i < repetitions; i++ ) {
 			Runnable userRunnable = factory.createRunnable( i );
 			executor.execute( new WrapRunnable( startLatch, endLatch, userRunnable ) );
 		}
