@@ -23,14 +23,12 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.FieldType.NumericType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
@@ -206,22 +204,6 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		final DoubleField numField = new DoubleField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
-	}
-
-	/*
-	 * TODO FieldType has several more attributes currently ignored. This is temporarily meant to not break too much Lucene 3x code.
-	 * Also: if we move to a static index schema serializing the field attributes should be unnecessary.
-	 */
-	private FieldType buildFieldType(int precisionStep, SerializableStore store, boolean indexed, boolean omitNorms,
-			boolean omitTermFreqAndPositions, NumericType numericFieldType) {
-		final FieldType type = new FieldType();
-		type.setNumericPrecisionStep( precisionStep );
-		type.setStored( store == SerializableStore.YES );
-		type.setIndexOptions( omitTermFreqAndPositions ? IndexOptions.DOCS_AND_FREQS : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
-		type.setOmitNorms( omitNorms );
-		type.setIndexed( indexed );
-		type.setNumericType( numericFieldType );
-		return type;
 	}
 
 	@Override
