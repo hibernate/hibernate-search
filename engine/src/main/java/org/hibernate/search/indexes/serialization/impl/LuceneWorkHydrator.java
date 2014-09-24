@@ -224,11 +224,6 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		return type;
 	}
 
-	@Deprecated //removed soon
-	public void addFieldWithBinaryData(String name, byte[] value, int offset, int length, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		addFieldWithBinaryData( name, value, offset, length );
-	}
-
 	@Override
 	public void addFieldWithBinaryData(String name, byte[] value, int offset, int length) {
 		Field luceneField = new StoredField( name, value, offset, length );
