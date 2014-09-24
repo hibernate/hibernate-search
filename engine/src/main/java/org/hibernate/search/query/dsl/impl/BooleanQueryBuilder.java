@@ -99,4 +99,10 @@ class BooleanQueryBuilder implements MustJunction {
 		}
 		return queryCustomizer.setWrappedQuery( query ).createQuery();
 	}
+
+	@Override
+	public boolean isEmpty() {
+		return clauses.isEmpty();
+	}
+
 }

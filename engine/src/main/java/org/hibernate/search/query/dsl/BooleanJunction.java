@@ -25,4 +25,9 @@ public interface BooleanJunction<T extends BooleanJunction> extends QueryCustomi
 	 * Call the .not() method to ensure results of the boolean query do NOT match the subquery.
 	 */
 	MustJunction must(Query query);
+
+	/**
+	 * @return true if no restrictions have been applied
+	 */
+	boolean isEmpty();
 }
