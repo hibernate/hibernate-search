@@ -19,11 +19,15 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.MustJunction;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  */
 class BooleanQueryBuilder implements MustJunction {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final List<BooleanClause> clauses;
 	private final QueryCustomizer queryCustomizer;
@@ -78,7 +82,7 @@ class BooleanQueryBuilder implements MustJunction {
 	public Query createQuery() {
 		final int nbrOfClauses = clauses.size();
 		if ( nbrOfClauses == 0 ) {
-			throw new AssertionFailure( "Cannot create an empty boolean query" );
+			throw log.booleanQueryWithoutClauses();
 		}
 		else if ( nbrOfClauses == 1 ) {
 			final BooleanClause uniqueClause = clauses.get( 0 );

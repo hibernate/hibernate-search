@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.junit.Assert;
+
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.ngram.NGramFilterFactory;
@@ -37,6 +39,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
@@ -303,7 +306,6 @@ public class DSLTest extends SearchTestBase {
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
 
-
 		//must
 		Query query = monthQb
 				.bool()
@@ -351,6 +353,17 @@ public class DSLTest extends SearchTestBase {
 
 
 		transaction.commit();
+	}
+
+	@Test(expected = SearchException.class)
+	public void testIllegalBooleanJunction() {
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+		//forgetting to set any condition on the boolean, an exception shall be thrown:
+		BooleanJunction<BooleanJunction> booleanJunction = monthQb.bool();
+		assertTrue( booleanJunction.isEmpty() );
+		Query query = booleanJunction.createQuery();
+		Assert.fail( "should not reach this point" );
 	}
 
 	@Test

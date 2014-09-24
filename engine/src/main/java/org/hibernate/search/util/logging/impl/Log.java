@@ -670,4 +670,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 226, value = "%s: %s" )
 	void logInfoStreamMessage(String componentName, String message);
 
+	@Message(id = 227, value = "A BooleanQuery is not valid without at least one clause. Use at least one of should(Query) or must(Query)." )
+	SearchException booleanQueryWithoutClauses();
+
 }
