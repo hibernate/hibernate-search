@@ -304,12 +304,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 87, value = "Unable to read TokenStream")
 	SearchException unableToReadTokenStream();
 
-	@Message(id = 88, value = "Unable to convert serializable TermVector to Lucene TermVector: %1$s")
-	SearchException unableToConvertSerializableTermVectorToLuceneTermVector(String termVector);
-
-	@Message(id = 89, value = "Unable to convert serializable Index to Lucene Index: %1$s")
-	SearchException unableToConvertSerializableIndexToLuceneIndex(String index);
-
 	@Message(id = 90, value = "Unable to convert serializable Store to Lucene Store: %1$s")
 	SearchException unableToConvertSerializableStoreToLuceneStore(String store);
 
