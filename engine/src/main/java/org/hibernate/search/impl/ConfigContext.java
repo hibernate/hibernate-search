@@ -7,6 +7,7 @@
 package org.hibernate.search.impl;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -247,6 +248,9 @@ public final class ConfigContext {
 				}
 			}
 			catch (IllegalArgumentException e) {
+				throw log.illegalLuceneVersionFormat( tmp, e.getMessage() );
+			}
+			catch (ParseException e) {
 				throw log.illegalLuceneVersionFormat( tmp, e.getMessage() );
 			}
 		}
