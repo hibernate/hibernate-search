@@ -16,7 +16,7 @@
     <files>
         <file>
             <source>${module.xml.basedir}/lucene/module.xml</source>
-            <outputDirectory>/org/apache/lucene/${luceneVersion}</outputDirectory>
+            <outputDirectory>/org/apache/lucene/${lucene.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
@@ -97,7 +97,7 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/apache/lucene/${luceneVersion}</outputDirectory>
+            <outputDirectory>org/apache/lucene/${lucene.module.slot}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
