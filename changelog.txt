@@ -1,6 +1,28 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Alpha7 (26-09-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1665] - Race condition in DirectoryProviderHelper.initializeIndexIfNeeded leads to failure in concurrent bootstrap
+    * [HSEARCH-1576] - Support Infinispan as the Hibernate Search directory provider
+
+** Improvement
+    * [HSEARCH-1616] - BooleanJunction isEmpty function
+    * [HSEARCH-1657] - Improve logging for inconsistent field configuration
+    * [HSEARCH-1658] - Expose configuration to enable Lucene Infostream
+    * [HSEARCH-1670] - Clarify warning message on extension points needing a public contructor
+    * [HSEARCH-1671] - Upgrade asciidoctor-maven-plugin to version 1.5.0
+    * [HSEARCH-1676] - Distributed JBoss modules for WildFly should expose a slot name [major.minor] rather than exact version
+    * [HSEARCH-1677] - Upgrade to Infinispan 7.0.0.Beta2
+
+** Task
+    * [HSEARCH-1580] - Decide how to support the "dependency graph" feature
+    * [HSEARCH-1660] - Upgrade JGroups to 3.5.0.Final
+    * [HSEARCH-1674] - OSGi integration tests shouldn't be deployed to Maven repositories during release
+
+
 Version 5.0.0.Alpha6 (18-08-2014)
 ------------------------
 
