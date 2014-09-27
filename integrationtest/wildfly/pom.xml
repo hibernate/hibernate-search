@@ -235,6 +235,40 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <!-- Apply patching of Infinispan Lucene Directory module: force new Lucene version for Lucene Directory module -->
+                    <execution>
+                        <id>fix-infinispan-directory-module</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/wildfly-${wildflyVersion}/modules/org/infinispan/lucene-directory/${infinispan.module.slot}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/infinispan-workarounds/lucene-directory</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- Apply patching of Infinispan Lucene Directory module: force new Lucene version for Infinispan Query module -->
+                    <execution>
+                        <id>fix-infinispan-modules</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/wildfly-${wildflyVersion}/modules/org/infinispan/query/${infinispan.module.slot}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/infinispan-workarounds/query</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

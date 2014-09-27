@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ This is a patched version of the module definition of Infinispan 7.0 for the
+ Infinispan Lucene Directory module: we change the slot for Apache Lucene.
+ (Only temporarily needed until Infinispan catches up)
+ -->
+<module xmlns="urn:jboss:module:1.1" name="org.infinispan.lucene-directory" slot="ispn-7.0">
+    <resources>
+        <resource-root path="infinispan-lucene-directory.jar"/>
+        <!-- Insert resources here -->
+    </resources>
+
+    <dependencies>
+        <module name="javax.api"/>
+        <module name="javax.transaction.api"/>
+        <module name="org.apache.lucene" slot="4.10" export="true"/>
+        <module name="org.jboss.logging"/>
+        <module name="org.infinispan" slot="ispn-7.0"/>
+    </dependencies>
+</module>
