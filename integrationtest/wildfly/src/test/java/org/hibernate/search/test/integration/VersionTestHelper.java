@@ -54,4 +54,11 @@ public class VersionTestHelper {
 		archive.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" );
 	}
 
+	public static String getDependencyVersionLucene() {
+		return System.getProperty( "dependency.version.Lucene" );
+	}
+
+	public static String getDependencyVersionHibernateCommonsAnnotations() {
+		return System.getProperty( "dependency.version.HibernateCommonsAnnotations" );
+	}
 }

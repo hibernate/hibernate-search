@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.engine.Version;
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -44,9 +45,9 @@ public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSla
 			libraryFiles.add( dependency( "org.hibernate:hibernate-search-engine:" + currentVersion ) );
 			libraryFiles.add( dependency( "org.hibernate:hibernate-search-backend-jms:" + currentVersion ) );
 			libraryFiles.add( dependency( "org.hibernate:hibernate-search-serialization-java:" + currentVersion ) );
-			libraryFiles.add( dependency( "org.apache.lucene:lucene-core:4.8.1" ) );
-			libraryFiles.add( dependency( "org.apache.lucene:lucene-analyzers-common:4.8.1" ) );
-			libraryFiles.add( dependency( "org.hibernate.common:hibernate-commons-annotations:4.0.4.Final" ) );
+			libraryFiles.add( dependency( "org.apache.lucene:lucene-core:" + VersionTestHelper.getDependencyVersionLucene() ) );
+			libraryFiles.add( dependency( "org.apache.lucene:lucene-analyzers-common:" + VersionTestHelper.getDependencyVersionLucene()) );
+			libraryFiles.add( dependency( "org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations() ) );
 			return libraryFiles.toArray( new File[0] );
 		}
 
