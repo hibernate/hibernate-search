@@ -140,7 +140,7 @@ your implementation from org.hibernate.search.store.ShardIdentifierProviderTempl
 basic implementation. Let's look at <<example-custom-shard-identifier-provider>> for an example.
 
 [[example-custom-shard-identifier-provider]]
-.Custom ShardidentiferProvider
+.Custom ShardIdentifierProvider
 ====
 [source, JAVA]
 ----
@@ -149,10 +149,10 @@ public static class AnimalShardIdentifierProvider extends ShardIdentifierProvide
  @Override
  public String getShardIdentifier(Class<?> entityType, Serializable id,
          String idAsString, Document document) {
-    if ( entityType.equals(Animal.class) ) {
-       String type = document.getFieldable("type").stringValue();
-       addShard(type);
-       return type;
+    if (entityType.equals(Animal.class)) {
+       String typeValue = document.getField("type").stringValue();
+       addShard(typeValue);
+       return typeValue;
     }
     throw new RuntimeException("Animal expected but found " + entityType);
  }
@@ -161,13 +161,11 @@ public static class AnimalShardIdentifierProvider extends ShardIdentifierProvide
  protected Set<String> loadInitialShardNames(Properties properties, BuildContext buildContext) {
     ServiceManager serviceManager = buildContext.getServiceManager();
     SessionFactory sessionFactory = serviceManager.requestService(
-        HibernateSessionFactoryServiceProvider.class, buildContext);
+        HibernateSessionFactoryService.class).getSessionFactory();
     Session session = sessionFactory.openSession();
     try {
        Criteria initialShardsCriteria = session.createCriteria(Animal.class);
-       initialShardsCriteria.setProjection( Projections.distinct(Property.forName("type")));
-
-       @SuppressWarnings("unchecked")
+       initialShardsCriteria.setProjection(Projections.distinct(Property.forName("type")));
        List<String> initialTypes = initialShardsCriteria.list();
        return new HashSet<String>(initialTypes);
     }
@@ -194,7 +192,7 @@ application starts. When using `ShardIdentifierProviderTemplate` as base class o
 in combination with Hibernate ORM is that the initial shard set is defined by the the distinct
 values of a given database column. <<example-custom-shard-identifier-provider>> shows how to handle
 such a case. `AnimalShardIdentifierProvider` makes in its `loadInitialShardNames()` implementation use
-of a service called `HibernateSessionFactoryServiceProvider` (see also <<section-services>>) which is
+of a service called `HibernateSessionFactoryService` (see also <<section-services>>) which is
 available within an ORM environment. It allows to request a Hibernate `SessionFactory` instance which
 can be used to run a Criteria query in order to determine the initial set of shard identifiers.
 
