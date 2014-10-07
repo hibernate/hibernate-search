@@ -235,23 +235,6 @@
                             </resources>
                         </configuration>
                     </execution>
-                    <!-- Apply patching of Infinispan modules: workaround for https://issues.jboss.org/browse/ISPN-4754 -->
-                    <execution>
-                        <id>fix-infinispan-modules</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/wildfly-${wildflyVersion}/modules/org/infinispan/query/${infinispan.module.slot}</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/infinispan-workarounds</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>
