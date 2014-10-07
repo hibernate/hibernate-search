@@ -241,99 +241,111 @@ benefit in sharing indexes.
 [[section-services]]
 === Using external services
 
-Any of the pluggable contracts we have seen so far allows for the injection of a service. The most
-notable example being the DirectoryProvider. The full list is:
+You can also create your own services, however, this is only necessary if you are extending some
+core components of Hibernate Search.
+For example your custom `DirectoryProvider` needs access to some other custom component.
+Many internal components get access to the `BuildContext` during initialisation, which can be used to access Services,
+and you can create a custom Service to wrap access to other components or share resources among extension points.
 
+This way your custom implementations can access any services normally included, or you can
+access your own services which can be injected at boot time, or you can replace any
+service we normally bundle so that existing components will consume your replacement
+implementation (see <<section-provided-services>> to override existing services).
 
-* DirectoryProvider
-* ReaderProvider
-* OptimizerStrategy
-* BackendQueueProcessor
-* Worker
-* ErrorHandler
-* MassIndexerProgressMonitor
+One example is the ability to have each of the Infinispan based `DirectoryProvider` instances
+to use a single injected Infinispan `CacheManager`: you could replace the `DefaultCacheManagerService`
+included in Hibernate Search to have it use a `CacheManager` which you provide in a different way
+than what the `DefaultCacheManagerService` is able to.
 
-Some of these components need to access a service which is either available in the environment or
-whose life-cycle is bound to the SearchFactory. Sometimes, you even want the same service to be
-shared amongst several instances of these contract. One example is the ability the share an
-Infinispan cache instance between several directory providers running in different `JVM`s to store
-the various indexes using the same underlying infrastructure; this provides real-time replication of
-indexes across nodes.
+==== Using a Service
 
+Many of of the pluggable contracts of Hibernate Search can use services. Services are accessible via
+the BuildContext interface as in the following example.
 
-
-==== Exposing a service
-
-To expose a service, you need to implement org.hibernate.search.spi.ServiceProvider<T>. T is
-the type of the service you want to use. Services are retrieved by components via their
-ServiceProvider class implementation.
-
-
-===== Managed services
-
-If your service ought to be started when Hibernate Search starts and stopped when Hibernate Search
-stops, you can use a managed service. Make sure to properly implement the start and stop methods of
-ServiceProvider. When the service is requested, the getService method is called.
-
-.Example of ServiceProvider implementation
+.Example of a custom DirectoryProvider using a ClassLoaderService
 ====
 [source, JAVA]
 ----
-public class CacheServiceProvider implements ServiceProvider<Cache> {
-    private CacheManager manager;
+public CustomDirectoryProvider implements DirectoryProvider<RAMDirectory> {
+    private ServiceManager serviceManager;
+    private ClassLoaderService classLoaderService;
 
-    public void start(Properties properties) {
-        //read configuration
-        manager = new CacheManager(properties);
+    public void initialize(
+        String directoryProviderName,
+        Properties properties,
+        BuildContext context) {
+        //get a reference to the ServiceManager
+        this.serviceManager = context.getServiceManager();
     }
 
-    public Cache getService() {
-        return manager.getCache(DEFAULT);
+    public void start() {
+        //get the current ClassLoaderService
+        classLoaderService = serviceManager.requestService(ClassLoaderService.class);
     }
 
-    void stop() {
-        manager.close();
+    public RAMDirectory getDirectory() {
+        //use the ClassLoaderService
+    }
+
+    public stop() {
+        //make sure to release all services
+        serviceManager.releaseService(ClassLoaderService.class);
     }
 }
 ----
 ====
 
-[NOTE]
-====
-The ServiceProvider implementation must have a no-arg constructor.
-====
+When you request a service, an instance of the service is returned to you.
+Make sure to then release the service once you are finished using it.
+Note that the service can be released in the `DirectoryProvider.stop` method if
+the `DirectoryProvider` uses the service during its lifetime or could be released right away
+if the service is only needed during initialisation time.
 
 
-To be transparently discoverable, such service should have an accompanying
-_META-INF/services/org.hibernate.search.spi.ServiceProvider_ whose content list the (various) service
-provider implementation(s).
+==== Implementing a Service
 
-.Content of META-INF/services/org.hibernate.search.spi.ServiceProvider
+To implement a new service, you need to create an interface which identifies it, which extends the
+the interface `org.hibernate.search.engine.service.spi.Service`.
+
+You can then add additional methods on your custom interface as needed, you will likely want to define
+at least one getter to retrieve whatever you're needing.
+
+Services are retrieved by components using the `Class` object of the interface you define as a key.
+
+Naturally you will need to provide an implementation of your custom interface too, and this implementation
+must have a public constructor taking no arguments.
+
+Optionally your custom component can also implement `org.hibernate.search.engine.service.spi.Startable`
+and/or `org.hibernate.search.engine.service.spi.Stoppable`, to be able to code preparation work
+or resource cleanup.
+
+===== Managed services
+
+To be transparently discoverable, you need a marker file in the jar bundling your custom components,
+which needs to be stored in the `/META-INF/services/` directory and named like the fully qualified
+name of your identifying interface, and contain a single line of text to match the fully qualified
+name of your implementation.
+
+.Marker path and filename for the CacheManagerService service
 ====
 ----
-com.acme.infra.hibernate.CacheServiceProvider
+/META-INF/services/org.hibernate.search.infinispan.CacheManagerService
 ----
 ====
 
+.Content of META-INF/services/org.hibernate.search.infinispan.CacheManagerService
+====
+----
+org.hibernate.search.infinispan.DefaultCacheManagerService
+----
+====
 
+This means that there can be only one default implementation for each interface: it would be an
+error to have multiple jars defining each a different implementation for the same service name,
+but you can override the implementation choice at runtime: that is called a _Provided_ service.
+
+[[section-provided-services]]
 ===== Provided services
-
-Alternatively, the service can be provided by the environment bootstrapping Hibernate Search. For
-example, Infinispan which uses Hibernate Search as its internal search engine can pass the
-CacheContainer to Hibernate Search. In this case, the CacheContainer instance is not managed by
-Hibernate Search and the start/stop methods of its corresponding service provider will not be used.
-
-
-[NOTE]
-====
-Provided services have priority over managed services. If a provider service is registered with the
-same ServiceProvider class as a managed service, the provided service will be used.
-====
-
-
-The provided services are passed to Hibernate Search via the SearchConfiguration interface
-(getProvidedServices).
-
 
 [IMPORTANT]
 ====
@@ -341,51 +353,31 @@ Provided services are used by frameworks controlling the life-cycle of Hibernate
 Search and not by traditional users.
 ====
 
-If, as a user, you want to retrieve a service instance from the environment, use registry services
-like JNDI and look the service up in the provider.
+Alternatively, the service can be provided by the environment bootstrapping Hibernate Search. For
+example, Infinispan which uses Hibernate Search as its internal search engine can pass the
+`CacheContainer` to Hibernate Search.
+In this case, the `CacheContainer` instance is not managed by Hibernate Search and the start/stop
+methods defined by optional `Stoppable` and `Startable` interfaces will be ignored.
 
-==== Using a service
+A Service implementation which is only used as a Provided Service doesn't need to have a public
+constructor taking no arguments.
 
-Many of of the pluggable contracts of Hibernate Search can use services. Services are accessible via
-the BuildContext interface.
-
-.Example of a directory provider using a cache service
+[NOTE]
 ====
-[source, JAVA]
-----
-public CustomDirectoryProvider implements DirectoryProvider<RAMDirectory> {
-    private BuildContext context;
-
-    public void initialize(
-        String directoryProviderName,
-        Properties properties,
-        BuildContext context) {
-        //initialize
-        this.context = context;
-    }
-
-    public void start() {
-        Cache cache = context.requestService(CacheServiceProvider.class);
-        //use cache
-    }
-
-    public RAMDirectory getDirectory() {
-        // use cache
-    }
-
-    public stop() {
-        //stop services
-        context.releaseService(CacheServiceProvider.class);
-    }
-}
-----
+Provided services have priority over managed services. If a provided service is registered with the
+same ServiceManager class as a managed service, the provided service will be used.
 ====
 
-When you request a service, an instance of the service is served to you. Make sure to then release
-the service. This is fundamental. Note that the service can be released in the
-DirectoryProvider.stop method if the DirectoryProvider uses the service during its lifetime or could
-be released right away of the service is simply used at initialization time.
+The provided services are passed to Hibernate Search via the SearchConfiguration interface: as
+implementor of method `getProvidedServices` you can return a Map of all services you need to
+provide.
 
+[NOTE]
+====
+When implementing a custom `org.hibernate.search.cfg.spi.SearchConfiguration` we recommend you
+extend the base class `org.hibernate.search.cfg.spi.SearchConfigurationBase`: that will improve
+compatibility by not breaking your code when we need to add new methods to this interface.
+====
 
 === Customizing Lucene's scoring formula
 
