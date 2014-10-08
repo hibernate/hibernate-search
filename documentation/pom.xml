@@ -67,28 +67,24 @@
                     <sourceDirectory>${jdocbookSourceDirectory}</sourceDirectory>
                     <sourceDocumentName>master.xml</sourceDocumentName>
                     <masterTranslation>en-US</masterTranslation>
-                    <translations>
-                    </translations>
+                    <translations></translations>
                     <imageResource>
                         <directory>${basedir}/src/main/docbook/en-US/images</directory>
                     </imageResource>
                     <formats>
                         <format>
                             <formatName>pdf</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl</stylesheetResource>
                             <finalName>hibernate_search_reference.pdf</finalName>
                         </format>
                         <format>
                             <formatName>html_single</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl</stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                         <format>
                             <formatName>html</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
-                            </stylesheetResource>
+                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl</stylesheetResource>
                             <finalName>index.html</finalName>
                         </format>
                     </formats>
@@ -165,7 +161,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore></ignore>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>

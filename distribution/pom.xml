@@ -126,8 +126,7 @@
                             <packages>org.hibernate.search.infinispan</packages>
                         </group>
                     </groups>
-                    <bottom>
-                        <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a>  All Rights Reserved]]></bottom>
+                    <bottom>Copyright &amp;copy; ${project.inceptionYear}-{currentYear} &lt;a href="http://redhat.com"&gt;Red Hat, Inc.&lt;/a&gt;  All Rights Reserved</bottom>
                 </configuration>
                 <executions>
                     <execution>
