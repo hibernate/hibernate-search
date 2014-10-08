@@ -38,13 +38,45 @@
     <properties>
         <module.xml.basedir>src/main/modules</module.xml.basedir>
         <hibernate.search.version>${project.version}</hibernate.search.version>
+        <hibernate.search.module.slot>${project.version}</hibernate.search.module.slot>
+
+        <!-- Needs to match the SLOT being used by Infinispan -->
+        <infinispan.integration.slot>5.3</infinispan.integration.slot>
+
+        <!-- Needs to match the SLOT being used by Infinispan -->
+        <jgroups.integration.slot>3.2</jgroups.integration.slot>
+
+        <!-- Needs to match the VERSION being used by Infinispan -->
+        <hibernate-search-infinispan.version>${project.version}</hibernate-search-infinispan.version>
+
+        <!-- Needs to match the VERSION being used by Infinispan (if any) -->
+        <jbossmarshalling.integration.slot>main</jbossmarshalling.integration.slot>
+
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-infinispan</artifactId>
+            <!-- This is not the version built by this same project Tag!
+              We need to use the version included in the Infinispan distribution -->
+            <version>${hibernate-search-infinispan.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-search-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-engine</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-lucene-directory</artifactId>
+            <version>${infinispanVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -92,6 +124,17 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+               <!-- Disable Enforcer as we're overriding the version to an external version of
+                org.hibernate:hibernate-search-infinispan -->
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-rules</id>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>
