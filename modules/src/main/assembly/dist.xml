@@ -25,6 +25,7 @@
     <id>jbossas-74-dist</id>
     <formats>
         <format>zip</format>
+        <format>dir</format> <!-- For ease of debugging only -->
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <baseDirectory>/</baseDirectory>
@@ -51,8 +52,8 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${module.xml.basedir}/infinispan/lucene-directory/module.xml</source>
-            <outputDirectory>/org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
+            <source>${module.xml.basedir}/search/infinispan-storage/module.xml</source>
+            <outputDirectory>/org/hibernate/search/infinispan-storage/${infinispan.integration.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -66,7 +67,6 @@
             <includes>
                 <include>org.hibernate:hibernate-search-engine</include>
                 <include>org.hibernate:hibernate-search-analyzer</include>
-                <include>org.hibernate:hibernate-search-infinispan</include>
             </includes>
             <excludes>
                 <exclude>org.apache.lucene:*</exclude>
@@ -93,11 +93,14 @@
 
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
+            <outputDirectory>org/hibernate/search/infinispan-storage/${infinispan.integration.slot}</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
                 <include>org.infinispan:infinispan-lucene-directory</include>
+                <include>org.infinispan:infinispan-core</include>
+                <include>org.infinispan:infinispan-commons</include>
+                <include>org.hibernate:hibernate-search-infinispan</include>
             </includes>
         </dependencySet>
 
