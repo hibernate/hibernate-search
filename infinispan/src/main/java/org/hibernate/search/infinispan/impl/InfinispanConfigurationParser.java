@@ -57,11 +57,21 @@ public class InfinispanConfigurationParser {
 	private ConfigurationBuilderHolder parseFile(ClassLoaderService classLoaderService, String filename, String transportOverrideResource) {
 		InputStream is = classLoaderService.locateResourceStream( filename );
 		try {
-			ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
-			//Workaround Infinispan's ClassLoader strategies to bend to our will:
-			fixClassLoaders( builderHolder );
-			patchTransportConfiguration( builderHolder, transportOverrideResource );
-			return builderHolder;
+			//Infinispan requires the context ClassLoader to have full visibility on all
+			//its components and eventual extension points even *during* configuration parsing.
+			final Thread currentThread = Thread.currentThread();
+			final ClassLoader originalContextClassLoader = currentThread.getContextClassLoader();
+			try {
+				currentThread.setContextClassLoader( ispnClassLoadr );
+				ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
+				//Workaround Infinispan's ClassLoader strategies to bend to our will:
+				fixClassLoaders( builderHolder );
+				patchTransportConfiguration( builderHolder, transportOverrideResource );
+				return builderHolder;
+			}
+			finally {
+				currentThread.setContextClassLoader( originalContextClassLoader );
+			}
 		}
 		finally {
 			Util.close( is );
