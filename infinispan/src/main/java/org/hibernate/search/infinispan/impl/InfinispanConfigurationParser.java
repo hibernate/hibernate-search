@@ -76,9 +76,19 @@ public class InfinispanConfigurationParser {
 			}
 		}
 		try {
-			ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
-			patchInfinispanClassLoader( builderHolder );
-			return builderHolder;
+			//Infinispan requires the context ClassLoader to have full visibility on all
+			//its components and eventual extension points even *during* configuration parsing.
+			final Thread currentThread = Thread.currentThread();
+			final ClassLoader originalContextClassLoader = currentThread.getContextClassLoader();
+			try {
+				currentThread.setContextClassLoader( searchConfigClassloader );
+				ConfigurationBuilderHolder builderHolder = configurationParser.parse( is );
+				patchInfinispanClassLoader( builderHolder );
+				return builderHolder;
+			}
+			finally {
+				currentThread.setContextClassLoader( originalContextClassLoader );
+			}
 		}
 		finally {
 			Util.close( is );
