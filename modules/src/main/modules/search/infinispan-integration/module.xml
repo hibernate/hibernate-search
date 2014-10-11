@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.infinispan-integration" slot="${hibernate.search.version}">
+    <resources>
+        <resource-root path="hibernate-search-infinispan-${hibernate.search.version}.jar" />
+    </resources>
+    <dependencies>
+        <module name="javax.transaction.api" />
+        <module name="org.apache.lucene" slot="${lucene.module.slot}" />
+        <module name="org.jboss.logging" />
+
+        <!-- Refer to the Infinispan 7 library modules -->
+        <module name="org.infinispan.lucene-directory" slot="${infinispan.module.slot}" />
+        <module name="org.infinispan" slot="${infinispan.module.slot}" />
+        <module name="org.infinispan.commons" slot="${infinispan.module.slot}" />
+
+        <!-- For CacheManager lookup by Naming -->
+        <module name="javax.api" />
+        <module name="org.jboss.as.naming" />
+    </dependencies>
+</module>
