@@ -20,7 +20,7 @@
         <module name="org.apache.avro" optional="true" />
 
         <!-- JMS backend support -->
-        <module name="org.hibernate.search.backend-jms" export="true" optional="true" slot="${hibernate.search.module.slot}" />
+        <module name="org.hibernate.search.backend-jms" export="true" optional="true" slot="${hibernate.search.version}" />
 
         <!-- JGroups integration -->
         <module name="org.jgroups" optional="true" slot="${jgroups.module.slot}" />

@@ -45,11 +45,6 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${aliases.xml.basedir}/search/backend-jms/module.xml</source>
-            <outputDirectory>/org/hibernate/search/backend-jms/${hibernate.search.module.slot}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
             <source>${module.xml.basedir}/search/infinispan-integration/module.xml</source>
             <outputDirectory>/org/hibernate/search/infinispan-integration/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
