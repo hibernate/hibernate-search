@@ -22,6 +22,19 @@
         <module.xml.basedir>src/main/modules</module.xml.basedir>
         <aliases.xml.basedir>src/main/aliases</aliases.xml.basedir>
         <hibernate.search.version>${project.version}</hibernate.search.version>
+
+        <!-- Needs to match the SLOT being used by Infinispan -->
+        <infinispan.integration.slot>${infinispan.module.slot}</infinispan.integration.slot>
+
+        <!-- Needs to match the SLOT being used by Infinispan -->
+        <jgroups.integration.slot>${jgroups.module.slot}</jgroups.integration.slot>
+
+        <!-- Needs to match the VERSION being used by Infinispan -->
+        <hibernate-search-infinispan.version>${project.version}</hibernate-search-infinispan.version>
+
+        <!-- Needs to match the SLOT being used by Infinispan (if any) -->
+        <jbossmarshalling.integration.slot>main</jbossmarshalling.integration.slot>
+
     </properties>
 
     <dependencies>
@@ -82,6 +95,17 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+               <!-- Disable Enforcer as we're overriding the version to an external version of
+                org.hibernate:hibernate-search-infinispan -->
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-rules</id>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>

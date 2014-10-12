@@ -106,6 +106,14 @@
             <groupId>org.jboss.shrinkwrap.descriptors</groupId>
             <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <!-- This exclusion is needed to be able to setup the project in Windows:
+                     it otherwise includes transitive dependency to the JDK JConsole -->
+                <exclusion>
+                    <artifactId>wildfly-patching</artifactId>
+                    <groupId>org.wildfly</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Java EE API -->
@@ -189,16 +197,32 @@
                                     <artifactId>wildfly-dist</artifactId>
                                     <version>${wildflyVersion}</version>
                                     <type>tar.gz</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/node1</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${wildflyVersion}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/node2</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.infinispan</groupId>
                                     <artifactId>infinispan-as-embedded-modules</artifactId>
                                     <version>${infinispanVersion}</version>
                                     <type>zip</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.infinispan</groupId>
+                                    <artifactId>infinispan-as-embedded-modules</artifactId>
+                                    <version>${infinispanVersion}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
@@ -207,7 +231,16 @@
                                     <classifier>wildfly-8-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildflyVersion}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-modules</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>wildfly-8-dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -220,13 +253,29 @@
                 <executions>
                     <!-- Copy the AS configuration files so we can use our custom configurations -->
                     <execution>
-                        <id>configure-as-node</id>
+                        <id>configure-as-node-node1</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/wildfly-${wildflyVersion}</outputDirectory>
+                            <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/wildflyConfig</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>configure-as-node-node2</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -237,13 +286,13 @@
                     </execution>
                     <!-- Apply patching of Infinispan Lucene Directory module: force new Lucene version for Lucene Directory module -->
                     <execution>
-                        <id>fix-infinispan-directory-module</id>
+                        <id>fix-infinispan-directory-module-node1</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/wildfly-${wildflyVersion}/modules/org/infinispan/lucene-directory/${infinispan.module.slot}</outputDirectory>
+                            <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}/modules/org/infinispan/lucene-directory/${infinispan.module.slot}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -254,13 +303,47 @@
                     </execution>
                     <!-- Apply patching of Infinispan Lucene Directory module: force new Lucene version for Infinispan Query module -->
                     <execution>
-                        <id>fix-infinispan-modules</id>
+                        <id>fix-infinispan-modules-node1</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/wildfly-${wildflyVersion}/modules/org/infinispan/query/${infinispan.module.slot}</outputDirectory>
+                            <outputDirectory>${project.build.directory}/node1/wildfly-${wildflyVersion}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/infinispan-workarounds/query</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- Apply patching of Infinispan Lucene Directory module: force new Lucene version for Lucene Directory module -->
+                    <execution>
+                        <id>fix-infinispan-directory-module-node2</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}/modules/org/infinispan/lucene-directory/${infinispan.module.slot}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/infinispan-workarounds/lucene-directory</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- Apply patching of Infinispan Lucene Directory module: force new Lucene version for Infinispan Query module -->
+                    <execution>
+                        <id>fix-infinispan-modules-node2</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/node2/wildfly-${wildflyVersion}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>

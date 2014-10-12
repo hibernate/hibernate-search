@@ -15,7 +15,10 @@ import org.hibernate.search.test.integration.wildfly.controller.MemberRegistrati
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
@@ -40,14 +43,27 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Arquillian.class)
 public class InfinispanModuleMemberRegistrationIT {
 
-	@Deployment
-	public static Archive<?> createTestArchive() {
+	@Deployment(name = "dep.active-1")
+	@TargetsContainer("container.active-1")
+	public static Archive<?> createTestDeploymentOne() {
+		return createTestArchive();
+	}
+
+	@Deployment(name = "dep.active-2")
+	@TargetsContainer("container.active-2")
+	public static Archive<?> createTestDeploymentTwo() {
+		return createTestArchive();
+	}
+
+	private static Archive<?> createTestArchive() {
 		return ShrinkWrap
 				.create( WebArchive.class, InfinispanModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsResource( "local-infinispan.xml", "local-infinispan.xml" )
 				.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" )
+				//This test is simply reusing the default configuration file, but we copy
+				//this configuration into the Archive to verify that resources can be loaded from it:
+				.addAsResource( "user-provided-infinispan.xml", "user-provided-infinispan.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -71,8 +87,12 @@ public class InfinispanModuleMemberRegistrationIT {
 				.value( "infinispan" )
 				.up()
 				.createProperty()
+				.name( "hibernate.search.default.exclusive_index_use" )
+				.value( "false" )
+				.up()
+				.createProperty()
 				.name( "hibernate.search.infinispan.configuration_resourcename" )
-				.value( "local-infinispan.xml" )
+				.value( "user-provided-infinispan.xml" )
 				.up()
 				.up()
 				.up()
@@ -83,7 +103,7 @@ public class InfinispanModuleMemberRegistrationIT {
 	@Inject
 	MemberRegistration memberRegistration;
 
-	@Test
+	@Test @InSequence(value = 1) @OperateOnDeployment("dep.active-1")
 	public void testRegister() throws Exception {
 		Member newMember = memberRegistration.getNewMember();
 		newMember.setName( "Davide D'Alto" );
@@ -94,7 +114,7 @@ public class InfinispanModuleMemberRegistrationIT {
 		assertNotNull( newMember.getId() );
 	}
 
-	@Test
+	@Test @InSequence(value = 2) @OperateOnDeployment("dep.active-2")
 	public void testNewMemberSearch() throws Exception {
 		Member newMember = memberRegistration.getNewMember();
 		newMember.setName( "Peter O'Tall" );
@@ -108,7 +128,7 @@ public class InfinispanModuleMemberRegistrationIT {
 		assertEquals( "Search hasn't found a new member", newMember.getName(), search.get( 0 ).getName() );
 	}
 
-	@Test
+	@Test @InSequence(value = 3) @OperateOnDeployment("dep.active-2")
 	public void testNonExistingMember() throws Exception {
 		List<Member> search = memberRegistration.search( "TotallyInventedName" );
 
