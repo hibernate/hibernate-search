@@ -46,7 +46,9 @@ public class InfinispanModuleMemberRegistrationIT {
 				.create( WebArchive.class, InfinispanModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsResource( "local-infinispan.xml", "local-infinispan.xml" )
+				//This test is simply reusing the default configuration file, but we copy
+				//this configuration into the Archive to verify that resources can be loaded from it:
+				.addAsResource( "user-provided-infinispan.xml", "user-provided-infinispan.xml" )
 				.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
@@ -72,7 +74,7 @@ public class InfinispanModuleMemberRegistrationIT {
 				.up()
 				.createProperty()
 				.name( "hibernate.search.infinispan.configuration_resourcename" )
-				.value( "local-infinispan.xml" )
+				.value( "user-provided-infinispan.xml" )
 				.up()
 				.up()
 				.up()
