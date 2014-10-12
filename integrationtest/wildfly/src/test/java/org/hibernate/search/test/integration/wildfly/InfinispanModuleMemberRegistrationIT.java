@@ -60,8 +60,10 @@ public class InfinispanModuleMemberRegistrationIT {
 				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsResource( "local-infinispan.xml", "local-infinispan.xml" )
 				.add( ModuleMemberRegistrationIT.manifest(), "META-INF/MANIFEST.MF" )
+				//This test is simply reusing the default configuration file, but we copy
+				//this configuration into the Archive to verify that resources can be loaded from it:
+				.addAsResource( "user-provided-infinispan.xml", "user-provided-infinispan.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
 	}
@@ -73,12 +75,25 @@ public class InfinispanModuleMemberRegistrationIT {
 				.name( "primary" )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
-					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
-					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
-					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "infinispan" ).up()
-					.createProperty().name( "hibernate.search.infinispan.configuration_resourcename" ).value( "local-infinispan.xml" ).up()
-				.up().up()
-			.exportAsString();
+				.createProperty()
+				.name( "hibernate.hbm2ddl.auto" )
+				.value( "create-drop" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.lucene_version" )
+				.value( "LUCENE_CURRENT" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.directory_provider" )
+				.value( "infinispan" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.infinispan.configuration_resourcename" )
+				.value( "user-provided-infinispan.xml" )
+				.up()
+				.up()
+				.up()
+				.exportAsString();
 		return new StringAsset( persistenceXml );
 	}
 
