@@ -2,7 +2,7 @@
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
-  ~ Copyright (c) 2012, Red Hat, Inc. and/or its affiliates or third-party contributors as
+  ~ Copyright (c) 2014, Red Hat, Inc. and/or its affiliates or third-party contributors as
   ~ indicated by the @author tags or express copyright attribution
   ~ statements applied by the authors.  All third-party contributions are
   ~ distributed under license by Red Hat, Inc.
@@ -22,27 +22,20 @@
   ~ 51 Franklin Street, Fifth Floor
   ~ Boston, MA  02110-1301  USA
   -->
-<module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.engine" slot="${hibernate.search.module.slot}">
+<module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.search-infinispan-integration-for-eap" slot="${hibernate.search.module.slot}">
     <resources>
-        <resource-root path="hibernate-search-engine-${hibernate.search.version}.jar" />
-        <resource-root path="hibernate-search-analyzers-${hibernate.search.version}.jar" />
-        <resource-root path="avro-${avroVersion}.jar" />
-        <resource-root path="jackson-core-asl-${jacksonAslVersion}.jar" />
-        <resource-root path="jackson-mapper-asl-${jacksonAslVersion}.jar" />
-        <resource-root path="paranamer-${paranamerVersion}.jar" />
+        <resource-root path="hibernate-search-infinispan-${hibernate.search.version}.jar" />
     </resources>
     <dependencies>
         <module name="javax.transaction.api" />
-        <module name="org.hibernate" />
-        <module name="org.hibernate.commons-annotations" />
         <module name="org.apache.lucene" export="true" slot="${luceneVersion}" />
-        <module name="org.apache.solr" export="true" optional="true" slot="${luceneVersion}" />
-        <module name="org.hibernate.search.search-infinispan-integration-for-eap" slot="${hibernate.search.module.slot}" services="import" />
+        <module name="org.hibernate.search.engine" slot="${hibernate.search.module.slot}" />
+        <module name="org.infinispan.lucene-directory" services="import" slot="${infinispanVersion}" />
+        <module name="org.infinispan" />
+        <module name="org.infinispan.commons" />
         <module name="org.jboss.logging" />
-        <module name="javax.persistence.api" />
-        <module name="javax.jms.api" />
 
-        <!-- For naming (used by Hibernate Search Infinispan) -->
+        <!-- For naming -->
         <module name="javax.api" />
         <module name="org.jboss.as.naming" />
     </dependencies>
