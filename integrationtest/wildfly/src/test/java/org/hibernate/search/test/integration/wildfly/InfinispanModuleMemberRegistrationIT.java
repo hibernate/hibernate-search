@@ -15,7 +15,10 @@ import org.hibernate.search.test.integration.wildfly.controller.MemberRegistrati
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
@@ -40,7 +43,8 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Arquillian.class)
 public class InfinispanModuleMemberRegistrationIT {
 
-	@Deployment
+	@Deployment(name = "dep.active-1")
+	@TargetsContainer("container.active-1")
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
 				.create( WebArchive.class, InfinispanModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
@@ -51,6 +55,13 @@ public class InfinispanModuleMemberRegistrationIT {
 				.addAsResource( "user-provided-infinispan.xml", "user-provided-infinispan.xml" )
 				.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
+	}
+
+	@Deployment(name = "dep.active-2")
+	@TargetsContainer("container.active-2")
+	public static Archive<?> createTestDeploymentTwo() {
+		//Second deployment is identical:
+		return createTestArchive();
 	}
 
 	private static Asset persistenceXml() {
@@ -73,6 +84,10 @@ public class InfinispanModuleMemberRegistrationIT {
 				.value( "infinispan" )
 				.up()
 				.createProperty()
+				.name( "hibernate.search.default.exclusive_index_use" )
+				.value( "false" )
+				.up()
+				.createProperty()
 				.name( "hibernate.search.infinispan.configuration_resourcename" )
 				.value( "user-provided-infinispan.xml" )
 				.up()
@@ -85,7 +100,7 @@ public class InfinispanModuleMemberRegistrationIT {
 	@Inject
 	MemberRegistration memberRegistration;
 
-	@Test
+	@Test @InSequence(value = 1) @OperateOnDeployment("dep.active-1")
 	public void testRegister() throws Exception {
 		Member newMember = memberRegistration.getNewMember();
 		newMember.setName( "Davide D'Alto" );
@@ -96,7 +111,7 @@ public class InfinispanModuleMemberRegistrationIT {
 		assertNotNull( newMember.getId() );
 	}
 
-	@Test
+	@Test @InSequence(value = 2) @OperateOnDeployment("dep.active-2")
 	public void testNewMemberSearch() throws Exception {
 		Member newMember = memberRegistration.getNewMember();
 		newMember.setName( "Peter O'Tall" );
@@ -110,7 +125,7 @@ public class InfinispanModuleMemberRegistrationIT {
 		assertEquals( "Search hasn't found a new member", newMember.getName(), search.get( 0 ).getName() );
 	}
 
-	@Test
+	@Test @InSequence(value = 3) @OperateOnDeployment("dep.active-2")
 	public void testNonExistingMember() throws Exception {
 		List<Member> search = memberRegistration.search( "TotallyInventedName" );
 
