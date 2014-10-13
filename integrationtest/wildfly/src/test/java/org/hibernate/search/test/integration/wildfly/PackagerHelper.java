@@ -61,6 +61,7 @@ public class PackagerHelper {
 			.using( new RejectDependenciesStrategy(
 				false, //we need some dependencies at the right version: Lucene, search-engine, etc..
 				"org.hibernate:hibernate-core",
+				"org.hibernate:hibernate-search-analyzers",
 				"org.hibernate:hibernate-commons-annotations",
 				"org.hibernate.javax.persistence:hibernate-jpa-2.1-api",
 				"org.jboss.logging:jboss-logging") )
