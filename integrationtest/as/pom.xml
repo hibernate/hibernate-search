@@ -214,7 +214,15 @@
                                     <version>${version.jboss.as}</version>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.jboss.as</groupId>
+                                    <artifactId>jboss-as-dist</artifactId>
+                                    <version>${version.jboss.as}</version>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/node2</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
@@ -223,7 +231,16 @@
                                     <classifier>jbossas-74-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/jboss-eap-6.3/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/jboss-eap-6.3/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-modules</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>jbossas-74-dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/node2/jboss-eap-6.3/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -236,13 +253,29 @@
                 <executions>
                     <!-- Copy the AS configuration files so we can use our custom configurations -->
                     <execution>
-                        <id>configure-as-node</id>
+                        <id>configure-as-node-node1</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/jboss-eap-6.3</outputDirectory>
+                            <outputDirectory>${project.build.directory}/node1/jboss-eap-6.3</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/as7config</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>configure-as-node-node2</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/node2/jboss-eap-6.3</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
