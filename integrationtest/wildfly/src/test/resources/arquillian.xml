@@ -8,19 +8,32 @@
         <property name="deploymentExportPath">target/</property>
     </engine>
 
-    <container qualifier="jboss" default="true">
-        <configuration>
-            <property name="jbossHome">${basedir}/target/wildfly-${version.wildfly}</property>
-            <!--
-                 Please leave this as false. It is a good, early catch for the reviewers to make
-                 sure that they have not left a stale server running when merging pull requests
-            -->
-            <property name="allowConnectingToRunningServer">false</property>
-            <!-- Needed for JMS tests
-            <property name="serverConfig">standalone-full.xml</property> -->
-            <!-- To debug the Arquillian managed application server: -->
-            <!-- <property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m -XX:MaxPermSize=128m</property> -->
-        </configuration>
-    </container>
+    <group qualifier="Grid" default="true">
+        <container qualifier="container.active-1" default="true">
+            <configuration>
+                <!--
+                     Please leave this as false. It is a good, early catch for the reviewers to make
+                     sure that they have not left a stale server running when merging pull requests
+                -->
+                <property name="allowConnectingToRunningServer">false</property>
+                <!-- Needed for JMS tests -->
+                <property name="serverConfig">standalone-full.xml</property>
+                <property name="jbossHome">${basedir}/target/node1/wildfly-${version.wildfly}</property>
+                <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=128m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
+                <!-- To debug the Arquillian managed application server: -->
+                <!-- property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m -XX:MaxPermSize=128m -Dorg.jboss.remoting-jmx.timeout=300  -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property-->
+            </configuration>
+        </container>
+        <!-- Copy of the above, except a port offset is applied and running from a different copy -->
+        <container qualifier="container.active-2">
+            <configuration>
+                <property name="allowConnectingToRunningServer">false</property>
+                <property name="serverConfig">standalone-full.xml</property>
+                <property name="jbossHome">${basedir}/target/node2/wildfly-${version.wildfly}</property>
+                <property name="javaVmArguments">-Djboss.socket.binding.port-offset=10000 -Xmx512m -XX:MaxPermSize=128m  -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
+                <property name="managementPort">19990</property>
+            </configuration>
+        </container>
+    </group>
 
 </arquillian>

@@ -224,7 +224,7 @@
                                     <version>${version.wildfly}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
@@ -233,7 +233,24 @@
                                     <classifier>wildfly-8-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${version.wildfly}/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${version.wildfly}/modules</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${version.wildfly}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/node2</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-search-modules</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>wildfly-8-dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/node2/wildfly-${version.wildfly}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -246,13 +263,29 @@
                 <executions>
                     <!-- Copy the AS configuration files so we can use our custom configurations -->
                     <execution>
-                        <id>configure-as-node</id>
+                        <id>configure-as-node-node1</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/wildfly-${version.wildfly}</outputDirectory>
+                            <outputDirectory>${project.build.directory}/node1/wildfly-${version.wildfly}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/as7config</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>configure-as-node-node2</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/node2/wildfly-${version.wildfly}</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
