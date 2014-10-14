@@ -63,17 +63,9 @@ public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSla
 			Set<File> libraryFiles = new HashSet<File>();
 			libraryFiles.add( dependency( "org.hibernate:hibernate-search-orm:" + currentVersion ) );
 			libraryFiles.add( dependency( "org.hibernate:hibernate-search-engine:" + currentVersion ) );
-			libraryFiles.add(
-					dependency( "org.apache.lucene:lucene-core:" + VersionTestHelper.getDependencyVersionLucene() )
-			);
-			libraryFiles.add(
-					dependency( "org.apache.lucene:lucene-analyzers:" + VersionTestHelper.getDependencyVersionLucene() )
-			);
-			libraryFiles.add(
-					dependency(
-							"org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations()
-					)
-			);
+			libraryFiles.add( dependency( "org.apache.lucene:lucene-core:" + VersionTestHelper.getDependencyVersionLucene() ) );
+			libraryFiles.add( dependency( "org.apache.lucene:lucene-analyzers:" + VersionTestHelper.getDependencyVersionLucene() ) );
+			libraryFiles.add( dependency( "org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations() ) );
 			return libraryFiles.toArray( new File[0] );
 		}
 
