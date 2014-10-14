@@ -16,6 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 
+import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
@@ -72,6 +73,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	private final ReentrantLock writeLock = new ReentrantLock();
 	private final AtomicReference<DirectoryReader> currentReader = new AtomicReference<DirectoryReader>();
+	private final CommitPolicy commitPolicy = new NRTCommitPolicy( writerHolder );
 
 	/**
 	 * Visits {@code LuceneWork} types to determine the kind of flushing we need to apply on the indexes
@@ -125,10 +127,8 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 
 	@Override
 	public void afterTransactionApplied(boolean someFailureHappened, boolean streaming) {
-		if ( someFailureHappened ) {
-			writerHolder.forceLockRelease();
-		}
-		else if ( !streaming ) {
+		commitPolicy.onChangeSetApplied( someFailureHappened, streaming );
+		if ( ! streaming ) {
 			setupNewReadersRequirements();
 		}
 	}
@@ -273,13 +273,18 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	public void flush() {
 		//Even if this is the NRT workspace, Flush is implemented as a real Flush to make sure
 		//MassIndexer output is committed to permanent storage
-		writerHolder.commitIndexWriter();
+		commitPolicy.onFlush();
 	}
 
 	@Override
 	public void notifyWorkApplied(LuceneWork work) {
 		incrementModificationCounter();
 		work.getWorkDelegate( flushStrategySelector ).apply( this );
+	}
+
+	@Override
+	public CommitPolicy getCommitPolicy() {
+		return commitPolicy;
 	}
 
 	/**

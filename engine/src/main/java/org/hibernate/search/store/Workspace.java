@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 
 /**
@@ -83,5 +84,11 @@ public interface Workspace {
 	 * @param work the LuceneWork which was just processed
 	 */
 	void notifyWorkApplied(LuceneWork work);
+
+	/**
+	 * Get the commit policy applied to the workspace
+	 * @return {@link org.hibernate.search.backend.impl.CommitPolicy}
+	 */
+	CommitPolicy getCommitPolicy();
 
 }

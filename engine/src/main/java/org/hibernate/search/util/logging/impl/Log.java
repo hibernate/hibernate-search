@@ -670,4 +670,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 228, value = "Property " + Environment.LUCENE_MATCH_VERSION + " set to value '%s' is not in a valid format to express a Lucene version: %s" )
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage);
 
+	@Message(id = 229, value = "Property " + Environment.INDEX_FLUSH_INTERVAL + "for the index '%s' needs to be positive." )
+	SearchException flushIntervalNeedsToBePositive(String indexName);
+
 }
