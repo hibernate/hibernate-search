@@ -63,6 +63,10 @@ public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSla
 			libraryFiles.add( dependency( "org.apache.lucene:lucene-core:" + VersionTestHelper.getDependencyVersionLucene() ) );
 			libraryFiles.add( dependency( "org.apache.lucene:lucene-analyzers:" + VersionTestHelper.getDependencyVersionLucene()) );
 			libraryFiles.add( dependency( "org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations() ) );
+			libraryFiles.add( dependency( "org.apache.avro:avro:jar:1.7.5" ) );
+			libraryFiles.add( dependency( "org.codehaus.jackson:jackson-core-asl:jar:1.9.2" ) );
+			libraryFiles.add( dependency( "org.codehaus.jackson:jackson-mapper-asl:1.9.2" ) );
+			libraryFiles.add( dependency( "com.thoughtworks.paranamer:paranamer:jar:2.3" ) );
 			return libraryFiles.toArray( new File[0] );
 		}
 
