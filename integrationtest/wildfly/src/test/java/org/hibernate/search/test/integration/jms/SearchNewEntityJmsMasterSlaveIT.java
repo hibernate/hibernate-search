@@ -24,17 +24,20 @@
 package org.hibernate.search.test.integration.jms;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.hibernate.search.Version;
-import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+
+import org.hibernate.search.Version;
+import org.hibernate.search.test.integration.VersionTestHelper;
+import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 /**
  * Execute the tests in {@link SearchNewEntityJmsMasterSlave} adding the the dependencies as jars in the
@@ -51,24 +54,34 @@ public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSla
 
 	/**
 	 * Lazy initialization of the libraries since Maven is painfully slow.
-	 *
-	 * @author Davide D'Alto <davide@hibernate.org>
 	 */
 	private static class LibrariesLoader {
 		public static final File[] LIBRARIES = init();
 
 		private static File[] init() {
-			MavenDependencyResolver resolver = DependencyResolvers.use( MavenDependencyResolver.class );
-			String currentVersion = Version.getVersionString();
-			File[] libraryFiles = resolver
-					.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
-					.exclusion( "org.hibernate:hibernate-entitymanager" )
-					.exclusion( "org.hibernate:hibernate-core" )
-					.exclusion( "org.hibernate:hibernate-search-analyzers" )
-					.exclusion( "org.jboss.logging:jboss-logging" )
-					.exclusion( "org.slf4j:slf4j-api" )
-					.resolveAsFiles();
-			return libraryFiles;
+			final String currentVersion = Version.getVersionString();
+			Set<File> libraryFiles = new HashSet<File>();
+			libraryFiles.add( dependency( "org.hibernate:hibernate-search-orm:" + currentVersion ) );
+			libraryFiles.add( dependency( "org.hibernate:hibernate-search-engine:" + currentVersion ) );
+			libraryFiles.add(
+					dependency( "org.apache.lucene:lucene-core:" + VersionTestHelper.getDependencyVersionLucene() )
+			);
+			libraryFiles.add(
+					dependency( "org.apache.lucene:lucene-analyzers:" + VersionTestHelper.getDependencyVersionLucene() )
+			);
+			libraryFiles.add(
+					dependency(
+							"org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations()
+					)
+			);
+			return libraryFiles.toArray( new File[0] );
+		}
+
+		private static File dependency(String mavenName) {
+			return Maven.resolver()
+					.resolve( mavenName )
+					.withoutTransitivity()
+					.asSingleFile();
 		}
 	}
 

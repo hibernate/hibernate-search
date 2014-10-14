@@ -24,7 +24,6 @@
 package org.hibernate.search.test.integration.wildfly;
 
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -34,16 +33,12 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.search.Version;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
@@ -64,22 +59,12 @@ public class MemberRegistrationIT {
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		String currentVersion = Version.getVersionString();
 		WebArchive archive = ShrinkWrap
 				.create( WebArchive.class, MemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsLibraries(
-						DependencyResolvers.use( MavenDependencyResolver.class )
-								.artifact( "org.hibernate:hibernate-search-orm:" + currentVersion )
-								.exclusion( "org.hibernate:hibernate-entitymanager" )
-								.exclusion( "org.hibernate:hibernate-core" )
-								.exclusion( "org.hibernate:hibernate-search-analyzers" )
-								.exclusion( "org.jboss.logging:jboss-logging" )
-								.resolveAs( JavaArchive.class ) )
+				.addAsLibraries( PackagerHelper.hibernateSearchLibraries() )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
-		// To debug dependencies, have it dump a zip export:
-		//archive.as( ZipExporter.class ).exportTo( new File("test-app.war"), true );
 		return archive;
 	}
 

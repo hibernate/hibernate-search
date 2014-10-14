@@ -48,7 +48,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.wildfly>8.1.0.Final</version.wildfly>
         <version.arquillian>1.1.2.Final</version.arquillian>
-        <version.shrinkwrapResolver>2.0.0-alpha-1</version.shrinkwrapResolver>
+        <version.shrinkwrapResolver>2.0.0</version.shrinkwrapResolver>
     </properties>
 
     <dependencyManagement>
@@ -103,6 +103,13 @@
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-depchain</artifactId>
+            <scope>test</scope>
+            <version>${version.shrinkwrapResolver}</version>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap.descriptors</groupId>
@@ -192,6 +199,13 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <hibernate.search.module.slot.version>${hibernate.search.module.slot}</hibernate.search.module.slot.version>
+                        <dependency.version.Lucene>${luceneVersion}</dependency.version.Lucene>
+                        <dependency.version.HibernateCommonsAnnotations>${hibernateCommonsAnnotationVersion}</dependency.version.HibernateCommonsAnnotations>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>

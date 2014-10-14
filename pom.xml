@@ -169,6 +169,7 @@
             <!-- Declared only in the modules. They are not Maven dependencies. -->
         <luceneRegexVersion>3.0.3</luceneRegexVersion>
         <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
+        <hibernate.search.module.slot>${project.version}</hibernate.search.module.slot>
     </properties>
 
     <dependencyManagement>
