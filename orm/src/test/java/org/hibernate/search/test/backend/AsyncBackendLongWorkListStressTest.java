@@ -14,6 +14,6 @@ public class AsyncBackendLongWorkListStressTest extends SyncBackendLongWorkListS
 	@Override
 	protected void configure(Configuration cfg) {
 		super.configure( cfg );
-		cfg.setProperty( Environment.WORKER_EXECUTION, "async" );
+		cfg.setProperty( "hibernate.search.default.worker.execution", "async" );
 	}
 }
