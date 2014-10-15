@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.TargetsContainer;
@@ -74,7 +75,7 @@ public class InfinispanModuleMemberRegistrationIT {
 				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.add( ModuleMemberRegistrationIT.manifest(), "META-INF/MANIFEST.MF" )
+				.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" )
 				//This test is simply reusing the default configuration file, but we copy
 				//this configuration into the Archive to verify that resources can be loaded from it:
 				.addAsResource( "user-provided-infinispan.xml", "user-provided-infinispan.xml" )

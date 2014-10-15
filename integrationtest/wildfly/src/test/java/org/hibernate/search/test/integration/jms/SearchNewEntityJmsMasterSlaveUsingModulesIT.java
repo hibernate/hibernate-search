@@ -25,8 +25,8 @@ package org.hibernate.search.test.integration.jms;
 
 import java.io.File;
 
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
-import org.hibernate.search.test.integration.wildfly.ModuleMemberRegistrationIT;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -68,7 +68,7 @@ public class SearchNewEntityJmsMasterSlaveUsingModulesIT extends SearchNewEntity
 	}
 
 	private static void addDependecies(Archive<?> archive) {
-		archive.add( ModuleMemberRegistrationIT.manifest(), "META-INF/MANIFEST.MF" );
+		archive.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" );
 	}
 
 }

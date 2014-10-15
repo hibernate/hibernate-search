@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -60,13 +61,9 @@ public class ModuleMemberRegistrationIT {
 				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.add( manifest(), "META-INF/MANIFEST.MF" )
+				.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
-	}
-
-	public static Asset manifest() {
-		return SolrModuleMemberRegistrationIT.manifest( false );
 	}
 
 	private static Asset persistenceXml() {

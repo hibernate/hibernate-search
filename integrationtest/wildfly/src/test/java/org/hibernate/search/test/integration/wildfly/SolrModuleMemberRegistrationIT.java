@@ -33,12 +33,12 @@ import junit.framework.Assert;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
-import org.hibernate.search.Version;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.test.integration.wildfly.controller.MemberRegistration;
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.model.SolrMember;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.util.AnalyzerUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -50,7 +50,6 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -69,21 +68,9 @@ public class SolrModuleMemberRegistrationIT {
 				.create( WebArchive.class, SolrModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, SolrMember.class, MemberRegistration.class, Resources.class, AnalyzerUtils.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.add( manifest( true ), "META-INF/MANIFEST.MF" )
+				.add( VersionTestHelper.moduleDependencyManifestIncludingSolr(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
-	}
-
-	public static Asset manifest(boolean includeSolr) {
-		final String currentVersion = Version.getVersionString();
-		String dependencyDef = "org.hibernate.search.orm:" + currentVersion + " services";
-		if ( includeSolr ) {
-			dependencyDef = dependencyDef + ", org.apache.solr:3.6.2";
-		}
-		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", dependencyDef )
-				.exportAsString();
-		return new StringAsset( manifest );
 	}
 
 	private static Asset persistenceXml() {

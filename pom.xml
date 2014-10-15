@@ -142,6 +142,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <hibernate.search.module.slot>${project.version}</hibernate.search.module.slot>
+
         <slf4jVersion>1.6.1</slf4jVersion>
         <luceneVersion>3.6.2</luceneVersion>
         <infinispanVersion>6.0.2.Final</infinispanVersion>
