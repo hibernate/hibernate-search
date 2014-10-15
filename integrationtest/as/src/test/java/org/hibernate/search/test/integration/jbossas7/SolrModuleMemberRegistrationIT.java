@@ -34,6 +34,7 @@ import junit.framework.Assert;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jbossas7.controller.MemberRegistration;
 import org.hibernate.search.test.integration.jbossas7.model.Member;
 import org.hibernate.search.test.integration.jbossas7.model.SolrMember;
@@ -49,7 +50,6 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -68,16 +68,9 @@ public class SolrModuleMemberRegistrationIT {
 				.create( WebArchive.class, SolrModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, SolrMember.class, MemberRegistration.class, Resources.class, AnalyzerUtils.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.add( manifest(), "META-INF/MANIFEST.MF" )
+				.add( VersionTestHelper.moduleDependencyManifestIncludingSolr(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
-	}
-
-	private static Asset manifest() {
-		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", "org.hibernate.search.orm services, org.apache.solr:3.6.2" )
-				.exportAsString();
-		return new StringAsset( manifest );
 	}
 
 	private static Asset persistenceXml() {

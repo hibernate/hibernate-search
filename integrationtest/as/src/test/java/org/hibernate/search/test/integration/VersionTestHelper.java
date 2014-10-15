@@ -43,6 +43,7 @@ import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 public class VersionTestHelper {
 
 	private static final String wildflySearchModuleDependency = "org.hibernate.search.orm:" + getVersionString() + " services";
+	private static final String wildflySearchModuleDependencyIncludingSolr = "org.hibernate.search.orm:" + getVersionString() + " services, org.apache.solr:" + getDependencyVersionLucene();
 
 	private VersionTestHelper() {
 		//not meant to be created
@@ -61,6 +62,13 @@ public class VersionTestHelper {
 	public static Asset moduleDependencyManifest() {
 		String manifest = Descriptors.create( ManifestDescriptor.class )
 				.attribute( "Dependencies", wildflySearchModuleDependency )
+				.exportAsString();
+		return new StringAsset( manifest );
+	}
+
+	public static Asset moduleDependencyManifestIncludingSolr() {
+		String manifest = Descriptors.create( ManifestDescriptor.class )
+				.attribute( "Dependencies", wildflySearchModuleDependencyIncludingSolr )
 				.exportAsString();
 		return new StringAsset( manifest );
 	}

@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.hibernate.search.test.integration.VersionTestHelper;
 import org.hibernate.search.test.integration.jbossas7.controller.MemberRegistration;
 import org.hibernate.search.test.integration.jbossas7.model.Member;
 import org.hibernate.search.test.integration.jbossas7.util.Resources;
@@ -45,7 +46,6 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.spec.se.manifest.ManifestDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -75,19 +75,12 @@ public class InfinispanModuleMemberRegistrationIT {
 				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.add( manifest(), "META-INF/MANIFEST.MF" )
+				.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" )
 				//This test is simply reusing the default configuration file, but we copy
 				//this configuration into the Archive to verify that resources can be loaded from it:
 				.addAsResource( "user-provided-infinispan.xml", "user-provided-infinispan.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
-	}
-
-	private static Asset manifest() {
-		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", "org.hibernate.search.orm services" )
-				.exportAsString();
-		return new StringAsset( manifest );
 	}
 
 	private static Asset persistenceXml() {
