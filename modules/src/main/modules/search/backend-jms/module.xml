@@ -10,7 +10,7 @@
         <resource-root path="hibernate-search-backend-jms-${hibernate.search.version}.jar" />
     </resources>
     <dependencies>
-        <module name="org.hibernate.search.engine" slot="${hibernate.search.module.slot}" />
+        <module name="org.hibernate.search.engine" slot="${hibernate.search.version}" />
         <module name="org.jboss.logging" />
         <module name="javax.jms.api" />
         <module name="org.jboss.as.naming" />

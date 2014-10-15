@@ -45,8 +45,8 @@
             <filtered>true</filtered>
         </file>
         <file>
-            <source>${aliases.xml.basedir}/search/backend-jms/module.xml</source>
-            <outputDirectory>/org/hibernate/search/backend-jms/${hibernate.search.module.slot}</outputDirectory>
+            <source>${module.xml.basedir}/search/infinispan-integration/module.xml</source>
+            <outputDirectory>/org/hibernate/search/infinispan-integration/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -59,7 +59,6 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-engine</include>
-                <include>org.hibernate:hibernate-search-infinispan</include>
                 <include>org.hibernate:hibernate-search-serialization-avro</include>
             </includes>
             <excludes>
@@ -92,6 +91,16 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-backend-jms</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/infinispan-integration/${hibernate.search.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-search-infinispan</include>
             </includes>
         </dependencySet>
 

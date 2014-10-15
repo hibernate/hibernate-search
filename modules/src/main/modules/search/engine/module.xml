@@ -9,7 +9,6 @@
     <resources>
         <resource-root path="hibernate-search-engine-${hibernate.search.version}.jar" />
         <resource-root path="hibernate-search-serialization-avro-${hibernate.search.version}.jar" />
-        <resource-root path="hibernate-search-infinispan-${hibernate.search.version}.jar" />
     </resources>
     <dependencies>
         <module name="javax.transaction.api" />
@@ -21,15 +20,15 @@
         <module name="org.apache.avro" optional="true" />
 
         <!-- JMS backend support -->
-        <module name="org.hibernate.search.backend-jms" export="true" optional="true" slot="${hibernate.search.module.slot}" />
+        <module name="org.hibernate.search.backend-jms" export="true" optional="true" slot="${hibernate.search.version}" />
 
-        <!-- JGroups and Infinispan 7 integrations -->
+        <!-- JGroups integration -->
         <module name="org.jgroups" optional="true" slot="${jgroups.module.slot}" />
-        <module name="org.infinispan.lucene-directory" export="true" optional="true" services="import" slot="${infinispan.module.slot}" />
-        <module name="org.infinispan" optional="true" slot="${infinispan.module.slot}" />
-        <module name="org.infinispan.commons" optional="true" slot="${infinispan.module.slot}" />
 
-        <!-- For naming (used by Hibernate Search Infinispan) -->
+        <!-- Infinispan integration -->
+        <module name="org.hibernate.search.infinispan-integration" optional="true" services="import" slot="${hibernate.search.version}" />
+
+        <!-- For naming -->
         <module name="javax.api" />
         <module name="org.jboss.as.naming" />
     </dependencies>
