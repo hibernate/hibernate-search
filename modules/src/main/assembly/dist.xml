@@ -55,6 +55,11 @@
             <outputDirectory>/org/infinispan/lucene-directory/${infinispanVersion}</outputDirectory>
             <filtered>true</filtered>
         </file>
+        <file>
+            <source>${module.xml.basedir}/search/search-infinispan-integration-for-eap/module.xml</source>
+            <outputDirectory>/org/hibernate/search/search-infinispan-integration-for-eap/${hibernate.search.module.slot}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
     </files>
 
     <dependencySets>
@@ -66,7 +71,6 @@
             <includes>
                 <include>org.hibernate:hibernate-search-engine</include>
                 <include>org.hibernate:hibernate-search-analyzer</include>
-                <include>org.hibernate:hibernate-search-infinispan</include>
             </includes>
             <excludes>
                 <exclude>org.apache.lucene:*</exclude>
@@ -88,6 +92,16 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-orm</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/search-infinispan-integration-for-eap/${hibernate.search.module.slot}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-search-infinispan</include>
             </includes>
         </dependencySet>
 

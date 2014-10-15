@@ -33,7 +33,10 @@ import org.hibernate.search.test.integration.wildfly.controller.MemberRegistrati
 import org.hibernate.search.test.integration.wildfly.model.Member;
 import org.hibernate.search.test.integration.wildfly.util.Resources;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
@@ -54,16 +57,26 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class InfinispanModuleMemberRegistrationIT {
 
-	@Deployment
+	@Deployment(name = "dep.active-1")
+	@TargetsContainer("container.active-1")
 	public static Archive<?> createTestArchive() {
 		WebArchive archive = ShrinkWrap
 				.create( WebArchive.class, ModuleMemberRegistrationIT.class.getSimpleName() + ".war" )
 				.addClasses( Member.class, MemberRegistration.class, Resources.class )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsResource( "local-infinispan.xml", "local-infinispan.xml" )
+				//This test is simply reusing the default configuration file, but we copy
+				//this configuration into the Archive to verify that resources can be loaded from it:
+				.addAsResource( "user-provided-infinispan.xml", "user-provided-infinispan.xml" )
 				.add( ModuleMemberRegistrationIT.manifest(), "META-INF/MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return archive;
+	}
+
+	@Deployment(name = "dep.active-2")
+	@TargetsContainer("container.active-2")
+	public static Archive<?> createTestDeploymentTwo() {
+		//Second deployment is identical:
+		return createTestArchive();
 	}
 
 	private static Asset persistenceXml() {
@@ -73,19 +86,36 @@ public class InfinispanModuleMemberRegistrationIT {
 				.name( "primary" )
 				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
 				.getOrCreateProperties()
-					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
-					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
-					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "infinispan" ).up()
-					.createProperty().name( "hibernate.search.infinispan.configuration_resourcename" ).value( "local-infinispan.xml" ).up()
-				.up().up()
-			.exportAsString();
+				.createProperty()
+				.name( "hibernate.hbm2ddl.auto" )
+				.value( "create-drop" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.lucene_version" )
+				.value( "LUCENE_CURRENT" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.directory_provider" )
+				.value( "infinispan" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.default.exclusive_index_use" )
+				.value( "false" )
+				.up()
+				.createProperty()
+				.name( "hibernate.search.infinispan.configuration_resourcename" )
+				.value( "user-provided-infinispan.xml" )
+				.up()
+				.up()
+				.up()
+				.exportAsString();
 		return new StringAsset( persistenceXml );
 	}
 
 	@Inject
 	MemberRegistration memberRegistration;
 
-	@Test
+	@Test @InSequence(value = 1) @OperateOnDeployment("dep.active-1")
 	public void testRegister() throws Exception {
 		Member newMember = memberRegistration.getNewMember();
 		newMember.setName( "Davide D'Alto" );
@@ -96,7 +126,7 @@ public class InfinispanModuleMemberRegistrationIT {
 		assertNotNull( newMember.getId() );
 	}
 
-	@Test
+	@Test @InSequence(value = 2) @OperateOnDeployment("dep.active-2")
 	public void testNewMemberSearch() throws Exception {
 		Member newMember = memberRegistration.getNewMember();
 		newMember.setName( "Peter O'Tall" );
@@ -110,8 +140,8 @@ public class InfinispanModuleMemberRegistrationIT {
 		assertEquals( "Search hasn't found a new member", newMember.getName(), search.get( 0 ).getName() );
 	}
 
-	@Test
-	public void testUnexistingMember() throws Exception {
+	@Test @InSequence(value = 3) @OperateOnDeployment("dep.active-2")
+	public void testNonExistingMember() throws Exception {
 		List<Member> search = memberRegistration.search( "TotallyInventedName" );
 
 		assertNotNull( "Search should never return null", search );
