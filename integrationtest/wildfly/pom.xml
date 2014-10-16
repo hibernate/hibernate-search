@@ -108,7 +108,6 @@
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-depchain</artifactId>
             <scope>test</scope>
-            <version>${version.shrinkwrapResolver}</version>
             <type>pom</type>
         </dependency>
         <dependency>
@@ -135,6 +134,14 @@
             <artifactId>wildfly-arquillian-container-managed</artifactId>
             <version>${version.wildfly}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- This exclusion is needed to be able to setup the project in Windows:
+                     it otherwise includes transitive dependency to the JDK JConsole -->
+                <exclusion>
+                    <artifactId>wildfly-patching</artifactId>
+                    <groupId>org.wildfly</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Java EE API -->
@@ -227,10 +234,10 @@
                                     <outputDirectory>${project.build.directory}/node1</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.jboss.as</groupId>
-                                    <artifactId>jboss-as-dist</artifactId>
-                                    <version>${version.jboss.as}</version>
-                                    <type>zip</type>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${version.wildfly}</version>
+                                    <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/node2</outputDirectory>
                                 </artifactItem>
@@ -238,7 +245,7 @@
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-search-modules</artifactId>
                                     <version>${project.version}</version>
-                                    <classifier>jbossas-74-dist</classifier>
+                                    <classifier>wildfly-8-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/node1/wildfly-${version.wildfly}/modules</outputDirectory>
@@ -254,19 +261,19 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.infinispan</groupId>
-                                    <artifactId>infinispan-as-modules</artifactId><!-- Named in JDG: infinispan-as-modules-library -->
+                                    <artifactId>infinispan-as-modules</artifactId>
                                     <version>${infinispanVersion}</version>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/node1/jboss-eap-6.3/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node1/wildfly-${version.wildfly}/modules</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.infinispan</groupId>
-                                    <artifactId>infinispan-as-modules</artifactId><!-- Named in JDG: infinispan-as-modules-library -->
+                                    <artifactId>infinispan-as-modules</artifactId>
                                     <version>${infinispanVersion}</version>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/node2/jboss-eap-6.3/modules</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/node2/wildfly-${version.wildfly}/modules</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

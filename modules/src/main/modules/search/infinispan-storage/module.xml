@@ -40,7 +40,7 @@ and obviously needs to avoid dependencies to different versions of Hibernate Sea
     <resources>
         <resource-root path="infinispan-core-${infinispanVersion}.jar"/>
         <resource-root path="infinispan-lucene-directory-${infinispanVersion}.jar" />
-        <!-- resource-root path="infinispan-commons-${infinispanVersion}.jar"/>   This module only exists since Infinispan 6 -->
+        <resource-root path="infinispan-commons-${infinispanVersion}.jar"/>
         <resource-root path="hibernate-search-infinispan-${hibernate-search-infinispan.version}.jar"/>
     </resources>
 
@@ -61,8 +61,5 @@ and obviously needs to avoid dependencies to different versions of Hibernate Sea
         <module name="org.jboss.marshalling" slot="${jbossmarshalling.integration.slot}" />
         <module name="org.jboss.marshalling.river" services="import" slot="${jbossmarshalling.integration.slot}" />
         <module name="org.jgroups" slot="${jgroups.integration.slot}" />
-
-        <!-- Required by Infinispan versions < 6.0 -->
-        <module name="org.jboss.staxmapper"  />
     </dependencies>
 </module>

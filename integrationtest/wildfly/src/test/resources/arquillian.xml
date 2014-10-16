@@ -17,8 +17,8 @@
         <container qualifier="container.active-2">
             <configuration>
                 <property name="jbossHome">${project.build.directory}/node2/wildfly-${version.wildfly}</property>
-                <property name="javaVmArguments">-Djboss.socket.binding.port-offset=100 -Xmx512m -XX:MaxPermSize=128m  -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
-                <property name="managementPort">10099</property>
+                <property name="javaVmArguments">-Djboss.socket.binding.port-offset=10000 -Xmx512m -XX:MaxPermSize=128m  -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1</property>
+                <property name="managementPort">19990</property>
             </configuration>
         </container>
     </group>

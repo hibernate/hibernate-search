@@ -40,10 +40,10 @@
         <hibernate.search.version>${project.version}</hibernate.search.version>
 
         <!-- Needs to match the SLOT being used by Infinispan -->
-        <infinispan.integration.slot>5.3</infinispan.integration.slot>
+        <infinispan.integration.slot>6.0</infinispan.integration.slot>
 
         <!-- Needs to match the SLOT being used by Infinispan -->
-        <jgroups.integration.slot>3.2</jgroups.integration.slot>
+        <jgroups.integration.slot>3.4</jgroups.integration.slot>
 
         <!-- Needs to match the VERSION being used by Infinispan -->
         <hibernate-search-infinispan.version>${project.version}</hibernate-search-infinispan.version>
