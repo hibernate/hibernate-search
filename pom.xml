@@ -27,7 +27,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>4.4.5-SNAPSHOT</version>
+    <version>4.4.5.Final</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>
@@ -58,7 +58,7 @@
         <connection>scm:git:git://github.com/hibernate/hibernate-search.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-search.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-search</url>
-      <tag>HEAD</tag>
+      <tag>4.4.5.Final</tag>
   </scm>
 
     <organization>
@@ -659,7 +659,7 @@
                         <requireMavenVersion>
                             <version>3.0.4</version>
                         </requireMavenVersion>
-                        <DependencyConvergence></DependencyConvergence>
+                        <DependencyConvergence />
                     </rules>
                 </configuration>
             </plugin>
@@ -968,8 +968,8 @@
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
                 <jdbc.user>sa</jdbc.user>
-                <jdbc.pass></jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.pass />
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -998,7 +998,7 @@
                 <jdbc.url>jdbc:mysql://vmg02.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -1019,7 +1019,7 @@
                 <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -1046,7 +1046,7 @@
                 <jdbc.url>jdbc:db2://vmg06.mw.lab.eng.bos.redhat.com:50000/jbossqa</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -1067,7 +1067,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -1087,7 +1087,7 @@
                 <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -1108,7 +1108,7 @@
                 <jdbc.url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=TCP)(HOST=vmg24-vip.mw.lab.eng.bos.redhat.com)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=vmg25-vip.mw.lab.eng.bos.redhat.com)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=qarac.jboss)))</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
         <profile>
@@ -1127,7 +1127,7 @@
                 <jdbc.url>jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=TCP)(HOST=vmg24-vip.mw.lab.eng.bos.redhat.com)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=vmg25-vip.mw.lab.eng.bos.redhat.com)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=qarac.jboss)))</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
 
@@ -1148,7 +1148,7 @@
                 <jdbc.url>jdbc:sybase:Tds:vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
         <profile>
@@ -1167,7 +1167,7 @@
                 <jdbc.url>jdbc:jtds:sybase://vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
                 <jdbc.user>searctru</jdbc.user>
                 <jdbc.pass>searctru</jdbc.pass>
-                <jdbc.isolation></jdbc.isolation>
+                <jdbc.isolation />
             </properties>
         </profile>
 
