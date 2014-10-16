@@ -1,6 +1,18 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.5.Final (16-10-2014)
+------------------------
+
+** Improvement
+    * [HSEARCH-1672] - Improve compatibiltity of Hibernate Search 4.4 with Infinispan 6.x (while keeping 5 as target)
+    * [HSEARCH-1692] - Modules: Move Infinispan related dependencies into their dedicated JBoss Module
+
+** Task
+    * [HSEARCH-1690] - Cleanup some small XML mistakes in the pom files of branch 4.4
+    * [HSEARCH-1695] - Arquillian versions used by branches 4.4 and 4.5 are not strictily compatible with the respective JBoss versions
+
+
 Version 4.4.4.Final (28-08-2014)
 ------------------------
 
