@@ -45,6 +45,8 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	private EmbeddedCacheManager cacheManager;
 
+	private AsyncDeleteExecutorService deletesExecutor;
+
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.directoryProviderName = directoryProviderName;
@@ -60,12 +62,14 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 	@Override
 	public void start(DirectoryBasedIndexManager indexManager) {
 		log.debug( "Starting InfinispanDirectory" );
+		deletesExecutor = getDeleteOperationsExecutor();
 		cacheManager.startCaches( metadataCacheName, dataCacheName, lockingCacheName );
 		Cache<?,?> metadataCache = cacheManager.getCache( metadataCacheName );
 		Cache<?,?> dataCache = cacheManager.getCache( dataCacheName );
 		Cache<?,?> lockingCache = cacheManager.getCache( lockingCacheName );
 		org.infinispan.lucene.directory.BuildContext directoryBuildContext = DirectoryBuilder
-				.newDirectoryInstance( metadataCache, dataCache, lockingCache, directoryProviderName );
+				.newDirectoryInstance( metadataCache, dataCache, lockingCache, directoryProviderName )
+				.deleteOperationsExecutor( deletesExecutor.getExecutor() );
 		if ( chunkSize != null ) {
 			directoryBuildContext.chunkSize( chunkSize.intValue() );
 		}
@@ -74,8 +78,14 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		log.debugf( "Initialized Infinispan index: '%s'", directoryProviderName );
 	}
 
+	private AsyncDeleteExecutorService getDeleteOperationsExecutor() {
+		return serviceManager.requestService( AsyncDeleteExecutorService.class );
+	}
+
 	@Override
 	public void stop() {
+		deletesExecutor.closeAndFlush();
+		serviceManager.releaseService( AsyncDeleteExecutorService.class );
 		try {
 			directory.close();
 		}
