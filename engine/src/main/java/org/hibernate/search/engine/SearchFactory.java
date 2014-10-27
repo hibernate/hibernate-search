@@ -96,6 +96,10 @@ public interface SearchFactory {
 	 */
 	Set<Class<?>> getIndexedTypes();
 
+	/**
+	 * Unwraps some internal Hibernate Search types.
+	 * Currently, no public type is accessible. This method should not be used by users.
+	 */
 	<T> T unwrap(Class<T> cls);
 
 }
