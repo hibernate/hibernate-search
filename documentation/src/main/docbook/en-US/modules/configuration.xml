@@ -1358,6 +1358,23 @@ hibernate.search.default.indexwriter.ram_buffer_size = 64</programlisting>
 
             <row>
               <entry>
+                <property>hibernate.search.[default|&lt;indexname&gt;].index_flush_interval</property>
+              </entry>
+
+              <entry>
+                <para>The interval in milliseconds between flushes of write operations 
+                to the index storage. Ignored unless <literal>worker.execution</literal> is configured as
+                <literal>async</literal>.</para>
+              </entry>
+
+              <entry>
+                <literal>1000</literal>
+              </entry>
+            </row>
+              
+
+            <row>
+              <entry>
                 <property>hibernate.search.​[default|&lt;indexname&gt;].​indexwriter.max_buffered_docs</property>
               </entry>
 
