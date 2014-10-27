@@ -6,15 +6,17 @@
  */
 package org.hibernate.search.util.impl;
 
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
+
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.logging.impl.Log;
 
 /**
  * Helper class to create threads;
@@ -65,7 +67,17 @@ public final class Executors {
 				new LinkedBlockingQueue<Runnable>( queueSize ),
 				new SearchThreadFactory( groupname ),
 				new BlockPolicy()
-				);
+		);
+	}
+
+	/**
+	 * Creates an executor for recurring tasks
+	 *
+	 * @param groupname a label to identify the threadpool; useful for profiling.
+	 * @return instance of {@link ScheduledThreadPoolExecutor}
+	 */
+	public static ScheduledExecutorService newScheduledThreadPool(String groupname) {
+		return new ScheduledThreadPoolExecutor(1, new SearchThreadFactory( groupname ));
 	}
 
 	/**

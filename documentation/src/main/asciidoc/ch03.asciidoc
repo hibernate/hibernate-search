@@ -1016,6 +1016,10 @@ When this queue is full adding more operations to the queue becomes a blocking o
 this setting doesn't make much sense unless the `worker.execution` is configured as `async`.
 |`1000`
 
+|hibernate.search.[default\|<indexname>].index_flush_interval|Defines the interval in milliseconds that updates will 
+be flushed to the index storage. Ignored unless `worker.execution` is configured as `async`.
+|`1000`
+
 |hibernate.search.​[default\|<indexname>].​indexwriter.max_buffered_delete_terms
 |Determines the minimal number of delete terms required before the buffered in-memory delete terms
 are applied and flushed. If there are documents buffered in memory at the time, they are merged and
