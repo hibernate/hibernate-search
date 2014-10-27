@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.CorruptIndexException;
+import org.hibernate.search.Environment;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.SearchException;
@@ -768,5 +769,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 225, value = "An index locking error occurred during initialization of Directory '%s'. This might indicate a concurrent initialization; "
 			+ "If you experience errors on this index you might need to remove the lock, or rebuild the index." )
 	void lockingFailureDuringInitialization(String directoryDescription);
+
+	@Message(id = 229, value = "Property " + Environment.INDEX_FLUSH_INTERVAL + "for the index '%s' needs to be positive." )
+	SearchException flushIntervalNeedsToBePositive(String indexName);
 
 }

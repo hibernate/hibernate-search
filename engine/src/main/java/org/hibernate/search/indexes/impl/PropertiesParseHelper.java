@@ -22,6 +22,7 @@ package org.hibernate.search.indexes.impl;
 
 import java.util.Properties;
 
+import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.Environment;
 import org.hibernate.search.SearchException;
@@ -36,6 +37,8 @@ import org.hibernate.search.store.optimization.impl.ExplicitOnlyOptimizerStrateg
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Contains helper to parse properties which should be read by the majority
@@ -44,6 +47,8 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class PropertiesParseHelper {
+
+	private static final Log log = LoggerFactory.make();
 
 	private PropertiesParseHelper() {
 		// no need to create instances
@@ -159,4 +164,18 @@ public class PropertiesParseHelper {
 		return readerProvider;
 	}
 
+	public static Integer extractFlushInterval(String indexName, Properties indexProps) {
+		String refreshInterval = indexProps.getProperty( Environment.INDEX_FLUSH_INTERVAL );
+		if ( refreshInterval != null ) {
+			String errorMsgOnParseFailure = "Illegal value for property " + Environment.INDEX_FLUSH_INTERVAL + " on index " + indexName;
+			int parsedInt = ConfigurationParseHelper.parseInt( refreshInterval, 0, errorMsgOnParseFailure );
+			if ( parsedInt < 0 ) {
+				throw log.flushIntervalNeedsToBePositive( indexName );
+			}
+			return parsedInt;
+		}
+		else {
+			return ScheduledCommitPolicy.DEFAULT_DELAY_MS;
+		}
+	}
 }
