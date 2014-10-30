@@ -7,6 +7,7 @@
 package org.hibernate.search.infinispan.logging.impl;
 
 import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.WARN;
 
 import javax.naming.NamingException;
 
@@ -31,5 +32,10 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@LogMessage(level = ERROR)
 	@Message(id = 100056, value = "Unable to release initial context")
 	void unableToReleaseInitialContext(@Cause NamingException ne);
+
+	@LogMessage(level = WARN)
+	@Message(id = 100057, value = "Interrupted while waiting for asynchronous delete operations to be flushed on the index. "
+			+ "Some stale segments might remain in the index.")
+	void interruptedWhileWaitingForAsyncDeleteFlush();
 
 }
