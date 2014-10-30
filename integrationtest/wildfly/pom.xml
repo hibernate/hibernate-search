@@ -247,6 +247,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Temporary workaround to make sure the same lucene version is used in infinispan and hibernate search modules -->
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>${project.build.directory}/**/module.xml</include>
+                    </includes>
+                    <xpath><![CDATA[ //module[@name="org.apache.lucene"]/@slot ]]></xpath>
+                    <token>^.*$</token>
+                    <value>${lucene.module.slot}</value>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

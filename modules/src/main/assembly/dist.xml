@@ -101,9 +101,6 @@
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
-                <include>org.infinispan:infinispan-lucene-directory</include>
-                <include>org.infinispan:infinispan-core</include>
-                <include>org.infinispan:infinispan-commons</include>
                 <include>org.hibernate:hibernate-search-infinispan</include>
             </includes>
         </dependencySet>
