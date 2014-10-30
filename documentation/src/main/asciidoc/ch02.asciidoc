@@ -129,8 +129,6 @@ guarantees. When configured to perform an automatic election, the master node is
 on the index name: the role is therefore possibly different for each index or shard.
 
 [[search-architecture-readerstrategy]]
-
-
 === Reader strategy
 
 When executing a query, Hibernate Search interacts with the Apache Lucene indexes through a reader

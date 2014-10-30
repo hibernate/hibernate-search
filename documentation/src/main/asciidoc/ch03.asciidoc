@@ -967,9 +967,9 @@ hibernate.search.[default|<indexname>].indexwriter.<parameter_name>
 ====
 
 If no value is set for an `indexwriter` value in a specific shard configuration, Hibernate Search
-will look at the index section, then at the default section.[[example-performamce-option-
-configuration]]
+will look at the index section, then at the default section.
 
+[[example-performance-option-configuration]]
 .Example performance option configuration
 ====
 ----
@@ -981,7 +981,7 @@ hibernate.search.default.indexwriter.ram_buffer_size = 64
 ----
 ====
 
-The configuration in <<example-performamce-option-configuration>> will result in these settings
+The configuration in <<example-performance-option-configuration>> will result in these settings
 applied on the second shard of the Animal index:
 
 * `max_merge_docs` = 10
@@ -991,10 +991,10 @@ applied on the second shard of the Animal index:
 
 All other values will use the defaults defined in Lucene.
 
-The default for all values is to leave them at Lucene's own default. The values listed in <<table-
-performance-parameters>> depend for this reason on the version of Lucene you are using. The values
-shown are relative to version `2.4`. For more information about Lucene indexing performance, please
-refer to the Lucene documentation.
+The default for all values is to leave them at Lucene's own default. The values listed in
+<<table-performance-parameters>> depend for this reason on the version of Lucene you are using.
+The values shown are relative to version `2.4`. For more information about Lucene indexing performance,
+please refer to the Lucene documentation.
 
 [[table-performance-parameters]]
 .List of indexing performance and behavior properties

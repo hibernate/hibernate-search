@@ -351,9 +351,9 @@ terms.
 
 ===== Wildcard queries
 
-You can also execute wildcard queries (queries where some of parts of the word are unknown). `?`
-represents a single character and `\*` represents any character sequence. Note that for performance
-purposes, it is recommended that the query does not start with either `?` or `*`.
+You can also execute wildcard queries (queries where some of parts of the word are unknown).
+The character `?` represents a single character and `\*` represents any character sequence.
+Note that for performance purposes, it is recommended that the query does not start with either `?` or `*`.
 
 ====
 [source, JAVA]
@@ -370,7 +370,7 @@ Query luceneQuery = mythQB
 
 [NOTE]
 ====
-Wildcard queries do not apply the analyzer on the matching terms. Otherwise the risk of `\*` or `?`
+Wildcard queries do not apply the analyzer on the matching terms. Otherwise the risk of `*` or `?`
 being mangled is too high.
 ====
 
@@ -703,8 +703,8 @@ by the DSL. Please give us feedback!
 
 ==== Building a Hibernate Search query
 
-So far we only covered the process of how to create your Lucene query (see <<section-building-
-lucene-queries>>). However, this is only the first step in the chain of actions. Let's now see how
+So far we only covered the process of how to create your Lucene query (see <<section-building-lucene-queries>>).
+However, this is only the first step in the chain of actions. Let's now see how
 to build the Hibernate Search query from the Lucene query.
 
 ===== Generality
@@ -740,7 +740,7 @@ fullTextQuery = fullTextSession
 ====
 
 In <<example-filtering-by-entity-type>> the first example returns only matching `Customer` instances,
-the second returns matching `Actor`s  and `Item` instances. The type restriction is fully polymorphic
+the second returns matching `Actor` and `Item` instances. The type restriction is fully polymorphic
 which means that if there are two indexed subclasses `Salesman` and `Customer` of the baseclass
 `Person`, it is possible to just specify `Person.class` in order to filter on result types.
 
@@ -1582,6 +1582,7 @@ category __Computers & Internet__ is one facet of this search. Another one is fo
 average customer review rating.
 
 [[example-amazon-facets]]
+.Facets Example on Amazon
 image::faceting.png[Search for _'Hibernate Search'_ on Amazon]
 
 In Hibernate Search the classes `QueryBuilder` and `FullTextQuery` are the entry point to the faceting
@@ -1781,7 +1782,7 @@ disabled via disableFaceting(<facetName>) or the query is discarded.
 ==== Interpreting a Facet result
 
 Each facet request results in a list of Facet instances. Each instance represents one facet/category
-value. In the CD example (<<example-discrete-faceting>>) where we want to categorize on the Cd
+value. In the CD example (<<example-discrete-faceting>>) where we want to categorize on the CD
 labels, there would for example be a `Facet` for each of the record labels Universal, Sony and Warner.
 <<example-facet-api>> shows the API of Facet.
 
@@ -1829,9 +1830,10 @@ public interface Facet {
 ====
 
 `getFacetingName()` and `getFieldName()` are returning the facet request name and the targeted document
-field name as specified by the underlying `FacetRequest`. For <<example-discrete-faceting>> that would
-be labelFacetRequest and label respectively. The interesting information is provided by `getValue()`
-and `getCount()`. The former is the actual facet/category value, for example a concrete record label
+field name as specified by the underlying `FacetRequest`. For example "<<example-discrete-faceting>>"
+that would be labelFacetRequest and label respectively.
+The interesting information is provided by `getValue()` and `getCount()`.
+The former is the actual facet/category value, for example a concrete record label
 like Universal. The latter returns the count for this value. To stick with the example again, the
 count value tells you how many Cds are released under the Universal label. Last but not least,
 `getFacetQuery()` returns a Lucene query which can be used to retrieve the entities counted in this
@@ -1954,6 +1956,6 @@ With some queries the class type won't be needed at all, in that case even if yo
 field cache, this might not be used; for example if you are targeting a single class, obviously all
 returned values will be of that type (this is evaluated at each Query execution).
 
-For the ID FieldCache to be used, the ids of targeted entities must be using a TwoWayFieldBridge (as
+For the ID FieldCache to be used, the ids of targeted entities must be using a `TwoWayFieldBridge` (as
 all built-in bridges), and all types being loaded in a specific query must use the field name for the
 id, and have ids of the same type (this is evaluated at each Query execution).

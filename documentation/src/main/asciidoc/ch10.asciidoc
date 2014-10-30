@@ -49,8 +49,8 @@ shared amongst several clients, you must adhere to the following rules:
 
 * Never call `indexReader.close()`, but always call `readerProvider.closeReader(reader)`, using a
 finally block.
-* Don't use this IndexReader for modification operations: it's a read-only IndexReader, you would
-get an exception).
+* Don't use this `IndexReader` for modification operations: it's a read-only instace, you would
+get an exception.
 
 Aside from those rules, you can use the IndexReader freely, especially to do native Lucene queries.
 Using this shared IndexReaders will be more efficient than by opening one directly from - for

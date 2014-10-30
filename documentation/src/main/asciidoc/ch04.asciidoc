@@ -147,8 +147,8 @@ indexing of null values (see JavaDocs of `LuceneOptions.indexNullAs()`).
 
 There exists also a companion annotation to @Field, called @NumericField. It can be specified in the
 same scope as @Field or @DocumentId, but only on Integer, Long, Float or Double properties. When
-used, the annotated property will be indexed using a link:http://en.wikipedia.org/wiki/Trie[Trie
-structure]. This enables efficient range queries and sorting, resulting in query response times
+used, the annotated property will be indexed using a link:http://en.wikipedia.org/wiki/Trie[Trie structure].
+This enables efficient range queries and sorting, resulting in query response times
 being orders of magnitude faster than the same query with plain @Field. The @NumericField annotation
 accepts the following parameters:
 
@@ -275,8 +275,8 @@ public class Essay {
 ----
 ====
 
-<<example-annotated-entity>> defines an index with four fields: `id` , `Abstract`, `text` and
-`grade` . Note that by default the field name is de-capitalized, following the JavaBean
+<<example-annotated-entity>> defines an index with four fields: `id`, `Abstract`, `text` and
+`grade`. Note that by default the field name is de-capitalized, following the JavaBean
 specification. The `grade` field is annotated as Numeric with a slightly larger precisionStep than
 the default.
 
@@ -1016,10 +1016,10 @@ doing.
 
 ===== Available analyzers
 
-Apache Lucene comes with a lot of useful default char filters, tokenizers and filters. You can find
-a complete list of char filter factories, tokenizer factories and filter factories at link:http://
-wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[http://wiki.apache.org/solr/AnalyzersTokenize
-rsTokenFilters]. Let's check a few of them.
+Apache Lucene comes with a lot of useful default char filters, tokenizers and filters.
+You can find a complete list of char filter factories, tokenizer factories and filter factories at
+link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters].
+Let's check a few of them.
 
 [[table-available-char-filters]]
 .Example of available char filters
@@ -1314,8 +1314,8 @@ directly passed to Tika for parsing.
 
 Tika uses metadata as in- and output of the parsing process and it also allows to provide additional
 context information. This process is described in
-link:http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html[Parser
-interface]. The Hibernate Search Tika bridge allows you to make use of these additional
+link:http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html[Parser interface].
+The Hibernate Search Tika bridge allows you to make use of these additional
 configuration options by providing two interfaces in conjunction with TikaBridge. The first
 interface is the TikaParseContextProvider. It allows you to create a custom ParseContext for the
 document parsing. The second interface is TikaMetadataProcessor which has two methods -
@@ -1439,7 +1439,7 @@ public class PaddedIntegerBridge implements StringBridge, ParameterizedBridge {
     public static String PADDING_PROPERTY = "padding";
     private int padding = 5; //default
 
-    public void setParameterValues(Map<String,String? parameters) {
+    public void setParameterValues(Map<String,String> parameters) {
         String padding = parameters.get( PADDING_PROPERTY );
         if (padding != null) this.padding = Integer.parseInt( padding );
     }
@@ -2106,7 +2106,7 @@ mapping.entity(Address.class)
                .indexName("Address_Index") //optional
                .interceptor(IndexWhenPublishedInterceptor.class); //optional
 
-cfg.getProperties().put( "hibernate.search.model_mapping", mapping );
+cfg.getProperties().put("hibernate.search.model_mapping", mapping);
 ----
 ====
 
