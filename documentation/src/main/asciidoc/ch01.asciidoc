@@ -322,7 +322,8 @@ fullTextEntityManager.createIndexer().startAndWait();
 ====
 
 After executing the above code, you should be able to see a Lucene index under `/var/lucene/indexes/example.Book`
-(or based on a different path depending how you configured the property `$$hibernate.search.default.directory_provider$$`)
+(or based on a different path depending how you configured the property `$$hibernate.search.default.directory_provider$$`).
+
 Go ahead an inspect this index with link:$$http://code.google.com/p/luke/$$[Luke]:
 it will help you to understand how Hibernate Search works.
 

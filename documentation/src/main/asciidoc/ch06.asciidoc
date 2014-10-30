@@ -134,11 +134,11 @@ transaction = fullTextSession.beginTransaction();
 //Scrollable results will avoid loading too many objects in memory
 ScrollableResults results = fullTextSession.createCriteria( Email.class )
     .setFetchSize(BATCH_SIZE)
-    .scroll( ScrollMode.FORWARD_ONLY );
+    .scroll(ScrollMode.FORWARD_ONLY);
 int index = 0;
-while( results.next() ) {
+while(results.next()) {
     index++;
-    fullTextSession.index( results.get(0) ); //index each element
+    fullTextSession.index(results.get(0)); //index each element
     if (index % BATCH_SIZE == 0) {
         fullTextSession.flushToIndexes(); //apply changes to indexes
         fullTextSession.clear(); //free memory since the queue is processed
