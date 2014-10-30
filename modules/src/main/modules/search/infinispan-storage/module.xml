@@ -38,9 +38,6 @@ and obviously needs to avoid dependencies to different versions of Hibernate Sea
 <module xmlns="urn:jboss:module:1.1" name="org.hibernate.search.infinispan-storage" slot="${infinispan.integration.slot}">
 
     <resources>
-        <resource-root path="infinispan-core-${infinispanVersion}.jar"/>
-        <resource-root path="infinispan-lucene-directory-${infinispanVersion}.jar" />
-        <resource-root path="infinispan-commons-${infinispanVersion}.jar"/>
         <resource-root path="hibernate-search-infinispan-${hibernate-search-infinispan.version}.jar"/>
     </resources>
 
@@ -61,5 +58,6 @@ and obviously needs to avoid dependencies to different versions of Hibernate Sea
         <module name="org.jboss.marshalling" slot="${jbossmarshalling.integration.slot}" />
         <module name="org.jboss.marshalling.river" services="import" slot="${jbossmarshalling.integration.slot}" />
         <module name="org.jgroups" slot="${jgroups.integration.slot}" />
+        <module name="org.infinispan" slot="${infinispan.module.slot}" />
     </dependencies>
 </module>
