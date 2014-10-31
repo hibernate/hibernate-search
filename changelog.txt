@@ -1,6 +1,34 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Beta1 (31-10-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1683] - Bundled JBoss Modules being generated for Apache Lucene uses wrong slot name
+    * [HSEARCH-1694] - AsyncBackendLongWorkListStressTest is sync
+    * [HSEARCH-1702] - Misrendered internal links in documentation
+    * [HSEARCH-1703] - Infinispan module compatibility
+
+** Improvement
+    * [HSEARCH-1680] - Upgrade to Apache Lucene 4.10.1
+    * [HSEARCH-1621] - Upgrade to Apache Lucene 4.9
+    * [HSEARCH-1693] - Time based commit for async indexing
+
+** New Feature
+    * [HSEARCH-1697] - Enable async deleteFile operations on Infinispan Directory
+
+** Task
+    * [HSEARCH-1595] - Update services section on online documentation
+    * [HSEARCH-1596] - Removal of method LuceneWorksBuilder.addFieldWithBinaryData
+    * [HSEARCH-1678] - Remove workaround for ISPN-4754 when it is fixed
+    * [HSEARCH-1687] - Dependency versions in Arquillian integration tests  should not be hardcoded
+    * [HSEARCH-1688] - Upgrade to Infinispan 7.0.0.CR1
+    * [HSEARCH-1696] - Infinispan integration on WildFly should depend on a dedicated module (Port HSEARCH-1692 from branch 4.4)
+    * [HSEARCH-1700] - Update Infinispan to 7.0.0.CR2 and JGroups to 3.6.0.Final
+    * [HSEARCH-1704] - Update to Hibernate ORM 4.3.7.Final
+
+
 Version 5.0.0.Alpha7 (26-09-2014)
 ------------------------
 
