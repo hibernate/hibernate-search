@@ -140,7 +140,7 @@
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>4.10.1</luceneVersion>
+        <luceneVersion>4.10.2</luceneVersion>
         <infinispanVersion>7.0.0.CR2</infinispanVersion>
         <jgroupsVersion>3.6.0.Final</jgroupsVersion>
         <hibernateVersion>4.3.7.Final</hibernateVersion>
