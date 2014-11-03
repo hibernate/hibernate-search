@@ -11,9 +11,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.lucene.search.Sort;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -21,102 +24,90 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.SearchTestBase;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hibernate.search.testsupport.TestForIssue;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Hibernate Search spatial : unit tests on indexing POIs in with Grid and Grid+Distance
  *
- * @author Nicolas Helleringer <nicolas.helleringer@novacodex.net>
+ * @author Nicolas Helleringer &lt;nicolas.helleringer@novacodex.net&gt;
+ * @author Hardy Ferentschik
  */
 public class SpatialIndexingTest extends SearchTestBase {
+	private FullTextSession fullTextSession;
+
+	@Before
+	public void createAndIndexTestData() throws Exception {
+		fullTextSession = Search.getFullTextSession( openSession() );
+
+		Transaction tx = fullTextSession.beginTransaction();
+
+		// POI
+		fullTextSession.save( new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" ) );
+		fullTextSession.save( new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" ) );
+		fullTextSession.save( new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" ) );
+		fullTextSession.save( new POI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" ) );
+		fullTextSession.save( new POI( 5, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" ) );
+		fullTextSession.save( new POI( 6, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" ) );
+
+		// NonGeoPOI
+		fullTextSession.save( new NonGeoPOI( 1, "Distance to 24,32 : 0", 24.0d, null, "" ) );
+		fullTextSession.save( new NonGeoPOI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" ) );
+		fullTextSession.save( new NonGeoPOI( 3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" ) );
+		fullTextSession.save( new NonGeoPOI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" ) );
+		fullTextSession.save( new NonGeoPOI( 5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" ) );
+		fullTextSession.save( new NonGeoPOI( 6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" ) );
+
+		// Event
+		SimpleDateFormat dateFormat = new SimpleDateFormat( "d M yyyy" );
+		Date date = dateFormat.parse( "10 9 1976" );
+		fullTextSession.save( new Event( 1, "Test", 24.0d, 32.0d, date ) );
+
+		// User
+		fullTextSession.save( new User( 1, 24.0d, 32.0d ) );
+
+		// UserRange
+		fullTextSession.save( new UserRange( 1, 24.0d, 32.0d ) );
+
+		// UserEx
+		fullTextSession.save( new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d ) );
+
+		// RangeEvent
+		fullTextSession.save( new RangeEvent( 1, "Test", 24.0d, 32.0d, date ) );
+
+		// Hotel
+		fullTextSession.save( new Hotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" ) );
+
+		// RangeHotel
+		fullTextSession.save( new RangeHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" ) );
+		fullTextSession.save( new RangeHotel( 2, "End of the world Hotel - Left", 0.0d, 179.0d, "Roots" ) );
+		fullTextSession.save( new RangeHotel( 3, "End of the world Hotel - Right", 0.0d, -179.0d, "Cosy" ) );
+
+		// Restaurant
+		fullTextSession.save(
+				new Restaurant( 1, "Al's kitchen", "42, space avenue CA8596 BYOB Street", 24.0d, 32.0d )
+		);
+
+		// GetterUser
+		fullTextSession.save( new GetterUser( 1, 24.0d, 32.0d ) );
+
+		tx.commit();
+	}
 
 	@Test
 	public void testIndexing() throws Exception {
-		POI poi = new POI( 1, "Test", 24.0d, 32.0d, "" );
-		POI poi2 = new POI( 2, "Test2", 0.0d, -179.0d, "" );
-		POI poi3 = new POI( 3, "Test3", 0.0d, 179.0d, "" );
-		POI poi4 = new POI( 4, "Test4", 89.0d, 1.0d, "" );
-		POI poi5 = new POI( 5, "Test5", -90.0d, 17.0d, "" );
-		POI poi6 = new POI( 6, "Test6", 47.0d, 154.0d, "" );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( poi );
-		fullTextSession.save( poi2 );
-		fullTextSession.save( poi3 );
-		fullTextSession.save( poi4 );
-		fullTextSession.save( poi5 );
-		fullTextSession.save( poi6 );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
-		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
 		double centerLatitude = 24;
-		double centerLongitude = 31.5;
+		double centerLongitude = 32;
 
-		final QueryBuilder builder = fullTextSession.getSearchFactory()
-				.buildQueryBuilder().forEntity( POI.class ).get();
-
-		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
-				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
-
-		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
-		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
-
-		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
-				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
-
-		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, POI.class );
-		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
-
-		org.apache.lucene.search.Query luceneQuery3 = builder.spatial().onCoordinates( "location" )
-				.within( 112, Unit.KM ).ofLatitude( 0.0d ).andLongitude( 180.0d ).createQuery();
-
-		org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, POI.class );
-		List results3 = hibQuery3.list();
-		Assert.assertEquals( 2, results3.size() );
-
-		org.apache.lucene.search.Query luceneQuery4 = builder.spatial().onCoordinates( "location" )
-				.within( 100000, Unit.KM ).ofLatitude( 0.0d ).andLongitude( 0.0d ).createQuery();
-
-		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, POI.class );
-		List results4 = hibQuery4.list();
-		Assert.assertEquals( 6, results4.size() );
-
-		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for ( Object entity : pois ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
+		assertNumberOfPointsOfInterestWithinRadius( centerLatitude, centerLongitude, 0, 1 );
+		assertNumberOfPointsOfInterestWithinRadius( centerLatitude, centerLongitude, 10, 1 );
+		assertNumberOfPointsOfInterestWithinRadius( centerLatitude, centerLongitude, 20, 4 );
+		assertNumberOfPointsOfInterestWithinRadius( centerLatitude, centerLongitude, 30, 6 );
 	}
 
 	@Test
 	public void testDistanceProjection() throws Exception {
-		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
-		POI poi2 = new POI( 2, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
-		POI poi3 = new POI( 3, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
-		POI poi4 = new POI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
-		POI poi5 = new POI( 5, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
-		POI poi6 = new POI( 6, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
-
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( poi );
-		fullTextSession.save( poi2 );
-		fullTextSession.save( poi3 );
-		tx.commit();
-		tx = fullTextSession.beginTransaction();
-		fullTextSession.save( poi4 );
-		fullTextSession.save( poi5 );
-		fullTextSession.save( poi6 );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		double centerLatitude = 24.0d;
 		double centerLongitude = 32.0d;
 
@@ -142,38 +133,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		Assert.assertEquals( ((Double)fourthResult[1]), 15.0636, 0.0001 );
 		Assert.assertEquals( ((Double)fifthResult[1]), 22.239, 0.001 );
 		Assert.assertEquals( ((Double)sixthResult[1]), 24.446, 0.001 );
-
-		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for ( Object entity : pois ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testDistanceSort() throws Exception {
-		POI poi = new POI( 1, "Distance to 24,32 : 0", 24.0d, 32.0d, "" );
-		POI poi2 = new POI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
-		POI poi3 = new POI( 3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
-		POI poi4 = new POI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
-		POI poi5 = new POI( 5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
-		POI poi6 = new POI( 6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
-
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( poi );
-		fullTextSession.save( poi2 );
-		fullTextSession.save( poi3 );
-		tx.commit();
-		tx = fullTextSession.beginTransaction();
-		fullTextSession.save( poi4 );
-		fullTextSession.save( poi5 );
-		fullTextSession.save( poi6 );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		double centerLatitude = 24.0d;
 		double centerLongitude = 32.0d;
 
@@ -188,39 +151,21 @@ public class SpatialIndexingTest extends SearchTestBase {
 		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
-		List results = hibQuery.list();
+		List<Object[]> results = hibQuery.list();
 
-		List<?> pois = fullTextSession.createQuery( "from " + POI.class.getName() ).list();
-		for ( Object entity : pois ) {
-			fullTextSession.delete( entity );
+		Double previousDistance = (Double) results.get( 0 )[1];
+		for ( int i = 1; i < results.size(); i++ ) {
+			Object[] projectionEntry = results.get( i );
+			Double currentDistance = (Double) projectionEntry[1];
+			assertTrue( previousDistance + " should be < " + currentDistance, previousDistance < currentDistance );
+			previousDistance = currentDistance;
 		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
+	@Ignore
+	@TestForIssue(jiraKey = "HSEARCH-1708")
 	public void testNonGeoDistanceSort() throws Exception {
-		NonGeoPOI poi = new NonGeoPOI( 1, "Distance to 24,32 : 0", 24.0d, null, "" );
-		NonGeoPOI poi2 = new NonGeoPOI( 2, "Distance to 24,32 : 24.45", 24.2d, 31.9d, "" );
-		NonGeoPOI poi3 = new NonGeoPOI( 3, "Distance to 24,32 : 10.16", 24.0d, 31.9d, "" );
-		NonGeoPOI poi4 = new NonGeoPOI( 4, "Distance to 24,32 : 15.06", 23.9d, 32.1d, "" );
-		NonGeoPOI poi5 = new NonGeoPOI( 5, "Distance to 24,32 : 11.12", 23.9d, 32.0d, "" );
-		NonGeoPOI poi6 = new NonGeoPOI( 6, "Distance to 24,32 : 22.24", 24.2d, 32.0d, "" );
-
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( poi );
-		fullTextSession.save( poi2 );
-		fullTextSession.save( poi3 );
-		tx.commit();
-		tx = fullTextSession.beginTransaction();
-		fullTextSession.save( poi4 );
-		fullTextSession.save( poi5 );
-		fullTextSession.save( poi6 );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		double centerLatitude = 24.0d;
 		double centerLongitude = 32.0d;
 
@@ -234,29 +179,13 @@ public class SpatialIndexingTest extends SearchTestBase {
 		hibQuery.setSort( distanceSort );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
-		List results = hibQuery.list();
 
-		List<?> pois = fullTextSession.createQuery( "from " + NonGeoPOI.class.getName() ).list();
-		for ( Object entity : pois ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
+		// TODO - unclear what this should to. See HSEARCH-1708. ATM the calculated distance is the same for all points.
+		hibQuery.list();
 	}
-
 
 	@Test
 	public void testSpatialAnnotationOnFieldLevel() throws Exception {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("d M yyyy");
-		Date date = dateFormat.parse( "10 9 1976" );
-		Event event = new Event( 1, "Test", 24.0d, 32.0d, date );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( event );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
 		double centerLatitude = 24;
 		double centerLongitude = 31.5;
@@ -277,25 +206,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Event.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + Event.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testSpatialAnnotationWithSubAnnotationsLevel() throws Exception {
-		User user = new User( 1, 24.0d, 32.0d );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( user );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
 		double centerLatitude = 24;
 		double centerLongitude = 31.5;
@@ -316,25 +230,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, User.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + User.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testSpatialAnnotationWithSubAnnotationsLevelRangeMode() throws Exception {
-		UserRange user = new UserRange( 1, 24.0d, 32.0d );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( user );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
 		double centerLatitude = 24;
 		double centerLongitude = 31.5;
@@ -355,26 +254,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserRange.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + UserRange.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testSpatialsAnnotation() throws Exception {
-		UserEx user = new UserEx( 1, 24.0d, 32.0d, 11.9d, 27.4d );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( user );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
-
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( UserEx.class ).get();
 
@@ -391,27 +274,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserEx.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + UserEx.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testSpatialAnnotationOnFieldLevelRangeMode() throws Exception {
-		SimpleDateFormat dateFormat = new SimpleDateFormat( "d M yyyy" );
-		Date date = dateFormat.parse( "10 9 1976" );
-		RangeEvent event = new RangeEvent( 1, "Test", 24.0d, 32.0d, date );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( event );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( RangeEvent.class ).get();
 
@@ -433,25 +299,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, RangeEvent.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + RangeEvent.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testSpatialAnnotationOnClassLevel() throws Exception {
-		Hotel hotel = new Hotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( hotel );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
 		double centerLatitude = 24;
 		double centerLongitude = 31.5;
@@ -472,29 +323,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Hotel.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + Hotel.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testSpatialAnnotationOnClassLevelRangeMode() throws Exception {
-		RangeHotel hotel = new RangeHotel( 1, "Plazza Athénée", 24.0d, 32.0d, "Luxurious" );
-		RangeHotel hotel2 = new RangeHotel( 2, "End of the world Hotel - Left", 0.0d, 179.0d, "Roots" );
-		RangeHotel hotel3 = new RangeHotel( 3, "End of the world Hotel - Right", 0.0d, -179.0d, "Cosy" );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( hotel );
-		fullTextSession.save( hotel2 );
-		fullTextSession.save( hotel3 );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
 		double centerLatitude = 24;
 		double centerLongitude = 31.5;
@@ -533,26 +365,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, RangeHotel.class );
 		List results4 = hibQuery4.list();
 		Assert.assertEquals( 3, results4.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + RangeHotel.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testSpatialAnnotationOnEmbeddableFieldLevel() throws Exception {
-		Restaurant restaurant = new Restaurant( 1, "Al's kitchen", "42, space avenue CA8596 BYOB Street", 24.0d, 32.0d);
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( restaurant );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
-
 		final QueryBuilder builder = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Restaurant.class ).get();
 
@@ -572,25 +388,10 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Restaurant.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + Restaurant.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Test
 	public void testSpatialLatLongOnGetters() throws Exception {
-		GetterUser user = new GetterUser( 1, 24.0d, 32.0d );
-		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-
-		Transaction tx = fullTextSession.beginTransaction();
-		fullTextSession.save( user );
-		tx.commit();
-
-		tx = fullTextSession.beginTransaction();
 		//Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
 		double centerLatitude = 24;
 		double centerLongitude = 31.5;
@@ -611,13 +412,6 @@ public class SpatialIndexingTest extends SearchTestBase {
 		org.hibernate.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, GetterUser.class );
 		List results2 = hibQuery2.list();
 		Assert.assertEquals( 1, results2.size() );
-
-		List<?> events = fullTextSession.createQuery( "from " + GetterUser.class.getName() ).list();
-		for ( Object entity : events ) {
-			fullTextSession.delete( entity );
-		}
-		tx.commit();
-		fullTextSession.close();
 	}
 
 	@Override
@@ -635,5 +429,20 @@ public class SpatialIndexingTest extends SearchTestBase {
 				NonGeoPOI.class,
 				GetterUser.class
 		};
+	}
+
+	private void assertNumberOfPointsOfInterestWithinRadius(double centerLatitude,
+			double centerLongitude,
+			double radius,
+			int expectedPoiCount) {
+		final QueryBuilder builder = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( POI.class ).get();
+
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+				.within( radius, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
+
+		org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+		List results = hibQuery.list();
+		Assert.assertEquals( "Unexpected number of POIs within radius", expectedPoiCount, results.size() );
 	}
 }
