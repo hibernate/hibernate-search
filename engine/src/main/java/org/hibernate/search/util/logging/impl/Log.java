@@ -420,7 +420,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
 	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
 
-	@Message(id = 131, value = "The field used for the spatial query is not using SpatialFieldBridge: %1$s.%2$s")
+	@Message(id = 131, value = "The field '%1$s#%2$s' used for the spatial query is not configured as spatial field. Check the proper use of @Spatial respectively SpatialFieldBridge")
 	SearchException targetedFieldNotSpatial(String className, String fieldName);
 
 	@Message(id = 133, value = "@ClassBridge implementation '%1$s' should implement either org.hibernate.search.bridge.FieldBridge, org.hibernate.search.bridge.TwoWayStringBridge or org.hibernate.search.bridge.StringBridge")
