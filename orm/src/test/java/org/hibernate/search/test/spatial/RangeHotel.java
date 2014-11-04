@@ -23,7 +23,7 @@ import javax.persistence.Id;
  */
 @Entity
 @Indexed
-@Spatial(name = "location")
+@Spatial
 public class RangeHotel implements Coordinates {
 	@Id
 	Integer id;

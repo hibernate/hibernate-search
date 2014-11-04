@@ -210,15 +210,15 @@ When using this form the `@Spatial.name` automatically defaults to the property 
 [[spatial-queries]]
 === Performing Spatial Queries
 
-You can use the Hibernate Search query DSL to build a query to search around a pair of coordinates (latitude,longitude)
+You can use the Hibernate Search query DSL to build a query to search around a pair of coordinates (latitude, longitude)
 or around a bean implementing the `Coordinates` interface.
 
 As with any fulltext query, the spatial query creation flow looks like:
 
 . retrieve a `QueryBuilder` from the `SearchFactory`
-. use the DSL to build a spatial query defining search center and radius
+. use the DSL to build a spatial query, defining search center and radius
 . optionally combine the resulting `Query` with other filters
-. call the `createFullTextQuery()` and use it as like any standard Hibernate or JPA Query
+. call the `createFullTextQuery()` and use the resulting query like any standard Hibernate or JPA query
 
 [[spatial-example-firstquery]]
 .Search for an Hotel by distance
@@ -228,8 +228,8 @@ As with any fulltext query, the spatial query creation flow looks like:
 QueryBuilder builder = fullTextSession.getSearchFactory()
   .buildQueryBuilder().forEntity( Hotel.class ).get();
 
-org.apache.lucene.search.Query luceneQuery = builder.spatial()
-  .onDefaultCoordinates()
+org.apache.lucene.search.Query luceneQuery = builder
+  .spatial()
   .within( radius, Unit.KM )
     .ofLatitude( centerLatitude )
     .andLongitude( centerLongitude )
@@ -241,11 +241,17 @@ List results = hibQuery.list();
 ----
 ====
 
-A fully working example can be found in the test-suite of the https://github.com/hibernate/hibernate-search[source code].
-Refer to https://github.com/hibernate/hibernate-search/blob/master/orm/src/test/java/org/hibernate/search/test/spatial/SpatialIndexingTest.java#L352[SpatialIndexingTest.testSpatialAnnotationOnClassLevel()]
-and its corresponding `Hotel` test class.
+[NOTE]
+====
+In the above example we did not explicitly specify the field name to use. The default coordinates field name was used
+implicitly. To target an alternative pair of coordinates at query time, we need to specify the field name as well.
+See <<spatial-multiplecoordinates>>.
+====
 
-Alternatively to passing separate latitude and longitude values, you can also pass an object implementing the
+A fully working example can be found in the test-suite of the https://github.com/hibernate/hibernate-search[source code].
+Refer to `SpatialIndexingTest.testSpatialAnnotationOnClassLevel()` and its corresponding `Hotel` test class.
+
+Alternatively to passing separate latitude and longitude values, you can also pass an instance implementing the
 `Coordinates` interface:
 
 .DSL example with Coordinates
@@ -255,7 +261,6 @@ Alternatively to passing separate latitude and longitude values, you can also pa
 Coordinates coordinates = Point.fromDegrees(24d, 31.5d);
 Query query = builder
   .spatial()
-    .onCoordinates( "location" )
     .within( 51, Unit.KM )
       .ofCoordinates( coordinates )
   .createQuery();
@@ -283,7 +288,7 @@ QueryBuilder builder = fullTextSession.getSearchFactory()
   .buildQueryBuilder().forEntity(POI.class).get();
 org.apache.lucene.search.Query luceneQuery = builder
   .spatial()
-     .onCoordinates("location")
+     .onField("location")
      .within(100, Unit.KM)
        .ofLatitude(centerLatitude)
        .andLongitude(centerLongitude)
@@ -335,7 +340,7 @@ QueryBuilder builder = fullTextSession.getSearchFactory()
    .buildQueryBuilder().forEntity( POI.class ).get();
 org.apache.lucene.search.Query luceneQuery = builder
   .spatial()
-    .onCoordinates("location")
+    .onField("location")
       .within(100, Unit.KM)
       .ofLatitude(centerLatitude)
       .andLongitude(centerLongitude)
@@ -369,8 +374,8 @@ won't be sorted
 
 You can associate multiple pairs of coordinates to the same entity, as long as each pair is
 uniquely identified by using a different name. This is achieved by stacking multiple `@Spatial`
-annotations in a `@Spatials` annotation, and specifying the `name` attribute on the `@Spatial`
-annotation.
+annotations within a single `@Spatials` annotation and specifying the `name` attribute on the individual `@Spatial`
+annotations.
 
 .Multiple sets of coordinates
 ====
@@ -403,11 +408,7 @@ public class UserEx {
 ----
 ====
 
-In the example <<spatial-example-firstquery>> we used `onDefaultCoordinates()` which points to the
-coordinates defined by a `@Spatial` annotation whose `name` attribute was not specified.
-
-To target an alternative pair of coordinates at query time, we need to specify the pair by name
-using `onCoordinates(String)` instead of `onDefaultCoordinates()`:
+To target an alternative pair of coordinates at query time, we need to specify the pair by name using `onField(String)`:
 
 .Querying on non-default coordinate set
 ====
@@ -416,8 +417,9 @@ using `onCoordinates(String)` instead of `onDefaultCoordinates()`:
 QueryBuilder builder = fullTextSession.getSearchFactory()
   .buildQueryBuilder().forEntity( UserEx.class ).get();
 
-org.apache.lucene.search.Query luceneQuery = builder.spatial()
-  .onCoordinates( "work" )
+org.apache.lucene.search.Query luceneQuery = builder
+  .spatial()
+  .onField( "work" )
   .within( radius, Unit.KM )
     .ofLatitude( centerLatitude )
     .andLongitude( centerLongitude )

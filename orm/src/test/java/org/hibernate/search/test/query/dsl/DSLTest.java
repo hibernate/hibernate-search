@@ -727,7 +727,7 @@ public class DSLTest extends SearchTestBase {
 		Coordinates coordinates = Point.fromDegrees( 24d, 31.5d );
 		Query query = builder
 				.spatial()
-					.onCoordinates( "location" )
+					.onField( "location" )
 					.within( 51, Unit.KM )
 						.ofCoordinates( coordinates )
 					.createQuery();
@@ -739,7 +739,7 @@ public class DSLTest extends SearchTestBase {
 
 		query = builder
 				.spatial()
-					.onCoordinates( "location" )
+					.onField( "location" )
 					.within( 500, Unit.KM )
 						.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
 					.createQuery();

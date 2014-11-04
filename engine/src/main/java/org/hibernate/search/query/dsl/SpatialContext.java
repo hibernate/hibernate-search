@@ -9,29 +9,24 @@ package org.hibernate.search.query.dsl;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public interface SpatialContext extends QueryCustomization<SpatialContext> {
+public interface SpatialContext extends QueryCustomization<SpatialContext>, SpatialMatchingContext {
 
 	//TODO score by proximity
 
 	/**
-	 * Used to create Spatial Queries on the default coordinates of
-	 * an entity. This is the one to use when {@link org.hibernate.search.annotations.Spatial} is being used
-	 * without defining a custom value for {@link org.hibernate.search.annotations.Spatial#name()}.
+	 * Used to select the spatial field/coordinates used for this query. If not specified, the default field
+	 * ({@link org.hibernate.search.annotations.Spatial#COORDINATES_DEFAULT_FIELD}) is used.
 	 *
-	 * @return  {@code SpatialMatchingContext} instance for continuation
-	 */
-	SpatialMatchingContext onDefaultCoordinates();
-
-	/**
-	 * An entity can have multiple {@link org.hibernate.search.annotations.Spatial} annotations defining
-	 * different sets of coordinates.
-	 * Each non-default Spatial instance has a name to identify it,
-	 * use this method to pick one of these non-default coordinate fields.
+	 * <p>
+	 * Note: An entity can have multiple {@link org.hibernate.search.annotations.Spatial} annotations defining
+	 * different sets of coordinates. Each non-default {@code Spatial} instance has a name to identify it. Use this method
+	 * to specify the targeted coordinate field.
+	 * </p>
 	 *
-	 * @param field The name of the set of coordinates to target for the query
+	 * @param fieldName The name of the set of coordinates to target for the query
 	 *
 	 * @return {@code SpatialMatchingContext} instance for continuation
 	 */
-	SpatialMatchingContext onCoordinates(String field);
+	SpatialMatchingContext onField(String fieldName);
 
 }

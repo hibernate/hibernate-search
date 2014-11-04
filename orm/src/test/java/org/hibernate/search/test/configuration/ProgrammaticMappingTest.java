@@ -659,14 +659,14 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		double centerLatitude = 24;
 		double centerLongitude = 31.5;
 
-		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().onField( "location" )
 				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery = session.createFullTextQuery( luceneQuery, MemberLevelTestPoI.class );
 		List<?> results = hibQuery.list();
 		assertEquals( 0, results.size() );
 
-		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onCoordinates( "location" )
+		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onField( "location" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.Query hibQuery2 = session.createFullTextQuery( luceneQuery2, MemberLevelTestPoI.class );
@@ -738,14 +738,14 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		centerLatitude = 24;
 		centerLongitude = 31.5;
 
-		luceneQuery = builder.spatial().onCoordinates( "location" )
+		luceneQuery = builder.spatial().onField( "location" )
 				.within( 50, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		hibQuery = session.createFullTextQuery( luceneQuery, LatLongAnnTestPoi.class );
 		results = hibQuery.list();
 		assertEquals( 0, results.size() );
 
-		luceneQuery2 = builder.spatial().onCoordinates( "location" )
+		luceneQuery2 = builder.spatial().onField( "location" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		hibQuery2 = session.createFullTextQuery( luceneQuery2, LatLongAnnTestPoi.class );
