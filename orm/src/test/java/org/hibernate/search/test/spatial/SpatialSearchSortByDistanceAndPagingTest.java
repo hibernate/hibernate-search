@@ -44,7 +44,7 @@ import org.junit.Test;
  * @author PB
  */
 @TestForIssue(jiraKey = "HSEARCH-1267")
-public class SpatialSearchSortByDistanceAndPaging extends SearchTestBase {
+public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 
 	private static final int EXPECTED_RESULTS_COUNT = 37;
 	private static final double CENTER_LAT = 54.0;
@@ -160,7 +160,7 @@ public class SpatialSearchSortByDistanceAndPaging extends SearchTestBase {
 		QueryBuilder builder = fTxtSess.getSearchFactory().buildQueryBuilder().forEntity( GeoEntity.class ).get();
 
 		org.apache.lucene.search.Query luceneQuery = builder.spatial()
-				.onDefaultCoordinates()
+				.usingDefaultField()
 				.within( distance, Unit.KM )
 				.ofLatitude( startLat )
 				.andLongitude( startLon )
