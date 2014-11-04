@@ -174,6 +174,11 @@ public class FullTextQueryImpl implements FullTextQuery {
 		return query.getFacetManager();
 	}
 
+	@Override
+	public String toString() {
+		return query.toString();
+	}
+
 	//TODO mutualize this code with the EM this will fix the rollback issues
 	@SuppressWarnings( { "ThrowableInstanceNeverThrown" })
 	private void throwPersistenceException(Exception e) {

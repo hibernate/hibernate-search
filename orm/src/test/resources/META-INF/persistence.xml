@@ -35,4 +35,10 @@
         <class>org.hibernate.search.test.event.autoindexembeddable.EmbeddableCategories</class>
         <exclude-unlisted-classes />
     </persistence-unit>
+
+    <persistence-unit name="ToStringTestPU">
+        <class>org.hibernate.search.test.jpa.ToStringTest$Foo</class>
+        <exclude-unlisted-classes />
+    </persistence-unit>
+
 </persistence>
