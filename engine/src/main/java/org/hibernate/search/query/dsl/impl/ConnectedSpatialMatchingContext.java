@@ -7,11 +7,8 @@
 package org.hibernate.search.query.dsl.impl;
 
 import org.hibernate.search.query.dsl.SpatialMatchingContext;
-import org.hibernate.search.query.dsl.SpatialTermination;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.query.dsl.WithinContext;
-import org.hibernate.search.spatial.Coordinates;
-import org.hibernate.search.spatial.impl.Point;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -33,30 +30,15 @@ public class ConnectedSpatialMatchingContext implements SpatialMatchingContext {
 		return new ConnectedWithinContext( this );
 	}
 
-	private static final class ConnectedWithinContext implements WithinContext, WithinContext.LongitudeContext {
-		private final ConnectedSpatialMatchingContext mother;
-		private double latitude;
+	QueryBuildingContext getQueryContext() {
+		return queryContext;
+	}
 
-		public ConnectedWithinContext(ConnectedSpatialMatchingContext mother) {
-			this.mother = mother;
-		}
+	QueryCustomizer getQueryCustomizer() {
+		return queryCustomizer;
+	}
 
-		@Override
-		public SpatialTermination ofCoordinates(Coordinates coordinates) {
-			mother.spatialContext.setCoordinates( coordinates );
-			return new ConnectedSpatialQueryBuilder( mother.spatialContext, mother.queryCustomizer, mother.queryContext );
-		}
-
-		@Override
-		public LongitudeContext ofLatitude(double latitude) {
-			this.latitude = latitude;
-			return this;
-		}
-
-		@Override
-		public SpatialTermination andLongitude(double longitude) {
-			mother.spatialContext.setCoordinates( Point.fromDegrees( latitude, longitude ) );
-			return new ConnectedSpatialQueryBuilder( mother.spatialContext, mother.queryCustomizer, mother.queryContext );
-		}
+	SpatialQueryContext getSpatialContext() {
+		return spatialContext;
 	}
 }

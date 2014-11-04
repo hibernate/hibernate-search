@@ -34,6 +34,8 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.testing.TestForIssue;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,6 +47,7 @@ import org.junit.Test;
  */
 @TestForIssue(jiraKey = "HSEARCH-1267")
 public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
+	private static final Log log = LoggerFactory.make();
 
 	private static final int EXPECTED_RESULTS_COUNT = 37;
 	private static final double CENTER_LAT = 54.0;
@@ -96,14 +99,14 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 	 * @return unique result count
 	 */
 	public int doSearch(double distance, int pageSize, boolean sortByDistance) {
-		System.out.println(
+		log.debug(
 				String.format(
 						"distance %.2f pageSize %d, sortByDistance %s",
 						distance, pageSize, sortByDistance
 				)
 		);
 
-		entitiesIdsSet = new HashMap<Long, Integer>();
+		entitiesIdsSet = new HashMap<>();
 		idx = 0;
 		int firstResult = 0;
 		List result;
@@ -123,7 +126,7 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 	 */
 	private void printResults(List<GeoEntity> list) {
 		for ( GeoEntity entity : list ) {
-			System.out.println(
+			log.debug(
 					String.format(
 							"%d %f %d%s",
 							idx, entity.getDistance(), entity.getId(),
@@ -136,7 +139,6 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 			}
 			idx++;
 		}
-		System.out.println();
 	}
 
 	/**
@@ -160,7 +162,6 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 		QueryBuilder builder = fTxtSess.getSearchFactory().buildQueryBuilder().forEntity( GeoEntity.class ).get();
 
 		org.apache.lucene.search.Query luceneQuery = builder.spatial()
-				.usingDefaultField()
 				.within( distance, Unit.KM )
 				.ofLatitude( startLat )
 				.andLongitude( startLon )
@@ -329,6 +330,6 @@ public class SpatialSearchSortByDistanceAndPagingTest extends SearchTestBase {
 
 		sessionHbn.getTransaction().commit();
 		sessionHbn.close();
-		System.out.println( "test data saved" );
+		log.debug( "test data saved" );
 	}
 }

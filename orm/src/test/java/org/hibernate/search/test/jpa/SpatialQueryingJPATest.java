@@ -58,7 +58,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().againstField( "location" )
 				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
@@ -114,7 +114,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().againstField( "location" )
 				.within( 100, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );
@@ -175,7 +175,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" )
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().againstField( "location" )
 				.within( 1.8097233616663808, Unit.KM )
 					.ofLatitude( centerLatitude )
 					.andLongitude( centerLongitude )
@@ -187,6 +187,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 		hibQuery.setMaxResults( 1000 );
 		hibQuery.setProjection( FullTextQuery.THIS, FullTextQuery.SPATIAL_DISTANCE );
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
+		@SuppressWarnings( "unchecked" )
 		List<Object[]> results = hibQuery.getResultList();
 
 		for ( Object[] result : results ) {
@@ -233,7 +234,7 @@ public class SpatialQueryingJPATest extends JPATestCase {
 
 		final QueryBuilder builder = em.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 
-		org.apache.lucene.search.Query luceneQuery = builder.spatial().onCoordinates( "location" ).within( 100, Unit.KM ).ofLatitude( centerLatitude )
+		org.apache.lucene.search.Query luceneQuery = builder.spatial().againstField( "location" ).within( 100, Unit.KM ).ofLatitude( centerLatitude )
 				.andLongitude( centerLongitude ).createQuery();
 
 		FullTextQuery hibQuery = em.createFullTextQuery( luceneQuery, POI.class );

@@ -10,6 +10,8 @@ import org.apache.lucene.search.Filter;
 
 import org.hibernate.search.query.dsl.SpatialContext;
 import org.hibernate.search.query.dsl.SpatialMatchingContext;
+import org.hibernate.search.query.dsl.Unit;
+import org.hibernate.search.query.dsl.WithinContext;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -29,14 +31,8 @@ public class ConnectedSpatialContext implements SpatialContext {
 	}
 
 	@Override
-	public SpatialMatchingContext onCoordinates(String field) {
-		spatialContext.setCoordinatesField( field );
-		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext );
-	}
-
-	@Override
-	public SpatialMatchingContext onDefaultCoordinates() {
-		spatialContext.setDefaultCoordinatesField();
+	public SpatialMatchingContext againstField(String fieldName) {
+		spatialContext.setCoordinatesField( fieldName );
 		return new ConnectedSpatialMatchingContext( queryContext, queryCustomizer, spatialContext );
 	}
 
@@ -56,5 +52,23 @@ public class ConnectedSpatialContext implements SpatialContext {
 	public SpatialContext filteredBy(Filter filter) {
 		queryCustomizer.filteredBy( filter );
 		return this;
+	}
+
+	@Override
+	public WithinContext within(double distance, Unit unit) {
+		spatialContext.setRadius( distance, unit );
+		return new ConnectedWithinContext( this );
+	}
+
+	QueryBuildingContext getQueryContext() {
+		return queryContext;
+	}
+
+	QueryCustomizer getQueryCustomizer() {
+		return queryCustomizer;
+	}
+
+	SpatialQueryContext getSpatialContext() {
+		return spatialContext;
 	}
 }

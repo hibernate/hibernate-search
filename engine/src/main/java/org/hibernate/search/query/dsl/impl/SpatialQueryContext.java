@@ -20,15 +20,11 @@ public class SpatialQueryContext {
 	private Coordinates coordinates;
 
 	public String getCoordinatesField() {
-		return coordinatesField;
+		return coordinatesField != null ? coordinatesField : Spatial.COORDINATES_DEFAULT_FIELD;
 	}
 
 	public void setCoordinatesField(String coordinatesField) {
 		this.coordinatesField = coordinatesField;
-	}
-
-	public void setDefaultCoordinatesField() {
-		this.coordinatesField = Spatial.COORDINATES_DEFAULT_FIELD;
 	}
 
 	public double getRadiusDistance() {
