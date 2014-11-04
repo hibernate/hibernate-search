@@ -164,12 +164,12 @@
         <commonsLoggingVersion>1.1.1</commonsLoggingVersion>
         <activeMQVersion>5.8.0</activeMQVersion>
 
-        <!-- Used only in the modules definitions of the hibernate-search-modules project. -->
-            <!-- Versions should be kept in sync with the dependencies resolved by Maven. -->
+        <!-- These versions are used by the modules definitions of the hibernate-search-modules project -->
+        <!-- Versions should be kept in sync with the dependencies resolved by Maven. -->
         <commonsIoVersion>2.1</commonsIoVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
-        <paranamerVersion>2.3</paranamerVersion>
-            <!-- Declared only in the modules. They are not Maven dependencies. -->
+
+        <!-- Declared only in the modules. They are not Maven dependencies. -->
         <luceneRegexVersion>3.0.3</luceneRegexVersion>
         <luceneRegexJakartaVersion>1.4</luceneRegexJakartaVersion>
     </properties>
@@ -233,6 +233,10 @@
                     <exclusion>
                         <groupId>org.tukaani</groupId>
                         <artifactId>xz</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.thoughtworks.paranamer</groupId>
+                        <artifactId>paranamer</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
