@@ -160,7 +160,6 @@
         <activeMQVersion>5.8.0</activeMQVersion>
         <commonsIoVersion>2.1</commonsIoVersion>
         <commonsLangVersion>2.6</commonsLangVersion>
-        <paranamerVersion>2.3</paranamerVersion>
 
         <!-- Integration tests -->
         <arquillianVersion>1.1.2.Final</arquillianVersion>
@@ -369,7 +368,7 @@
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>${jacksonAslVersion}</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>${commonsCompressVersion}</version>
