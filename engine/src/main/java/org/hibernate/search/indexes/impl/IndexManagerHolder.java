@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
+
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -27,7 +28,6 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoadingExceptio
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.interceptor.DefaultEntityInterceptor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -214,7 +214,7 @@ public class IndexManagerHolder {
 	private Class<? extends EntityIndexingInterceptor> getInterceptorClassFromHierarchy(XClass entity, Indexed indexedAnnotation) {
 		Class<? extends EntityIndexingInterceptor> result = indexedAnnotation.interceptor();
 		XClass superEntity = entity;
-		while ( result == DefaultEntityInterceptor.class ) {
+		while ( result == EntityIndexingInterceptor.class ) {
 			superEntity = superEntity.getSuperclass();
 			//Object.class
 			if ( superEntity == null ) {
@@ -367,7 +367,7 @@ public class IndexManagerHolder {
 					entity,
 					indexedAnnotation
 			);
-			if ( interceptorClass == DefaultEntityInterceptor.class ) {
+			if ( interceptorClass == EntityIndexingInterceptor.class ) {
 				interceptor = null;
 			}
 			else {
