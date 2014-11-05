@@ -110,7 +110,7 @@
                     </sourcepath>
                     <tags>
                         <tag>
-                            <name>experimental</name>
+                            <name>hsearch.experimental</name>
                             <placement>a</placement>
                             <head>Experimental</head>
                         </tag>
