@@ -439,13 +439,16 @@ This set of queries has its own chapter, check out <<spatial>>.
 [[search-query-querydsl-mlt]]
 ===== More Like This queries
 
-Have you ever looked at an article or document and thought "I want to find more that look like
-this"? Have you ever appreciated an e-commerce website that gives you similar articles than the one
-you are exploring?
+[IMPORTANT]
+====
+This feature is considered experimental.
+====
+
+Have you ever looked at an article or document and thought: "I want to find more like this"? Have you ever
+appreciated an e-commerce website that gives you similar articles to the one you are exploring?
 
 More Like This queries are achieving just that. You feed it an entity (or its identifier) and
 Hibernate Search returns the list of entities that are similar.
-
 
 [NOTE]
 .How does it work?
@@ -455,8 +458,7 @@ create a query matching the most meaningful terms per field. This is a slight va
 the original Lucene `MoreLikeThisQuery` implementation.
 ====
 
-
-The query DSL API should be self explaining, let's look at some usage examples.
+The query DSL API should be self explaining. Let's look at some usage examples.
 
 ====
 [source, JAVA]
@@ -478,15 +480,10 @@ List<Object[]> results = (List<Object[]>) fullTextSession
 ----
 ====
 
-This first example takes a Coffee id and finds the matching coffees across all fields. To be fair,
-this is not across _all_ fields:
-
-
-* fields storing term vectors are considered
-* fields storing the actual value are considered
-* however, numeric fields are excluded today - that might change in a future version
-* id fields of the root and embedded entities are excluded as it would not make much sense in a
-More Like This query.
+This first example takes the id of an Coffee entity and finds the matching coffees across all fields. To be fair,
+this is not across _all_ fields. To be included in the More Like This query, fields need to store term vectors or the
+actual field value. Id fields (of the root entity as well as embedded entities) and numeric fields are excluded.
+The latter exclusion might change in future versions.
 
 Looking at the `Coffee` class, the following fields are considered: `name` as it is stored,
 `description` as it stores the term vector. `id` and `internalDescription` are excluded.
@@ -521,13 +518,12 @@ public class Coffee {
 ----
 ====
 
-Here we have used a projection to retrieve the relative score of each element. We might use the
+In the example above we used projection to retrieve the relative score of each element. We might use the
 score to only display the results for which the score is high enough.
-
 
 [TIP]
 ====
-For best performance and best results, store the term vectors for the fields you want to involve in
+For best performance and best results, store the term vectors for the fields you want to include in
 a More Like This query.
 ====
 
@@ -572,7 +568,6 @@ Query mltQuery = qb
 ----
 ====
 
-
 [NOTE]
 ====
 By default, the results contain at the top the entity you are comparing with. This is particularly
@@ -584,7 +579,7 @@ useful to compare relative scores. If you don't need it, you can exclude it.
 ----
 Query mltQuery = qb
         .moreLikeThis()
-                .excludeEntityUsedForComparison()
+            .excludeEntityUsedForComparison()
             .comparingField("summary").boostedTo(10f)
             .andField("description")
             .toEntity( coffee )
@@ -601,7 +596,7 @@ overall score. Start with a boost factor of `1` and adjust from there.
 ----
 Query mltQuery = qb
         .moreLikeThis()
-                .favorSignificantTermsWithFactor(1f)
+            .favorSignificantTermsWithFactor(1f)
             .comparingField("summary").boostedTo(10f)
             .andField("description")
             .toEntity( coffee )
@@ -611,7 +606,7 @@ Query mltQuery = qb
 
 Remember, more like this is a very subjective meaning and will vary depending on your data and the
 rules of your domain. With the various options offered, Hibernate Search arms you with the tools to
-adjust this weapon. Make sure to continuously test the results on your data set.
+adjust this weapon. Make sure to continuously test the results against your data set.
 
 ===== Combining queries
 

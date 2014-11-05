@@ -66,7 +66,10 @@ public interface QueryBuilder {
 
 	/**
 	 * Build a query matching resembling content.
+	 *
 	 * It uses an approach similar to Lucene's {@code MoreLikeThis}
+	 *
+	 * @hsearch.experimental More Like This queries are considered experimental
 	 */
 	MoreLikeThisContext moreLikeThis();
 }

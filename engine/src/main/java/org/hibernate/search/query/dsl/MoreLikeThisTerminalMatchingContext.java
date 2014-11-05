@@ -11,7 +11,9 @@ package org.hibernate.search.query.dsl;
  * Represents the next step after comparingAllFields.
  * No additional field can be defined.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @hsearch.experimental More Like This queries are considered experimental
+ *
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public interface MoreLikeThisTerminalMatchingContext extends MoreLikeThisMatchingContext {
 }
