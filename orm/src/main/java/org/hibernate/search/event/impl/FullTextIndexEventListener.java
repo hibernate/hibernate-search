@@ -59,7 +59,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 @SuppressWarnings("serial")
-public class FullTextIndexEventListener implements PostDeleteEventListener,
+public final class FullTextIndexEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener, FlushEventListener,
