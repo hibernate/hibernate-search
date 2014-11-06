@@ -12,11 +12,7 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
- * Created with IntelliJ IDEA.
- * User: nicolashelleringer
- * Date: 30/05/12
- * Time: 16:50
- * To change this template use File | Settings | File Templates.
+ * @author Nicolas Helleringer &lt;nicolas.helleringer@novacodex.net&gt;
  */
 @Embeddable
 public class Position {
