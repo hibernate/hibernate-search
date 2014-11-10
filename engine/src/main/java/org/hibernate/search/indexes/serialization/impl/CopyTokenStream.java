@@ -34,9 +34,9 @@ public class CopyTokenStream extends TokenStream implements Serializable {
 	private List<List<AttributeImpl>> cache;
 	private int index;
 
-	public static SerializableTokenStream buildSerializabletokenStream(TokenStream tokenStream) {
+	public static SerializableTokenStream buildSerializableTokenStream(TokenStream tokenStream) {
 		try {
-			List<List<AttributeImpl>> stream = fillCache( tokenStream );
+			List<List<AttributeImpl>> stream = createAttributeLists( tokenStream );
 			return new SerializableTokenStream(stream);
 		}
 		catch (IOException e) {
@@ -80,15 +80,15 @@ public class CopyTokenStream extends TokenStream implements Serializable {
 		index = 0;
 	}
 
-	private static List<List<AttributeImpl>> fillCache(TokenStream input) throws IOException {
-		List<List<AttributeImpl>> results = new ArrayList<List<AttributeImpl>>();
+	private static List<List<AttributeImpl>> createAttributeLists(TokenStream input) throws IOException {
+		List<List<AttributeImpl>> results = new ArrayList<>();
 		while ( input.incrementToken() ) {
-			List<AttributeImpl> attrs = new ArrayList<AttributeImpl>();
+			List<AttributeImpl> attrs = new ArrayList<>();
 			results.add( attrs );
 			Iterator<AttributeImpl> iter = input.getAttributeImplsIterator();
 			while ( iter.hasNext() ) {
 				//we need to clone as AttributeImpl instances can be reused across incrementToken() calls
-				attrs.add( (AttributeImpl) iter.next().clone() );
+				attrs.add( iter.next().clone() );
 			}
 		}
 		input.end();

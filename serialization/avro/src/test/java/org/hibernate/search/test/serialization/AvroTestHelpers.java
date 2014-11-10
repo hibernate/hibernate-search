@@ -174,8 +174,8 @@ final class AvroTestHelpers {
 		catch (IOException e) {
 			throw new RuntimeException( e );
 		}
-		SerializableTokenStream serOriginal = CopyTokenStream.buildSerializabletokenStream( original );
-		SerializableTokenStream serCopy = CopyTokenStream.buildSerializabletokenStream( copy );
+		SerializableTokenStream serOriginal = CopyTokenStream.buildSerializableTokenStream( original );
+		SerializableTokenStream serCopy = CopyTokenStream.buildSerializableTokenStream( copy );
 		if ( serOriginal.getStream().size() != serCopy.getStream().size() ) {
 			return false;
 		}

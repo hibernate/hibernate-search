@@ -102,7 +102,7 @@ public final class LuceneFieldContext {
 	}
 
 	public SerializableTokenStream getTokenStream() {
-		return CopyTokenStream.buildSerializabletokenStream( field.tokenStreamValue() );
+		return CopyTokenStream.buildSerializableTokenStream( field.tokenStreamValue() );
 	}
 
 	public BytesRef getBinaryValue() {
