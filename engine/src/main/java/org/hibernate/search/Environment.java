@@ -199,6 +199,14 @@ public final class Environment {
 	public static final String MAX_QUEUE_LENGTH = "max_queue_length";
 
 	/**
+	 * The lucene backend can operate in async mode, and can apply changes to the index at
+	 * regular intervals, effectively collapsing incoming changesets in order to reduce the
+	 * amount of commits. This property specifies the interval in ms that commits will be done.
+	 * This property will be ignored unless async indexing is enabled.
+	 */
+	public static final String INDEX_FLUSH_INTERVAL = "index_flush_interval";
+
+	/**
 	 * If nothing else is specified we use {@code Version.LUCENE_CURRENT} as the default Lucene version. This version
 	 * parameter was introduced by Lucene to attempt providing backwards compatibility when upgrading Lucene versions
 	 * and not wanting to rebuild the index from scratch. It's highly recommended to specify a version, so that you

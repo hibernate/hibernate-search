@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.index.CorruptIndexException;
+import org.hibernate.search.Environment;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.SearchException;
@@ -769,5 +770,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 212, value = "An exception occurred while the MassIndexer was transforming identifiers to Lucene Documents")
 	String massIndexerExceptionWhileTransformingIds();
+
+	@Message(id = 229, value = "Property " + Environment.INDEX_FLUSH_INTERVAL + "for the index '%s' needs to be positive." )
+	SearchException flushIntervalNeedsToBePositive(String indexName);
 
 }
