@@ -41,11 +41,10 @@ public class ConcurrentServiceTest {
 	@Test
 	public void concurrentSerialization() throws Exception {
 		final LuceneWorkSerializer serializer = extractSerializer();
-		final List<LuceneWork> works = SerializationTest.buildWorks();
 		final ConcurrentRunner runner = new ConcurrentRunner( new TaskFactory() {
 			@Override
 			public Runnable createRunnable(int i) throws Exception {
-				return new SerializingThread( serializer, works );
+				return new SerializingThread( serializer, SerializationTest.buildWorks() );
 			}
 		});
 		runner.execute();
