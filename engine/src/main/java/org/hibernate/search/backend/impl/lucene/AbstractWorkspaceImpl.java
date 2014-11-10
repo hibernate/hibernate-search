@@ -101,9 +101,12 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	}
 
 	@Override
-	public abstract void afterTransactionApplied(boolean someFailureHappened, boolean streaming);
+	public void afterTransactionApplied(boolean someFailureHappened, boolean streaming) {
+		getCommitPolicy().onChangeSetApplied( someFailureHappened, streaming );
+	}
 
 	public void shutDownNow() {
+		getCommitPolicy().onClose();
 		log.shuttingDownBackend( indexManager.getIndexName() );
 		writerHolder.closeIndexWriter();
 	}
@@ -122,4 +125,8 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 		return indexMetadataIsComplete && entitiesInIndexManager.size() == 1;
 	}
 
+	@Override
+	public void flush() {
+		getCommitPolicy().onFlush();
+	}
 }
