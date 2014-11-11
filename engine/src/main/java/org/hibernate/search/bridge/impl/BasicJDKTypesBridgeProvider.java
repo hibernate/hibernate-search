@@ -43,67 +43,52 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  */
 public class BasicJDKTypesBridgeProvider implements BridgeProvider {
 
+	public static final TwoWayFieldBridge CHARACTER = new TwoWayString2FieldBridgeAdaptor( new CharacterBridge() );
+	public static final TwoWayFieldBridge DOUBLE = new TwoWayString2FieldBridgeAdaptor( new DoubleBridge() );
+	public static final TwoWayFieldBridge FLOAT = new TwoWayString2FieldBridgeAdaptor( new FloatBridge() );
+	public static final TwoWayFieldBridge SHORT = new TwoWayString2FieldBridgeAdaptor( new ShortBridge() );
+	public static final TwoWayFieldBridge INTEGER = new TwoWayString2FieldBridgeAdaptor( new IntegerBridge() );
+	public static final TwoWayFieldBridge LONG = new TwoWayString2FieldBridgeAdaptor( new LongBridge() );
+	public static final TwoWayFieldBridge BIG_INTEGER = new TwoWayString2FieldBridgeAdaptor( new BigIntegerBridge() );
+	public static final TwoWayFieldBridge BIG_DECIMAL = new TwoWayString2FieldBridgeAdaptor( new BigDecimalBridge() );
+	public static final TwoWayFieldBridge STRING = new TwoWayString2FieldBridgeAdaptor( new StringBridge() );
+	public static final TwoWayFieldBridge BOOLEAN = new TwoWayString2FieldBridgeAdaptor( new BooleanBridge() );
+	public static final TwoWayFieldBridge Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
+	public static final TwoWayFieldBridge Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
+	public static final TwoWayFieldBridge UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );
 
-	public static final TwoWayFieldBridge CHARACTER;
-	public static final TwoWayFieldBridge DOUBLE;
-	public static final TwoWayFieldBridge FLOAT;
-	public static final TwoWayFieldBridge SHORT;
-	public static final TwoWayFieldBridge INTEGER;
-	public static final TwoWayFieldBridge LONG;
-	public static final TwoWayFieldBridge BIG_INTEGER;
-	public static final TwoWayFieldBridge BIG_DECIMAL;
-	public static final TwoWayFieldBridge STRING;
-	public static final TwoWayFieldBridge BOOLEAN;
-	public static final TwoWayFieldBridge Url;
-	public static final TwoWayFieldBridge Uri;
-	public static final TwoWayFieldBridge UUID;
+	//Not static as it depends on the application's classloader
+	private final TwoWayFieldBridge clazz;
 
-	//volatile necessary due to the lazy initialization nature of CLAZZ which requires a service manager
-	public volatile TwoWayFieldBridge clazz;
-	private volatile Map<String, FieldBridge> builtInBridges = new HashMap<String, FieldBridge>();
+	private final Map<String, FieldBridge> builtInBridges;
 
-	static {
-		CHARACTER = new TwoWayString2FieldBridgeAdaptor( new CharacterBridge() );
-		DOUBLE = new TwoWayString2FieldBridgeAdaptor( new DoubleBridge() );
-		FLOAT = new TwoWayString2FieldBridgeAdaptor( new FloatBridge() );
-		SHORT = new TwoWayString2FieldBridgeAdaptor( new ShortBridge() );
-		INTEGER = new TwoWayString2FieldBridgeAdaptor( new IntegerBridge() );
-		LONG = new TwoWayString2FieldBridgeAdaptor( new LongBridge() );
-		BIG_INTEGER = new TwoWayString2FieldBridgeAdaptor( new BigIntegerBridge() );
-		BIG_DECIMAL = new TwoWayString2FieldBridgeAdaptor( new BigDecimalBridge() );
-		STRING = new TwoWayString2FieldBridgeAdaptor( new StringBridge() );
-		BOOLEAN = new TwoWayString2FieldBridgeAdaptor( new BooleanBridge() );
-		Url = new TwoWayString2FieldBridgeAdaptor( new UrlBridge() );
-		Uri = new TwoWayString2FieldBridgeAdaptor( new UriBridge() );
-		UUID = new TwoWayString2FieldBridgeAdaptor( new UUIDBridge() );
-	}
-
-	public BasicJDKTypesBridgeProvider(ServiceManager serviceManager) {
-		clazz = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge( serviceManager ) );
-		builtInBridges = new HashMap<String, FieldBridge>();
-		builtInBridges.put( Character.class.getName(), CHARACTER );
-		builtInBridges.put( char.class.getName(), CHARACTER );
-		builtInBridges.put( Double.class.getName(), DOUBLE );
-		builtInBridges.put( double.class.getName(), DOUBLE );
-		builtInBridges.put( Float.class.getName(), FLOAT );
-		builtInBridges.put( float.class.getName(), FLOAT );
-		builtInBridges.put( Short.class.getName(), SHORT );
-		builtInBridges.put( short.class.getName(), SHORT );
-		builtInBridges.put( Integer.class.getName(), INTEGER );
-		builtInBridges.put( int.class.getName(), INTEGER );
-		builtInBridges.put( Long.class.getName(), LONG );
-		builtInBridges.put( long.class.getName(), LONG );
-		builtInBridges.put( BigInteger.class.getName(), BIG_INTEGER );
-		builtInBridges.put( BigDecimal.class.getName(), BIG_DECIMAL );
-		builtInBridges.put( String.class.getName(), STRING );
-		builtInBridges.put( Boolean.class.getName(), BOOLEAN );
-		builtInBridges.put( boolean.class.getName(), BOOLEAN );
-		builtInBridges.put( URL.class.getName(), Url );
-		builtInBridges.put( URI.class.getName(), Uri );
-		builtInBridges.put( UUID.class.getName(), UUID );
-		builtInBridges.put( Date.class.getName(), DateBridgeProvider.DATE_MILLISECOND );
-		builtInBridges.put( Calendar.class.getName(), CalendarBridgeProvider.CALENDAR_MILLISECOND );
-		builtInBridges.put( Class.class.getName(), clazz );
+	BasicJDKTypesBridgeProvider(ServiceManager serviceManager) {
+		this.clazz = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge( serviceManager ) );
+		Map<String, FieldBridge> bridges = new HashMap<String, FieldBridge>();
+		bridges.put( Character.class.getName(), CHARACTER );
+		bridges.put( char.class.getName(), CHARACTER );
+		bridges.put( Double.class.getName(), DOUBLE );
+		bridges.put( double.class.getName(), DOUBLE );
+		bridges.put( Float.class.getName(), FLOAT );
+		bridges.put( float.class.getName(), FLOAT );
+		bridges.put( Short.class.getName(), SHORT );
+		bridges.put( short.class.getName(), SHORT );
+		bridges.put( Integer.class.getName(), INTEGER );
+		bridges.put( int.class.getName(), INTEGER );
+		bridges.put( Long.class.getName(), LONG );
+		bridges.put( long.class.getName(), LONG );
+		bridges.put( BigInteger.class.getName(), BIG_INTEGER );
+		bridges.put( BigDecimal.class.getName(), BIG_DECIMAL );
+		bridges.put( String.class.getName(), STRING );
+		bridges.put( Boolean.class.getName(), BOOLEAN );
+		bridges.put( boolean.class.getName(), BOOLEAN );
+		bridges.put( URL.class.getName(), Url );
+		bridges.put( URI.class.getName(), Uri );
+		bridges.put( UUID.class.getName(), UUID );
+		bridges.put( Date.class.getName(), DateBridgeProvider.DATE_MILLISECOND );
+		bridges.put( Calendar.class.getName(), CalendarBridgeProvider.CALENDAR_MILLISECOND );
+		bridges.put( Class.class.getName(), clazz );
+		this.builtInBridges = bridges;
 	}
 
 	@Override
