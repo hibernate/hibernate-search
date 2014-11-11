@@ -8,19 +8,16 @@ package org.hibernate.search.backend;
 
 import java.lang.reflect.Constructor;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -117,34 +114,6 @@ public final class BackendFactory {
 	public static boolean isConfiguredAsSync(Properties properties) {
 		// default to sync if none defined
 		return !"async".equalsIgnoreCase( properties.getProperty( Environment.WORKER_EXECUTION ) );
-	}
-
-	/**
-	 * Builds an ExecutorService to run backend work.
-	 *
-	 * @param properties Might optionally contain configuration options for the ExecutorService
-	 * @param indexManagerName The indexManager going to be linked to this ExecutorService
-	 *
-	 * @return null if the work needs execution in sync
-	 */
-	public static ExecutorService buildWorkersExecutor(Properties properties, String indexManagerName) {
-		int threadPoolSize = getWorkerThreadPoolSize( properties );
-		int queueSize = getWorkerQueueSize( properties );
-		return Executors.newFixedThreadPool(
-				threadPoolSize,
-				"IndexWriter worker executor for " + indexManagerName,
-				queueSize
-		);
-	}
-
-	public static int getWorkerThreadPoolSize(Properties properties) {
-		//default to a simple asynchronous operation
-		return ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_THREADPOOL_SIZE, 1 );
-	}
-
-	public static int getWorkerQueueSize(Properties properties) {
-		//no queue limit
-		return ConfigurationParseHelper.getIntValue( properties, Environment.WORKER_WORKQUEUE_SIZE, Integer.MAX_VALUE );
 	}
 
 	private static BackendQueueProcessor createJGroupsQueueProcessor(String selectorClass, BuildContext buildContext) {

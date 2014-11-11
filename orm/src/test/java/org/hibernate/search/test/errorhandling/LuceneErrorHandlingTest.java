@@ -63,7 +63,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 		final HarmlessWork fourthWork = new HarmlessWork( "fourthWork" );
 		queue.add( fourthWork );
 		indexManager.performOperations( queue, null );
-		Assert.assertEquals( 4, WORK_COUNTER.get() );
+		Assert.assertEquals( 2, WORK_COUNTER.get() );
 
 		String errorMessage = mockErrorHandler.getErrorMessage();
 		Throwable exception = mockErrorHandler.getLastException();
@@ -75,6 +75,8 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 
 		expectedErrorMessage.append( "Subsequent failures:\n" );
 		LogErrorHandler.appendFailureMessage( expectedErrorMessage, firstFailure );
+		LogErrorHandler.appendFailureMessage( expectedErrorMessage, thirdWork );
+		LogErrorHandler.appendFailureMessage( expectedErrorMessage, fourthWork );
 
 		// should verify the errorHandler logs the work which was not processed (third and fourth)
 		// and which work was failing

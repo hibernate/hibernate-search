@@ -68,21 +68,6 @@ public final class Environment {
 	public static final String QUEUEINGPROCESSOR_BATCHSIZE = "hibernate.search.batch_size";
 
 	/**
-	 * Thread pool size
-	 * default 1
-	 */
-	public static final String WORKER_THREADPOOL_SIZE = Environment.WORKER_PREFIX + "thread_pool.size";
-
-	/**
-	 * Size of the buffer queue (besides the thread pool size)
-	 * <ul>
-	 * <li>only used then execution is async</li>
-	 * <li>default infinite</li>
-	 * </ul>
-	 */
-	public static final String WORKER_WORKQUEUE_SIZE = Environment.WORKER_PREFIX + "buffer_queue.max";
-
-	/**
 	 * define the reader prefix
 	 */
 	public static final String READER_PREFIX = "reader";

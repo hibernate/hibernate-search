@@ -200,9 +200,7 @@ threads to load the User instances using batches of 25 objects per query; these 
 also need to process indexed embedded relations and custom FieldBridges or ClassBridges, to finally
 output a Lucene document. In this conversion process these threads are likely going to need to
 trigger lazy loading of additional attributes, so you will probably need a high number of threads
-working in parallel. The number of threads working on actual index writing is defined by the backend
-configuration of each index. See the option `worker.thread_pool.size` in
-<<table-work-execution-configuration>>.
+working in parallel.
 
 As of Hibernate Search 4.4.0, instead of indexing all the types in parallel, the MassIndexer is
 configured by default to index only one type in parallel. It prevents resource exhaustion especially

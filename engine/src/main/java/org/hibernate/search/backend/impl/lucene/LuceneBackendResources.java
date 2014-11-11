@@ -9,7 +9,6 @@ package org.hibernate.search.backend.impl.lucene;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -38,7 +37,6 @@ public final class LuceneBackendResources {
 	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
 	private final ExecutorService queueingExecutor;
-	private final ExecutorService workersExecutor;
 	private final int maxQueueLength;
 	private final String indexName;
 
@@ -52,7 +50,6 @@ public final class LuceneBackendResources {
 		this.visitor = new LuceneWorkVisitor( workspace );
 		this.maxQueueLength = PropertiesParseHelper.extractMaxQueueSize( indexName, props );
 		this.queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
-		this.workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
 		ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 		readLock = readWriteLock.readLock();
 		writeLock = readWriteLock.writeLock();
@@ -65,17 +62,12 @@ public final class LuceneBackendResources {
 		this.visitor = new LuceneWorkVisitor( workspace );
 		this.maxQueueLength = previous.maxQueueLength;
 		this.queueingExecutor = previous.queueingExecutor;
-		this.workersExecutor = previous.workersExecutor;
 		this.readLock = previous.readLock;
 		this.writeLock = previous.writeLock;
 	}
 
 	public ExecutorService getQueueingExecutor() {
 		return queueingExecutor;
-	}
-
-	public ExecutorService getWorkersExecutor() {
-		return workersExecutor;
 	}
 
 	public int getMaxQueueLength() {
@@ -98,7 +90,6 @@ public final class LuceneBackendResources {
 		//need to close them in this specific order:
 		try {
 			flushCloseExecutor( queueingExecutor );
-			flushCloseExecutor( workersExecutor );
 		}
 		finally {
 			workspace.shutDownNow();

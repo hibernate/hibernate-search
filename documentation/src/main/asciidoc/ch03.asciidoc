@@ -489,14 +489,6 @@ The following options can be different on each index; in fact they need the inde
 |hibernate.search.<indexName>.​worker.execution|`sync`: synchronous execution (default)
 
 `async`: asynchronous execution
-|hibernate.search.<indexName>.​worker.thread_pool.size|The backend can apply updates from the same transaction
-            context (or batch) in parallel, using a threadpool. The default
-            value is 1. You can experiment with larger values if you have many
-            operations per transaction.
-|hibernate.search.<indexName>.​worker.buffer_queue.max|Defines the maximal number of work queue if the thread poll
-            is starved. Useful only for asynchronous execution. Default to
-            infinite. If the limit is reached, the work is done by the main
-            thread.
 
 |===============
 
@@ -603,8 +595,6 @@ hibernate.search.default.worker.jms.password = wonttellyou
 
 ## Optional asynchronous execution strategy
 # hibernate.search.default.worker.execution = async
-# hibernate.search.default.worker.thread_pool.size = 2
-# hibernate.search.default.worker.buffer_queue.max = 50
 ----
 ====
 
