@@ -15,8 +15,9 @@ import org.hibernate.annotations.common.reflection.XMember;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class XMemberToAnnotatedElementAdaptor implements AnnotatedElement {
-	private XMember delegate;
+class XMemberToAnnotatedElementAdaptor implements AnnotatedElement {
+
+	private final XMember delegate;
 
 	public XMemberToAnnotatedElementAdaptor(XMember member) {
 		this.delegate = member;

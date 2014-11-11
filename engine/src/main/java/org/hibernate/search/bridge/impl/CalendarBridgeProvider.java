@@ -24,7 +24,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class CalendarBridgeProvider extends ExtendedBridgeProvider {
+class CalendarBridgeProvider extends ExtendedBridgeProvider {
 	private static final Log LOG = LoggerFactory.make();
 
 	private static final FieldBridge CALENDAR_YEAR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_YEAR );
@@ -33,7 +33,7 @@ public class CalendarBridgeProvider extends ExtendedBridgeProvider {
 	private static final FieldBridge CALENDAR_HOUR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_HOUR );
 	private static final FieldBridge CALENDAR_MINUTE = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MINUTE );
 	private static final FieldBridge CALENDAR_SECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_SECOND );
-	public static final FieldBridge CALENDAR_MILLISECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MILLISECOND );
+	static final FieldBridge CALENDAR_MILLISECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MILLISECOND );
 
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {

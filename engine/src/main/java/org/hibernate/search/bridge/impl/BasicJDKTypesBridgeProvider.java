@@ -41,7 +41,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class BasicJDKTypesBridgeProvider implements BridgeProvider {
+class BasicJDKTypesBridgeProvider implements BridgeProvider {
 
 	private static final TwoWayFieldBridge CHARACTER = new TwoWayString2FieldBridgeAdaptor( new CharacterBridge() );
 	private static final TwoWayFieldBridge DOUBLE = new TwoWayString2FieldBridgeAdaptor( new DoubleBridge() );

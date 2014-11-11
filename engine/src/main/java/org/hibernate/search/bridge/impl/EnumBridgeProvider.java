@@ -17,7 +17,7 @@ import org.hibernate.search.bridge.spi.BridgeProvider;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class EnumBridgeProvider implements BridgeProvider {
+class EnumBridgeProvider implements BridgeProvider {
 	@Override
 	public FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext) {
 		if ( bridgeProviderContext.getReturnType().isEnum() ) {

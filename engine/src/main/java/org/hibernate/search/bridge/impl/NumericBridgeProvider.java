@@ -16,7 +16,8 @@ import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class NumericBridgeProvider extends ExtendedBridgeProvider {
+class NumericBridgeProvider extends ExtendedBridgeProvider {
+
 	private static final Map<String, NumericFieldBridge> numericBridges;
 
 	static {

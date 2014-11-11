@@ -25,7 +25,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class SpatialBridgeProvider extends ExtendedBridgeProvider {
+class SpatialBridgeProvider extends ExtendedBridgeProvider {
+
 	private static final Log LOG = LoggerFactory.make();
 
 	@Override

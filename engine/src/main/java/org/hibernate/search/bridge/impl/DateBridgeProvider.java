@@ -24,7 +24,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class DateBridgeProvider extends ExtendedBridgeProvider {
+class DateBridgeProvider extends ExtendedBridgeProvider {
+
 	private static final Log LOG = LoggerFactory.make();
 
 	private static final FieldBridge DATE_YEAR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
@@ -33,7 +34,7 @@ public class DateBridgeProvider extends ExtendedBridgeProvider {
 	private static final FieldBridge DATE_HOUR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_HOUR );
 	private static final FieldBridge DATE_MINUTE = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MINUTE );
 	private static final FieldBridge DATE_SECOND = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_SECOND );
-	public static final FieldBridge DATE_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(DateBridge.DATE_MILLISECOND );
+	static final FieldBridge DATE_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(DateBridge.DATE_MILLISECOND );
 
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {

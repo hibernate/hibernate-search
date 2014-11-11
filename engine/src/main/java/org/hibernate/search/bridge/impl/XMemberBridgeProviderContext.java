@@ -19,7 +19,8 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBridgeProviderContext {
+class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBridgeProviderContext {
+
 	private final AnnotatedElement annotatedElement;
 	private final Class<?> returnTypeElement;
 	private final String memberName;
