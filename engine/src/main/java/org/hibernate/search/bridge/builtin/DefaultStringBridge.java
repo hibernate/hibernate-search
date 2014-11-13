@@ -5,12 +5,12 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-package org.hibernate.search.bridge.builtin.impl;
+package org.hibernate.search.bridge.builtin;
 
 import org.hibernate.search.bridge.StringBridge;
 
 /**
- * Convert an object using the toString method or return {@code null} if the object is {@code null}.
+ * Convert an object using the object's {@code toString} method or return {@code null} if the object is {@code null}.
  *
  * @author Davide D'Alto
  */

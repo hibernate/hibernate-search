@@ -10,6 +10,7 @@ package org.hibernate.search.bridge.builtin.impl;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.builtin.ArrayBridge;
+import org.hibernate.search.bridge.builtin.DefaultStringBridge;
 
 /**
  * An implementation of {@link org.hibernate.search.bridge.builtin.ArrayBridge} that can be used with Hibernate Search query DSL.

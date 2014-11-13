@@ -9,6 +9,7 @@ package org.hibernate.search.bridge.builtin.impl;
 
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.bridge.builtin.DefaultStringBridge;
 import org.hibernate.search.bridge.builtin.IterableBridge;
 
 /**
