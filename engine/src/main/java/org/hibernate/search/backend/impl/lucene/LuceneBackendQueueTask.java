@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 
@@ -31,10 +30,10 @@ final class LuceneBackendQueueTask implements Runnable {
 
 	private final Lock modificationLock;
 	private final LuceneBackendResources resources;
-	private final List<LuceneWork> workList;
+	private final Iterable<LuceneWork> workList;
 	private final IndexingMonitor monitor;
 
-	LuceneBackendQueueTask(List<LuceneWork> workList, LuceneBackendResources resources, IndexingMonitor monitor) {
+	LuceneBackendQueueTask(Iterable<LuceneWork> workList, LuceneBackendResources resources, IndexingMonitor monitor) {
 		this.workList = workList;
 		this.resources = resources;
 		this.monitor = monitor;

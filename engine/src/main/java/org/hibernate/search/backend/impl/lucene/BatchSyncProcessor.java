@@ -11,10 +11,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -35,7 +32,8 @@ public class BatchSyncProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final BlockingQueue<Changeset> transferQueue = new LinkedBlockingDeque<>();
+	private final MultiWriteDrainableLinkedList<Changeset> transferQueue = new MultiWriteDrainableLinkedList<>();
+
 	private volatile LuceneBackendResources resources;
 	private final String indexName;
 	private volatile boolean stop = false;
@@ -72,7 +70,7 @@ public class BatchSyncProcessor {
 		wakeUpConsumer();
 		boolean interrupted = false;
 		while ( ! changeset.isProcessed() && ! interrupted ) {
-			LockSupport.park();
+			parkCurrentThread();
 			if ( Thread.interrupted() ) {
 				interrupted = true;
 			}
@@ -114,14 +112,13 @@ public class BatchSyncProcessor {
 			while ( ! stop ) {
 				while ( transferQueue.isEmpty() && ! stop ) {
 					// Avoid busy wait
-					LockSupport.park();
+					parkCurrentThread();
 				}
 				if ( ! transferQueue.isEmpty() ) {
-					List<Changeset> changesets = new LinkedList<>();
-					transferQueue.drainTo( changesets );
+					Iterable<Changeset> changesets = transferQueue.drainToDetachedIterable();
 					ChangesetList changesetList = new ChangesetList( changesets );
 					try {
-						LuceneBackendQueueTask luceneBackendQueueTask = new LuceneBackendQueueTask( changesetList.getWork(), resources, null );
+						LuceneBackendQueueTask luceneBackendQueueTask = new LuceneBackendQueueTask( changesetList, resources, null );
 						luceneBackendQueueTask.run();
 					}
 					finally {
@@ -131,6 +128,11 @@ public class BatchSyncProcessor {
 			}
 			log.stoppingSyncConsumerThread( indexName );
 		}
+	}
+
+	private void parkCurrentThread() {
+		//Always use some safety margin when parking threads:
+		LockSupport.parkNanos( 1_000_000_000 );
 	}
 
 }

@@ -20,7 +20,7 @@ import org.hibernate.search.exception.ErrorContext;
 public class ErrorContextBuilder {
 
 	private Throwable th;
-	private List<LuceneWork> workToBeDone;
+	private Iterable<LuceneWork> workToBeDone;
 	private List<LuceneWork> failingOperations;
 	private List<LuceneWork> operationsThatWorked;
 
@@ -45,8 +45,8 @@ public class ErrorContextBuilder {
 
 	}
 
-	public ErrorContextBuilder allWorkToBeDone(List<LuceneWork> workOnWriter) {
-		this.workToBeDone = new ArrayList<LuceneWork>( workOnWriter );
+	public ErrorContextBuilder allWorkToBeDone(Iterable<LuceneWork> workOnWriter) {
+		this.workToBeDone = workOnWriter;
 		return this;
 	}
 
@@ -57,7 +57,10 @@ public class ErrorContextBuilder {
 
 		// for situation when there is a primary failure
 		if ( workToBeDone != null ) {
-			List<LuceneWork> workLeft = new ArrayList<LuceneWork>( workToBeDone );
+			List<LuceneWork> workLeft = new ArrayList<LuceneWork>();
+			for ( LuceneWork work : workToBeDone ) {
+				workLeft.add( work );
+			}
 			if ( operationsThatWorked != null ) {
 				workLeft.removeAll( operationsThatWorked );
 			}
