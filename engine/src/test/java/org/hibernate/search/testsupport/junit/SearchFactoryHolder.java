@@ -18,6 +18,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -35,7 +36,9 @@ public class SearchFactoryHolder extends ExternalResource {
 	private final Class<?>[] entities;
 	private final Properties configuration;
 	private final Map<Class<? extends Service>,Service> providedServices = new HashMap<>();
-	private SearchFactoryImplementor sf;
+
+	private SearchFactoryImplementor[] searchImplementors;
+	private int numberOfSessionFactories = 1;
 
 	public SearchFactoryHolder(Class<?>... entities) {
 		this( null, entities );
@@ -48,11 +51,18 @@ public class SearchFactoryHolder extends ExternalResource {
 	}
 
 	public SearchFactoryImplementor getSearchFactory() {
-		return sf;
+		return searchImplementors[0];
 	}
 
 	@Override
 	protected void before() throws Throwable {
+		searchImplementors = new SearchFactoryImplementor[numberOfSessionFactories];
+		for ( int i = 0; i < numberOfSessionFactories; i++ ) {
+			searchImplementors[i] = createSearchFactory();
+		}
+	}
+
+	private SearchFactoryImplementor createSearchFactory() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setProgrammaticMapping( buildMappingDefinition );
 		for ( Entry<Class<? extends Service>, Service> entry : providedServices.entrySet() ) {
@@ -64,16 +74,20 @@ public class SearchFactoryHolder extends ExternalResource {
 		for ( Class<?> c : entities ) {
 			cfg.addClass( c );
 		}
-		sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		return new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
 	}
 
 	@Override
 	protected void after() {
-		sf.close();
+		if ( searchImplementors != null ) {
+			for ( SearchFactoryImplementor sf : searchImplementors ) {
+				sf.close();
+			}
+		}
 	}
 
 	public SearchFactoryHolder withProperty(String key, Object value) {
-		Assert.assertNull( "SessionFactory already initialized", sf );
+		Assert.assertNull( "SearchFactory already initialized", searchImplementors );
 		configuration.put( key, value );
 		return this;
 	}
@@ -84,10 +98,24 @@ public class SearchFactoryHolder extends ExternalResource {
 	}
 
 	public AbstractWorkspaceImpl extractWorkspace(Class indexedType) {
-		EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( indexedType );
+		EntityIndexBinding indexBindingForEntity = getSearchFactory().getIndexBinding( indexedType );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
 		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
 		return backend.getIndexResources().getWorkspace();
+	}
+
+	/**
+	 * Allows to construct multiple copies of the SearchFactory.
+	 * Each of them will have identical configuration and share the instances of the provided services.
+	 * Most other helpers provided by this class will access only the first SearchFactory, unless
+	 * they accept a specific index argument.
+	 */
+	public SearchFactoryHolder multipleInstances(int clusterNodes) {
+		if ( clusterNodes < 1 ) {
+			throw new SearchException( "Can not construct less than one node" );
+		}
+		this.numberOfSessionFactories = clusterNodes;
+		return this;
 	}
 
 }
