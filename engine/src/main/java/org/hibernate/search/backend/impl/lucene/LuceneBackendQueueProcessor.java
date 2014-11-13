@@ -25,11 +25,8 @@ package org.hibernate.search.backend.impl.lucene;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
-import org.hibernate.search.SearchException;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -57,6 +54,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	private boolean sync;
 	private AbstractWorkspaceImpl workspaceOverride;
 	private LuceneBackendTaskStreamer streamWorker;
+	private BatchSyncProcessor batchSyncProcessor;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
@@ -68,11 +66,14 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		}
 		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );
 		streamWorker = new LuceneBackendTaskStreamer( resources );
+		batchSyncProcessor = new BatchSyncProcessor( resources, indexManager.getIndexName() );
+		batchSyncProcessor.start();
 	}
 
 	@Override
 	public void close() {
 		resources.shutdown();
+		batchSyncProcessor.shutdown();
 	}
 
 	@Override
@@ -88,25 +89,15 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
-		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask(
-				workList,
-				resources,
-				monitor
-		);
 		if ( sync ) {
-			Future<?> future = resources.getQueueingExecutor().submit( luceneBackendQueueProcessor );
-			try {
-				future.get();
-			}
-			catch (InterruptedException e) {
-				log.interruptedWhileWaitingForIndexActivity( e );
-				Thread.currentThread().interrupt();
-			}
-			catch (ExecutionException e) {
-				throw new SearchException( "Error applying updates to the Lucene index", e.getCause() );
-			}
+			batchSyncProcessor.submit( workList, monitor );
 		}
 		else {
+			LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask(
+					workList,
+					resources,
+					monitor
+			);
 			resources.getQueueingExecutor().execute( luceneBackendQueueProcessor );
 		}
 	}
@@ -133,6 +124,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	@Override
 	public void indexMappingChanged() {
 		resources = resources.onTheFlyRebuild();
+		batchSyncProcessor.updateResources( resources );
 	}
 
 }
