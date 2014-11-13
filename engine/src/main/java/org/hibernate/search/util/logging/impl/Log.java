@@ -673,4 +673,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 229, value = "Property " + Environment.INDEX_FLUSH_INTERVAL + "for the index '%s' needs to be positive." )
 	SearchException flushIntervalNeedsToBePositive(String indexName);
 
+	@LogMessage(level = INFO)
+	@Message(id = 230, value = "Starting sync consumer thread for index '%s'" )
+	void startingSyncConsumerThread(String indexName);
+
+	@LogMessage(level = INFO)
+	@Message(id = 231, value = "Stopping sync consumer thread for index '%s'" )
+	void stoppingSyncConsumerThread(String indexName);
 }
