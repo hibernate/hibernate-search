@@ -337,7 +337,7 @@ To use the Infinispan directory via Maven, add the following dependencies:
 <dependency>
    <groupId>org.hibernate</groupId>
    <artifactId>hibernate-search</artifactId>
-   <version>WORKING</version>
+   <version>{hibernateSearchVersion}</version>
 </dependency>
 <dependency>
    <groupId>org.hibernate</groupId>
