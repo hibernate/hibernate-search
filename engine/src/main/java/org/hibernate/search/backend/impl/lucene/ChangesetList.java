@@ -6,36 +6,72 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import org.hibernate.search.backend.LuceneWork;
+import java.util.Collections;
+import java.util.Iterator;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.search.backend.LuceneWork;
 
 /**
  * Aggregator for {@link org.hibernate.search.backend.impl.lucene.Changeset}
  *
  * @author gustavonalle
  */
-final class ChangesetList {
+final class ChangesetList implements Iterable<LuceneWork> {
 
-	private final List<Changeset> changesets;
+	private final Iterable<Changeset> changesets;
 
-	ChangesetList(List<Changeset> changesets) {
+	ChangesetList(Iterable<Changeset> changesets) {
 		this.changesets = changesets;
-	}
-
-	List<LuceneWork> getWork() {
-		ArrayList<LuceneWork> luceneWorks = new ArrayList<>();
-		for ( Changeset changeset : changesets ) {
-			luceneWorks.addAll( changeset.getWorkList() );
-		}
-		return luceneWorks;
 	}
 
 	void markProcessed() {
 		for ( Changeset changeset : changesets ) {
 			changeset.markProcessed();
 		}
+	}
+
+	@Override
+	public Iterator<LuceneWork> iterator() {
+		return new WorkIterator( changesets.iterator() );
+	}
+
+	/**
+	 * A shallow iterator on all LuceneWork which avoids collection copies.
+	 * Optimized as this code area is very hot at runtime.
+	 */
+	private static class WorkIterator implements Iterator<LuceneWork> {
+
+		private Iterator<Changeset> outerIterator;
+		private Iterator<LuceneWork> current = Collections.<LuceneWork>emptyIterator();
+
+		public WorkIterator(Iterator<Changeset> iterator) {
+			this.outerIterator = iterator;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return current.hasNext() || outerIterator.hasNext();
+		}
+
+		@Override
+		public LuceneWork next() {
+			if ( current.hasNext() ) {
+				//advance the inner loop only
+				return current.next();
+			}
+			else {
+				//advance outer loop first
+				Changeset next = outerIterator.next();
+				current = next.getWorkListIterator();
+				return current.next();
+			}
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException( "This iterator is unable to remove elements" );
+		}
+
 	}
 
 }
