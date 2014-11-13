@@ -1,6 +1,33 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Beta2 (13-11-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1592] - DefaultStringBridge cannot be used with programmatic configuration API
+    * [HSEARCH-1655] - Avro's ConcurrentServiceTest fails occasionally
+    * [HSEARCH-1713] - Remove the DefaultEntityInterceptor implementation of EntityIndexingInterceptor
+
+** Improvement
+    * [HSEARCH-1173] - JPA FullTextQuery toString() with query information
+    * [HSEARCH-1273] - Improve usability and consistency of spatial API
+    * [HSEARCH-1368] - FullTextIndexEventListener becomes final
+    * [HSEARCH-1469] - Consider the term 'geospatial' instead of 'spatial'
+    * [HSEARCH-1470] - Provide better error message when the user writes a geospatial query against a non spatial field
+    * [HSEARCH-1699] - Batching IndexWriter commits for multiple synchronous worksets
+    * [HSEARCH-1718] - Avoid array resize overhead in the ErrorContextBuilder
+
+** Task
+    * [HSEARCH-1500] - Review Serialization strategies
+    * [HSEARCH-1579] - Consider removing direct references to FieldBridges from BridgeFactory
+    * [HSEARCH-1705] - Mark the MoreLikeThis feature as experimental
+    * [HSEARCH-1707] - Upgrade to Apache Lucene 4.10.2
+    * [HSEARCH-1712] - Remove dependency to ParaNamer
+    * [HSEARCH-1716] - Simplify the Lucene writing backend by dropping the parallel execution of writer tasks
+    * [HSEARCH-1717] - Update Infinispan to 7.0.0.Final
+
+
 Version 5.0.0.Beta1 (31-10-2014)
 ------------------------
 
@@ -141,6 +168,7 @@ Version 5.0.0.Alpha4 (20-05-2014)
     * [HSEARCH-1455] - Remove deprecated method and classes
     * [HSEARCH-1471] - Migrate documentation to asciidoc
     * [HSEARCH-1553] - Remove SearchConfiguration#getIndexManagerFactory and make index manager factory a service
+    * [HSEARCH-1555] - Update HibernateSearchResourceLoader to use the new ClassLoaderService
     * [HSEARCH-1593] - Update README in root with new build instructions
     * [HSEARCH-1598] - Upgrade to JGroups 3.5.0.Beta5
     * [HSEARCH-1599] - Upgrade to Infinispan 7.0.0.Alpha4
@@ -213,6 +241,7 @@ Version 5.0.0.Alpha2 (05-03-2014)
     * [HSEARCH-1511] - Provide new FuzzyQuery options to the DSL
     * [HSEARCH-1514] - A Service should be flagged Startable or Stoppable as an implementation detail
     * [HSEARCH-1517] - Upgrade to WildFly 8.0.0.Final
+    * [HSEARCH-1518] - Upgrade to JTA spec 1.2
     * [HSEARCH-1519] - Upgrade to ShrinkWrap stable 2.0
     * [HSEARCH-1520] - Remove hibernate-search-analyzers module
 
