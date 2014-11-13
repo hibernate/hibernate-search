@@ -26,6 +26,7 @@ package org.hibernate.search.backend.impl.lucene;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.LockSupport;
 
@@ -47,8 +48,8 @@ final class Changeset {
 		this.monitor = monitor;
 	}
 
-	List<LuceneWork> getWorkList() {
-		return workList;
+	Iterator<LuceneWork> getWorkListIterator() {
+		return workList.iterator();
 	}
 
 	IndexingMonitor getMonitor() {

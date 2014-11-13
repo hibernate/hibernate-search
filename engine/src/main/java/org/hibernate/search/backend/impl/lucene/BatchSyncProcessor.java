@@ -28,10 +28,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -52,7 +49,8 @@ public class BatchSyncProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final BlockingQueue<Changeset> transferQueue = new LinkedBlockingDeque<Changeset>();
+	private final MultiWriteDrainableLinkedList<Changeset> transferQueue = new MultiWriteDrainableLinkedList<Changeset>();
+
 	private volatile LuceneBackendResources resources;
 	private final String indexName;
 	private volatile boolean stop = false;
@@ -89,7 +87,7 @@ public class BatchSyncProcessor {
 		wakeUpConsumer();
 		boolean interrupted = false;
 		while ( ! changeset.isProcessed() && ! interrupted ) {
-			LockSupport.park();
+			parkCurrentThread();
 			if ( Thread.interrupted() ) {
 				interrupted = true;
 			}
@@ -128,26 +126,36 @@ public class BatchSyncProcessor {
 	private class Consumer implements Runnable {
 		@Override
 		public void run() {
+			Iterable<Changeset> changesets;
 			while ( ! stop ) {
-				while ( transferQueue.isEmpty() && ! stop ) {
+				changesets = transferQueue.drainToDetachedIterable();
+				while ( changesets == null && ! stop ) {
 					// Avoid busy wait
-					LockSupport.park();
+					parkCurrentThread();
+					changesets = transferQueue.drainToDetachedIterable();
 				}
-				if ( ! transferQueue.isEmpty() ) {
-					List<Changeset> changesets = new LinkedList<Changeset>();
-					transferQueue.drainTo( changesets );
-					ChangesetList changesetList = new ChangesetList( changesets );
-					try {
-						LuceneBackendQueueTask luceneBackendQueueTask = new LuceneBackendQueueTask( changesetList.getWork(), resources, null );
-						luceneBackendQueueTask.run();
-					}
-					finally {
-						changesetList.markProcessed();
-					}
+				if ( changesets != null ) {
+					applyChangesets( changesets );
 				}
 			}
 			log.stoppingSyncConsumerThread( indexName );
 		}
+
+		private void applyChangesets(Iterable<Changeset> changesets) {
+			ChangesetList changesetList = new ChangesetList( changesets );
+			try {
+				LuceneBackendQueueTask luceneBackendQueueTask = new LuceneBackendQueueTask( changesetList.copyToList(), resources, null );
+				luceneBackendQueueTask.run();
+			}
+			finally {
+				changesetList.markProcessed();
+			}
+		}
+	}
+
+	private void parkCurrentThread() {
+		//Always use some safety margin when parking threads:
+		LockSupport.parkNanos( 1000000000 );
 	}
 
 }
