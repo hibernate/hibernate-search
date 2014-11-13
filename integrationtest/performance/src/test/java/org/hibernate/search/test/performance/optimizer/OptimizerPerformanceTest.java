@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
@@ -87,7 +88,10 @@ public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 			es.execute( work );
 			es.execute( reverseWork );
 		}
-		while ( work.count < iteration - 1 ) {
+
+		es.shutdown();
+
+		while ( work.count.get() < iteration - 1 ) {
 			Thread.sleep( 20 );
 		}
 		System.out.println(
@@ -98,7 +102,7 @@ public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 
 	protected static class Work implements Runnable {
 		private final SessionFactory sf;
-		public volatile int count = 0;
+		public AtomicInteger count = new AtomicInteger( 0 );
 
 		public Work(SessionFactory sf) {
 			this.sf = sf;
@@ -160,7 +164,7 @@ public class OptimizerPerformanceTest extends SearchTestCaseJUnit4 {
 				s.delete( c );
 				tx.commit();
 				s.close();
-				count++;
+				count.incrementAndGet();
 			}
 			catch (Throwable t) {
 				t.printStackTrace();
