@@ -16,9 +16,9 @@ public class Conditions {
 	private Conditions() { }
 
 	public static void assertConditionMet(Condition condition) throws InterruptedException {
-		int maxLoops = 10;
+		int maxLoops = 500;
 		int loop = 0;
-		int sleep = 1000;
+		int sleep = 100;
 		while ( ! condition.evaluate() ) {
 			Thread.sleep( sleep );
 			if ( ++ loop > maxLoops ) {
