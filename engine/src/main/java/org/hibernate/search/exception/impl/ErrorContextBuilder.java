@@ -7,6 +7,7 @@
 package org.hibernate.search.exception.impl;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
@@ -79,7 +80,7 @@ public class ErrorContextBuilder {
 
 	private List<LuceneWork> getOperationsThatWorked() {
 		if ( operationsThatWorked == null ) {
-			operationsThatWorked = new ArrayList<LuceneWork>();
+			operationsThatWorked = new LinkedList<LuceneWork>();
 		}
 		return operationsThatWorked;
 	}
