@@ -7,16 +7,12 @@
 package org.hibernate.search.test.backend.lucene;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.CountingErrorHandler;
@@ -31,6 +27,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import static org.hibernate.search.test.backend.lucene.Conditions.assertConditionMet;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -92,10 +89,6 @@ public class ScheduledCommitPolicyTest {
 		assertConditionMet( new IndexingFinishedCondition( sfAsyncExclusiveIndex, NUMBER_ENTITIES + 10 + 1 ) );
 	}
 
-	private interface Condition {
-		boolean evaluate();
-	}
-
 	private class IndexingFinishedCondition implements Condition {
 		private final int docs;
 		private final SearchFactoryImplementor searchFactory;
@@ -132,38 +125,13 @@ public class ScheduledCommitPolicyTest {
 		}
 	}
 
-	private void assertConditionMet(Condition condition) throws InterruptedException {
-		int maxLoops = 10;
-		int loop = 0;
-		int sleep = 1000;
-		while ( ! condition.evaluate() ) {
-			Thread.sleep( sleep );
-			if ( ++ loop > maxLoops ) {
-				throw new AssertionFailure( "Condition not met because of a timeout" );
-			}
-		}
-	}
-
 	private void writeData(SearchFactoryHolder sfHolder, int numberEntities) {
 		for ( int i = 0; i < numberEntities; i++ ) {
-			Quote quote = new Quote( 1, i * 10 );
-			Work work = new Work( quote, quote.id, WorkType.ADD, false );
+			Quote quote = new Quote( 1, "description" );
+			Work work = new Work( quote, quote.getId(), WorkType.ADD, false );
 			TransactionContextForTest tc = new TransactionContextForTest();
 			sfHolder.getSearchFactory().getWorker().performWork( work, tc );
 			tc.end();
-		}
-	}
-
-	@Indexed
-	private static class Quote {
-		@DocumentId
-		long id;
-		@Field
-		int price;
-
-		private Quote(long id, int price) {
-			this.id = id;
-			this.price = price;
 		}
 	}
 
