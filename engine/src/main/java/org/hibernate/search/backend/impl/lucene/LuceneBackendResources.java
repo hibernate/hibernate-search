@@ -54,7 +54,6 @@ public final class LuceneBackendResources {
 	private final LuceneWorkVisitor visitor;
 	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
-	private final ExecutorService queueingExecutor;
 	private final ExecutorService workersExecutor;
 	private final int maxQueueLength;
 	private final String indexName;
@@ -62,13 +61,14 @@ public final class LuceneBackendResources {
 	private final ReadLock readLock;
 	private final WriteLock writeLock;
 
+	private volatile ExecutorService asyncIndexingExecutor;
+
 	LuceneBackendResources(WorkerBuildContext context, DirectoryBasedIndexManager indexManager, Properties props, AbstractWorkspaceImpl workspace) {
 		this.indexName = indexManager.getIndexName();
 		this.errorHandler = context.getErrorHandler();
 		this.workspace = workspace;
 		this.visitor = new LuceneWorkVisitor( workspace );
 		this.maxQueueLength = PropertiesParseHelper.extractMaxQueueSize( indexName, props );
-		this.queueingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
 		this.workersExecutor = BackendFactory.buildWorkersExecutor( props, indexName );
 		ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 		readLock = readWriteLock.readLock();
@@ -81,14 +81,31 @@ public final class LuceneBackendResources {
 		this.workspace = previous.workspace;
 		this.visitor = new LuceneWorkVisitor( workspace );
 		this.maxQueueLength = previous.maxQueueLength;
-		this.queueingExecutor = previous.queueingExecutor;
 		this.workersExecutor = previous.workersExecutor;
+		this.asyncIndexingExecutor = previous.asyncIndexingExecutor;
 		this.readLock = previous.readLock;
 		this.writeLock = previous.writeLock;
 	}
 
-	public ExecutorService getQueueingExecutor() {
-		return queueingExecutor;
+	public ExecutorService getAsynchIndexingExecutor() {
+		ExecutorService executor = asyncIndexingExecutor;
+		if ( executor != null ) {
+			return executor;
+		}
+		else {
+			return getAsynchIndexingExecutorSynchronized();
+		}
+	}
+
+	private synchronized ExecutorService getAsynchIndexingExecutorSynchronized() {
+		ExecutorService executor = asyncIndexingExecutor;
+		if ( executor != null ) {
+			return executor;
+		}
+		else {
+			this.asyncIndexingExecutor = Executors.newFixedThreadPool( 1, "Index updates queue processor for index " + indexName, maxQueueLength );
+			return this.asyncIndexingExecutor;
+		}
 	}
 
 	public ExecutorService getWorkersExecutor() {
@@ -114,7 +131,7 @@ public final class LuceneBackendResources {
 	public void shutdown() {
 		//need to close them in this specific order:
 		try {
-			flushCloseExecutor( queueingExecutor );
+			flushCloseExecutor( asyncIndexingExecutor );
 			flushCloseExecutor( workersExecutor );
 		}
 		finally {
@@ -123,6 +140,9 @@ public final class LuceneBackendResources {
 	}
 
 	private void flushCloseExecutor(ExecutorService executor) {
+		if ( executor == null ) {
+			return;
+		}
 		executor.shutdown();
 		try {
 			executor.awaitTermination( Long.MAX_VALUE, TimeUnit.SECONDS );

@@ -54,7 +54,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	private boolean sync;
 	private AbstractWorkspaceImpl workspaceOverride;
 	private LuceneBackendTaskStreamer streamWorker;
-	private BatchSyncProcessor batchSyncProcessor;
+	private WorkProcessor workProcessor;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
@@ -66,14 +66,23 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		}
 		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );
 		streamWorker = new LuceneBackendTaskStreamer( resources );
-		batchSyncProcessor = new BatchSyncProcessor( resources, indexManager.getIndexName() );
-		batchSyncProcessor.start();
+		String indexName = indexManager.getIndexName();
+		if ( sync ) {
+			final SyncWorkProcessor batchSyncProcessor = new SyncWorkProcessor( resources, indexName );
+			batchSyncProcessor.start();
+			log.luceneBackendInitializedSynchronously( indexName );
+			workProcessor = batchSyncProcessor;
+		}
+		else {
+			workProcessor = new AsyncWorkProcessor( resources );
+			log.luceneBackendInitializedAsynchronously( indexName );
+		}
 	}
 
 	@Override
 	public void close() {
 		resources.shutdown();
-		batchSyncProcessor.shutdown();
+		workProcessor.shutdown();
 	}
 
 	@Override
@@ -89,17 +98,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
-		if ( sync ) {
-			batchSyncProcessor.submit( workList, monitor );
-		}
-		else {
-			LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask(
-					workList,
-					resources,
-					monitor
-			);
-			resources.getQueueingExecutor().execute( luceneBackendQueueProcessor );
-		}
+		workProcessor.submit( workList, monitor );
 	}
 
 	@Override
@@ -124,7 +123,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	@Override
 	public void indexMappingChanged() {
 		resources = resources.onTheFlyRebuild();
-		batchSyncProcessor.updateResources( resources );
+		workProcessor.updateResources( resources );
 	}
 
 }
