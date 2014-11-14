@@ -28,7 +28,7 @@ import java.util.concurrent.locks.LockSupport;
  *
  * @author gustavonalle
  */
-public class BatchSyncProcessor {
+public class BatchSyncProcessor implements BlockProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -99,7 +99,7 @@ public class BatchSyncProcessor {
 	 * Handle on the fly rebuilds
 	 * @param resources new instance of {@link org.hibernate.search.backend.impl.lucene.LuceneBackendResources}
 	 */
-	void updateResources(LuceneBackendResources resources) {
+	public void updateResources(LuceneBackendResources resources) {
 		this.resources = resources;
 	}
 
