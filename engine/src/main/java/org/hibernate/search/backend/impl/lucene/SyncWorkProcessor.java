@@ -20,7 +20,7 @@ import java.util.concurrent.locks.LockSupport;
  * Multiple threads produce one or more {@link org.hibernate.search.backend.LuceneWork}
  * by calling {@link #submit(java.util.List, org.hibernate.search.backend.IndexingMonitor)},
  * and get blocked until their changes are applied to the index;</p>
- * The {@link org.hibernate.search.backend.impl.lucene.BatchSyncProcessor.Consumer} thread will
+ * The {@link org.hibernate.search.backend.impl.lucene.SyncWorkProcessor.Consumer} thread will
  * coalesce changes from multiple threads and apply them in the index, releasing the waiting threads
  * at the end.
  * <p>
@@ -28,7 +28,7 @@ import java.util.concurrent.locks.LockSupport;
  *
  * @author gustavonalle
  */
-public class BatchSyncProcessor {
+final class SyncWorkProcessor implements WorkProcessor {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -44,7 +44,7 @@ public class BatchSyncProcessor {
 	 * @param resources LuceneResources to obtain the workspace
 	 * @param indexName for debugging purposes
 	 */
-	public BatchSyncProcessor(LuceneBackendResources resources, String indexName) {
+	public SyncWorkProcessor(LuceneBackendResources resources, String indexName) {
 		this.resources = resources;
 		this.indexName = indexName;
 		consumerThread = new Thread( new Consumer(), "Hibernate Search sync consumer thread for index " + indexName );
@@ -99,7 +99,7 @@ public class BatchSyncProcessor {
 	 * Handle on the fly rebuilds
 	 * @param resources new instance of {@link org.hibernate.search.backend.impl.lucene.LuceneBackendResources}
 	 */
-	void updateResources(LuceneBackendResources resources) {
+	public void updateResources(LuceneBackendResources resources) {
 		this.resources = resources;
 	}
 
