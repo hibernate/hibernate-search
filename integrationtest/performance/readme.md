@@ -21,13 +21,21 @@ log from index check and uncaught exceptions.
 - `org.hibernate.search.test.performance.scenario.SmokeTestScenario` (used by default)
 - `org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario`
 - `org.hibernate.search.test.performance.scenario.FileSystemNearRealTimeTestScenario`
+
+
+## Enable benchmarking
+
+All metrics are disabled by default, so that you're not forced to run lengthy test for any build.
+A system property enables them:
+
+   > -Dorg.hibernate.search.enable_performance_tests=true
  
 
 ## Examples how to run
 
 - run tests in standalone mode against in-memory database
 
-    > mvn clean test -Dtest=TestRunnerStandalone -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario
+    > mvn clean test -Dtest=TestRunnerStandalone -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario -Dorg.hibernate.search.enable_performance_tests=true
 
 - run tests in standalone mode against specified database (via system properties)
 
@@ -39,13 +47,15 @@ log from index check and uncaught exceptions.
                      -Dhibernate.connection.url=jdbc:postgresql://localhost:5432/dev
                      -Dhibernate.connection.username=foo
                      -Dhibernate.connection.password=foo
+                     -Dorg.hibernate.search.enable_performance_tests=true
                      
 - run tests in container mode against default data source (java:jboss/datasources/ExampleDS)
 
-    > mvn clean test -Dtest=TestRunnerArquillian -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario
+    > mvn clean test -Dtest=TestRunnerArquillian -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario -Dorg.hibernate.search.enable_performance_tests=true
 
 - run tests in container mode against specified data source (via system property)                     
     
     > mvn clean test -Dtest=TestRunnerArquillian
                      -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario 
                      -Ddatasource=foo
+                     -Dorg.hibernate.search.enable_performance_tests=true
