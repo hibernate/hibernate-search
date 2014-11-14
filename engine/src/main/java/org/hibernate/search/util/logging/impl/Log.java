@@ -780,4 +780,12 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = 231, value = "Stopping sync consumer thread for index '%s'" )
 	void stoppingSyncConsumerThread(String indexName);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 232, value = "Backend for index '%s' started: using a Synchronous batching backend." )
+	void luceneBackendInitializedSynchronously(String indexName);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 233, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
+	void luceneBackendInitializedAsynchronously(String indexName);
 }
