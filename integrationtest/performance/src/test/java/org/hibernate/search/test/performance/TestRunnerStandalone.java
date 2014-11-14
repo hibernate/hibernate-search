@@ -44,6 +44,7 @@ public class TestRunnerStandalone {
 		setDefaultProperty( properties, "hibernate.c3p0.min_size", "5" );
 		setDefaultProperty( properties, "hibernate.c3p0.max_size", "20" );
 		setDefaultProperty( properties, "hibernate.c3p0.max_statements", "50" );
+		setDefaultProperty( properties, "hibernate.connection.isolation", "2" );
 		return properties;
 	}
 
