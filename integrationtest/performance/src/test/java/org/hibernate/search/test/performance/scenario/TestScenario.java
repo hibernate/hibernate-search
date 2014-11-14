@@ -101,7 +101,7 @@ public abstract class TestScenario {
 
 		initDatabaseStopWatch.start();
 
-		BatchSupport batchSupport = new BatchSupport( sf );
+		BatchSupport batchSupport = new BatchSupport( sf, initialOffset );
 		batchSupport.execute( "insert into author(id, name) values(?, ?)", initialAutorCount,
 				new BatchCallback() {
 					@Override

@@ -21,12 +21,13 @@ import org.hibernate.jdbc.Work;
 public class BatchSupport {
 
 	private static final long batchSize = 1000;
-	private static final long initialOffset = 1000 * 1000;
 
 	private final SessionFactory sf;
+	private final long initialOffset;
 
-	public BatchSupport(SessionFactory sf) {
+	public BatchSupport(SessionFactory sf, long initialOffset) {
 		this.sf = sf;
+		this.initialOffset = initialOffset;
 	}
 
 	public void execute(final String sql, long totalCount, final BatchCallback batchCallback) {
