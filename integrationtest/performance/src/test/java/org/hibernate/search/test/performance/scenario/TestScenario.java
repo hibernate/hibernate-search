@@ -56,11 +56,11 @@ public abstract class TestScenario {
 
 	public TestScenario() {
 		if ( PERFORMANCE_ENABLED ) {
-			this.initialAutorCount = 10 * 1000;
-			this.initialBookCount = 1000 * 1000;
-			this.warmupCyclesCount = 100;
-			this.measuredCyclesCount = 1000;
-			initialOffset = 1000 * 1000;
+			this.initialAutorCount = 10_000;
+			this.initialBookCount = 1_000_000;
+			this.warmupCyclesCount = 300;
+			this.measuredCyclesCount = 4_000;
+			this.initialOffset = 1_000_000;
 		}
 		else {
 			this.initialAutorCount = 10;
@@ -77,7 +77,7 @@ public abstract class TestScenario {
 		this.initialBookCount = initialBookCount;
 		this.warmupCyclesCount = warmupCyclesCount;
 		this.measuredCyclesCount = measuredCyclesCount;
-		this.initialOffset = 1000 * 1000;
+		this.initialOffset = 1_000_000;
 	}
 
 	public Properties getHibernateProperties() {
