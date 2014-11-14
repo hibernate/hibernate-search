@@ -346,12 +346,11 @@ public class IndexManagerHolder {
 	private ShardIdentifierProvider createShardIdentifierProvider(WorkerBuildContext buildContext, Properties indexProperty) {
 		ShardIdentifierProvider shardIdentifierProvider;
 		String shardIdentityProviderName = indexProperty.getProperty( SHARDING_STRATEGY );
-		ServiceManager serviceManager = buildContext.getServiceManager();
 		shardIdentifierProvider = ClassLoaderHelper.instanceFromName(
 				ShardIdentifierProvider.class,
 				shardIdentityProviderName,
 				"ShardIdentifierProvider",
-				serviceManager
+				buildContext.getClassLoaderService()
 		);
 
 		shardIdentifierProvider.initialize( new MaskedProperty( indexProperty, SHARDING_STRATEGY ), buildContext );
@@ -408,12 +407,11 @@ public class IndexManagerHolder {
 			return DEFAULT_SIMILARITY;
 		}
 		else {
-			ServiceManager serviceManager = buildContext.getServiceManager();
 			return ClassLoaderHelper.instanceFromName(
 					Similarity.class,
 					defaultSimilarityClassName,
 					"default similarity",
-					serviceManager
+					buildContext.getClassLoaderService()
 			);
 
 		}
@@ -423,12 +421,11 @@ public class IndexManagerHolder {
 		Similarity configLevelSimilarity = null;
 		String similarityClassName = indexProperties.getProperty( Environment.SIMILARITY_CLASS_PER_INDEX );
 		if ( similarityClassName != null ) {
-			ServiceManager serviceManager = buildContext.getServiceManager();
 			configLevelSimilarity = ClassLoaderHelper.instanceFromName(
 					Similarity.class,
 					similarityClassName,
 					"Similarity class for index " + directoryProviderName,
-					serviceManager
+					buildContext.getClassLoaderService()
 			);
 		}
 		return configLevelSimilarity;
@@ -455,7 +452,7 @@ public class IndexManagerHolder {
 					IndexShardingStrategy.class,
 					shardingStrategyName,
 					"IndexShardingStrategy",
-					serviceManager
+					buildContext.getClassLoaderService()
 			);
 		}
 		shardingStrategy.initialize(
@@ -532,10 +529,7 @@ public class IndexManagerHolder {
 
 		Class<?> shardingStrategy;
 		try {
-			shardingStrategy = ClassLoaderHelper.classForName(
-					shardingStrategyName,
-					buildContext.getServiceManager()
-			);
+			shardingStrategy = buildContext.getClassLoaderService().classForName( shardingStrategyName );
 		}
 		catch (ClassLoadingException e) {
 			throw log.getUnableToLoadShardingStrategyClassException( shardingStrategyName );

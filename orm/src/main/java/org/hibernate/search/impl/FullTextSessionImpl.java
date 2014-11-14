@@ -24,7 +24,7 @@ import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
@@ -178,10 +178,8 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 
 		if ( factoryClassName != null ) {
 			SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-			ServiceManager serviceManager = searchFactoryImplementor.getServiceManager();
-			factory = ClassLoaderHelper.instanceFromName(
-					MassIndexerFactory.class, factoryClassName, "Mass indexer factory", serviceManager
-			);
+			ClassLoaderService classLoaderService = searchFactoryImplementor.getClassLoaderService();
+			factory = ClassLoaderHelper.instanceFromName( MassIndexerFactory.class, factoryClassName, "Mass indexer factory", classLoaderService );
 		}
 		else {
 			factory = new DefaultMassIndexerFactory();

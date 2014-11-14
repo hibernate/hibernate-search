@@ -8,6 +8,7 @@ package org.hibernate.search.testsupport.setup;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -52,6 +53,11 @@ public class BuildContextForTest implements BuildContext {
 	@Override
 	public ErrorHandler getErrorHandler() {
 		return new LogErrorHandler();
+	}
+
+	@Override
+	public ClassLoaderService getClassLoaderService() {
+		return searchConfiguration.getClassLoaderService();
 	}
 }
 

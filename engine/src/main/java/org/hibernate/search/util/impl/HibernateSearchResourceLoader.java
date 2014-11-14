@@ -11,7 +11,6 @@ import java.io.InputStream;
 
 import org.apache.lucene.analysis.util.ResourceLoader;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -23,24 +22,18 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class HibernateSearchResourceLoader implements ResourceLoader {
-	private static final Log log = LoggerFactory.make();
-	private final ServiceManager serviceManager;
 
-	public HibernateSearchResourceLoader(ServiceManager serviceManager) {
-		this.serviceManager = serviceManager;
+	private static final Log log = LoggerFactory.make();
+
+	private final ClassLoaderService classLoaderService;
+
+	public HibernateSearchResourceLoader(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
 	}
 
 	@Override
 	public InputStream openResource(String resource) throws IOException {
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
-		InputStream inputStream;
-		try {
-			inputStream = classLoaderService.locateResourceStream( resource );
-		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
-		}
-
+		InputStream inputStream = classLoaderService.locateResourceStream( resource );
 		if ( inputStream == null ) {
 			throw log.unableToLoadResource( resource );
 		}
@@ -55,7 +48,7 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 				expectedType,
 				className,
 				describeComponent( className ),
-				serviceManager
+				classLoaderService
 		);
 	}
 
@@ -65,7 +58,7 @@ public class HibernateSearchResourceLoader implements ResourceLoader {
 				expectedType,
 				className,
 				describeComponent( className ),
-				serviceManager
+				classLoaderService
 		);
 	}
 

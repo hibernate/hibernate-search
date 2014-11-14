@@ -40,8 +40,10 @@ public class StandardServiceManager implements ServiceManager {
 	private final ConcurrentHashMap<Class<?>, ServiceWrapper<?>> cachedServices = new ConcurrentHashMap<Class<?>, ServiceWrapper<?>>();
 	private final Map<Class<? extends Service>, Object> providedServices;
 	private final Map<Class<? extends Service>, String> defaultServices;
+	private final ClassLoaderService classLoaderService;
 
 	private volatile boolean allServicesReleased = false;
+
 
 	public StandardServiceManager(SearchConfiguration searchConfiguration, BuildContext buildContext) {
 		this( searchConfiguration, buildContext, Collections.<Class<? extends Service>, String>emptyMap() );
@@ -54,6 +56,7 @@ public class StandardServiceManager implements ServiceManager {
 		this.properties = searchConfiguration.getProperties();
 		this.providedServices = createProvidedServices( searchConfiguration );
 		this.defaultServices = defaultServices;
+		this.classLoaderService = searchConfiguration.getClassLoaderService();
 	}
 
 	@Override
@@ -167,7 +170,7 @@ public class StandardServiceManager implements ServiceManager {
 					serviceRole,
 					defaultServices.get( serviceRole ),
 					"default service",
-					this
+					classLoaderService
 			);
 			services.add( service );
 		}

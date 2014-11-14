@@ -19,15 +19,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
-
-import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
@@ -69,13 +67,13 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 	private String directoryProviderName;
 	private Properties properties;
 	private UpdateTask updateTask;
-	private ServiceManager serviceManager;
+	private ClassLoaderService classLoaderService;
 
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.properties = properties;
 		this.directoryProviderName = directoryProviderName;
-		this.serviceManager = context.getServiceManager();
+		this.classLoaderService = context.getClassLoaderService();
 		//source guessing
 		sourceIndexDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, false );
 		log.debugf( "Source directory: %s", sourceIndexDir.getPath() );
@@ -139,8 +137,8 @@ public class FSSlaveDirectoryProvider implements DirectoryProvider<Directory> {
 		int readCurrentState = current; //Unneeded value, but ensure visibility of state protected by memory barrier
 		int currentToBe = 0;
 		try {
-			directory1 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "1" ), properties, serviceManager );
-			directory2 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "2" ), properties, serviceManager );
+			directory1 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "1" ), properties, classLoaderService );
+			directory2 = DirectoryProviderHelper.createFSIndex( new File( indexDir, "2" ), properties, classLoaderService );
 			File currentMarker = new File( indexDir, "current1" );
 			File current2Marker = new File( indexDir, "current2" );
 			if ( currentMarker.exists() ) {

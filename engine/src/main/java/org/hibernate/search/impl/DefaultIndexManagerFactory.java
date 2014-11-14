@@ -9,7 +9,7 @@ package org.hibernate.search.impl;
 import java.util.Properties;
 
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
@@ -30,7 +30,7 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 
 	private static final Log log = LoggerFactory.make();
 
-	private ServiceManager serviceManager;
+	private ClassLoaderService classLoaderService;
 
 	@Override
 	public IndexManager createDefaultIndexManager() {
@@ -47,14 +47,11 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 			IndexManager indexManager = fromAlias( indexManagerImplementationName );
 			if ( indexManager == null ) {
 				indexManagerImplementationName = aliasToFQN( indexManagerImplementationName );
-				Class<?> indexManagerClass = ClassLoaderHelper.classForName(
-						indexManagerImplementationName,
-						serviceManager
-				);
-				indexManager = ClassLoaderHelper.instanceFromClass(
+				indexManager = ClassLoaderHelper.instanceFromName(
 						IndexManager.class,
-						indexManagerClass,
-						"index manager"
+						indexManagerImplementationName,
+						"custom IndexManager",
+						classLoaderService
 				);
 			}
 			log.indexManagerAliasResolved( indexManagerImplementationName, indexManager.getClass() );
@@ -64,7 +61,7 @@ public class DefaultIndexManagerFactory implements IndexManagerFactory, Startabl
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
-		this.serviceManager = context.getServiceManager();
+		classLoaderService = context.getClassLoaderService();
 	}
 
 	/**

@@ -8,7 +8,7 @@
 package org.hibernate.search.bridge.spi;
 
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 
 /**
  * Service interface to implement to allow custom bridges to be
@@ -39,9 +39,8 @@ public interface BridgeProvider {
 		Class<?> getReturnType();
 
 		/**
-		 * Provides access to the {@code ServiceManager} and gives access to
-		 * Hibernate Search services like the {@code ClassLoaderService}.
+		 * Provides access to the {@code ClassLoaderService}.
 		 */
-		ServiceManager getServiceManager();
+		ClassLoaderService getClassLoaderService();
 	}
 }

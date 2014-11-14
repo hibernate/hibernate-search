@@ -16,6 +16,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -58,6 +59,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private boolean indexMetadataIsComplete;
 	private boolean isIdProvidedImplicit;
 	private IndexManagerFactory indexManagerFactory;
+	private ClassLoaderService classLoaderService;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
 		indexingStrategy = oldFactoryState.getIndexingStrategy();
@@ -81,6 +83,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		indexMetadataIsComplete = oldFactoryState.isIndexMetadataComplete();
 		isIdProvidedImplicit = oldFactoryState.isIdProvidedImplicit();
 		indexManagerFactory = oldFactoryState.getIndexManagerFactory();
+		classLoaderService = oldFactoryState.getClassLoaderService();
 	}
 
 	@Override
@@ -286,6 +289,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setIndexManagerFactory(IndexManagerFactory indexManagerFactory) {
 		this.indexManagerFactory = indexManagerFactory;
+	}
+
+	@Override
+	public ClassLoaderService getClassLoaderService() {
+		return classLoaderService;
+	}
+
+	public void setClassLoaderService(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
 	}
 
 }

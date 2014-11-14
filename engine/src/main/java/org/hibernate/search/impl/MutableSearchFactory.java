@@ -19,6 +19,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -306,6 +307,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public IndexManagerFactory getIndexManagerFactory() {
 		return delegate.getIndexManagerFactory();
+	}
+
+	@Override
+	public ClassLoaderService getClassLoaderService() {
+		return delegate.getClassLoaderService();
 	}
 
 	@Override

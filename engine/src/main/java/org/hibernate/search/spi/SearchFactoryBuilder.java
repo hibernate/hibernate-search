@@ -44,6 +44,7 @@ import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -224,6 +225,7 @@ public class SearchFactoryBuilder {
 				cfg.getProperties()
 		);
 		// build worker and back end components
+		factoryState.setClassLoaderService( cfg.getClassLoaderService() );
 		factoryState.setWorker( WorkerFactory.createWorker( cfg, buildContext, queueingProcessor ) );
 		factoryState.setFilterCachingStrategy( buildFilterCachingStrategy( cfg ) );
 		factoryState.setCacheBitResultsSize(
@@ -282,6 +284,7 @@ public class SearchFactoryBuilder {
 		if ( rootFactory == null ) {
 			//set the mutable structure of factory state
 			rootFactory = new MutableSearchFactory();
+			factoryState.setClassLoaderService( cfg.getClassLoaderService() );
 			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinding>() );
 			factoryState.setDocumentBuildersContainedEntities( new ConcurrentHashMap<Class<?>, DocumentBuilderContainedEntity>() );
 			factoryState.setFilterDefinitions( new ConcurrentHashMap<String, FilterDef>() );
@@ -637,6 +640,11 @@ public class SearchFactoryBuilder {
 		@Override
 		public ServiceManager getServiceManager() {
 			return factoryState.getServiceManager();
+		}
+
+		@Override
+		public ClassLoaderService getClassLoaderService() {
+			return factoryState.getClassLoaderService();
 		}
 
 	}

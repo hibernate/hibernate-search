@@ -22,7 +22,7 @@ import org.hibernate.search.annotations.CharFilterDef;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.util.impl.HibernateSearchResourceLoader;
 
 import static org.hibernate.search.util.impl.ClassLoaderHelper.instanceFromClass;
@@ -49,8 +49,8 @@ final class SolrAnalyzerBuilder {
 	 */
 	public static Analyzer buildAnalyzer(AnalyzerDef analyzerDef,
 			Version luceneMatchVersion,
-			ServiceManager serviceManager) throws IOException {
-		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader( serviceManager );
+			ClassLoaderService classLoaderService) throws IOException {
+		ResourceLoader defaultResourceLoader = new HibernateSearchResourceLoader( classLoaderService );
 		TokenizerDef token = analyzerDef.tokenizer();
 		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( token.params(), luceneMatchVersion );
 		TokenizerFactory tokenFactory = instanceFromClass(

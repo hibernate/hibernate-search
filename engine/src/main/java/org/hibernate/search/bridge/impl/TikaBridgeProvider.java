@@ -14,9 +14,7 @@ import java.sql.Blob;
 
 import org.hibernate.search.annotations.TikaBridge;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -44,21 +42,16 @@ class TikaBridgeProvider extends ExtendedBridgeProvider {
 				throw LOG.unsupportedTikaBridgeType( returnType );
 			}
 			TikaBridge tikaAnnotation = annotatedElement.getAnnotation( TikaBridge.class );
-			return createTikaBridge( tikaAnnotation, context.getServiceManager() );
+			return createTikaBridge( tikaAnnotation, context.getClassLoaderService() );
 		}
 		return null;
 	}
 
-	private FieldBridge createTikaBridge(org.hibernate.search.annotations.TikaBridge annotation, ServiceManager serviceManager) {
+	private FieldBridge createTikaBridge(org.hibernate.search.annotations.TikaBridge annotation, ClassLoaderService classLoaderService) {
 		Class<?> tikaBridgeClass;
 		FieldBridge tikaBridge;
-		try {
-			tikaBridgeClass = ClassLoaderHelper.classForName( TIKA_BRIDGE_NAME, serviceManager );
-			tikaBridge = ClassLoaderHelper.instanceFromClass( FieldBridge.class, tikaBridgeClass, "Tika bridge" );
-		}
-		catch (ClassLoadingException e) {
-			throw new AssertionFailure( "Unable to find Tika bridge class: " + TIKA_BRIDGE_NAME );
-		}
+		tikaBridgeClass = classLoaderService.classForName( TIKA_BRIDGE_NAME );
+		tikaBridge = ClassLoaderHelper.instanceFromClass( FieldBridge.class, tikaBridgeClass, "Tika bridge" );
 
 		Class<?> tikaMetadataProcessorClass = annotation.metadataProcessor();
 		if ( tikaMetadataProcessorClass != void.class ) {

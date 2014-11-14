@@ -22,6 +22,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -107,8 +108,10 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	private final IndexManagerFactory indexManagerFactory;
 	private final ObjectLookupMethod defaultObjectLookupMethod;
 	private final DatabaseRetrievalMethod defaultDatabaseRetrievalMethod;
+	private final ClassLoaderService classLoaderService;
 
 	public ImmutableSearchFactory(SearchFactoryState state) {
+		this.classLoaderService = state.getClassLoaderService();
 		this.analyzers = state.getAnalyzers();
 		this.cacheBitResultsSize = state.getCacheBitResultsSize();
 		this.configurationProperties = state.getConfigurationProperties();
@@ -514,6 +517,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		else {
 			throw new SearchException( "Can not unwrap an ImmutableSearchFactory into a '" + cls + "'" );
 		}
+	}
+
+	@Override
+	public ClassLoaderService getClassLoaderService() {
+		return classLoaderService;
 	}
 
 }

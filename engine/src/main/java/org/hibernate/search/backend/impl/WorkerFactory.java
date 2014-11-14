@@ -12,7 +12,6 @@ import java.util.Properties;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -39,12 +38,11 @@ public abstract class WorkerFactory {
 	}
 
 	private static Worker instantiateExplicitlyConfiguredWorker(WorkerBuildContext buildContext, String workerImplClassName) {
-		ServiceManager serviceManager = buildContext.getServiceManager();
 		return ClassLoaderHelper.instanceFromName(
 				Worker.class,
 				workerImplClassName,
 				"worker",
-				serviceManager
+				buildContext.getClassLoaderService()
 		);
 	}
 

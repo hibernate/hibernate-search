@@ -13,7 +13,6 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.util.impl.Executors;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -100,12 +99,11 @@ public class PropertiesParseHelper {
 		MaskedProperty maskedProperty = new MaskedProperty( indexProperties, "optimizer" );
 		String optimizerImplClassName = maskedProperty.getProperty( "implementation" );
 		if ( optimizerImplClassName != null && ( !"default".equalsIgnoreCase( optimizerImplClassName ) ) ) {
-			ServiceManager serviceManager = buildContext.getServiceManager();
 			return ClassLoaderHelper.instanceFromName(
 					OptimizerStrategy.class,
 					optimizerImplClassName,
 					"Optimizer Strategy",
-					serviceManager
+					buildContext.getClassLoaderService()
 			);
 		}
 		else {
@@ -157,12 +155,11 @@ public class PropertiesParseHelper {
 			readerProvider = new SharingBufferReaderProvider();
 		}
 		else {
-			ServiceManager serviceManager = buildContext.getServiceManager();
 			readerProvider = ClassLoaderHelper.instanceFromName(
 					DirectoryBasedReaderProvider.class,
 					readerProviderImplName,
 					"readerProvider",
-					serviceManager
+					buildContext.getClassLoaderService()
 			);
 		}
 		readerProvider.initialize( indexManager, maskedProperties );
