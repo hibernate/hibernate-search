@@ -16,8 +16,6 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This will actually contain the Workspace and LuceneWork visitor implementation,
@@ -31,13 +29,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 
-	private static final Log log = LoggerFactory.make();
-
 	private volatile LuceneBackendResources resources;
 	private boolean sync;
 	private AbstractWorkspaceImpl workspaceOverride;
 	private LuceneBackendTaskStreamer streamWorker;
-	private BatchSyncProcessor batchSyncProcessor;
+	private BlockProcessor blockProcessor;
 
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, DirectoryBasedIndexManager indexManager) {
@@ -49,14 +45,20 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		}
 		resources = new LuceneBackendResources( context, indexManager, props, workspaceOverride );
 		streamWorker = new LuceneBackendTaskStreamer( resources );
-		batchSyncProcessor = new BatchSyncProcessor( resources, indexManager.getIndexName() );
-		batchSyncProcessor.start();
+		if ( sync ) {
+			final BatchSyncProcessor batchSyncProcessor = new BatchSyncProcessor( resources, indexManager.getIndexName() );
+			batchSyncProcessor.start();
+			blockProcessor = batchSyncProcessor;
+		}
+		else {
+			blockProcessor = new AsyncProcessor( resources );
+		}
 	}
 
 	@Override
 	public void close() {
 		resources.shutdown();
-		batchSyncProcessor.shutdown();
+		blockProcessor.shutdown();
 	}
 
 	@Override
@@ -72,17 +74,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 		if ( workList == null ) {
 			throw new IllegalArgumentException( "workList should not be null" );
 		}
-		if ( sync ) {
-			batchSyncProcessor.submit( workList, monitor );
-		}
-		else {
-			LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask(
-					workList,
-					resources,
-					monitor
-			);
-			resources.getQueueingExecutor().execute( luceneBackendQueueProcessor );
-		}
+		blockProcessor.submit( workList, monitor );
 	}
 
 	@Override
@@ -107,7 +99,7 @@ public class LuceneBackendQueueProcessor implements BackendQueueProcessor {
 	@Override
 	public void indexMappingChanged() {
 		resources = resources.onTheFlyRebuild();
-		batchSyncProcessor.updateResources( resources );
+		blockProcessor.updateResources( resources );
 	}
 
 }

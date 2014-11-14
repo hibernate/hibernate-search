@@ -94,6 +94,13 @@ public class BackendStressTest {
 	 */
 	private static final int REPEAT = 1;
 
+	/**
+	 * Number of Hibernate Search engines to start.
+	 * This won't affect the backend, but affects the latency
+	 * of storage operations in Infinispan.
+	 */
+	private static final int CLUSTER_NODES = 4;
+
 	@Parameterized.Parameters
 	public static List<Object[]> data() {
 		return Arrays.asList( new Object[REPEAT][0] );
@@ -108,7 +115,8 @@ public class BackendStressTest {
 			.withProperty( "hibernate.search.default.indexmanager", indexManager.toString() )
 			.withProperty( "hibernate.search.default.chunk_size", String.valueOf( chunkSize ) )
 			.withProperty( "hibernate.search.default.indexwriter.merge_factor", "20" )
-			.withProperty( "hibernate.search.default.indexwriter.ram_buffer_size", "32" );
+			.withProperty( "hibernate.search.default.indexwriter.ram_buffer_size", "32" )
+			.multipleInstances( CLUSTER_NODES );
 
 	public BackendStressTest() {
 		this.workLog = new WorkLog( numberOfThreads * docsPerThread, addPercentage, updatesPercentage );
