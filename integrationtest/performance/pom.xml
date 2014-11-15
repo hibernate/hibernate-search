@@ -73,7 +73,7 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-c3p0</artifactId>
+            <artifactId>hibernate-hikaricp</artifactId>
             <version>${hibernateVersion}</version>
             <scope>test</scope>
         </dependency>
