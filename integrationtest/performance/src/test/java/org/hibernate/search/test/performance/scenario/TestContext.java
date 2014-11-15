@@ -34,7 +34,7 @@ public class TestContext {
 	public static final boolean ASSERT_QUERY_RESULTS = true;
 	public static final boolean CHECK_INDEX_STATE = true;
 	public static final int MAX_AUTHORS = 1000;
-	public static final int THREADS_COUNT = PERFORMANCE_ENABLED ? 10 : 2;
+	public static final int THREADS_COUNT = PERFORMANCE_ENABLED ? 20 : 2;
 
 	public final SessionFactory sf;
 	public final TestScenario scenario;

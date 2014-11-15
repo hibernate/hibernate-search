@@ -58,8 +58,8 @@ public abstract class TestScenario {
 		if ( PERFORMANCE_ENABLED ) {
 			this.initialAutorCount = 10_000;
 			this.initialBookCount = 1_000_000;
-			this.warmupCyclesCount = 300;
-			this.measuredCyclesCount = 4_000;
+			this.warmupCyclesCount = 1_000;
+			this.measuredCyclesCount = 5_000;
 			this.initialOffset = 1_000_000;
 		}
 		else {
