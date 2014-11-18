@@ -17,6 +17,7 @@
     <container qualifier="jboss" default="true">
         <configuration>
             <property name="jbossHome">${basedir}/target/wildfly-${wildflyVersion}</property>
+            <property name="javaVmArguments">-Xmx512m -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr=127.0.0.1 -XX:+IgnoreUnrecognizedVMOptions</property>
         </configuration>
     </container>
 
