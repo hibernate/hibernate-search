@@ -30,7 +30,6 @@ import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.util.ManualTransactionContext;
 import org.hibernate.search.test.util.SearchFactoryHolder;
@@ -45,6 +44,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import static org.hibernate.search.test.backend.lucene.Conditions.assertConditionMet;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -55,7 +55,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith( BMUnitRunner.class )
 public class ScheduledCommitPolicyTest {
 
-	private static final int NUMBER_ENTITIES = 100;
+	private static final int NUMBER_ENTITIES = 1000;
 
 	@Rule
 	public SearchFactoryHolder sfAsyncExclusiveIndex = new SearchFactoryHolder( Quote.class )
@@ -106,10 +106,6 @@ public class ScheduledCommitPolicyTest {
 		assertConditionMet( new IndexingFinishedCondition( sfAsyncExclusiveIndex, NUMBER_ENTITIES + 10 + 1 ) );
 	}
 
-	private interface Condition {
-		boolean evaluate();
-	}
-
 	private class IndexingFinishedCondition implements Condition {
 		private final int docs;
 		private final SearchFactoryImplementor searchFactory;
@@ -148,22 +144,10 @@ public class ScheduledCommitPolicyTest {
 		}
 	}
 
-	private void assertConditionMet(Condition condition) throws InterruptedException {
-		int maxLoops = 10;
-		int loop = 0;
-		int sleep = 1000;
-		while ( ! condition.evaluate() ) {
-			Thread.sleep( sleep );
-			if ( ++ loop > maxLoops ) {
-				throw new AssertionFailure( "Condition not met because of a timeout" );
-			}
-		}
-	}
-
 	private void writeData(SearchFactoryHolder sfHolder, int numberEntities) {
 		for ( int i = 0; i < numberEntities; i++ ) {
-			Quote quote = new Quote( 1, i * 10 );
-			Work<Quote> work = new Work<Quote>( quote, quote.id, WorkType.ADD, false );
+			Quote quote = new Quote( 1, "description" );
+			Work<Quote> work = new Work<Quote>( quote, quote.getId(), WorkType.ADD, false );
 			ManualTransactionContext tc = new ManualTransactionContext();
 			sfHolder.getSearchFactory().getWorker().performWork( work, tc );
 			tc.end();
