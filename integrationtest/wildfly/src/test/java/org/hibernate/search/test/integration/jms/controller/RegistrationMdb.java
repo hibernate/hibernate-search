@@ -13,9 +13,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
-import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 
 @MessageDriven(activationConfig = {
@@ -27,9 +27,9 @@ public class RegistrationMdb extends AbstractJMSHibernateSearchController implem
 	private EntityManager em;
 
 	@Override
-	protected SearchFactory getSearchFactory() {
+	protected SearchFactoryIntegrator getSearchFactoryIntegrator() {
 		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
-		return fullTextEntityManager.getSearchFactory();
+		return fullTextEntityManager.getSearchFactory().unwrap( SearchFactoryIntegrator.class );
 	}
 
 }

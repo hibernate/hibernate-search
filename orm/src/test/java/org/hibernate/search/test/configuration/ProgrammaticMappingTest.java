@@ -340,7 +340,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	@Test
 	public void testProvidedIdMapping() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		SearchFactoryImplementor sf = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+		SearchFactoryImplementor sf = fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
 
 		ProvidedIdEntry person1 = new ProvidedIdEntry();
 		person1.setName( "Big Goat" );

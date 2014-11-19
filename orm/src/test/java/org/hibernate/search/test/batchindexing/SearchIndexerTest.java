@@ -42,7 +42,7 @@ public class SearchIndexerTest {
 				.addAnnotatedClass( Nation.class )
 				.build();
 		FullTextSession fullTextSession = ftsb.openFullTextSession();
-		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
 		{
 			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, Book.class );
 			assertTrue( tsii.getRootEntities().contains( Book.class ) );

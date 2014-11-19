@@ -46,7 +46,7 @@ public class CheckerLuceneIndex {
 
 		Session s = ctx.sf.openSession();
 		FullTextSession fts = Search.getFullTextSession( s );
-		SearchFactoryImplementor sfi = (SearchFactoryImplementor) fts.getSearchFactory();
+		SearchFactoryImplementor sfi = fts.getSearchFactory().unwrap( SearchFactoryImplementor.class );
 		Collection<IndexManager> indexManagers = sfi.getIndexManagerHolder().getIndexManagers();
 
 		for ( IndexManager indexManager : indexManagers ) {

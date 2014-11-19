@@ -33,7 +33,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.SearchFactory;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.engine.Version;
 
 import static org.junit.Assert.assertEquals;

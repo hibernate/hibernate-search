@@ -113,7 +113,7 @@ public final class ClusterTestHelper {
 	 * @return the number of nodes as seen by the current node
 	 */
 	public static int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
-		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) node.getSearchFactory();
+		SearchFactoryIntegrator searchFactory = node.getSearchFactory().unwrap( SearchFactoryIntegrator.class );
 		EntityIndexBinding indexBinding = searchFactory.getIndexBinding( entityType );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();

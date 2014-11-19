@@ -7,21 +7,22 @@
 package org.hibernate.search.test.jms.master;
 
 import org.hibernate.search.backend.impl.jms.AbstractJMSHibernateSearchController;
-import org.hibernate.search.engine.SearchFactory;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 
 /**
  * @author Emmanuel Bernard
  */
 public class MDBSearchController extends AbstractJMSHibernateSearchController {
 
-	final SearchFactory searchFactory;
+	final SearchFactoryIntegrator searchFactory;
 
-	MDBSearchController( SearchFactory searchFactory ) {
+	MDBSearchController( SearchFactoryImplementor searchFactory ) {
 		this.searchFactory = searchFactory;
 	}
 
 	@Override
-	protected SearchFactory getSearchFactory() {
+	protected SearchFactoryIntegrator getSearchFactoryIntegrator() {
 		return searchFactory;
 	}
 

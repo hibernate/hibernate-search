@@ -46,7 +46,7 @@ public class ExclusiveIndexTest {
 			.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
 			.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
 			.openFullTextSession();
-		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = ftSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
 		ftSession.close();
 		IndexManagerHolder allIndexesManager = searchFactory.getIndexManagerHolder();
 		//explicitly enabled:

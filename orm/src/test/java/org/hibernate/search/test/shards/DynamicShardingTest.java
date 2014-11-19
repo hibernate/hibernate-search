@@ -188,7 +188,7 @@ public class DynamicShardingTest extends SearchTestBase {
 
 		SessionFactory newSessionFactory = config.buildSessionFactory();
 		FullTextSession fullTextSession = Search.getFullTextSession( newSessionFactory.openSession() );
-		return (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+		return fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
 	}
 
 	public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate {
