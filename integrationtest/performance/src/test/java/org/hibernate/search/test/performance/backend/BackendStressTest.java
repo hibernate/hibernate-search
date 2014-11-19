@@ -44,32 +44,32 @@ public class BackendStressTest {
 	/**
 	 * Sync or Async
 	 */
-	private final Mode mode = Mode.sync;
+	private static final Mode mode = Mode.sync;
 
 	/**
 	 * Directory used
 	 */
-	private final Provider provider = Provider.RAM;
+	private static final Provider provider = Provider.RAM;
 
 	/**
 	 * Index manager
 	 */
-	private final IndexManager indexManager = IndexManager.DIRECTORY;
+	private static final IndexManager indexManager = IndexManager.DIRECTORY;
 
 	/**
 	 * Threads doing read/updates/deletes
 	 */
-	private final int numberOfThreads = 5;
+	private static final int numberOfThreads = 5;
 
 	/**
 	 * Total number of indexing works each thread will carry
 	 */
-	private final int docsPerThread = 500;
+	private static final int docsPerThread = 500;
 
 	/**
 	 * Percentage of the total work that will be ADD
 	 */
-	private final int addPercentage = 100;
+	private static final int addPercentage = 100;
 
 	/**
 	 * Percentage of the total work that will be UPDATE (0-100).
@@ -77,17 +77,17 @@ public class BackendStressTest {
 	 * of the operations will be DELETE. Deletes are always done
 	 * on previously added documents
 	 */
-	private final int updatesPercentage = 0;
+	private static final int updatesPercentage = 0;
 
 	/**
 	 * Chunk size, used only for the infinispan directory
 	 */
-	private final long chunkSize = 16 * 1024;
+	private static final long chunkSize = 16 * 1024;
 
 	/**
 	 * For progress output
 	 */
-	private final int printEach = 500;
+	private static final int printEach = 50;
 
 	/**
 	 * Number of times to execute the test
@@ -98,8 +98,10 @@ public class BackendStressTest {
 	 * Number of Hibernate Search engines to start.
 	 * This won't affect the backend, but affects the latency
 	 * of storage operations in Infinispan.
+	 * Defaults to 4 for Infinispan only as it makes no sense
+	 * to have a value different than 1 for other directories.
 	 */
-	private static final int CLUSTER_NODES = 4;
+	private static final int CLUSTER_NODES = (provider == Provider.INFINISPAN) ? 4 : 1;
 
 	@Parameterized.Parameters
 	public static List<Object[]> data() {
