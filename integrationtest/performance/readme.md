@@ -37,17 +37,13 @@ A system property enables them:
 
     > mvn clean test -Dtest=TestRunnerStandalone -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario -Dorg.hibernate.search.enable_performance_tests=true
 
-- run tests in standalone mode against specified database (via system properties)
+- run tests in standalone mode against a PostgreSQL database (via system properties)
 
-    > mvn clean test -Ppostgresql84
-                     -Dtest=TestRunnerStandalone 
-                     -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario
-                     -Dhibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-                     -Dhibernate.connection.driver_class=org.postgresql.Driver
-                     -Dhibernate.connection.url=jdbc:postgresql://localhost:5432/dev
-                     -Dhibernate.connection.username=foo
-                     -Dhibernate.connection.password=foo
-                     -Dorg.hibernate.search.enable_performance_tests=true
+    > mvn clean test -Ppostgresql84 -Dtest=TestRunnerStandalone -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario -Dhibernate.dialect=org.hibernate.dialect.PostgreSQLDialect -Dhibernate.connection.driver_class=org.postgresql.Driver -Dhibernate.connection.url=jdbc:postgresql://localhost:5432/dev -Dhibernate.connection.username=foo -Dhibernate.connection.password=foo -Dorg.hibernate.search.enable_performance_tests=true
+
+- run tests in standalone mode against a MariaDB database (via system properties)
+
+    > mvn clean test -Pmysql51 -Dtest=TestRunnerStandalone -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario -Dhibernate.hikari.dataSourceClassName=com.mysql.jdbc.jdbc2.optional.MysqlDataSource -Dhibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect -Dhibernate.hikari.dataSource.url=jdbc:mysql://hostname:3306/hibperf -Dhibernate.hikari.dataSource.user=foo -Dhibernate.hikari.dataSource.password=foo -Dorg.hibernate.search.enable_performance_tests=true
                      
 - run tests in container mode against default data source (java:jboss/datasources/ExampleDS)
 
@@ -55,7 +51,4 @@ A system property enables them:
 
 - run tests in container mode against specified data source (via system property)                     
     
-    > mvn clean test -Dtest=TestRunnerArquillian
-                     -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario 
-                     -Ddatasource=foo
-                     -Dorg.hibernate.search.enable_performance_tests=true
+    > mvn clean test -Dtest=TestRunnerArquillian -Dscenario=org.hibernate.search.test.performance.scenario.FileSystemDefaultTestScenario -Ddatasource=foo -Dorg.hibernate.search.enable_performance_tests=true

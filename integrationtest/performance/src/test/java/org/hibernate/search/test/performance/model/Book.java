@@ -16,6 +16,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
@@ -40,6 +41,7 @@ import org.hibernate.search.annotations.TokenizerDef;
  * @author Tomas Hradec
  */
 @Entity
+@Table(name = "book")
 @Indexed
 @AnalyzerDef(name = "textAnalyzer", tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class), filters = {
 		@TokenFilterDef(factory = LowerCaseFilterFactory.class),
