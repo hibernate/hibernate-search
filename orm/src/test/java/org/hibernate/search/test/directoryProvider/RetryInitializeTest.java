@@ -77,7 +77,7 @@ public class RetryInitializeTest {
 		assertNotNull( scheduledPeriod );
 		assertEquals( Long.valueOf( 12000L ), scheduledPeriod );
 
-		SearchFactoryIntegrator searchFactory = (SearchFactoryIntegrator) slave.getSearchFactory();
+		SearchFactoryIntegrator searchFactory = slave.getSearchFactory().unwrap( SearchFactoryIntegrator.class );
 
 		EntityIndexBinding snowIndexBinder = searchFactory.getIndexBinding( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();

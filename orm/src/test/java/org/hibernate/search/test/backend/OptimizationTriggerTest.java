@@ -15,7 +15,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.impl.MutableSearchFactory;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -95,7 +95,7 @@ public class OptimizationTriggerTest extends SearchTestBase {
 	}
 
 	private DirectoryBasedIndexManager getSingleIndexManager(Class<?> clazz) {
-		MutableSearchFactory searchFactory = (MutableSearchFactory) getSearchFactory();
+		SearchFactoryImplementor searchFactory = getSearchFactory().unwrap( SearchFactoryImplementor.class );
 		EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( clazz );
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 		assertEquals( 1, indexManagers.length );

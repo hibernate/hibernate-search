@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine;
+package org.hibernate.search;
 
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public interface SearchFactory {
 	 *
 	 * @param entityType the entity type (index) to optimize
 	 */
-	void optimize(Class entityType);
+	void optimize(Class<?> entityType);
 
 	/**
 	 * Retrieve an analyzer instance by its definition name

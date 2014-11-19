@@ -37,7 +37,7 @@ public class CustomBackendTest {
 			.setProperty( "hibernate.search.default.worker.backend", name )
 			.addAnnotatedClass( BlogEntry.class )
 			.openFullTextSession();
-		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) ftSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = ftSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
 		ftSession.close();
 		IndexManagerHolder allIndexesManager = searchFactory.getIndexManagerHolder();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) allIndexesManager.getIndexManager( "org.hibernate.search.test.configuration.BlogEntry" );

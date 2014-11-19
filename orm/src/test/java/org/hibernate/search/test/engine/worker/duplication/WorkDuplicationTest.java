@@ -18,7 +18,7 @@ import org.hibernate.Transaction;
 
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.engine.SearchFactory;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.WorkQueue;
@@ -109,7 +109,7 @@ public class WorkDuplicationTest extends SearchTestBase {
 	@Test
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
-		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+		SearchFactoryImplementor searchFactory = fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
 
 		// create test entity
 		SpecialPerson person = new SpecialPerson();

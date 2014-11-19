@@ -7,10 +7,11 @@
 package org.hibernate.search.jpa;
 
 import java.io.Serializable;
+
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.MassIndexer;
-import org.hibernate.search.engine.SearchFactory;
+import org.hibernate.search.SearchFactory;
 
 /**
  * Extends an EntityManager with Full-Text operations

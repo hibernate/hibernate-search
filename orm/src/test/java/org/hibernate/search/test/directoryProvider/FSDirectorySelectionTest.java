@@ -69,7 +69,7 @@ public class FSDirectorySelectionTest extends SearchTestBase {
 		Session session = factory.openSession();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		SearchFactoryIntegrator searchFactoryIntegrator = (SearchFactoryIntegrator) fullTextSession.getSearchFactory();
+		SearchFactoryIntegrator searchFactoryIntegrator = fullTextSession.getSearchFactory().unwrap( SearchFactoryIntegrator.class );
 		EntityIndexBinding snowIndexBinder = searchFactoryIntegrator.getIndexBinding( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertTrue( "Wrong number of directory providers", indexManagers.length == 1 );

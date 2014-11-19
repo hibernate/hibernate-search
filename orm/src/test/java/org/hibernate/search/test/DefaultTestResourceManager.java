@@ -23,9 +23,9 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.engine.SearchFactory;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -51,7 +51,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private Configuration cfg;
 	private SessionFactory sessionFactory;
 	private Session session;
-	private SearchFactoryImplementor searchFactory;
+	private SearchFactory searchFactory;
 	private boolean needsConfigurationRebuild;
 
 	public DefaultTestResourceManager(Class<?>[] annotatedClasses) {
@@ -134,7 +134,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		if ( searchFactory == null ) {
 			Session session = openSession();
 			FullTextSession fullTextSession = Search.getFullTextSession( session );
-			searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+			searchFactory = fullTextSession.getSearchFactory();
 			fullTextSession.close();
 		}
 		return searchFactory;
@@ -142,10 +142,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public SearchFactoryImplementor getSearchFactoryImpl() {
-		FullTextSession s = Search.getFullTextSession( openSession() );
-		s.close();
-		SearchFactory searchFactory = s.getSearchFactory();
-		return (SearchFactoryImplementor) searchFactory;
+		return getSearchFactory().unwrap( SearchFactoryImplementor.class );
 	}
 
 	@Override
