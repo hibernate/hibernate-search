@@ -34,8 +34,8 @@ public interface Workspace {
 	 *
 	 * @param writer the IndexWriter to use for optimization
 	 * @see org.hibernate.search.backend.OptimizeLuceneWork
-	 * @see org.hibernate.search.spi.SearchFactoryIntegrator#optimize()
-	 * @see org.hibernate.search.spi.SearchFactoryIntegrator#optimize(Class)
+	 * @see org.hibernate.search.spi.SearchIntegrator#optimize()
+	 * @see org.hibernate.search.spi.SearchIntegrator#optimize(Class)
 	 */
 	void performOptimization(IndexWriter writer);
 

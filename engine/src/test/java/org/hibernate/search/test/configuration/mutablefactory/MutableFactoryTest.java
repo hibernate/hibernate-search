@@ -27,7 +27,7 @@ import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.testsupport.TestConstants;
@@ -53,7 +53,7 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testAddingClassFullModel() throws Exception {
-		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
+		SearchIntegrator sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
 		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
 		sf = builder.currentFactory( sf )
 				.addClass( A.class )
@@ -103,7 +103,7 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testAddingClassSimpleAPI() throws Exception {
-		SearchFactoryIntegrator sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
+		SearchIntegrator sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
 
 		sf.addClasses( A.class );
 
@@ -156,7 +156,7 @@ public class MutableFactoryTest {
 		sf.close();
 	}
 
-	private static void doIndexWork(Object entity, Integer id, SearchFactoryIntegrator sfi, TransactionContextForTest tc) {
+	private static void doIndexWork(Object entity, Integer id, SearchIntegrator sfi, TransactionContextForTest tc) {
 		Work work = new Work( entity, id, WorkType.INDEX );
 		sfi.getWorker().performWork( work, tc );
 	}

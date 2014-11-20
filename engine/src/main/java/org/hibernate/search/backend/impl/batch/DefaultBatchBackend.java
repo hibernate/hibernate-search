@@ -19,7 +19,7 @@ import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
@@ -32,10 +32,10 @@ import org.hibernate.search.store.IndexShardingStrategy;
  */
 public class DefaultBatchBackend implements BatchBackend {
 
-	private final SearchFactoryIntegrator searchFactoryImplementor;
+	private final SearchIntegrator searchFactoryImplementor;
 	private final MassIndexerProgressMonitor progressMonitor;
 
-	public DefaultBatchBackend(SearchFactoryIntegrator searchFactoryImplementor, MassIndexerProgressMonitor progressMonitor) {
+	public DefaultBatchBackend(SearchIntegrator searchFactoryImplementor, MassIndexerProgressMonitor progressMonitor) {
 		this.searchFactoryImplementor = searchFactoryImplementor;
 		this.progressMonitor = progressMonitor;
 	}

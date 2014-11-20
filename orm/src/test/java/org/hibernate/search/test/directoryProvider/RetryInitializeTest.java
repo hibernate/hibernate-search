@@ -22,7 +22,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -77,7 +77,7 @@ public class RetryInitializeTest {
 		assertNotNull( scheduledPeriod );
 		assertEquals( Long.valueOf( 12000L ), scheduledPeriod );
 
-		SearchFactoryIntegrator searchFactory = slave.getSearchFactory().unwrap( SearchFactoryIntegrator.class );
+		SearchIntegrator searchFactory = slave.getSearchFactory().unwrap( SearchIntegrator.class );
 
 		EntityIndexBinding snowIndexBinder = searchFactory.getIndexBinding( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();

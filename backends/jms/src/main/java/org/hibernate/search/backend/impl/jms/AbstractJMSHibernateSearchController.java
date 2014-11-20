@@ -17,7 +17,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -32,7 +32,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 
 	private static final Log log = LoggerFactory.make();
 
-	protected abstract SearchFactoryIntegrator getSearchFactoryIntegrator();
+	protected abstract SearchIntegrator getSearchIntegrator();
 
 	/**
 	 * Provides an optional extension point for the case you have to
@@ -59,7 +59,7 @@ public abstract class AbstractJMSHibernateSearchController implements MessageLis
 		final String indexName;
 		final List<LuceneWork> queue;
 		final IndexManager indexManager;
-		SearchFactoryImplementor factory = getSearchFactoryIntegrator().unwrap( SearchFactoryImplementor.class );
+		SearchFactoryImplementor factory = getSearchIntegrator().unwrap( SearchFactoryImplementor.class );
 		try {
 			indexName = objectMessage.getStringProperty( Environment.INDEX_NAME_JMS_PROPERTY );
 			indexManager = factory.getIndexManagerHolder().getIndexManager( indexName );

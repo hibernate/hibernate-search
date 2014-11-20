@@ -21,7 +21,7 @@ import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.ClusterSharedConnectionProvider;
 import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.remoting.transport.Address;
@@ -109,7 +109,7 @@ public class SharedIndexTest {
 	 * @return
 	 */
 	protected int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
-		SearchFactoryIntegrator searchFactory = node.getSearchFactory().unwrap( SearchFactoryIntegrator.class );
+		SearchIntegrator searchFactory = node.getSearchFactory().unwrap( SearchIntegrator.class );
 		EntityIndexBinding indexBinding = searchFactory.getIndexBinding( Toaster.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();

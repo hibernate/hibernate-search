@@ -22,7 +22,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
@@ -69,8 +69,8 @@ public class FSDirectorySelectionTest extends SearchTestBase {
 		Session session = factory.openSession();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		SearchFactoryIntegrator searchFactoryIntegrator = fullTextSession.getSearchFactory().unwrap( SearchFactoryIntegrator.class );
-		EntityIndexBinding snowIndexBinder = searchFactoryIntegrator.getIndexBinding( SnowStorm.class );
+		SearchIntegrator searchIntegrator = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
+		EntityIndexBinding snowIndexBinder = searchIntegrator.getIndexBinding( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertTrue( "Wrong number of directory providers", indexManagers.length == 1 );
 
