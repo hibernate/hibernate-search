@@ -8,9 +8,9 @@ package org.hibernate.search.test.jgroups.common;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.backend.jgroups.impl.DispatchMessageSender;
 import org.hibernate.search.backend.jgroups.impl.MessageSenderService;
+import org.hibernate.search.spi.SearchFactoryIntegrator;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.jgroups.JChannel;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class InjectedChannelTest extends JGroupsCommonTest {
 
 	@Test
 	public void testInjectionHappened() throws Exception {
-		SearchFactoryImplementor searchFactory = getSearchFactory().unwrap( SearchFactoryImplementor.class );
+		SearchFactoryIntegrator searchFactory = getSearchFactory().unwrap( SearchFactoryIntegrator.class );
 		MessageSenderService sender = searchFactory.getServiceManager().requestService( MessageSenderService.class );
 		Assert.assertTrue( masterChannel.getAddress().equals( sender.getAddress() ) );
 	}
