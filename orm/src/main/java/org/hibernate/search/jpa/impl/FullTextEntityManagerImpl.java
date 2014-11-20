@@ -39,7 +39,8 @@ import org.hibernate.Session;
 /**
  * @author Emmanuel Bernard
  */
-public class FullTextEntityManagerImpl implements FullTextEntityManager, Serializable {
+final class FullTextEntityManagerImpl implements FullTextEntityManager, Serializable {
+
 	private static final Log log = LoggerFactory.make();
 
 	private final EntityManager em;

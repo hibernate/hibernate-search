@@ -17,7 +17,7 @@ import org.hibernate.Session;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public final class OptimisticLockingCompatibilityHelper {
+final class OptimisticLockingCompatibilityHelper {
 
 	//This is the new class name, and is extended by the deprecated one so it is compatible with both types
 	private static final String parentOptimisticLockExceptionClassName = "org.hibernate.dialect.lock.OptimisticEntityLockException";

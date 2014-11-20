@@ -19,13 +19,13 @@ import org.hibernate.search.Search;
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
-public class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuilder {
+class FullTextSharedSessionBuilderDelegator implements FullTextSharedSessionBuilder {
+
 	private final SharedSessionBuilder builder;
 
 	public FullTextSharedSessionBuilderDelegator(SharedSessionBuilder builder) {
 		this.builder = builder;
 	}
-
 
 	@Override
 	public FullTextSharedSessionBuilder interceptor() {

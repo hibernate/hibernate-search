@@ -23,7 +23,7 @@ import org.hibernate.search.stat.Statistics;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
  * @since 5.0
  */
-public final class SearchFactoryImpl implements SearchFactory {
+final class SearchFactoryImpl implements SearchFactory {
 
 	private final SearchFactoryImplementor searchFactoryImplementor;
 

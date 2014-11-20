@@ -20,8 +20,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.impl.FullTextSessionImpl;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
@@ -121,7 +121,7 @@ public class OptimizerPerformanceTest extends SearchTestBase {
 
 				s = sf.openSession();
 				tx = s.beginTransaction();
-				FullTextSession fts = new FullTextSessionImpl( s );
+				FullTextSession fts = Search.getFullTextSession( s );
 				QueryParser parser = new QueryParser(
 						TestConstants.getTargetLuceneVersion(),
 						"id", TestConstants.stopAnalyzer
