@@ -84,13 +84,6 @@ public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
 	Properties getConfigurationProperties();
 
 	/**
-	 * Returns the service manager.
-	 *
-	 * @return Returns the service manager.
-	 */
-	ServiceManager getServiceManager();
-
-	/**
 	 * Returns the default {@code DatabaseRetrievalMethod}.
 	 *
 	 * This is either the system default or the default specified via the configuration property

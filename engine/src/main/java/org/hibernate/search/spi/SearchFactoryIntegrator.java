@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexReaderAccessor;
@@ -49,12 +50,6 @@ public interface SearchFactoryIntegrator {
 	 */
 	void addClasses(Class<?>... classes);
 
-	//TODO consider accepting SearchConfiguration or SearchMapping
-
-	Worker getWorker();
-
-	void close();
-
 	/**
 	 * Return an Hibernate Search query object.
 	 * This object uses fluent APIs to define the query executed.
@@ -78,9 +73,12 @@ public interface SearchFactoryIntegrator {
 	 */
 	ErrorHandler getErrorHandler();
 
+	/**
+	 * Useful if you need to create custom exception types to represent query timeouts.
+	 *
+	 * @return the configured TimeoutExceptionFactory
+	 */
 	TimeoutExceptionFactory getDefaultTimeoutExceptionFactory();
-
-	// Below are copied from SearchFactory:
 
 	/**
 	 * Optimize all indexes
@@ -93,7 +91,6 @@ public interface SearchFactoryIntegrator {
 	 * @param entityType the entity type (index) to optimize
 	 */
 	void optimize(Class entityType);
-
 
 	/**
 	 * Retrieve an analyzer instance by its definition name
@@ -161,5 +158,22 @@ public interface SearchFactoryIntegrator {
 	 * Currently, no public type is accessible. This method should not be used by users.
 	 */
 	<T> T unwrap(Class<T> cls);
+
+	/**
+	 * Returns the service manager.
+	 *
+	 * @return Returns the service manager.
+	 */
+	ServiceManager getServiceManager();
+
+	/**
+	 * The Worker is the entry point to apply writes and updates to the indexes.
+	 */
+	Worker getWorker();
+
+	/**
+	 * Shuts down all workers and releases all resources.
+	 */
+	void close();
 
 }
