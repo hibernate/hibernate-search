@@ -34,7 +34,7 @@ import org.hibernate.search.bridge.builtin.UriBridge;
 import org.hibernate.search.bridge.builtin.UrlBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.BridgeProvider;
-import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 
 /**
  * Support all the default types of the JDK.
@@ -62,8 +62,8 @@ class BasicJDKTypesBridgeProvider implements BridgeProvider {
 
 	private final Map<String, FieldBridge> builtInBridges;
 
-	BasicJDKTypesBridgeProvider(ServiceManager serviceManager) {
-		this.clazz = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge( serviceManager ) );
+	BasicJDKTypesBridgeProvider(ClassLoaderService classLoaderService) {
+		this.clazz = new TwoWayString2FieldBridgeAdaptor( new org.hibernate.search.bridge.builtin.ClassBridge( classLoaderService ) );
 		Map<String, FieldBridge> bridges = new HashMap<String, FieldBridge>();
 		bridges.put( Character.class.getName(), CHARACTER );
 		bridges.put( char.class.getName(), CHARACTER );

@@ -32,7 +32,6 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoadingExceptio
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * A concurrent implementation of the {@code Statistics} interface.
@@ -240,10 +239,10 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ClassLoaderHelper.classForName( entity, searchFactoryImplementor.getServiceManager() );
+			clazz = searchFactoryImplementor.getClassLoaderService().classForName( entity );
 		}
 		catch (ClassLoadingException e) {
-			throw new IllegalArgumentException( entity + "not a indexed entity" );
+			throw new IllegalArgumentException( entity + "not an indexed entity" );
 		}
 		return clazz;
 	}

@@ -29,9 +29,9 @@ import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.apache.lucene.util.Version;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.store.LockFactoryProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -113,8 +113,8 @@ public final class DirectoryProviderHelper {
 	 * @return the created {@code FSDirectory} instance
 	 * @throws java.io.IOException if an error
 	 */
-	public static FSDirectory createFSIndex(File indexDir, Properties properties, ServiceManager serviceManager) throws IOException {
-		LockFactory lockFactory = createLockFactory( indexDir, properties, serviceManager );
+	public static FSDirectory createFSIndex(File indexDir, Properties properties, ClassLoaderService classLoaderService) throws IOException {
+		LockFactory lockFactory = createLockFactory( indexDir, properties, classLoaderService );
 		FSDirectoryType fsDirectoryType = FSDirectoryType.getType( properties );
 		FSDirectory fsDirectory = fsDirectoryType.getDirectory( indexDir, null );
 
@@ -171,7 +171,7 @@ public final class DirectoryProviderHelper {
 	 * @return the LockFactory as configured, or a SimpleFSLockFactory
 	 *         in case of configuration errors or as a default.
 	 */
-	public static LockFactory createLockFactory(File indexDir, Properties dirConfiguration, ServiceManager serviceManager) {
+	public static LockFactory createLockFactory(File indexDir, Properties dirConfiguration, ClassLoaderService classLoaderService) {
 		//For FS-based indexes default to "native", default to "single" otherwise.
 		String defaultStrategy = indexDir == null ? "single" : "native";
 		String lockFactoryName = dirConfiguration.getProperty( LOCKING_STRATEGY_PROP_NAME, defaultStrategy );
@@ -198,7 +198,7 @@ public final class DirectoryProviderHelper {
 					LockFactoryProvider.class,
 					lockFactoryName,
 					LOCKING_STRATEGY_PROP_NAME,
-					serviceManager
+					classLoaderService
 			);
 			return lockFactoryFactory.createLockFactory( indexDir, dirConfiguration );
 		}

@@ -29,6 +29,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
@@ -80,6 +81,7 @@ public final class ConfigContext {
 	private final boolean implicitProvidedId;
 	private final SearchMapping searchMapping;
 	private final ServiceManager serviceManager;
+	private final ClassLoaderService classLoaderService;
 
 	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext) {
 		this( searchConfiguration, buildContext, null );
@@ -87,6 +89,7 @@ public final class ConfigContext {
 
 	public ConfigContext(SearchConfiguration searchConfiguration, BuildContext buildContext, SearchMapping searchMapping) {
 		this.serviceManager = buildContext.getServiceManager();
+		this.classLoaderService = searchConfiguration.getClassLoaderService();
 		this.luceneMatchVersion = getLuceneMatchVersion( searchConfiguration );
 		this.defaultAnalyzer = initAnalyzer( searchConfiguration );
 		this.jpaPresent = isPresent( "javax.persistence.Id" );
@@ -148,7 +151,7 @@ public final class ConfigContext {
 		String analyzerClassName = cfg.getProperty( Environment.ANALYZER_CLASS );
 		if ( analyzerClassName != null ) {
 			try {
-				analyzerClass = ClassLoaderHelper.classForName( analyzerClassName, serviceManager );
+				analyzerClass = cfg.getClassLoaderService().classForName( analyzerClassName );
 			}
 			catch (Exception e) {
 				return buildLazyAnalyzer( analyzerClassName );
@@ -212,7 +215,7 @@ public final class ConfigContext {
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {
 		try {
-			return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion, serviceManager );
+			return SolrAnalyzerBuilder.buildAnalyzer( analyzerDef, luceneMatchVersion, classLoaderService );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Could not initializer Analyzer definition" + analyzerDef, e );
@@ -225,7 +228,7 @@ public final class ConfigContext {
 
 	private boolean isPresent(String className) {
 		try {
-			ClassLoaderHelper.classForName( className, serviceManager );
+			classLoaderService.classForName( className );
 			return true;
 		}
 		catch (Exception e) {
@@ -305,5 +308,9 @@ public final class ConfigContext {
 		}
 
 		return classBridgeInstances != null ? classBridgeInstances : Collections.<FieldBridge, ClassBridge>emptyMap();
+	}
+
+	public ClassLoaderService getClassLoaderService() {
+		return classLoaderService;
 	}
 }

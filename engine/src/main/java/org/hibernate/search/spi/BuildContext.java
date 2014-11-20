@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.spi;
 
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
@@ -71,4 +72,6 @@ public interface BuildContext {
 	 * @return the configured {@code ErrorHandler}
 	 */
 	ErrorHandler getErrorHandler();
+
+	ClassLoaderService getClassLoaderService();
 }

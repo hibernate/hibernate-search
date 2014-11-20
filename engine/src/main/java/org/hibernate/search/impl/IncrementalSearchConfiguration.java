@@ -99,6 +99,6 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 
 	@Override
 	public ClassLoaderService getClassLoaderService() {
-		return searchFactoryState.getServiceManager().requestService( ClassLoaderService.class );
+		return searchFactoryState.getClassLoaderService();
 	}
 }

@@ -35,18 +35,18 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 		this.indexName = directoryProviderName;
 		this.properties = properties;
 		this.serviceManager = context.getServiceManager();
-	}
-
-	@Override
-	public void start(DirectoryBasedIndexManager indexManager) {
 		try {
-			directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties, serviceManager ) );
-			properties = null;
-			DirectoryProviderHelper.initializeIndexIfNeeded( directory );
+			this.directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties, context.getClassLoaderService() ) );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + indexName, e );
 		}
+	}
+
+	@Override
+	public void start(DirectoryBasedIndexManager indexManager) {
+		properties = null;
+		DirectoryProviderHelper.initializeIndexIfNeeded( directory );
 	}
 
 

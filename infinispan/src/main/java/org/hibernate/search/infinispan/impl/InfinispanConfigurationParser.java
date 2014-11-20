@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
-import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.spi.BuildContext;
 import org.infinispan.commons.util.Util;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
@@ -40,18 +40,13 @@ public class InfinispanConfigurationParser {
 	 *
 	 * @param filename Infinispan configuration resource name
 	 * @param transportOverrideResource An alternative JGroups configuration file to be injected
-	 * @param serviceManager the ServiceManager to load resources
+	 * @param context of the SearchFactory initialization
 	 * @throws IOException
 	 * @return
 	 */
-	public ConfigurationBuilderHolder parseFile(String filename, String transportOverrideResource, ServiceManager serviceManager) throws IOException {
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
-		try {
-			return parseFile( classLoaderService, filename, transportOverrideResource );
-		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
-		}
+	public ConfigurationBuilderHolder parseFile(String filename, String transportOverrideResource, BuildContext context) throws IOException {
+		ClassLoaderService classLoaderService = context.getClassLoaderService();
+		return parseFile( classLoaderService, filename, transportOverrideResource );
 	}
 
 	private ConfigurationBuilderHolder parseFile(ClassLoaderService classLoaderService, String filename, String transportOverrideResource) {

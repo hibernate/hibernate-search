@@ -14,7 +14,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
 import org.hibernate.search.infinispan.impl.InfinispanConfigurationParser;
@@ -75,7 +74,6 @@ public class DefaultCacheManagerService implements CacheManagerService, Startabl
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
-		ServiceManager serviceManager = context.getServiceManager();
 		String name = ConfigurationParseHelper.getString( properties, CACHE_MANAGER_RESOURCE_PROP, null );
 		if ( name == null ) {
 			// No JNDI lookup configured: start the CacheManager
@@ -86,7 +84,7 @@ public class DefaultCacheManagerService implements CacheManagerService, Startabl
 			final String transportOverrideResource = properties.getProperty( INFINISPAN_TRANSPORT_OVERRIDE_RESOURCENAME );
 			try {
 				InfinispanConfigurationParser ispnConfiguration = new InfinispanConfigurationParser();
-				ConfigurationBuilderHolder configurationBuilderHolder = ispnConfiguration.parseFile( cfgName, transportOverrideResource, serviceManager );
+				ConfigurationBuilderHolder configurationBuilderHolder = ispnConfiguration.parseFile( cfgName, transportOverrideResource, context );
 				cacheManager = new DefaultCacheManager( configurationBuilderHolder, true );
 				manageCacheManager = true;
 			}

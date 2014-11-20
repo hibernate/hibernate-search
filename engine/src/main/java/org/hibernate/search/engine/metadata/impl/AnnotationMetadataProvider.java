@@ -86,7 +86,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	public AnnotationMetadataProvider(ReflectionManager reflectionManager, ConfigContext configContext) {
 		this.reflectionManager = reflectionManager;
 		this.configContext = configContext;
-		this.bridgeFactory = new BridgeFactory( configContext.getServiceManager() );
+		this.bridgeFactory = new BridgeFactory( configContext );
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				null,
 				member,
 				reflectionManager,
-				configContext.getServiceManager()
+				configContext.getClassLoaderService()
 		);
 
 		DocumentFieldMetadata fieldMetadata =
@@ -219,7 +219,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				numericFieldAnn,
 				member,
 				reflectionManager,
-				configContext.getServiceManager()
+				configContext.getClassLoaderService()
 		);
 		if ( !( idBridge instanceof TwoWayFieldBridge ) ) {
 			throw new SearchException(
@@ -269,8 +269,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			Annotation jpaId;
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends Annotation> jpaIdClass =
-						ClassLoaderHelper.classForName( "javax.persistence.Id", configContext.getServiceManager() );
+				Class<? extends Annotation> jpaIdClass = configContext.getClassLoaderService().classForName( "javax.persistence.Id" );
 				jpaId = member.getAnnotation( jpaIdClass );
 			}
 			catch (ClassLoadingException e) {
@@ -567,7 +566,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				null,
 				member,
 				reflectionManager,
-				configContext.getServiceManager()
+				configContext.getClassLoaderService()
 		);
 
 		DocumentFieldMetadata fieldMetadata = new DocumentFieldMetadata.Builder( fieldName, store, index, termVector )
@@ -873,7 +872,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				numericFieldAnnotation,
 				member,
 				reflectionManager,
-				configContext.getServiceManager()
+				configContext.getClassLoaderService()
 		);
 
 		String nullToken = determineNullToken( fieldAnnotation, configContext );
@@ -956,11 +955,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			Annotation transientAnnotation;
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends Annotation> transientAnnotationClass =
-						ClassLoaderHelper.classForName(
-								"javax.persistence.Transient",
-								configContext.getServiceManager()
-						);
+				Class<? extends Annotation> transientAnnotationClass = configContext.getClassLoaderService().classForName( "javax.persistence.Transient" );
 				transientAnnotation = member.getAnnotation( transientAnnotationClass );
 			}
 			catch (ClassLoadingException e) {

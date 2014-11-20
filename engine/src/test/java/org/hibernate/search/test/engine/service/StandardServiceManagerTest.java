@@ -7,6 +7,7 @@
 package org.hibernate.search.test.engine.service;
 
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
@@ -213,6 +214,11 @@ public class StandardServiceManagerTest {
 
 		@Override
 		public ErrorHandler getErrorHandler() {
+			return null;
+		}
+
+		@Override
+		public ClassLoaderService getClassLoaderService() {
 			return null;
 		}
 	}

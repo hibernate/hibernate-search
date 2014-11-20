@@ -212,7 +212,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			return clazz;
 		}
 		else {
-			return DocumentBuilderHelper.getDocumentClass( className, searchFactoryImplementor.getServiceManager() );
+			return DocumentBuilderHelper.getDocumentClass( className, searchFactoryImplementor.getClassLoaderService() );
 		}
 	}
 

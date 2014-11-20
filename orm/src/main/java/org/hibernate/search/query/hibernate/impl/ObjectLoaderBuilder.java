@@ -17,7 +17,6 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
@@ -94,16 +93,12 @@ public class ObjectLoaderBuilder {
 		if ( criteria instanceof CriteriaImpl ) {
 			String targetEntity = ( (CriteriaImpl) criteria ).getEntityOrClassName();
 			if ( entityType == null ) {
-				ServiceManager serviceManager = searchFactoryImplementor.getServiceManager();
 				try {
-					ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+					ClassLoaderService classLoaderService = searchFactoryImplementor.getClassLoaderService();
 					entityType = classLoaderService.classForName( targetEntity );
 				}
 				catch (ClassLoadingException e) {
 					throw new SearchException( "Unable to load entity class from criteria: " + targetEntity, e );
-				}
-				finally {
-					serviceManager.releaseService( ClassLoaderService.class );
 				}
 			}
 			else {

@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.bridge.builtin;
 
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
  * Convert a Class back and forth
@@ -20,10 +19,10 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  */
 public class ClassBridge implements TwoWayStringBridge {
 
-	private final ServiceManager serviceManager;
+	private final ClassLoaderService classLoaderService;
 
-	public ClassBridge(ServiceManager serviceManager) {
-		this.serviceManager = serviceManager;
+	public ClassBridge(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
 	}
 
 	@Override
@@ -33,7 +32,7 @@ public class ClassBridge implements TwoWayStringBridge {
 		}
 		else {
 			try {
-				return ClassLoaderHelper.classForName( stringValue, serviceManager );
+				return classLoaderService.classForName( stringValue );
 			}
 			catch (ClassLoadingException e) {
 				throw new SearchException( "Unable to deserialize Class: " + stringValue, e );

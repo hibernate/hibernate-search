@@ -16,7 +16,6 @@ import org.apache.lucene.util.Version;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**
  * Utility class to load instances of other classes by using a fully qualified name,
@@ -43,7 +42,7 @@ public class ClassLoaderHelper {
 	 * @param classNameToLoad a fully qualified class name, whose type is assignable to targetSuperType
 	 * @param componentDescription a meaningful description of the role the instance will have,
 	 * used to enrich error messages to describe the context of the error
-	 * @param serviceManager Service manager allowing access to the class loading service
+	 * @param classLoaderService to allow loading the class
 	 *
 	 * @return a new instance of the type given by {@code classNameToLoad}
 	 *
@@ -53,8 +52,8 @@ public class ClassLoaderHelper {
 	public static <T> T instanceFromName(Class<T> targetSuperType,
 			String classNameToLoad,
 			String componentDescription,
-			ServiceManager serviceManager) {
-		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, serviceManager );
+			ClassLoaderService classLoaderService) {
+		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classLoaderService );
 		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
 	}
 
@@ -267,11 +266,9 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	public static Class<?> classForName(String classNameToLoad, String componentDescription, ServiceManager serviceManager) {
-		Class<?> clazz;
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+	public static Class<?> classForName(String classNameToLoad, String componentDescription, ClassLoaderService classLoaderService) {
 		try {
-			clazz = classLoaderService.classForName( classNameToLoad );
+			return classLoaderService.classForName( classNameToLoad );
 		}
 		catch (ClassLoadingException e) {
 			throw new SearchException(
@@ -279,17 +276,13 @@ public class ClassLoaderHelper {
 							" implementation class: " + classNameToLoad, e
 			);
 		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
-		}
-		return clazz;
 	}
 
 	public static <T> Class<? extends T> classForName(Class<T> targetSuperType,
 			String classNameToLoad,
 			String componentDescription,
-			ServiceManager serviceManager) {
-		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, serviceManager );
+			ClassLoaderService classLoaderService) {
+		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classLoaderService );
 		try {
 			return clazzDef.asSubclass( targetSuperType );
 		}
@@ -301,27 +294,4 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	/**
-	 * Perform resolution of a class name.
-	 * <p/>
-	 * Here we first check the context classloader, if one, before delegating to
-	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
-	 *
-	 * @param classNameToLoad The class name
-	 * @param serviceManager The service manager from which to retrieve the class loader service
-	 *
-	 * @return The class reference.
-	 *
-	 * @throws ClassLoadingException From {@link Class#forName(String, boolean, ClassLoader)}.
-	 */
-	public static Class classForName(String classNameToLoad, ServiceManager serviceManager) {
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
-		try {
-			return classLoaderService.classForName( classNameToLoad );
-		}
-
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
-		}
-	}
 }

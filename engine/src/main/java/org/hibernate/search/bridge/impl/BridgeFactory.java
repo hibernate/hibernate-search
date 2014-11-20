@@ -15,8 +15,8 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -48,7 +48,7 @@ public final class BridgeFactory {
 	private Set<BridgeProvider> annotationBasedProviders;
 	private Set<BridgeProvider> regularProviders;
 
-	public BridgeFactory(ServiceManager serviceManager) {
+	public BridgeFactory(ConfigContext configContext) {
 		annotationBasedProviders = new HashSet<BridgeProvider>(5);
 		annotationBasedProviders.add( new CalendarBridgeProvider() );
 		annotationBasedProviders.add( new DateBridgeProvider() );
@@ -56,15 +56,10 @@ public final class BridgeFactory {
 		annotationBasedProviders.add( new SpatialBridgeProvider() );
 		annotationBasedProviders.add( new TikaBridgeProvider() );
 
-		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
-		try {
-			regularProviders = classLoaderService.loadJavaServices( BridgeProvider.class );
-			regularProviders.add( new EnumBridgeProvider() );
-			regularProviders.add( new BasicJDKTypesBridgeProvider( serviceManager ) );
-		}
-		finally {
-			serviceManager.releaseService( ClassLoaderService.class );
-		}
+		ClassLoaderService classLoaderService = configContext.getClassLoaderService();
+		regularProviders = classLoaderService.loadJavaServices( BridgeProvider.class );
+		regularProviders.add( new EnumBridgeProvider() );
+		regularProviders.add( new BasicJDKTypesBridgeProvider( classLoaderService ) );
 	}
 
 	/**
@@ -157,14 +152,14 @@ public final class BridgeFactory {
 			NumericField numericField,
 			XMember member,
 			ReflectionManager reflectionManager,
-			ServiceManager serviceManager
+			ClassLoaderService classLoaderService
 	) {
 		FieldBridge bridge = findExplicitFieldBridge( field, member, reflectionManager );
 		if ( bridge != null ) {
 			return bridge;
 		}
 
-		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext( member, numericField, reflectionManager, serviceManager );
+		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext( member, numericField, reflectionManager, classLoaderService );
 		ContainerType containerType = getContainerType( member, reflectionManager );
 
 		// We do annotation based providers as Tike at least needs priority over
