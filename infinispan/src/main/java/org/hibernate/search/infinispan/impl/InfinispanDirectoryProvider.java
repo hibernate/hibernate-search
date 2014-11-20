@@ -47,6 +47,8 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	private AsyncDeleteExecutorService deletesExecutor;
 
+	private boolean writeFileListAsync;
+
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.directoryProviderName = directoryProviderName;
@@ -57,6 +59,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		lockingCacheName = InfinispanIntegration.getLockingCacheName( properties );
 		//Let it return null if it's not set, so that we can avoid applying any override.
 		chunkSize = ConfigurationParseHelper.getIntValue( properties, "chunk_size" );
+		writeFileListAsync = ConfigurationParseHelper.getBooleanValue( properties, InfinispanIntegration.WRITE_METADATA_ASYNC, false );
 	}
 
 	@Override
@@ -69,6 +72,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		Cache<?,?> lockingCache = cacheManager.getCache( lockingCacheName );
 		org.infinispan.lucene.directory.BuildContext directoryBuildContext = DirectoryBuilder
 				.newDirectoryInstance( metadataCache, dataCache, lockingCache, directoryProviderName )
+				.writeFileListAsynchronously( writeFileListAsync )
 				.deleteOperationsExecutor( deletesExecutor.getExecutor() );
 		if ( chunkSize != null ) {
 			directoryBuildContext.chunkSize( chunkSize.intValue() );
