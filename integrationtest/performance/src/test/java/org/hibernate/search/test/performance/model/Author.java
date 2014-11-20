@@ -8,6 +8,7 @@ package org.hibernate.search.test.performance.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.search.annotations.Field;
@@ -16,6 +17,7 @@ import org.hibernate.search.annotations.Field;
  * @author Tomas Hradec
  */
 @Entity
+@Table(name = "author")
 public class Author {
 
 	@Id
