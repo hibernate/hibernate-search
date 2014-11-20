@@ -50,6 +50,12 @@ public class InfinispanIntegration {
 	public static final String DEFAULT_INDEXESMETADATA_CACHENAME = "LuceneIndexesMetadata";
 
 	/**
+	 * Configuration attribute to control if the writes to Index Metadata should be performed asynchronously.
+	 * Defaults to {@code "false"}. Setting this to {@code "true"} might improve performance but is highly experimental.
+	 */
+	public static final String WRITE_METADATA_ASYNC = "metadata_writes_async";
+
+	/**
 	 * @param properties the Hibernate Search configuration
 	 * @return the name of the Cache to be retrieved from the CacheManager to store Index Metadata
 	 */
