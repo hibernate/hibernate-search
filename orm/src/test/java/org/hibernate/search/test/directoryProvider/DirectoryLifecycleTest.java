@@ -12,7 +12,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class DirectoryLifecycleTest {
 		.build();
 		CloseCheckingDirectoryProvider directoryProvider;
 		try {
-			SearchFactoryIntegrator searchFactory = builder.getSearchFactory().unwrap( SearchFactoryIntegrator.class );
+			SearchIntegrator searchFactory = builder.getSearchFactory().unwrap( SearchIntegrator.class );
 			EntityIndexBinding snowIndexBinder = searchFactory.getIndexBinding( SnowStorm.class );
 			IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 			assertThat( indexManagers.length ).isEqualTo( 1 );

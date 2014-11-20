@@ -33,7 +33,7 @@ public interface IndexReaderAccessor {
 	 * <p>
 	 * The returned IndexReader is read only; writing directly to the index is discouraged. If you
 	 * need to write to the index use the
-	 * {@link org.hibernate.search.spi.SearchFactoryIntegrator#getWorker()} to queue change operations to the backend.
+	 * {@link org.hibernate.search.spi.SearchIntegrator#getWorker()} to queue change operations to the backend.
 	 * </p>
 	 * <p>
 	 * The IndexReader should not be closed in other ways except being returned to this instance via

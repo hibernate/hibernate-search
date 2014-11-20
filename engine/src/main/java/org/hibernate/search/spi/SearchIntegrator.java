@@ -32,7 +32,7 @@ import org.hibernate.search.stat.Statistics;
  * @author Emmanuel Bernard
  * @hsearch.experimental
  */
-public interface SearchFactoryIntegrator {
+public interface SearchIntegrator {
 
 	/**
 	 * Returns the entity to index binding for the given type.

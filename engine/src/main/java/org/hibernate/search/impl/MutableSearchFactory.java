@@ -36,7 +36,7 @@ import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchFactoryBuilder;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
@@ -50,7 +50,7 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  *
  * @author Emmanuel Bernard
  */
-public class MutableSearchFactory implements SearchFactoryImplementorWithShareableState, SearchFactoryIntegrator, WorkerBuildContext {
+public class MutableSearchFactory implements SearchFactoryImplementorWithShareableState, SearchIntegrator, WorkerBuildContext {
 	// Implements WorkerBuilderContext for the dynamic sharding approach which build IndexManager lazily
 
 	//a reference to the same instance of this class is help by clients and various HSearch services
@@ -310,7 +310,7 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	@Override
 	public <T> T unwrap(Class<T> cls) {
-		if ( SearchFactoryIntegrator.class.equals( cls ) || SearchFactoryImplementor.class.equals( cls ) ) {
+		if ( SearchIntegrator.class.equals( cls ) || SearchFactoryImplementor.class.equals( cls ) ) {
 			return (T) this;
 		}
 		else {

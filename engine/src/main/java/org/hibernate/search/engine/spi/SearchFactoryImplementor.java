@@ -18,7 +18,7 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.SearchFactoryIntegrator;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
 /**
@@ -27,7 +27,7 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public interface SearchFactoryImplementor extends SearchFactoryIntegrator {
+public interface SearchFactoryImplementor extends SearchIntegrator {
 
 	/**
 	 * Returns a map of all known entity index binding (indexed entities) keyed against the indexed type
