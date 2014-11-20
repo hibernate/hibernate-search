@@ -95,6 +95,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman-bmunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
@@ -173,4 +183,29 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <!-- tools classes are needed by byteman -->
+        <profile>
+            <id>default-toolsjar-profile</id>
+            <activation>
+                <file>
+                    <exists>${java.home}/../lib/tools.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <jdk-toolsjar>${java.home}/../lib/tools.jar</jdk-toolsjar>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac-toolsjar-profile</id>
+            <activation>
+                <file>
+                    <exists>${java.home}/../Classes/classes.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <jdk-toolsjar>${java.home}/../Classes/classes.jar</jdk-toolsjar>
+            </properties>
+        </profile>
+    </profiles>
 </project>
