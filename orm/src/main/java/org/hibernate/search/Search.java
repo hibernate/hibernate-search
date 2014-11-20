@@ -7,7 +7,7 @@
 package org.hibernate.search;
 
 import org.hibernate.Session;
-import org.hibernate.search.impl.FullTextSessionImpl;
+import org.hibernate.search.impl.ImplementationFactory;
 
 /**
  * Helper class to get a {@code FullTextSession} from a regular ORM session.
@@ -25,7 +25,7 @@ public final class Search {
 			return (FullTextSession) session;
 		}
 		else {
-			return new FullTextSessionImpl( session );
+			return ImplementationFactory.createFullTextSession( session );
 		}
 	}
 

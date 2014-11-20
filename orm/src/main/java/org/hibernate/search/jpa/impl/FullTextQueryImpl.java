@@ -65,7 +65,8 @@ import org.hibernate.transform.ResultTransformer;
  *
  * @author Emmanuel Bernard
  */
-public class FullTextQueryImpl implements FullTextQuery {
+final class FullTextQueryImpl implements FullTextQuery {
+
 	private final org.hibernate.search.FullTextQuery query;
 	private final Session session;
 	private Integer firstResult;

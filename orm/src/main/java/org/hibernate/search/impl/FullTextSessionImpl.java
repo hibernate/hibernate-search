@@ -41,7 +41,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author John Griffin
  * @author Hardy Ferentschik
  */
-public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession, SessionImplementor {
+final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession, SessionImplementor {
+
 	private static final Log log = LoggerFactory.make();
 
 	private transient SearchFactoryImplementor searchFactory;
