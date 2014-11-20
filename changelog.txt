@@ -1,6 +1,29 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Beta3 (20-11-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1731] - Should not have a transitive dependency to jboss-logging-annotations
+
+** Improvement
+    * [HSEARCH-1725] - Improve allocation rate of the new Lucene synchronous batching backend
+    * [HSEARCH-1732] - Update links to javadoc external sites
+
+** New Feature
+    * [HSEARCH-1728] - Create a configuration attribute to allow usage of the Infinispan Directory option writeFileListAsynchronously
+
+** Task
+    * [HSEARCH-1719] - Performance tests are not able to run
+    * [HSEARCH-1720] - Switch the performance tests to use the Hikari connection pool
+    * [HSEARCH-1721] - Reconfigure build to make it possible to test the main modules on JDK9
+    * [HSEARCH-1722] - Fix race condition in OptimizerPerformanceTest
+    * [HSEARCH-1723] - Allow BackendStressTest to test clustered Infinispan configurations
+    * [HSEARCH-1726] - Allow performance validation tests to run on MariaDB
+    * [HSEARCH-1727] - Restore original package name for SearchFactory, break inheritance link with SearchFactoryIntegrator
+
+
 Version 5.0.0.Beta2 (13-11-2014)
 ------------------------
 
