@@ -24,7 +24,7 @@
     <properties>
         <!--
         we disable the enforcer plugin for this module as it is not possible to maintain the dependency convergence
-        here due to dependency conflicts in JBoss AS dependencies.
+        here due to dependency conflicts with specific versions of WildFly
         -->
         <enforcer.skip>true</enforcer.skip>
 

@@ -20,6 +20,14 @@
     <name>Hibernate Search Performance Tests</name>
     <description>Hibernate Search Performance Tests</description>
 
+    <properties>
+        <!--
+        we disable the enforcer plugin for this module as it is not possible to maintain the dependency convergence
+        here due to dependency conflicts with specific versions of WildFly
+        -->
+        <enforcer.skip>true</enforcer.skip>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
