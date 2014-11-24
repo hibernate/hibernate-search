@@ -4,14 +4,14 @@
 [[search-mapping-entity]]
 === Mapping an entity
 
-In <<getting-started>> you have already learned that all the metadata information needed to index
+In <<getting-started>> you have already seen that all the metadata information needed to index
 entities is described through annotations. There is no need for XML mapping files. You can still use
 Hibernate mapping files for the basic Hibernate configuration, but the Hibernate Search specific
 configuration has to be expressed via annotations.
 
 [NOTE]
 ====
-There is no XML configuration available for Hibernate Search but we provide a powerful programmatic
+There is no XML configuration available for Hibernate Search but we provide a programmatic
 mapping API that elegantly replaces this kind of deployment form (see
 <<hsearch-mapping-programmaticapi>> for more information).
 
@@ -46,31 +46,49 @@ You can optionally specify the `Indexed.index` attribute to change the default n
 For more information regarding index naming see <<search-configuration-directory>>.
 
 You can also specify an optional indexing interceptor. For more information see
-<<search-mapping-indexinginterceptor>>.
+<<search-mapping-indexinginterceptor, conditional indexing>>.
 
 [[field-annotation]]
 ===== @Field
 
-For each property (or attribute) of your entity, you have the ability to describe how it will be
-indexed. The default (no annotation present) means that the property is ignored by the indexing
-process. `@Field` does declare a property as indexed and allows you to configure several aspects of
-the indexing process by setting one or more of the following attributes:
+For each property of your entity, you have the ability to describe whether and how it
+will be indexed. Adding the `@Field` annotation declares a property as indexed and allows you to
+configure various aspects of the indexing process. Without `@Field` the property is ignored by
+the indexing process.
 
-* `name`: describe under which name the property should be stored in the Lucene Document. The
+Hibernate Search tries to determine the best way to index your property. In most
+cases this will be as string, but for the types int, long, double and float (and their respective
+Java wrapper types) Lucene's numeric field encoding (see <<numeric-field-annotation>>) is used.
+This numeric encoding uses a so called link:http://en.wikipedia.org/wiki/Trie[Trie structure] which
+allows for efficient range queries and sorting, resulting in query response times
+being orders of magnitude faster than with the plain string encoding.
+
+[CAUTION]
+====
+Prior to Search 5, numeric field encoding was only chosen if explicitly requested via `@NumericField`.
+As of Search 5 this encoding is automatically chosen for numeric types. To avoid numeric encoding
+you can explicitly specify a non numeric field bridge via `@Field.bridge` or `@FieldBridge`. The
+package `org.hibernate.search.bridge.builtin` contains a set of bridges which encode numbers as strings,
+for example `org.hibernate.search.bridge.builtin.IntegerBridge`.
+====
+
+The following attributes of the `@Field` annotation help you control the indexing outcome:
+
+* `name`: describes under which name the property should be stored in the Lucene Document. The
 default value is the property name (following the JavaBeans convention)
 
-* `store`: describe whether or not the property is stored in the Lucene index. You can store the
-value `Store.YES` (consuming more space in the index but allowing projection, see <<projections>>),
+* `store`: describes whether or not the property is stored in the Lucene index. You can store the
+value `Store.YES` (consuming more space in the index but allowing <<projections, projection>>),
 store it in a compressed way `Store.COMPRESS` (this does consume more CPU), or avoid any storage
 `Store.NO` (this is the default value). When a property is stored, you can retrieve its original
-value from the Lucene Document. Storing the property has no impact though on whether the value is
+value from the Lucene Document. Storing the property has no impact on whether the value is
 searchable or not.
 
-* `index`: describe whether the property is indexed or not. The different values are `Index.NO`
-(no indexing, i.e. cannot be found by a query), `Index.YES` (the element gets indexed and is
-searchable). The default value is `Index.YES`. `Index.NO` can be useful for cases where a property
-is not required to be searchable, but should be available for projection.
-
+* `index`: describes whether the property is indexed or not. The different values are `Index.NO`
+(no indexing, meaning the value cannot be found by a query), `Index.YES` (the element gets indexed
+and is searchable). The default value is `Index.YES`. `Index.NO` can be useful for cases where a
+property is not required to be searchable, but needed for projection.
++
 [TIP]
 ====
 `Index.NO` in combination with `Analyze.YES` or `Norms.YES` is not useful, since analyze and norms
@@ -79,14 +97,14 @@ require the property to be indexed
 
 * `analyze`: determines whether the property is analyzed (`Analyze.YES`) or not (`Analyze.NO`).
 The default value is `Analyze.YES`.
-
++
 [TIP]
 ====
 Whether or not you want to analyze a property depends on whether you wish to search the element as
 is, or by the words it contains. It make sense to analyze a text field, but probably not a date
 field.
 ====
-
++
 [TIP]
 ====
 Fields used for sorting or faceting _must not_ be analyzed.
@@ -98,8 +116,9 @@ boosting will not be available in this case. The default value is `Norms.YES`.
 
 * `termVector`: describes collections of term-frequency pairs. This attribute enables the storing
 of the term vectors within the documents during indexing. The default value is `TermVector.NO`.
-`
++
 The different values of this attribute are:
++
 [options="header"]
 |===============
 |Value|Definition
@@ -118,58 +137,60 @@ The different values of this attribute are:
 |TermVector.WITH_POSITION_OFFSETS|Store the term vector, token position and offset
                     information. This is a combination of the YES,
                     WITH_OFFSETS and WITH_POSITIONS.
-
 |===============
 
-* `indexNullAs`: Per default null values are ignored and not indexed. However, using indexNullAs
+* `indexNullAs`: Per default null values are ignored and not indexed. However, using `indexNullAs`
 you can specify a string which will be inserted as token for the null value. Per default this value
 is set to `org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL` indicating that null values
 should not be indexed. You can set this value to `DEFAULT_NULL_TOKEN` to indicate that a default null
 token should be used. This default null token can be specified in the configuration using
 `hibernate.search.default_null_token`. If this property is not set the string "_null_" will
 be used as default.
-
++
 [NOTE]
 ====
 When indexNullAs is used, it is important to use the chosen null token in search queries (see
 <<search-query>>) in order to find null values. It is also advisable to use this feature only with
-un-analyzed fields (``analyze=`Analyze.NO`).
+un-analyzed fields (`analyze=Analyze.NO`).
 ====
-
-[WARNING]
++
+[NOTE]
 ====
-When implementing a custom FieldBridge or TwoWayFieldBridge it is up to the developer to handle the
+When implementing a custom `FieldBridge` or `TwoWayFieldBridge` it is up to the developer to handle the
 indexing of null values (see JavaDocs of `LuceneOptions.indexNullAs()`).
 ====
+
+* `boost`: Refer to section about <<section-boosting,boosting>>
+
+* `bridge`: Refer to section about <<section-custom-bridges, field bridges>>
 
 [[numeric-field-annotation]]
 ===== @NumericField
 
-There exists also a companion annotation to @Field, called @NumericField. It can be specified in the
-same scope as @Field or @DocumentId, but only on Integer, Long, Float or Double properties. When
-used, the annotated property will be indexed using a link:http://en.wikipedia.org/wiki/Trie[Trie structure].
-This enables efficient range queries and sorting, resulting in query response times
-being orders of magnitude faster than the same query with plain @Field. The @NumericField annotation
-accepts the following parameters:
+`@NumericField` is a companion annotation to `@Field`. It can be specified in the
+same scope as `@Field`, but only on properties of numeric type like int, long, double and float
+(and their respective Java wrapper types). It allows to define a custom `precisionStep` for the
+numeric encoding of the property value.
+
+`@NumericField` accepts the following parameters:
 
 [options="header"]
 |===============
 |Value|Definition
-|forField|(Optional) Specify the name of of the related @Field
-                  that will be indexed as numeric. It's only mandatory when
-                  the property contains more than a @Field declaration
-|precisionStep|(Optional) Change the way that the Trie structure is
-                  stored in the index. Smaller precisionSteps lead to more
+|`forField`|(Optional) Specify the name of of the related `@Field`
+                  that will be indexed numerically. It's only mandatory when
+                  the property contains more than a `@Field` declaration
+|`precisionStep`|(Optional) Change the way that the Trie structure is
+                  stored in the index. Smaller `precisionSteps` lead to more
                   disk space usage and faster range and sort queries. Larger
                   values lead to less space used and range query performance
-                  more close to the range query in normal @Fields. Default
+                  more close to the range query using string encoding. Default
                   value is 4.
-
 |===============
 
-Lucene supports the numeric types: Double, Long, Integer and Float. Other numeric types should use
-the default string encoding (via @Field), unless the application can deal with a potential loss in
-precision, in which case a custom NumericFieldBridge can be used. See
+Lucene supports the numeric types: `Double`, `Long`, `Integer` and `Float`. Other numeric types
+should use the default string encoding (via `@Field`), unless the application can deal with a
+potential loss in precision, in which case a custom `NumericFieldBridge` can be used. See
 <<example-custom-numericfieldbridge>>.
 
 [[example-custom-numericfieldbridge]]
@@ -178,16 +199,17 @@ precision, in which case a custom NumericFieldBridge can be used. See
 [source, JAVA]
 ----
 public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
-   private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
+    private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
 
-   @Override
-   public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-      if ( value != null ) {
-         BigDecimal decimalValue = (BigDecimal) value;
-         Long indexedValue = Long.valueOf( decimalValue.multiply( storeFactor ).longValue() );
-         luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
-      }
-   }
+    @Override
+    public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+        if ( value != null ) {
+            BigDecimal decimalValue = (BigDecimal) value;
+            long tmpLong = decimalValue.multiply( storeFactor ).longValue();
+            Long indexedValue = Long.valueOf( tmpLong );
+            luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
+        }
+    }
 
     @Override
     public Object get(String name, Document document) {
@@ -195,20 +217,19 @@ public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
         BigDecimal storedBigDecimal = new BigDecimal( fromLucene );
         return storedBigDecimal.divide( storeFactor );
     }
-
 }
 ----
 ====
 
 You would use this custom bridge like seen in <<example-useof-custom-numericfieldbridge>>. In this
-case three annotations are used - @Field, @NumericField and @FieldBridge. @Field is required to mark
-the property for being indexed (a standalone @NumericField is never allowed). @NumericField might be
-omitted in this specific case, because the used @FieldBridge annotation refers already to a
-NumericFieldBridge instance. However, the use of @NumericField is recommended to make the use of the
-property as numeric value explicit.
+case three annotations are used - `@Field`, `@NumericField` and `@FieldBridge`. `@Field` is required
+to mark the property for being indexed (a standalone `@NumericField` is never allowed).
+`@NumericField` might be omitted in this specific case, because the used `@FieldBridge` annotation
+refers already to a `NumericFieldBridge` instance. However, the use of `@NumericField` makes the
+use of the property as numeric value explicit.
 
 [[example-useof-custom-numericfieldbridge]]
-.Use of BigDecimalNumericFieldBridge
+.Use of `BigDecimalNumericFieldBridge`
 ====
 [source, JAVA]
 ----
@@ -243,9 +264,10 @@ public static class Item {
 ===== @Id
 
 Finally, the id property of an entity is a special property used by Hibernate Search to ensure index
-unicity of a given entity. By design, an id has to be stored and must not be tokenized. To mark a
-property as index id, use the `@DocumentId` annotation. If you are using JPA and you have specified
-@Id you can omit @DocumentId. The chosen entity id will also be used as document id.
+unicity of a given entity. By design, an id has to be stored and must not be tokenized. It is also
+always string encoded, even if the id is a number. To mark a property as index id, use the
+`@DocumentId` annotation. If you are using JPA and you are using `@Id` you can omit `@DocumentId`.
+The chosen entity id will also be used as document id.
 
 [[example-annotated-entity]]
 .Specifying indexed properties
@@ -688,6 +710,7 @@ on its own to build an indexing dependency graph.
 When an entity is reindexed, all the entities pointed by `@ContainedIn` are also going to be
 reindexed.
 
+[[section-boosting]]
 === Boosting
 
 Lucene has the notion of _boosting_ which allows you to give certain documents or fields more or
@@ -1246,7 +1269,7 @@ Hibernate Search comes bundled with a set of built-in bridges between a Java pro
 full text representation.
 
 null:: Per default null elements are not indexed. Lucene does not support null elements. However, in
-some situation it can be useful to insert a custom token representing the null value. See 
+some situation it can be useful to insert a custom token representing the null value. See
 <<field-annotation>> for more information.
 
 java.lang.String:: Strings are indexed as are
@@ -1371,6 +1394,7 @@ TikaBridge does not implement TwoWayFieldBridge: queries built using the DSL (as
 <<example-tika-mapping>>) need to explicitly enable the option ignoreFieldBridge().
 ====
 
+[[section-custom-bridges]]
 ==== Custom bridges
 
 Sometimes, the built-in bridges of Hibernate Search do not cover some of your property types, or the
@@ -1540,6 +1564,7 @@ It is important for the two-way process to be idempotent
 (ie `object = stringToObject(objectToString( object ) )` ).
 ====
 
+[[section-filed-bridge]]
 ===== FieldBridge
 
 Some use cases require more than a simple object to string translation when mapping a property to a
@@ -1803,7 +1828,7 @@ serviceManager.releaseService( ClassLoaderService.class );
 ====
 
 [[search-mapping-indexinginterceptor]]
-=== Conditional indexing: to index or not based on entity state
+=== Conditional indexing
 
 [IMPORTANT]
 ====

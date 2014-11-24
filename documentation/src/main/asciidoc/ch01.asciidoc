@@ -213,26 +213,27 @@ storing it is the ability to retrieve them via projections (see <<projections>>)
 Without projections, Hibernate Search will per default execute a Lucene query in order to find the
 database identifiers of the entities matching the query criteria and use these identifiers to
 retrieve managed objects from the database. The decision for or against projection has to be made on
-a case to case basis. The default behavior is recommended since it returns managed objects whereas
+a case by case basis. The default behavior is recommended since it returns managed objects whereas
 projections only return object arrays.
 
 Note that `index=Index.YES`, `analyze=Analyze.YES` and `store=Store.NO` are the default values for
 these parameters and could be omitted.
 
-After this short look under the hood let's go back to annotating the Book class. Another annotation
+After this short look under the hood let's go back to annotating the `Book` class. Another annotation
 we have not yet discussed is `@DateBridge`. This annotation is one of the built-in field bridges in
-Hibernate Search. The Lucene index is mostly string based, with limited support for encoding numbers.
-For this reason Hibernate Search must convert the data types of the indexed fields to strings and vice versa.
-A range of predefined bridges are provided, including the DateBridge which will convert a
-`java.util.Date` into a `String` with the specified resolution. For more details see <<search-mapping-bridge>>.
+Hibernate Search. The Lucene index is mostly string based, with special support for encoding numbers.
+Hibernate Search must convert the data types of the indexed fields to their respective Lucene
+encoding and vice versa. A range of predefined bridges is provided for this purpose, including the
+`DateBridge` which will convert a `java.util.Date` into a `String` with the specified resolution.
+For more details see <<search-mapping-bridge>>.
 
-This leaves us with `@IndexedEmbedded`.
-This annotation is used to index associated entities (`@ManyToMany`, `@\*ToOne`, `@Embedded` and `@ElementCollection`)
-as part of the owning entity.
-This is needed since a Lucene index document is a flat data structure which does not know anything about object relations.
-To ensure that the author's name will be searchable you have to make sure that the names are indexed as part of the book itself.
-On top of `@IndexedEmbedded` you will also have to mark all fields of the associated entity you want
-to have included in the index with `@Indexed`.
+This leaves us with `@IndexedEmbedded`. This annotation is used to index associated entities
+(`@ManyToMany`, `@*ToOne`, `@Embedded` and `@ElementCollection`) as part of the owning entity.
+This is needed since a Lucene index document is a flat data structure which does not know anything
+about object relations.
+To ensure that the author names will be searchable you have to make sure that the names are indexed
+as part of the book itself. On top of `@IndexedEmbedded` you will also have to mark all fields of
+the associated entity you want to have included in the index with `@Indexed`.
 For more details see <<search-mapping-associated>>.
 
 These settings should be sufficient for now. For more details on entity mapping refer to
