@@ -21,6 +21,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
@@ -81,16 +82,23 @@ public class BridgeTest extends SearchTestBase {
 		Query query;
 		List result;
 
-		query = parser.parse(
-				"double2:[2.1 TO 2.1] AND float2:[2.1 TO 2.1] " +
-						"AND integerv2:[2 TO 2.1] AND long2:[2 TO 2.1] AND type:\"dog\" AND storm:false"
-		);
+		BooleanQuery booleanQuery = new BooleanQuery();
+		booleanQuery.add( NumericRangeQuery.newDoubleRange( "double2", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST );
+		booleanQuery.add( NumericRangeQuery.newFloatRange( "float2", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST );
+		booleanQuery.add( NumericRangeQuery.newIntRange( "integerv2", 2, 3, true, true ), BooleanClause.Occur.MUST );
+		booleanQuery.add( NumericRangeQuery.newLongRange( "long2", 2l, 3l, true, true ), BooleanClause.Occur.MUST );
+		booleanQuery.add( new TermQuery(new Term("type", "dog")), BooleanClause.Occur.MUST );
+		booleanQuery.add( new TermQuery(new Term("storm", "false")), BooleanClause.Occur.MUST );
 
-		result = session.createFullTextQuery( query ).list();
+		result = session.createFullTextQuery( booleanQuery ).list();
 		assertEquals( "find primitives and do not fail on null", 1, result.size() );
 
-		query = parser.parse( "double1:[2.1 TO 2.1] OR float1:[2.1 TO 2.1] OR integerv1:[2 TO 2.1] OR long1:[2 TO 2.1]" );
-		result = session.createFullTextQuery( query ).list();
+		booleanQuery = new BooleanQuery();
+		booleanQuery.add( NumericRangeQuery.newDoubleRange( "double1", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST );
+		booleanQuery.add( NumericRangeQuery.newFloatRange( "float1", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST );
+		booleanQuery.add( NumericRangeQuery.newIntRange( "integerv1", 2, 3, true, true ), BooleanClause.Occur.MUST );
+		booleanQuery.add( NumericRangeQuery.newLongRange( "long1", 2l, 3l, true, true ), BooleanClause.Occur.MUST );
+		result = session.createFullTextQuery( booleanQuery ).list();
 		assertEquals( "null elements should not be stored", 0, result.size() ); //the query is dumb because restrictive
 
 		query = parser.parse( "type:dog" );

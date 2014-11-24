@@ -10,6 +10,7 @@ package org.hibernate.search.bridge.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 
@@ -21,7 +22,7 @@ class NumericBridgeProvider extends ExtendedBridgeProvider {
 	private static final Map<String, NumericFieldBridge> numericBridges;
 
 	static {
-		numericBridges = new HashMap<String, NumericFieldBridge>();
+		numericBridges = new HashMap<>();
 		numericBridges.put( Integer.class.getName(), NumericFieldBridge.INT_FIELD_BRIDGE );
 		numericBridges.put( int.class.getName(), NumericFieldBridge.INT_FIELD_BRIDGE );
 		numericBridges.put( Long.class.getName(), NumericFieldBridge.LONG_FIELD_BRIDGE );
@@ -34,7 +35,13 @@ class NumericBridgeProvider extends ExtendedBridgeProvider {
 
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext bridgeContext) {
-		if ( bridgeContext.getNumericField() != null ) {
+		if ( numericBridges.containsKey( bridgeContext.getReturnType().getName() ) ) {
+
+			// document id should only be indexed numerically in case there is an explicit @NumericField
+			if ( bridgeContext.isId() && !bridgeContext.getAnnotatedElement().isAnnotationPresent( NumericField.class ) ) {
+				return null;
+			}
+
 			return numericBridges.get( bridgeContext.getReturnType().getName() );
 		}
 		return null;

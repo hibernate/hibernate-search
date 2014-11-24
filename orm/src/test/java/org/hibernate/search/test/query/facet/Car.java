@@ -13,8 +13,10 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.bridge.builtin.IntegerBridge;
 
 /**
  * @author Hardy Ferentschik
@@ -32,7 +34,7 @@ public class Car {
 	@Field(store = Store.YES)
 	private String make;
 
-	@Field(analyze = Analyze.NO)
+	@Field(analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class))
 	private int cubicCapacity;
 
 	public Car() {

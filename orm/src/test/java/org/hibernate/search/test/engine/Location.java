@@ -50,19 +50,15 @@ public class Location {
 	private Country country;
 
 	@Field(name = "myCounter")
-	@NumericField(forField = "myCounter")
 	private Long counter;
 
 	@Field(store = Store.YES)
-	@NumericField(forField = "latitude", precisionStep = 1)
 	private double latitude;
 
 	@Field(store = Store.YES)
-	@NumericField(forField = "longitude")
 	private Double longitude;
 
 	@Field
-	@NumericField
 	private Integer ranking;
 
 	@Field
@@ -119,3 +115,4 @@ public class Location {
 	}
 
 }
+

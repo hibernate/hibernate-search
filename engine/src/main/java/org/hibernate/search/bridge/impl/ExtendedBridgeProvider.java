@@ -9,7 +9,6 @@ package org.hibernate.search.bridge.impl;
 
 import java.lang.reflect.AnnotatedElement;
 
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.exception.AssertionFailure;
@@ -50,9 +49,8 @@ abstract class ExtendedBridgeProvider implements BridgeProvider {
 		String getMemberName();
 
 		/**
-		 * Return the appropriate {@link org.hibernate.search.annotations.NumericField} annotation
-		 * if present.
+		 * @return {@code true} if the indexed type is the document id, {@code false} otherwise.
 		 */
-		NumericField getNumericField();
+		boolean isId();
 	}
 }

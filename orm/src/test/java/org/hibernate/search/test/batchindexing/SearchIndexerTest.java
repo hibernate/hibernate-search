@@ -10,15 +10,17 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.junit.Test;
 
 import org.hibernate.Transaction;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.batchindexing.impl.MassIndexerImpl;
+import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 
@@ -132,8 +134,10 @@ public class SearchIndexerTest {
 		}
 		{
 			//verify index is still empty:
-			assertEquals( 0, countResults( new Term( "title", "trek" ), ftsb, Dvd.class ) );
-			assertEquals( 0, countResults( new Term( "id", "not" ), ftsb, WeirdlyIdentifiedEntity.class ) );
+			assertEquals( 0, countResults( new TermQuery( new Term( "title", "trek" ) ), ftsb, Dvd.class ) );
+			assertEquals(
+					0, countResults( new TermQuery( new Term( "id", "not" ) ), ftsb, WeirdlyIdentifiedEntity.class )
+			);
 		}
 		{
 			FullTextSession fullTextSession = ftsb.openFullTextSession();
@@ -143,7 +147,7 @@ public class SearchIndexerTest {
 		}
 		{
 			//verify index is now containing both DVDs:
-			assertEquals( 2, countResults( new Term( "title", "trek" ), ftsb, Dvd.class ) );
+			assertEquals( 2, countResults( new TermQuery( new Term( "title", "trek" ) ), ftsb, Dvd.class ) );
 		}
 		{
 			FullTextSession fullTextSession = ftsb.openFullTextSession();
@@ -153,7 +157,10 @@ public class SearchIndexerTest {
 		}
 		{
 			//verify index is now containing the weirdly identified entity:
-			assertEquals( 1, countResults( new Term( "id", "identifier" ), ftsb, WeirdlyIdentifiedEntity.class ) );
+			assertEquals(
+					1,
+					countResults( new TermQuery( new Term( "id", "identifier" ) ), ftsb, WeirdlyIdentifiedEntity.class )
+			);
 		}
 		ftsb.close();
 	}
@@ -181,8 +188,15 @@ public class SearchIndexerTest {
 		}
 		{
 			//verify index is still empty:
-			assertEquals( 0, countResults( new Term( "jiraDescription", "freezes" ), ftsb, ExtendedIssueEntity.class ) );
-			assertEquals( 0, countResults( new Term( "jiraCode", "HSEARCH" ), ftsb, ExtendedIssueEntity.class ) );
+			assertEquals(
+					0, countResults(
+							new TermQuery( new Term( "jiraDescription", "freezes" ) ), ftsb, ExtendedIssueEntity.class
+					)
+			);
+			assertEquals(
+					0,
+					countResults( new TermQuery( new Term( "jiraCode", "HSEARCH" ) ), ftsb, ExtendedIssueEntity.class )
+			);
 		}
 		{
 			FullTextSession fullTextSession = ftsb.openFullTextSession();
@@ -192,19 +206,31 @@ public class SearchIndexerTest {
 		}
 		{
 			//verify index via term readers:
-			assertEquals( 1, countResults( new Term( "jiraDescription", "freezes" ), ftsb, ExtendedIssueEntity.class ) );
-			assertEquals( 1, countResults( new Term( "id", "1" ), ftsb, ExtendedIssueEntity.class ) );
+			assertEquals(
+					1,
+					countResults(
+							new TermQuery( new Term( "jiraDescription", "freezes" ) ), ftsb, ExtendedIssueEntity.class
+					)
+			);
+
+			assertEquals(
+					1,
+					countResults(
+							NumericRangeQuery.newLongRange( "id", 1l, 1l, true, true ), ftsb, ExtendedIssueEntity.class
+					)
+			);
 		}
 		ftsb.close();
 	}
 
 	//helper method
-	private int countResults(Term termForQuery, FullTextSessionBuilder ftSessionBuilder, Class<?> type) {
-		TermQuery fullTextQuery = new TermQuery( termForQuery );
+	private int countResults(Query query, FullTextSessionBuilder ftSessionBuilder, Class<?> type) {
 		FullTextSession fullTextSession = ftSessionBuilder.openFullTextSession();
 		Transaction transaction = fullTextSession.beginTransaction();
-		FullTextQuery query = fullTextSession.createFullTextQuery( fullTextQuery, type );
-		int resultSize = query.getResultSize();
+
+		FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( query, type );
+		int resultSize = fullTextQuery.getResultSize();
+
 		transaction.commit();
 		fullTextSession.close();
 		return resultSize;

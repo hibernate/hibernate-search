@@ -48,6 +48,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
@@ -159,9 +160,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
 		FieldBridge fieldBridge = bridgeFactory.guessType(
-				null,
-				null,
 				member,
+				true,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -213,11 +213,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			parseContext.setExplicitDocumentId( true );
 		}
 
-		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
 		FieldBridge idBridge = bridgeFactory.guessType(
-				null,
-				numericFieldAnn,
 				member,
+				true,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -563,9 +561,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		Field.TermVector termVector = Field.TermVector.NO;
 		FieldBridge fieldBridge = bridgeFactory.guessType(
-				null,
-				null,
 				member,
+				false,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -854,8 +851,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		XProperty member = propertyMetadataBuilder.getPropertyAccessor();
 
 		if ( isPropertyTransient( member, configContext ) ) {
-			//If the indexed values are derived from a Transient field, we can't rely on dirtyness of properties.
-			//Only applies on JPA mapped entities.
+			// If the indexed values are derived from a Transient field, we can't rely on dirtiness of properties.
+			// Only applies on JPA mapped entities.
 			typeMetadataBuilder.disableStateInspectionOptimization();
 		}
 
@@ -870,8 +867,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		FieldBridge fieldBridge = bridgeFactory.guessType(
 				fieldAnnotation,
-				numericFieldAnnotation,
 				member,
+				false,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -900,14 +897,17 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				.analyzer( analyzer )
 				.indexNullAs( nullToken );
 
-		if ( numericFieldAnnotation != null ) {
-			fieldMetadataBuilder.numeric()
+		// if we are having a numeric value make sure to mark the metadata and set the precision
+		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
+		// field bridge
+		if ( numericFieldAnnotation != null || fieldBridge instanceof NumericFieldBridge ) {
+			fieldMetadataBuilder
+					.numeric()
 					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) );
 		}
 
 		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
-
 
 		// keep track of collection role names for ORM integration optimization based on collection update events
 		parseContext.collectUnqualifiedCollectionRole( member.getName() );

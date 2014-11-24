@@ -10,6 +10,7 @@ package org.hibernate.search.test.embedded.nested.containedIn;
 import java.util.List;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.Transaction;
@@ -32,6 +33,7 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-385")
+	@SuppressWarnings( "unchecked" )
 	public void testDocumentsAt0() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Transaction tx = fts.beginTransaction();
@@ -56,9 +58,14 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 
 		tx = fts.beginTransaction();
 
-		assertEquals( 1, fts.createFullTextQuery( new TermQuery( new Term("uid", new Long(uid1).toString() ) ), Entity1ForDoc0.class ).getResultSize() );
-		assertEquals( 1, fts.createFullTextQuery( new TermQuery( new Term("entities2.uid", String.valueOf( uid2 ) ) ), Entity1ForDoc0.class ).getResultSize() );
-
+		assertEquals(
+				1,
+				fts.createFullTextQuery( new TermQuery( new Term( "uid", Long.toString( uid1 ) ) ), Entity1ForDoc0.class ).getResultSize()
+		);
+		assertEquals(
+				1,
+				fts.createFullTextQuery( new TermQuery( new Term( "entities2.uid", Long.toString( uid2 ) ) ), Entity1ForDoc0.class ).getResultSize()
+		);
 
 		tx.commit();
 
@@ -74,6 +81,7 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue( jiraKey = "HSEARCH-386")
+	@SuppressWarnings( "unchecked" )
 	public void testContainedInAndLazy() {
 		FullTextSession fts = Search.getFullTextSession( getSessionFactory().openSession() );
 		Entity1ForUnindexed ent1_0 = new Entity1ForUnindexed();
@@ -110,7 +118,10 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 		long otherId = other.getUid();
 
 		assertEquals( 1, fts
-				.createFullTextQuery( new TermQuery( new Term( "entity1.uid", new Long( ent1_0.getUid() ).toString() ) ), Entity2ForUnindexed.class )
+				.createFullTextQuery(
+						NumericRangeQuery.newLongRange( "entity1.uid", ent1_0.getUid(), ent1_0.getUid(), true, true ),
+						Entity2ForUnindexed.class
+				)
 				.getResultSize() );
 		Entity1ForUnindexed toDelete = (Entity1ForUnindexed) fts.get( Entity1ForUnindexed.class, otherId );
 

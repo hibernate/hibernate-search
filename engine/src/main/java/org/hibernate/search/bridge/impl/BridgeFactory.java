@@ -11,19 +11,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.bridge.spi.BridgeProvider;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
-import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.ParameterizedBridge;
@@ -34,6 +29,10 @@ import org.hibernate.search.bridge.builtin.impl.BuiltinIterableBridge;
 import org.hibernate.search.bridge.builtin.impl.BuiltinMapBridge;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.spi.BridgeProvider;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -153,9 +152,17 @@ public final class BridgeFactory {
 		return bridge;
 	}
 
+	public FieldBridge guessType(XMember member,
+			boolean isId,
+			ReflectionManager reflectionManager,
+			ServiceManager serviceManager
+	) {
+		return guessType( null, member, isId, reflectionManager, serviceManager );
+	}
+
 	public FieldBridge guessType(Field field,
-			NumericField numericField,
 			XMember member,
+			boolean isId,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
@@ -164,7 +171,9 @@ public final class BridgeFactory {
 			return bridge;
 		}
 
-		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext( member, numericField, reflectionManager, serviceManager );
+		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext(
+				member, isId, reflectionManager, serviceManager
+		);
 		ContainerType containerType = getContainerType( member, reflectionManager );
 
 		// We do annotation based providers as Tika at least needs priority over

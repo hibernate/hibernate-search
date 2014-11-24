@@ -89,12 +89,6 @@ public class DSLTest extends SearchTestBase {
 		Query query = monthQb.keyword().onField( "monthValue" ).matching( 2 ).createQuery();
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		query = monthQb.keyword()
-				.onField( "monthValue" )
-					.ignoreFieldBridge()
-				.matching( "2" )
-				.createQuery();
-		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 		transaction.commit();
 	}
 

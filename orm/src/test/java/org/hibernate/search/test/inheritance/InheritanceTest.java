@@ -9,10 +9,9 @@ package org.hibernate.search.test.inheritance;
 import java.io.Serializable;
 import java.util.List;
 
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.Transaction;
@@ -151,26 +150,24 @@ public class InheritanceTest extends SearchTestBase {
 		FullTextSession s = Search.getFullTextSession( openSession() );
 		Transaction tx = s.beginTransaction();
 
-		Query query = new TermQuery( new Term( "numberOfEggs", "2" ) );
+		Query query = NumericRangeQuery.newIntRange( "numberOfEggs", 2, 2, true, true );
 		org.hibernate.Query hibQuery = s.createFullTextQuery( query, Eagle.class );
 		List result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Wrong number of hits. There should be two birds.", 1, result.size() );
 
-		query = new TermQuery( new Term( "numberOfEggs", "2" ) );
+		query = NumericRangeQuery.newIntRange( "numberOfEggs", 2, 2, true, true );
 		hibQuery = s.createFullTextQuery( query, Bird.class );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Wrong number of hits. There should be two birds.", 2, result.size() );
 
-		query = new TermQuery( new Term( "numberOfEggs", "2" ) );
 		hibQuery = s.createFullTextQuery( query, Mammal.class );
 		result = hibQuery.list();
 		assertNotNull( result );
 		assertEquals( "Wrong number of hits. There should be two birds.", 0, result.size() );
 
 		try {
-			query = new TermQuery( new Term( "numberOfEggs", "2" ) );
 			hibQuery = s.createFullTextQuery( query, String.class );
 			hibQuery.list();
 			fail();
@@ -288,7 +285,7 @@ public class InheritanceTest extends SearchTestBase {
 		Eagle eagle = new Eagle();
 		eagle.setName( "Bald Eagle" );
 		eagle.setNumberOfEggs( 2 );
-		eagle.setWingYype( Eagle.WingType.BROAD );
+		eagle.setWingType( Eagle.WingType.BROAD );
 		s.save( eagle );
 
 		tx.commit();

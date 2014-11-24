@@ -11,22 +11,21 @@ import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.Search;
-import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.TestForIssue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -118,15 +117,15 @@ public class NumericFieldTest extends SearchTestBase {
 			Assert.assertEquals( 1, list.size() );
 			Object[] firstProjection = (Object[]) list.get( 0 );
 			Assert.assertEquals( 1, firstProjection.length );
-			Assert.assertEquals( Double.valueOf( -20d ), firstProjection[0] );
+			Assert.assertEquals( -20d, firstProjection[0] );
 			List listAgain = fullTextSession.createFullTextQuery( latitudeQuery, Location.class )
 					.setProjection( "coordinatePair_x", "coordinatePair_y" )
 					.list();
 			Assert.assertEquals( 1, listAgain.size() );
 			Object[] secondProjection = (Object[]) listAgain.get( 0 );
 			Assert.assertEquals( 2, secondProjection.length );
-			Assert.assertEquals( Double.valueOf( 1d ), secondProjection[0] );
-			Assert.assertEquals( Double.valueOf( 2d ), secondProjection[1] );
+			Assert.assertEquals( 1d, secondProjection[0] );
+			Assert.assertEquals( 2d, secondProjection[1] );
 		}
 		finally {
 			tx.commit();
@@ -198,6 +197,7 @@ public class NumericFieldTest extends SearchTestBase {
 		return new Country( name, idh );
 	}
 
+	@SuppressWarnings("unchecked")
 	private void cleanData() {
 		Transaction tx = fullTextSession.beginTransaction();
 		List<Location> locations = fullTextSession.createCriteria( Location.class ).list();
