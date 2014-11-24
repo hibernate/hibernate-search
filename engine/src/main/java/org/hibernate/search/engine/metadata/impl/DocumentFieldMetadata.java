@@ -178,6 +178,13 @@ public class DocumentFieldMetadata {
 		public DocumentFieldMetadata build() {
 			return new DocumentFieldMetadata( this );
 		}
+
+		@Override
+		public String toString() {
+			return "Builder{" +
+					"fieldName='" + fieldName + '\'' +
+					'}';
+		}
 	}
 }
 

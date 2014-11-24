@@ -11,9 +11,10 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.exception.SearchException;
 
 /**
- * Utility class to handle Numeric Fields
+ * Utility class to handle numeric fields.
  *
  * @author Gustavo Fernandes
+ * @author Hardy Ferentschik
  */
 public final class NumericFieldUtils {
 
@@ -24,7 +25,7 @@ public final class NumericFieldUtils {
 	public static Query createNumericRangeQuery(String fieldName, Object from, Object to,
 												boolean includeLower, boolean includeUpper) {
 
-		Class numericClass;
+		Class<?> numericClass;
 
 		if ( from != null ) {
 			numericClass = from.getClass();
@@ -53,16 +54,17 @@ public final class NumericFieldUtils {
 		// TODO: check for type before in the mapping
 		throw new SearchException(
 				"Cannot create numeric range query for field " + fieldName + ", since values are not numeric " +
-						"(int,long, short or double) ");
+						"(int, long, short or double) ");
 	}
 
 	/**
-	 * Will create a RangeQuery matching exactly the provided value: lower
+	 * Will create a {@code RangeQuery} matching exactly the provided value: lower
 	 * and upper value match, and bounds are included. This should perform
 	 * as efficiently as a TermQuery.
-	 * @param fieldName
-	 * @param value
-	 * @return the created Query
+	 *
+	 * @param fieldName the field name the query targets
+	 * @param value the value to match
+	 * @return the created {@code Query}
 	 */
 	public static Query createExactMatchQuery(String fieldName, Object value) {
 		return createNumericRangeQuery( fieldName, value, value, true, true );

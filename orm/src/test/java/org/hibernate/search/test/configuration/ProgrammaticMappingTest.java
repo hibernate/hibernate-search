@@ -73,7 +73,6 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "" + address.getAddressId() );
-		System.out.println( luceneQuery.toString() );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( "documentId does not work properly", 1, query.getResultSize() );
 

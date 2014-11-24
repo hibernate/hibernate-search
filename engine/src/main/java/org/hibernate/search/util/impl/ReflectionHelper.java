@@ -92,7 +92,7 @@ public abstract class ReflectionHelper {
 	 * @return the list of classes in the hierarchy starting at {@code java.lang.Object}
 	 */
 	public static List<XClass> createXClassHierarchy(XClass clazz) {
-		List<XClass> hierarchy = new LinkedList<XClass>();
+		List<XClass> hierarchy = new LinkedList<>();
 		XClass next;
 		for ( XClass previousClass = clazz; previousClass != null; previousClass = next ) {
 			next = previousClass.getSuperclass();

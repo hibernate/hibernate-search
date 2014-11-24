@@ -171,13 +171,14 @@ public class IndexedTypeDescriptorImpl implements IndexedTypeDescriptor {
 	private Map<String, PropertyDescriptor> createPropertyDescriptors(TypeMetadata typeMetadata) {
 		Map<String, PropertyDescriptor> propertyDescriptorsTmp = new HashMap<String, PropertyDescriptor>();
 		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
-			createOrMergeProperDescriptor( propertyDescriptorsTmp, propertyMetadata );
+			createOrMergePropertyDescriptor( propertyDescriptorsTmp, propertyMetadata );
 		}
-		createOrMergeProperDescriptor( propertyDescriptorsTmp, typeMetadata.getIdPropertyMetadata() );
+		createOrMergePropertyDescriptor( propertyDescriptorsTmp, typeMetadata.getIdPropertyMetadata() );
 		return propertyDescriptorsTmp;
 	}
 
-	private void createOrMergeProperDescriptor(Map<String, PropertyDescriptor> propertyDescriptorsTmp, PropertyMetadata propertyMetadata) {
+	private void createOrMergePropertyDescriptor(Map<String, PropertyDescriptor> propertyDescriptorsTmp,
+			PropertyMetadata propertyMetadata) {
 		String propertyName = propertyMetadata.getPropertyAccessorName();
 		Set<FieldDescriptor> tmpSet = new HashSet<FieldDescriptor>();
 		if ( propertyDescriptorsTmp.containsKey( propertyName ) ) {

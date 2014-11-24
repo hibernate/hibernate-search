@@ -38,7 +38,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * This factory is responsible for creating and initializing build-in and custom <i>FieldBridges</i>.
+ * This factory is responsible for creating and initializing build-in and custom {@code FieldBridge}s.
  *
  * @author Emmanuel Bernard
  * @author John Griffin
@@ -49,7 +49,7 @@ public final class BridgeFactory {
 	private Set<BridgeProvider> regularProviders;
 
 	public BridgeFactory(ServiceManager serviceManager) {
-		annotationBasedProviders = new HashSet<BridgeProvider>(5);
+		annotationBasedProviders = new HashSet<>(5);
 		annotationBasedProviders.add( new CalendarBridgeProvider() );
 		annotationBasedProviders.add( new DateBridgeProvider() );
 		annotationBasedProviders.add( new NumericBridgeProvider() );
@@ -121,7 +121,7 @@ public final class BridgeFactory {
 	 */
 	public void injectParameters(ClassBridge classBridgeConfiguration, Object classBridge) {
 		if ( classBridgeConfiguration.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( classBridge.getClass() ) ) {
-			Map<String, String> params = new HashMap<String, String>( classBridgeConfiguration.params().length );
+			Map<String, String> params = new HashMap<>( classBridgeConfiguration.params().length );
 			for ( Parameter param : classBridgeConfiguration.params() ) {
 				params.put( param.name(), param.value() );
 			}
@@ -167,7 +167,7 @@ public final class BridgeFactory {
 		ExtendedBridgeProvider.ExtendedBridgeProviderContext context = new XMemberBridgeProviderContext( member, numericField, reflectionManager, serviceManager );
 		ContainerType containerType = getContainerType( member, reflectionManager );
 
-		// We do annotation based providers as Tike at least needs priority over
+		// We do annotation based providers as Tika at least needs priority over
 		// default providers because it might override the type for String
 		// TODO: introduce the notion of bridge contributor annotations to cope with this in the future
 		for ( BridgeProvider provider : annotationBasedProviders ) {
@@ -272,23 +272,24 @@ public final class BridgeFactory {
 	}
 
 	/**
-	 * Extract the field bridge from @Field.bridge or @FieldBridge.
-	 * Return null if none is present.
+	 * @return the field bridge explicitly specified via {@code @Field.bridge} or {@code @FieldBridge}. {@code null}
+	 * is returned if none is present.
 	 */
 	private FieldBridge findExplicitFieldBridge(Field field, XMember member, ReflectionManager reflectionManager) {
 		//TODO Should explicit FieldBridge also support the notion of container like numeric fields and provider based fields?
 		//     the main problem is that support for a bridge accepting a Map would break
 		FieldBridge bridge = null;
-		org.hibernate.search.annotations.FieldBridge bridgeAnn;
+
+		org.hibernate.search.annotations.FieldBridge bridgeAnnotation;
 		//@Field bridge has priority over @FieldBridge
 		if ( field != null && void.class != field.bridge().impl() ) {
-			bridgeAnn = field.bridge();
+			bridgeAnnotation = field.bridge();
 		}
 		else {
-			bridgeAnn = member.getAnnotation( org.hibernate.search.annotations.FieldBridge.class );
+			bridgeAnnotation = member.getAnnotation( org.hibernate.search.annotations.FieldBridge.class );
 		}
-		if ( bridgeAnn != null ) {
-			bridge = doExtractType( bridgeAnn, member, reflectionManager );
+		if ( bridgeAnnotation != null ) {
+			bridge = doExtractType( bridgeAnnotation, member, reflectionManager );
 		}
 		return bridge;
 	}
@@ -327,7 +328,7 @@ public final class BridgeFactory {
 				throw LOG.noFieldBridgeInterfaceImplementedByFieldBridge( impl.getName(), appliedOnName );
 			}
 			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
-				Map<String, String> params = new HashMap<String, String>( bridgeAnn.params().length );
+				Map<String, String> params = new HashMap<>( bridgeAnn.params().length );
 				for ( Parameter param : bridgeAnn.params() ) {
 					params.put( param.name(), param.value() );
 				}
