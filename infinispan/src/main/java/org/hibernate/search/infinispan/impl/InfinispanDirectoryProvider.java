@@ -30,6 +30,7 @@ import org.infinispan.Cache;
 import org.infinispan.lucene.directory.DirectoryBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.LockFactory;
 
 import org.hibernate.search.engine.ServiceManager;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
@@ -81,6 +82,8 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	private EmbeddedCacheManager cacheManager;
 
+	private LockFactory indexWriterLockFactory;
+
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.directoryProviderName = directoryProviderName;
@@ -91,6 +94,10 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		lockingCacheName = InfinispanIntegration.getLockingCacheName( properties );
 		//Let it return null if it's not set, so that we can avoid applying any override.
 		chunkSize = ConfigurationParseHelper.getIntValue( properties, "chunk_size" );
+		//Only override the default Infinispan LockDirectory if an explicit option is set:
+		if ( DirectoryProviderHelper.configurationExplicitlySetsLockFactory( properties ) ) {
+			indexWriterLockFactory = DirectoryProviderHelper.createLockFactory( null, properties );
+		}
 	}
 
 	@Override
@@ -104,6 +111,9 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 				.newDirectoryInstance( metadataCache, dataCache, lockingCache, directoryProviderName );
 		if ( chunkSize != null ) {
 			directoryBuildContext.chunkSize( chunkSize.intValue() );
+		}
+		if ( indexWriterLockFactory != null ) {
+			directoryBuildContext.overrideWriteLocker( indexWriterLockFactory );
 		}
 		directory = directoryBuildContext.create();
 		DirectoryProviderHelper.initializeIndexIfNeeded( directory );

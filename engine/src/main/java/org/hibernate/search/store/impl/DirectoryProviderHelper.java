@@ -167,6 +167,14 @@ public final class DirectoryProviderHelper {
 	}
 
 	/**
+	 * @param dirConfiguration the properties representing the configuration for this index
+	 * @return {@code true} if the configuration contains an override for the locking_strategy
+	 */
+	public static boolean configurationExplicitlySetsLockFactory(Properties dirConfiguration) {
+		return dirConfiguration.getProperty( LOCKING_STRATEGY_PROP_NAME ) != null;
+	}
+
+	/**
 	 * Creates a LockFactory as selected in the configuration for the
 	 * DirectoryProvider.
 	 * The SimpleFSLockFactory and NativeFSLockFactory need a File to know
