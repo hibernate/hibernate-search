@@ -303,6 +303,53 @@ public class SearchFactoryBuilder {
 			factoryState.setIdProvidedImplicit( cfg.isIdProvidedImplicit() );
 		}
 	}
+	
+	/**
+	 * creates a clean searchFactoryState.
+	 */
+	public void createCleanSearchFactoryState() {
+		this.createCleanFactoryState(this.cfg, new BuildContext());
+	}
+
+	/**
+	 * retrieves the MetaData for the given classes. This can only be called
+	 * after either {@link #createCleanSearchFactoryState()} or
+	 * {@link #buildSearchFactory()} has been called once.
+	 */
+	public Map<Class<?>, TypeMetadata> getMetaData(List<Class<?>> classes) {
+		final Properties configurationProperties = this.factoryState
+				.getConfigurationProperties();
+		BuildContext buildContext = new BuildContext();
+
+		IncrementalSearchConfiguration searchConfiguration = new IncrementalSearchConfiguration(
+				classes, configurationProperties, this.factoryState);
+
+		applySearchMappingToMetadata(
+				searchConfiguration.getReflectionManager(),
+				searchConfiguration.getProgrammaticMapping());
+
+		ConfigContext configContext = new ConfigContext(searchConfiguration,
+				buildContext, searchConfiguration.getProgrammaticMapping());
+
+		final Map<XClass, Class<?>> classMappings = initializeClassMappings(
+				searchConfiguration, searchConfiguration.getReflectionManager());
+
+		final org.hibernate.search.engine.metadata.impl.MetadataProvider metadataProvider = new AnnotationMetadataProvider(
+				searchConfiguration.getReflectionManager(), configContext);
+
+		Map<Class<?>, TypeMetadata> metaData = new HashMap<>();
+
+		for (Map.Entry<XClass, Class<?>> mapping : classMappings.entrySet()) {
+			Class<?> mappedClass = mapping.getValue();
+			if (metadataProvider.containsSearchMetadata(mappedClass)) {
+				TypeMetadata typeMetadata = metadataProvider
+						.getTypeMetadataFor(mappedClass);
+				metaData.put(mappedClass, typeMetadata);
+			}
+		}
+
+		return metaData;
+	}
 
 	/*
 	 * Initialize the document builder
@@ -365,7 +412,7 @@ public class SearchFactoryBuilder {
 
 		// Create all IndexManagers, configure and start them:
 		for ( XClass mappedXClass : rootIndexedEntities ) {
-			Class mappedClass = classMappings.get( mappedXClass );
+			Class<?> mappedClass = classMappings.get( mappedXClass );
 			MutableEntityIndexBinding entityIndexBinding = indexesFactory.buildEntityIndexBinding(
 					mappedXClass,
 					mappedClass,
