@@ -1,6 +1,31 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.5.2.Final (2-12-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1623] - Concurrency problem with WeakIdentityHashMap in FullTextIndexEventListener
+    * [HSEARCH-1651] - Backend configuration property name is documented incorrectly
+    * [HSEARCH-1665] - Race condition in DirectoryProviderHelper.initializeIndexIfNeeded leads to failure in concurrent bootstrap
+    * [HSEARCH-1734] - The locking_strategy property is ignored when using the Infinispan Directory
+    * [HSEARCH-1735] - Background threads should not be started when not required
+
+** Improvement
+    * [HSEARCH-1657] - Improve logging for inconsistent field configuration
+    * [HSEARCH-1693] - Time based commit for async indexing
+    * [HSEARCH-1699] - Batching IndexWriter commits for multiple synchronous worksets
+    * [HSEARCH-1725] - Improve allocation rate of the new Lucene synchronous batching backend
+
+** Task
+    * [HSEARCH-1642] - Update components in 4.5 branch: Hibernate ORM, Hibernate Commons Annotations, JBossLogger
+    * [HSEARCH-1643] - Upgrade branch 4.5 to run integrationtests with WildFly 8.1
+    * [HSEARCH-1695] - Arquillian versions used by branches 4.4 and 4.5 are not strictily compatible with the respective JBoss versions
+    * [HSEARCH-1696] - Infinispan integration on WildFly should depend on a dedicated module (Port HSEARCH-1692 from branch 4.4)
+    * [HSEARCH-1712] - Remove dependency to ParaNamer
+    * [HSEARCH-1722] - Fix race condition in OptimizerPerformanceTest
+
+
 Version 4.5.1.Final (10-04-2014)
 ------------------------
 
