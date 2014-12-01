@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+Version 4.4.6.Final (2-12-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1734] - The locking_strategy property is ignored when using the Infinispan Directory
+    * [HSEARCH-1735] - Background threads should not be started when not required
+
+** Improvement
+    * [HSEARCH-1693] - Time based commit for async indexing
+    * [HSEARCH-1699] - Batching IndexWriter commits for multiple synchronous worksets
+    * [HSEARCH-1725] - Improve allocation rate of the new Lucene synchronous batching backend
+
+** Task
+    * [HSEARCH-1712] - Remove dependency to ParaNamer
+    * [HSEARCH-1722] - Fix race condition in OptimizerPerformanceTest
+
+
 Version 4.4.5.Final (16-10-2014)
 ------------------------
 
