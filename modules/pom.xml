@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-search-parent</artifactId>
-        <version>4.4.6.Final</version>
+        <version>4.4.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>hibernate-search-modules</artifactId>
@@ -47,7 +47,7 @@
         <jgroups.integration.slot>3.2</jgroups.integration.slot>
 
         <!-- Needs to match the VERSION being used by Infinispan -->
-        <hibernate-search-infinispan.version>4.4.6.Final</hibernate-search-infinispan.version>
+        <hibernate-search-infinispan.version>4.4.7-SNAPSHOT</hibernate-search-infinispan.version>
 
         <!-- Needs to match the VERSION being used by Infinispan (if any) -->
         <jbossmarshalling.integration.slot>main</jbossmarshalling.integration.slot>
