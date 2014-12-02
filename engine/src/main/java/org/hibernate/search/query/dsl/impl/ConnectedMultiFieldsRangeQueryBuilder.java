@@ -15,12 +15,11 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
+import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**
@@ -33,8 +32,9 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	private final QueryBuildingContext queryContext;
 
 	public ConnectedMultiFieldsRangeQueryBuilder(RangeQueryContext rangeContext,
-												QueryCustomizer queryCustomizer, List<FieldContext> fieldContexts,
-												QueryBuildingContext queryContext) {
+			QueryCustomizer queryCustomizer,
+			List<FieldContext> fieldContexts,
+			QueryBuildingContext queryContext) {
 		this.rangeContext = rangeContext;
 		this.queryCustomizer = queryCustomizer;
 		this.fieldContexts = fieldContexts;
@@ -78,15 +78,12 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 		final Query perFieldQuery;
 		final String fieldName = fieldContext.getField();
 		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
-
-		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
-
-		final FieldBridge fieldBridge = fieldContext.getFieldBridge() != null ? fieldContext.getFieldBridge() : documentBuilder.getBridge( fieldContext.getField() );
-
 		final Object fromObject = rangeContext.getFrom();
 		final Object toObject = rangeContext.getTo();
 
-		if ( fieldBridge != null && NumericFieldBridge.class.isAssignableFrom( fieldBridge.getClass() ) ) {
+		FieldDescriptor fieldDescriptor = queryContext.getFactory().getIndexedTypeDescriptor( queryContext.getEntityType() ).getIndexedField( fieldName );
+
+		if ( fieldDescriptor != null && FieldDescriptor.Type.NUMERIC.equals( fieldDescriptor.getType() ) ) {
 			perFieldQuery = NumericFieldUtils.createNumericRangeQuery(
 					fieldName,
 					fromObject,
@@ -96,6 +93,7 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 			);
 		}
 		else {
+			final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
 			final String fromString = fieldContext.objectToString( documentBuilder, fromObject, conversionContext );
 			final String lowerTerm = fromString == null ?
 					null :

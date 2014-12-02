@@ -75,7 +75,7 @@ public class MapBridgeTestEntity {
 		this.name = name;
 	}
 
-	@Field(indexNullAs = NULL_TOKEN)
+	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
 	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@CollectionTable(name = "NullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
@@ -93,7 +93,7 @@ public class MapBridgeTestEntity {
 		this.nullIndexed.put( key, nullIndexed );
 	}
 
-	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN)
+	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@NumericField
 	@ElementCollection
 	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)

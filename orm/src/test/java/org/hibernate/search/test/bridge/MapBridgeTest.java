@@ -254,6 +254,7 @@ public class MapBridgeTest extends SearchTestBase {
 		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );
 		if ( checkNullToken ) {
 			termMatchingContext.ignoreFieldBridge();
+			termMatchingContext.ignoreAnalyzer();
 		}
 		Query query = termMatchingContext.matching( value ).createQuery();
 		return fullTextSession.createFullTextQuery( query, MapBridgeTestEntity.class ).list();

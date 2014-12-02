@@ -681,11 +681,20 @@ public interface Log extends BasicLogger {
 	@Message(id = 231, value = "Stopping sync consumer thread for index '%s'" )
 	void stoppingSyncConsumerThread(String indexName);
 
+	@Message(id = 232, value = "The specified query '%s' contains a numeric sub query which targets the string encoded field(s) '%s'. Check your query or try limiting the targeted entities." )
+	SearchException stringEncodedFieldsAreTargetedWithNumericQuery(String query, String numericFields);
+
+	@Message(id = 233, value = "The specified query '%s' contains a string based sub query which targets the numeric encoded field(s) '%s'. Check your query or try limiting the targeted entities." )
+	SearchException numericEncodedFieldsAreTargetedWithStringQuery(String query, String numericFields);
+
+	@Message(id = 234, value = "None of the specified entity types ('%s') or any of their subclasses are indexed." )
+	IllegalArgumentException targetedEntityTypesNotIndexed(String targetedEntities);
+
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 232, value = "Backend for index '%s' started: using a Synchronous batching backend." )
+	@Message(id = 235, value = "Backend for index '%s' started: using a Synchronous batching backend." )
 	void luceneBackendInitializedSynchronously(String indexName);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 233, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
+	@Message(id = 236, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
 	void luceneBackendInitializedAsynchronously(String indexName);
 }

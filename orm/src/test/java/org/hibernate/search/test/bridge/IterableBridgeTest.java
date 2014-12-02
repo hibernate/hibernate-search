@@ -257,6 +257,7 @@ public class IterableBridgeTest extends SearchTestBase {
 		TermMatchingContext termMatchingContext = queryBuilder.keyword().onField( fieldName );
 		if ( checkRawValue ) {
 			termMatchingContext.ignoreFieldBridge();
+			termMatchingContext.ignoreAnalyzer();
 		}
 		Query query = termMatchingContext.matching( value ).createQuery();
 		return fullTextSession.createFullTextQuery( query, IterableBridgeTestEntity.class ).list();

@@ -38,8 +38,9 @@ import static org.hibernate.search.annotations.FieldCacheType.ID;
 public class Location {
 
 	@Id
-	@DocumentId(name = "overriddenFieldName")
-	@NumericField
+	@DocumentId
+	@Field(name = "overriddenFieldName")
+	@NumericField(forField = "overriddenFieldName")
 	private int id;
 
 	public int getId() {

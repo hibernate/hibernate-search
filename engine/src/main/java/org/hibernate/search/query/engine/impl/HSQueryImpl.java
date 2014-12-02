@@ -52,6 +52,7 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.store.IndexShardingStrategy;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -139,11 +140,10 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	public HSQuery targetedEntities(List<Class<?>> classes) {
 		clearCachedResults();
 		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>( classes );
-		final Class[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
+		final Class<?>[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
 		this.indexedTargetedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( classesAsArray );
 		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
-			String msg = "None of the specified entity types or any of their subclasses are indexed.";
-			throw new IllegalArgumentException( msg );
+			throw log.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ));
 		}
 		return this;
 	}
@@ -527,22 +527,22 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
 	private LazyQueryState buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
-		Map<Class<?>, EntityIndexBinding> builders = searchFactoryImplementor.getIndexBindings();
+		Map<Class<?>, EntityIndexBinding> indexBindings = searchFactoryImplementor.getIndexBindings();
 		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
-
 		Similarity searcherSimilarity = null;
+
 		//TODO check if caching this work for the last n list of indexedTargetedEntities makes a perf boost
 		if ( indexedTargetedEntities.size() == 0 ) {
 			// empty indexedTargetedEntities array means search over all indexed entities,
 			// but we have to make sure there is at least one
-			if ( builders.isEmpty() ) {
+			if ( indexBindings.isEmpty() ) {
 				throw new SearchException(
 						"There are no mapped entities. Don't forget to add @Indexed to at least one class."
 				);
 			}
 
-			for ( EntityIndexBinding entityIndexBinding : builders.values() ) {
+			for ( EntityIndexBinding entityIndexBinding : indexBindings.values() ) {
 				DocumentBuilderIndexedEntity builder = entityIndexBinding.getDocumentBuilder();
 				searcherSimilarity = checkSimilarity( searcherSimilarity, entityIndexBinding.getSimilarity() );
 				if ( builder.getIdKeywordName() != null ) {
@@ -559,7 +559,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			Set<Class<?>> involvedClasses = new HashSet<Class<?>>( indexedTargetedEntities.size() );
 			involvedClasses.addAll( indexedTargetedEntities );
 			for ( Class<?> clazz : indexedTargetedEntities ) {
-				EntityIndexBinding indexBinder = builders.get( clazz );
+				EntityIndexBinding indexBinder = indexBindings.get( clazz );
 				if ( indexBinder != null ) {
 					DocumentBuilderIndexedEntity builder = indexBinder.getDocumentBuilder();
 					involvedClasses.addAll( builder.getMappedSubclasses() );
@@ -567,7 +567,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 
 			for ( Class clazz : involvedClasses ) {
-				EntityIndexBinding entityIndexBinding = builders.get( clazz );
+				EntityIndexBinding entityIndexBinding = indexBindings.get( clazz );
 				//TODO should we rather choose a polymorphic path and allow non mapped entities
 				if ( entityIndexBinding == null ) {
 					throw new SearchException( "Not a mapped entity (don't forget to add @Indexed): " + clazz );
@@ -621,10 +621,25 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		//handle the sort and projection
 		final String[] projection = this.projectedFields;
 		if ( Boolean.TRUE.equals( forceScoring ) ) {
-			return new LazyQueryState( filteredQuery, compoundReader, searcherSimilarity, true, true );
+			return new LazyQueryState(
+					filteredQuery,
+					compoundReader,
+					searcherSimilarity,
+					searchFactoryImplementor,
+					classesAndSubclasses,
+					true,
+					true
+			);
 		}
 		else if ( Boolean.FALSE.equals( forceScoring ) ) {
-			return new LazyQueryState( filteredQuery, compoundReader, searcherSimilarity, false, false );
+			return new LazyQueryState(
+					filteredQuery,
+					compoundReader,
+					searcherSimilarity,
+					searchFactoryImplementor,
+					classesAndSubclasses,
+					false, false
+			);
 		}
 		else if ( this.sort != null && projection != null ) {
 			boolean activate = false;
@@ -635,12 +650,30 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				}
 			}
 			if ( activate ) {
-				return new LazyQueryState( filteredQuery, compoundReader, searcherSimilarity, true, false );
+				return new LazyQueryState(
+						filteredQuery,
+						compoundReader,
+						searcherSimilarity,
+						searchFactoryImplementor,
+						classesAndSubclasses,
+						true,
+						false
+				);
 			}
 		}
 		//default
-		return new LazyQueryState( filteredQuery, compoundReader, searcherSimilarity, false, false );
+		return new LazyQueryState(
+				filteredQuery,
+				compoundReader,
+				searcherSimilarity,
+				searchFactoryImplementor,
+				classesAndSubclasses,
+				false,
+				false
+		);
 	}
+
+
 
 	private Similarity checkSimilarity(Similarity similarity, Similarity entitySimilarity) {
 		if ( similarity == null ) {
@@ -833,13 +866,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			try {
 				key = (FilterKey) def.getKeyMethod().invoke( instance );
 			}
-			catch (IllegalAccessException e) {
-				throw new SearchException(
-						"Unable to access @Key method: "
-								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
-				);
-			}
-			catch (InvocationTargetException e) {
+			catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SearchException(
 						"Unable to access @Key method: "
 								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
