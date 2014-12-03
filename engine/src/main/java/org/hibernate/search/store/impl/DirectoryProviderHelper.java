@@ -174,6 +174,10 @@ public final class DirectoryProviderHelper {
 		return dirConfiguration.getProperty( LOCKING_STRATEGY_PROP_NAME ) != null;
 	}
 
+	public static boolean isNativeLockingStrategy(Properties dirConfiguration) {
+		return "native".equals( dirConfiguration.getProperty( LOCKING_STRATEGY_PROP_NAME ) );
+	}
+
 	/**
 	 * Creates a LockFactory as selected in the configuration for the
 	 * DirectoryProvider.
