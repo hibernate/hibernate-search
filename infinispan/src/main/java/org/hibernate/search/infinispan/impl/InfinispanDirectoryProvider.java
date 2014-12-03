@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.infinispan.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -66,7 +67,15 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		writeFileListAsync = ConfigurationParseHelper.getBooleanValue( properties, InfinispanIntegration.WRITE_METADATA_ASYNC, false );
 		//Only override the default Infinispan LockDirectory if an explicit option is set:
 		if ( DirectoryProviderHelper.configurationExplicitlySetsLockFactory( properties ) ) {
-			indexWriterLockFactory = DirectoryProviderHelper.createLockFactory( null, properties, serviceManager );
+			File verifiedIndexDir = null;
+			if ( DirectoryProviderHelper.isNativeLockingStrategy( properties ) ) {
+				verifiedIndexDir = DirectoryProviderHelper.getVerifiedIndexDir(
+						directoryProviderName,
+						properties,
+						true
+				);
+			}
+			indexWriterLockFactory = DirectoryProviderHelper.createLockFactory( verifiedIndexDir, properties, serviceManager );
 		}
 	}
 
