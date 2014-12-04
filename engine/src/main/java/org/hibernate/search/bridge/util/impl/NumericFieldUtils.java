@@ -6,9 +6,14 @@
  */
 package org.hibernate.search.bridge.util.impl;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.exception.SearchException;
+
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Utility class to handle numeric fields.
@@ -17,6 +22,8 @@ import org.hibernate.search.exception.SearchException;
  * @author Hardy Ferentschik
  */
 public final class NumericFieldUtils {
+
+	private static final Log log = LoggerFactory.make();
 
 	private NumericFieldUtils() {
 		//not allowed
@@ -34,9 +41,7 @@ public final class NumericFieldUtils {
 			numericClass = to.getClass();
 		}
 		else {
-			throw new SearchException(
-				"Cannot create numeric range query for field " + fieldName + ", since from and to values are " +
-						"null");
+			throw log.rangeQueryWithNullToAndFromValue( fieldName );
 		}
 
 		if ( numericClass.isAssignableFrom( Double.class ) ) {
@@ -51,10 +56,23 @@ public final class NumericFieldUtils {
 		if ( numericClass.isAssignableFrom( Float.class ) ) {
 			return NumericRangeQuery.newFloatRange( fieldName, (Float) from, (Float) to, includeLower, includeUpper );
 		}
-		// TODO: check for type before in the mapping
-		throw new SearchException(
-				"Cannot create numeric range query for field " + fieldName + ", since values are not numeric " +
-						"(int, long, short or double) ");
+		if ( numericClass.isAssignableFrom( Date.class ) ) {
+			Long fromValue = from != null ? ((Date) from).getTime() : null;
+			Long toValue = to != null ? ((Date) to).getTime() : null;
+			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
+		if ( numericClass.isAssignableFrom( Date.class ) ) {
+			Long fromValue = from != null ? ((Date) from).getTime() : null;
+			Long toValue = to != null ? ((Date) to).getTime() : null;
+			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
+		if ( numericClass.isAssignableFrom( Calendar.class ) ) {
+			Long fromValue = from != null ? ((Calendar) from).getTime().getTime() : null;
+			Long toValue = to != null ? ((Calendar) to).getTime().getTime() : null;
+			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
+		}
+
+		throw log.numericRangeQueryWithNonNumericToAndFromValues( fieldName );
 	}
 
 	/**

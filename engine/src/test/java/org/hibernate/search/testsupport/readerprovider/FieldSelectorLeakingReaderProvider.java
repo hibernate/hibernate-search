@@ -29,7 +29,7 @@ import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.query.engine.impl.ReusableDocumentStoredFieldVisitor;
 
 /**
- * ReaderProvider to inspect the type of FieldSelector being applied.
+ * {@code ReaderProvider} to inspect the type of {@code FieldSelector} being applied.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
@@ -42,7 +42,7 @@ public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderPro
 	}
 
 	/**
-	 * Verifies the FieldSelector being used contains the listed fieldnames (and no more).
+	 * Verifies the FieldSelector being used contains the listed field names (and no more).
 	 * Note that DocumentBuilder.CLASS_FIELDNAME is always used.
 	 * @param expectedFieldNames
 	 * @throws IOException

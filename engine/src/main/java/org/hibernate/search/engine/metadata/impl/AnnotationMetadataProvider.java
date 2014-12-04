@@ -49,6 +49,7 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
@@ -887,22 +888,33 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				index
 		);
 
-		DocumentFieldMetadata.Builder fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
-				fieldName,
-				store,
-				index,
-				termVector
-		)
-				.boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
-				.fieldBridge( fieldBridge )
-				.analyzer( analyzer )
-				.indexNullAs( nullToken );
+		DocumentFieldMetadata.Builder fieldMetadataBuilder;
 
 		// if we are having a numeric value make sure to mark the metadata and set the precision
+		// also numeric values don't need to be analyzed and norms are omitted (see also org.apache.lucene.document.LongField)
 		if ( isNumericField( numericFieldAnnotation, fieldBridge ) ) {
-			fieldMetadataBuilder
+			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
+					fieldName,
+					store,
+					Field.Index.NOT_ANALYZED_NO_NORMS,
+					termVector
+			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
+					.fieldBridge( fieldBridge )
+					.analyzer( analyzer )
+					.indexNullAs( nullToken )
 					.numeric()
 					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) );
+		}
+		else {
+			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
+					fieldName,
+					store,
+					index,
+					termVector
+			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
+					.fieldBridge( fieldBridge )
+					.analyzer( analyzer )
+					.indexNullAs( nullToken );
 		}
 
 		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
@@ -919,7 +931,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
 		// field bridge
-		return numericFieldAnnotation != null || fieldBridge instanceof NumericFieldBridge;
+		return numericFieldAnnotation != null || fieldBridge instanceof NumericFieldBridge || fieldBridge instanceof NumericEncodingDateBridge;
 	}
 
 	private String determineNullToken(org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context) {

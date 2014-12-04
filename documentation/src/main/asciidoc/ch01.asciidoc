@@ -224,8 +224,8 @@ we have not yet discussed is `@DateBridge`. This annotation is one of the built-
 Hibernate Search. The Lucene index is mostly string based, with special support for encoding numbers.
 Hibernate Search must convert the data types of the indexed fields to their respective Lucene
 encoding and vice versa. A range of predefined bridges is provided for this purpose, including the
-`DateBridge` which will convert a `java.util.Date` into a `String` with the specified resolution.
-For more details see <<search-mapping-bridge>>.
+`DateBridge` which will convert a `java.util.Date` into a numeric value (a `long`) with the
+specified resolution. For more details see <<section-built-in-bridges>>.
 
 This leaves us with `@IndexedEmbedded`. This annotation is used to index associated entities
 (`@ManyToMany`, `@*ToOne`, `@Embedded` and `@ElementCollection`) as part of the owning entity.

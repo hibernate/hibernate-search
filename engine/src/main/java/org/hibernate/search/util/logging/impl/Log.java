@@ -697,4 +697,14 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 236, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
 	void luceneBackendInitializedAsynchronously(String indexName);
+
+	@Message(id = 237, value = "Cannot create numeric range query for field '%s', since from and to values are null" )
+	SearchException rangeQueryWithNullToAndFromValue(String fieldName);
+
+	@Message(id = 238, value = "Cannot create numeric range query for field '%s', since values are not numeric (Date, int, long, short or double)")
+	SearchException numericRangeQueryWithNonNumericToAndFromValues(String fieldName);
+
+	@Message(id = 239, value = "Unknown field encoding type: %1$s")
+	AssertionFailure unknownEncodingType(String encoding);
+
 }

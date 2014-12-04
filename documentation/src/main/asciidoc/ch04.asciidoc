@@ -1263,6 +1263,7 @@ for most of your properties Hibernate Search does the translation job for you th
 built-in bridges. However, in some cases you need a more fine grained control over the translation
 process.
 
+[[section-built-in-bridges]]
 ==== Built-in bridges
 
 Hibernate Search comes bundled with a set of built-in bridges between a Java property type and its
@@ -1274,27 +1275,24 @@ some situation it can be useful to insert a custom token representing the null v
 
 java.lang.String:: Strings are indexed as are
 
-short, Short, integer, Integer, long, Long, float, Float, double, Double, BigInteger, BigDecimal::
-Numbers are converted into their string representation. Note that numbers cannot be compared by
-Lucene (ie used in ranged queries) out of the box: they have to be padded
+`short`, `Short`, `integer`, `Integer`, `long`, `Long`, `float`, `Float`, `double`, `Double`:: Are
+per default indexed numerically using a link:http://en.wikipedia.org/wiki/Trie[Trie structure]. You
+need to use a `NumericRangeQuery` to search for values. See also <<field-annotation>> and
+<<numeric-field-annotation>>
 
-[NOTE]
-====
-Using a Range query has drawbacks; an alternative approach is to use a Filter query which will
-filter the result query to the appropriate range.
-Hibernate Search will support a padding mechanism
-====
+`BigInteger`, `BigDecimal`::
+`BigInteger` and `BigDecimal` are converted into their string representation and indexed. Note that
+in this form the values cannot be compared by Lucene using for example a `TermRangeQuery`.
+For that the string representation would need to be padded. An alternative using numeric encoding
+with a potential loss in precision can be seen in <<example-custom-numericfieldbridge>>.
 
-java.util.Date:: Dates are stored as yyyyMMddHHmmssSSS in GMT time
-(200611072203012 for Nov 7th of 2006 4:03PM and 12ms EST). You shouldn't really bother with the
-internal format. What is important is that when using a TermRangeQuery, you should know that the
-dates have to be expressed in GMT time.
-`
+`java.util.Date`, `java.util.Calendar`:: Dates are indexed as `long` value representing the number
+of milliseconds since _January 1, 1970, 00:00:00 GMT_. You shouldn't really bother with the
+internal format. It is important, however, to query a numerically indexed date via a `NumericRangeQuery`.
++
 Usually, storing the date up to the millisecond is not necessary. `@DateBridge` defines the
-appropriate resolution you are willing to store in the index
-(`@DateBridge(resolution=Resolution.DAY)`). The date pattern will then be truncated accordingly.
-`
-
+appropriate resolution you are willing to store in the index.
++
 ====
 [source, JAVA]
 ----
@@ -1307,18 +1305,21 @@ public class Meeting {
     // ...
 ----
 ====
-
-[WARNING]
++
+You can also choose to encode the date as string using the `encoding=EncodingType.STRING` of
+`DateBridge`. In this case the dates are stored in the format _yyyyMMddHHmmssSSS_ (using GMT time).
++
+[IMPORTANT]
 ====
 A Date whose resolution is lower than `MILLISECOND` cannot be a `@DocumentId`
 ====
-
++
 [IMPORTANT]
 ====
-The default Date bridge uses Lucene's DateTools to convert from and to String. This means that all
-dates are expressed in GMT time. If your requirements are to store dates in a fixed time zone you
-have to implement a custom date bridge. Make sure you understand the requirements of your
-applications regarding to date indexing and searching.
+The default date bridge uses Lucene's `DateTools` to convert from `Date` or `Calendar` to its indexed
+value. This means that all dates are expressed in GMT time. If your requirements are to store dates
+in a fixed time zone you have to implement a custom date bridge. Make sure you understand the
+requirements of your applications regarding to date indexing and searching.
 ====
 
 java.net.URI, java.net.URL:: URI and URL are converted to their string representation

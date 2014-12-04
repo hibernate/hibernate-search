@@ -350,9 +350,9 @@ public class MappingModelMetadataProvider implements MetadataProvider {
 		private void createDateBridge(PropertyDescriptor property) {
 			Map<String, Object> map = property.getDateBridge();
 			for ( Map.Entry<String, Object> entry : map.entrySet() ) {
-				AnnotationDescriptor dateBrigeAnnotation = new AnnotationDescriptor( DateBridge.class );
-				dateBrigeAnnotation.setValue( entry.getKey(), entry.getValue() );
-				annotations.put( DateBridge.class, createAnnotation( dateBrigeAnnotation ) );
+				AnnotationDescriptor dateBridgeAnnotation = new AnnotationDescriptor( DateBridge.class );
+				dateBridgeAnnotation.setValue( entry.getKey(), entry.getValue() );
+				annotations.put( DateBridge.class, createAnnotation( dateBridgeAnnotation ) );
 			}
 		}
 

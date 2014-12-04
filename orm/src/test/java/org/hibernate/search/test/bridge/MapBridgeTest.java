@@ -9,7 +9,7 @@ package org.hibernate.search.test.bridge;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
@@ -17,12 +17,10 @@ import org.hibernate.Transaction;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.test.SearchTestBase;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +29,6 @@ import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.ITAL
 import static org.hibernate.search.test.bridge.MapBridgeTestEntity.Language.KLINGON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test indexing of {@link javax.persistence.ElementCollection} annotated elements.
@@ -53,14 +50,6 @@ public class MapBridgeTest extends SearchTestBase {
 		Session session = openSession();
 		fullTextSession = Search.getFullTextSession( session );
 		prepareData();
-	}
-
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		cleanData();
-		assertTrue( indexIsEmpty() );
-		super.tearDown();
 	}
 
 	private void prepareData() {
@@ -227,7 +216,10 @@ public class MapBridgeTest extends SearchTestBase {
 
 	@Test
 	public void testDateIndexing() throws Exception {
-		List<MapBridgeTestEntity> results = findResults( "dates", indexedDate, false );
+		List<MapBridgeTestEntity> results = findResultsWithRangeQuery(
+				"dates",
+				DateTools.round( indexedDate, DateTools.Resolution.SECOND )
+		);
 
 		assertNotNull( "No result found for an indexed collection", results );
 		assertEquals( "Wrong number of results returned for an indexed collection", 1, results.size() );
@@ -261,6 +253,14 @@ public class MapBridgeTest extends SearchTestBase {
 	}
 
 	@SuppressWarnings("unchecked")
+	private List<MapBridgeTestEntity> findResultsWithRangeQuery(String fieldName, Object start) {
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder()
+				.forEntity( MapBridgeTestEntity.class ).get();
+		Query query = queryBuilder.range().onField( fieldName ).above( start ).createQuery();
+		return fullTextSession.createFullTextQuery( query, MapBridgeTestEntity.class ).list();
+	}
+
+	@SuppressWarnings("unchecked")
 	private List<MapBridgeTestEntity> findNumericResults(String fieldName, Object number) {
 		Query query = NumericFieldUtils.createNumericRangeQuery( fieldName, number, number, true, true );
 		return fullTextSession.createFullTextQuery( query, MapBridgeTestEntity.class ).list();
@@ -276,34 +276,5 @@ public class MapBridgeTest extends SearchTestBase {
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class<?>[] { MapBridgeTestEntity.class, };
-	}
-
-	private void cleanData() {
-		Transaction tx = fullTextSession.beginTransaction();
-		@SuppressWarnings("unchecked")
-		List<MapBridgeTestEntity> locations = fullTextSession.createCriteria( MapBridgeTestEntity.class ).list();
-		for ( MapBridgeTestEntity location : locations ) {
-			fullTextSession.delete( location );
-		}
-		tx.commit();
-		fullTextSession.close();
-	}
-
-	private boolean indexIsEmpty() {
-		int numDocsForeigner = countSizeForType( MapBridgeTestEntity.class );
-		return numDocsForeigner == 0;
-	}
-
-	private int countSizeForType(Class<?> type) {
-		SearchFactory searchFactory = fullTextSession.getSearchFactory();
-		int numDocs = -1; // to have it fail in case of errors
-		IndexReader locationIndexReader = searchFactory.getIndexReaderAccessor().open( type );
-		try {
-			numDocs = locationIndexReader.numDocs();
-		}
-		finally {
-			searchFactory.getIndexReaderAccessor().close( locationIndexReader );
-		}
-		return numDocs;
 	}
 }

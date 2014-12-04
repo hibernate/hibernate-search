@@ -8,12 +8,13 @@ package org.hibernate.search.test.filter;
 
 import java.util.Calendar;
 
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeFilter;
 
 import org.hibernate.Session;
 
@@ -102,7 +103,12 @@ public class FilterTest extends SearchTestBase {
 	public void testStraightFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
-		Filter dateFilter = TermRangeFilter.newStringRange( "delivery", "2001", "2005", true, true );
+		Calendar calendar = Calendar.getInstance();
+		calendar.set( Calendar.YEAR, 2001 );
+		long from = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
+		calendar.set( Calendar.YEAR, 2005 );
+		long to = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
+		Filter dateFilter = NumericRangeFilter.newLongRange( "delivery", from, to, true, true );
 		ftQuery.setFilter( dateFilter );
 		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
 
@@ -126,7 +132,12 @@ public class FilterTest extends SearchTestBase {
 	public void testCachedEmptyFilters() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
-		Filter dateFilter = TermRangeFilter.newStringRange( "delivery", "2001", "2005", true, true );
+		Calendar calendar = Calendar.getInstance();
+		calendar.set( Calendar.YEAR, 2001 );
+		long from = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
+		calendar.set( Calendar.YEAR, 2005 );
+		long to = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.YEAR );
+		Filter dateFilter = NumericRangeFilter.newLongRange( "delivery", from, to, true, true );
 		ftQuery.setFilter( dateFilter );
 		assertEquals( "Should select only liz", 1, ftQuery.getResultSize() );
 
