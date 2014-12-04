@@ -34,7 +34,14 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 	private static final FieldAcceptor NOT_ACCEPT = new DenyingFieldAcceptor();
 
 	private final FieldAcceptor rootAcceptor;
+	private final int totalFields;
+
+	//The Lucene Document which will be returned. Lazily initialized.
 	private Document doc = null;
+
+	//Counts the number of fields which have not been loaded yet (counting down from the known set of needed fields)
+	//This field needs to be reset to the value of totalFields when the doc field is changed.
+	private int missingFields;
 
 	public ReusableDocumentStoredFieldVisitor(Set<String> fieldsToLoad) {
 		FieldAcceptor previous = NOT_ACCEPT;
@@ -42,6 +49,8 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 			previous = new ChainedFieldAcceptor( previous, fieldName );
 		}
 		this.rootAcceptor = previous;
+		this.totalFields = fieldsToLoad.size();
+		this.missingFields = totalFields;
 	}
 
 	@Override
@@ -81,7 +90,15 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 
 	@Override
 	public Status needsField(FieldInfo fieldInfo) throws IOException {
-		return rootAcceptor.acceptField( fieldInfo.name );
+		if ( missingFields == 0 ) {
+			// An aggressive STOP could prevent unnecessary I/O !
+			return Status.STOP;
+		}
+		final Status s = rootAcceptor.acceptField( fieldInfo.name );
+		if ( s == Status.YES ) {
+			missingFields--;
+		}
+		return s;
 	}
 
 	/**
@@ -113,6 +130,7 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 		}
 		else {
 			this.doc = null;
+			this.missingFields = totalFields;
 			return localDoc;
 		}
 	}
