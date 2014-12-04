@@ -63,7 +63,7 @@ public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderPro
 		}
 	}
 
-	private static FieldInfo forgeFieldInfo(String fieldName) {
+	static FieldInfo forgeFieldInfo(String fieldName) {
 		//Specific options besides the field name aren't important:
 		//we just need to satisfy the constructor
 		return new FieldInfo( fieldName, true, 0, false, true, false,
