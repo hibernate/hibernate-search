@@ -368,6 +368,7 @@ public class DSLTest extends SearchTestBase {
 
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
 		calendar.set( 1900, 2, 12, 0, 0, 0 );
+		calendar.set( Calendar.MILLISECOND, 0 );
 		Date from = calendar.getTime();
 		calendar.set( 1910, 2, 12, 0, 0, 0 );
 		Date to = calendar.getTime();
@@ -389,8 +390,8 @@ public class DSLTest extends SearchTestBase {
 						.ignoreFieldBridge()
 					.andField( "justfortest" )
 						.ignoreFieldBridge().ignoreAnalyzer()
-					.from( DateTools.dateToString( from, DateTools.Resolution.MINUTE ) )
-					.to( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+					.from( DateTools.round( from, DateTools.Resolution.MINUTE ) )
+					.to( DateTools.round( to, DateTools.Resolution.MINUTE ) )
 						.excludeLimit()
 					.createQuery();
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
@@ -425,7 +426,7 @@ public class DSLTest extends SearchTestBase {
 						.ignoreFieldBridge()
 					.andField( "justfortest" )
 						.ignoreFieldBridge().ignoreAnalyzer()
-					.below( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+					.below( DateTools.round( to, DateTools.Resolution.MINUTE ) )
 					.createQuery();
 
 		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
@@ -474,33 +475,51 @@ public class DSLTest extends SearchTestBase {
 						.ignoreFieldBridge()
 					.andField( "justfortest" )
 						.ignoreFieldBridge().ignoreAnalyzer()
-					.above( DateTools.dateToString( to, DateTools.Resolution.MINUTE ) )
+					.above( DateTools.round( to, DateTools.Resolution.MINUTE ) )
 					.createQuery();
 		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 1, hibQuery.getResultSize() );
 		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
+
+		transaction.commit();
+	}
+
+	@Test
+	public void testRangeQueryAboveInclusive() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
 
 		// test the limits, inclusive
-		query = monthQb
+		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
-					.above( february )
-					.createQuery();
-		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
-		assertEquals( 1, hibQuery.getResultSize() );
+				.onField( "estimatedCreation" )
+				.andField( "justfortest" )
+				.ignoreFieldBridge().ignoreAnalyzer()
+				.above( february )
+				.createQuery();
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+		assertEquals( "Wrong number of query results", 1, hibQuery.getResultSize() );
 		assertEquals( "February", ( (Month) hibQuery.list().get( 0 ) ).getName() );
 
+		transaction.commit();
+	}
+
+	@Test
+	public void testRangeQueryAboveExclusive() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
 		// test the limits, exclusive
-		query = monthQb
+		Query query = monthQb
 				.range()
-					.onField( "estimatedCreation" )
-					.andField( "justfortest" )
-						.ignoreFieldBridge().ignoreAnalyzer()
-					.above( february ).excludeLimit()
-					.createQuery();
-		hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
+				.onField( "estimatedCreation" )
+				.andField( "justfortest" )
+				.ignoreFieldBridge().ignoreAnalyzer()
+				.above( february ).excludeLimit()
+				.createQuery();
+		FullTextQuery hibQuery = fullTextSession.createFullTextQuery( query, Month.class );
 		assertEquals( 0, hibQuery.getResultSize() );
 
 		transaction.commit();
@@ -826,6 +845,7 @@ public class DSLTest extends SearchTestBase {
 		final Calendar calendar = Calendar.getInstance();
 		calendar.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
 		calendar.set( 1900, 2, 12, 0, 0, 0 );
+		calendar.set( Calendar.MILLISECOND, 0 );
 		Date january = calendar.getTime();
 		fullTextSession.persist(
 				new Month(

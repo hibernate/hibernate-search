@@ -65,7 +65,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	public void testResultOrderedByDateDescending() throws Exception {
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
-		Sort dateDescending = new Sort( new SortField( "creationDate", SortField.Type.STRING, DESC ) );
+		Sort dateDescending = new Sort( new SortField( "creationDate", SortField.Type.LONG, DESC ) );
 		List<ProductArticle> result = query( "Hib*" ).setSort( dateDescending ).setFirstResult( 3 ).getResultList();
 
 		assertThat( result ).as( "query result" ).hasSize( 3 );
@@ -76,12 +76,6 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 		em.clear();
 	}
 
-	@Override
-	public void tearDown() {
-		deleteArticles();
-		super.tearDown();
-	}
-
 	private FullTextQuery query(String q) throws ParseException {
 		org.apache.lucene.search.Query query = queryParser.parse( q );
 		return em.createFullTextQuery( query, ProductArticle.class );
@@ -90,8 +84,7 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 	private Date date(int day, int month, int year) {
 		Calendar cal = Calendar.getInstance( Locale.US );
 		cal.set( year, month, day, 11, 05, 30 );
-		Date date = cal.getTime();
-		return date;
+		return cal.getTime();
 	}
 
 	private ProductArticle article(int id, String header, Date date) {
@@ -100,14 +93,6 @@ public class SortUsingEntityManagerTest extends JPATestCase {
 		article.setHeader( header );
 		article.setArticleId( Integer.valueOf( id ) );
 		return article;
-	}
-
-	private void deleteArticles() {
-		EntityTransaction tx = em.getTransaction();
-		tx.begin();
-		em.createQuery( "delete " + ProductArticle.class.getName() ).executeUpdate();
-		tx.commit();
-		em.clear();
 	}
 
 	@Override

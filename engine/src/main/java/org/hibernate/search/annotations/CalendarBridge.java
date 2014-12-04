@@ -13,8 +13,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines the temporal resolution of a given field
- * Calendar are stored as String in GMT
+ * Defines the temporal resolution and encoding type of a {@code Calendar} field.
+ *
+ * <p>
+ * </b>Note:</b> Dates are encoded in the GMT timezone.
+ * </p>
  *
  * @author Amin Mohammed-Coleman
  */
@@ -22,7 +25,13 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface CalendarBridge {
-
+	/**
+	 * @return the resolution for the annotated {@code Calendar} instance. The date of the calendar will be rounded to the specified resolution.
+	 */
 	Resolution resolution();
 
+	/**
+	 * @return the encoding type for the annotated {@code Calendar} instance.
+	 */
+	EncodingType encoding() default EncodingType.NUMERIC;
 }

@@ -11,8 +11,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -85,8 +83,6 @@ class BasicJDKTypesBridgeProvider implements BridgeProvider {
 		bridges.put( URL.class.getName(), Url );
 		bridges.put( URI.class.getName(), Uri );
 		bridges.put( UUID.class.getName(), UUID );
-		bridges.put( Date.class.getName(), DateBridgeProvider.DATE_MILLISECOND );
-		bridges.put( Calendar.class.getName(), CalendarBridgeProvider.CALENDAR_MILLISECOND );
 		bridges.put( Class.class.getName(), clazz );
 		this.builtInBridges = bridges;
 	}

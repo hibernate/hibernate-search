@@ -233,6 +233,7 @@ public class ProjectionQueryTest extends SearchTestBase {
 		resetFieldSelector();
 		@SuppressWarnings("unchecked")
 		List<String> result = hibQuery.list();
+
 		assertFieldSelectorEnabled( "lastname", "dept", "id" );
 		assertTrue( "incorrect transformation", result.get( 0 ).startsWith( "1000, Griffin, ITech" ) );
 		assertTrue( "incorrect transformation", result.get( 1 ).startsWith( "1002, Jimenez, ITech" ) );

@@ -201,37 +201,6 @@ ensures that the query uses the same term transformation than the indexing (lowe
 stemming and so on). If the analyzing process generates several terms for a given word, a boolean
 query is used with the `SHOULD` logic (roughly an `OR` logic).
 
-Let's see how you can search a property that is not of type string.
-
-====
-[source, JAVA]
-----
-@Entity
-@Indexed
-public class Myth {
-  @Field(analyze = Analyze.NO)
-  @DateBridge(resolution = Resolution.YEAR)
-  public Date getCreationDate() { return creationDate; }
-  public Date setCreationDate(Date creationDate) { this.creationDate = creationDate; }
-  private Date creationDate;
-
-  // ...
-}
-
-Date birthdate = ...;
-Query luceneQuery = mythQb.keyword().onField("creationDate").matching(birthdate).createQuery();
-----
-====
-
-[NOTE]
-====
-In plain Lucene, you would have had to convert the Date object to its string representation (in this
-case the year).
-====
-
-This conversion works for any object, not just Date, provided that the FieldBridge has an
-objectToString method (and all built-in `FieldBridge` implementations do).
-
 We make the example a little more advanced now and have a look at how to search a field that uses
 ngram analyzers. ngram analyzers index succession of ngrams of your words which helps to recover
 from user typos. For example the 3-grams of the word hibernate are hib, ibe, ber, rna, nat, ate.
@@ -255,18 +224,15 @@ from user typos. For example the 3-grams of the word hibernate are hib, ibe, ber
 @Indexed
 public class Myth {
   @Field(analyzer=@Analyzer(definition="ngram")
-  @DateBridge(resolution = Resolution.YEAR)
   public String getName() { return name; }
-  public String setName(Date name) { this.name = name; }
+  public String setName(String name) { this.name = name; }
   private String name;
 
   ...
 }
 
-Date birthdate = ...;
 Query luceneQuery = mythQb.keyword().onField("name").matching("Sisiphus")
    .createQuery();
-
 ----
 ====
 
@@ -274,13 +240,11 @@ The matching word "Sisiphus" will be lower-cased and then split into 3-grams: si
 hus. Each of these n-gram will be part of the query. We will then be able to find the Sysiphus myth
 (with a `y`). All that is transparently done for you.
 
-
 [NOTE]
 ====
 If for some reason you do not want a specific field to use the field bridge or the analyzer you can
 call the `ignoreAnalyzer()` or `ignoreFieldBridge()` functions.
 ====
-
 
 To search for multiple possible words in the same field, simply add them all in the matching clause.
 
@@ -1673,7 +1637,7 @@ There are several preconditions an indexed field has to meet in order to categor
 * The indexed property must be of type `String`, `Date` or of the numeric type int, long, double or
 float (or their respective Java wrapper types).
 
-* For numeric values you need to make sure that the values are string encoded by explicitly
+* For numeric and date values you need to make sure that the values are string encoded by explicitly
 specifying a non numeric field bridge via `@Field.bridge` or `@FieldBridge`. The package `org.
 hibernate.search.bridge.builtin` contains a set of bridges which encode numbers as strings, for
 example `org.hibernate.search.bridge.builtin.IntegerBridge`.

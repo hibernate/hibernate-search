@@ -3,8 +3,7 @@
 
 Welcome to Hibernate Search. The following chapter will guide you through the initial steps required
 to integrate Hibernate Search into an existing Hibernate ORM enabled application. In case you are a
-Hibernate new timer we recommend you start link:$$http://hibernate.org/quick-start.html$$[here].
-
+Hibernate new timer we recommend you start link:http://hibernate.org/quick-start.html[here].
 
 === System Requirements
 
@@ -12,14 +11,14 @@ Hibernate new timer we recommend you start link:$$http://hibernate.org/quick-sta
 
 |===============
 |Java Runtime|Requires Java version _7_ or greater. You
-            can download a Java Runtime for Windows/Linux/Solaris link:$$http://www.oracle.com/technetwork/java/javase/downloads/index.html$$[here].
+            can download a Java Runtime for Windows/Linux/Solaris link:http://www.oracle.com/technetwork/java/javase/downloads/index.html[here].
 |Hibernate Search| `hibernate-search-{hibernateSearchVersion}.jar` and all
             runtime dependencies. You can get the jar artifacts either from
-            the `dist/lib` directory of the link:$$http://sourceforge.net/projects/hibernate/files/hibernate-search/$$[Hibernate Search distribution] or you can download them from the
-            link:$$http://repository.jboss.org/nexus/content/groups/public-jboss/org/hibernate/ $$[JBoss maven repository].
+            the `dist/lib` directory of the link:http://sourceforge.net/projects/hibernate/files/hibernate-search/[Hibernate Search distribution] or you can download them from the
+            link:http://repository.jboss.org/nexus/content/groups/public-jboss/org/hibernate/[JBoss maven repository].
 |Hibernate Core|You will need
             `hibernate-core-{hibernateVersion}.jar` and its
-            dependencies (either from the link:$$http://sourceforge.net/projects/hibernate/files/hibernate4/$$[distribution bundle] or the maven repository).
+            dependencies (either from the link:http://sourceforge.net/projects/hibernate/files/hibernate4/[distribution bundle] or the maven repository).
 |JPA 2.1|Hibernate Search can be used without JPA but the following instructions will use JPA annotations for basic
             entity configuration (`@Entity`, `@Id`, `@OneToMany`,...).
 |===============
@@ -126,17 +125,16 @@ An example `persistence.xml` configuration could look like this:
 ----
 ====
 
-First you have to tell Hibernate Search which DirectoryProvider to use. This can be achieved by
+First you have to tell Hibernate Search which `DirectoryProvider` to use. This can be achieved by
 setting the `hibernate.search.default.directory_provider` property. Apache Lucene has the notion
 of a `Directory` to store the index files. Hibernate Search handles the initialization and
 configuration of a Lucene `Directory` instance via a `DirectoryProvider`. In this tutorial we will
-use a a directory provider storing the index in the file system. This will give us the ability to
+use a a directory provider which stores the index on the file system. This will give us the ability to
 inspect the Lucene indexes created by Hibernate Search (eg via
-link:$$http://code.google.com/p/luke/$$[Luke]). Once you have a working configuration you can start
+link:http://code.google.com/p/luke/[Luke]). Once you have a working configuration you can start
 experimenting with other directory providers (see <<search-configuration-directory>>).
 You also have to specify the default base directory for all indexes via
-`hibernate.search.default.indexBase`: this defines the path where you want to store indexes,
-as this `DirectoryProvider` is the one used to store indexes on filesystem.
+`hibernate.search.default.indexBase`. This defines the path where indexes are stored.
 
 Let's assume that your application contains the Hibernate managed classes `example.Book` and
 `example.Author` and you want to add free text search capabilities to your application in order to
@@ -193,8 +191,8 @@ public class Author {
 ----
 ====
 
-To achieve this you have to add a few annotations to the Book and Author class. The first annotation
-`@Indexed` marks Book as indexable. By design Hibernate Search needs to store an _untokenized_ id in
+To achieve this you have to add a few annotations to the `Book` and `Author` class. The first annotation
+`@Indexed` marks `Book` as indexable. By design Hibernate Search needs to store an _untokenized_ id in
 the index to ensure index uniqueness for a given entity (for now don't worry if you don't know what
 _untokenized_ means, it will soon be clear).
 
@@ -204,17 +202,16 @@ text will be indexed, while `analyze=Analyze.YES` ensures that the text will be 
 default Lucene analyzer. Usually, analyzing or tokenizing means chunking a sentence into individual
 words and potentially excluding common words like "a" or "the". We will talk more about analyzers a
 little later on.
-The third parameter we specify within `@Field(store=Store.NO)`, ensures that the actual data
+The third parameter we specify is `store=Store.NO`, which ensures that the actual data
 will not be stored in the index.
-Whether this data is stored in the index or not has nothing to do with the ability to search for it.
+Whether data is stored in the index or not has nothing to do with the ability to search for it.
 It is not necessary to store fields in the index to allow Lucene to search for them: the benefit of
-storing it is the ability to retrieve them via projections (see <<projections>>).
+storing them is the ability to retrieve them via projections (see <<projections>>).
 
 Without projections, Hibernate Search will per default execute a Lucene query in order to find the
 database identifiers of the entities matching the query criteria and use these identifiers to
 retrieve managed objects from the database. The decision for or against projection has to be made on
-a case by case basis. The default behavior is recommended since it returns managed objects whereas
-projections only return object arrays.
+a case by case basis.
 
 Note that `index=Index.YES`, `analyze=Analyze.YES` and `store=Store.NO` are the default values for
 these parameters and could be omitted.
@@ -224,8 +221,8 @@ we have not yet discussed is `@DateBridge`. This annotation is one of the built-
 Hibernate Search. The Lucene index is mostly string based, with special support for encoding numbers.
 Hibernate Search must convert the data types of the indexed fields to their respective Lucene
 encoding and vice versa. A range of predefined bridges is provided for this purpose, including the
-`DateBridge` which will convert a `java.util.Date` into a `String` with the specified resolution.
-For more details see <<search-mapping-bridge>>.
+`DateBridge` which will convert a `java.util.Date` into a numeric value (a `long`) with the
+specified resolution. For more details see <<section-built-in-bridges>>.
 
 This leaves us with `@IndexedEmbedded`. This annotation is used to index associated entities
 (`@ManyToMany`, `@*ToOne`, `@Embedded` and `@ElementCollection`) as part of the owning entity.
@@ -323,18 +320,18 @@ fullTextEntityManager.createIndexer().startAndWait();
 ====
 
 After executing the above code, you should be able to see a Lucene index under `/var/lucene/indexes/example.Book`
-(or based on a different path depending how you configured the property `$$hibernate.search.default.directory_provider$$`).
+(or based on a different path depending how you configured the property `hibernate.search.default.directory_provider`).
 
-Go ahead an inspect this index with link:$$http://code.google.com/p/luke/$$[Luke]:
+Go ahead an inspect this index with link:http://code.google.com/p/luke/[Luke]:
 it will help you to understand how Hibernate Search works.
 
 === Searching
 
 Now it is time to execute a first search. The general approach is to create a Lucene query, either
 via the Lucene API (<<search-query-lucene-api>>) or via the Hibernate Search query DSL
-(<<search-query-querydsl>>), and then wrap this query into a org.hibernate.Query in order to get all the
+(<<search-query-querydsl>>), and then wrap this query into a `org.hibernate.Query` in order to get all the
 functionality one is used to from the Hibernate API. The following code will prepare a query against
-the indexed fields, execute it and return a list of Books.
+the indexed fields, execute it and return a list of `Book` instances.
 
 .Using Hibernate Session to create and execute a search
 ====
@@ -408,7 +405,6 @@ be achieved by choosing an analyzer class which applies word stemming during the
 as* the search process. Hibernate Search offers several ways to configure the analyzer to be used
 (see <<analyzer>>):
 
-
 * Setting the `hibernate.search.analyzer` property in the configuration file.
 The specified class will then be the default analyzer.
 * Setting the `@Analyzer` annotation at the entity level.
@@ -419,7 +415,7 @@ analyzer to use or one can refer to an analyzer definition defined by the `@Anal
 In the latter case the analyzer framework with its factories approach is utilized. To find out more
 about the factory classes available you can either browse the Lucene JavaDoc or read the
 corresponding section on the
-link:$$http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters$$[Solr Wiki].
+link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki].
 
 [NOTE]
 ====
@@ -434,8 +430,8 @@ depend on Apache Solr anymore to use it. The required classes are part of the co
 distribution.
 ====
 
-In the example below a StandardTokenizerFactory is used followed by two filter factories,
-LowerCaseFilterFactory and SnowballPorterFilterFactory. The standard tokenizer splits words at
+In the example below a `StandardTokenizerFactory` is used followed by two filter factories,
+`LowerCaseFilterFactory` and `SnowballPorterFilterFactory`. The standard tokenizer splits words at
 punctuation characters and hyphens while keeping email addresses and internet hostnames intact. It
 is a good general purpose tokenizer. The lowercase filter lowercases the letters in each token
 whereas the snowball filter finally applies language specific stemming.
@@ -489,8 +485,8 @@ public class Book {
 }
 ====
 
-Using @AnalyzerDef only defines an Analyzer, you still have to apply it to entities and or
-properties using @Analyzer. Like in the above example the `customanalyzer` is defined but not
+Using `@AnalyzerDef` only defines an Analyzer, you still have to apply it to entities and or
+properties using `@Analyzer`. Like in the above example the `customanalyzer` is defined but not
 applied on the entity: it's applied on the `title` and `subtitle` properties only. An analyzer
 definition is global, so you can define it on any entity and reuse the definition on other entities.
 

@@ -690,11 +690,21 @@ public interface Log extends BasicLogger {
 	@Message(id = 234, value = "None of the specified entity types ('%s') or any of their subclasses are indexed." )
 	IllegalArgumentException targetedEntityTypesNotIndexed(String targetedEntities);
 
+	@Message(id = 235, value = "Cannot create numeric range query for field '%s', since from and to values are null" )
+	SearchException rangeQueryWithNullToAndFromValue(String fieldName);
+
+	@Message(id = 236, value = "Cannot create numeric range query for field '%s', since values are not numeric (Date, int, long, short or double)")
+	SearchException numericRangeQueryWithNonNumericToAndFromValues(String fieldName);
+
+	@Message(id = 237, value = "Unknown field encoding type: %1$s")
+	AssertionFailure unknownEncodingType(String encoding);
+
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 235, value = "Backend for index '%s' started: using a Synchronous batching backend." )
+	@Message(id = 238, value = "Backend for index '%s' started: using a Synchronous batching backend." )
 	void luceneBackendInitializedSynchronously(String indexName);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 236, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
+	@Message(id = 239, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
 	void luceneBackendInitializedAsynchronously(String indexName);
+
 }
