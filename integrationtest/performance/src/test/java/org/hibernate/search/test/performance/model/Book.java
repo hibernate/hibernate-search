@@ -30,7 +30,6 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -66,11 +65,9 @@ public class Book {
 	private Date publicationDate;
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
-	@NumericField
 	private Float rating;
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
-	@NumericField
 	private Long totalSold;
 
 	@IndexedEmbedded

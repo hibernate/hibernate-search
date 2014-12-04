@@ -25,7 +25,6 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
@@ -94,7 +93,6 @@ public class IterableBridgeTestEntity {
 	}
 
 	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
-	@NumericField
 	@ElementCollection
 	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@CollectionTable(name = "NumericNullIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
@@ -131,7 +129,6 @@ public class IterableBridgeTestEntity {
 	@Field(store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
-	@NumericField
 	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "iterable_id"))
 	@Column(name = "numericNullNotIndexed")
 	public List<Long> getNumericNullNotIndexed() {

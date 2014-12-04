@@ -14,7 +14,6 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 
 @Entity
@@ -25,7 +24,6 @@ public class Truck {
 	private int id;
 
 	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.YES, indexNullAs = "-1")
-	@NumericField
 	private Integer horsePower;
 
 	public Truck() {

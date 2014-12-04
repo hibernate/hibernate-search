@@ -22,7 +22,6 @@ import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Norms;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 
 /**
@@ -79,7 +78,6 @@ public class Month {
 	private int monthValue;
 
 	@Field
-	@NumericField
 	public double raindropInMm;
 
 	@Field
