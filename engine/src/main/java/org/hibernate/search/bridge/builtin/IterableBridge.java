@@ -7,6 +7,8 @@
 package org.hibernate.search.bridge.builtin;
 
 import org.apache.lucene.document.Document;
+
+import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
@@ -18,28 +20,27 @@ import org.hibernate.search.bridge.LuceneOptions;
  *
  * @author Davide D'Alto
  */
-public class IterableBridge implements FieldBridge {
+public class IterableBridge implements FieldBridge, ContainerBridge {
 
 	private final FieldBridge bridge;
 
 	/**
-	 * @param bridge
-	 *            the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of the {@link java.lang.Iterable} object.
+	 * @param bridge the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of the {@link java.lang.Iterable} object.
 	 */
 	public IterableBridge(FieldBridge bridge) {
 		this.bridge = bridge;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.hibernate.search.bridge.FieldBridge#set(java.lang.String, java.lang.Object, org.apache.lucene.document.Document, org.hibernate.search.bridge.LuceneOptions)
-	 */
 	@Override
 	public void set(String fieldName, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
 			indexNotNullIterable( fieldName, value, document, luceneOptions );
 		}
+	}
+
+	@Override
+	public FieldBridge getElementBridge() {
+		return bridge;
 	}
 
 	private void indexNotNullIterable(String name, Object value, Document document, LuceneOptions luceneOptions) {

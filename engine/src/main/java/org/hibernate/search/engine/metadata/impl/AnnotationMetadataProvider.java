@@ -44,6 +44,7 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
@@ -898,9 +899,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				.indexNullAs( nullToken );
 
 		// if we are having a numeric value make sure to mark the metadata and set the precision
-		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
-		// field bridge
-		if ( numericFieldAnnotation != null || fieldBridge instanceof NumericFieldBridge ) {
+		if ( isNumericField( numericFieldAnnotation, fieldBridge ) ) {
 			fieldMetadataBuilder
 					.numeric()
 					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) );
@@ -911,6 +910,16 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		// keep track of collection role names for ORM integration optimization based on collection update events
 		parseContext.collectUnqualifiedCollectionRole( member.getName() );
+	}
+
+	private boolean isNumericField(NumericField numericFieldAnnotation, FieldBridge fieldBridge) {
+		if ( fieldBridge instanceof ContainerBridge ) {
+			fieldBridge = ( (ContainerBridge) fieldBridge ).getElementBridge();
+		}
+
+		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
+		// field bridge
+		return numericFieldAnnotation != null || fieldBridge instanceof NumericFieldBridge;
 	}
 
 	private String determineNullToken(org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context) {

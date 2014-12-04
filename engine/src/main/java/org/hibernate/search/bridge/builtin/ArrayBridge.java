@@ -7,6 +7,8 @@
 package org.hibernate.search.bridge.builtin;
 
 import org.apache.lucene.document.Document;
+
+import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
@@ -17,23 +19,17 @@ import org.hibernate.search.bridge.LuceneOptions;
  *
  * @author Davide D'Alto
  */
-public class ArrayBridge implements FieldBridge {
+public class ArrayBridge implements FieldBridge, ContainerBridge {
 
 	private final FieldBridge bridge;
 
 	/**
-	 * @param bridge
-	 *            the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of the array
+	 * @param bridge the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of the array
 	 */
 	public ArrayBridge(FieldBridge bridge) {
 		this.bridge = bridge;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.hibernate.search.bridge.FieldBridge#set(java.lang.String, java.lang.Object, org.apache.lucene.document.Document, org.hibernate.search.bridge.LuceneOptions)
-	 */
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
@@ -41,7 +37,12 @@ public class ArrayBridge implements FieldBridge {
 		}
 	}
 
-	void indexNotNullArray(String name, Object value, Document document, LuceneOptions luceneOptions) {
+	@Override
+	public FieldBridge getElementBridge() {
+		return bridge;
+	}
+
+	private void indexNotNullArray(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		Object[] collection = (Object[]) value;
 		for ( Object entry : collection ) {
 			indexEntry( name, entry, document, luceneOptions );
@@ -51,5 +52,4 @@ public class ArrayBridge implements FieldBridge {
 	private void indexEntry(String fieldName, Object entry, Document document, LuceneOptions luceneOptions) {
 		bridge.set( fieldName, entry, document, luceneOptions );
 	}
-
 }
