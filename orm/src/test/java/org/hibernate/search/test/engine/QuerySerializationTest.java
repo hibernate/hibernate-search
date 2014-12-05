@@ -18,9 +18,9 @@ import org.hibernate.Session;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
 import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.AlternateDocument;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
@@ -52,7 +52,7 @@ public class QuerySerializationTest extends SearchTestBase {
 		TermQuery query = new TermQuery( new Term( "Abstract", "hibernate" ) );
 
 		FullTextSession fullTextSession = Search.getFullTextSession( s );
-		SearchFactoryImplementor searchFactory = (SearchFactoryImplementor) fullTextSession.getSearchFactory();
+		SearchIntegrator searchFactory = (SearchIntegrator) fullTextSession.getSearchFactory();
 
 		//this is *not* the standard way to create a Query:
 		HSQuery hsQuery = searchFactory.createHSQuery()

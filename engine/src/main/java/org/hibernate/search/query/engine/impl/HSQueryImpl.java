@@ -51,6 +51,7 @@ import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -118,8 +119,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	}
 
 	@Override
-	public void afterDeserialise(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public void afterDeserialise(SearchIntegrator searchIntegrator) {
+		this.searchFactoryImplementor = searchIntegrator.unwrap( SearchFactoryImplementor.class );
 	}
 
 	@Override

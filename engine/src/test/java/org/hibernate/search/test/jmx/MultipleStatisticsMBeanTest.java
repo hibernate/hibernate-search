@@ -55,7 +55,7 @@ public class MultipleStatisticsMBeanTest {
 	@Test
 	public void testDefaultRegistration() throws Exception {
 		String suffix = null;
-		try ( SearchIntegrator searchFactory = createSearchFactoryUsingJndiPrefix( suffix ) ) {
+		try ( SearchIntegrator searchFactory = createSearchIntegratorUsingJndiPrefix( suffix ) ) {
 			testStatisticsMBeanRegistered( suffix );
 		}
 	}
@@ -63,7 +63,7 @@ public class MultipleStatisticsMBeanTest {
 	@Test
 	public void testRegistrationWithSuffix() throws Exception {
 		String suffix = "myapp";
-		try ( SearchIntegrator searchFactory = createSearchFactoryUsingJndiPrefix( suffix ) ) {
+		try ( SearchIntegrator searchFactory = createSearchIntegratorUsingJndiPrefix( suffix ) ) {
 			testStatisticsMBeanRegistered( suffix );
 		}
 	}
@@ -71,11 +71,11 @@ public class MultipleStatisticsMBeanTest {
 	@Test
 	public void testMultipleMbeanRegistration() throws Exception {
 		String suffixApp1 = "app-1";
-		try ( SearchIntegrator factory1 = createSearchFactoryUsingJndiPrefix( suffixApp1 ) ) {
+		try ( SearchIntegrator factory1 = createSearchIntegratorUsingJndiPrefix( suffixApp1 ) ) {
 			testStatisticsMBeanRegistered( suffixApp1 );
 
 			String suffixApp2 = "app-2";
-			try ( SearchIntegrator factory2 = createSearchFactoryUsingJndiPrefix( suffixApp2 ) ) {
+			try ( SearchIntegrator factory2 = createSearchIntegratorUsingJndiPrefix( suffixApp2 ) ) {
 				testStatisticsMBeanRegistered( suffixApp2 );
 			}
 		}
@@ -84,7 +84,7 @@ public class MultipleStatisticsMBeanTest {
 	@Test
 	public void testStatisticMBeanGetsUnregistered() throws Exception {
 		String suffix = "myapp";
-		try ( SearchIntegrator searchFactory = createSearchFactoryUsingJndiPrefix( suffix ) ) {
+		try ( SearchIntegrator searchFactory = createSearchIntegratorUsingJndiPrefix( suffix ) ) {
 			testStatisticsMBeanRegistered( suffix );
 		}
 
@@ -113,7 +113,7 @@ public class MultipleStatisticsMBeanTest {
 		assertEquals( JMXRegistrar.StatisticsInfo.class.getName(), mBean.getClassName() );
 	}
 
-	private SearchIntegrator createSearchFactoryUsingJndiPrefix(String suffix) {
+	private SearchIntegrator createSearchIntegratorUsingJndiPrefix(String suffix) {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
 				.addProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" )

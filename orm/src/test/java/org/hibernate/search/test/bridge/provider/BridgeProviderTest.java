@@ -63,8 +63,8 @@ public class BridgeProviderTest extends SearchTestBase {
 				.addClass( Chain.class );
 		boolean throwException = false;
 		try {
-			SearchIntegrator sf = new SearchIntegratorBuilder().configuration( conf ).buildSearchIntegrator();
-			sf.close();
+			SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( conf ).buildSearchIntegrator();
+			searchIntegrator.close();
 		}
 		catch (SearchException e) {
 			assertThat( e.getMessage() ).contains( "TheaterBridgeProvider1" );

@@ -18,6 +18,7 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -51,8 +52,8 @@ public class MassIndexerImpl implements MassIndexer {
 	private MassIndexerProgressMonitor monitor;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 
-	protected MassIndexerImpl(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory, Class<?>... entities) {
-		this.searchFactoryImplementor = searchFactory;
+	protected MassIndexerImpl(SearchIntegrator searchIntegrator, SessionFactoryImplementor sessionFactory, Class<?>... entities) {
+		this.searchFactoryImplementor = searchIntegrator.unwrap( SearchFactoryImplementor.class );
 		this.sessionFactory = sessionFactory;
 		rootEntities = toRootEntities( searchFactoryImplementor, entities );
 		if ( searchFactoryImplementor.isJMXEnabled() ) {

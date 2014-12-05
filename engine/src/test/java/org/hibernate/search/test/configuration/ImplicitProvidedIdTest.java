@@ -141,10 +141,10 @@ public class ImplicitProvidedIdTest {
 	 * @param fieldName The expected name of the ID field
 	 */
 	private void storeBooksViaProvidedId(SearchConfigurationForTest cfg, String fieldName, boolean matchTitle) {
-		SearchIntegrator sf = null;
+		SearchIntegrator searchIntegrator = null;
 		try {
 			//Should fail right here when @ProvidedId is not enabled:
-			sf = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
+			searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 
 			Book book = new Book();
 			book.title = "Less is nice";
@@ -153,10 +153,10 @@ public class ImplicitProvidedIdTest {
 			String isbn = "some entity-external id";
 			Work work = new Work( book, isbn, WorkType.ADD, false );
 			TransactionContextForTest tc = new TransactionContextForTest();
-			sf.getWorker().performWork( work, tc );
+			searchIntegrator.getWorker().performWork( work, tc );
 			tc.end();
 
-			QueryBuilder queryBuilder = sf.buildQueryBuilder()
+			QueryBuilder queryBuilder = searchIntegrator.buildQueryBuilder()
 					.forEntity( Book.class )
 					.get();
 
@@ -166,15 +166,15 @@ public class ImplicitProvidedIdTest {
 				.matching( matchTitle ? book.title : isbn )
 				.createQuery();
 
-			int queryResultSize = sf.createHSQuery()
+			int queryResultSize = searchIntegrator.createHSQuery()
 					.luceneQuery( query )
 					.targetedEntities( Arrays.asList( new Class<?>[]{ Book.class } ) )
 					.queryResultSize();
 			Assert.assertEquals( 1, queryResultSize );
 		}
 		finally {
-			if ( sf != null ) {
-				sf.close();
+			if ( searchIntegrator != null ) {
+				searchIntegrator.close();
 			}
 		}
 	}

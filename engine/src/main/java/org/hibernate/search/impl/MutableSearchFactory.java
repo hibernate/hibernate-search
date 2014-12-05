@@ -28,6 +28,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
@@ -306,6 +307,11 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	@Override
 	public IndexManagerFactory getIndexManagerFactory() {
 		return delegate.getIndexManagerFactory();
+	}
+
+	@Override
+	public IndexManager getIndexManager(String indexName) {
+		return delegate.getIndexManager( indexName );
 	}
 
 	@Override

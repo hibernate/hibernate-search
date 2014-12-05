@@ -25,8 +25,8 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -63,7 +63,7 @@ public class ReadWriteParallelismTest {
 
 	@Test
 	public void testPropertiesIndexing() throws InterruptedException {
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		SearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		ThreadPoolExecutor threadPool = Executors.newFixedThreadPool( THREAD_NUMBER, "ReadWriteParallelismTest" );
 		for ( int i = 0; i < THREAD_NUMBER; i++ ) {
 			threadPool.execute( new Task( searchFactory, i ) );
@@ -104,8 +104,8 @@ public class ReadWriteParallelismTest {
 		tc.end();
 	}
 
-	private static void verifyMatches(SearchFactoryImplementor searchFactory, int expectedMatches, Query query) {
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery()
+	private static void verifyMatches(SearchIntegrator searchIntegrator, int expectedMatches, Query query) {
+		List<EntityInfo> queryEntityInfos = searchIntegrator.createHSQuery()
 				.luceneQuery( query )
 				.targetedEntities( Arrays.asList( new Class<?>[]{ Book.class } ) )
 				.queryEntityInfos();
@@ -115,9 +115,9 @@ public class ReadWriteParallelismTest {
 	private static class Task implements Runnable {
 
 		private final int threadId;
-		private final SearchFactoryImplementor searchFactory;
+		private final SearchIntegrator searchFactory;
 
-		public Task(SearchFactoryImplementor searchFactory, int threadId) {
+		public Task(SearchIntegrator searchFactory, int threadId) {
 			this.searchFactory = searchFactory;
 			this.threadId = threadId;
 		}

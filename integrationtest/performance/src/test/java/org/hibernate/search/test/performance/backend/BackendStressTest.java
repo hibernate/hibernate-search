@@ -9,7 +9,7 @@ package org.hibernate.search.test.performance.backend;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.backend.lucene.Condition;
 import org.hibernate.search.test.backend.lucene.Quote;
 import org.hibernate.search.test.backend.lucene.StopTimer;
@@ -162,7 +162,7 @@ public class BackendStressTest {
 
 	@Test
 	public void testRun() throws Exception {
-		SearchFactoryImplementor searchFactoryImplementor = sfHolderSync.getSearchFactory();
+		SearchIntegrator searchFactoryImplementor = sfHolderSync.getSearchFactory();
 
 		ThreadPoolExecutor executor = Executors.newFixedThreadPool( numberOfThreads, "BackendStressTest" );
 
@@ -194,15 +194,15 @@ public class BackendStressTest {
 	 */
 	class MinimumSizeCondition implements Condition {
 		final int expectedSize;
-		private final SearchFactoryImplementor searchFactoryImplementor;
+		private final SearchIntegrator integrator;
 
-		MinimumSizeCondition(SearchFactoryImplementor searchFactoryImplementor) {
-			this.searchFactoryImplementor = searchFactoryImplementor;
+		MinimumSizeCondition(SearchIntegrator integrator) {
+			this.integrator = integrator;
 			expectedSize = workLog.calculateIndexSize();
 		}
 		@Override
 		public boolean evaluate() {
-			int size = searchFactoryImplementor
+			int size = integrator
 					.createHSQuery()
 					.luceneQuery( new MatchAllDocsQuery() )
 					.targetedEntities( Arrays.<Class<?>>asList( Quote.class ) )
@@ -214,10 +214,10 @@ public class BackendStressTest {
 	}
 
 	class Task implements Runnable {
-		private final SearchFactoryImplementor searchFactory;
+		private final SearchIntegrator searchFactory;
 
-		public Task(SearchFactoryImplementor searchFactory) {
-			this.searchFactory = searchFactory;
+		public Task(SearchIntegrator integrator) {
+			this.searchFactory = integrator;
 		}
 
 		@Override

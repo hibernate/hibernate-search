@@ -17,6 +17,7 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).
@@ -229,7 +230,7 @@ public interface HSQuery extends ProjectionConstants {
 	 *
 	 * @param searchFactory a {@link org.hibernate.search.engine.spi.SearchFactoryImplementor} object.
 	 */
-	void afterDeserialise(SearchFactoryImplementor searchFactory);
+	void afterDeserialise(SearchIntegrator searchFactory);
 
 	/**
 	 * <p>setSpatialParameters.</p>

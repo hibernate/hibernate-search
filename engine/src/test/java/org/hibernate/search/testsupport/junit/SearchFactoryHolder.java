@@ -38,7 +38,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	private final Properties configuration;
 	private final Map<Class<? extends Service>,Service> providedServices = new HashMap<>();
 
-	private SearchIntegrator[] searchImplementors;
+	private SearchIntegrator[] searchIntegrator;
 	private int numberOfSessionFactories = 1;
 
 	public SearchFactoryHolder(Class<?>... entities) {
@@ -52,14 +52,14 @@ public class SearchFactoryHolder extends ExternalResource {
 	}
 
 	public SearchFactoryImplementor getSearchFactory() {
-		return searchImplementors[0].unwrap( SearchFactoryImplementor.class );
+		return searchIntegrator[0].unwrap( SearchFactoryImplementor.class );
 	}
 
 	@Override
 	protected void before() throws Throwable {
-		searchImplementors = new SearchFactoryImplementor[numberOfSessionFactories];
+		searchIntegrator = new SearchIntegrator[numberOfSessionFactories];
 		for ( int i = 0; i < numberOfSessionFactories; i++ ) {
-			searchImplementors[i] = createSearchFactory();
+			searchIntegrator[i] = createSearchFactory();
 		}
 	}
 
@@ -80,15 +80,15 @@ public class SearchFactoryHolder extends ExternalResource {
 
 	@Override
 	protected void after() {
-		if ( searchImplementors != null ) {
-			for ( SearchIntegrator sf : searchImplementors ) {
+		if ( searchIntegrator != null ) {
+			for ( SearchIntegrator sf : searchIntegrator ) {
 				sf.close();
 			}
 		}
 	}
 
 	public SearchFactoryHolder withProperty(String key, Object value) {
-		Assert.assertNull( "SearchFactory already initialized", searchImplementors );
+		Assert.assertNull( "SearchIntegrator already initialized", searchIntegrator );
 		configuration.put( key, value );
 		return this;
 	}

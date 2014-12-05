@@ -505,6 +505,11 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 		return indexManagerFactory;
 	}
 
+	@Override
+	public IndexManager getIndexManager(String indexName) {
+		return getIndexManagerHolder().getIndexManager( indexName );
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T unwrap(Class<T> cls) {

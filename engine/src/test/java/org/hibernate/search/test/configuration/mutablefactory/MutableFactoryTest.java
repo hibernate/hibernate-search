@@ -54,15 +54,15 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testAddingClassFullModel() throws Exception {
-		SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator();
+		SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator();
 		final SearchIntegratorBuilder builder = new SearchIntegratorBuilder();
-		sf = builder.currentSearchIntegrator( sf )
+		searchIntegrator = builder.currentSearchIntegrator( searchIntegrator )
 				.addClass( A.class )
 				.buildSearchIntegrator();
 
 		TransactionContextForTest tc = new TransactionContextForTest();
 
-		doIndexWork( new A( 1, "Emmanuel" ), 1, sf, tc );
+		doIndexWork( new A( 1, "Emmanuel" ), 1, searchIntegrator, tc );
 
 		tc.end();
 
@@ -73,33 +73,33 @@ public class MutableFactoryTest {
 		);
 		Query luceneQuery = parser.parse( "Emmanuel" );
 
-		IndexReader indexReader = sf.getIndexReaderAccessor().open( A.class );
+		IndexReader indexReader = searchIntegrator.getIndexReaderAccessor().open( A.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
-		sf.getIndexReaderAccessor().close( indexReader );
+		searchIntegrator.getIndexReaderAccessor().close( indexReader );
 
-		sf = builder.currentSearchIntegrator( sf )
+		searchIntegrator = builder.currentSearchIntegrator( searchIntegrator )
 				.addClass( B.class )
 				.buildSearchIntegrator();
 
 		tc = new TransactionContextForTest();
 
-		doIndexWork( new B( 1, "Noel" ), 1, sf, tc );
+		doIndexWork( new B( 1, "Noel" ), 1, searchIntegrator, tc );
 
 		tc.end();
 
 		luceneQuery = parser.parse( "Noel" );
 
-		indexReader = sf.getIndexReaderAccessor().open( B.class );
+		indexReader = searchIntegrator.getIndexReaderAccessor().open( B.class );
 		searcher = new IndexSearcher( indexReader );
 		hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 1, hits.totalHits );
 
-		sf.getIndexReaderAccessor().close( indexReader );
+		searchIntegrator.getIndexReaderAccessor().close( indexReader );
 
-		sf.close();
+		searchIntegrator.close();
 	}
 
 	@Test

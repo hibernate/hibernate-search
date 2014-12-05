@@ -9,7 +9,7 @@ package org.hibernate.search.test.batchindexing;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.hibernate.testing.RequiresDialect;
@@ -29,8 +29,8 @@ public class FetchSizeConfigurationTest extends SearchTestBase {
 	@RequiresDialect(comment = "H2 does not accept negative fetch sizes",
 		strictMatching = true, value = org.hibernate.dialect.H2Dialect.class)
 	public void testSetFetchSizeOnH2Fails() throws InterruptedException {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		MockErrorHandler mockErrorHandler = MassIndexerErrorReportingTest.getErrorHandler( searchFactory );
+		SearchIntegrator searchIntegrator = getSearchFactoryImpl();
+		MockErrorHandler mockErrorHandler = MassIndexerErrorReportingTest.getErrorHandler( searchIntegrator );
 
 		FullTextSession fullTextSession = MassIndexerErrorReportingTest.prepareSomeData( this );
 
@@ -47,8 +47,8 @@ public class FetchSizeConfigurationTest extends SearchTestBase {
 	@RequiresDialect(comment = "MySQL definitely should accept Integer.MIN_VALUE",
 		strictMatching = false, value = org.hibernate.dialect.MySQLDialect.class)
 	public void testSetFetchSizeOnMySQL() throws InterruptedException {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		MockErrorHandler mockErrorHandler = MassIndexerErrorReportingTest.getErrorHandler( searchFactory );
+		SearchIntegrator searchIntegrator = getSearchFactoryImpl();
+		MockErrorHandler mockErrorHandler = MassIndexerErrorReportingTest.getErrorHandler( searchIntegrator );
 
 		FullTextSession fullTextSession = MassIndexerErrorReportingTest.prepareSomeData( this );
 

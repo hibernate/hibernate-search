@@ -37,7 +37,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	@Test
 	public void testTypeIsSetForField() {
-		SearchIntegrator searchFactory = createSearchFactory( Foo.class );
+		SearchIntegrator searchFactory = createSearchIntegrator( Foo.class );
 
 		Foo foo = new Foo( 0l );
 
@@ -49,7 +49,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	@Test
 	public void testTypeIsSetForGetter() {
-		SearchIntegrator searchFactory = createSearchFactory( Bar.class );
+		SearchIntegrator searchFactory = createSearchIntegrator( Bar.class );
 
 		Bar bar = new Bar( 0l );
 
@@ -61,7 +61,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	@Test
 	public void testTypeIsSetForClass() {
-		SearchIntegrator searchFactory = createSearchFactory( Snafu.class );
+		SearchIntegrator searchFactory = createSearchIntegrator( Snafu.class );
 
 		Snafu snafu = new Snafu( 0l );
 
@@ -71,7 +71,7 @@ public class AppliedOnTypeAwareBridgeTest {
 		tc.end();
 	}
 
-	private SearchIntegrator createSearchFactory(Class<?> clazz) {
+	private SearchIntegrator createSearchIntegrator(Class<?> clazz) {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addClass( clazz );
 
