@@ -17,6 +17,7 @@ import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
@@ -43,7 +44,7 @@ public class Cd {
 	private int price;
 
 	@Field(analyze = Analyze.NO)
-	@DateBridge(resolution = Resolution.YEAR)
+	@DateBridge(resolution = Resolution.YEAR, encoding = EncodingType.STRING)
 	private Date releaseYear;
 
 	public Cd() {

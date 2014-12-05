@@ -1263,38 +1263,36 @@ for most of your properties Hibernate Search does the translation job for you th
 built-in bridges. However, in some cases you need a more fine grained control over the translation
 process.
 
+[[section-built-in-bridges]]
 ==== Built-in bridges
 
 Hibernate Search comes bundled with a set of built-in bridges between a Java property type and its
 full text representation.
 
-null:: Per default null elements are not indexed. Lucene does not support null elements. However, in
-some situation it can be useful to insert a custom token representing the null value. See
-<<field-annotation>> for more information.
+`null`:: Per default `null` elements are not indexed. Lucene does not support `null` elements.
+However, in some situation it can be useful to insert a custom token representing the `null` value.
+See <<field-annotation>> for more information.
 
-java.lang.String:: Strings are indexed as are
+`java.lang.String`:: Strings are indexed as are
 
-short, Short, integer, Integer, long, Long, float, Float, double, Double, BigInteger, BigDecimal::
-Numbers are converted into their string representation. Note that numbers cannot be compared by
-Lucene (ie used in ranged queries) out of the box: they have to be padded
+`short`, `Short`, `integer`, `Integer`, `long`, `Long`, `float`, `Float`, `double`, `Double`:: Are
+per default indexed numerically using a link:http://en.wikipedia.org/wiki/Trie[Trie structure]. You
+need to use a `NumericRangeQuery` to search for values. See also <<field-annotation>> and
+<<numeric-field-annotation>>
 
-[NOTE]
-====
-Using a Range query has drawbacks; an alternative approach is to use a Filter query which will
-filter the result query to the appropriate range.
-Hibernate Search will support a padding mechanism
-====
+`BigInteger`, `BigDecimal`::
+`BigInteger` and `BigDecimal` are converted into their string representation and indexed. Note that
+in this form the values cannot be compared by Lucene using for example a `TermRangeQuery`.
+For that the string representation would need to be padded. An alternative using numeric encoding
+with a potential loss in precision can be seen in <<example-custom-numericfieldbridge>>.
 
-java.util.Date:: Dates are stored as yyyyMMddHHmmssSSS in GMT time
-(200611072203012 for Nov 7th of 2006 4:03PM and 12ms EST). You shouldn't really bother with the
-internal format. What is important is that when using a TermRangeQuery, you should know that the
-dates have to be expressed in GMT time.
-`
+`java.util.Date`, `java.util.Calendar`:: Dates are indexed as `long` value representing the number
+of milliseconds since _January 1, 1970, 00:00:00 GMT_. You shouldn't really bother with the
+internal format. It is important, however, to query a numerically indexed date via a `NumericRangeQuery`.
++
 Usually, storing the date up to the millisecond is not necessary. `@DateBridge` defines the
-appropriate resolution you are willing to store in the index
-(`@DateBridge(resolution=Resolution.DAY)`). The date pattern will then be truncated accordingly.
-`
-
+appropriate resolution you are willing to store in the index.
++
 ====
 [source, JAVA]
 ----
@@ -1307,23 +1305,26 @@ public class Meeting {
     // ...
 ----
 ====
-
-[WARNING]
++
+You can also choose to encode the date as string using the `encoding=EncodingType.STRING` of
+`DateBridge`. In this case the dates are stored in the format _yyyyMMddHHmmssSSS_ (using GMT time).
++
+[IMPORTANT]
 ====
 A Date whose resolution is lower than `MILLISECOND` cannot be a `@DocumentId`
 ====
-
++
 [IMPORTANT]
 ====
-The default Date bridge uses Lucene's DateTools to convert from and to String. This means that all
-dates are expressed in GMT time. If your requirements are to store dates in a fixed time zone you
-have to implement a custom date bridge. Make sure you understand the requirements of your
-applications regarding to date indexing and searching.
+The default date bridge uses Lucene's `DateTools` to convert from `Date` or `Calendar` to its indexed
+value. This means that all dates are expressed in GMT time. If your requirements are to store dates
+in a fixed time zone you have to implement a custom date bridge. Make sure you understand the
+requirements of your applications regarding to date indexing and searching.
 ====
 
-java.net.URI, java.net.URL:: URI and URL are converted to their string representation
+`java.net.URI`, `java.net.URL`:: `URI` and `URL` are converted to their string representation
 
-java.lang.Class:: Class are converted to their fully qualified class name. The thread context
+`java.lang.Class`:: Classes are converted to their fully qualified class name. The thread context
 classloader is used when the class is rehydrated
 
 ==== Tika bridge
@@ -1569,9 +1570,9 @@ It is important for the two-way process to be idempotent
 
 Some use cases require more than a simple object to string translation when mapping a property to a
 Lucene index. To give you the greatest possible flexibility you can also implement a bridge as a
-FieldBridge. This interface gives you a property value and let you map it the way you want in your
-Lucene Document. You can for example store a property in two different document fields. The
-interface is very similar in its concept to the Hibernate UserTypes.
+`FieldBridge`. This interface gives you a property value and let you map it the way you want in your
+Lucene `Document`. You can for example store a property in two different document fields. The
+interface is very similar in its concept to the Hibernate ORM `UserTypes`.
 
 [[example-field-bridge]]
 .Implementing the FieldBridge interface
@@ -1579,8 +1580,9 @@ interface is very similar in its concept to the Hibernate UserTypes.
 [source, JAVA]
 ----
 /**
- * Store the date in 3 different fields - year, month, day - to ease Range Query per
+ * Store the date in 3 different fields - year, month, day - to ease the creation of RangeQuery per
  * year, month or day (eg get all the elements of December for the last 5 years).
+ *
  * @author Emmanuel Bernard
  */
 public class DateSplitBridge implements FieldBridge {
@@ -1624,13 +1626,12 @@ private Date date;
 ----
 ====
 
-In <<example-field-bridge>> the fields are not added directly to Document. Instead the addition is
-delegated to the LuceneOptions helper; this helper will apply the options you have selected on
-`@Field`, like `Store` or `TermVector`, or apply the chosen @Boost value. It is especially useful
+In <<example-field-bridge>> the fields are not added directly to `Document`. Instead the addition is
+delegated to the `LuceneOptions` helper; this helper will apply the options you have selected on
+`@Field`, like `Store` or `TermVector`, or apply the chosen `@Boost` value. It is especially useful
 to encapsulate the complexity of `COMPRESS` implementations. Even though it is recommended to
-delegate to LuceneOptions to add fields to the Document, nothing stops you from editing the Document
-directly and ignore the LuceneOptions in case you need to.
-
+delegate to `LuceneOptions` to add fields to the `Document`, nothing stops you from editing the
+`Document` directly and ignore the LuceneOptions in case you need to.
 
 [TIP]
 ====
