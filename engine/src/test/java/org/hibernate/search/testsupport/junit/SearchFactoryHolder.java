@@ -20,7 +20,8 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.rules.ExternalResource;
 
@@ -37,7 +38,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	private final Properties configuration;
 	private final Map<Class<? extends Service>,Service> providedServices = new HashMap<>();
 
-	private SearchFactoryImplementor[] searchImplementors;
+	private SearchIntegrator[] searchImplementors;
 	private int numberOfSessionFactories = 1;
 
 	public SearchFactoryHolder(Class<?>... entities) {
@@ -51,7 +52,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	}
 
 	public SearchFactoryImplementor getSearchFactory() {
-		return searchImplementors[0];
+		return searchImplementors[0].unwrap( SearchFactoryImplementor.class );
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public class SearchFactoryHolder extends ExternalResource {
 		}
 	}
 
-	private SearchFactoryImplementor createSearchFactory() {
+	private SearchIntegrator createSearchFactory() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setProgrammaticMapping( buildMappingDefinition );
 		for ( Entry<Class<? extends Service>, Service> entry : providedServices.entrySet() ) {
@@ -74,13 +75,13 @@ public class SearchFactoryHolder extends ExternalResource {
 		for ( Class<?> c : entities ) {
 			cfg.addClass( c );
 		}
-		return new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 	}
 
 	@Override
 	protected void after() {
 		if ( searchImplementors != null ) {
-			for ( SearchFactoryImplementor sf : searchImplementors ) {
+			for ( SearchIntegrator sf : searchImplementors ) {
 				sf.close();
 			}
 		}

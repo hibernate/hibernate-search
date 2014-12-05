@@ -26,7 +26,7 @@ import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
@@ -47,17 +47,18 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testCreateEmptyFactory() throws Exception {
-		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
-		sf.close();
+		try ( SearchIntegrator si = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
+			// no-op
+		}
 	}
 
 	@Test
 	public void testAddingClassFullModel() throws Exception {
-		SearchIntegrator sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
-		final SearchFactoryBuilder builder = new SearchFactoryBuilder();
-		sf = builder.currentFactory( sf )
+		SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator();
+		final SearchIntegratorBuilder builder = new SearchIntegratorBuilder();
+		sf = builder.currentSearchIntegrator( sf )
 				.addClass( A.class )
-				.buildSearchFactory();
+				.buildSearchIntegrator();
 
 		TransactionContextForTest tc = new TransactionContextForTest();
 
@@ -79,9 +80,9 @@ public class MutableFactoryTest {
 
 		sf.getIndexReaderAccessor().close( indexReader );
 
-		sf = builder.currentFactory( sf )
+		sf = builder.currentSearchIntegrator( sf )
 				.addClass( B.class )
-				.buildSearchFactory();
+				.buildSearchIntegrator();
 
 		tc = new TransactionContextForTest();
 
@@ -103,7 +104,7 @@ public class MutableFactoryTest {
 
 	@Test
 	public void testAddingClassSimpleAPI() throws Exception {
-		SearchIntegrator sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
+		SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator();
 
 		sf.addClasses( A.class );
 
@@ -168,8 +169,7 @@ public class MutableFactoryTest {
 				"name",
 				TestConstants.standardAnalyzer
 		);
-		final SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( new SearchConfigurationForTest() ).buildSearchFactory();
-		try {
+		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( new SearchConfigurationForTest() ).buildSearchIntegrator() ) {
 			List<DoAddClasses> runnables = new ArrayList<DoAddClasses>( 10 );
 			final int nbrOfThread = 10;
 			final int nbrOfClassesPerThread = 10;
@@ -209,9 +209,6 @@ public class MutableFactoryTest {
 				sf.getIndexReaderAccessor().close( indexReader );
 			}
 		}
-		finally {
-			sf.close();
-		}
 	}
 
 	private static Class<?> getClassByNumber(int i, ServiceManager serviceManager) throws ClassNotFoundException {
@@ -248,8 +245,8 @@ public class MutableFactoryTest {
 			return factorOfClassesPerThread;
 		}
 
-		public DoAddClasses(SearchFactoryImplementor searchFactoryImplementor, int factorOfClassesPerThread, int nbrOfClassesPerThread) {
-			this.searchFactoryImplementor = searchFactoryImplementor;
+		public DoAddClasses(SearchIntegrator si, int factorOfClassesPerThread, int nbrOfClassesPerThread) {
+			this.searchFactoryImplementor = si.unwrap( SearchFactoryImplementor.class );
 			this.factorOfClassesPerThread = factorOfClassesPerThread;
 			this.parser = new QueryParser(
 					TestConstants.getTargetLuceneVersion(),

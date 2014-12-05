@@ -17,7 +17,7 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
@@ -61,7 +61,7 @@ public class IndexMetadataCompleteConfiguredTest {
 			;
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addClass( Document.class );
-		MutableSearchFactory sf = (MutableSearchFactory) new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		MutableSearchFactory sf = (MutableSearchFactory) new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 		try {
 			assertEquals( expectation, extractWorkspace( sf, Document.class ).areSingleTermDeletesSafe() );
 

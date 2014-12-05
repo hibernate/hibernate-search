@@ -12,9 +12,9 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -46,8 +46,8 @@ public class IndexedEmbeddedWithAbstractClassTest {
 				.addClass( AbstractA.class )
 				.addClass( D.class );
 
-		SearchFactoryImplementor searchFactory = new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
-		searchFactory.close();
+		SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
+		searchIntegrator.close();
 		Assert.assertEquals( "Wrong invocation count", 1, BytemanHelper.getAndResetInvocationCount() );
 	}
 
@@ -64,7 +64,7 @@ public class IndexedEmbeddedWithAbstractClassTest {
 					.addClass( AbstractB.class )
 					.addClass( D.class );
 
-			new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 			fail( "Invalid configuration should throw an exception" );
 		}
 		catch (SearchException e) {
@@ -86,7 +86,7 @@ public class IndexedEmbeddedWithAbstractClassTest {
 					.addClass( AbstractC.class )
 					.addClass( D.class );
 
-			new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 			fail( "Invalid configuration should throw an exception" );
 		}
 		catch (SearchException e) {

@@ -26,7 +26,7 @@ import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
@@ -257,9 +257,9 @@ public class ShardingConfigurationTest {
 		}
 		configuration.addClass( Foo.class );
 
-		return (MutableSearchFactory) new SearchFactoryBuilder().configuration(
+		return (MutableSearchFactory) new SearchIntegratorBuilder().configuration(
 				configuration
-		).buildSearchFactory();
+		).buildSearchIntegrator();
 	}
 
 	@Indexed(index = "foo")

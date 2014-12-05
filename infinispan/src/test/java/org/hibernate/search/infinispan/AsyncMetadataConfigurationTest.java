@@ -11,7 +11,7 @@ import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -69,7 +69,7 @@ public class AsyncMetadataConfigurationTest {
 			configuration.addProperty( "hibernate.search.default.write_metadata_async", async.toString() );
 		}
 
-		new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 		assertEquals( "The directory provider was not started", 1, BytemanHelper.getAndResetInvocationCount() );
 	}
 }

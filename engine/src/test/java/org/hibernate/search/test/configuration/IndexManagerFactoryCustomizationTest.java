@@ -26,7 +26,8 @@ import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -67,8 +68,7 @@ public class IndexManagerFactoryCustomizationTest {
 
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addClass( Document.class );
-		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
-		try {
+		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
 			Assert.assertEquals( expectedIndexManagerClass, extractDocumentIndexManagerClassName( sf, "documents" ) );
 			// trigger a SearchFactory rebuild:
 			sf.addClasses( Dvd.class );
@@ -76,13 +76,11 @@ public class IndexManagerFactoryCustomizationTest {
 			Assert.assertEquals( expectedIndexManagerClass, extractDocumentIndexManagerClassName( sf, "dvds" ) );
 			Assert.assertEquals( expectedIndexManagerClass, extractDocumentIndexManagerClassName( sf, "documents" ) );
 		}
-		finally {
-			sf.close();
-		}
 	}
 
-	private Class<? extends IndexManager> extractDocumentIndexManagerClassName(SearchFactoryImplementor sf, String indexName) {
-		IndexManager indexManager = sf.getIndexManagerHolder().getIndexManager( indexName );
+	private Class<? extends IndexManager> extractDocumentIndexManagerClassName(SearchIntegrator si, String indexName) {
+		SearchFactoryImplementor factoryImplementor = si.unwrap( SearchFactoryImplementor.class );
+		IndexManager indexManager = factoryImplementor.getIndexManagerHolder().getIndexManager( indexName );
 		Assert.assertNotNull( indexManager );
 		return indexManager.getClass();
 	}

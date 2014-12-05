@@ -20,8 +20,8 @@ import org.hibernate.search.backend.impl.TransactionalWorker;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 import static org.junit.Assert.assertNotNull;
@@ -50,8 +50,8 @@ public class WorkerScopeConfigurationTest {
 
 	@Test
 	public void testDefaultWorker() {
-		SearchFactoryImplementor searchFactoryImplementor =
-				new SearchFactoryBuilder().configuration( manualConfiguration ).buildSearchFactory();
+		SearchIntegrator searchFactoryImplementor =
+				new SearchIntegratorBuilder().configuration( manualConfiguration ).buildSearchIntegrator();
 		assertNotNull( "Worker should have been created", searchFactoryImplementor.getWorker() );
 		assertTrue( "Wrong worker class", searchFactoryImplementor.getWorker() instanceof TransactionalWorker );
 	}
@@ -59,8 +59,8 @@ public class WorkerScopeConfigurationTest {
 	@Test
 	public void testExplicitTransactionalWorker() {
 		manualConfiguration.addProperty( "hibernate.search.worker.scope", "transaction" );
-		SearchFactoryImplementor searchFactoryImplementor =
-				new SearchFactoryBuilder().configuration( manualConfiguration ).buildSearchFactory();
+		SearchIntegrator searchFactoryImplementor =
+				new SearchIntegratorBuilder().configuration( manualConfiguration ).buildSearchIntegrator();
 		assertNotNull( "Worker should have been created", searchFactoryImplementor.getWorker() );
 		assertTrue( "Wrong worker class", searchFactoryImplementor.getWorker() instanceof TransactionalWorker );
 	}
@@ -68,8 +68,8 @@ public class WorkerScopeConfigurationTest {
 	@Test
 	public void testCustomWorker() {
 		manualConfiguration.addProperty( "hibernate.search.worker.scope", CustomWorker.class.getName() );
-		SearchFactoryImplementor searchFactoryImplementor =
-				new SearchFactoryBuilder().configuration( manualConfiguration ).buildSearchFactory();
+		SearchIntegrator searchFactoryImplementor =
+				new SearchIntegratorBuilder().configuration( manualConfiguration ).buildSearchIntegrator();
 		assertNotNull( "Worker should have been created", searchFactoryImplementor.getWorker() );
 		assertTrue( "Wrong worker class", searchFactoryImplementor.getWorker() instanceof CustomWorker );
 	}
@@ -79,8 +79,8 @@ public class WorkerScopeConfigurationTest {
 		manualConfiguration.addProperty( "hibernate.search.worker.scope", CustomWorkerExpectingFooAndBar.class.getName() );
 		manualConfiguration.addProperty( "hibernate.search.worker.foo", "foo" );
 		manualConfiguration.addProperty( "hibernate.search.worker.bar", "bar" );
-		SearchFactoryImplementor searchFactoryImplementor =
-				new SearchFactoryBuilder().configuration( manualConfiguration ).buildSearchFactory();
+		SearchIntegrator searchFactoryImplementor =
+				new SearchIntegratorBuilder().configuration( manualConfiguration ).buildSearchIntegrator();
 		assertNotNull( "Worker should have been created", searchFactoryImplementor.getWorker() );
 		assertTrue( "Wrong worker class", searchFactoryImplementor.getWorker() instanceof CustomWorkerExpectingFooAndBar );
 	}
@@ -89,7 +89,7 @@ public class WorkerScopeConfigurationTest {
 	public void testUnknownWorkerImplementationClass() {
 		manualConfiguration.addProperty( "hibernate.search.worker.scope", "foo" );
 		try {
-			new SearchFactoryBuilder().configuration( manualConfiguration ).buildSearchFactory();
+			new SearchIntegratorBuilder().configuration( manualConfiguration ).buildSearchIntegrator();
 			fail();
 		}
 		catch (SearchException e) {

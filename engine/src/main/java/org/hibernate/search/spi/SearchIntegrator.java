@@ -32,7 +32,7 @@ import org.hibernate.search.stat.Statistics;
  * @author Emmanuel Bernard
  * @hsearch.experimental
  */
-public interface SearchIntegrator {
+public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Returns the entity to index binding for the given type.

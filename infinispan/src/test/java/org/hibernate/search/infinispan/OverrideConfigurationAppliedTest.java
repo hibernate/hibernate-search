@@ -12,7 +12,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
@@ -44,7 +44,7 @@ public class OverrideConfigurationAppliedTest {
 		//an illegal value to then verify the failure.
 		exceptions.expect( SearchException.class );
 		exceptions.expectMessage( "HSEARCH000103" );
-		new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 	}
 
 	@Indexed(index = "index1")

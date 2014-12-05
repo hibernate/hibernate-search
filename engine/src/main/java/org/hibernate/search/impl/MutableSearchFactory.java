@@ -35,7 +35,7 @@ import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
@@ -215,13 +215,13 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	@Override
 	public void addClasses(Class<?>... classes) {
-		final SearchFactoryBuilder builder = new SearchFactoryBuilder().currentFactory( this );
+		final SearchIntegratorBuilder builder = new SearchIntegratorBuilder().currentSearchIntegrator( this );
 		for ( Class<?> type : classes ) {
 			builder.addClass( type );
 		}
 		try {
 			mutating.lock();
-			builder.buildSearchFactory();
+			builder.buildSearchIntegrator();
 		}
 		finally {
 			mutating.unlock();
@@ -310,7 +310,7 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	@Override
 	public <T> T unwrap(Class<T> cls) {
-		if ( SearchIntegrator.class.equals( cls ) || SearchFactoryImplementor.class.equals( cls ) ) {
+		if ( SearchIntegrator.class.equals( cls ) || SearchFactoryImplementor.class.equals( cls ) || MutableSearchFactory.class.equals( cls ) ) {
 			return (T) this;
 		}
 		else {
