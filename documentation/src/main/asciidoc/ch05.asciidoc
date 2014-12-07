@@ -233,7 +233,6 @@ public class Myth {
 
 Query luceneQuery = mythQb.keyword().onField("name").matching("Sisiphus")
    .createQuery();
-
 ----
 ====
 
@@ -241,13 +240,11 @@ The matching word "Sisiphus" will be lower-cased and then split into 3-grams: si
 hus. Each of these n-gram will be part of the query. We will then be able to find the Sysiphus myth
 (with a `y`). All that is transparently done for you.
 
-
 [NOTE]
 ====
 If for some reason you do not want a specific field to use the field bridge or the analyzer you can
 call the `ignoreAnalyzer()` or `ignoreFieldBridge()` functions.
 ====
-
 
 To search for multiple possible words in the same field, simply add them all in the matching clause.
 
