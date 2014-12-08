@@ -9,6 +9,7 @@ package org.hibernate.search.infinispan;
 import java.io.IOException;
 
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.infinispan.impl.DefaultCacheManagerService;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;

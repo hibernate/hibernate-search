@@ -17,6 +17,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.infinispan.impl.DefaultCacheManagerService;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.util.impl.FileHelper;
