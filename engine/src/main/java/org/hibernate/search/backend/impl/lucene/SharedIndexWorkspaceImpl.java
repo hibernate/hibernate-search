@@ -10,7 +10,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 import java.util.Properties;

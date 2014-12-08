@@ -12,6 +12,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.NRTWorkspaceImpl;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;

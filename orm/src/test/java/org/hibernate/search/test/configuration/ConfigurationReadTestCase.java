@@ -15,7 +15,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.configuration.impl.IndexWriterSetting;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Before;
 

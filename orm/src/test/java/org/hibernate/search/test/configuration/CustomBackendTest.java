@@ -10,12 +10,12 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
-
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 
 /**

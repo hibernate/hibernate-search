@@ -47,7 +47,7 @@ public class IndexManagerOverrideTest {
 
 		//checks for the default implementation
 		checkIndexManagerType( allIndexesManager, "org.hibernate.search.test.configuration.BlogEntry",
-				org.hibernate.search.indexes.impl.DirectoryBasedIndexManager.class );
+				org.hibernate.search.indexes.spi.DirectoryBasedIndexManager.class );
 
 		//Uses "NRT" taken from shortcut names
 		checkIndexManagerType( allIndexesManager, "Book",

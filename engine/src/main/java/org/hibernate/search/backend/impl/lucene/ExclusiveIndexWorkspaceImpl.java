@@ -9,8 +9,8 @@ package org.hibernate.search.backend.impl.lucene;
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.CommitPolicy;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 
 import java.util.Properties;
