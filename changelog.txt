@@ -1,6 +1,28 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.CR1 (8-12-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-968] - Index dates as numeric fields
+    * [HSEARCH-1734] - The locking_strategy property is ignored when using the Infinispan Directory
+    * [HSEARCH-1735] - Background threads should not be started when not required
+    * [HSEARCH-1737] - Locking strategy "native" ignoring "index base" on Infinispan Directory
+
+** Improvement
+    * [HSEARCH-763] - Index numeric properties by using @NumericField by default
+    * [HSEARCH-1738] - Can prevent some I/O by aggressively exiting the FieldSelector visitor
+    * [HSEARCH-1741] - Various documentation improvements
+
+** Task
+    * [HSEARCH-1673] - Define and verify a clearly limited SPI for Infinispan Query
+    * [HSEARCH-1730] - Move all .impl classes in hibernate-search-engine into engine.impl
+    * [HSEARCH-1733] - Upgrade to WildFly 8.2.0.Final
+    * [HSEARCH-1739] - Rename SearchFactoryBuilder to SearchIntegrationBuilder
+    * [HSEARCH-1740] - Move SearchFactoryImplementor out of the SPI package
+
+
 Version 5.0.0.Beta3 (20-11-2014)
 ------------------------
 
