@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.infinispan;
+package org.hibernate.search.infinispan.impl;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -17,8 +17,8 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
-import org.hibernate.search.infinispan.impl.InfinispanConfigurationParser;
 import org.hibernate.search.infinispan.logging.impl.Log;
+import org.hibernate.search.infinispan.spi.CacheManagerService;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.JNDIHelper;

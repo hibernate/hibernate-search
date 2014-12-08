@@ -15,7 +15,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
+import org.hibernate.search.infinispan.spi.InfinispanDirectoryProvider;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.directoryProvider.CustomLockFactoryProvider;
 import org.hibernate.search.testsupport.TestForIssue;
