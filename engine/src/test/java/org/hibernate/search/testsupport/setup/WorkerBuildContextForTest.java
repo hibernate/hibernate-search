@@ -7,7 +7,7 @@
 package org.hibernate.search.testsupport.setup;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.search.engine.impl.SimpleInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 

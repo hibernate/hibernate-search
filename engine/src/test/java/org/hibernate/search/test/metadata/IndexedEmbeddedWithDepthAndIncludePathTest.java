@@ -11,12 +11,11 @@ import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.testsupport.TestForIssue;
 
 import static org.junit.Assert.assertNotNull;

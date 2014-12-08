@@ -14,7 +14,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.impl.MutableSearchFactory;
+import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;

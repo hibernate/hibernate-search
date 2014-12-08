@@ -9,8 +9,8 @@ package org.hibernate.search.cfg;
 import java.util.Map;
 
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.engine.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
