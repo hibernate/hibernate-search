@@ -58,7 +58,6 @@ import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.engine.spi.EntityState;
-import org.hibernate.search.engine.spi.SearchMappingBuilder;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.exception.impl.LogErrorHandler;
@@ -195,7 +194,7 @@ public class SearchIntegratorBuilder {
 			cfg = new ReflectionReplacingSearchConfiguration( reflectionManager, cfg );
 		}
 
-		final SearchMapping mapping = SearchMappingBuilder.getSearchMapping( cfg );
+		final SearchMapping mapping = SearchMapping.getSearchMapping( cfg );
 		applySearchMappingToMetadata( reflectionManager, mapping );
 
 		factoryState.setSearchMapping( mapping ); // might be null if feature is not used
