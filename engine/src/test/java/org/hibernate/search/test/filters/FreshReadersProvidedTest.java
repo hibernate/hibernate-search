@@ -30,7 +30,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -57,7 +57,7 @@ public class FreshReadersProvidedTest {
 
 	@Test
 	public void filtersTest() {
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Assert.assertNotNull( searchFactory.getIndexManagerHolder().getIndexManager( "guests" ) );
 
 		{ // Store guest "Thorin Oakenshield" in the index
@@ -144,7 +144,7 @@ public class FreshReadersProvidedTest {
 	 * @param filter test filter instance
 	 */
 	private void checkFilterInspectedAllSegments(RecordingFilter filter) {
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		IndexReader currentIndexReader = searchFactory.getIndexReaderAccessor().open( Guest.class );
 		try {
 			List<IndexReader> allSubReaders = getSubIndexReaders( (MultiReader) currentIndexReader );

@@ -44,16 +44,16 @@ public class SearchIndexerTest {
 				.addAnnotatedClass( Nation.class )
 				.build();
 		FullTextSession fullTextSession = ftsb.openFullTextSession();
-		SearchIntegrator searchFactory = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
+		SearchIntegrator integrator = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
 		{
-			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, Book.class );
+			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( integrator, Book.class );
 			assertTrue( tsii.getRootEntities().contains( Book.class ) );
 			assertFalse( tsii.getRootEntities().contains( ModernBook.class ) );
 			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
 		}
 		{
 			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl(
-					searchFactory,
+					integrator,
 					ModernBook.class,
 					AncientBook.class,
 					Book.class
@@ -64,7 +64,7 @@ public class SearchIndexerTest {
 		}
 		{
 			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl(
-					searchFactory,
+					integrator,
 					ModernBook.class,
 					AncientBook.class
 			);
@@ -74,7 +74,7 @@ public class SearchIndexerTest {
 		}
 		//verify that indexing Object will result in one separate indexer working per root indexed entity
 		{
-			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, Object.class );
+			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( integrator, Object.class );
 			assertTrue( tsii.getRootEntities().contains( Book.class ) );
 			assertTrue( tsii.getRootEntities().contains( Dvd.class ) );
 			assertFalse( tsii.getRootEntities().contains( AncientBook.class ) );
@@ -87,8 +87,8 @@ public class SearchIndexerTest {
 
 	private static class TestableMassIndexerImpl extends MassIndexerImpl {
 
-		protected TestableMassIndexerImpl(SearchIntegrator searchFactory, Class<?>... types) {
-			super( searchFactory, null, types );
+		protected TestableMassIndexerImpl(SearchIntegrator integrator, Class<?>... types) {
+			super( integrator, null, types );
 		}
 
 		public Set<Class<?>> getRootEntities() {

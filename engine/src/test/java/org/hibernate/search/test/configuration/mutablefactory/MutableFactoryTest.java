@@ -20,7 +20,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.util.impl.Executors;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -226,7 +226,7 @@ public class MutableFactoryTest {
 	}
 
 	private static class DoAddClasses implements Runnable {
-		private final SearchFactoryImplementor searchFactoryImplementor;
+		private final ExtendedSearchIntegrator extendedIntegrator;
 		private final int factorOfClassesPerThread;
 		private final QueryParser parser;
 		private final int nbrOfClassesPerThread;
@@ -246,7 +246,7 @@ public class MutableFactoryTest {
 		}
 
 		public DoAddClasses(SearchIntegrator si, int factorOfClassesPerThread, int nbrOfClassesPerThread) {
-			this.searchFactoryImplementor = si.unwrap( SearchFactoryImplementor.class );
+			this.extendedIntegrator = si.unwrap( ExtendedSearchIntegrator.class );
 			this.factorOfClassesPerThread = factorOfClassesPerThread;
 			this.parser = new QueryParser(
 					TestConstants.getTargetLuceneVersion(),
@@ -263,16 +263,16 @@ public class MutableFactoryTest {
 					final int i = factorOfClassesPerThread * nbrOfClassesPerThread + index;
 					final Class<?> aClass = MutableFactoryTest.getClassByNumber(
 							i,
-							searchFactoryImplementor.getServiceManager()
+							extendedIntegrator.getServiceManager()
 					);
-					searchFactoryImplementor.addClasses( aClass );
+					extendedIntegrator.addClasses( aClass );
 					Object entity = aClass.getConstructor( Integer.class, String.class )
 							.newInstance( i, "Emmanuel" + i );
 					TransactionContextForTest context = new TransactionContextForTest();
-					MutableFactoryTest.doIndexWork( entity, i, searchFactoryImplementor, context );
+					MutableFactoryTest.doIndexWork( entity, i, extendedIntegrator, context );
 					context.end();
 
-					EntityIndexBinding indexBindingForEntity = searchFactoryImplementor.getIndexBinding( aClass );
+					EntityIndexBinding indexBindingForEntity = extendedIntegrator.getIndexBinding( aClass );
 					assertNotNull( indexBindingForEntity );
 					IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 					assertEquals( 1, indexManagers.length );
@@ -285,7 +285,7 @@ public class MutableFactoryTest {
 					}
 
 					Query luceneQuery = parser.parse( "Emmanuel" + i );
-					IndexReader indexReader = searchFactoryImplementor.getIndexReaderAccessor().open( aClass );
+					IndexReader indexReader = extendedIntegrator.getIndexReaderAccessor().open( aClass );
 					IndexSearcher searcher = new IndexSearcher( indexReader );
 					TopDocs hits = searcher.search( luceneQuery, 1000 );
 					if ( hits.totalHits != 1 ) {
@@ -293,7 +293,7 @@ public class MutableFactoryTest {
 						failureInfo = "failure: Emmanuel" + i + " for " + aClass.getName();
 						return;
 					}
-					searchFactoryImplementor.getIndexReaderAccessor().close( indexReader );
+					extendedIntegrator.getIndexReaderAccessor().close( indexReader );
 				}
 			}
 			catch (Exception e) {

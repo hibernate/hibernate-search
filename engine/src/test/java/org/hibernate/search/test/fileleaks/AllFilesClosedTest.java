@@ -16,7 +16,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
@@ -90,7 +90,7 @@ public class AllFilesClosedTest {
 	}
 
 	private FileMonitoringDirectory getDirectory(String indexName) {
-		SearchFactoryImplementor implementor = searchIntegrator.unwrap( SearchFactoryImplementor.class );
+		ExtendedSearchIntegrator implementor = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) implementor.getIndexManagerHolder().getIndexManager( indexName );
 		FileMonitoringDirectoryProvider directoryProvider = (FileMonitoringDirectoryProvider) indexManager.getDirectoryProvider();
 		FileMonitoringDirectory directory = (FileMonitoringDirectory) directoryProvider.getDirectory();

@@ -28,7 +28,7 @@ import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.HibernateSessionLoadingInitializer;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -70,7 +70,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 			SessionFactory sessionFactory,
 			CountDownLatch producerEndSignal,
 			CacheMode cacheMode, Class<?> type,
-			SearchFactoryImplementor searchFactory,
+			ExtendedSearchIntegrator searchFactory,
 			String idName, BatchBackend backend, ErrorHandler errorHandler) {
 		this.source = fromIdentifierListToEntities;
 		this.monitor = monitor;

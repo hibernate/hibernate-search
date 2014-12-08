@@ -15,7 +15,7 @@ import org.hibernate.SessionFactory;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.testing.junit4.CustomRunner;
 import org.junit.After;
@@ -76,8 +76,8 @@ public abstract class SearchTestBase implements TestResourceManager {
 	}
 
 	@Override
-	public SearchFactoryImplementor getSearchFactoryImpl() {
-		return getTestResourceManager().getSearchFactoryImpl();
+	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
+		return getTestResourceManager().getExtendedSearchIntegrator();
 	}
 
 	@Override

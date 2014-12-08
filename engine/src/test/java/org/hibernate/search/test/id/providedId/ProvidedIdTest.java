@@ -22,7 +22,7 @@ import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.impl.DocumentExtractorImpl;
 import org.hibernate.search.query.engine.impl.LazyQueryState;
@@ -46,7 +46,7 @@ public class ProvidedIdTest {
 
 	@Test
 	public void testProvidedId() throws Exception {
-		SearchFactoryImplementor searchFactoryImplementor = configuration.getSearchFactory();
+		ExtendedSearchIntegrator extendedIntegrator = configuration.getSearchFactory();
 
 		ProvidedIdPerson person1 = new ProvidedIdPerson();
 		person1.setName( "Big Goat" );
@@ -63,11 +63,11 @@ public class ProvidedIdTest {
 		TransactionContextForTest tc = new TransactionContextForTest();
 
 		Work work = new Work( person1, 1, WorkType.INDEX );
-		searchFactoryImplementor.getWorker().performWork( work, tc );
+		extendedIntegrator.getWorker().performWork( work, tc );
 		work = new Work( person2, 2, WorkType.INDEX );
-		searchFactoryImplementor.getWorker().performWork( work, tc );
+		extendedIntegrator.getWorker().performWork( work, tc );
 		Work work2 = new Work( person3, 3, WorkType.INDEX );
-		searchFactoryImplementor.getWorker().performWork( work2, tc );
+		extendedIntegrator.getWorker().performWork( work2, tc );
 
 		tc.end();
 
@@ -79,7 +79,7 @@ public class ProvidedIdTest {
 		//we cannot use FTQuery because @ProvidedId does not provide the getter id and Hibernate Search Query extension
 		//needs it. So we use plain Lucene
 
-		IndexReader indexReader = searchFactoryImplementor.getIndexReaderAccessor().open( ProvidedIdPerson.class );
+		IndexReader indexReader = extendedIntegrator.getIndexReaderAccessor().open( ProvidedIdPerson.class );
 		IndexSearcher searcher = new IndexSearcher( indexReader );
 		TopDocs hits = searcher.search( luceneQuery, 1000 );
 		assertEquals( 3, hits.totalHits );
@@ -91,15 +91,15 @@ public class ProvidedIdTest {
 				luceneQuery,
 				indexReader,
 				defaultSimilarity,
-				searchFactoryImplementor,
-				searchFactoryImplementor.getIndexedTypes(),
+				extendedIntegrator,
+				extendedIntegrator.getIndexedTypes(),
 				false,
 				false
 		);
 
 		QueryHits queryHits = new QueryHits(
 				lowLevelSearcher, null, null,
-				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, searchFactoryImplementor.getTimingSource() ),
+				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, extendedIntegrator.getTimingSource() ),
 				null,
 				false,
 				null,
@@ -113,7 +113,7 @@ public class ProvidedIdTest {
 		targetedClasses.add( ProvidedIdPerson.class );
 		targetedClasses.add( ProvidedIdPersonSub.class );
 		DocumentExtractor extractor = new DocumentExtractorImpl(
-				queryHits, searchFactoryImplementor, new String[] { "name" },
+				queryHits, extendedIntegrator, new String[] { "name" },
 				identifiers, false,
 				lowLevelSearcher,
 				luceneQuery,
@@ -129,6 +129,6 @@ public class ProvidedIdTest {
 		assertTrue( titles.contains( "Regular goat" ) );
 		assertTrue( titles.contains( "Mini Goat" ) );
 		assertTrue( titles.contains( "Big Goat" ) );
-		searchFactoryImplementor.getIndexReaderAccessor().close( indexReader );
+		extendedIntegrator.getIndexReaderAccessor().close( indexReader );
 	}
 }

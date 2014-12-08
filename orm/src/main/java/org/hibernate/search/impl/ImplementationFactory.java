@@ -26,8 +26,8 @@ public final class ImplementationFactory {
 		return new FullTextSessionImpl( session );
 	}
 
-	public static SearchFactory createSearchFactory(SearchIntegrator searchFactoryImplementor) {
-		return new SearchFactoryImpl( searchFactoryImplementor );
+	public static SearchFactory createSearchFactory(SearchIntegrator searchIntegrator) {
+		return new SearchFactoryImpl( searchIntegrator );
 	}
 
 }

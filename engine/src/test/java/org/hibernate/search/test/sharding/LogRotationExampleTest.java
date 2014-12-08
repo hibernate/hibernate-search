@@ -24,7 +24,7 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -71,7 +71,7 @@ public class LogRotationExampleTest {
 
 	@Test
 	public void filtersTest() {
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Assert.assertNotNull( searchFactory.getIndexManagerHolder() );
 
 		storeLog( makeTimestamp( 2013, 10, 7, 21, 33 ), "implementing method makeTimestamp" );
@@ -104,7 +104,7 @@ public class LogRotationExampleTest {
 	}
 
 	private int queryAndFilter(Query luceneQuery, int fromHour, int toHour) {
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		HSQuery hsQuery = searchFactory.createHSQuery()
 			.luceneQuery( luceneQuery )
 			.targetedEntities( Arrays.asList( new Class<?>[]{ LogMessage.class } ) );
@@ -121,7 +121,7 @@ public class LogRotationExampleTest {
 		log.timestamp = timestamp;
 		log.message = message;
 
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Work work = new Work( log, log.timestamp, WorkType.ADD, false );
 		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );
@@ -132,7 +132,7 @@ public class LogRotationExampleTest {
 		LogMessage log = new LogMessage();
 		log.timestamp = timestamp;
 
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Work work = new Work( LogMessage.class, log.timestamp, WorkType.DELETE );
 		TransactionContextForTest tc = new TransactionContextForTest();
 		searchFactory.getWorker().performWork( work, tc );

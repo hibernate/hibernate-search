@@ -24,7 +24,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.WorkQueue;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
@@ -109,7 +109,7 @@ public class WorkDuplicationTest extends SearchTestBase {
 	@Test
 	public void testAddWorkGetReplacedByDeleteWork() throws Exception {
 		FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession( openSession() );
-		SearchFactoryImplementor searchFactory = fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
+		ExtendedSearchIntegrator integrator = fullTextSession.getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
 
 		// create test entity
 		SpecialPerson person = new SpecialPerson();
@@ -121,7 +121,7 @@ public class WorkDuplicationTest extends SearchTestBase {
 
 		person.addEmailAddress( emailAddress );
 
-		WorkQueue plannerEngine = new WorkQueue( searchFactory );
+		WorkQueue plannerEngine = new WorkQueue( integrator );
 
 		plannerEngine.add( new Work( person, 1, WorkType.ADD ) );
 

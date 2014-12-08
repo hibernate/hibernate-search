@@ -20,7 +20,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
@@ -53,7 +53,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private final Set<Class<?>> containedEntityTypes = new HashSet<Class<?>>();
 	private LuceneWorkSerializer serializer;
 	private SerializationProvider serializationProvider;
-	private SearchFactoryImplementor boundSearchFactory = null;
+	private ExtendedSearchIntegrator boundSearchIntegrator = null;
 	private DirectoryBasedReaderProvider readers = null;
 	private ServiceManager serviceManager;
 
@@ -118,12 +118,12 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public Analyzer getAnalyzer(String name) {
-		return boundSearchFactory.getAnalyzer( name );
+		return boundSearchIntegrator.getAnalyzer( name );
 	}
 
 	@Override
-	public void setSearchFactory(SearchFactoryImplementor boundSearchFactory) {
-		this.boundSearchFactory = boundSearchFactory;
+	public void setSearchFactory(ExtendedSearchIntegrator boundSearchIntegrator) {
+		this.boundSearchIntegrator = boundSearchIntegrator;
 		triggerWorkspaceReconfiguration();
 	}
 
@@ -143,7 +143,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	public LuceneWorkSerializer getSerializer() {
 		if ( serializer == null ) {
 			serializationProvider = serviceManager.requestService( SerializationProvider.class );
-			serializer = new LuceneWorkSerializerImpl( serializationProvider, boundSearchFactory );
+			serializer = new LuceneWorkSerializerImpl( serializationProvider, boundSearchIntegrator );
 			log.indexManagerUsesSerializationService( this.indexName, this.serializer.describeSerializer() );
 		}
 		return serializer;
@@ -156,7 +156,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	//Not exposed on the IndexManager interface
 	public EntityIndexBinding getIndexBinding(Class<?> entityType) {
-		return boundSearchFactory.getIndexBinding( entityType );
+		return boundSearchIntegrator.getIndexBinding( entityType );
 	}
 
 	//Not exposed on the IndexManager interface
@@ -180,7 +180,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	private void triggerWorkspaceReconfiguration() {
-		if ( boundSearchFactory != null ) { //otherwise it's too early
+		if ( boundSearchIntegrator != null ) { //otherwise it's too early
 			backend.indexMappingChanged();
 		}
 	}

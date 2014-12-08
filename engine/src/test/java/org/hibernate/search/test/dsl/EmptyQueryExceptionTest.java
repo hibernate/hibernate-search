@@ -11,7 +11,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.EmptyQueryException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -36,7 +36,7 @@ public class EmptyQueryExceptionTest {
 
 	@Test
 	public void verifyExceptionOnNonMeaningfullQueries() {
-		final SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		final ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 
 		Book book = new Book();
 		book.title = "Empty Book";

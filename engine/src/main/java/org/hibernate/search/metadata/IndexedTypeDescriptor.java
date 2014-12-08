@@ -35,7 +35,7 @@ public interface IndexedTypeDescriptor extends FieldContributor {
 	/**
 	 * Returns a set of {@code IndexDescriptor} instances describing Lucene index information, in particular the index name.
 	 * The index name can also be used to retrieve the actual {@code IndexManager} for this index via
-	 * {@link org.hibernate.search.engine.spi.SearchFactoryImplementor#getIndexManagerHolder()#getIndexManager(String)}.
+	 * {@link org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator#getIndexManagerHolder()#getIndexManager(String)}.
 	 *
 	 * For non sharded indexes there will be only a single {@code IndexDescriptor}. The empty set is returned for an unindexed type
 	 *
