@@ -8,8 +8,7 @@
 package org.hibernate.search.query.dsl.impl;
 
 import org.apache.lucene.analysis.Analyzer;
-
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 
 /**
  * Keep the query builder contextual information

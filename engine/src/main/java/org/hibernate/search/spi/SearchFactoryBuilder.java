@@ -8,7 +8,7 @@
 package org.hibernate.search.spi;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 
 /**
  * @deprecated Use SearchIntegrationBuilder instead. This class will be removed!

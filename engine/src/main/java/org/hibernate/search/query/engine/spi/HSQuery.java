@@ -14,7 +14,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -228,7 +228,7 @@ public interface HSQuery extends ProjectionConstants {
 	/**
 	 * <p>afterDeserialise.</p>
 	 *
-	 * @param searchFactory a {@link org.hibernate.search.engine.spi.SearchFactoryImplementor} object.
+	 * @param searchFactory a {@link org.hibernate.search.engine.friend.SearchFactoryImplementor} object.
 	 */
 	void afterDeserialise(SearchIntegrator searchFactory);
 

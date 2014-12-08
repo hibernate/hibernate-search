@@ -8,7 +8,7 @@ package org.hibernate.search.test.configuration.bootstrapfailure;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;

@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;

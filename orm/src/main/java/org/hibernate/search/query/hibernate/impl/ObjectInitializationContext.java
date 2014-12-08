@@ -8,8 +8,7 @@ package org.hibernate.search.query.hibernate.impl;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 
 /**
