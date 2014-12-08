@@ -27,8 +27,8 @@ final class SearchFactoryImpl implements SearchFactory {
 
 	private final SearchIntegrator searchIntegrator;
 
-	public SearchFactoryImpl(SearchIntegrator searchFactoryImplementor) {
-		this.searchIntegrator = searchFactoryImplementor;
+	public SearchFactoryImpl(SearchIntegrator searchIntegrator) {
+		this.searchIntegrator = searchIntegrator;
 	}
 
 	@Override

@@ -128,7 +128,7 @@ public class JMSSlaveTest extends SearchTestBase {
 
 	private void registerMessageListener() throws Exception {
 		MessageConsumer consumer = getQueueSession().createConsumer( getMessageQueue() );
-		consumer.setMessageListener( new SearchQueueChecker( getSearchFactoryImpl() ) );
+		consumer.setMessageListener( new SearchQueueChecker( getExtendedSearchIntegrator() ) );
 	}
 
 	private Queue getMessageQueue() throws Exception {

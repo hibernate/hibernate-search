@@ -108,7 +108,7 @@ public class JGroupsMasterTest extends SearchTestBase {
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		final String indexManagerName = "org.hibernate.search.test.jgroups.master.TShirt";
-		IndexManager indexManager = getSearchFactoryImpl().getIndexManagerHolder().getIndexManager( indexManagerName );
+		IndexManager indexManager = getExtendedSearchIntegrator().getIndexManagerHolder().getIndexManager( indexManagerName );
 		//send message to all listeners
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
 		data = MessageSerializationHelper.prependString( indexManagerName, data );

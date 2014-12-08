@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.batchindexing.impl;
 
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -19,15 +19,15 @@ abstract class ErrorHandledRunnable implements Runnable {
 
 	private static final Log log = LoggerFactory.make();
 
-	protected final SearchFactoryImplementor searchFactoryImplementor;
+	protected final ExtendedSearchintegrator extendedIntegrator;
 
-	protected ErrorHandledRunnable(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	protected ErrorHandledRunnable(ExtendedSearchintegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator;
 	}
 
 	@Override
 	public final void run() {
-		ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
+		ErrorHandler errorHandler = extendedIntegrator.getErrorHandler();
 		try {
 			runWithErrorHandler();
 		}

@@ -16,8 +16,8 @@ public class MDBSearchController extends AbstractJMSHibernateSearchController {
 
 	final SearchIntegrator integrator;
 
-	MDBSearchController( SearchIntegrator searchFactory ) {
-		this.integrator = searchFactory;
+	MDBSearchController(SearchIntegrator integrator) {
+		this.integrator = integrator;
 	}
 
 	@Override

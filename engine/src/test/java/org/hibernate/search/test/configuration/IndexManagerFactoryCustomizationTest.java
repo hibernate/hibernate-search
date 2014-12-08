@@ -18,7 +18,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.impl.DefaultIndexManagerFactory;
 import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
@@ -79,7 +79,7 @@ public class IndexManagerFactoryCustomizationTest {
 	}
 
 	private Class<? extends IndexManager> extractDocumentIndexManagerClassName(SearchIntegrator si, String indexName) {
-		SearchFactoryImplementor factoryImplementor = si.unwrap( SearchFactoryImplementor.class );
+		ExtendedSearchintegrator factoryImplementor = si.unwrap( ExtendedSearchintegrator.class );
 		IndexManager indexManager = factoryImplementor.getIndexManagerHolder().getIndexManager( indexName );
 		Assert.assertNotNull( indexManager );
 		return indexManager.getClass();

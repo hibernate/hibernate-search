@@ -7,13 +7,13 @@
 
 package org.hibernate.search.spi.impl;
 
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 
 /**
- * Search Factory implementor exposing its sharable state.
+ * Contract for {@code ExtendedSearchintegrator} implementors exposing its shareable state.
  * The state can then be extracted and used to mutate factories.
  *
  * @author Emmanuel Bernard
  */
-public interface SearchFactoryImplementorWithShareableState extends SearchFactoryImplementor, SearchFactoryState {
+public interface ExtendedSearchintegratorWithShareableState extends ExtendedSearchintegrator, SearchFactoryState {
 }

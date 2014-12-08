@@ -13,7 +13,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
@@ -36,7 +36,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  */
 public class TransactionalWorker implements Worker {
 
-	//note: there is one Worker instance per SearchFactory, reused concurrently for all sessions.
+	//note: there is only one Worker instance, reused concurrently for all sessions.
 
 	private static final Log log = LoggerFactory.make();
 
@@ -44,7 +44,7 @@ public class TransactionalWorker implements Worker {
 	//synchronized map since for a given transaction, we have not concurrent access
 	protected final ConcurrentMap<Object, PostTransactionWorkQueueSynchronization> synchronizationPerTransaction = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 	private QueueingProcessor queueingProcessor;
-	private SearchFactoryImplementor factory;
+	private ExtendedSearchintegrator factory;
 	private InstanceInitializer instanceInitializer;
 
 	private boolean transactionExpected;
@@ -145,7 +145,7 @@ public class TransactionalWorker implements Worker {
 	@Override
 	public void initialize(Properties props, WorkerBuildContext context, QueueingProcessor queueingProcessor) {
 		this.queueingProcessor = queueingProcessor;
-		this.factory = context.getUninitializedSearchFactory();
+		this.factory = context.getUninitializedSearchIntegrator();
 		this.transactionExpected = context.isTransactionManagerExpected();
 		this.instanceInitializer = context.getInstanceInitializer();
 	}

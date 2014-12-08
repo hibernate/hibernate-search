@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -29,19 +29,19 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
  */
 public class MultiClassesQueryLoader extends AbstractLoader {
 	private Session session;
-	private SearchFactoryImplementor searchFactoryImplementor;
+	private ExtendedSearchintegrator extendedIntegrator;
 	private List<RootEntityMetadata> entityMetadata;
 	private TimeoutManager timeoutManager;
 	private ObjectInitializer objectInitializer;
 
 	@Override
 	public void init(Session session,
-					SearchFactoryImplementor searchFactoryImplementor,
+					ExtendedSearchintegrator extendedIntegrator,
 					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {
-		super.init( session, searchFactoryImplementor );
+		super.init( session, extendedIntegrator );
 		this.session = session;
-		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutManager = timeoutManager;
 		this.objectInitializer = objectInitializer;
 	}
@@ -57,7 +57,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		// root entity could lead to quite inefficient queries in Hibernate when using table per class
 		if ( entityTypes.size() == 0 ) {
 			//support all classes
-			for ( Map.Entry<Class<?>, EntityIndexBinding> entry : searchFactoryImplementor.getIndexBindings().entrySet() ) {
+			for ( Map.Entry<Class<?>, EntityIndexBinding> entry : extendedIntegrator.getIndexBindings().entrySet() ) {
 				//get only root entities to limit queries
 				if ( entry.getValue().getDocumentBuilder().isRoot() ) {
 					safeEntityTypes.add( entry.getKey() );
@@ -69,7 +69,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		}
 		entityMetadata = new ArrayList<>( safeEntityTypes.size() );
 		for ( Class clazz : safeEntityTypes ) {
-			entityMetadata.add( new RootEntityMetadata( clazz, searchFactoryImplementor ) );
+			entityMetadata.add( new RootEntityMetadata( clazz, extendedIntegrator ) );
 		}
 	}
 
@@ -134,7 +134,7 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 					bucketEntityInfos, idToObjectMap, new ObjectInitializationContext(
 							key.criteria,
 							key.rootEntity,
-							searchFactoryImplementor,
+							extendedIntegrator,
 							timeoutManager,
 							session
 					)
@@ -158,9 +158,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 		public final Set<Class<?>> mappedSubclasses;
 		private final Criteria criteria;
 
-		RootEntityMetadata(Class<?> rootEntity, SearchFactoryImplementor searchFactoryImplementor) {
+		RootEntityMetadata(Class<?> rootEntity, ExtendedSearchintegrator extendedIntegrator) {
 			this.rootEntity = rootEntity;
-			EntityIndexBinding provider = searchFactoryImplementor.getIndexBinding( rootEntity );
+			EntityIndexBinding provider = extendedIntegrator.getIndexBinding( rootEntity );
 			if ( provider == null ) {
 				throw new AssertionFailure("Provider not found for class: " + rootEntity);
 			}

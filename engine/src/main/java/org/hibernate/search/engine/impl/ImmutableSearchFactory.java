@@ -21,7 +21,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.Version;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -52,7 +52,7 @@ import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.impl.ExtendedSearchintegratorWithShareableState;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.impl.StatisticsImpl;
@@ -66,7 +66,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class ImmutableSearchFactory implements SearchFactoryImplementorWithShareableState, WorkerBuildContext {
+public class ImmutableSearchFactory implements ExtendedSearchintegratorWithShareableState, WorkerBuildContext {
 
 	static {
 		Version.touch();
@@ -368,7 +368,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	}
 
 	@Override
-	public SearchFactoryImplementor getUninitializedSearchFactory() {
+	public ExtendedSearchintegrator getUninitializedSearchIntegrator() {
 		return this;
 	}
 
@@ -385,7 +385,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 				mbeanNameSuffix
 		);
 
-		// since the SearchFactory is mutable we might have an already existing MBean which we have to unregister first
+		// since the Searchintegrator is mutable we might have an already existing MBean which we have to unregister first
 		if ( JMXRegistrar.isNameRegistered( objectName ) ) {
 			JMXRegistrar.unRegisterMBean( objectName );
 		}
@@ -512,7 +512,7 @@ public class ImmutableSearchFactory implements SearchFactoryImplementorWithShare
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T unwrap(Class<T> cls) {
-		if ( SearchIntegrator.class.isAssignableFrom( cls ) || SearchFactoryImplementor.class.isAssignableFrom( cls ) ) {
+		if ( SearchIntegrator.class.isAssignableFrom( cls ) || ExtendedSearchintegrator.class.isAssignableFrom( cls ) ) {
 			return (T) this;
 		}
 		else {

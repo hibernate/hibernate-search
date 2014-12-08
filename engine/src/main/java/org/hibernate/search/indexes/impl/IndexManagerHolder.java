@@ -21,7 +21,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.impl.DynamicShardingEntityIndexBinding;
 import org.hibernate.search.engine.impl.EntityIndexBindingFactory;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
@@ -31,7 +31,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.impl.ExtendedSearchintegratorWithShareableState;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.store.ShardIdentifierProvider;
 import org.hibernate.search.store.impl.IdHashShardingStrategy;
@@ -144,7 +144,7 @@ public class IndexManagerHolder {
 			indexManager.addContainedEntity( entityIndexBinding.getDocumentBuilder().getBeanClass() );
 			return indexManager;
 		}
-		SearchFactoryImplementor searchFactory = entityIndexBinding.getSearchFactory();
+		ExtendedSearchintegrator searchFactory = entityIndexBinding.getSearchintegrator();
 		WorkerBuildContext context;
 		//known implementations of SearchFactory passed are MutableSearchFactory and ImmutableSearchFactory
 		if ( WorkerBuildContext.class.isAssignableFrom( searchFactory.getClass() ) ) {
@@ -179,11 +179,11 @@ public class IndexManagerHolder {
 
 	/**
 	 * Useful for MutableSearchFactory, this haves all managed IndexManagers
-	 * switch over to the new SearchFactory.
+	 * switch over to the new SearchIntegrator.
 	 *
-	 * @param factory the new SearchFactory to set on each IndexManager.
+	 * @param factory the new SearchIntegrator to set on each IndexManager.
 	 */
-	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
+	public void setActiveSearchIntegrator(ExtendedSearchintegratorWithShareableState factory) {
 		for ( IndexManager indexManager : getIndexManagers() ) {
 			indexManager.setSearchFactory( factory );
 		}

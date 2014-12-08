@@ -19,7 +19,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 
@@ -91,7 +91,7 @@ final class Helper {
 	}
 
 	static DocumentBuilderIndexedEntity getDocumentBuilder(QueryBuildingContext queryContext) {
-		final SearchFactoryImplementor factory = queryContext.getFactory();
+		final ExtendedSearchintegrator factory = queryContext.getFactory();
 		final Class<?> type = queryContext.getEntityType();
 		EntityIndexBinding indexBinding = factory.getIndexBinding( type );
 		if ( indexBinding == null ) {

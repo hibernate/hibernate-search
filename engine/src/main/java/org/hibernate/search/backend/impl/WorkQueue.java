@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.impl.WorkPlan;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.logging.impl.Log;
@@ -31,15 +31,15 @@ public class WorkQueue {
 	//flag indicating if data has been sealed and not modified since
 	private boolean sealedAndUnchanged;
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final ExtendedSearchintegrator extendedIntegrator;
 
-	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
-		this.plan = new WorkPlan( searchFactoryImplementor );
+	public WorkQueue(ExtendedSearchintegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator;
+		this.plan = new WorkPlan( extendedIntegrator );
 	}
 
-	public WorkQueue(SearchFactoryImplementor searchFactoryImplementor, WorkPlan plan) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public WorkQueue(ExtendedSearchintegrator extendedIntegrator, WorkPlan plan) {
+		this.extendedIntegrator = extendedIntegrator;
 		this.plan = plan;
 	}
 
@@ -52,8 +52,8 @@ public class WorkQueue {
 		if ( log.isTraceEnabled() ) {
 			log.tracef( "Splitting work queue with %d works", plan.size() );
 		}
-		WorkQueue subQueue = new WorkQueue( searchFactoryImplementor, plan );
-		this.plan = new WorkPlan( searchFactoryImplementor );
+		WorkQueue subQueue = new WorkQueue( extendedIntegrator, plan );
+		this.plan = new WorkPlan( extendedIntegrator );
 		this.sealedAndUnchanged = false;
 		return subQueue;
 	}

@@ -29,7 +29,7 @@ public class FetchSizeConfigurationTest extends SearchTestBase {
 	@RequiresDialect(comment = "H2 does not accept negative fetch sizes",
 		strictMatching = true, value = org.hibernate.dialect.H2Dialect.class)
 	public void testSetFetchSizeOnH2Fails() throws InterruptedException {
-		SearchIntegrator searchIntegrator = getSearchFactoryImpl();
+		SearchIntegrator searchIntegrator = getExtendedSearchIntegrator();
 		MockErrorHandler mockErrorHandler = MassIndexerErrorReportingTest.getErrorHandler( searchIntegrator );
 
 		FullTextSession fullTextSession = MassIndexerErrorReportingTest.prepareSomeData( this );
@@ -47,7 +47,7 @@ public class FetchSizeConfigurationTest extends SearchTestBase {
 	@RequiresDialect(comment = "MySQL definitely should accept Integer.MIN_VALUE",
 		strictMatching = false, value = org.hibernate.dialect.MySQLDialect.class)
 	public void testSetFetchSizeOnMySQL() throws InterruptedException {
-		SearchIntegrator searchIntegrator = getSearchFactoryImpl();
+		SearchIntegrator searchIntegrator = getExtendedSearchIntegrator();
 		MockErrorHandler mockErrorHandler = MassIndexerErrorReportingTest.getErrorHandler( searchIntegrator );
 
 		FullTextSession fullTextSession = MassIndexerErrorReportingTest.prepareSomeData( this );

@@ -63,7 +63,7 @@ public class JGroupsConfigurationTest {
 	}
 
 	/**
-	 * Attempts to start a SearchFactory, and make sure we close it if it happens to start
+	 * Attempts to start a SearchIntegrator, and make sure we close it if it happens to start
 	 * correctly.
 	 * @param cfg a configuration to try booting
 	 * @throws Throwable

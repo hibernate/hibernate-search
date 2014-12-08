@@ -15,7 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 
 import org.hibernate.internal.CriteriaImpl;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
@@ -28,7 +28,7 @@ public class QueryLoader extends AbstractLoader {
 
 	private Session session;
 	private Class entityType;
-	private SearchFactoryImplementor searchFactoryImplementor;
+	private ExtendedSearchintegrator extendedIntegrator;
 	private Criteria criteria;
 	private boolean isExplicitCriteria;
 	private TimeoutManager timeoutManager;
@@ -37,12 +37,12 @@ public class QueryLoader extends AbstractLoader {
 
 	@Override
 	public void init(Session session,
-					SearchFactoryImplementor searchFactoryImplementor,
+					ExtendedSearchintegrator extendedIntegrator,
 					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {
-		super.init( session, searchFactoryImplementor );
+		super.init( session, extendedIntegrator );
 		this.session = session;
-		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutManager = timeoutManager;
 		this.objectInitializer = objectInitializer;
 	}
@@ -88,7 +88,7 @@ public class QueryLoader extends AbstractLoader {
 		objectInitializer.initializeObjects(
 				entityInfos,
 				idToObjectMap,
-				new ObjectInitializationContext( criteria, entityType, searchFactoryImplementor, timeoutManager, session )
+				new ObjectInitializationContext( criteria, entityType, extendedIntegrator, timeoutManager, session )
 		);
 
 		ArrayList<Object> result = new ArrayList<>( idToObjectMap.size() );

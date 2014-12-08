@@ -39,7 +39,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.Version;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
@@ -68,7 +68,7 @@ import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.impl.ExtendedSearchintegratorWithShareableState;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -114,20 +114,20 @@ public class SearchIntegratorBuilder {
 	private final MutableSearchFactoryState factoryState = new MutableSearchFactoryState();
 
 	public SearchIntegrator buildSearchIntegrator() {
-		SearchFactoryImplementor searchFactoryImplementor;
+		ExtendedSearchintegrator extendedIntegrator;
 		if ( rootFactory == null ) {
 			if ( classes.size() > 0 ) {
 				throw new SearchException( "Cannot add a class if the original SearchFactory is not passed" );
 			}
-			searchFactoryImplementor = buildNewSearchFactory();
+			extendedIntegrator = buildNewSearchFactory();
 		}
 		else {
-			searchFactoryImplementor = buildIncrementalSearchFactory();
+			extendedIntegrator = buildIncrementalSearchFactory();
 		}
-		return searchFactoryImplementor;
+		return extendedIntegrator;
 	}
 
-	private SearchFactoryImplementor buildIncrementalSearchFactory() {
+	private ExtendedSearchintegrator buildIncrementalSearchFactory() {
 		removeClassesAlreadyManaged();
 		if ( classes.size() == 0 ) {
 			return rootFactory;
@@ -166,8 +166,8 @@ public class SearchIntegratorBuilder {
 
 		//update backend
 		//TODO make sure the old IndexManagers and backends are disposed - not currently a problem as we only support adding entities incrementally
-		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );
-		factoryState.setActiveSearchFactory( factory );
+		ExtendedSearchintegratorWithShareableState factory = new ImmutableSearchFactory( factoryState );
+		factoryState.setActiveSearchIntegrator( factory );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
 	}
@@ -186,7 +186,7 @@ public class SearchIntegratorBuilder {
 		}
 	}
 
-	private SearchFactoryImplementor buildNewSearchFactory() {
+	private ExtendedSearchintegrator buildNewSearchFactory() {
 		BuildContext buildContext = new BuildContext();
 		createCleanFactoryState( cfg, buildContext );
 
@@ -227,8 +227,8 @@ public class SearchIntegratorBuilder {
 						cfg.getProperties(), Environment.CACHE_DOCIDRESULTS_SIZE, CachingWrapperFilter.DEFAULT_SIZE
 				)
 		);
-		SearchFactoryImplementorWithShareableState factory = new ImmutableSearchFactory( factoryState );
-		factoryState.setActiveSearchFactory( factory );
+		ExtendedSearchintegratorWithShareableState factory = new ImmutableSearchFactory( factoryState );
+		factoryState.setActiveSearchIntegrator( factory );
 		rootFactory.setDelegate( factory );
 		return rootFactory;
 	}
@@ -596,7 +596,7 @@ public class SearchIntegratorBuilder {
 		private final SearchFactoryState factoryState = SearchIntegratorBuilder.this.factoryState;
 
 		@Override
-		public SearchFactoryImplementor getUninitializedSearchFactory() {
+		public ExtendedSearchintegrator getUninitializedSearchIntegrator() {
 			return rootFactory;
 		}
 

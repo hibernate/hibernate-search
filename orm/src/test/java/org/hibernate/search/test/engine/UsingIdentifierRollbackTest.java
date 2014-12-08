@@ -33,8 +33,8 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 
 	@Test
 	public void testEntityDeletionWithoutIdentifier() {
-		SearchIntegrator searchFactoryImpl = getSearchFactoryImpl();
-		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		MockErrorHandler errorHandler = (MockErrorHandler) integrator.getErrorHandler();
 
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
@@ -54,8 +54,8 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 
 	@Test
 	public void testRolledBackIdentifiersOnUnusualDocumentId() {
-		SearchIntegrator searchFactoryImpl = getSearchFactoryImpl();
-		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		MockErrorHandler errorHandler = (MockErrorHandler) integrator.getErrorHandler();
 
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
