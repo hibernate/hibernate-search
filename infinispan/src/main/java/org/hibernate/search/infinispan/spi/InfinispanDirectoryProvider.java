@@ -13,8 +13,7 @@ import java.util.Properties;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.apache.lucene.store.LockFactory;
-
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.AsyncDeleteExecutorService;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.BuildContext;

@@ -23,7 +23,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.FullTextFilterImplementor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.SearchIntegratorBuilder;

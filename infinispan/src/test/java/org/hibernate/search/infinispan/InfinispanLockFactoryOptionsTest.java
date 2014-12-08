@@ -13,7 +13,7 @@ import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.infinispan.spi.InfinispanDirectoryProvider;
 import org.hibernate.search.store.DirectoryProvider;

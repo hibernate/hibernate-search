@@ -19,15 +19,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
-
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
