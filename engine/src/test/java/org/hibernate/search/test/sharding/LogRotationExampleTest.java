@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.junit.Assert;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.annotations.DocumentId;
@@ -25,7 +24,7 @@ import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.query.dsl.QueryBuilder;

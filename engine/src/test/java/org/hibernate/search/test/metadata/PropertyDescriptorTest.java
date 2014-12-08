@@ -14,9 +14,9 @@ import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;

@@ -22,7 +22,7 @@ import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;

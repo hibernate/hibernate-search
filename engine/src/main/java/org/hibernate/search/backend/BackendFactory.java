@@ -14,7 +14,7 @@ import org.hibernate.search.backend.impl.blackhole.BlackHoleBackendQueueProcesso
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.StringHelper;

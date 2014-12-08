@@ -14,7 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.transaction.spi.TransactionFactory;
 import org.hibernate.event.spi.EventSource;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

@@ -32,15 +32,15 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
@@ -356,7 +356,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	@Test
 	public void testProvidedIdMapping() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		SearchFactoryImplementor sf = fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
+		SearchIntegrator sf = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
 
 		ProvidedIdEntry person1 = new ProvidedIdEntry();
 		person1.setName( "Big Goat" );

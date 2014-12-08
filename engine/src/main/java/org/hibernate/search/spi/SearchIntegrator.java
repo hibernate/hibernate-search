@@ -14,6 +14,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexReaderAccessor;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -32,7 +33,7 @@ import org.hibernate.search.stat.Statistics;
  * @author Emmanuel Bernard
  * @hsearch.experimental
  */
-public interface SearchIntegrator {
+public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Returns the entity to index binding for the given type.
@@ -175,5 +176,7 @@ public interface SearchIntegrator {
 	 * Shuts down all workers and releases all resources.
 	 */
 	void close();
+
+	IndexManager getIndexManager(String indexName);
 
 }

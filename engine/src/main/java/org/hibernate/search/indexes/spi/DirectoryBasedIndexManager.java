@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.indexes.impl;
+package org.hibernate.search.indexes.spi;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,15 +20,13 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.indexes.serialization.impl.LuceneWorkSerializerImpl;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
-import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
-import org.hibernate.search.indexes.spi.IndexManager;
-import org.hibernate.search.indexes.spi.ReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.DirectoryProviderFactory;

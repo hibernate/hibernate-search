@@ -4,15 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.impl;
+package org.hibernate.search.engine.impl;
 
 import java.util.Properties;
 
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;

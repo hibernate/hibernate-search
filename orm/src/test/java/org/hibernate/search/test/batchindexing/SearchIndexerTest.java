@@ -20,7 +20,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.batchindexing.impl.MassIndexerImpl;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 
@@ -44,7 +44,7 @@ public class SearchIndexerTest {
 				.addAnnotatedClass( Nation.class )
 				.build();
 		FullTextSession fullTextSession = ftsb.openFullTextSession();
-		SearchFactoryImplementor searchFactory = fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
+		SearchIntegrator searchFactory = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
 		{
 			TestableMassIndexerImpl tsii = new TestableMassIndexerImpl( searchFactory, Book.class );
 			assertTrue( tsii.getRootEntities().contains( Book.class ) );
@@ -87,7 +87,7 @@ public class SearchIndexerTest {
 
 	private static class TestableMassIndexerImpl extends MassIndexerImpl {
 
-		protected TestableMassIndexerImpl(SearchFactoryImplementor searchFactory, Class<?>... types) {
+		protected TestableMassIndexerImpl(SearchIntegrator searchFactory, Class<?>... types) {
 			super( searchFactory, null, types );
 		}
 

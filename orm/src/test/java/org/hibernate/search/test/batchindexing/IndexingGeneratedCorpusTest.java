@@ -29,9 +29,9 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.batchindexing.impl.MassIndexerImpl;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
@@ -174,7 +174,7 @@ public class IndexingGeneratedCorpusTest {
 	}
 
 	private void verifyIndexIsLocked(boolean isLocked, Class type) throws IOException {
-		SearchFactoryImplementor searchFactory = builder.getSearchFactory().unwrap( SearchFactoryImplementor.class );
+		SearchIntegrator searchFactory = builder.getSearchFactory().unwrap( SearchIntegrator.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getIndexBinding( type ).getIndexManagers()[0];
 		Directory directory = indexManager.getDirectoryProvider().getDirectory();
 		LockFactory lockFactory = directory.getLockFactory();

@@ -14,8 +14,9 @@ import junit.framework.AssertionFailedError;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.infinispan.impl.DefaultCacheManagerService;
+import org.hibernate.search.infinispan.spi.InfinispanDirectoryProvider;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;

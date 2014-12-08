@@ -21,6 +21,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
@@ -29,7 +30,6 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoadingExceptio
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

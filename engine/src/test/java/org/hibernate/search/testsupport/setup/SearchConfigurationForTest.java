@@ -18,7 +18,7 @@ import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.search.spi.DefaultInstanceInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.testsupport.TestConstants;
 
@@ -42,7 +42,7 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	private ClassLoaderService classLoaderService;
 
 	public SearchConfigurationForTest() {
-		this( SimpleInitializer.INSTANCE );
+		this( DefaultInstanceInitializer.DEFAULT_INITIALIZER );
 	}
 
 	public SearchConfigurationForTest(InstanceInitializer init) {

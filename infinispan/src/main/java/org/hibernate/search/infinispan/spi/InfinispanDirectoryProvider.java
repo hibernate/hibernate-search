@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.infinispan.impl;
+package org.hibernate.search.infinispan.spi;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,10 +13,8 @@ import java.util.Properties;
 import org.apache.lucene.store.Directory;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.apache.lucene.store.LockFactory;
-
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.infinispan.CacheManagerService;
-import org.hibernate.search.infinispan.InfinispanIntegration;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.infinispan.impl.AsyncDeleteExecutorService;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.impl.DirectoryProviderHelper;

@@ -16,9 +16,9 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.MoreLikeThisTermination;
 import org.hibernate.search.query.dsl.MoreLikeThisToEntityContentAndTermination;
 import org.hibernate.search.util.logging.impl.Log;

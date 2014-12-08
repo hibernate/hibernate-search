@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.spi;
+package org.hibernate.search.engine.integration.impl;
 
 import java.util.Map;
 import java.util.Properties;
@@ -13,6 +13,9 @@ import java.util.Set;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
+import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.DatabaseRetrievalMethod;

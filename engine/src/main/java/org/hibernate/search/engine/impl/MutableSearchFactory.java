@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.impl;
+package org.hibernate.search.engine.impl;
 
 import java.util.Map;
 import java.util.Properties;
@@ -18,16 +18,16 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.engine.spi.TimingSource;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
@@ -35,7 +35,7 @@ import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
@@ -215,13 +215,13 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	@Override
 	public void addClasses(Class<?>... classes) {
-		final SearchFactoryBuilder builder = new SearchFactoryBuilder().currentFactory( this );
+		final SearchIntegratorBuilder builder = new SearchIntegratorBuilder().currentSearchIntegrator( this );
 		for ( Class<?> type : classes ) {
 			builder.addClass( type );
 		}
 		try {
 			mutating.lock();
-			builder.buildSearchFactory();
+			builder.buildSearchIntegrator();
 		}
 		finally {
 			mutating.unlock();
@@ -309,8 +309,13 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	}
 
 	@Override
+	public IndexManager getIndexManager(String indexName) {
+		return delegate.getIndexManager( indexName );
+	}
+
+	@Override
 	public <T> T unwrap(Class<T> cls) {
-		if ( SearchIntegrator.class.equals( cls ) || SearchFactoryImplementor.class.equals( cls ) ) {
+		if ( SearchIntegrator.class.equals( cls ) || SearchFactoryImplementor.class.equals( cls ) || MutableSearchFactory.class.equals( cls ) ) {
 			return (T) this;
 		}
 		else {

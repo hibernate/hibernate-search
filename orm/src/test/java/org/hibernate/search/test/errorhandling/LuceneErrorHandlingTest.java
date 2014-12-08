@@ -20,11 +20,11 @@ import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Assert;
 import org.junit.Test;
@@ -86,7 +86,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 	}
 
 	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
+		SearchIntegrator searchFactory = getSearchFactoryImpl();
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		return (MockErrorHandler)errorHandler;

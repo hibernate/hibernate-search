@@ -16,9 +16,8 @@ import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;

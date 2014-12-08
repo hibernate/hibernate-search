@@ -8,16 +8,14 @@
 package org.hibernate.search.test.bridge.provider;
 
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.junit.Test;
@@ -65,8 +63,8 @@ public class BridgeProviderTest extends SearchTestBase {
 				.addClass( Chain.class );
 		boolean throwException = false;
 		try {
-			SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( conf ).buildSearchFactory();
-			sf.close();
+			SearchIntegrator searchIntegrator = new SearchIntegratorBuilder().configuration( conf ).buildSearchIntegrator();
+			searchIntegrator.close();
 		}
 		catch (SearchException e) {
 			assertThat( e.getMessage() ).contains( "TheaterBridgeProvider1" );

@@ -12,8 +12,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
@@ -65,7 +65,7 @@ public class ConcurrentMergeErrorHandledTest extends SearchTestBase {
 	}
 
 	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
+		SearchIntegrator searchFactory = getSearchFactoryImpl();
 		ErrorHandler errorHandler = searchFactory.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		return (MockErrorHandler) errorHandler;

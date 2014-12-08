@@ -14,12 +14,13 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.Version;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.IndexControl;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -62,9 +63,10 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
 			configuration.getProperties().put( SESSION_FACTORY_PROPERTY_KEY, factory );
 			if ( searchFactoryImplementor == null ) {
-				searchFactoryImplementor = new SearchFactoryBuilder()
+				SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
 						.configuration( new SearchConfigurationFromHibernateCore( configuration, classLoaderService ) )
-						.buildSearchFactory();
+						.buildSearchIntegrator();
+				searchFactoryImplementor = searchIntegrator.unwrap( SearchFactoryImplementor.class );
 			}
 
 			String enableJMX = configuration.getProperty( Environment.JMX_ENABLED );

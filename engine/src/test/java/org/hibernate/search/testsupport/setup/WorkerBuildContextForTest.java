@@ -7,7 +7,7 @@
 package org.hibernate.search.testsupport.setup;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.search.spi.DefaultInstanceInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 
@@ -34,7 +34,7 @@ public class WorkerBuildContextForTest extends BuildContextForTest implements Wo
 
 	@Override
 	public InstanceInitializer getInstanceInitializer() {
-		return SimpleInitializer.INSTANCE;
+		return DefaultInstanceInitializer.DEFAULT_INITIALIZER;
 	}
 }
 

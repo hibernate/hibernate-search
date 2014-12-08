@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;

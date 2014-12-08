@@ -9,7 +9,7 @@ package org.hibernate.search.hcore.util.impl;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.hcore.impl.SearchFactoryReference;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

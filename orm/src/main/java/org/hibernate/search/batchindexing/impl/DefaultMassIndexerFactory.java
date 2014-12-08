@@ -10,7 +10,7 @@ import java.util.Properties;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.MassIndexer;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
 
 /**
@@ -27,10 +27,10 @@ public class DefaultMassIndexerFactory implements MassIndexerFactory {
 	}
 
 	@Override
-	public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
+	public MassIndexer createMassIndexer(SearchIntegrator searchIntegrator, SessionFactoryImplementor sessionFactory,
 			Class<?>... entities) {
 		final Class<?>[] types = entities.length == 0 ? OBJECT_ARRAY : entities;
-		return new MassIndexerImpl( searchFactory, sessionFactory, types );
+		return new MassIndexerImpl( searchIntegrator, sessionFactory, types );
 	}
 
 }

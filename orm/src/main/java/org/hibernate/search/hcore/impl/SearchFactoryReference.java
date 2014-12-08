@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.hcore.impl;
 
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
 

@@ -15,7 +15,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.indexes.spi.ReaderProvider;
