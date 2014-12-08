@@ -22,7 +22,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Weight;
 import org.apache.lucene.search.similarities.Similarity;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
@@ -43,7 +43,7 @@ public final class LazyQueryState implements Closeable {
 	private final IndexSearcher searcher;
 	private final boolean fieldSortDoTrackScores;
 	private final boolean fieldSortDoMaxScore;
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final Set<Class<?>> targetedTypes;
 
 	private Query rewrittenQuery;
@@ -52,7 +52,7 @@ public final class LazyQueryState implements Closeable {
 	public LazyQueryState(Query userQuery,
 			IndexReader reader,
 			Similarity searcherSimilarity,
-			SearchFactoryImplementor searchFactoryImplementor,
+			ExtendedSearchIntegrator extendedIntegrator,
 			Set<Class<?>> targetedTypes,
 			boolean fieldSortDoTrackScores,
 			boolean fieldSortDoMaxScore) {
@@ -61,7 +61,7 @@ public final class LazyQueryState implements Closeable {
 		this.fieldSortDoMaxScore = fieldSortDoMaxScore;
 		this.searcher = new IndexSearcher( reader );
 		this.searcher.setSimilarity( searcherSimilarity );
-		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.extendedIntegrator = extendedIntegrator;
 		this.targetedTypes = targetedTypes;
 	}
 
@@ -126,7 +126,7 @@ public final class LazyQueryState implements Closeable {
 		Set<String> stringEncodedFieldNames = new HashSet<>();
 		Set<String> numericEncodedFieldNames = new HashSet<>();
 		for ( Class<?> targetedType : targetedTypes ) {
-			IndexedTypeDescriptor indexedTypeDescriptor = searchFactoryImplementor.getIndexedTypeDescriptor(
+			IndexedTypeDescriptor indexedTypeDescriptor = extendedIntegrator.getIndexedTypeDescriptor(
 					targetedType
 			);
 			// get the field contributions from the type (class bridges)

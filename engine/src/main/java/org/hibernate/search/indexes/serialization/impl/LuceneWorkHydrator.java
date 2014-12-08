@@ -40,7 +40,7 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorksBuilder;
@@ -59,7 +59,7 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
 public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private static final Log log = LoggerFactory.make();
 
-	private SearchFactoryImplementor searchFactory;
+	private ExtendedSearchIntegrator searchIntegrator;
 	private List<LuceneWork> results;
 	private ClassLoader loader;
 	private Document luceneDocument;
@@ -67,8 +67,8 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private List<List<AttributeImpl>> tokens;
 	private Serializable id;
 
-	public LuceneWorkHydrator(SearchFactoryImplementor searchFactory) {
-		this.searchFactory = searchFactory;
+	public LuceneWorkHydrator(ExtendedSearchIntegrator searchIntegrator) {
+		this.searchIntegrator = searchIntegrator;
 		this.results = new ArrayList<LuceneWork>();
 		this.loader = Thread.currentThread().getContextClassLoader();
 	}
@@ -92,7 +92,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				"entity class",
-				searchFactory.getServiceManager()
+				searchIntegrator.getServiceManager()
 		);
 		results.add( new PurgeAllLuceneWork( entityClass ) );
 	}
@@ -112,7 +112,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				"entity class",
-				searchFactory.getServiceManager()
+				searchIntegrator.getServiceManager()
 		);
 		LuceneWork result = new DeleteLuceneWork(
 				id,
@@ -128,7 +128,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				"entity class",
-				searchFactory.getServiceManager()
+				searchIntegrator.getServiceManager()
 		);
 		LuceneWork result = new AddLuceneWork(
 				id,
@@ -147,7 +147,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		Class<?> entityClass = ClassLoaderHelper.classForName(
 				entityClassName,
 				"entity class",
-				searchFactory.getServiceManager()
+				searchIntegrator.getServiceManager()
 		);
 		LuceneWork result = new UpdateLuceneWork(
 				id,
@@ -327,7 +327,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	private String objectIdInString(Class<?> entityClass, Serializable id, ConversionContext conversionContext) {
-		EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( entityClass );
+		EntityIndexBinding indexBindingForEntity = searchIntegrator.getIndexBinding( entityClass );
 		if ( indexBindingForEntity == null ) {
 			throw new SearchException( "Unable to find entity type metadata while deserializing: " + entityClass );
 		}

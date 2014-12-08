@@ -56,7 +56,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 		this.indexManager = indexManager;
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
-		this.integrator = context.getUninitializedSearchFactory();
+		this.integrator = context.getUninitializedSearchIntegrator();
 		QueueConnectionFactory factory = initializeJMSQueueConnectionFactory( props );
 		this.jmsQueue = initializeJMSQueue( factory, props );
 		this.connection = initializeJMSConnection( factory, props );

@@ -16,7 +16,7 @@ import org.hibernate.Criteria;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -67,14 +67,14 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 
 		@SuppressWarnings("unchecked")
 		List<Object> queryResultList = criteria.list();
-		InstanceInitializer instanceInitializer = objectInitializationContext.getSearchFactoryImplementor()
+		InstanceInitializer instanceInitializer = objectInitializationContext.getExtendedSearchintegrator()
 				.getInstanceInitializer();
 		for ( Object o : queryResultList ) {
 			Class<?> loadedType = instanceInitializer.getClass( o );
 			Object unproxiedObject = instanceInitializer.unproxy( o );
 			DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder(
 					loadedType,
-					objectInitializationContext.getSearchFactoryImplementor()
+					objectInitializationContext.getExtendedSearchintegrator()
 			);
 			if ( documentBuilder == null ) {
 				// the query result can contain entities which are not indexed. This can for example happen if
@@ -111,7 +111,7 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 			ObjectInitializationContext objectInitializationContext) {
 		DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder(
 				objectInitializationContext.getEntityType(),
-				objectInitializationContext.getSearchFactoryImplementor()
+				objectInitializationContext.getExtendedSearchintegrator()
 		);
 		String idName = documentBuilder.getIdentifierName();
 		Disjunction disjunction = Restrictions.disjunction();
@@ -134,10 +134,10 @@ public class CriteriaObjectInitializer implements ObjectInitializer {
 		criteria.add( disjunction );
 	}
 
-	private DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entityType, SearchFactoryImplementor searchFactoryImplementor) {
-		Set<Class<?>> indexedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
+	private DocumentBuilderIndexedEntity getDocumentBuilder(Class<?> entityType, ExtendedSearchIntegrator extendedIntegrator) {
+		Set<Class<?>> indexedEntities = extendedIntegrator.getIndexedTypesPolymorphic( new Class<?>[] { entityType } );
 		if ( indexedEntities.size() > 0 ) {
-			return searchFactoryImplementor.getIndexBinding(
+			return extendedIntegrator.getIndexBinding(
 					indexedEntities.iterator().next()
 			).getDocumentBuilder();
 		}

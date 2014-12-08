@@ -15,7 +15,7 @@ import org.apache.lucene.search.similarities.Similarity;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.spi.WorkerBuildContext;
 
@@ -103,11 +103,11 @@ public interface IndexManager {
 	Analyzer getAnalyzer(String name);
 
 	/**
-	 * Connects this {@code IndexManager} to a new {@code SearchFactory}.
+	 * Connects this {@code IndexManager} to a new {@code ExtendedSearchintegrator}.
 	 *
-	 * @param boundSearchFactory the existing search factory to which to associate this index manager with
+	 * @param boundSearchIntegrator the existing search factory to which to associate this index manager with
 	 */
-	void setSearchFactory(SearchFactoryImplementor boundSearchFactory);
+	void setSearchFactory(ExtendedSearchIntegrator boundSearchIntegrator);
 
 	/**
 	 * @param entity Adds the specified entity type to this index manager, making it responsible for manging this type.

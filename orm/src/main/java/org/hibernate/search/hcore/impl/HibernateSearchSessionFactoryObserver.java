@@ -14,7 +14,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.impl.SearchConfigurationFromHibernateCore;
 import org.hibernate.search.engine.Version;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.jmx.impl.IndexControl;
@@ -46,7 +46,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private final FullTextIndexEventListener listener;
 
 	private String indexControlMBeanName;
-	private SearchFactoryImplementor searchFactoryImplementor;
+	private ExtendedSearchIntegrator extendedIntegrator;
 
 	public HibernateSearchSessionFactoryObserver(Configuration configuration,
 			FullTextIndexEventListener listener,
@@ -62,11 +62,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		try {
 			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
 			configuration.getProperties().put( SESSION_FACTORY_PROPERTY_KEY, factory );
-			if ( searchFactoryImplementor == null ) {
+			if ( extendedIntegrator == null ) {
 				SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
 						.configuration( new SearchConfigurationFromHibernateCore( configuration, classLoaderService ) )
 						.buildSearchIntegrator();
-				searchFactoryImplementor = searchIntegrator.unwrap( SearchFactoryImplementor.class );
+				extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
 			}
 
 			String enableJMX = configuration.getProperty( Environment.JMX_ENABLED );
@@ -74,9 +74,9 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 				enableIndexControlBean();
 			}
 			configuration = null; //free up some memory as we no longer need it
-			listener.initialize( searchFactoryImplementor );
+			listener.initialize( extendedIntegrator );
 			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
-			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( searchFactoryImplementor );
+			factoryImplementor.getServiceRegistry().getService( SearchFactoryReference.class ).initialize( extendedIntegrator );
 			failedBoot = false;
 		}
 		finally {
@@ -88,8 +88,8 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 	@Override
 	public void sessionFactoryClosed(SessionFactory factory) {
-		if ( searchFactoryImplementor != null ) {
-			searchFactoryImplementor.close();
+		if ( extendedIntegrator != null ) {
+			extendedIntegrator.close();
 		}
 		if ( indexControlMBeanName != null ) {
 			JMXRegistrar.unRegisterMBean( indexControlMBeanName );
@@ -118,7 +118,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 		IndexControl indexCtrlBean = new IndexControl(
 				configuration.getProperties(),
-				searchFactoryImplementor.getServiceManager()
+				extendedIntegrator.getServiceManager()
 		);
 		JMXRegistrar.registerMBean( indexCtrlBean, IndexControlMBean.class, objectName );
 		indexControlMBeanName = objectName;

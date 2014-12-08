@@ -30,7 +30,7 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public interface SearchFactoryImplementor extends SearchIntegrator {
+public interface ExtendedSearchIntegrator extends SearchIntegrator {
 
 	/**
 	 * Returns a map of all known entity index binding (indexed entities) keyed against the indexed type

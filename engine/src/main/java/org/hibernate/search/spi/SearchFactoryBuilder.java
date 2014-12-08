@@ -8,7 +8,7 @@
 package org.hibernate.search.spi;
 
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 
 /**
  * @deprecated Use SearchIntegrationBuilder instead. This class will be removed!
@@ -31,8 +31,8 @@ public class SearchFactoryBuilder extends SearchIntegratorBuilder {
 		return this;
 	}
 
-	public SearchFactoryImplementor buildSearchFactory() {
-		return super.buildSearchIntegrator().unwrap( SearchFactoryImplementor.class );
+	public ExtendedSearchIntegrator buildSearchFactory() {
+		return super.buildSearchIntegrator().unwrap( ExtendedSearchIntegrator.class );
 	}
 
 }

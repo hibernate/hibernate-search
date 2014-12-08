@@ -16,7 +16,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.util.impl.Executors;
@@ -35,7 +35,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final SessionFactoryImplementor sessionFactory;
 
 	protected Set<Class<?>> rootEntities = new HashSet<Class<?>>();
@@ -53,10 +53,10 @@ public class MassIndexerImpl implements MassIndexer {
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 
 	protected MassIndexerImpl(SearchIntegrator searchIntegrator, SessionFactoryImplementor sessionFactory, Class<?>... entities) {
-		this.searchFactoryImplementor = searchIntegrator.unwrap( SearchFactoryImplementor.class );
+		this.extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
 		this.sessionFactory = sessionFactory;
-		rootEntities = toRootEntities( searchFactoryImplementor, entities );
-		if ( searchFactoryImplementor.isJMXEnabled() ) {
+		rootEntities = toRootEntities( extendedIntegrator, entities );
+		if ( extendedIntegrator.isJMXEnabled() ) {
 			monitor = new JMXRegistrar.IndexingProgressMonitor();
 		}
 		else {
@@ -72,11 +72,11 @@ public class MassIndexerImpl implements MassIndexer {
 	 *
 	 * @return a new set of entities
 	 */
-	private static Set<Class<?>> toRootEntities(SearchFactoryImplementor searchFactoryImplementor, Class<?>... selection) {
+	private static Set<Class<?>> toRootEntities(ExtendedSearchIntegrator extendedIntegrator, Class<?>... selection) {
 		Set<Class<?>> entities = new HashSet<Class<?>>();
 		//first build the "entities" set containing all indexed subtypes of "selection".
 		for ( Class<?> entityType : selection ) {
-			Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic(
+			Set<Class<?>> targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic(
 					new Class[] {
 							entityType
 					}
@@ -204,7 +204,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
-				rootEntities, searchFactoryImplementor, sessionFactory,
+				rootEntities, extendedIntegrator, sessionFactory,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,

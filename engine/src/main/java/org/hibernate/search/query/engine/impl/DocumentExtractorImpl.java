@@ -20,7 +20,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -51,7 +51,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final String[] projection;
 	private final QueryHits queryHits;
 	private final LazyQueryState searcher;
@@ -68,7 +68,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 	private final ConversionContext exceptionWrap = new ContextualExceptionBridgeHelper();
 
 	public DocumentExtractorImpl(QueryHits queryHits,
-								SearchFactoryImplementor searchFactoryImplementor,
+								ExtendedSearchIntegrator extendedIntegrator,
 								String[] projection,
 								Set<String> idFieldNames,
 								boolean allowFieldSelection,
@@ -77,7 +77,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 								int firstIndex,
 								int maxIndex,
 								Set<Class<?>> classesAndSubclasses) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.extendedIntegrator = extendedIntegrator;
 		if ( projection != null ) {
 			this.projection = projection.clone();
 		}
@@ -167,12 +167,12 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 
 	private EntityInfo extractEntityInfo(int docId, Document document, int scoreDocIndex, ConversionContext exceptionWrap) throws IOException {
 		Class clazz = extractClass( docId, document, scoreDocIndex );
-		String idName = DocumentBuilderHelper.getDocumentIdName( searchFactoryImplementor, clazz );
+		String idName = DocumentBuilderHelper.getDocumentIdName( extendedIntegrator, clazz );
 		Serializable id = extractId( docId, document, clazz );
 		Object[] projected = null;
 		if ( projection != null && projection.length > 0 ) {
 			projected = DocumentBuilderHelper.getDocumentFields(
-					searchFactoryImplementor, clazz, document, projection, exceptionWrap
+					extendedIntegrator, clazz, document, projection, exceptionWrap
 			);
 		}
 		return new EntityInfoImpl( clazz, idName, id, projected );
@@ -186,7 +186,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			return (Serializable) this.idsCollector.getValue( docId );
 		}
 		else {
-			return DocumentBuilderHelper.getDocumentId( searchFactoryImplementor, clazz, document, exceptionWrap );
+			return DocumentBuilderHelper.getDocumentId( extendedIntegrator, clazz, document, exceptionWrap );
 		}
 	}
 
@@ -212,7 +212,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 			return clazz;
 		}
 		else {
-			return DocumentBuilderHelper.getDocumentClass( className, searchFactoryImplementor.getServiceManager() );
+			return DocumentBuilderHelper.getDocumentClass( className, extendedIntegrator.getServiceManager() );
 		}
 	}
 

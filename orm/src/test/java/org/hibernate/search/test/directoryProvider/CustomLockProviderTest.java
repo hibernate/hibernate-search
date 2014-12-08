@@ -90,8 +90,8 @@ public class CustomLockProviderTest {
 		}
 		FullTextSessionBuilder ftsb = fullTextSessionBuilder.build();
 		try {
-			SearchIntegrator searchFactory = ftsb.getSearchFactory().unwrap( SearchIntegrator.class );
-			EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( SnowStorm.class );
+			SearchIntegrator integrator = ftsb.getSearchFactory().unwrap( SearchIntegrator.class );
+			EntityIndexBinding indexBindingForEntity = integrator.getIndexBinding( SnowStorm.class );
 			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
 			DirectoryProvider directoryProvider = indexManager.getDirectoryProvider();
 			Directory directory = directoryProvider.getDirectory();

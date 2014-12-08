@@ -72,8 +72,8 @@ public class ErrorHandlingDuringDocumentCreationTest extends SearchTestBase {
 	}
 
 	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
-		SearchIntegrator searchFactory = getSearchFactoryImpl();
-		ErrorHandler errorHandler = searchFactory.getErrorHandler();
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		ErrorHandler errorHandler = integrator.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		return (MockErrorHandler) errorHandler;
 	}

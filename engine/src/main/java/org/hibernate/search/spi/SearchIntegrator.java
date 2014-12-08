@@ -46,7 +46,7 @@ public interface SearchIntegrator extends AutoCloseable {
 	EntityIndexBinding getIndexBinding(Class<?> entityType);
 
 	/**
-	 * Add the following classes to the SearchFactory. If these classes are new to the SearchFactory this
+	 * Add the following classes to the SearchIntegrator. If these classes are new to the SearchIntegrator this
 	 * will trigger a reconfiguration.
 	 */
 	void addClasses(Class<?>... classes);
@@ -62,7 +62,7 @@ public interface SearchIntegrator extends AutoCloseable {
 	HSQuery createHSQuery();
 
 	/**
-	 * @return true if the SearchFactory was stopped
+	 * @return true if the SearchIntegrator was stopped
 	 */
 	boolean isStopped();
 
@@ -70,7 +70,7 @@ public interface SearchIntegrator extends AutoCloseable {
 	 * Used to catch exceptions in all synchronous operations; but default they are logged, the user
 	 * can configure alternative error management means.
 	 *
-	 * @return the configured ErrorHandler, global to the SearchFactory
+	 * @return the configured ErrorHandler, global to the SearchIntegrator
 	 */
 	ErrorHandler getErrorHandler();
 
@@ -131,7 +131,7 @@ public interface SearchIntegrator extends AutoCloseable {
 	/**
 	 * Provides access to the IndexReader API
 	 *
-	 * @return the IndexReaderAccessor for this SearchFactory
+	 * @return the IndexReaderAccessor for this SearchIntegrator
 	 */
 	IndexReaderAccessor getIndexReaderAccessor();
 

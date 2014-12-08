@@ -32,7 +32,7 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.FieldCacheType;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.filter.StandardFilterKey;
@@ -70,7 +70,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private static final Log log = LoggerFactory.make();
 	private static final FullTextFilterImplementor[] EMPTY_FULL_TEXT_FILTER_IMPLEMENTOR = new FullTextFilterImplementor[0];
 
-	private transient SearchFactoryImplementor searchFactoryImplementor;
+	private transient ExtendedSearchIntegrator extendedIntegrator;
 	private Query luceneQuery;
 	private List<Class<?>> targetedEntities;
 	private transient TimeoutManagerImpl timeoutManager;
@@ -113,14 +113,14 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private Integer resultSize;
 
 
-	public HSQueryImpl(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
-		this.timeoutExceptionFactory = searchFactoryImplementor.getDefaultTimeoutExceptionFactory();
+	public HSQueryImpl(ExtendedSearchIntegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator;
+		this.timeoutExceptionFactory = extendedIntegrator.getDefaultTimeoutExceptionFactory();
 	}
 
 	@Override
-	public void afterDeserialise(SearchIntegrator searchIntegrator) {
-		this.searchFactoryImplementor = searchIntegrator.unwrap( SearchFactoryImplementor.class );
+	public void afterDeserialise(SearchIntegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator.unwrap( ExtendedSearchIntegrator.class );
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		clearCachedResults();
 		this.targetedEntities = classes == null ? new ArrayList<Class<?>>( 0 ) : new ArrayList<Class<?>>( classes );
 		final Class<?>[] classesAsArray = targetedEntities.toArray( new Class[targetedEntities.size()] );
-		this.indexedTargetedEntities = searchFactoryImplementor.getIndexedTypesPolymorphic( classesAsArray );
+		this.indexedTargetedEntities = extendedIntegrator.getIndexedTypesPolymorphic( classesAsArray );
 		if ( targetedEntities.size() > 0 && indexedTargetedEntities.size() == 0 ) {
 			throw log.targetedEntityTypesNotIndexed( StringHelper.join( targetedEntities, "," ));
 		}
@@ -224,7 +224,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			if ( luceneQuery == null ) {
 				throw new AssertionFailure( "Requesting TimeoutManager before setting luceneQuery()" );
 			}
-			timeoutManager = new TimeoutManagerImpl( luceneQuery, timeoutExceptionFactory, this.searchFactoryImplementor.getTimingSource() );
+			timeoutManager = new TimeoutManagerImpl( luceneQuery, timeoutExceptionFactory, this.extendedIntegrator.getTimingSource() );
 		}
 		return timeoutManager;
 	}
@@ -284,7 +284,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private DocumentExtractor buildDocumentExtractor(LazyQueryState searcher, QueryHits queryHits, int first, int max) {
 		return new DocumentExtractorImpl(
 				queryHits,
-				searchFactoryImplementor,
+				extendedIntegrator,
 				projectedFields,
 				idFieldNames,
 				allowFieldSelectionInProjection,
@@ -328,7 +328,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			//the timeoutManager does not need to be stopped nor reset as a start does indeed reset
 			getTimeoutManager().start();
 			//get result size without object initialization
-			LazyQueryState searcher = buildSearcher( searchFactoryImplementor, false );
+			LazyQueryState searcher = buildSearcher( extendedIntegrator, false );
 			if ( searcher == null ) {
 				resultSize = 0;
 			}
@@ -352,7 +352,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	public Explanation explain(int documentId) {
 		//don't use TimeoutManager here as explain is a dev tool when things are weird... or slow :)
 		Explanation explanation = null;
-		LazyQueryState searcher = buildSearcher( searchFactoryImplementor, true );
+		LazyQueryState searcher = buildSearcher( extendedIntegrator, true );
 		if ( searcher == null ) {
 			throw new SearchException(
 					"Unable to build explanation for document id:"
@@ -383,7 +383,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 
 		filterDefinition = new FullTextFilterImpl();
 		filterDefinition.setName( name );
-		FilterDef filterDef = searchFactoryImplementor.getFilterDefinition( name );
+		FilterDef filterDef = extendedIntegrator.getFilterDefinition( name );
 		if ( filterDef == null ) {
 			throw log.unknownFullTextFilter( name );
 		}
@@ -426,7 +426,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		buildFilters();
 		QueryHits queryHits;
 
-		boolean stats = searchFactoryImplementor.getStatistics().isStatisticsEnabled();
+		boolean stats = extendedIntegrator.getStatistics().isStatisticsEnabled();
 		long startTime = 0;
 		if ( stats ) {
 			startTime = System.nanoTime();
@@ -479,7 +479,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		resultSize = queryHits.getTotalHits();
 
 		if ( stats ) {
-			searchFactoryImplementor.getStatisticsImplementor()
+			extendedIntegrator.getStatisticsImplementor()
 					.searchExecuted( searcher.describeQuery(), System.nanoTime() - startTime );
 		}
 		facetManager.setFacetResults( queryHits.getFacets() );
@@ -515,20 +515,20 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	}
 
 	private LazyQueryState buildSearcher() {
-		return buildSearcher( searchFactoryImplementor, null );
+		return buildSearcher( extendedIntegrator, null );
 	}
 
 	/**
 	 * Build the index searcher for this fulltext query.
 	 *
-	 * @param searchFactoryImplementor the search factory.
+	 * @param extendedIntegrator the search factory.
 	 * @param forceScoring if true, force SCORE computation, if false, force not to compute score, if null used best choice
 	 *
 	 * @return the <code>IndexSearcher</code> for this query (can be <code>null</code>.
 	 *         TODO change classesAndSubclasses by side effect, which is a mismatch with the Searcher return, fix that.
 	 */
-	private LazyQueryState buildSearcher(SearchFactoryImplementor searchFactoryImplementor, Boolean forceScoring) {
-		Map<Class<?>, EntityIndexBinding> indexBindings = searchFactoryImplementor.getIndexBindings();
+	private LazyQueryState buildSearcher(ExtendedSearchIntegrator extendedIntegrator, Boolean forceScoring) {
+		Map<Class<?>, EntityIndexBinding> indexBindings = extendedIntegrator.getIndexBindings();
 		List<IndexManager> targetedIndexes = new ArrayList<IndexManager>();
 		Set<String> idFieldNames = new HashSet<String>();
 		Similarity searcherSimilarity = null;
@@ -608,7 +608,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 		}
 		else {
-			this.classesAndSubclasses = searchFactoryImplementor.getIndexedTypes();
+			this.classesAndSubclasses = extendedIntegrator.getIndexedTypes();
 		}
 
 		//set up the searcher
@@ -626,7 +626,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					filteredQuery,
 					compoundReader,
 					searcherSimilarity,
-					searchFactoryImplementor,
+					extendedIntegrator,
 					classesAndSubclasses,
 					true,
 					true
@@ -637,7 +637,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					filteredQuery,
 					compoundReader,
 					searcherSimilarity,
-					searchFactoryImplementor,
+					extendedIntegrator,
 					classesAndSubclasses,
 					false, false
 			);
@@ -655,7 +655,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 						filteredQuery,
 						compoundReader,
 						searcherSimilarity,
-						searchFactoryImplementor,
+						extendedIntegrator,
 						classesAndSubclasses,
 						true,
 						false
@@ -667,7 +667,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 				filteredQuery,
 				compoundReader,
 				searcherSimilarity,
-				searchFactoryImplementor,
+				extendedIntegrator,
 				classesAndSubclasses,
 				false,
 				false
@@ -750,7 +750,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		 * FilterKey implementations and Filter(Factory) do not have to be threadsafe wrt their parameter injection
 		 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
 		 */
-		FilterDef def = searchFactoryImplementor.getFilterDefinition( fullTextFilter.getName() );
+		FilterDef def = extendedIntegrator.getFilterDefinition( fullTextFilter.getName() );
 		//def can never be null, ti's guarded by enableFullTextFilter(String)
 
 		if ( isPreQueryFilterOnly( def ) ) {
@@ -762,7 +762,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 
 		// try to get the filter out of the cache
 		Filter filter = cacheInstance( def.getCacheMode() ) ?
-				searchFactoryImplementor.getFilterCachingStrategy().getCachedFilter( key ) :
+				extendedIntegrator.getFilterCachingStrategy().getCachedFilter( key ) :
 				null;
 
 		if ( filter == null ) {
@@ -770,7 +770,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 
 			// add filter to cache if we have to
 			if ( cacheInstance( def.getCacheMode() ) ) {
-				searchFactoryImplementor.getFilterCachingStrategy().addCachedFilter( key, filter );
+				extendedIntegrator.getFilterCachingStrategy().addCachedFilter( key, filter );
 			}
 		}
 		return filter;
@@ -833,7 +833,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 */
 	private Filter addCachingWrapperFilter(Filter filter, FilterDef def) {
 		if ( cacheResults( def.getCacheMode() ) ) {
-			int cachingWrapperFilterSize = searchFactoryImplementor.getFilterCacheBitResultsSize();
+			int cachingWrapperFilterSize = extendedIntegrator.getFilterCacheBitResultsSize();
 			filter = new CachingWrapperFilter( filter, cachingWrapperFilterSize );
 		}
 
@@ -935,8 +935,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	}
 
 	@Override
-	public SearchFactoryImplementor getSearchFactoryImplementor() {
-		return searchFactoryImplementor;
+	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
+		return extendedIntegrator;
 	}
 
 	private boolean useFieldCacheOnTypes() {
@@ -951,7 +951,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @return The FieldCacheCollectorFactory to use for this query, or null to not use FieldCaches
 	 */
 	private FieldCacheCollectorFactory getAppropriateIdFieldCollectorFactory() {
-		Map<Class<?>, EntityIndexBinding> builders = searchFactoryImplementor.getIndexBindings();
+		Map<Class<?>, EntityIndexBinding> builders = extendedIntegrator.getIndexBindings();
 		Set<FieldCacheCollectorFactory> allCollectors = new HashSet<FieldCacheCollectorFactory>();
 		// we need all documentBuilder to agree on type, fieldName, and enabling the option:
 		FieldCacheCollectorFactory anyImplementation = null;

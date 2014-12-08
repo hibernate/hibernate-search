@@ -45,7 +45,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
@@ -94,9 +94,9 @@ public class MoreLikeThisBuilder<T> {
 	private ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE inputType;
 	private TermQuery findById;
 
-	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity documentBuilder, SearchFactoryImplementor searchFactory ) {
+	public MoreLikeThisBuilder( DocumentBuilderIndexedEntity documentBuilder, ExtendedSearchIntegrator searchIntegrator ) {
 		this.documentBuilder = documentBuilder;
-		Similarity configuredSimilarity = searchFactory.getIndexBindings().get( documentBuilder.getBeanClass() ).getSimilarity();
+		Similarity configuredSimilarity = searchIntegrator.getIndexBindings().get( documentBuilder.getBeanClass() ).getSimilarity();
 		if ( configuredSimilarity instanceof TFIDFSimilarity ) {
 			this.similarity = (TFIDFSimilarity) configuredSimilarity;
 		}
