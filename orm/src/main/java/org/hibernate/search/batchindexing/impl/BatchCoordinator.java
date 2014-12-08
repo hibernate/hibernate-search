@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.CacheMode;
@@ -46,7 +46,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final int idFetchSize;
 
 	public BatchCoordinator(Set<Class<?>> rootEntities,
-							SearchFactoryImplementor searchFactoryImplementor,
+							ExtendedSearchintegrator extendedIntegrator,
 							SessionFactoryImplementor sessionFactory,
 							int typesToIndexInParallel,
 							int documentBuilderThreads,
@@ -58,7 +58,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 							boolean optimizeAfterPurge,
 							MassIndexerProgressMonitor monitor,
 							int idFetchSize) {
-		super( searchFactoryImplementor );
+		super( extendedIntegrator );
 		this.idFetchSize = idFetchSize;
 		this.rootEntities = rootEntities.toArray( new Class<?>[rootEntities.size()] );
 		this.sessionFactory = sessionFactory;
@@ -76,7 +76,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 
 	@Override
 	public void runWithErrorHandler() {
-		final BatchBackend backend = searchFactoryImplementor.makeBatchBackend( monitor );
+		final BatchBackend backend = extendedIntegrator.makeBatchBackend( monitor );
 		try {
 			beforeBatch( backend ); // purgeAll and pre-optimize activities
 			doBatchWork( backend );
@@ -103,7 +103,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		for ( Class<?> type : rootEntities ) {
 			executor.execute(
 					new BatchIndexingWorkspace(
-							searchFactoryImplementor, sessionFactory, type,
+							extendedIntegrator, sessionFactory, type,
 							documentBuilderThreads,
 							cacheMode, objectLoadingBatchSize, endAllSignal,
 							monitor, backend, objectsLimit, idFetchSize
@@ -119,7 +119,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	 * @param backend
 	 */
 	private void afterBatch(BatchBackend backend) {
-		Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( rootEntities );
+		Set<Class<?>> targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic( rootEntities );
 		if ( this.optimizeAtEnd ) {
 			backend.optimize( targetedClasses );
 		}
@@ -133,7 +133,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private void beforeBatch(BatchBackend backend) {
 		if ( this.purgeAtStart ) {
 			//purgeAll for affected entities
-			Set<Class<?>> targetedClasses = searchFactoryImplementor.getIndexedTypesPolymorphic( rootEntities );
+			Set<Class<?>> targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic( rootEntities );
 			for ( Class<?> clazz : targetedClasses ) {
 				//needs do be in-sync work to make sure we wait for the end of it.
 				backend.doWorkInSync( new PurgeAllLuceneWork( clazz ) );

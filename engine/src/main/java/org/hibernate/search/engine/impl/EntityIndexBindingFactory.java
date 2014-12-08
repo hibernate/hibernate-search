@@ -51,7 +51,7 @@ public final class EntityIndexBindingFactory {
 					similarity,
 					safeInterceptor,
 					properties,
-					context.getUninitializedSearchFactory(),
+					context.getUninitializedSearchIntegrator(),
 					indexManagerHolder,
 					rootDirectoryProviderName );
 		}

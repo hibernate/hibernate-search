@@ -39,7 +39,7 @@ public interface TestResourceManager {
 
 	SearchFactory getSearchFactory();
 
-	SearchIntegrator getSearchFactoryImpl();
+	SearchIntegrator getExtendedSearchIntegrator();
 
 	Directory getDirectory(Class<?> clazz);
 

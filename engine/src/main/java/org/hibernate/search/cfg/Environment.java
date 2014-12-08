@@ -89,7 +89,7 @@ public final class Environment {
 
 	/**
 	 * When set to true a lock on the index will not be released until the
-	 * SearchFactory (or SessionFactory) is closed.
+	 * SearchIntegrator (or SessionFactory) is closed.
 	 * This improves performance in applying changes to the index, but no other application
 	 * can access the index in write mode while Hibernate Search is running.
 	 * This is an index-scoped property and defaults to false.

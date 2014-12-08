@@ -64,7 +64,7 @@ public abstract class ConfigurationReadTestCase extends SearchTestBase {
 	}
 
 	private Integer getParameter(int shard, IndexWriterSetting setting, Class testEntity) {
-		EntityIndexBinding mappingForEntity = getSearchFactoryImpl().getIndexBinding( testEntity );
+		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( testEntity );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) mappingForEntity.getIndexManagers()[shard];
 		LuceneIndexingParameters luceneIndexingParameters = indexManager.getIndexingParameters();
 		return luceneIndexingParameters.getIndexParameters().getCurrentValueFor( setting );

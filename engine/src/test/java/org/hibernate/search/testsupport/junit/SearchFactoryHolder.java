@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.SearchException;
@@ -51,8 +51,8 @@ public class SearchFactoryHolder extends ExternalResource {
 		this.configuration = new Properties();
 	}
 
-	public SearchFactoryImplementor getSearchFactory() {
-		return searchIntegrator[0].unwrap( SearchFactoryImplementor.class );
+	public ExtendedSearchintegrator getSearchFactory() {
+		return searchIntegrator[0].unwrap( ExtendedSearchintegrator.class );
 	}
 
 	@Override

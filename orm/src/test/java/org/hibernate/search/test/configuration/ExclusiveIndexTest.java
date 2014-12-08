@@ -19,7 +19,7 @@ import org.hibernate.search.backend.impl.lucene.ExclusiveIndexWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.backend.impl.lucene.SharedIndexWorkspaceImpl;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
@@ -46,9 +46,9 @@ public class ExclusiveIndexTest {
 			.addAnnotatedClass( org.hibernate.search.test.query.Book.class )
 			.addAnnotatedClass( org.hibernate.search.test.query.Author.class )
 			.openFullTextSession();
-		SearchFactoryImplementor searchFactory = ftSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
+		ExtendedSearchintegrator integrator = ftSession.getSearchFactory().unwrap( ExtendedSearchintegrator.class );
 		ftSession.close();
-		IndexManagerHolder allIndexesManager = searchFactory.getIndexManagerHolder();
+		IndexManagerHolder allIndexesManager = integrator.getIndexManagerHolder();
 		//explicitly enabled:
 		assertExclusiveIsEnabled( allIndexesManager, "org.hibernate.search.test.configuration.BlogEntry", true );
 		//explicitly disabled (this entity defined a short index name):

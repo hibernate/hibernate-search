@@ -29,7 +29,7 @@ import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.AbstractQueryImpl;
 import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
@@ -79,12 +79,11 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		//TODO handle flushMode
 		super( query.toString(), null, session, parameterMetadata );
 
-		SearchFactoryImplementor searchFactoryImplementor = getSearchFactoryImplementor();
-		this.objectLookupMethod = searchFactoryImplementor.getDefaultObjectLookupMethod();
-		this.databaseRetrievalMethod = searchFactoryImplementor.getDefaultDatabaseRetrievalMethod();
+		ExtendedSearchintegrator extendedIntegrator = getExtendedSearchIntegrator();
+		this.objectLookupMethod = extendedIntegrator.getDefaultObjectLookupMethod();
+		this.databaseRetrievalMethod = extendedIntegrator.getDefaultDatabaseRetrievalMethod();
 
-		//TODO get a factory on searchFactoryImplementor
-		hSearchQuery = getSearchFactoryImplementor().createHSQuery();
+		hSearchQuery = getExtendedSearchIntegrator().createHSQuery();
 		hSearchQuery
 				.luceneQuery( query )
 				.timeoutExceptionFactory( exceptionFactory )
@@ -147,7 +146,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 				.targetedEntities( hSearchQuery.getTargetedEntities() )
 				.indexedTargetedEntities( hSearchQuery.getIndexedTargetedEntities() )
 				.session( session )
-				.searchFactory( hSearchQuery.getSearchFactoryImplementor() )
+				.searchFactory( hSearchQuery.getExtendedSearchIntegrator() )
 				.timeoutManager( hSearchQuery.getTimeoutManager() )
 				.lookupMethod( objectLookupMethod )
 				.retrievalMethod( databaseRetrievalMethod );
@@ -163,7 +162,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		ProjectionLoader loader = new ProjectionLoader();
 		loader.init(
 				(Session) session,
-				hSearchQuery.getSearchFactoryImplementor(),
+				hSearchQuery.getExtendedSearchIntegrator(),
 				resultTransformer,
 				loaderBuilder,
 				hSearchQuery.getProjectedFields(),
@@ -361,14 +360,14 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		return this;
 	}
 
-	private SearchFactoryImplementor getSearchFactoryImplementor() {
-		return ContextHelper.getSearchFactoryBySessionImplementor( session );
+	private ExtendedSearchintegrator getExtendedSearchIntegrator() {
+		return ContextHelper.getSearchintegratorBySessionImplementor( session );
 	}
 
 	private static final Loader noLoader = new Loader() {
 		@Override
 		public void init(Session session,
-						SearchFactoryImplementor searchFactoryImplementor,
+						ExtendedSearchintegrator extendedIntegrator,
 						ObjectInitializer objectInitializer,
 						TimeoutManager timeoutManager) {
 		}

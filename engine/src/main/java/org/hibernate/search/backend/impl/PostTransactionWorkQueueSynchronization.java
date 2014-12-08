@@ -12,7 +12,7 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.backend.spi.Work;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -43,11 +43,11 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	 */
 	public PostTransactionWorkQueueSynchronization(Object transactionIdentifier, QueueingProcessor queueingProcessor,
 			ConcurrentMap<Object, PostTransactionWorkQueueSynchronization> queuePerTransaction,
-			SearchFactoryImplementor searchFactoryImplementor) {
+			ExtendedSearchintegrator extendedIntegrator) {
 		this.transactionIdentifier = transactionIdentifier;
 		this.queueingProcessor = queueingProcessor;
 		this.queuePerTransaction = queuePerTransaction;
-		queue = new WorkQueue( searchFactoryImplementor );
+		queue = new WorkQueue( extendedIntegrator );
 	}
 
 	public void add(Work work) {

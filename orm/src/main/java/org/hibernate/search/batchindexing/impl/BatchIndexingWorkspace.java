@@ -16,7 +16,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
@@ -57,7 +57,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	private final int idFetchSize;
 
-	public BatchIndexingWorkspace(SearchFactoryImplementor searchFactoryImplementor,
+	public BatchIndexingWorkspace(ExtendedSearchintegrator extendedIntegrator,
 								SessionFactoryImplementor sessionFactory,
 								Class<?> entityType,
 								int objectLoadingThreads,
@@ -68,10 +68,10 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 								BatchBackend backend,
 								long objectsLimit,
 								int idFetchSize) {
-		super( searchFactoryImplementor );
+		super( extendedIntegrator );
 		this.indexedType = entityType;
 		this.idFetchSize = idFetchSize;
-		this.idNameOfIndexedType = searchFactoryImplementor.getIndexBinding( entityType )
+		this.idNameOfIndexedType = extendedIntegrator.getIndexBinding( entityType )
 				.getDocumentBuilder()
 				.getIdentifierName();
 		this.sessionFactory = sessionFactory;
@@ -98,8 +98,8 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	@Override
 	public void runWithErrorHandler() {
 		try {
-			final ErrorHandler errorHandler = searchFactoryImplementor.getErrorHandler();
-			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( searchFactoryImplementor, sessionFactory, errorHandler );
+			final ErrorHandler errorHandler = extendedIntegrator.getErrorHandler();
+			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( extendedIntegrator, sessionFactory, errorHandler );
 			//first start the consumers, then the producers (reverse order):
 			//from primary keys to LuceneWork ADD operations:
 			startTransformationToLuceneWork( transactionalContext, errorHandler );
@@ -141,7 +141,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		final Runnable documentOutputter = new OptionallyWrapInJTATransaction( transactionalContext,
 				new IdentifierConsumerDocumentProducer(
 						primaryKeyStream, monitor, sessionFactory, producerEndSignal,
-						cacheMode, indexedType, searchFactoryImplementor,
+						cacheMode, indexedType, extendedIntegrator,
 						idNameOfIndexedType, backend, errorHandler
 				));
 		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );

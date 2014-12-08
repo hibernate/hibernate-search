@@ -18,7 +18,7 @@ import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -39,7 +39,7 @@ import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.impl.ExtendedSearchintegratorWithShareableState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
@@ -50,18 +50,18 @@ import org.hibernate.search.stat.spi.StatisticsImplementor;
  *
  * @author Emmanuel Bernard
  */
-public class MutableSearchFactory implements SearchFactoryImplementorWithShareableState, SearchIntegrator, WorkerBuildContext {
+public class MutableSearchFactory implements ExtendedSearchintegratorWithShareableState, SearchIntegrator, WorkerBuildContext {
 	// Implements WorkerBuilderContext for the dynamic sharding approach which build IndexManager lazily
 
 	//a reference to the same instance of this class is help by clients and various HSearch services
 	//when changing the SearchFactory internals, only the underlying delegate should be changed.
 	//the volatile ensure that the state is replicated upon underlying factory switch.
-	private volatile SearchFactoryImplementorWithShareableState delegate;
+	private volatile ExtendedSearchintegratorWithShareableState delegate;
 
 	//lock to be acquired every time the underlying searchFactory is rebuilt
 	private final Lock mutating = new ReentrantLock();
 
-	public void setDelegate(SearchFactoryImplementorWithShareableState delegate) {
+	public void setDelegate(ExtendedSearchintegratorWithShareableState delegate) {
 		this.delegate = delegate;
 	}
 
@@ -116,7 +116,7 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 	}
 
 	@Override
-	public SearchFactoryImplementor getUninitializedSearchFactory() {
+	public ExtendedSearchintegrator getUninitializedSearchIntegrator() {
 		return this;
 	}
 
@@ -315,7 +315,7 @@ public class MutableSearchFactory implements SearchFactoryImplementorWithShareab
 
 	@Override
 	public <T> T unwrap(Class<T> cls) {
-		if ( SearchIntegrator.class.equals( cls ) || SearchFactoryImplementor.class.equals( cls ) || MutableSearchFactory.class.equals( cls ) ) {
+		if ( SearchIntegrator.class.equals( cls ) || ExtendedSearchintegrator.class.equals( cls ) || MutableSearchFactory.class.equals( cls ) ) {
 			return (T) this;
 		}
 		else {

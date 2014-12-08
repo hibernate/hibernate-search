@@ -63,10 +63,10 @@ public class ReadWriteParallelismTest {
 
 	@Test
 	public void testPropertiesIndexing() throws InterruptedException {
-		SearchIntegrator searchFactory = sfHolder.getSearchFactory();
+		SearchIntegrator integrator = sfHolder.getSearchFactory();
 		ThreadPoolExecutor threadPool = Executors.newFixedThreadPool( THREAD_NUMBER, "ReadWriteParallelismTest" );
 		for ( int i = 0; i < THREAD_NUMBER; i++ ) {
-			threadPool.execute( new Task( searchFactory, i ) );
+			threadPool.execute( new Task( integrator, i ) );
 		}
 		threadPool.shutdown();
 		//Time to warmup only:
@@ -115,27 +115,27 @@ public class ReadWriteParallelismTest {
 	private static class Task implements Runnable {
 
 		private final int threadId;
-		private final SearchIntegrator searchFactory;
+		private final SearchIntegrator integrator;
 
-		public Task(SearchIntegrator searchFactory, int threadId) {
-			this.searchFactory = searchFactory;
+		public Task(SearchIntegrator integrator, int threadId) {
+			this.integrator = integrator;
 			this.threadId = threadId;
 		}
 
 		@Override
 		public void run() {
-			final Worker worker = searchFactory.getWorker();
+			final Worker worker = integrator.getWorker();
 			final String title = "Volume N' " + Integer.toString( threadId );
 			final Integer bookId = Integer.valueOf( threadId );
 			final Query query = new TermQuery( new Term( "title", title ) );
 			try {
 				while ( running.get() ) {
 					cyclesCompleted.incrementAndGet();
-					verifyMatches( searchFactory, 0, query );
+					verifyMatches( integrator, 0, query );
 					writeABook( bookId, title, worker );
-					verifyMatches( searchFactory, 1, query );
+					verifyMatches( integrator, 1, query );
 					deleteABook( bookId, worker );
-					verifyMatches( searchFactory, 0, query );
+					verifyMatches( integrator, 0, query );
 				}
 			}
 			catch (RuntimeException re) {

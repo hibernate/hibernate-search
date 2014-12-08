@@ -100,7 +100,7 @@ public class JMSMasterTest extends SearchTestBase {
 
 	private void registerMessageListener() throws Exception {
 		MessageConsumer consumer = getQueueSession().createConsumer( getMessageQueue() );
-		consumer.setMessageListener( new MDBSearchController( getSearchFactoryImpl() ) );
+		consumer.setMessageListener( new MDBSearchController( getExtendedSearchIntegrator() ) );
 	}
 
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
@@ -109,7 +109,7 @@ public class JMSMasterTest extends SearchTestBase {
 		message.setStringProperty(
 				Environment.INDEX_NAME_JMS_PROPERTY,
 				indexName );
-		IndexManager indexManager = getSearchFactoryImpl().getIndexManagerHolder().getIndexManager( indexName );
+		IndexManager indexManager = getExtendedSearchIntegrator().getIndexManagerHolder().getIndexManager( indexName );
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
 		message.setObject( data );
 		QueueSender sender = getQueueSession().createSender( getMessageQueue() );

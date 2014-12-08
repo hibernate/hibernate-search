@@ -10,7 +10,7 @@ package org.hibernate.search.query.dsl.impl;
 import java.util.Set;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.query.dsl.EntityContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
@@ -22,9 +22,9 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  * @author Emmanuel Bernard
  */
 public class ConnectedQueryContextBuilder implements QueryContextBuilder {
-	private final SearchFactoryImplementor factory;
+	private final ExtendedSearchintegrator factory;
 
-	public ConnectedQueryContextBuilder(SearchFactoryImplementor factory) {
+	public ConnectedQueryContextBuilder(ExtendedSearchintegrator factory) {
 		this.factory = factory;
 	}
 
@@ -37,7 +37,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 		private final ScopedAnalyzer queryAnalyzer;
 		private final QueryBuildingContext context;
 
-		public HSearchEntityContext(Class<?> entityType, SearchFactoryImplementor factory) {
+		public HSearchEntityContext(Class<?> entityType, ExtendedSearchintegrator factory) {
 			// get a type for meta-data retrieval; if the given type itself is not indexed, one indexed sub-type will
 			// be used; note that this allows to e.g. query for fields not present on the given type but on one of its
 			// sub-types, but we accept this for now
@@ -61,7 +61,7 @@ public class ConnectedQueryContextBuilder implements QueryContextBuilder {
 		 * @return the given type itself if it is indexed, otherwise the first found indexed sub-type or {@code null} if
 		 * neither the given type nor any of its sub-types are indexed
 		 */
-		private Class<?> getIndexBoundType(Class<?> entityType, SearchFactoryImplementor factory) {
+		private Class<?> getIndexBoundType(Class<?> entityType, ExtendedSearchintegrator factory) {
 			if ( factory.getIndexBinding( entityType ) != null ) {
 				return entityType;
 			}

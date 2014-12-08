@@ -7,7 +7,7 @@
 package org.hibernate.search.test.engine.service;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
@@ -191,7 +191,7 @@ public class StandardServiceManagerTest {
 	private class DummyBuildContext implements BuildContext {
 
 		@Override
-		public SearchFactoryImplementor getUninitializedSearchFactory() {
+		public ExtendedSearchintegrator getUninitializedSearchIntegrator() {
 			return null;
 		}
 

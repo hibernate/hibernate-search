@@ -28,8 +28,8 @@ public class MassIndexerErrorReportingTest extends SearchTestBase {
 			action = "throw new NullPointerException(\"Byteman created NPE\")",
 			name = "testMassIndexerErrorsReported")
 	public void testMassIndexerErrorsReported() throws InterruptedException {
-		SearchIntegrator searchFactory = getSearchFactoryImpl();
-		MockErrorHandler mockErrorHandler = getErrorHandler( searchFactory );
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		MockErrorHandler mockErrorHandler = getErrorHandler( integrator );
 
 		FullTextSession fullTextSession = prepareSomeData( this );
 
@@ -43,8 +43,8 @@ public class MassIndexerErrorReportingTest extends SearchTestBase {
 		Assert.assertEquals( "Byteman created NPE", exception.getMessage() );
 	}
 
-	static MockErrorHandler getErrorHandler(SearchIntegrator searchFactory) {
-		ErrorHandler errorHandler = searchFactory.getErrorHandler();
+	static MockErrorHandler getErrorHandler(SearchIntegrator integrator) {
+		ErrorHandler errorHandler = integrator.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		MockErrorHandler mockErrorHandler = (MockErrorHandler) errorHandler;
 		return mockErrorHandler;

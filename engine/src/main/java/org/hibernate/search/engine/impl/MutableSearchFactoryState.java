@@ -25,7 +25,7 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
-import org.hibernate.search.spi.impl.SearchFactoryImplementorWithShareableState;
+import org.hibernate.search.spi.impl.ExtendedSearchintegratorWithShareableState;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 
 /**
@@ -207,8 +207,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		return allIndexesManager;
 	}
 
-	public void setActiveSearchFactory(SearchFactoryImplementorWithShareableState factory) {
-		allIndexesManager.setActiveSearchFactory( factory );
+	public void setActiveSearchIntegrator(ExtendedSearchintegratorWithShareableState factory) {
+		allIndexesManager.setActiveSearchIntegrator( factory );
 	}
 
 	@Override

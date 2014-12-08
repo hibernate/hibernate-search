@@ -40,7 +40,7 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.integration.impl.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchintegrator;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.util.impl.ReflectionHelper;
@@ -71,7 +71,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	private boolean disabled;
 	private boolean skipDirtyChecks = true;
-	private SearchFactoryImplementor searchFactoryImplementor;
+	private ExtendedSearchintegrator extendedIntegrator;
 
 	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
 	// transient because it's not serializable (and state doesn't need to live longer than a flush).
@@ -165,8 +165,8 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		}
 	}
 
-	public SearchFactoryImplementor getSearchFactoryImplementor() {
-		return searchFactoryImplementor;
+	public ExtendedSearchintegrator getExtendedSearchFactoryIntegrator() {
+		return extendedIntegrator;
 	}
 
 	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
@@ -189,11 +189,11 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	/**
 	 * Initialize method called by Hibernate Core when the SessionFactory starts
 	 */
-	public void initialize(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
-		String indexingStrategy = searchFactoryImplementor.getIndexingStrategy();
+	public void initialize(ExtendedSearchintegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator;
+		String indexingStrategy = extendedIntegrator.getIndexingStrategy();
 		if ( INDEXING_STRATEGY_EVENT.equals( indexingStrategy ) ) {
-			disabled = searchFactoryImplementor.getIndexBindings().size() == 0;
+			disabled = extendedIntegrator.getIndexBindings().size() == 0;
 		}
 		else if ( INDEXING_STRATEGY_MANUAL.equals( indexingStrategy ) ) {
 			disabled = true;
@@ -202,7 +202,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		log.debug( "Hibernate Search event listeners " + ( disabled ? "deactivated" : "activated" ) );
 
 		if ( ! disabled ) {
-			skipDirtyChecks = !searchFactoryImplementor.isDirtyChecksEnabled();
+			skipDirtyChecks = !extendedIntegrator.isDirtyChecksEnabled();
 			log.debug( "Hibernate Search dirty checks " + ( skipDirtyChecks ? "disabled" : "enabled" ) );
 		}
 	}
@@ -225,7 +225,7 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	protected void processWork(Object entity, Serializable id, WorkType workType, AbstractEvent event, boolean identifierRollbackEnabled) {
 		Work work = new Work( entity, id, workType, identifierRollbackEnabled );
 		final EventSourceTransactionContext transactionContext = new EventSourceTransactionContext( event.getSession() );
-		searchFactoryImplementor.getWorker().performWork( work, transactionContext );
+		extendedIntegrator.getWorker().performWork( work, transactionContext );
 	}
 
 	protected void processCollectionEvent(AbstractCollectionEvent event) {
@@ -303,12 +303,12 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	 */
 	protected AbstractDocumentBuilder getDocumentBuilder(final Object instance) {
 		Class<?> clazz = instance.getClass();
-		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding( clazz );
+		EntityIndexBinding entityIndexBinding = extendedIntegrator.getIndexBinding( clazz );
 		if ( entityIndexBinding != null ) {
 			return entityIndexBinding.getDocumentBuilder();
 		}
 		else {
-			return searchFactoryImplementor.getDocumentBuilderContainedEntity( clazz );
+			return extendedIntegrator.getDocumentBuilderContainedEntity( clazz );
 		}
 	}
 
