@@ -139,8 +139,8 @@
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
         <luceneVersion>4.10.2</luceneVersion>
-        <infinispanVersion>7.0.0.Final</infinispanVersion>
-        <jgroupsVersion>3.6.0.Final</jgroupsVersion>
+        <infinispanVersion>7.0.2.Final</infinispanVersion>
+        <jgroupsVersion>3.6.1.Final</jgroupsVersion>
         <hibernateVersion>4.3.7.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.5.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
