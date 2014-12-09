@@ -20,12 +20,13 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * package class extracting the SearchMappingFactory if needed
+ * Helper to extract the programmatic SearchMapping from a configuration object
  */
-public class SearchMappingBuilder {
+public class SearchMappingHelper {
+
 	private static final Log LOG = LoggerFactory.make();
 
-	private SearchMappingBuilder() {
+	private SearchMappingHelper() {
 	}
 
 	/**
@@ -42,7 +43,7 @@ public class SearchMappingBuilder {
 	 * @param cfg the search configuration
 	 * @return SearchMapping
 	 */
-	public static SearchMapping getSearchMapping(SearchConfiguration cfg) {
+	public static SearchMapping extractSearchMapping(SearchConfiguration cfg) {
 		// try SearchConfiguration object first and then properties
 		Object modelMappingProperty = cfg.getProgrammaticMapping();
 		if ( modelMappingProperty == null ) {
