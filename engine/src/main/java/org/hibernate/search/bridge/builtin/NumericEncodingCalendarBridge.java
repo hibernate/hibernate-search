@@ -45,6 +45,10 @@ public class NumericEncodingCalendarBridge extends NumericEncodingDateBridge {
 			Resolution.MILLISECOND
 	);
 
+	public NumericEncodingCalendarBridge() {
+		super( Resolution.MILLISECOND );
+	}
+
 	public NumericEncodingCalendarBridge(Resolution resolution) {
 		super( resolution );
 	}

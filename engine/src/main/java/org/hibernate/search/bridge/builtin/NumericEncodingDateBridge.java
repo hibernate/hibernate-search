@@ -50,6 +50,10 @@ public class NumericEncodingDateBridge implements TwoWayFieldBridge, Parameteriz
 
 	private DateTools.Resolution resolution;
 
+	public NumericEncodingDateBridge() {
+		this( Resolution.MILLISECOND );
+	}
+
 	public NumericEncodingDateBridge(Resolution resolution) {
 		this.resolution = DateResolutionUtil.getLuceneResolution( resolution );
 	}

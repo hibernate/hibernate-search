@@ -59,7 +59,7 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
 	@Override
 	public final String objectToString(final Object object) {
-		return object.toString();
+		return object == null ? null : object.toString();
 	}
 
 	@Override
