@@ -30,6 +30,7 @@ import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.TRACE;
 import static org.jboss.logging.Logger.Level.WARN;
+import static org.jboss.logging.Logger.Level.DEBUG;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -673,11 +674,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 229, value = "Property " + Environment.INDEX_FLUSH_INTERVAL + "for the index '%s' needs to be positive." )
 	SearchException flushIntervalNeedsToBePositive(String indexName);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 230, value = "Starting sync consumer thread for index '%s'" )
 	void startingSyncConsumerThread(String indexName);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 231, value = "Stopping sync consumer thread for index '%s'" )
 	void stoppingSyncConsumerThread(String indexName);
 
