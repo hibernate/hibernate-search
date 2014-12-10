@@ -708,4 +708,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 239, value = "Unknown field encoding type: %1$s")
 	AssertionFailure unknownEncodingType(String encoding);
 
+	@Message(id = 240, value = "Unable to parse value '%2$s' of field '%1$s' into a Date")
+	SearchException invalidStringDateFieldInDocument(String fieldName, String value);
+
 }

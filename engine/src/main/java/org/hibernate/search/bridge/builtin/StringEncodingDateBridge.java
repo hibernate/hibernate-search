@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.bridge.builtin;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -19,6 +20,8 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Bridge a {@code java.util.Date} to a {@code String}, truncated to the specified resolution.
@@ -37,6 +40,8 @@ import org.hibernate.search.bridge.builtin.impl.DateResolutionUtil;
  * @author Emmanuel Bernard
  */
 public class StringEncodingDateBridge implements TwoWayFieldBridge, ParameterizedBridge {
+	private static final Log log = LoggerFactory.make();
+
 	public static final TwoWayFieldBridge DATE_YEAR = new StringEncodingDateBridge( Resolution.YEAR );
 	public static final TwoWayFieldBridge DATE_MONTH = new StringEncodingDateBridge( Resolution.MONTH );
 	public static final TwoWayFieldBridge DATE_DAY = new StringEncodingDateBridge( Resolution.DAY );
@@ -58,7 +63,12 @@ public class StringEncodingDateBridge implements TwoWayFieldBridge, Parameterize
 	public Object get(String name, Document document) {
 		final IndexableField field = document.getField( name );
 		if ( field != null ) {
-			return field.stringValue();
+			try {
+				return DateTools.stringToDate( field.stringValue() );
+			}
+			catch (ParseException e) {
+				throw log.invalidStringDateFieldInDocument( name, field.stringValue() );
+			}
 		}
 		else {
 			return null;
