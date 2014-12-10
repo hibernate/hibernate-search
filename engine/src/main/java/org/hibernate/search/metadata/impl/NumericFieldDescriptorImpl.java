@@ -15,10 +15,12 @@ import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
  */
 public class NumericFieldDescriptorImpl extends FieldDescriptorImpl implements NumericFieldSettingsDescriptor {
 	private final int precisionStep;
+	private final NumericEncodingType numericEncodingType;
 
 	public NumericFieldDescriptorImpl(DocumentFieldMetadata documentFieldMetadata) {
 		super( documentFieldMetadata );
 		this.precisionStep = documentFieldMetadata.getPrecisionStep();
+		this.numericEncodingType = documentFieldMetadata.getNumericEncodingType();
 	}
 
 	@Override
@@ -27,10 +29,15 @@ public class NumericFieldDescriptorImpl extends FieldDescriptorImpl implements N
 	}
 
 	@Override
+	public NumericEncodingType encodingType() {
+		return numericEncodingType;
+	}
+
+	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder( "NumericFieldDescriptorImpl{" );
-		sb.append( "precisionStep=" ).append( precisionStep );
-		sb.append( '}' );
-		return sb.toString();
+		return "NumericFieldDescriptorImpl{" +
+				"precisionStep=" + precisionStep +
+				", encodingType=" + numericEncodingType +
+				"} " + super.toString();
 	}
 }
