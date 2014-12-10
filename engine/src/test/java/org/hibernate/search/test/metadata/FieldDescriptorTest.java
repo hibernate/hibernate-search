@@ -8,6 +8,9 @@
 package org.hibernate.search.test.metadata;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
@@ -22,13 +25,12 @@ import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.TestForIssue;
-import org.junit.Before;
-import org.junit.Test;
 
+import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -129,6 +131,13 @@ public class FieldDescriptorTest {
 				"the numeric step should be " + expectedPrecisionStep,
 				expectedPrecisionStep,
 				numericFieldSettingsDescriptor.precisionStep()
+		);
+
+		NumericEncodingType expectedNumericEncodingType = NumericEncodingType.INTEGER;
+		assertEquals(
+				"the numeric field should be encoded as " + expectedNumericEncodingType,
+				expectedNumericEncodingType,
+				numericFieldSettingsDescriptor.encodingType()
 		);
 	}
 

@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
+
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -70,6 +71,7 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
+import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
  * A metadata provider which extracts the required information from annotations.
@@ -903,7 +905,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					.analyzer( analyzer )
 					.indexNullAs( nullToken )
 					.numeric()
-					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) );
+					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) )
+					.numericEncodingType( determineNumericFieldEncoding( fieldBridge ) );
 		}
 		else {
 			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
@@ -932,6 +935,39 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
 		// field bridge
 		return numericFieldAnnotation != null || fieldBridge instanceof NumericFieldBridge || fieldBridge instanceof NumericEncodingDateBridge;
+	}
+
+	private NumericEncodingType determineNumericFieldEncoding(FieldBridge fieldBridge) {
+		if ( fieldBridge instanceof ContainerBridge ) {
+			fieldBridge = ( (ContainerBridge) fieldBridge ).getElementBridge();
+		}
+
+		if ( fieldBridge instanceof NumericFieldBridge ) {
+			NumericFieldBridge numericFieldBridge = (NumericFieldBridge) fieldBridge;
+			switch ( numericFieldBridge ) {
+				case INT_FIELD_BRIDGE: {
+					return NumericEncodingType.INTEGER;
+				}
+				case LONG_FIELD_BRIDGE: {
+					return NumericEncodingType.LONG;
+				}
+				case DOUBLE_FIELD_BRIDGE: {
+					return NumericEncodingType.DOUBLE;
+				}
+				case FLOAT_FIELD_BRIDGE: {
+					return NumericEncodingType.FLOAT;
+				}
+				default: {
+					return NumericEncodingType.UNKNOWN;
+				}
+			}
+		}
+
+		if ( fieldBridge instanceof NumericEncodingDateBridge ) {
+			return NumericEncodingType.LONG;
+		}
+
+		return NumericEncodingType.UNKNOWN;
 	}
 
 	private String determineNullToken(org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context) {
