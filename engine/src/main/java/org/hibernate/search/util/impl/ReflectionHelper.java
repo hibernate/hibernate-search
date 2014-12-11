@@ -8,7 +8,9 @@ package org.hibernate.search.util.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,13 +18,17 @@ import java.util.List;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.util.StringHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public abstract class ReflectionHelper {
+	private static final Log LOG = LoggerFactory.make();
 
 	private ReflectionHelper() {
 	}
@@ -140,6 +146,58 @@ public abstract class ReflectionHelper {
 	 */
 	public static boolean isSearchAnnotation(Annotation annotation) {
 		return "org.hibernate.search.annotations".equals( annotation.annotationType().getPackage().getName() );
+	}
+
+
+	/**
+	 * Creates an instance of the specified class and returns it. If {@code checkForFactoryAnnotation == true}, the created
+	 * instance is checked for a {@code @Factory} annotated method. If one exists the factory method is invoked and the
+	 * return value returns as expected instances.
+	 *
+	 * @param clazz the class to instantiate
+	 * @param checkForFactoryAnnotation  whether to check for {@code @Factory} annotated methods
+	 * @return the created instance
+	 */
+	public static Object createInstance(Class<?> clazz, boolean checkForFactoryAnnotation) {
+		// create the instance
+		Object instance;
+		try {
+			instance = clazz.newInstance();
+		}
+		catch (InstantiationException e) {
+			throw LOG.noPublicNoArgConstructor( clazz.getName() );
+		}
+		catch (IllegalAccessException e) {
+			throw LOG.unableToAccessClass( clazz.getName() );
+		}
+
+		if ( !checkForFactoryAnnotation ) {
+			return instance;
+		}
+
+		// check for a factory annotation
+		int numberOfFactoryMethodsFound = 0;
+		for ( Method method : clazz.getMethods() ) {
+			if ( method.isAnnotationPresent( Factory.class ) ) {
+				if ( numberOfFactoryMethodsFound == 1 ) {
+					throw LOG.multipleFactoryMethodsInClass( clazz.getName() );
+				}
+				if ( method.getReturnType() == void.class ) {
+					throw LOG.factoryMethodsMustReturnAnObject( clazz.getName(), method.getName() );
+				}
+				try {
+					instance = method.invoke( instance );
+				}
+				catch (IllegalAccessException e) {
+					throw LOG.unableToAccessMethod( clazz.getName(), method.getName() );
+				}
+				catch (InvocationTargetException e) {
+					throw LOG.exceptionDuringFactoryMethodExecution( e, clazz.getName(), method.getName() );
+				}
+				numberOfFactoryMethodsFound++;
+			}
+		}
+		return instance;
 	}
 
 	private static boolean containsSearchAnnotation(Annotation[] annotations) {

@@ -33,6 +33,7 @@ import org.hibernate.search.bridge.spi.BridgeProvider;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -152,15 +153,15 @@ public final class BridgeFactory {
 		return bridge;
 	}
 
-	public FieldBridge guessType(XMember member,
+	public FieldBridge buildFieldBridge(XMember member,
 			boolean isId,
 			ReflectionManager reflectionManager,
 			ServiceManager serviceManager
 	) {
-		return guessType( null, member, isId, reflectionManager, serviceManager );
+		return buildFieldBridge( null, member, isId, reflectionManager, serviceManager );
 	}
 
-	public FieldBridge guessType(Field field,
+	public FieldBridge buildFieldBridge(Field field,
 			XMember member,
 			boolean isId,
 			ReflectionManager reflectionManager,
@@ -298,52 +299,51 @@ public final class BridgeFactory {
 			bridgeAnnotation = member.getAnnotation( org.hibernate.search.annotations.FieldBridge.class );
 		}
 		if ( bridgeAnnotation != null ) {
-			bridge = doExtractType( bridgeAnnotation, member, reflectionManager );
+			bridge = createFieldBridgeFromAnnotation(
+					bridgeAnnotation, member.getName(), reflectionManager.toClass( member.getType() )
+			);
 		}
 		return bridge;
 	}
 
-	private FieldBridge doExtractType(
-			org.hibernate.search.annotations.FieldBridge bridgeAnn,
-			XMember member,
-			ReflectionManager reflectionManager) {
-		return doExtractType( bridgeAnn, member.getName(), reflectionManager.toClass( member.getType() ) );
-	}
-
-	private FieldBridge doExtractType(
+	private FieldBridge createFieldBridgeFromAnnotation(
 			org.hibernate.search.annotations.FieldBridge bridgeAnn,
 			String appliedOnName,
 			Class<?> appliedOnType) {
-		assert bridgeAnn != null : "@FieldBridge instance cannot be null";
+		if ( bridgeAnn == null ) {
+			throw new AssertionFailure( "@FieldBridge instance cannot be null" );
+		}
+
 		FieldBridge bridge;
-		Class<?> impl = bridgeAnn.impl();
-		if ( impl == void.class ) {
+		Class<?> fieldBridgeClass = bridgeAnn.impl();
+		if ( fieldBridgeClass == void.class ) {
 			throw LOG.noImplementationClassInFieldBridge( appliedOnName );
 		}
 		try {
-			Object instance = impl.newInstance();
-			if ( FieldBridge.class.isAssignableFrom( impl ) ) {
+			Object instance = ReflectionHelper.createInstance( fieldBridgeClass, true );
+
+			if ( FieldBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
 				bridge = (FieldBridge) instance;
 			}
-			else if ( TwoWayStringBridge.class.isAssignableFrom( impl ) ) {
+			else if ( TwoWayStringBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
 				bridge = new TwoWayString2FieldBridgeAdaptor(
 						(TwoWayStringBridge) instance
 				);
 			}
-			else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( impl ) ) {
+			else if ( org.hibernate.search.bridge.StringBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
 				bridge = new String2FieldBridgeAdaptor( (org.hibernate.search.bridge.StringBridge) instance );
 			}
 			else {
-				throw LOG.noFieldBridgeInterfaceImplementedByFieldBridge( impl.getName(), appliedOnName );
+				throw LOG.noFieldBridgeInterfaceImplementedByFieldBridge( fieldBridgeClass.getName(), appliedOnName );
 			}
-			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( impl ) ) {
+			if ( bridgeAnn.params().length > 0 && ParameterizedBridge.class.isAssignableFrom( fieldBridgeClass ) ) {
 				Map<String, String> params = new HashMap<>( bridgeAnn.params().length );
 				for ( Parameter param : bridgeAnn.params() ) {
 					params.put( param.name(), param.value() );
 				}
 				( (ParameterizedBridge) instance ).setParameterValues( params );
 			}
-			populateReturnType( appliedOnType, impl, instance );
+			populateReturnType( appliedOnType, fieldBridgeClass, instance );
 		}
 		catch (Exception e) {
 			throw LOG.unableToInstantiateFieldBridge( appliedOnName, appliedOnType.getName(), e );
@@ -393,7 +393,7 @@ public final class BridgeFactory {
 		FieldBridge bridge = null;
 
 		if ( fieldBridgeAnnotation != null ) {
-			bridge = doExtractType(
+			bridge = createFieldBridgeFromAnnotation(
 					fieldBridgeAnnotation,
 					appliedOnType.getName(),
 					reflectionManager.toClass( appliedOnType )

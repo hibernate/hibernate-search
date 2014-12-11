@@ -9,19 +9,23 @@ package org.hibernate.search.test.util.impl;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import org.junit.Test;
+
 import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
 import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -66,6 +70,60 @@ public class ReflectionHelperTest {
 		);
 	}
 
+	@Test
+	public void testCreateInstanceWithClassHavingPrivateNoArgConstructorThrowsException() {
+		try {
+			ReflectionHelper.createInstance( F.class, false );
+			fail( "It should not be possible to create a class with no public no-args constructor." );
+		}
+		catch (SearchException e) {
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000242" ) );
+		}
+	}
+
+	@Test
+	public void testCreateInstanceWithClassHavingNoNoArgConstructorThrowsException() {
+		try {
+			ReflectionHelper.createInstance( G.class, false );
+			fail( "It should not be possible to create a class with no public no-args constructor." );
+		}
+		catch (SearchException e) {
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000242" ) );
+		}
+	}
+
+	@Test
+	public void testUsingMultipleFactoryAnnotationsThrowsException() {
+		try {
+			ReflectionHelper.createInstance( H.class, true );
+			fail( "More than once @Factory annotation should throw an exception." );
+		}
+		catch (SearchException e) {
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000241" ) );
+		}
+	}
+
+	@Test
+	public void testFactoryMethodWithNoReturnTypeThrowsException() {
+		try {
+			ReflectionHelper.createInstance( I.class, true );
+			fail( "Factory methods w/o return type should throw an exception." );
+		}
+		catch (SearchException e) {
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000244" ) );
+		}
+	}
+
+	@Test
+	public void testSuccessfulExecutionOfFactoryMethod() {
+		assertTrue( "The factory method return type was expected.", ReflectionHelper.createInstance( K.class, true ) instanceof D );
+	}
+
+	@Test
+	public void testSuccessfulInstantiationOfClass() {
+		assertTrue( "The factory method should not be executed", ReflectionHelper.createInstance( K.class, false ) instanceof K );
+	}
+
 	public class A {
 		@Field
 		private String name;
@@ -84,9 +142,51 @@ public class ReflectionHelperTest {
 	}
 
 	@Analyzer
-	public class D {
+	public static class D {
 	}
 
 	public class E {
+	}
+
+	public class F {
+		private F() {
+		}
+	}
+
+	public class G {
+		private G(String foo) {
+		}
+	}
+
+	public static class H {
+		@Factory
+		public Object foo() {
+			return new Object();
+		}
+
+		@Factory
+		public Object bar() {
+			return new Object();
+		}
+	}
+
+	public static class I {
+		@Factory
+		public void foo() {
+		}
+	}
+
+	public static class J {
+		@Factory
+		public Object foo() {
+			throw new IllegalArgumentException( );
+		}
+	}
+
+	public static class K {
+		@Factory
+		public D create() {
+			return new D();
+		}
 	}
 }

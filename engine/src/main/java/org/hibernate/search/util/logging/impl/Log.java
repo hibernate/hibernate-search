@@ -711,4 +711,21 @@ public interface Log extends BasicLogger {
 	@Message(id = 240, value = "Unable to parse value '%2$s' of field '%1$s' into a Date")
 	SearchException invalidStringDateFieldInDocument(String fieldName, String value);
 
+	@Message(id = 241, value = "Multiple @Factory methods defined in %s")
+	SearchException multipleFactoryMethodsInClass(String className);
+
+	@Message(id = 242, value = "Search requires '%s' to have a public no-arg constructor in order to instantiate it")
+	SearchException noPublicNoArgConstructor(String className);
+
+	@Message(id = 243, value = "Unable to access class '%s'")
+	SearchException unableToAccessClass(String className);
+
+	@Message(id = 244, value = "Factory methods must return an object. '%1$s#%2$s' does not")
+	SearchException factoryMethodsMustReturnAnObject(String className, String methodName);
+
+	@Message(id = 245, value = "Unable to access method '%1$s#%2$s'")
+	SearchException unableToAccessMethod(String className, String methodName);
+
+	@Message(id = 246, value = "An exception occurred while invoking '%1$s#%2$s'")
+	SearchException exceptionDuringFactoryMethodExecution(@Cause Exception e, String className, String methodName);
 }
