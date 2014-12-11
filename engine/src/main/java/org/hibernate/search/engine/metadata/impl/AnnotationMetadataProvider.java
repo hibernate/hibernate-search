@@ -163,7 +163,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, ConfigContext configContext, String fieldName) {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
-		FieldBridge fieldBridge = bridgeFactory.guessType(
+		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				member,
 				true,
 				reflectionManager,
@@ -217,7 +217,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			parseContext.setExplicitDocumentId( true );
 		}
 
-		FieldBridge idBridge = bridgeFactory.guessType(
+		FieldBridge idBridge = bridgeFactory.buildFieldBridge(
 				member,
 				true,
 				reflectionManager,
@@ -564,7 +564,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Store store = spatialAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		Field.TermVector termVector = Field.TermVector.NO;
-		FieldBridge fieldBridge = bridgeFactory.guessType(
+		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				member,
 				false,
 				reflectionManager,
@@ -869,7 +869,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( fieldAnnotation.termVector() );
 
-		FieldBridge fieldBridge = bridgeFactory.guessType(
+		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				fieldAnnotation,
 				member,
 				false,

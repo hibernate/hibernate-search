@@ -711,4 +711,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 240, value = "Unable to parse value '%2$s' of field '%1$s' into a Date")
 	SearchException invalidStringDateFieldInDocument(String fieldName, String value);
 
+	@Message(id = 241, value = "Multiple @Factory methods defined in %s")
+	SearchException multipleFactoryMethodsInClass(String className);
+
 }
