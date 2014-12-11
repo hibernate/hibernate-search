@@ -1,6 +1,26 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.CR2 (11-12-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1744] - NumericFieldBridge#objectToString does not check for null
+    * [HSEARCH-1751] - Extend NumericFieldSettingsDescriptor to expose the numeric encoding type
+    * [HSEARCH-1752] - StringEncodingDateBridge does not comply with the TwoWayFieldBridge contract
+
+** Improvement
+    * [HSEARCH-642] - Support for only manual indexing of particular entity types
+    * [HSEARCH-1747] - Reduce verbosity of logging message for start/stop of backend threads
+    * [HSEARCH-1749] - Separate the Avro Serialization module into its own isolated JBoss Module
+    * [HSEARCH-1750] - Rename SearchMappingBuilder to SearchMappingHelper
+
+** Task
+    * [HSEARCH-1743] - Rename SearchFactoryImplementor to ExtendedSearchIntegrator
+    * [HSEARCH-1746] - Update Infinispan to 7.0.2.Final and JGroups to 3.6.1.Final
+    * [HSEARCH-1754] - Speedup execution of InfinispanNativeLockFactoryTest: no need for a cluster
+
+
 Version 5.0.0.CR1 (8-12-2014)
 ------------------------
 
