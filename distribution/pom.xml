@@ -50,6 +50,13 @@
             <artifactId>hibernate-search-infinispan</artifactId>
         </dependency>
 
+        <!-- Making sure the docs get build prior to running the assembly -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-search-documentation</artifactId>
+            <type>pom</type>
+        </dependency>
+
         <!-- Need to list out optional/provided dependencies here again in order to include them via assembly dependency set -->
         <dependency>
             <groupId>org.hibernate</groupId>

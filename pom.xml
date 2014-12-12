@@ -439,6 +439,12 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-documentation</artifactId>
+                <type>pom</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${commonsCodecVersion}</version>
