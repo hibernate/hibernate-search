@@ -24,6 +24,7 @@ import org.hibernate.search.query.dsl.RangeTerminationExcludable;
 
 /**
  * @author Emmanuel Bernard
+ * @author Sanne Grinovero
  */
 public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationExcludable {
 	private final RangeQueryContext rangeContext;
@@ -77,36 +78,64 @@ public class ConnectedMultiFieldsRangeQueryBuilder implements RangeTerminationEx
 	private Query createQuery(FieldContext fieldContext, ConversionContext conversionContext) {
 		final Query perFieldQuery;
 		final String fieldName = fieldContext.getField();
-		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
-		final Object fromObject = rangeContext.getFrom();
-		final Object toObject = rangeContext.getTo();
 
 		FieldDescriptor fieldDescriptor = queryContext.getFactory().getIndexedTypeDescriptor( queryContext.getEntityType() ).getIndexedField( fieldName );
-
-		if ( fieldDescriptor != null && FieldDescriptor.Type.NUMERIC.equals( fieldDescriptor.getType() ) ) {
-			perFieldQuery = NumericFieldUtils.createNumericRangeQuery(
-					fieldName,
-					fromObject,
-					toObject,
-					!rangeContext.isExcludeFrom(),
-					!rangeContext.isExcludeTo()
-			);
+		if ( fieldDescriptor != null ) {
+			if ( FieldDescriptor.Type.NUMERIC.equals( fieldDescriptor.getType() ) ) {
+				perFieldQuery = createNumericRangeQuery( fieldName, rangeContext );
+			}
+			else {
+				perFieldQuery = createKeywordRangeQuery( fieldName, rangeContext, queryContext, conversionContext, fieldContext );
+			}
 		}
 		else {
-			final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
-			final String fromString = fieldContext.objectToString( documentBuilder, fromObject, conversionContext );
-			final String lowerTerm = fromString == null ?
-					null :
-					Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
-
-			final String toString = fieldContext.objectToString( documentBuilder, toObject, conversionContext );
-			final String upperTerm = toString == null ?
-					null :
-					Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
-
-			perFieldQuery = TermRangeQuery.newStringRange( fieldName, lowerTerm, upperTerm, !rangeContext.isExcludeFrom(), !rangeContext.isExcludeTo() );
+			//we need to guess the proper type from the parameter types (Fallback logic required by the protobuf integration in Infinispan)
+			if ( rangeBoundaryTypeRequiredNumericQuery( rangeContext.getFrom(), rangeContext.getTo() ) ) {
+				perFieldQuery = createNumericRangeQuery( fieldName, rangeContext );
+			}
+			else {
+				perFieldQuery = createKeywordRangeQuery( fieldName, rangeContext, queryContext, conversionContext, fieldContext );
+			}
 		}
 
 		return fieldContext.getFieldCustomizer().setWrappedQuery( perFieldQuery ).createQuery();
+	}
+
+	private boolean rangeBoundaryTypeRequiredNumericQuery(Object from, Object to) {
+		if ( from != null ) {
+			return NumericFieldUtils.requiresNumericRangeQuery( from );
+		}
+		else if ( to != null ) {
+			return NumericFieldUtils.requiresNumericRangeQuery( to );
+		}
+		return false;
+	}
+
+	private static Query createKeywordRangeQuery(String fieldName, RangeQueryContext rangeContext, QueryBuildingContext queryContext, ConversionContext conversionContext, FieldContext fieldContext) {
+		final Analyzer queryAnalyzer = queryContext.getQueryAnalyzer();
+		final Object fromObject = rangeContext.getFrom();
+		final Object toObject = rangeContext.getTo();
+		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
+		final String fromString = fieldContext.objectToString( documentBuilder, fromObject, conversionContext );
+		final String lowerTerm = fromString == null ?
+				null :
+				Helper.getAnalyzedTerm( fieldName, fromString, "from", queryAnalyzer, fieldContext );
+
+		final String toString = fieldContext.objectToString( documentBuilder, toObject, conversionContext );
+		final String upperTerm = toString == null ?
+				null :
+				Helper.getAnalyzedTerm( fieldName, toString, "to", queryAnalyzer, fieldContext );
+
+		return TermRangeQuery.newStringRange( fieldName, lowerTerm, upperTerm, !rangeContext.isExcludeFrom(), !rangeContext.isExcludeTo() );
+	}
+
+	private static Query createNumericRangeQuery(String fieldName, RangeQueryContext rangeContext) {
+		return NumericFieldUtils.createNumericRangeQuery(
+				fieldName,
+				rangeContext.getFrom(),
+				rangeContext.getTo(),
+				!rangeContext.isExcludeFrom(),
+				!rangeContext.isExcludeTo()
+		);
 	}
 }
