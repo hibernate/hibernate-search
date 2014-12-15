@@ -112,6 +112,7 @@ public class TransactionalWorker implements Worker {
 			case PURGE:
 			case PURGE_ALL:
 			case INDEX:
+			case DELETE_BY_QUERY:
 				operation = IndexingOverride.APPLY_DEFAULT;
 				break;
 			default:
