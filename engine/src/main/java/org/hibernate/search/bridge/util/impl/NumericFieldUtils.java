@@ -88,4 +88,24 @@ public final class NumericFieldUtils {
 		return createNumericRangeQuery( fieldName, value, value, true, true );
 	}
 
+	/**
+	 * When the type of RangeQuery needs to be guessed among keyword based ranges or numeric based
+	 * range queries, the parameter type defines the strategy.
+	 * This should match the default FieldBridge used for each type.
+	 * @param typedValue on Object
+	 * @return true if the typedValue argument is of any type which is by default indexed as a NumericField
+	 */
+	public static boolean isTypeDefaultingToNumericRangeQueries(Object typedValue) {
+		if ( typedValue == null ) {
+			return false;
+		}
+		final Class<?> numericClass = typedValue.getClass();
+		return numericClass.isAssignableFrom( Double.class ) ||
+				numericClass.isAssignableFrom( Long.class ) ||
+				numericClass.isAssignableFrom( Integer.class ) ||
+				numericClass.isAssignableFrom( Float.class ) ||
+				numericClass.isAssignableFrom( Calendar.class )
+				;
+	}
+
 }
