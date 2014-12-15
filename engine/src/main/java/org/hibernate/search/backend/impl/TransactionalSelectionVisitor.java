@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -22,6 +23,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * context bound list of operations instead of sending all changes directly to the backend.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Martin Braun
  */
 public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {
 
@@ -32,6 +34,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
 	private final FlushSelectionDelegate flushDelegate = new FlushSelectionDelegate();
+	private final DeleteByQuerySelectionDelegate deleteByQueryDelegate = new DeleteByQuerySelectionDelegate();
 
 	private TransactionalSelectionVisitor() {
 		// use INSTANCE as this delegator is stateless
@@ -67,6 +70,11 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		return flushDelegate;
 	}
 
+	@Override
+	public ContextAwareSelectionDelegate getDelegate(DeleteByQueryLuceneWork deleteByQueryLuceneWork) {
+		return this.deleteByQueryDelegate;
+	}
+
 	private static class AddSelectionDelegate implements ContextAwareSelectionDelegate {
 
 		@Override
@@ -84,6 +92,23 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 	}
 
 	private static class DeleteSelectionDelegate implements ContextAwareSelectionDelegate {
+
+		@Override
+		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
+				WorkQueuePerIndexSplitter context) {
+			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
+					work.getEntityClass(),
+					work.getId(),
+					work.getIdInString()
+			);
+			for ( IndexManager indexManager : indexManagers ) {
+				context.getIndexManagerQueue( indexManager ).add( work );
+			}
+		}
+
+	}
+
+	private static class DeleteByQuerySelectionDelegate implements ContextAwareSelectionDelegate {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,

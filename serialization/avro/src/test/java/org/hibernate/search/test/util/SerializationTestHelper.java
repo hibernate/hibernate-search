@@ -119,6 +119,9 @@ public final class SerializationTestHelper {
 		else if ( work instanceof FlushLuceneWork ) {
 			assertFlush( (FlushLuceneWork) work, (FlushLuceneWork) copy );
 		}
+		else if ( work instanceof DeleteByQueryLuceneWork ) {
+			assertDeleteByQuery( (DeleteByQueryLuceneWork) work, (DeleteByQueryLuceneWork) copy );
+		}
 		else {
 			fail( "unexpected type" );
 		}
@@ -140,6 +143,11 @@ public final class SerializationTestHelper {
 		assertThat( copy.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
 				.isEqualTo( work.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
+	}
+
+	private static void assertDeleteByQuery(DeleteByQueryLuceneWork work, DeleteByQueryLuceneWork copy) {
+		assertThat( work.getEntityClass() ).as( "DeleteByQuery.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
+		assertThat( work.getDeletionQuery() ).as( "DeleteByQuery.getDeletionQuery is not copied" ).isEqualTo( copy.getDeletionQuery() );
 	}
 
 	private static void assertDocument(Document original, Document copy) {

@@ -17,6 +17,7 @@ import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
@@ -44,6 +45,7 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  * @author Hardy Ferentschik
  */
 public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
+
 	private static Log log = LoggerFactory.make();
 
 	private final ExtendedSearchIntegrator searchIntegrator;
@@ -82,6 +84,9 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 				else if (work instanceof DeleteLuceneWork) {
 					processId( work, serializer );
 					serializer.addDelete( work.getEntityClass().getName() );
+				}
+				else if ( work instanceof DeleteByQueryLuceneWork ) {
+					serializer.addDeleteByQuery( work.getEntityClass().getName(), ( (DeleteByQueryLuceneWork) work ).getDeletionQuery() );
 				}
 				else if (work instanceof AddLuceneWork ) {
 					serializeDocument( work.getDocument(), serializer );

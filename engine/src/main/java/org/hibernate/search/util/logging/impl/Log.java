@@ -13,6 +13,7 @@ import java.io.IOException;
 import org.apache.lucene.index.CorruptIndexException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.Environment;
@@ -765,6 +766,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 257, value = "'%1$s' is an unexpected type for a numeric doc value")
 	SearchException unexpectedNumericDocValuesTypeType(String docValuesType);
+	
+	@Message(id = 258, value = "Unable to delete all %s matching Query: %s")
+	SearchException unableToDeleteByQuery(Class<?> entityClass, DeletionQuery deletionQuery, @Cause Exception e );
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 258, value = "Attempting to load a field named '%s' from the Lucene Document. This Document instance doesn't have such a field." )

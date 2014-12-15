@@ -52,6 +52,7 @@ class ProtocolBuilderV1_2 extends ProtocolBuilderV1_1 {
 		parseSchema( "operation/Delete" );
 		parseSchema( "operation/Add" );
 		parseSchema( "operation/Update" );
+		parseSchema( "operation/DeleteByQuery" );
 		parseSchema( "Message" );
 		return parseProtocol( "Works" );
 	}
