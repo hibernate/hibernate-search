@@ -299,26 +299,29 @@ additional properties using the prefix `hibernate.search.<indexname>`.
 [[infinispan-directories]]
 ==== Infinispan Directory configuration
 
-Infinispan is a distributed, scalable, highly available data grid platform which supports
-auto-discovery of peer nodes. Using Infinispan and Hibernate Search in combination, it is possible to
-store the Lucene index in a distributed environment where index updates are quickly available on all
-nodes.
+Infinispan is a distributed, scalable, cloud friendly data grid platform.
+Hibernate Search is able to use Infinispan to store the Lucene index, so your application can
+benefit from its distribution capabilities to get index updates available on all nodes at short latency.
 
-This section describes in greater detail how to configure Hibernate Search to use an Infinispan
-Lucene Directory.
+This section describes how to configure Hibernate Search to use an Infinispan Lucene Directory.
 
 When using an Infinispan Directory the index is stored in memory and shared across multiple nodes.
-It is considered a single directory distributed across all participating nodes. If a node updates
-the index, all other nodes are updated as well. Updates on one node can be immediately searched for
-in the whole cluster.
+It is considered a single directory distributed across all participating nodes: if a node updates
+the index, all other nodes are updated as well.
+Updates on one node can be immediately searched for in the whole cluster.
 
-The default configuration replicates all data defining the index across all nodes, thus consuming a
-significant amount of memory. For large indexes it's suggested to enable data distribution, so that
-each piece of information is replicated to a subset of all cluster members.
+The default configuration replicates all data which defines the index across all nodes, thus consuming a
+significant amount of memory but providing the best query performance.
+For large indexes it's suggested to enable data distribution, so that each piece of information is
+replicated to a subset of all cluster members. The distribution option will reduce the amount of memory
+required for each node but is less efficient as it will cause high network usage among the nodes.
 
 It is also possible to offload part or most information to a `CacheStore`, such as plain filesystem,
-Amazon S3, Cassandra, Berkley DB or standard relational databases. You can configure it to have a
+Amazon S3, Cassandra, MongoDB or standard relational databases. You can configure it to have a
 `CacheStore` on each node or have a single centralized one shared by each node.
+
+A popular choice is to use a replicated index aiming to keep the whole index in memory, combined with
+a `CacheStore` as safety valve in case the index gets larger than expected.
 
 See the link:http://infinispan.org/documentation/[ Infinispan documentation] for all Infinispan
 configuration options.
@@ -347,9 +350,9 @@ To use the Infinispan directory via Maven, add the following dependencies:
 ----
 ====
 
-For the non-maven users, add `hibernate-search-infinispan.jar`, `infinispan-lucene-directory.jar`
-and `infinispan-core.jar` to your application classpath. These last two jars are distributed by
-link:http://infinispan.org/download/[Infinispan].
+For the non-maven users, add `hibernate-search-infinispan.jar`, `infinispan-lucene-directory.jar`,
+`infinispan-core.jar` and `infinispan-commons.jar` to your application classpath.
+These last three jars are distributed by the link:http://infinispan.org/download/[Infinispan project downloads].
 
 
 ===== Architecture
@@ -433,9 +436,8 @@ configuration.
 
 The file `jgroups-ec2.xml` used in the example above is one of the several JGroups configurations
 included in Infinispan. It is a good starting point to run on Amazon EC2 networks. For more details
-and examples see link:http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_use_one_of_the_
-pre_configured_jgroups_files[ usage of pre-configured JGroups stacks] in the Infinispan
-configuration guide.
+and examples see link:http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_use_one_of_the_pre_configured_jgroups_files[usage of pre-configured JGroups stacks]
+in the Infinispan configuration guide.
 
 [[configuration-worker]]
 === Worker configuration
@@ -1325,7 +1327,9 @@ level deployment, in META-INF (or WEB-INF for web deployments).
 <jboss-deployment-structure>
     <deployment>
         <dependencies>
-            <module name="org.hibernate.search.orm" services="export" />
+            <module
+                name="org.hibernate.search.orm"
+                services="export" />
         </dependencies>
     </deployment>
 </jboss-deployment-structure>
@@ -1370,7 +1374,10 @@ level deployment, in META-INF (or WEB-INF for web deployments).
 <jboss-deployment-structure>
     <deployment>
         <dependencies>
-            <module name="org.hibernate.search.orm" slot="{hibernateSearchVersion}" services="export" />
+            <module
+                name="org.hibernate.search.orm"
+                slot="{hibernateSearchVersion}"
+                services="export" />
         </dependencies>
     </deployment>
 </jboss-deployment-structure>
@@ -1384,7 +1391,21 @@ Hibernate Search (as part of the WFK) and come with a different edition of this 
 tailored for EAP users.
 ====
 
-
 More information about the modules configuration in WildFly can be found in the
-link:$$https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+WildFly$$[Class Loading in WildFly 8] wiki.
+link:https://docs.jboss.org/author/display/WFLY8/Class+Loading+in+WildFly[Class Loading in WildFly 8] wiki.
 
+==== Using Infinispan with Hibernate Search on WildFly
+
+The Infinispan project is also included in WildFly so you can use the feature without needing additional downloads.
+
+If you are updating the version of Hibernate Search in WildFly as described in the previous paragraph,
+you might need to update Infinispan too.
+The process is very similar: download the modules from link:http://infinispan.org/download/[Infinispan project downloads],
+picking a compatible version, and decompress the modules into the `modules` directory for your WildFly installation.
+
+Hibernate Search version `{hibernateSearchVersion}` was compiled and tested with Infinispan version `{infinispanVersion}`;
+generally a more recent version of either project is expected to be backwards compatible for cross-project integration
+purposes as long as they have the same "major.minor" family version.
+
+For example for a version of Hibernate Search depending on Infinispan `7.0.3.Final` it should be safe to upgrade
+Infinispan to `7.0.6.Final`, but an upgrade to `7.1.0.Final` might not work.
