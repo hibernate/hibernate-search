@@ -453,6 +453,18 @@ public class TypeMetadata {
 		}
 
 		public Builder addProperty(PropertyMetadata propertyMetadata) {
+			if ( idPropertyMetadata != null && idPropertyMetadata.getPropertyAccessorName() != null ) {
+				// the id property is always a single field
+				String idFieldName = idPropertyMetadata.getFieldMetadata().get( 0 ).getName();
+				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+					if ( idFieldName.equals( fieldMetadata.getName() ) ) {
+						throw log.fieldTriesToOverrideIdFieldSettings(
+								propertyMetadata.getPropertyAccessor().getDeclaringClass().getName(),
+								propertyMetadata.getPropertyAccessor().getName()
+						);
+					}
+				}
+			}
 			this.propertyMetadataList.add( propertyMetadata );
 			return this;
 		}

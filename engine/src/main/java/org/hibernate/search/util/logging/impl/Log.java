@@ -728,4 +728,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 246, value = "An exception occurred while invoking '%1$s#%2$s'")
 	SearchException exceptionDuringFactoryMethodExecution(@Cause Exception e, String className, String methodName);
+
+	@Message(id = 247, value = "An indexed field defined on '%1$s:%2$s' tries to override the id field settings. The document id field settings cannot be modified. Use a different field name.")
+	SearchException fieldTriesToOverrideIdFieldSettings(String className, String propertyName);
+
 }
