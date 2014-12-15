@@ -22,9 +22,13 @@ import org.hibernate.Transaction;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.backend.SingularTermQuery;
 import org.hibernate.search.backend.jms.impl.JmsBackendQueueProcessor;
+import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jms.master.JMSMasterTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,6 +110,24 @@ public class JMSSlaveTest extends SearchTestBase {
 
 		assertEquals( 1, SearchQueueChecker.queues );
 		assertEquals( 2, SearchQueueChecker.works );
+		s.close();
+
+		SearchQueueChecker.reset();
+		s = openSession();
+		tx = s.beginTransaction();
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			ExtendedSearchIntegrator integrator = this.getExtendedSearchIntegrator();
+			integrator.getWorker().performWork( new DeleteByQueryWork( TShirt.class, new SingularTermQuery( "id", String.valueOf( ts.getId() ) ) ), tc );
+			tc.end();
+		}
+		tx.commit();
+
+		// Need to sleep for the message consumption
+		Thread.sleep( 500 );
+
+		assertEquals( 1, SearchQueueChecker.queues );
+		assertEquals( 1, SearchQueueChecker.works );
 		s.close();
 	}
 

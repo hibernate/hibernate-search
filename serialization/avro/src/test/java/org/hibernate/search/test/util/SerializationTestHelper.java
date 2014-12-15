@@ -34,8 +34,8 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
 import org.junit.Assert;
-
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -119,6 +119,9 @@ public final class SerializationTestHelper {
 		else if ( work instanceof FlushLuceneWork ) {
 			assertFlush( (FlushLuceneWork) work, (FlushLuceneWork) copy );
 		}
+		else if ( work instanceof DeleteByQueryLuceneWork ) {
+			assertDeleteByQuery( (DeleteByQueryLuceneWork) work, (DeleteByQueryLuceneWork) copy );
+		}
 		else {
 			fail( "unexpected type" );
 		}
@@ -140,6 +143,11 @@ public final class SerializationTestHelper {
 		assertThat( copy.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
 				.isEqualTo( work.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
+	}
+
+	private static void assertDeleteByQuery(DeleteByQueryLuceneWork work, DeleteByQueryLuceneWork copy) {
+		assertThat( work.getEntityClass() ).as( "DeleteByQuery.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
+		assertThat( work.getDeletionQuery() ).as( "DeleteByQuery.getDeletionQuery is not copied" ).isEqualTo( copy.getDeletionQuery() );
 	}
 
 	private static void assertDocument(Document original, Document copy) {

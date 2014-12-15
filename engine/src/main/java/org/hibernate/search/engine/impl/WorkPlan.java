@@ -16,8 +16,11 @@ import java.util.Set;
 
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.DeletionQuery;
+import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.spi.ConversionContext;
@@ -40,6 +43,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
+ * @author Martin Braun
  * @since 3.3
  */
 @SuppressWarnings( { "rawtypes", "unchecked" })
@@ -169,6 +173,8 @@ public class WorkPlan {
 		 */
 		private boolean purgeAll = false;
 
+		private List<DeletionQuery> deletionQueries = new ArrayList<>();
+
 		/**
 		 * The type of all classes being managed
 		 */
@@ -202,7 +208,12 @@ public class WorkPlan {
 		public void addWork(Work work) {
 			if ( work.getType() == WorkType.PURGE_ALL ) {
 				entityById.clear();
+				this.deletionQueries.clear();
 				purgeAll = true;
+			}
+			else if ( work.getType() == WorkType.DELETE_BY_QUERY ) {
+				DeleteByQueryWork delWork = (DeleteByQueryWork) work;
+				this.deletionQueries.add( delWork.getDeleteByQuery() );
 			}
 			else {
 				Serializable id = extractProperId( work );
@@ -254,6 +265,9 @@ public class WorkPlan {
 			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 			if ( purgeAll ) {
 				luceneQueue.add( new PurgeAllLuceneWork( entityClass ) );
+			}
+			for ( DeletionQuery delQuery : this.deletionQueries ) {
+				luceneQueue.add( new DeleteByQueryLuceneWork( this.entityClass, delQuery ) );
 			}
 			for ( Entry<Serializable, PerEntityWork> entry : entityInstances ) {
 				Serializable indexingId = entry.getKey();
@@ -414,6 +428,9 @@ public class WorkPlan {
 				case PURGE_ALL:
 					// not breaking intentionally: PURGE_ALL should not reach this
 					// class
+				case DELETE_BY_QUERY:
+					// not breaking intentionally: DELETE_BY_QUERY should not reach
+					// this class
 				default:
 					throw new SearchException( "unexpected state:" + type );
 			}
@@ -467,6 +484,7 @@ public class WorkPlan {
 					// nothing to do, as something else was done
 					break;
 				case PURGE_ALL:
+				case DELETE_BY_QUERY:
 				default:
 					throw new SearchException( "unexpected state:" + type );
 			}

@@ -41,6 +41,7 @@
         `operation/Delete`,
         `operation/Add`,
         `operation/Update`,
+        `operation/DeleteByQuery`,
 
         `Message`
     ]
