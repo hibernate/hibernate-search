@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
-import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 
 /**
@@ -31,7 +30,7 @@ public class Entity1ForUnindexed implements Serializable {
 
 	@Id
 	@GeneratedValue
-	@Field(analyze = Analyze.NO)
+	@Field(name = "uid-numeric")
 	@Column(name = "universalid")
 	private long uid;
 
