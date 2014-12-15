@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.lucene.util.AttributeImpl;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.backend.DeleteByQuerySupport;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
@@ -39,30 +40,24 @@ public class JavaSerializationDeserializer implements Deserializer {
 			else if ( operation instanceof Delete ) {
 				Delete safeOperation = (Delete) operation;
 				hydrator.addId( safeOperation.getId() );
-				hydrator.addDeleteLuceneWork(
-						safeOperation.getEntityClassName(),
-						conversionContext
-				);
+				hydrator.addDeleteLuceneWork( safeOperation.getEntityClassName(), conversionContext );
+			}
+			else if ( operation instanceof DeleteByQuery ) {
+				DeleteByQuery safeOperation = (DeleteByQuery) operation;
+				DeleteByQuerySupport.StringToQueryMapper mapper = DeleteByQuerySupport.FROM_STRING.get( safeOperation.getKey() );
+				hydrator.addDeleteByQueryLuceneWork( safeOperation.getEntityClassName(), mapper.fromString( safeOperation.getQuery() ) );
 			}
 			else if ( operation instanceof Add ) {
 				Add safeOperation = (Add) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
 				hydrator.addId( safeOperation.getId() );
-				hydrator.addAddLuceneWork(
-						safeOperation.getEntityClassName(),
-						safeOperation.getFieldToAnalyzerMap(),
-						conversionContext
-				);
+				hydrator.addAddLuceneWork( safeOperation.getEntityClassName(), safeOperation.getFieldToAnalyzerMap(), conversionContext );
 			}
 			else if ( operation instanceof Update ) {
 				Update safeOperation = (Update) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
 				hydrator.addId( safeOperation.getId() );
-				hydrator.addUpdateLuceneWork(
-						safeOperation.getEntityClassName(),
-						safeOperation.getFieldToAnalyzerMap(),
-						conversionContext
-				);
+				hydrator.addUpdateLuceneWork( safeOperation.getEntityClassName(), safeOperation.getFieldToAnalyzerMap(), conversionContext );
 			}
 		}
 	}
@@ -77,52 +72,20 @@ public class JavaSerializationDeserializer implements Deserializer {
 			else if ( field instanceof SerializableNumericField ) {
 				SerializableNumericField safeField = (SerializableNumericField) field;
 				if ( field instanceof SerializableIntField ) {
-					hydrator.addIntNumericField(
-							( (SerializableIntField) field ).getValue(),
-							safeField.getName(),
-							safeField.getPrecisionStep(),
-							safeField.getStore(),
-							safeField.isIndexed(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
+					hydrator.addIntNumericField( ( (SerializableIntField) field ).getValue(), safeField.getName(), safeField.getPrecisionStep(),
+							safeField.getStore(), safeField.isIndexed(), safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
 				}
 				else if ( field instanceof SerializableLongField ) {
-					hydrator.addLongNumericField(
-							( (SerializableLongField) field ).getValue(),
-							safeField.getName(),
-							safeField.getPrecisionStep(),
-							safeField.getStore(),
-							safeField.isIndexed(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
+					hydrator.addLongNumericField( ( (SerializableLongField) field ).getValue(), safeField.getName(), safeField.getPrecisionStep(),
+							safeField.getStore(), safeField.isIndexed(), safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
 				}
 				else if ( field instanceof SerializableFloatField ) {
-					hydrator.addFloatNumericField(
-							( (SerializableFloatField) field ).getValue(),
-							safeField.getName(),
-							safeField.getPrecisionStep(),
-							safeField.getStore(),
-							safeField.isIndexed(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
+					hydrator.addFloatNumericField( ( (SerializableFloatField) field ).getValue(), safeField.getName(), safeField.getPrecisionStep(),
+							safeField.getStore(), safeField.isIndexed(), safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
 				}
 				else if ( field instanceof SerializableDoubleField ) {
-					hydrator.addDoubleNumericField(
-							( (SerializableDoubleField) field ).getValue(),
-							safeField.getName(),
-							safeField.getPrecisionStep(),
-							safeField.getStore(),
-							safeField.isIndexed(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
+					hydrator.addDoubleNumericField( ( (SerializableDoubleField) field ).getValue(), safeField.getName(), safeField.getPrecisionStep(),
+							safeField.getStore(), safeField.isIndexed(), safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
 				}
 				else {
 					throw new SearchException( "Unknown SerializableNumericField: " + field.getClass() );
@@ -132,25 +95,14 @@ public class JavaSerializationDeserializer implements Deserializer {
 				SerializableField safeField = (SerializableField) field;
 				if ( field instanceof SerializableBinaryField ) {
 					SerializableBinaryField reallySafeField = (SerializableBinaryField) field;
-					hydrator.addFieldWithBinaryData(
-							reallySafeField.getName(),
-							reallySafeField.getValue(),
-							reallySafeField.getOffset(),
-							reallySafeField.getLength()
-					);
+					hydrator.addFieldWithBinaryData( reallySafeField.getName(), reallySafeField.getValue(), reallySafeField.getOffset(),
+							reallySafeField.getLength() );
 				}
 				else if ( field instanceof SerializableStringField ) {
 					SerializableStringField reallySafeField = (SerializableStringField) field;
-					hydrator.addFieldWithStringData(
-							reallySafeField.getName(),
-							reallySafeField.getValue(),
-							reallySafeField.getStore(),
-							reallySafeField.getIndex(),
-							reallySafeField.getTermVector(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
+					hydrator.addFieldWithStringData( reallySafeField.getName(), reallySafeField.getValue(), reallySafeField.getStore(),
+							reallySafeField.getIndex(), reallySafeField.getTermVector(), safeField.getBoost(), safeField.isOmitNorms(),
+							safeField.isOmitTermFreqAndPositions() );
 				}
 				else if ( field instanceof SerializableTokenStreamField ) {
 					SerializableTokenStreamField reallySafeField = (SerializableTokenStreamField) field;
@@ -161,24 +113,13 @@ public class JavaSerializationDeserializer implements Deserializer {
 						}
 						hydrator.addToken();
 					}
-					hydrator.addFieldWithTokenStreamData(
-							reallySafeField.getName(),
-							reallySafeField.getTermVector(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
+					hydrator.addFieldWithTokenStreamData( reallySafeField.getName(), reallySafeField.getTermVector(), safeField.getBoost(),
+							safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
 				}
 				else if ( field instanceof SerializableReaderField ) {
 					SerializableReaderField reallySafeField = (SerializableReaderField) field;
-					hydrator.addFieldWithSerializableReaderData(
-							reallySafeField.getName(),
-							reallySafeField.getValue(),
-							reallySafeField.getTermVector(),
-							safeField.getBoost(),
-							safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions()
-					);
+					hydrator.addFieldWithSerializableReaderData( reallySafeField.getName(), reallySafeField.getValue(), reallySafeField.getTermVector(),
+							safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
 				}
 				else {
 					throw new SearchException( "Unknown SerializableField: " + field.getClass() );

@@ -1,0 +1,14 @@
+{
+    "name": "Delete",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "class",
+            "type": "int"
+        },
+        {
+            "name": "id",
+            "type": "Id"
+        }
+    ]
+}

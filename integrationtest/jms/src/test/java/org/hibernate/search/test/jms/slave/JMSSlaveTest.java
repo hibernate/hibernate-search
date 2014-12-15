@@ -7,6 +7,7 @@
 package org.hibernate.search.test.jms.slave;
 
 import java.util.Properties;
+
 import javax.jms.MessageConsumer;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
@@ -16,15 +17,17 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 
 import org.apache.activemq.broker.BrokerService;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.backend.SingularTermQuery;
 import org.hibernate.search.backend.jms.impl.JmsBackendQueueProcessor;
+import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jms.master.JMSMasterTest;
+import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +43,7 @@ import static org.junit.Assert.assertEquals;
 public class JMSSlaveTest extends SearchTestBase {
 
 	/**
-	 * Name of the test queue as found in JNDI  (see jndi.properties).
+	 * Name of the test queue as found in JNDI (see jndi.properties).
 	 */
 	private static final String QUEUE_NAME = "queue/searchtest";
 
@@ -75,7 +78,7 @@ public class JMSSlaveTest extends SearchTestBase {
 		s.persist( ts2 );
 		tx.commit();
 
-		//need to sleep for the message consumption
+		// need to sleep for the message consumption
 		Thread.sleep( 500 );
 
 		assertEquals( 1, SearchQueueChecker.queues );
@@ -88,7 +91,7 @@ public class JMSSlaveTest extends SearchTestBase {
 		ts.setLogo( "Peter pan" );
 		tx.commit();
 
-		//need to sleep for the message consumption
+		// need to sleep for the message consumption
 		Thread.sleep( 500 );
 
 		assertEquals( 1, SearchQueueChecker.queues );
@@ -101,11 +104,29 @@ public class JMSSlaveTest extends SearchTestBase {
 		s.delete( s.get( TShirt.class, ts2.getId() ) );
 		tx.commit();
 
-		//Need to sleep for the message consumption
+		// Need to sleep for the message consumption
 		Thread.sleep( 500 );
 
 		assertEquals( 1, SearchQueueChecker.queues );
 		assertEquals( 2, SearchQueueChecker.works );
+		s.close();
+
+		SearchQueueChecker.reset();
+		s = openSession();
+		tx = s.beginTransaction();
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			ExtendedSearchIntegrator integrator = this.getExtendedSearchIntegrator();
+			integrator.getWorker().performWork( new DeleteByQueryWork( TShirt.class, new SingularTermQuery( "id", String.valueOf( ts.getId() ) ) ), tc );
+			tc.end();
+		}
+		tx.commit();
+
+		// Need to sleep for the message consumption
+		Thread.sleep( 500 );
+
+		assertEquals( 1, SearchQueueChecker.queues );
+		assertEquals( 1, SearchQueueChecker.works );
 		s.close();
 	}
 
@@ -155,11 +176,10 @@ public class JMSSlaveTest extends SearchTestBase {
 		cfg.setProperty( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
 		cfg.setProperty( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_QUEUE, QUEUE_NAME );
 
-		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of jndi properties to create the InitialContext
+		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of
+		// jndi properties to create the InitialContext
 		// for the queue processor
-		cfg.setProperty(
-				"hibernate.search.default.worker.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-		);
+		cfg.setProperty( "hibernate.search.default.worker.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory" );
 		cfg.setProperty( "hibernate.search.default.worker.jndi.url", "vm://localhost" );
 		cfg.setProperty( "hibernate.search.default.worker.jndi.connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
 		cfg.setProperty( "hibernate.search.default.worker.jndi.queue.queue/searchtest", "searchQueue" );
@@ -167,16 +187,12 @@ public class JMSSlaveTest extends SearchTestBase {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] {
-				TShirt.class
-		};
+		return new Class[] { TShirt.class };
 	}
 
 	private Context getJndiInitialContext() throws NamingException {
 		Properties props = new Properties();
-		props.setProperty(
-				Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-		);
+		props.setProperty( Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory" );
 		props.setProperty( Context.PROVIDER_URL, "vm://localhost" );
 		props.setProperty( "connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
 		props.setProperty( "queue.queue/searchtest", "searchQueue" );

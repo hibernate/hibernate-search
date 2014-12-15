@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.impl;
 
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexingMonitor;
@@ -18,12 +19,11 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * This visitor applies the selection logic from the plugged IndexShardingStrategies to
- * stream operations, as used by optimize() and batching operations.
- * Using a visitor/selector pattern for different implementations of addAsPayLoadsToQueue
- * depending on the type of LuceneWork.
+ * This visitor applies the selection logic from the plugged IndexShardingStrategies to stream operations, as used by
+ * optimize() and batching operations. Using a visitor/selector pattern for different implementations of
+ * addAsPayLoadsToQueue depending on the type of LuceneWork.
  *
- * @author Sanne Grinovero
+ * @author Sanne Grinovero, Martin Braun
  */
 public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperationSelectionDelegate> {
 
@@ -31,6 +31,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
 	private final AllSelectionDelegate allManagersDelegate = new AllSelectionDelegate();
 	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
+	private final DeleteByQuerySelectionDelegate deleteByQueryDelegate = new DeleteByQuerySelectionDelegate();
 
 	public static final StreamingSelectionVisitor INSTANCE = new StreamingSelectionVisitor();
 
@@ -68,17 +69,29 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 		return allManagersDelegate;
 	}
 
+	@Override
+	public StreamingOperationSelectionDelegate getDelegate(DeleteByQueryLuceneWork deleteByQueryLuceneWork) {
+		return this.deleteByQueryDelegate;
+	}
+
+	private static class DeleteByQuerySelectionDelegate implements StreamingOperationSelectionDelegate {
+
+		@Override
+		public void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
+			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion( work.getEntityClass(), work.getId(), work.getIdInString() );
+			for ( IndexManager indexManager : indexManagers ) {
+				indexManager.performStreamOperation( work, monitor, forceAsync );
+			}
+		}
+
+	}
+
 	private static class AddSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		@Override
-		public final void performStreamOperation(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition(
-					work.getEntityClass(),
-					work.getId(),
-					work.getIdInString(),
-					work.getDocument()
-			);
+		public final void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
+			IndexManager indexManager = shardingStrategy.getIndexManagerForAddition( work.getEntityClass(), work.getId(), work.getIdInString(),
+					work.getDocument() );
 			indexManager.performStreamOperation( work, monitor, forceAsync );
 		}
 
@@ -87,13 +100,8 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	private static class DeleteSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		@Override
-		public final void performStreamOperation(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityClass(),
-					work.getId(),
-					work.getIdInString()
-			);
+		public final void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
+			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion( work.getEntityClass(), work.getId(), work.getIdInString() );
 			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}
@@ -104,8 +112,7 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	private static class AllSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		@Override
-		public final void performStreamOperation(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
+		public final void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
 			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForAllShards();
 			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
@@ -117,13 +124,8 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	private static class PurgeAllSelectionDelegate implements StreamingOperationSelectionDelegate {
 
 		@Override
-		public final void performStreamOperation(LuceneWork work,
-				IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
-			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion(
-					work.getEntityClass(),
-					work.getId(),
-					work.getIdInString()
-			);
+		public final void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
+			IndexManager[] indexManagers = shardingStrategy.getIndexManagersForDeletion( work.getEntityClass(), work.getId(), work.getIdInString() );
 			for ( IndexManager indexManager : indexManagers ) {
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}

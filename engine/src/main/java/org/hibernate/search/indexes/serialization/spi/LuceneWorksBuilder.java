@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.util.AttributeImpl;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.bridge.spi.ConversionContext;
 
 /**
@@ -28,6 +29,8 @@ public interface LuceneWorksBuilder {
 	void addId(Serializable id);
 
 	void addDeleteLuceneWork(String entityClassName, ConversionContext conversionContext);
+
+	void addDeleteByQueryLuceneWork(String entityClassName, DeletionQuery deletionQuery);
 
 	void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext);
 

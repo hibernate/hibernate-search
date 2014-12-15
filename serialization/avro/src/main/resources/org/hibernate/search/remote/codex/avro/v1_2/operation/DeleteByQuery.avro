@@ -1,0 +1,18 @@
+{
+    "name": "DeleteByQuery",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "class",
+            "type": "int"
+        },
+        {
+            "name": "key",
+            "type": "int"
+        },
+        {
+            "name": "query",
+            "type": {"type": "array", "items": "string"}
+        }
+    ]
+}

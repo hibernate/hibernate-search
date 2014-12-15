@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.LuceneWork;
 
 /**
@@ -43,6 +44,8 @@ public interface Serializer {
 	void addIdAsString(String id);
 
 	void addDelete(String entityClassName);
+
+	void addDeleteByQuery(String entityClassName, DeletionQuery deletionQuery);
 
 	void addAdd(String entityClassName, Map<String, String> fieldToAnalyzerMap);
 
