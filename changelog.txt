@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.0.Final (16-12-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1759] - Ambiguous mapping on Id field should be disallowed
+    * [HSEARCH-1760] - Projection on the "Id" keyword should not be repeated again as a normal field when an "id" field exists as well
+
+** Improvement
+    * [HSEARCH-1757] - Allow usage of Factory annotation to create FieldBridge instances
+
+** Task
+    * [HSEARCH-1682] - Document the need to optionally download the JBoss Modules from Infinispan
+    * [HSEARCH-1755] - Constructor of DefaultStringBridge needs to be public in order to be used via @FieldBridge
+    * [HSEARCH-1756] - Make sure documentation gets included in dist bundles
+    * [HSEARCH-1758] - Fallback strategy for RangeQuery builder should not necessarily pick a keyword based range query
+
+
 Version 5.0.0.CR2 (11-12-2014)
 ------------------------
 
