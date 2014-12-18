@@ -25,7 +25,10 @@ package org.hibernate.search.infinispan.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import org.infinispan.Cache;
 import org.infinispan.lucene.directory.DirectoryBuilder;
@@ -85,11 +88,14 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 
 	private LockFactory indexWriterLockFactory;
 
+	private AsyncDeleteExecutorService deletesExecutor;
+
 	@Override
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		this.directoryProviderName = directoryProviderName;
 		this.serviceManager = context.getServiceManager();
 		this.cacheManager = serviceManager.requestService( CacheManagerServiceProvider.class, context );
+		this.deletesExecutor = serviceManager.requestService( DefaultAsyncDeleteExecutorServiceProvider.class, context );
 		metadataCacheName = InfinispanIntegration.getMetadataCacheName( properties );
 		dataCacheName = InfinispanIntegration.getDataCacheName( properties );
 		lockingCacheName = InfinispanIntegration.getLockingCacheName( properties );
@@ -118,6 +124,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		Cache<?,?> lockingCache = cacheManager.getCache( lockingCacheName );
 		org.infinispan.lucene.directory.BuildContext directoryBuildContext = DirectoryBuilder
 				.newDirectoryInstance( metadataCache, dataCache, lockingCache, directoryProviderName );
+		augmentDirectoryWithAsyncDeletes( directoryBuildContext );
 		if ( chunkSize != null ) {
 			directoryBuildContext.chunkSize( chunkSize.intValue() );
 		}
@@ -129,8 +136,30 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		log.debugf( "Initialized Infinispan index: '%s'", directoryProviderName );
 	}
 
+	private void augmentDirectoryWithAsyncDeletes(org.infinispan.lucene.directory.BuildContext directoryBuildContext) {
+		Executor executor = deletesExecutor.getExecutor();
+		try {
+			Method operationsExecutor = directoryBuildContext.getClass().getMethod(
+					"deleteOperationsExecutor",
+					Executor.class
+			);
+			operationsExecutor.invoke( directoryBuildContext, executor );
+		}
+		catch (NoSuchMethodException e) {
+			log.asyncDeletesNotSupported();
+		}
+		catch (InvocationTargetException e) {
+			log.asyncDeletesInvocationError( e.getMessage() );
+		}
+		catch (IllegalAccessException e) {
+			log.asyncDeletesIllegalAccess( e.getMessage() );
+		}
+	}
+
 	@Override
 	public void stop() {
+		deletesExecutor.closeAndFlush();
+		serviceManager.releaseService( DefaultAsyncDeleteExecutorServiceProvider.class );
 		try {
 			directory.close();
 		}
