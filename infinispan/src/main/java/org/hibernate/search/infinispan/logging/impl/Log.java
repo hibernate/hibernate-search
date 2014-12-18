@@ -21,6 +21,7 @@
 package org.hibernate.search.infinispan.logging.impl;
 
 import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.WARN;
 
 import javax.naming.NamingException;
 
@@ -45,5 +46,22 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	@LogMessage(level = ERROR)
 	@Message(id = 100056, value = "Unable to release initial context")
 	void unableToReleaseInitialContext(@Cause NamingException ne);
+
+	@LogMessage(level = WARN)
+	@Message(id = 100057, value = "Interrupted while waiting for asynchronous delete operations to be flushed on the index. "
+			+ "Some stale segments might remain in the index.")
+	void interruptedWhileWaitingForAsyncDeleteFlush();
+
+	@LogMessage(level = WARN)
+	@Message(id = 100058, value = "Not enabling async deletes as the directory provider does not support it.")
+	void asyncDeletesNotSupported();
+
+	@LogMessage(level = WARN)
+	@Message(id = 100059, value = "Not enabling async deletes due to error invoking directory provider config method [%s].")
+	void asyncDeletesInvocationError(String cause);
+
+	@LogMessage(level = WARN)
+	@Message(id = 100060, value = "Not enabling async deletes due to illegal access to directory provider [%s].")
+	void asyncDeletesIllegalAccess(String cause);
 
 }

@@ -88,6 +88,34 @@ public final class Executors {
 	}
 
 	/**
+	 * Creates a dynamically scalable threadpool having an upper bound of threads and queue size
+	 * which ultimately falls back to a CallerRunsPolicy.
+	 *
+	 * @param threadsMin initial and minimum threadpool size
+	 * @param threadsMax maximumx threadpool size
+	 * @param groupname used to assign nice names to the threads to help diagnostics and tuning
+	 * @param queueSize maximum size of the blocking queue holding the work
+	 *
+	 * @return the new Executor instance
+	 */
+	public static ThreadPoolExecutor newScalableThreadPool(
+			int threadsMin,
+			int threadsMax,
+			String groupname,
+			int queueSize) {
+		return new ThreadPoolExecutor(
+				threadsMin,
+				threadsMax,
+				30,
+				TimeUnit.SECONDS,
+				new LinkedBlockingQueue<Runnable>( queueSize ),
+				new SearchThreadFactory( groupname ),
+				new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy()
+		);
+	}
+
+
+	/**
 	 * Creates an executor for recurring tasks
 	 *
 	 * @param groupname a label to identify the threadpool; useful for profiling.
