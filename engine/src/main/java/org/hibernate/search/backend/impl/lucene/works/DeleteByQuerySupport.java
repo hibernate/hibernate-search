@@ -11,16 +11,17 @@ import org.hibernate.search.backend.SerializableQuery;
 import org.hibernate.search.backend.SingularTermQuery;
 
 /**
+ * This class has means to convert all (by default) supported SerializableQueries back to
+ * Lucene Queries.
  * 
- * @author Martin
- *
+ * @author Martin Braun
  */
 public final class DeleteByQuerySupport {
-	
+
 	private DeleteByQuerySupport() {
 		throw new AssertionError("can't touch this!");
 	}
-	
+
 	public static final Map<Integer, ToLuceneQuery> TO_LUCENE_QUERY_CONVERTER;
 	static {
 		{
@@ -40,7 +41,7 @@ public final class DeleteByQuerySupport {
 			TO_LUCENE_QUERY_CONVERTER = Collections.unmodifiableMap(map);
 		}
 	}
-	
+
 	public static final Map<Integer, Class<? extends SerializableQuery>> SUPPORTED_TYPES;
 	static {
 		{

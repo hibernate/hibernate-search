@@ -45,6 +45,23 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
+		// TODO: we could let experts supply their own means to convert back to
+		// Queries here by letting users specify a provider-service in the
+		// hibernate-properties. However, this could be a risky thing to do for
+		// users (users of this feature should definitely be warned then that
+		// they will have to worry about serialization problems that might
+		// occur!)
+
+		// this could be done via a SerializableQuery type that contains a
+		// String representation of a query
+		// which could (not necessarily) be a LuceneQueryParser-Query (this
+		// could be dangerous though)
+
+		// but if users can supply their own deletion-serialization logic
+		// they can also handle problems with different behaving versions
+		// by hand by encoding the version of their code that should be in use
+		// into the Query (or we could simply put that into our Wrapping
+		// Query-Type)
 		{
 			ToLuceneQuery converter = DeleteByQuerySupport.TO_LUCENE_QUERY_CONVERTER
 					.get(query.getQueryKey());
