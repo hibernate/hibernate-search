@@ -16,7 +16,9 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.SingularTermQuery;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
@@ -85,7 +87,7 @@ public class SerializationInstanceNotReusedTest {
 
 	private byte[] makeSomeSerializedWork() {
 		//Random: we won't deserialize this
-		return new byte[]{ 0, 1, 2};
+		return new byte[]{ 0, 1, 2 };
 	}
 
 	private List<LuceneWork> makeSomeWork() {

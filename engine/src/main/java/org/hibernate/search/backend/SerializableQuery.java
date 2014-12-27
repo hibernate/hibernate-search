@@ -14,7 +14,7 @@ public interface SerializableQuery extends Serializable {
 	 * used to identify the type of query faster (no need for instanceof checks)
 	 * in the Delegate
 	 * 
-	 * @return
+	 * @return the unique query key
 	 */
 	public int getQueryKey();
 
