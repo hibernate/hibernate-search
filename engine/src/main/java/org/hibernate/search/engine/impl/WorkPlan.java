@@ -19,7 +19,7 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
-import org.hibernate.search.backend.SerializableQuery;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
@@ -180,7 +180,7 @@ public class WorkPlan {
 		 */
 		private boolean purgeAll = false;
 
-		private List<SerializableQuery> deletionQueries = new ArrayList<>();
+		private List<DeletionQuery> deletionQueries = new ArrayList<>();
 
 		/**
 		 * The type of all classes being managed
@@ -279,7 +279,7 @@ public class WorkPlan {
 			if (purgeAll) {
 				luceneQueue.add(new PurgeAllLuceneWork(entityClass));
 			}
-			for(SerializableQuery delQuery : this.deletionQueries) {
+			for(DeletionQuery delQuery : this.deletionQueries) {
 				luceneQueue.add(new DeleteByQueryLuceneWork(this.entityClass, delQuery));
 			}
 			for (Entry<Serializable, PerEntityWork> entry : entityInstances) {

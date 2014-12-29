@@ -1,28 +1,25 @@
 package org.hibernate.search.backend;
 
-import java.io.Serializable;
-
 /**
- * serializable equivalent to {@link org.apache.lucene.search.TermQuery} and supports only
+ * DeleteByQuery equivalent to {@link org.apache.lucene.search.TermQuery} and supports only
  * Strings as values
  * 
  * @author Martin Braun
  */
-public class SingularTermQuery implements SerializableQuery, Serializable {
+public class SingularTermQuery implements DeletionQuery {
 
 	public static final int QUERY_KEY = 1;
-	private static final long serialVersionUID = 4044626299423006482L;
 
-	private final String key;
+	private final String fieldName;
 	private final String value;
 
 	public SingularTermQuery(String key, String value) {
-		this.key = key;
+		this.fieldName = key;
 		this.value = value;
 	}
 
-	public String getKey() {
-		return key;
+	public String getFieldName() {
+		return fieldName;
 	}
 
 	public String getValue() {
@@ -36,7 +33,7 @@ public class SingularTermQuery implements SerializableQuery, Serializable {
 
 	@Override
 	public String toString() {
-		return "SingularTermQuery: +" + key + ":" + value;
+		return "SingularTermQuery: +" + fieldName + ":" + value;
 	}
 
 }

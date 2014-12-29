@@ -7,17 +7,19 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.backend.DeleteByQueryLuceneWork;
+import org.hibernate.search.backend.DeleteByQuerySupport;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.SerializableQuery;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.store.Workspace;
+import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Stateless implementation that performs an <code>DeleteByQueryWork</code>.
+ * Stateless implementation that performs a <code>DeleteByQueryWork</code>.
  *
  * @author Martin Braun
  * @see LuceneWorkVisitor
@@ -38,7 +40,7 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 		DeleteByQueryLuceneWork deleteWork = (DeleteByQueryLuceneWork) work;
 
 		final Class<?> entityType = work.getEntityClass();
-		final SerializableQuery query = deleteWork.getQuery();
+		final DeletionQuery query = deleteWork.getDeletionQuery();
 
 		log.tracef("Removing all %s matching Query: %s", entityType.toString(),
 				query.toString());
@@ -63,9 +65,12 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 		// into the Query (or we could simply put that into our Wrapping
 		// Query-Type)
 		{
-			ToLuceneQuery converter = DeleteByQuerySupport.TO_LUCENE_QUERY_CONVERTER
+			DeleteByQuerySupport.ToLuceneQuery converter = DeleteByQuerySupport.TO_LUCENE_QUERY_CONVERTER
 					.get(query.getQueryKey());
-			Query queryToDelete = converter.build(query);
+
+			ScopedAnalyzer analyzer = this.workspace.getDocumentBuilder(
+					entityType).getAnalyzer();
+			Query queryToDelete = converter.build(query, analyzer);
 
 			entityDeletionQuery.add(queryToDelete, BooleanClause.Occur.MUST);
 		}
@@ -83,7 +88,7 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 					entityType.toString(), query.toString());
 			throw new SearchException(message, e);
 		}
-		workspace.notifyWorkApplied(work);
+		this.workspace.notifyWorkApplied(work);
 
 	}
 

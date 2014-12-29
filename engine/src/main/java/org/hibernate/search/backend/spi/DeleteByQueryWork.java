@@ -1,7 +1,7 @@
 package org.hibernate.search.backend.spi;
 
-import org.hibernate.search.backend.SerializableQuery;
-import org.hibernate.search.backend.impl.lucene.works.DeleteByQuerySupport;
+import org.hibernate.search.backend.DeletionQuery;
+import org.hibernate.search.backend.DeleteByQuerySupport;
 
 /**
  * Delete via a serializable query
@@ -13,7 +13,7 @@ public class DeleteByQueryWork extends Work {
 	// to pollute the Work class with more fields that
 	// don't have a meaning for the other WorkTypes.
 
-	private final SerializableQuery deleteByQuery;
+	private final DeletionQuery deleteByQuery;
 
 	/**
 	 * Creates a DeleteByWork
@@ -26,12 +26,12 @@ public class DeleteByQueryWork extends Work {
 	 *             if a unsupported SerializableQuery is passed
 	 */
 	public DeleteByQueryWork(Class<?> entityType,
-			SerializableQuery deleteByQuery) {
+			DeletionQuery deleteByQuery) {
 		super(entityType, null, WorkType.DELETE_BY_QUERY);
 		if (entityType == null) {
 			throw new IllegalArgumentException("entityType must not be null");
 		}
-		Class<? extends SerializableQuery> clazz = DeleteByQuerySupport.SUPPORTED_TYPES
+		Class<? extends DeletionQuery> clazz = DeleteByQuerySupport.SUPPORTED_TYPES
 				.get(deleteByQuery.getQueryKey());
 		if (clazz != null && clazz.equals(deleteByQuery.getClass())) {
 			this.deleteByQuery = deleteByQuery;
@@ -41,7 +41,7 @@ public class DeleteByQueryWork extends Work {
 		}
 	}
 
-	public SerializableQuery getDeleteByQuery() {
+	public DeletionQuery getDeleteByQuery() {
 		return deleteByQuery;
 	}
 

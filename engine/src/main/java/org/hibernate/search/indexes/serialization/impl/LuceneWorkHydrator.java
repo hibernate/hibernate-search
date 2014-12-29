@@ -34,10 +34,12 @@ import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -121,6 +123,17 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		results.add( result );
 		id = null;
+	}
+	
+	@Override
+	public void addDeleteByQueryLuceneWork(String entityClassName, DeletionQuery deleteByQuery) {
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				"entity class",
+				searchIntegrator.getServiceManager()
+		);
+		LuceneWork result = new DeleteByQueryLuceneWork(entityClass, deleteByQuery);
+		this.results.add( result );
 	}
 
 	@Override
