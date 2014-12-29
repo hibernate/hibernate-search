@@ -52,7 +52,7 @@ import org.junit.Assert;
 final class AvroTestHelpers {
 
 	private AvroTestHelpers() {
-		//Utility class: not meant to be constructed
+		// Utility class: not meant to be constructed
 	}
 
 	static List<List<AttributeImpl>> buildTokenSteamWithAttributes() {
@@ -108,7 +108,7 @@ final class AvroTestHelpers {
 			assertUpdate( (UpdateLuceneWork) work, (UpdateLuceneWork) copy );
 		}
 		else if ( work instanceof DeleteByQueryLuceneWork ) {
-			assertDeleteByQuery( (DeleteByQueryLuceneWork) work, (DeleteByQueryLuceneWork) copy);
+			assertDeleteByQuery( (DeleteByQueryLuceneWork) work, (DeleteByQueryLuceneWork) copy );
 		}
 		else {
 			fail( "unexpected type" );
@@ -119,12 +119,11 @@ final class AvroTestHelpers {
 		assertThat( work.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
 		assertThat( work.getId() ).as( "Add.getId is not copied" ).isEqualTo( copy.getId() );
 		assertThat( work.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
-		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
-				.isEqualTo( copy.getFieldToAnalyzerMap() );
+		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" ).isEqualTo( copy.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
 	}
-	
-	private static void assertDeleteByQuery( DeleteByQueryLuceneWork work, DeleteByQueryLuceneWork copy) {
+
+	private static void assertDeleteByQuery(DeleteByQueryLuceneWork work, DeleteByQueryLuceneWork copy) {
 		assertThat( work.getEntityClass() ).as( "DeleteByQuery.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
 		assertThat( work.getDeletionQuery() ).as( "DeleteByQuery.getDeletionQuery is not copied" ).isEqualTo( copy.getDeletionQuery() );
 	}
@@ -133,8 +132,7 @@ final class AvroTestHelpers {
 		assertThat( work.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
 		assertThat( work.getId() ).as( "Add.getId is not copied" ).isEqualTo( copy.getId() );
 		assertThat( work.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
-		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
-				.isEqualTo( copy.getFieldToAnalyzerMap() );
+		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" ).isEqualTo( copy.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
 	}
 
@@ -211,29 +209,20 @@ final class AvroTestHelpers {
 			assertThat( origAttr.toString() ).isEqualTo( copyAttr.toString() );
 		}
 		else if ( origAttr instanceof PayloadAttribute ) {
-			assertThat( ( (PayloadAttribute) origAttr ).getPayload() ).isEqualTo(
-					( (PayloadAttribute) copyAttr ).getPayload()
-			);
+			assertThat( ( (PayloadAttribute) origAttr ).getPayload() ).isEqualTo( ( (PayloadAttribute) copyAttr ).getPayload() );
 		}
 		else if ( origAttr instanceof KeywordAttribute ) {
-			assertThat( ( (KeywordAttribute) origAttr ).isKeyword() ).isEqualTo(
-					( (KeywordAttribute) copyAttr ).isKeyword()
-			);
+			assertThat( ( (KeywordAttribute) origAttr ).isKeyword() ).isEqualTo( ( (KeywordAttribute) copyAttr ).isKeyword() );
 		}
 		else if ( origAttr instanceof PositionIncrementAttribute ) {
 			assertThat( ( (PositionIncrementAttribute) origAttr ).getPositionIncrement() ).isEqualTo(
-					( (PositionIncrementAttribute) copyAttr ).getPositionIncrement()
-			);
+					( (PositionIncrementAttribute) copyAttr ).getPositionIncrement() );
 		}
 		else if ( origAttr instanceof FlagsAttribute ) {
-			assertThat( ( (FlagsAttribute) origAttr ).getFlags() ).isEqualTo(
-					( (FlagsAttribute) copyAttr ).getFlags()
-			);
+			assertThat( ( (FlagsAttribute) origAttr ).getFlags() ).isEqualTo( ( (FlagsAttribute) copyAttr ).getFlags() );
 		}
 		else if ( origAttr instanceof TypeAttribute ) {
-			assertThat( ( (TypeAttribute) origAttr ).type() ).isEqualTo(
-					( (TypeAttribute) copyAttr ).type()
-			);
+			assertThat( ( (TypeAttribute) origAttr ).type() ).isEqualTo( ( (TypeAttribute) copyAttr ).type() );
 		}
 		else if ( origAttr instanceof OffsetAttribute ) {
 			OffsetAttribute orig = (OffsetAttribute) origAttr;
@@ -265,23 +254,19 @@ final class AvroTestHelpers {
 	}
 
 	private static void assertDelete(DeleteLuceneWork work, DeleteLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as( "Delete.getEntityClass is not copied" )
-				.isEqualTo( copy.getEntityClass() );
+		assertThat( work.getEntityClass() ).as( "Delete.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
 		assertThat( work.getId() ).as( "Delete.getId is not copied" ).isEqualTo( copy.getId() );
-		assertThat( (Object) work.getDocument() ).as( "Delete.getDocument is not the same" )
-				.isEqualTo( copy.getDocument() );
-		assertThat( work.getIdInString() ).as( "Delete.getIdInString is not the same" )
-				.isEqualTo( copy.getIdInString() );
-		assertThat( work.getFieldToAnalyzerMap() ).as( "Delete.getFieldToAnalyzerMap is not the same" )
-				.isEqualTo( copy.getFieldToAnalyzerMap() );
+		assertThat( (Object) work.getDocument() ).as( "Delete.getDocument is not the same" ).isEqualTo( copy.getDocument() );
+		assertThat( work.getIdInString() ).as( "Delete.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
+		assertThat( work.getFieldToAnalyzerMap() ).as( "Delete.getFieldToAnalyzerMap is not the same" ).isEqualTo( copy.getFieldToAnalyzerMap() );
 	}
 
 	private static void assertPurgeAll(PurgeAllLuceneWork work, PurgeAllLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as( "PurgeAllLuceneWork.getEntityClass is not copied" )
-				.isEqualTo( copy.getEntityClass() );
+		assertThat( work.getEntityClass() ).as( "PurgeAllLuceneWork.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
 	}
 
 	static class SerializableStringReader extends Reader implements Serializable {
+
 		private boolean read = false;
 
 		@Override

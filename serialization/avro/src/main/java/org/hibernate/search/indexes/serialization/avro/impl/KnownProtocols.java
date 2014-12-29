@@ -96,7 +96,7 @@ final class KnownProtocols {
 		}
 		return p;
 	}
-	
+
 	private Protocol getV1_2() {
 		Protocol p = v1_2;
 		if ( p == null ) {

@@ -1,13 +1,19 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 package org.hibernate.search.indexes.serialization.avro.impl;
 
 import org.apache.avro.Protocol;
 
 public class ProtocolBuilderV1_2 extends ProtocolBuilderV1_1 {
-	
+
 	private static String V1_2_PATH = "org/hibernate/search/remote/codex/avro/v1_2/";
 
 	/**
-	 * @return an Avro Protocol at version 1.1
+	 * @return an Avro Protocol at version 1.2
 	 */
 	@Override
 	Protocol build() {
@@ -39,7 +45,7 @@ public class ProtocolBuilderV1_2 extends ProtocolBuilderV1_1 {
 		parseSchema( "operation/Delete" );
 		parseSchema( "operation/Add" );
 		parseSchema( "operation/Update" );
-		parseSchema( "operation/DeleteByQuery");
+		parseSchema( "operation/DeleteByQuery" );
 		parseSchema( "Message" );
 		return parseProtocol( "Works" );
 	}
@@ -48,6 +54,5 @@ public class ProtocolBuilderV1_2 extends ProtocolBuilderV1_1 {
 	protected String getResourceBasePath() {
 		return V1_2_PATH;
 	}
-
 
 }

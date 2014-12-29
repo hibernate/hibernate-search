@@ -32,8 +32,6 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.util.Utf8;
-import org.hibernate.search.backend.DeleteByQuerySupport;
-import org.hibernate.search.backend.SingularTermQuery;
 import org.junit.Test;
 
 /**
@@ -41,10 +39,17 @@ import org.junit.Test;
  */
 public class AvroTest {
 
+	@Test
+	public void test1_1() throws Exception {
+		this.experimentWithAvro( "org/hibernate/search/remote/codex/avro/v1_1/", false );
+	}
 
 	@Test
-	public void experimentWithAvro() throws Exception {
-		String root = "org/hibernate/search/remote/codex/avro/v1_2/";
+	public void test1_2() throws Exception {
+		this.experimentWithAvro( "org/hibernate/search/remote/codex/avro/v1_2/", true );
+	}
+
+	public void experimentWithAvro(String root, boolean checkDeleteByQuery) throws Exception {
 		parseSchema( root + "attribute/TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
 		parseSchema( root + "attribute/CharTermAttribute.avro", "attribute/CharTermAttribute" );
 		parseSchema( root + "attribute/PayloadAttribute.avro", "attribute/PayloadAttribute" );
@@ -73,9 +78,10 @@ public class AvroTest {
 		parseSchema( root + "operation/Delete.avro", "operation/Delete" );
 		parseSchema( root + "operation/Add.avro", "operation/Add" );
 		parseSchema( root + "operation/Update.avro", "operation/Update" );
-		parseSchema( root + "operation/DeleteByQuery.avro", "operation/DeleteByQuery" );
 		parseSchema( root + "Message.avro", "Message" );
-
+		if ( checkDeleteByQuery ) {
+			parseSchema( root + "operation/DeleteByQuery.avro", "operation/DeleteByQuery" );
+		}
 
 		String filename = root + "Works.avpr";
 		Protocol protocol = parseProtocol( filename, "Works" );
@@ -100,7 +106,6 @@ public class AvroTest {
 		final Schema deleteSchema = protocol.getType( "Delete" );
 		final Schema addSchema = protocol.getType( "Add" );
 		final Schema updateSchema = protocol.getType( "Update" );
-		final Schema deleteByQuerySchema = protocol.getType("DeleteByQuery");
 		Schema messageSchema = protocol.getType( "Message" );
 
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -116,12 +121,12 @@ public class AvroTest {
 		classReferences.add( AvroTest.class.getName() );
 
 		List<GenericRecord> fieldables = new ArrayList<GenericRecord>( 1 );
-		//custom fieldable
+		// custom fieldable
 		GenericRecord customFieldable = new GenericData.Record( custonFieldableSchema );
 		customFieldable.put( "instance", ByteBuffer.wrap( serializableSample ) );
 		fieldables.add( customFieldable );
 
-		//numeric fields
+		// numeric fields
 		GenericRecord numericField = createNumeric( intFieldSchema );
 		numericField.put( "value", 3 );
 		fieldables.add( numericField );
@@ -135,7 +140,7 @@ public class AvroTest {
 		numericField.put( "value", 2.3d );
 		fieldables.add( numericField );
 
-		//fields
+		// fields
 		GenericRecord field = createField( binarySchema );
 		field.put( "offset", 0 );
 		field.put( "length", 10 );
@@ -158,7 +163,7 @@ public class AvroTest {
 		positions.add( 2 );
 		positions.add( 3 );
 		positions.add( 4 );
-		attr.put( "positions", positions);
+		attr.put( "positions", positions );
 		attrs.add( attr );
 		attrs.add( ByteBuffer.wrap( serializableSample ) );
 
@@ -188,17 +193,21 @@ public class AvroTest {
 		GenericRecord delete = new GenericData.Record( deleteSchema );
 		delete.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		id = new GenericData.Record( idSchema );
-		id.put( "value", new Long(30) );
+		id.put( "value", new Long( 30 ) );
 		delete.put( "id", id );
 
 		GenericRecord purgeAll = new GenericData.Record( purgeAllSchema );
 		purgeAll.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		GenericRecord optimizeAll = new GenericData.Record( optimizeAllSchema );
-		
-		GenericRecord deleteByQuery = new GenericData.Record( deleteByQuerySchema );
-		deleteByQuery.put( "class", AvroTest.class );
-		deleteByQuery.put( "key", classReferences.indexOf( AvroTest.class.getName() ) );
-		deleteByQuery.put( "query", Arrays.asList(new String[] { "key", "value" }));
+
+		if ( checkDeleteByQuery ) {
+			final Schema deleteByQuerySchema = protocol.getType( "DeleteByQuery" );
+
+			GenericRecord deleteByQuery = new GenericData.Record( deleteByQuerySchema );
+			deleteByQuery.put( "class", AvroTest.class );
+			deleteByQuery.put( "key", classReferences.indexOf( AvroTest.class.getName() ) );
+			deleteByQuery.put( "query", Arrays.asList( new String[] { "key", "value" } ) );
+		}
 
 		GenericRecord flush = new GenericData.Record( flushSchema );
 
@@ -208,7 +217,6 @@ public class AvroTest {
 		operations.add( flush );
 		operations.add( delete );
 		operations.add( add );
-
 
 		GenericRecord message = new GenericData.Record( messageSchema );
 		message.put( "classReferences", classReferences );
@@ -226,17 +234,17 @@ public class AvroTest {
 				System.out.println( result );
 
 				assertThat( result ).isNotNull();
-				//operations
+				// operations
 				assertThat( result.get( "operations" ) ).isNotNull().isInstanceOf( List.class );
 				List<?> ops = (List<?>) result.get( "operations" );
 				assertThat( ops ).hasSize( 5 );
 
-				//Flush
+				// Flush
 				assertThat( ops.get( 2 ) ).isInstanceOf( GenericRecord.class );
 				GenericRecord flushOp = (GenericRecord) ops.get( 2 );
 				assertThat( flushOp.getSchema().getName() ).isEqualTo( "Flush" );
 
-				//Delete
+				// Delete
 				assertThat( ops.get( 3 ) ).isInstanceOf( GenericRecord.class );
 				GenericRecord deleteOp = (GenericRecord) ops.get( 3 );
 				assertThat( deleteOp.getSchema().getName() ).isEqualTo( "Delete" );
@@ -244,7 +252,7 @@ public class AvroTest {
 				assertThat( actual ).isInstanceOf( Long.class );
 				assertThat( actual ).isEqualTo( Long.valueOf( 30 ) );
 
-				//Add
+				// Add
 				assertThat( ops.get( 4 ) ).isInstanceOf( GenericRecord.class );
 				GenericRecord addOp = (GenericRecord) ops.get( 4 );
 				assertThat( addOp.getSchema().getName() ).isEqualTo( "Add" );
@@ -256,20 +264,20 @@ public class AvroTest {
 				bb.get( copy );
 				assertThat( serializableSample ).isEqualTo( copy );
 
-				//fieldToAnalyzerMap
+				// fieldToAnalyzerMap
 				assertThat( addOp.get( "fieldToAnalyzerMap" ) ).isInstanceOf( Map.class );
 				assertThat( (Map) addOp.get( "fieldToAnalyzerMap" ) ).hasSize( 2 );
 
-				//document
+				// document
 				assertThat( addOp.get( "document" ) ).isNotNull();
 				GenericRecord document = (GenericRecord) addOp.get( "document" );
 				assertThat( document.get( "boost" ) ).isEqualTo( 2.3f );
 
-				//numeric fields
+				// numeric fields
 				assertThat( document.get( "fieldables" ) ).isNotNull().isInstanceOf( List.class );
 				List<?> fields = (List<?>) document.get( "fieldables" );
 
-				assertThat( fields ).hasSize( 9 ); //custom + 4 numerics + 4 fields
+				assertThat( fields ).hasSize( 9 ); // custom + 4 numerics + 4 fields
 
 				field = (GenericRecord) fields.get( 0 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "CustomFieldable" );
@@ -290,7 +298,7 @@ public class AvroTest {
 				assertThat( field.get( "value" ) ).isEqualTo( 2.3d );
 				assertNumericField( field );
 
-				//fields
+				// fields
 				field = (GenericRecord) fields.get( 5 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "BinaryField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( ByteBuffer.class );

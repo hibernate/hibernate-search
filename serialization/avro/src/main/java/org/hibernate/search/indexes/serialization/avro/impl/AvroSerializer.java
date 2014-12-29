@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.indexes.serialization.avro.impl;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -49,6 +48,7 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class AvroSerializer implements Serializer {
+
 	private static final Log log = LoggerFactory.make();
 
 	private GenericRecord idRecord;
@@ -140,17 +140,15 @@ public class AvroSerializer implements Serializer {
 		operations.add( delete );
 		idRecord = null;
 	}
-	
+
 	@Override
-	public void addDeleteByQuery(String entityClassName,
-			DeletionQuery deletionQuery) {
+	public void addDeleteByQuery(String entityClassName, DeletionQuery deletionQuery) {
 		int classRef = getClassReference( entityClassName );
-		GenericRecord deleteByQuery = new GenericData.Record( protocol.getType("DeleteByQuery" ) );
+		GenericRecord deleteByQuery = new GenericData.Record( protocol.getType( "DeleteByQuery" ) );
 		deleteByQuery.put( "class", classRef );
 		deleteByQuery.put( "key", deletionQuery.getQueryKey() );
-		DeleteByQuerySupport.QueryToStringMapper mapper = 
-				DeleteByQuerySupport.TO_STRING.get(deletionQuery.getQueryKey());
-		deleteByQuery.put( "query", Arrays.asList(mapper.toString(deletionQuery)));
+		DeleteByQuerySupport.QueryToStringMapper mapper = DeleteByQuerySupport.TO_STRING.get( deletionQuery.getQueryKey() );
+		deleteByQuery.put( "query", Arrays.asList( mapper.toString( deletionQuery ) ) );
 		operations.add( deleteByQuery );
 	}
 
@@ -252,7 +250,7 @@ public class AvroSerializer implements Serializer {
 		GenericRecord field = createNormalField( "BinaryField", context );
 		BytesRef binaryValue = context.getBinaryValue();
 		field.put( "value", ByteBuffer.wrap( binaryValue.bytes, binaryValue.offset, binaryValue.length ) );
-		//Following two attributes are meant for serialization format backwards compatibility:
+		// Following two attributes are meant for serialization format backwards compatibility:
 		field.put( "offset", 0 );
 		field.put( "length", binaryValue.length );
 		fieldables.add( field );
@@ -365,10 +363,10 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public void addDocument() {
 		document = new GenericData.Record( protocol.getType( "Document" ) );
-		//backwards compatibility: we used to have a boost here in Lucene 3 / Hibernate Search 4.x
-		//With Lucene 3 there was a notion of "Document level boost" which was then dropped.
-		//Using the constant 1f doesn't hurt as it would be multiplied by the field boost,
-		//which in the new design incorporates the factor.
+		// backwards compatibility: we used to have a boost here in Lucene 3 / Hibernate Search 4.x
+		// With Lucene 3 there was a notion of "Document level boost" which was then dropped.
+		// Using the constant 1f doesn't hurt as it would be multiplied by the field boost,
+		// which in the new design incorporates the factor.
 		document.put( "boost", 1f );
 		document.put( "fieldables", fieldables );
 	}
