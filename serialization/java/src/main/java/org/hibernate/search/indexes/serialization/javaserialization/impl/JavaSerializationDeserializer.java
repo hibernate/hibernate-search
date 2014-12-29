@@ -40,130 +40,93 @@ public class JavaSerializationDeserializer implements Deserializer {
 			else if ( operation instanceof Delete ) {
 				Delete safeOperation = (Delete) operation;
 				hydrator.addId( safeOperation.getId() );
-				hydrator.addDeleteLuceneWork(
-						safeOperation.getEntityClassName(),
-						conversionContext
-				);
-			} else if(operation instanceof DeleteByQuery ) {
+				hydrator.addDeleteLuceneWork( safeOperation.getEntityClassName(), conversionContext );
+			}
+			else if ( operation instanceof DeleteByQuery ) {
 				DeleteByQuery safeOperation = (DeleteByQuery) operation;
-				DeleteByQuerySupport.StringToQueryMapper mapper = 
-						DeleteByQuerySupport.FROM_STRING.get(
-								safeOperation.getKey());
-				hydrator.addDeleteByQueryLuceneWork(safeOperation.getEntityClassName(), 
-						mapper.fromString(safeOperation.getQuery()));
+				DeleteByQuerySupport.StringToQueryMapper mapper = DeleteByQuerySupport.FROM_STRING.get( safeOperation.getKey() );
+				hydrator.addDeleteByQueryLuceneWork( safeOperation.getEntityClassName(), mapper.fromString( safeOperation.getQuery() ) );
 			}
 			else if ( operation instanceof Add ) {
 				Add safeOperation = (Add) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
 				hydrator.addId( safeOperation.getId() );
-				hydrator.addAddLuceneWork(
-						safeOperation.getEntityClassName(),
-						safeOperation.getFieldToAnalyzerMap(),
-						conversionContext
-				);
+				hydrator.addAddLuceneWork( safeOperation.getEntityClassName(), safeOperation.getFieldToAnalyzerMap(), conversionContext );
 			}
 			else if ( operation instanceof Update ) {
 				Update safeOperation = (Update) operation;
 				buildLuceneDocument( safeOperation.getDocument(), hydrator );
 				hydrator.addId( safeOperation.getId() );
-				hydrator.addUpdateLuceneWork(
-						safeOperation.getEntityClassName(),
-						safeOperation.getFieldToAnalyzerMap(),
-						conversionContext
-				);
+				hydrator.addUpdateLuceneWork( safeOperation.getEntityClassName(), safeOperation.getFieldToAnalyzerMap(), conversionContext );
 			}
 		}
 	}
 
-	private void buildLuceneDocument(SerializableDocument document,
-			LuceneWorksBuilder hydrator) {
+	private void buildLuceneDocument(SerializableDocument document, LuceneWorksBuilder hydrator) {
 		hydrator.defineDocument();
-		for (SerializableFieldable field : document.getFieldables()) {
-			if (field instanceof SerializableCustomFieldable) {
+		for ( SerializableFieldable field : document.getFieldables() ) {
+			if ( field instanceof SerializableCustomFieldable ) {
 				SerializableCustomFieldable safeField = (SerializableCustomFieldable) field;
-				hydrator.addFieldable(safeField.getInstance());
-			} else if (field instanceof SerializableNumericField) {
+				hydrator.addFieldable( safeField.getInstance() );
+			}
+			else if ( field instanceof SerializableNumericField ) {
 				SerializableNumericField safeField = (SerializableNumericField) field;
-				if (field instanceof SerializableIntField) {
-					hydrator.addIntNumericField(
-							((SerializableIntField) field).getValue(),
-							safeField.getName(), safeField.getPrecisionStep(),
-							safeField.getStore(), safeField.isIndexed(),
-							safeField.getBoost(), safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions());
-				} else if (field instanceof SerializableLongField) {
-					hydrator.addLongNumericField(
-							((SerializableLongField) field).getValue(),
-							safeField.getName(), safeField.getPrecisionStep(),
-							safeField.getStore(), safeField.isIndexed(),
-							safeField.getBoost(), safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions());
-				} else if (field instanceof SerializableFloatField) {
-					hydrator.addFloatNumericField(
-							((SerializableFloatField) field).getValue(),
-							safeField.getName(), safeField.getPrecisionStep(),
-							safeField.getStore(), safeField.isIndexed(),
-							safeField.getBoost(), safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions());
-				} else if (field instanceof SerializableDoubleField) {
-					hydrator.addDoubleNumericField(
-							((SerializableDoubleField) field).getValue(),
-							safeField.getName(), safeField.getPrecisionStep(),
-							safeField.getStore(), safeField.isIndexed(),
-							safeField.getBoost(), safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions());
-				} else {
-					throw new SearchException(
-							"Unknown SerializableNumericField: "
-									+ field.getClass());
+				if ( field instanceof SerializableIntField ) {
+					hydrator.addIntNumericField( ( (SerializableIntField) field ).getValue(), safeField.getName(), safeField.getPrecisionStep(),
+							safeField.getStore(), safeField.isIndexed(), safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
 				}
-			} else if (field instanceof SerializableField) {
+				else if ( field instanceof SerializableLongField ) {
+					hydrator.addLongNumericField( ( (SerializableLongField) field ).getValue(), safeField.getName(), safeField.getPrecisionStep(),
+							safeField.getStore(), safeField.isIndexed(), safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
+				}
+				else if ( field instanceof SerializableFloatField ) {
+					hydrator.addFloatNumericField( ( (SerializableFloatField) field ).getValue(), safeField.getName(), safeField.getPrecisionStep(),
+							safeField.getStore(), safeField.isIndexed(), safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
+				}
+				else if ( field instanceof SerializableDoubleField ) {
+					hydrator.addDoubleNumericField( ( (SerializableDoubleField) field ).getValue(), safeField.getName(), safeField.getPrecisionStep(),
+							safeField.getStore(), safeField.isIndexed(), safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
+				}
+				else {
+					throw new SearchException( "Unknown SerializableNumericField: " + field.getClass() );
+				}
+			}
+			else if ( field instanceof SerializableField ) {
 				SerializableField safeField = (SerializableField) field;
-				if (field instanceof SerializableBinaryField) {
+				if ( field instanceof SerializableBinaryField ) {
 					SerializableBinaryField reallySafeField = (SerializableBinaryField) field;
-					hydrator.addFieldWithBinaryData(reallySafeField.getName(),
-							reallySafeField.getValue(),
-							reallySafeField.getOffset(),
-							reallySafeField.getLength());
-				} else if (field instanceof SerializableStringField) {
+					hydrator.addFieldWithBinaryData( reallySafeField.getName(), reallySafeField.getValue(), reallySafeField.getOffset(),
+							reallySafeField.getLength() );
+				}
+				else if ( field instanceof SerializableStringField ) {
 					SerializableStringField reallySafeField = (SerializableStringField) field;
-					hydrator.addFieldWithStringData(reallySafeField.getName(),
-							reallySafeField.getValue(),
-							reallySafeField.getStore(),
-							reallySafeField.getIndex(),
-							reallySafeField.getTermVector(),
-							safeField.getBoost(), safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions());
-				} else if (field instanceof SerializableTokenStreamField) {
+					hydrator.addFieldWithStringData( reallySafeField.getName(), reallySafeField.getValue(), reallySafeField.getStore(),
+							reallySafeField.getIndex(), reallySafeField.getTermVector(), safeField.getBoost(), safeField.isOmitNorms(),
+							safeField.isOmitTermFreqAndPositions() );
+				}
+				else if ( field instanceof SerializableTokenStreamField ) {
 					SerializableTokenStreamField reallySafeField = (SerializableTokenStreamField) field;
-					List<List<AttributeImpl>> tokens = reallySafeField
-							.getValue().getStream();
-					for (List<AttributeImpl> token : tokens) {
-						for (AttributeImpl attribute : token) {
-							hydrator.addAttributeInstance(attribute);
+					List<List<AttributeImpl>> tokens = reallySafeField.getValue().getStream();
+					for ( List<AttributeImpl> token : tokens ) {
+						for ( AttributeImpl attribute : token ) {
+							hydrator.addAttributeInstance( attribute );
 						}
 						hydrator.addToken();
 					}
-					hydrator.addFieldWithTokenStreamData(
-							reallySafeField.getName(),
-							reallySafeField.getTermVector(),
-							safeField.getBoost(), safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions());
-				} else if (field instanceof SerializableReaderField) {
-					SerializableReaderField reallySafeField = (SerializableReaderField) field;
-					hydrator.addFieldWithSerializableReaderData(
-							reallySafeField.getName(),
-							reallySafeField.getValue(),
-							reallySafeField.getTermVector(),
-							safeField.getBoost(), safeField.isOmitNorms(),
-							safeField.isOmitTermFreqAndPositions());
-				} else {
-					throw new SearchException("Unknown SerializableField: "
-							+ field.getClass());
+					hydrator.addFieldWithTokenStreamData( reallySafeField.getName(), reallySafeField.getTermVector(), safeField.getBoost(),
+							safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
 				}
-			} else {
-				throw new SearchException("Unknown SerializableFieldable: "
-						+ field.getClass());
+				else if ( field instanceof SerializableReaderField ) {
+					SerializableReaderField reallySafeField = (SerializableReaderField) field;
+					hydrator.addFieldWithSerializableReaderData( reallySafeField.getName(), reallySafeField.getValue(), reallySafeField.getTermVector(),
+							safeField.getBoost(), safeField.isOmitNorms(), safeField.isOmitTermFreqAndPositions() );
+				}
+				else {
+					throw new SearchException( "Unknown SerializableField: " + field.getClass() );
+				}
+			}
+			else {
+				throw new SearchException( "Unknown SerializableFieldable: " + field.getClass() );
 			}
 		}
 	}

@@ -39,7 +39,7 @@ public class NativeJavaSerializationProvider implements SerializationProvider, S
 
 	@Override
 	public void start(Properties properties, BuildContext context) {
-		//The Deserializer is threadsafe and can be reused, the Serializer is not
+		// The Deserializer is threadsafe and can be reused, the Serializer is not
 		this.deserializerInstance = new JavaSerializationDeserializer();
 	}
 }

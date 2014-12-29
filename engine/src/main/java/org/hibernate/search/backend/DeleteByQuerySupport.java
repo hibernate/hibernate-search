@@ -1,3 +1,9 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 package org.hibernate.search.backend;
 
 import java.io.IOException;
@@ -22,18 +28,17 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * This class has means to convert all (by default) supported
- * DeletionQueries back to Lucene Queries and to their
+ * This class has means to convert all (by default) supported DeletionQueries back to Lucene Queries and to their
  * String[] representation and back.
- * 
+ *
  * @author Martin Braun
  */
 public final class DeleteByQuerySupport {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	private DeleteByQuerySupport() {
-		throw new AssertionError("can't touch this!");
+		throw new AssertionError( "can't touch this!" );
 	}
 
 	public static final Map<Integer, ToLuceneQuery> TO_LUCENE_QUERY_CONVERTER;
@@ -41,57 +46,50 @@ public final class DeleteByQuerySupport {
 		{
 			Map<Integer, ToLuceneQuery> map = new HashMap<>();
 
-			map.put(SingularTermQuery.QUERY_KEY, new ToLuceneQuery() {
+			map.put( SingularTermQuery.QUERY_KEY, new ToLuceneQuery() {
 
 				@Override
-				public Query build(DeletionQuery deletionQuery,
-						ScopedAnalyzer analyzerForEntity) {
+				public Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity) {
 					SingularTermQuery query = (SingularTermQuery) deletionQuery;
 					try {
-						TokenStream tokenStream = analyzerForEntity
-								.tokenStream(query.getFieldName(),
-										query.getValue());
+						TokenStream tokenStream = analyzerForEntity.tokenStream( query.getFieldName(), query.getValue() );
 						tokenStream.reset();
 						try {
 							BooleanQuery booleanQuery = new BooleanQuery();
-							while (tokenStream.incrementToken()) {
-								String value = tokenStream.getAttribute(
-										CharTermAttribute.class).toString();
-								booleanQuery.add(
-										new TermQuery(new Term(query
-												.getFieldName(), value)),
-										Occur.MUST);
+							while ( tokenStream.incrementToken() ) {
+								String value = tokenStream.getAttribute( CharTermAttribute.class ).toString();
+								booleanQuery.add( new TermQuery( new Term( query.getFieldName(), value ) ), Occur.MUST );
 							}
 							return booleanQuery;
-						} finally {
+						}
+						finally {
 							tokenStream.close();
 						}
-					} catch (IOException e) {
-						throw new AssertionError(
-								"no IOException can occur while using a TokenStream "
-										+ "that is generated via String");
+					}
+					catch (IOException e) {
+						throw new AssertionError( "no IOException can occur while using a TokenStream " + "that is generated via String" );
 					}
 				}
 
-			});
-			
-			map.put(ClassicQueryParserQuery.QUERY_KEY, new ToLuceneQuery() {
-				
+			} );
+
+			map.put( ClassicQueryParserQuery.QUERY_KEY, new ToLuceneQuery() {
+
 				@Override
-				public Query build(DeletionQuery deletionQuery,
-						ScopedAnalyzer analyzerForEntity) {
-					QueryParser queryParser = new QueryParser("", analyzerForEntity);
+				public Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity) {
+					QueryParser queryParser = new QueryParser( "", analyzerForEntity );
 					ClassicQueryParserQuery query = (ClassicQueryParserQuery) deletionQuery;
 					try {
-						return queryParser.parse(query.getQuery());
-					} catch (ParseException e) {
-						throw new RuntimeException(e);
+						return queryParser.parse( query.getQuery() );
+					}
+					catch (ParseException e) {
+						throw new RuntimeException( e );
 					}
 				}
-				
-			});
 
-			TO_LUCENE_QUERY_CONVERTER = Collections.unmodifiableMap(map);
+			} );
+
+			TO_LUCENE_QUERY_CONVERTER = Collections.unmodifiableMap( map );
 		}
 	}
 
@@ -100,10 +98,10 @@ public final class DeleteByQuerySupport {
 		{
 			Map<Integer, Class<? extends DeletionQuery>> map = new HashMap<>();
 
-			map.put(SingularTermQuery.QUERY_KEY, SingularTermQuery.class);
-			map.put(ClassicQueryParserQuery.QUERY_KEY, ClassicQueryParserQuery.class);
+			map.put( SingularTermQuery.QUERY_KEY, SingularTermQuery.class );
+			map.put( ClassicQueryParserQuery.QUERY_KEY, ClassicQueryParserQuery.class );
 
-			SUPPORTED_TYPES = Collections.unmodifiableMap(map);
+			SUPPORTED_TYPES = Collections.unmodifiableMap( map );
 		}
 	}
 
@@ -112,41 +110,39 @@ public final class DeleteByQuerySupport {
 		{
 			Map<Integer, StringToQueryMapper> map = new HashMap<>();
 
-			map.put(SingularTermQuery.QUERY_KEY, new StringToQueryMapper() {
+			map.put( SingularTermQuery.QUERY_KEY, new StringToQueryMapper() {
 
 				@Override
 				public DeletionQuery fromString(String[] string) {
-					if (string.length != 2) {
-						throw new IllegalArgumentException(
-								"for a TermQuery to work there have to be "
-										+ "exactly 2 Arguments (fieldName & value");
+					if ( string.length != 2 ) {
+						throw new IllegalArgumentException( "for a TermQuery to work there have to be " + "exactly 2 Arguments (fieldName & value" );
 					}
-					return new SingularTermQuery(string[0], string[1]);
+					return new SingularTermQuery( string[0], string[1] );
 				}
 
-			});
-			
-			map.put(ClassicQueryParserQuery.QUERY_KEY, new StringToQueryMapper() {
+			} );
+
+			map.put( ClassicQueryParserQuery.QUERY_KEY, new StringToQueryMapper() {
 
 				@Override
 				public DeletionQuery fromString(String[] string) {
 					try {
-						Version version = Version.parse(string[0]);
-						if(!version.equals(ClassicQueryParserQuery.LUCENE_VERSION)) {
-							log.warn("using ClassicQueryParserQuery for deletion with "
-									+ "different version than in use on this instance. "
-									+ "this could yield unexpected behaviour.");
+						Version version = Version.parse( string[0] );
+						if ( !version.equals( ClassicQueryParserQuery.LUCENE_VERSION ) ) {
+							log.warnf( "using ClassicQueryParserQuery for deletion with " + "different version than in use on this instance. "
+									+ "this could yield unexpected behaviour." );
 						}
-						return new ClassicQueryParserQuery(Version.parse(string[0]), string[1]);
-					} catch (java.text.ParseException e) {
-						//forward compatible Version.parse. should not happen
-						throw new RuntimeException(e);
+						return new ClassicQueryParserQuery( Version.parse( string[0] ), string[1] );
+					}
+					catch (java.text.ParseException e) {
+						// forward compatible Version.parse. should not happen
+						throw new RuntimeException( e );
 					}
 				}
-				
-			});
 
-			FROM_STRING = Collections.unmodifiableMap(map);
+			} );
+
+			FROM_STRING = Collections.unmodifiableMap( map );
 		}
 	}
 
@@ -155,98 +151,76 @@ public final class DeleteByQuerySupport {
 		{
 			Map<Integer, QueryToStringMapper> map = new HashMap<>();
 
-			map.put(SingularTermQuery.QUERY_KEY, new QueryToStringMapper() {
+			map.put( SingularTermQuery.QUERY_KEY, new QueryToStringMapper() {
 
 				@Override
 				public String[] toString(DeletionQuery deletionQuery) {
 					SingularTermQuery query = (SingularTermQuery) deletionQuery;
-					return new String[] { query.getFieldName(),
-							query.getValue() };
+					return new String[] { query.getFieldName(), query.getValue() };
 				}
 
-			});
-			
-			map.put(ClassicQueryParserQuery.QUERY_KEY, new QueryToStringMapper() {
-				
+			} );
+
+			map.put( ClassicQueryParserQuery.QUERY_KEY, new QueryToStringMapper() {
+
 				@Override
 				public String[] toString(DeletionQuery deletionQuery) {
 					ClassicQueryParserQuery query = (ClassicQueryParserQuery) deletionQuery;
-					return new String[] {
-							query.getVersion().toString(),
-							query.getQuery()
-					};
+					return new String[] { query.getVersion().toString(), query.getQuery() };
 				}
-				
-			});
 
-			TO_STRING = Collections.unmodifiableMap(map);
+			} );
+
+			TO_STRING = Collections.unmodifiableMap( map );
 		}
 	}
 
 	static {
-		//make sure everything is setup correctly
+		// make sure everything is setup correctly
 		Set<Integer> counts = new HashSet<>();
-		counts.add(TO_LUCENE_QUERY_CONVERTER.size());
-		counts.add(TO_STRING.size());
-		counts.add(FROM_STRING.size());
-		counts.add(SUPPORTED_TYPES.size());
-		if (counts.size() != 1) {
-			throw new AssertionError(
-					"all Maps/Sets inside this class must have the same "
-							+ "size. Make sure that every QueryType is found in every Map/Set");
+		counts.add( TO_LUCENE_QUERY_CONVERTER.size() );
+		counts.add( TO_STRING.size() );
+		counts.add( FROM_STRING.size() );
+		counts.add( SUPPORTED_TYPES.size() );
+		if ( counts.size() != 1 ) {
+			throw new AssertionError( "all Maps/Sets inside this class must have the same " + "size. Make sure that every QueryType is found in every Map/Set" );
 		}
 	}
 
 	/**
-	 * Interface to map the several <code>DeleteByQuery</code>s to a Lucene
-	 * query.
-	 * 
-	 * This is done outside of the <code>DeleteByQuery</code> class to not
-	 * overcomplicate the serialization process
-	 * 
+	 * Interface to map the several <code>DeleteByQuery</code>s to a Lucene query. This is done outside of the
+	 * <code>DeleteByQuery</code> class to not overcomplicate the serialization process
+	 *
 	 * @author Martin Braun
 	 */
-	public static interface ToLuceneQuery {
+	public interface ToLuceneQuery {
 
-		public Query build(DeletionQuery deletionQuery,
-				ScopedAnalyzer analyzerForEntity);
+		Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity);
 
 	}
 
 	/*
-	 * Why we use String arrays here:
-	 * 
-	 * Why use Strings at all and not i.e. byte[] ?: As we want to support
-	 * different versions of Queries later on and we don't want to write
-	 * Serialization code over and over again in the Serialization module for
-	 * all the different types we have one toString and fromString here. and we
-	 * force to use Strings because i.e. using byte[] would suggest using Java
-	 * Serialization for this process, but that would prevent us from changing
-	 * our API internally in the future.
-	 * 
-	 * Why not plain Strings?:
-	 * 
-	 * But using plain Strings would leave us with yet another problem: We would
-	 * have to encode all our different fields into a single string. For that we
-	 * would need some magical chars to separate or we would need to use
-	 * something like JSON/XML to pass the data consistently. This would be far
-	 * too much overkill for us.
-	 * 
-	 * By using String[] we force users (or API designers) to no use Java
-	 * Serialization (well Serialization to BASE64 or another String
-	 * representation is still possible, but nvm that) and we still have an
-	 * _easy_ way of dealing with multiple fields in our different Query Types.
+	 * Why we use String arrays here: Why use Strings at all and not i.e. byte[] ?: As we want to support different
+	 * versions of Queries later on and we don't want to write Serialization code over and over again in the
+	 * Serialization module for all the different types we have one toString and fromString here. and we force to use
+	 * Strings because i.e. using byte[] would suggest using Java Serialization for this process, but that would prevent
+	 * us from changing our API internally in the future. Why not plain Strings?: But using plain Strings would leave us
+	 * with yet another problem: We would have to encode all our different fields into a single string. For that we
+	 * would need some magical chars to separate or we would need to use something like JSON/XML to pass the data
+	 * consistently. This would be far too much overkill for us. By using String[] we force users (or API designers) to
+	 * no use Java Serialization (well Serialization to BASE64 or another String representation is still possible, but
+	 * nvm that) and we still have an _easy_ way of dealing with multiple fields in our different Query Types.
 	 */
 
-	public static interface StringToQueryMapper {
+	public interface StringToQueryMapper {
 
-		public DeletionQuery fromString(String[] string);
+		DeletionQuery fromString(String[] string);
 
 	}
 
-	public static interface QueryToStringMapper {
+	public interface QueryToStringMapper {
 
-		public String[] toString(DeletionQuery deletionQuery);
+		String[] toString(DeletionQuery deletionQuery);
 
 	}
 

@@ -37,6 +37,6 @@ public enum WorkType {
 	 * This type is used for batch indexing.
 	 */
 	INDEX,
-	
+
 	DELETE_BY_QUERY
 }

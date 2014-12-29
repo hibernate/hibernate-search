@@ -25,6 +25,7 @@ import org.hibernate.search.indexes.serialization.spi.Serializer;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class NativeJavaSerializer implements Serializer {
+
 	private Serializable id;
 	private Set<Operation> ops;
 	private Set<SerializableFieldable> serialFields;
@@ -96,14 +97,11 @@ public class NativeJavaSerializer implements Serializer {
 		ops.add( new Update( entityClassName, id, currentDocument, fieldToAnalyzerMap ) );
 		clearDocument();
 	}
-	
+
 	@Override
-	public void addDeleteByQuery(String entityClassName,
-			DeletionQuery deletionQuery) {
-		DeleteByQuerySupport.QueryToStringMapper mapper = 
-				DeleteByQuerySupport.TO_STRING.get(deletionQuery.getQueryKey());
-		ops.add(new DeleteByQuery(entityClassName, deletionQuery.getQueryKey(), 
-				mapper.toString(deletionQuery)));
+	public void addDeleteByQuery(String entityClassName, DeletionQuery deletionQuery) {
+		DeleteByQuerySupport.QueryToStringMapper mapper = DeleteByQuerySupport.TO_STRING.get( deletionQuery.getQueryKey() );
+		ops.add( new DeleteByQuery( entityClassName, deletionQuery.getQueryKey(), mapper.toString( deletionQuery ) ) );
 	}
 
 	@Override

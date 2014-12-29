@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.util.Utf8;
+import org.hibernate.search.backend.DeleteByQuerySupport;
+import org.hibernate.search.backend.SingularTermQuery;
 import org.junit.Test;
 
 /**
@@ -41,7 +44,7 @@ public class AvroTest {
 
 	@Test
 	public void experimentWithAvro() throws Exception {
-		String root = "org/hibernate/search/remote/codex/avro/v1_1/";
+		String root = "org/hibernate/search/remote/codex/avro/v1_2/";
 		parseSchema( root + "attribute/TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
 		parseSchema( root + "attribute/CharTermAttribute.avro", "attribute/CharTermAttribute" );
 		parseSchema( root + "attribute/PayloadAttribute.avro", "attribute/PayloadAttribute" );
@@ -70,6 +73,7 @@ public class AvroTest {
 		parseSchema( root + "operation/Delete.avro", "operation/Delete" );
 		parseSchema( root + "operation/Add.avro", "operation/Add" );
 		parseSchema( root + "operation/Update.avro", "operation/Update" );
+		parseSchema( root + "operation/DeleteByQuery.avro", "operation/DeleteByQuery" );
 		parseSchema( root + "Message.avro", "Message" );
 
 
@@ -96,6 +100,7 @@ public class AvroTest {
 		final Schema deleteSchema = protocol.getType( "Delete" );
 		final Schema addSchema = protocol.getType( "Add" );
 		final Schema updateSchema = protocol.getType( "Update" );
+		final Schema deleteByQuerySchema = protocol.getType("DeleteByQuery");
 		Schema messageSchema = protocol.getType( "Message" );
 
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -189,6 +194,11 @@ public class AvroTest {
 		GenericRecord purgeAll = new GenericData.Record( purgeAllSchema );
 		purgeAll.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		GenericRecord optimizeAll = new GenericData.Record( optimizeAllSchema );
+		
+		GenericRecord deleteByQuery = new GenericData.Record( deleteByQuerySchema );
+		deleteByQuery.put( "class", AvroTest.class );
+		deleteByQuery.put( "key", classReferences.indexOf( AvroTest.class.getName() ) );
+		deleteByQuery.put( "query", Arrays.asList(new String[] { "key", "value" }));
 
 		GenericRecord flush = new GenericData.Record( flushSchema );
 

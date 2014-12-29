@@ -36,13 +36,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.toByteArray;
 
 /**
- * Serializes {@code List<LuceneWork>} instances back and forth using a pluggable {@code SerializerProvider}.
- *
- * This class controls the overall traversal process and delegates true serialization work to the {@code SerializerProvider}.
+ * Serializes {@code List<LuceneWork>} instances back and forth using a pluggable {@code SerializerProvider}. This class
+ * controls the overall traversal process and delegates true serialization work to the {@code SerializerProvider}.
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
+
 	private static Log log = LoggerFactory.make();
 
 	private final ExtendedSearchIntegrator searchIntegrator;
@@ -72,26 +72,25 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 				if ( work instanceof OptimizeLuceneWork ) {
 					serializer.addOptimizeAll();
 				}
-				else if (work instanceof PurgeAllLuceneWork) {
+				else if ( work instanceof PurgeAllLuceneWork ) {
 					serializer.addPurgeAll( work.getEntityClass().getName() );
 				}
-				else if (work instanceof FlushLuceneWork) {
+				else if ( work instanceof FlushLuceneWork ) {
 					serializer.addFlush();
 				}
-				else if (work instanceof DeleteLuceneWork) {
+				else if ( work instanceof DeleteLuceneWork ) {
 					processId( work, serializer );
 					serializer.addDelete( work.getEntityClass().getName() );
 				}
-				else if (work instanceof DeleteByQueryLuceneWork) {
-					serializer.addDeleteByQuery(work.getEntityClass().getName(), 
-							((DeleteByQueryLuceneWork) work).getDeletionQuery());
+				else if ( work instanceof DeleteByQueryLuceneWork ) {
+					serializer.addDeleteByQuery( work.getEntityClass().getName(), ( (DeleteByQueryLuceneWork) work ).getDeletionQuery() );
 				}
-				else if (work instanceof AddLuceneWork ) {
+				else if ( work instanceof AddLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
 					processId( work, serializer );
 					serializer.addAdd( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
 				}
-				else if (work instanceof UpdateLuceneWork ) {
+				else if ( work instanceof UpdateLuceneWork ) {
 					buildDocument( work.getDocument(), serializer );
 					processId( work, serializer );
 					serializer.addUpdate( work.getEntityClass().getName(), work.getFieldToAnalyzerMap() );
@@ -178,10 +177,11 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 						throw log.unknownNumericFieldType( dataType );
 				}
 			}
-			else if (fieldable instanceof Field) {
+			else if ( fieldable instanceof Field ) {
 				Field safeField = (Field) fieldable;
-				//FIXME it seems like in new Field implementation it's possible to have multiple data types at the same time. Investigate?
-				//The following sequence of else/ifs would not be appropriate.
+				// FIXME it seems like in new Field implementation it's possible to have multiple data types at the same
+				// time. Investigate?
+				// The following sequence of else/ifs would not be appropriate.
 				if ( safeField.binaryValue() != null ) {
 					serializer.addFieldWithBinaryData( new LuceneFieldContext( safeField ) );
 				}

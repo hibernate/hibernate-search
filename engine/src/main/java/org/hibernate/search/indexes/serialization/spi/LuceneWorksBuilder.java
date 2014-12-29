@@ -29,15 +29,15 @@ public interface LuceneWorksBuilder {
 	void addId(Serializable id);
 
 	void addDeleteLuceneWork(String entityClassName, ConversionContext conversionContext);
-	
-	void addDeleteByQueryLuceneWork(String entityClassName, DeletionQuery deleteByQuery);
+
+	void addDeleteByQueryLuceneWork(String entityClassName, DeletionQuery deletionQuery);
 
 	void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext);
 
 	void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext);
 
 	void defineDocument();
-	
+
 	void addFieldable(byte[] instance);
 
 	void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions);

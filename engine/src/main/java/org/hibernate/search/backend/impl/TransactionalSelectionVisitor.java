@@ -68,7 +68,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 	public ContextAwareSelectionDelegate getDelegate(FlushLuceneWork flushLuceneWork) {
 		return flushDelegate;
 	}
-	
+
 	@Override
 	public ContextAwareSelectionDelegate getDelegate(DeleteByQueryLuceneWork deleteByQueryLuceneWork) {
 		return this.deleteByQueryDelegate;
@@ -106,7 +106,7 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		}
 
 	}
-	
+
 	private static class DeleteByQuerySelectionDelegate implements ContextAwareSelectionDelegate {
 
 		@Override
