@@ -12,11 +12,12 @@ package org.hibernate.search.indexes.serialization.javaserialization.impl;
  */
 public class DeleteByQuery implements Operation {
 
-	private String entityClassName;
-	private int key;
-	private String[] query;
+	private final String entityClassName;
+	private final int key;
+	private final String[] query;
 
 	public DeleteByQuery(String entityClassName, int key, String[] query) {
+		this.entityClassName = entityClassName;
 		this.key = key;
 		this.query = query;
 	}
