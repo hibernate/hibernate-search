@@ -37,7 +37,7 @@ public class DeleteByQueryWork extends Work {
 			this.deleteByQuery = deleteByQuery;
 		} else {
 			throw new IllegalArgumentException(
-					"unsupported SerializableQuery passed. you can't supply your own custom type here!");
+					"unsupported SerializableQuery passed. you can't supply your own custom class here!");
 		}
 	}
 

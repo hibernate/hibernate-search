@@ -45,7 +45,7 @@ public interface Serializer {
 
 	void addDelete(String entityClassName);
 	
-	void addDeleteByQuery(String entityClassName, DeletionQuery deleteByQuery);
+	void addDeleteByQuery(String entityClassName, DeletionQuery deletionQuery);
 
 	void addAdd(String entityClassName, Map<String, String> fieldToAnalyzerMap);
 

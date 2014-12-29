@@ -5,6 +5,9 @@ import java.io.Serializable;
 import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
+ * Representation of deleteByQuery(...) from Lucene. Currently not all functionality
+ * of Lucene is supported but can be added
+ * 
  * @author Martin Braun
  */
 public class DeleteByQueryLuceneWork extends LuceneWork implements Serializable {

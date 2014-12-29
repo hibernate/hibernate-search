@@ -10,11 +10,16 @@ import java.util.Set;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.util.Version;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This class has means to convert all (by default) supported
@@ -24,6 +29,8 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  * @author Martin Braun
  */
 public final class DeleteByQuerySupport {
+	
+	private static final Log log = LoggerFactory.make();
 
 	private DeleteByQuerySupport() {
 		throw new AssertionError("can't touch this!");
@@ -37,9 +44,9 @@ public final class DeleteByQuerySupport {
 			map.put(SingularTermQuery.QUERY_KEY, new ToLuceneQuery() {
 
 				@Override
-				public Query build(DeletionQuery deleteByQuery,
+				public Query build(DeletionQuery deletionQuery,
 						ScopedAnalyzer analyzerForEntity) {
-					SingularTermQuery query = (SingularTermQuery) deleteByQuery;
+					SingularTermQuery query = (SingularTermQuery) deletionQuery;
 					try {
 						TokenStream tokenStream = analyzerForEntity
 								.tokenStream(query.getFieldName(),
@@ -67,6 +74,22 @@ public final class DeleteByQuerySupport {
 				}
 
 			});
+			
+			map.put(ClassicQueryParserQuery.QUERY_KEY, new ToLuceneQuery() {
+				
+				@Override
+				public Query build(DeletionQuery deletionQuery,
+						ScopedAnalyzer analyzerForEntity) {
+					QueryParser queryParser = new QueryParser("", analyzerForEntity);
+					ClassicQueryParserQuery query = (ClassicQueryParserQuery) deletionQuery;
+					try {
+						return queryParser.parse(query.getQuery());
+					} catch (ParseException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				
+			});
 
 			TO_LUCENE_QUERY_CONVERTER = Collections.unmodifiableMap(map);
 		}
@@ -78,6 +101,7 @@ public final class DeleteByQuerySupport {
 			Map<Integer, Class<? extends DeletionQuery>> map = new HashMap<>();
 
 			map.put(SingularTermQuery.QUERY_KEY, SingularTermQuery.class);
+			map.put(ClassicQueryParserQuery.QUERY_KEY, ClassicQueryParserQuery.class);
 
 			SUPPORTED_TYPES = Collections.unmodifiableMap(map);
 		}
@@ -101,6 +125,26 @@ public final class DeleteByQuerySupport {
 				}
 
 			});
+			
+			map.put(ClassicQueryParserQuery.QUERY_KEY, new StringToQueryMapper() {
+
+				@Override
+				public DeletionQuery fromString(String[] string) {
+					try {
+						Version version = Version.parse(string[0]);
+						if(!version.equals(ClassicQueryParserQuery.LUCENE_VERSION)) {
+							log.warn("using ClassicQueryParserQuery for deletion with "
+									+ "different version than in use on this instance. "
+									+ "this could yield unexpected behaviour.");
+						}
+						return new ClassicQueryParserQuery(Version.parse(string[0]), string[1]);
+					} catch (java.text.ParseException e) {
+						//forward compatible Version.parse. should not happen
+						throw new RuntimeException(e);
+					}
+				}
+				
+			});
 
 			FROM_STRING = Collections.unmodifiableMap(map);
 		}
@@ -114,12 +158,25 @@ public final class DeleteByQuerySupport {
 			map.put(SingularTermQuery.QUERY_KEY, new QueryToStringMapper() {
 
 				@Override
-				public String[] toString(DeletionQuery deleteByQuery) {
-					SingularTermQuery query = (SingularTermQuery) deleteByQuery;
+				public String[] toString(DeletionQuery deletionQuery) {
+					SingularTermQuery query = (SingularTermQuery) deletionQuery;
 					return new String[] { query.getFieldName(),
 							query.getValue() };
 				}
 
+			});
+			
+			map.put(ClassicQueryParserQuery.QUERY_KEY, new QueryToStringMapper() {
+				
+				@Override
+				public String[] toString(DeletionQuery deletionQuery) {
+					ClassicQueryParserQuery query = (ClassicQueryParserQuery) deletionQuery;
+					return new String[] {
+							query.getVersion().toString(),
+							query.getQuery()
+					};
+				}
+				
 			});
 
 			TO_STRING = Collections.unmodifiableMap(map);
@@ -151,7 +208,7 @@ public final class DeleteByQuerySupport {
 	 */
 	public static interface ToLuceneQuery {
 
-		public Query build(DeletionQuery deleteByQuery,
+		public Query build(DeletionQuery deletionQuery,
 				ScopedAnalyzer analyzerForEntity);
 
 	}
@@ -189,7 +246,7 @@ public final class DeleteByQuerySupport {
 
 	public static interface QueryToStringMapper {
 
-		public String[] toString(DeletionQuery deleteByQuery);
+		public String[] toString(DeletionQuery deletionQuery);
 
 	}
 

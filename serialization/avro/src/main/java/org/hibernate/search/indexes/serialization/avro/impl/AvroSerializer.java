@@ -366,7 +366,7 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addDeleteByQuery(String entityClassName,
-			DeletionQuery deleteByQuery) {
+			DeletionQuery deletionQuery) {
 		throw new UnsupportedOperationException("not implemented yet!");
 	}
 }

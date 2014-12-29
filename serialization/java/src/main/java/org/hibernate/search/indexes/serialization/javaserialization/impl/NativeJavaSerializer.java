@@ -99,11 +99,11 @@ public class NativeJavaSerializer implements Serializer {
 	
 	@Override
 	public void addDeleteByQuery(String entityClassName,
-			DeletionQuery deleteByQuery) {
+			DeletionQuery deletionQuery) {
 		DeleteByQuerySupport.QueryToStringMapper mapper = 
-				DeleteByQuerySupport.TO_STRING.get(deleteByQuery.getQueryKey());
-		ops.add(new DeleteByQuery(entityClassName, deleteByQuery.getQueryKey(), 
-				mapper.toString(deleteByQuery)));
+				DeleteByQuerySupport.TO_STRING.get(deletionQuery.getQueryKey());
+		ops.add(new DeleteByQuery(entityClassName, deletionQuery.getQueryKey(), 
+				mapper.toString(deletionQuery)));
 	}
 
 	@Override
