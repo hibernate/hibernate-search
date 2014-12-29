@@ -54,6 +54,7 @@ public final class DeleteByQuerySupport {
 					return (CustomBehaviour) Class.forName( className ).newInstance();
 				}
 				catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+					//TODO: maybe add a nicer exception here or logging
 					throw new RuntimeException( e );
 				}
 			}
