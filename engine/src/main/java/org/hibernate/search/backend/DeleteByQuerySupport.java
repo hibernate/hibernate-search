@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -39,6 +41,24 @@ public final class DeleteByQuerySupport {
 
 	private DeleteByQuerySupport() {
 		throw new AssertionError( "can't touch this!" );
+	}
+
+	private static final ConcurrentHashMap<String, CustomBehaviour> CUSTOM_BEHAVIOURS = new ConcurrentHashMap<>();
+
+	private static CustomBehaviour customBehaviour(String className) {
+		return CUSTOM_BEHAVIOURS.computeIfAbsent( className, new Function<String, CustomBehaviour>() {
+
+			@Override
+			public CustomBehaviour apply(String className) {
+				try {
+					return (CustomBehaviour) Class.forName( className ).newInstance();
+				}
+				catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+					throw new RuntimeException( e );
+				}
+			}
+
+		} );
 	}
 
 	public static final Map<Integer, ToLuceneQuery> TO_LUCENE_QUERY_CONVERTER;
@@ -89,6 +109,15 @@ public final class DeleteByQuerySupport {
 
 			} );
 
+			map.put( CustomBehaviourQuery.QUERY_KEY, new ToLuceneQuery() {
+
+				@Override
+				public Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity) {
+					CustomBehaviourQuery query = (CustomBehaviourQuery) deletionQuery;
+					return customBehaviour( query.getBehaviourClass() ).toLuceneQuery( query, analyzerForEntity );
+				}
+			} );
+
 			TO_LUCENE_QUERY_CONVERTER = Collections.unmodifiableMap( map );
 		}
 	}
@@ -100,6 +129,7 @@ public final class DeleteByQuerySupport {
 
 			map.put( SingularTermQuery.QUERY_KEY, SingularTermQuery.class );
 			map.put( ClassicQueryParserQuery.QUERY_KEY, ClassicQueryParserQuery.class );
+			map.put( CustomBehaviourQuery.QUERY_KEY,  CustomBehaviourQuery.class );
 
 			SUPPORTED_TYPES = Collections.unmodifiableMap( map );
 		}
@@ -141,6 +171,18 @@ public final class DeleteByQuerySupport {
 				}
 
 			} );
+			
+			map.put(CustomBehaviourQuery.QUERY_KEY, new StringToQueryMapper() {
+				
+				@Override
+				public DeletionQuery fromString(String[] string) {
+					String behaviourClass = string[0];
+					String[] restArray = new String[string.length - 1];
+					System.arraycopy( string, 1, restArray, 0, restArray.length );
+					return customBehaviour( behaviourClass ).fromString( restArray );
+				}
+				
+			});
 
 			FROM_STRING = Collections.unmodifiableMap( map );
 		}
@@ -170,6 +212,20 @@ public final class DeleteByQuerySupport {
 				}
 
 			} );
+			
+			map.put(CustomBehaviourQuery.QUERY_KEY, new QueryToStringMapper() {
+				
+				@Override
+				public String[] toString(DeletionQuery deletionQuery) {
+					CustomBehaviourQuery query = (CustomBehaviourQuery) deletionQuery;
+					String[] customData = customBehaviour( query.getBehaviourClass() ).toString( query );
+					String[] ret = new String[customData.length + 1];
+					ret[0] = query.getBehaviourClass();
+					System.arraycopy( customData, 0, ret, 1, customData.length );
+					return ret;
+				}
+				
+			});
 
 			TO_STRING = Collections.unmodifiableMap( map );
 		}

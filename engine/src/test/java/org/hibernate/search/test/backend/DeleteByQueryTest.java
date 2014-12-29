@@ -12,10 +12,16 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.backend.CustomBehaviour;
+import org.hibernate.search.backend.CustomBehaviourQuery;
+import org.hibernate.search.backend.DeleteByQuerySupport;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.SingularTermQuery;
 import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.backend.spi.Work;
@@ -25,6 +31,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
+import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -55,6 +62,60 @@ public class DeleteByQueryTest {
 		}
 
 		this.assertCount( 1, integrator );
+
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			worker.performWork( new DeleteByQueryWork( Book.class, new CustomBehaviourQuery( MyCustomBehaviour.class, "6" ) ), tc );
+			tc.end();
+		}
+
+		this.assertCount( 0, integrator );
+
+		{
+			CustomBehaviourQuery query = new CustomBehaviourQuery( MyCustomBehaviour.class, "5" );
+
+			{
+				String[] strRep = DeleteByQuerySupport.TO_STRING.get( query.getQueryKey() ).toString( query );
+				DeletionQuery fromStrRep = DeleteByQuerySupport.FROM_STRING.get( query.getQueryKey() ).fromString( strRep );
+
+				assertEquals( query, fromStrRep );
+			}
+
+		}
+	}
+
+	public static class MyCustomBehaviour implements CustomBehaviour {
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * org.hibernate.search.backend.CustomBehaviour#toLuceneQuery(org.hibernate.search.backend.CustomBehaviourQuery,
+		 * org.hibernate.search.util.impl.ScopedAnalyzer)
+		 */
+		@Override
+		public Query toLuceneQuery(CustomBehaviourQuery query, ScopedAnalyzer analyzerForEntity) {
+			String id = query.getData().toString();
+			return new TermQuery( new Term( "id", id ) );
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.hibernate.search.backend.CustomBehaviour#toString(org.hibernate.search.backend.CustomBehaviourQuery)
+		 */
+		@Override
+		public String[] toString(CustomBehaviourQuery query) {
+			return new String[] { query.getData().toString() };
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.hibernate.search.backend.CustomBehaviour#fromString(java.lang.String[])
+		 */
+		@Override
+		public CustomBehaviourQuery fromString(String[] string) {
+			return new CustomBehaviourQuery( MyCustomBehaviour.class, string[0] );
+		}
+
 	}
 
 	private void assertCount(int count, ExtendedSearchIntegrator integrator) {
