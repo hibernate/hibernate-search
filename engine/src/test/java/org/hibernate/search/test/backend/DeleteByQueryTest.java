@@ -15,9 +15,11 @@ import java.util.List;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.util.Version;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.backend.ClassicQueryParserQuery;
 import org.hibernate.search.backend.CustomBehaviour;
 import org.hibernate.search.backend.CustomBehaviourQuery;
 import org.hibernate.search.backend.DeleteByQuerySupport;
@@ -52,7 +54,6 @@ public class DeleteByQueryTest {
 			}
 			tc.end();
 		}
-
 		this.assertCount( 2, integrator );
 
 		{
@@ -60,19 +61,13 @@ public class DeleteByQueryTest {
 			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermQuery( "id", String.valueOf( 5 ) ) ), tc );
 			tc.end();
 		}
-
 		this.assertCount( 1, integrator );
 
 		{
+			CustomBehaviourQuery query = new CustomBehaviourQuery( MyCustomBehaviour.class, "6" );
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Book.class, new CustomBehaviourQuery( MyCustomBehaviour.class, "6" ) ), tc );
+			worker.performWork( new DeleteByQueryWork( Book.class, query ), tc );
 			tc.end();
-		}
-
-		this.assertCount( 0, integrator );
-
-		{
-			CustomBehaviourQuery query = new CustomBehaviourQuery( MyCustomBehaviour.class, "5" );
 
 			{
 				String[] strRep = DeleteByQuerySupport.TO_STRING.get( query.getQueryKey() ).toString( query );
@@ -80,8 +75,33 @@ public class DeleteByQueryTest {
 
 				assertEquals( query, fromStrRep );
 			}
-
 		}
+		this.assertCount( 0, integrator );
+
+		// REINITIALIZE FOR FURTHER TESTS
+		{
+			TransactionContextForTest tc = new TransactionContextForTest();
+			for ( Work work : this.makeBooks() ) {
+				worker.performWork( work, tc );
+			}
+			tc.end();
+		}
+		this.assertCount( 2, integrator );
+
+		{
+			ClassicQueryParserQuery query = new ClassicQueryParserQuery( Version.LUCENE_4_10_2, "+id:5" );
+			TransactionContextForTest tc = new TransactionContextForTest();
+			worker.performWork( new DeleteByQueryWork( Book.class, query ), tc );
+			tc.end();
+
+			{
+				String[] strRep = DeleteByQuerySupport.TO_STRING.get( query.getQueryKey() ).toString( query );
+				DeletionQuery fromStrRep = DeleteByQuerySupport.FROM_STRING.get( query.getQueryKey() ).fromString( strRep );
+
+				assertEquals( query, fromStrRep );
+			}
+		}
+		this.assertCount( 1, integrator );
 	}
 
 	public static class MyCustomBehaviour implements CustomBehaviour {
