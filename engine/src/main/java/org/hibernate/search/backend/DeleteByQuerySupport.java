@@ -54,7 +54,7 @@ public final class DeleteByQuerySupport {
 					return (CustomBehaviour) Class.forName( className ).newInstance();
 				}
 				catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-					//TODO: maybe add a nicer exception here or logging
+					// TODO: maybe add a nicer exception here or logging
 					throw new RuntimeException( e );
 				}
 			}
@@ -130,7 +130,7 @@ public final class DeleteByQuerySupport {
 
 			map.put( SingularTermQuery.QUERY_KEY, SingularTermQuery.class );
 			map.put( ClassicQueryParserQuery.QUERY_KEY, ClassicQueryParserQuery.class );
-			map.put( CustomBehaviourQuery.QUERY_KEY,  CustomBehaviourQuery.class );
+			map.put( CustomBehaviourQuery.QUERY_KEY, CustomBehaviourQuery.class );
 
 			SUPPORTED_TYPES = Collections.unmodifiableMap( map );
 		}
@@ -172,9 +172,9 @@ public final class DeleteByQuerySupport {
 				}
 
 			} );
-			
-			map.put(CustomBehaviourQuery.QUERY_KEY, new StringToQueryMapper() {
-				
+
+			map.put( CustomBehaviourQuery.QUERY_KEY, new StringToQueryMapper() {
+
 				@Override
 				public DeletionQuery fromString(String[] string) {
 					String behaviourClass = string[0];
@@ -182,8 +182,8 @@ public final class DeleteByQuerySupport {
 					System.arraycopy( string, 1, restArray, 0, restArray.length );
 					return customBehaviour( behaviourClass ).fromString( restArray );
 				}
-				
-			});
+
+			} );
 
 			FROM_STRING = Collections.unmodifiableMap( map );
 		}
@@ -213,9 +213,9 @@ public final class DeleteByQuerySupport {
 				}
 
 			} );
-			
-			map.put(CustomBehaviourQuery.QUERY_KEY, new QueryToStringMapper() {
-				
+
+			map.put( CustomBehaviourQuery.QUERY_KEY, new QueryToStringMapper() {
+
 				@Override
 				public String[] toString(DeletionQuery deletionQuery) {
 					CustomBehaviourQuery query = (CustomBehaviourQuery) deletionQuery;
@@ -225,8 +225,8 @@ public final class DeleteByQuerySupport {
 					System.arraycopy( customData, 0, ret, 1, customData.length );
 					return ret;
 				}
-				
-			});
+
+			} );
 
 			TO_STRING = Collections.unmodifiableMap( map );
 		}
