@@ -61,11 +61,6 @@ public final class NumericFieldUtils {
 			Long toValue = to != null ? ((Date) to).getTime() : null;
 			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
 		}
-		if ( numericClass.isAssignableFrom( Date.class ) ) {
-			Long fromValue = from != null ? ((Date) from).getTime() : null;
-			Long toValue = to != null ? ((Date) to).getTime() : null;
-			return NumericRangeQuery.newLongRange( fieldName, fromValue, toValue, includeLower, includeUpper );
-		}
 		if ( numericClass.isAssignableFrom( Calendar.class ) ) {
 			Long fromValue = from != null ? ((Calendar) from).getTime().getTime() : null;
 			Long toValue = to != null ? ((Calendar) to).getTime().getTime() : null;
@@ -88,4 +83,22 @@ public final class NumericFieldUtils {
 		return createNumericRangeQuery( fieldName, value, value, true, true );
 	}
 
+	/**
+	 * When the type of {@code RangeQuery} needs to be guessed among keyword based ranges or numeric based
+	 * range queries, the parameter type defines the strategy.
+	 * This should match the default {@code FieldBridge} used for each type.
+	 * @param value on Object
+	 * @return true if the value argument is of any type which is by default indexed as a NumericField
+	 */
+	public static boolean requiresNumericRangeQuery(Object value) {
+		if ( value == null ) {
+			return false;
+		}
+		final Class<?> numericClass = value.getClass();
+		return numericClass.isAssignableFrom( Double.class ) ||
+				numericClass.isAssignableFrom( Long.class ) ||
+				numericClass.isAssignableFrom( Integer.class ) ||
+				numericClass.isAssignableFrom( Float.class ) ||
+				numericClass.isAssignableFrom( Calendar.class );
+	}
 }

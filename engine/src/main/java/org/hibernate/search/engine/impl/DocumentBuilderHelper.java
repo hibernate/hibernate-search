@@ -144,7 +144,7 @@ public final class DocumentBuilderHelper {
 			for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
 				final String fieldName = fieldMetadata.getName();
 				int matchingPosition = getFieldPosition( fields, fieldName );
-				if ( matchingPosition != -1 ) {
+				if ( matchingPosition != -1 && result[matchingPosition] == NOT_SET ) {
 					contextualBridge.pushProperty( fieldName );
 					try {
 						populateResult(
@@ -183,7 +183,7 @@ public final class DocumentBuilderHelper {
 		//process class bridges
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
 			int matchingPosition = getFieldPosition( fields, fieldMetadata.getName() );
-			if ( matchingPosition != -1 ) {
+			if ( matchingPosition != -1 && result[matchingPosition] == NOT_SET ) {
 				populateResult(
 						fieldMetadata.getName(),
 						fieldMetadata.getFieldBridge(),

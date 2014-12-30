@@ -24,8 +24,8 @@ import org.hibernate.search.annotations.Store;
 public class PinPoint {
 
 	@Id
-	@Field(name = "id")
-	@NumericField(forField = "id")
+	@Field(name = "numeric_id")
+	@NumericField(forField = "numeric_id")
 	private int id;
 
 	@Field(store = Store.YES)

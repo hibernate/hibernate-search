@@ -23,7 +23,9 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 @Indexed
 public class IncorrectObjectToString {
 
-	@Id @GeneratedValue @Field( bridge = @FieldBridge(impl = ErrorOnGetBridge.class) )
+	@Id
+	@GeneratedValue
+	@FieldBridge(impl = ErrorOnGetBridge.class)
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }
 	private Long id;

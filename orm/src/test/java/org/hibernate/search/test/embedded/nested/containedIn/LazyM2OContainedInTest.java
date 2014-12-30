@@ -22,6 +22,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.testing.cache.CachingRegionFactory;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -119,7 +120,9 @@ public class LazyM2OContainedInTest extends SearchTestBase {
 
 		assertEquals( 1, fts
 				.createFullTextQuery(
-						NumericRangeQuery.newLongRange( "entity1.uid", ent1_0.getUid(), ent1_0.getUid(), true, true ),
+						NumericRangeQuery.newLongRange(
+								"entity1.uid-numeric", ent1_0.getUid(), ent1_0.getUid(), true, true
+						),
 						Entity2ForUnindexed.class
 				)
 				.getResultSize() );
