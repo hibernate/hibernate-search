@@ -29,14 +29,14 @@ public class DeleteByQueryWork extends Work {
 	 * @param deleteByQuery the query to delete by
 	 * @throws IllegalArgumentException if a unsupported SerializableQuery is passed
 	 */
-	public DeleteByQueryWork(Class<?> entityType, DeletionQuery deleteByQuery) {
+	public DeleteByQueryWork(Class<?> entityType, DeletionQuery deletionQuery) {
 		super( entityType, null, WorkType.DELETE_BY_QUERY );
 		if ( entityType == null ) {
 			throw new IllegalArgumentException( "entityType must not be null" );
 		}
-		Class<? extends DeletionQuery> clazz = DeleteByQuerySupport.SUPPORTED_TYPES.get( deleteByQuery.getQueryKey() );
-		if ( clazz != null && clazz.equals( deleteByQuery.getClass() ) ) {
-			this.deleteByQuery = deleteByQuery;
+		Class<? extends DeletionQuery> clazz = DeleteByQuerySupport.SUPPORTED_TYPES.get( deletionQuery.getQueryKey() );
+		if ( clazz != null && clazz.equals( deletionQuery.getClass() ) ) {
+			this.deleteByQuery = deletionQuery;
 		}
 		else {
 			throw new IllegalArgumentException( "unsupported SerializableQuery passed. you can't supply your own custom class here!" );
