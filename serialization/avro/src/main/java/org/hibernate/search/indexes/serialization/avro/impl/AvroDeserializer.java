@@ -165,7 +165,7 @@ public class AvroDeserializer implements Deserializer {
 			}
 			else if ( "NumericFloatField".equals( schema ) ) {
 				hydrator.addFloatNumericField(
-						asFloat(field, "value" ),
+						asFloat( field, "value" ),
 						asString( field, "name" ),
 						asInt( field, "precisionStep" ),
 						asStore( field ),
