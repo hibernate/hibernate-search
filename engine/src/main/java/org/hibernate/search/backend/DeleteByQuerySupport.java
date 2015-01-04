@@ -115,7 +115,7 @@ public final class DeleteByQuerySupport {
 				@Override
 				public Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity) {
 					CustomBehaviourQuery query = (CustomBehaviourQuery) deletionQuery;
-					return customBehaviour( query.getBehaviourClass() ).toLuceneQuery( query, analyzerForEntity );
+					return customBehaviour( query.getBehaviourClass() ).dataToLuceneQuery( query.getData(), analyzerForEntity );
 				}
 			} );
 
@@ -180,7 +180,8 @@ public final class DeleteByQuerySupport {
 					String behaviourClass = string[0];
 					String[] restArray = new String[string.length - 1];
 					System.arraycopy( string, 1, restArray, 0, restArray.length );
-					return customBehaviour( behaviourClass ).fromString( restArray );
+					CustomBehaviour customBehaviour = customBehaviour( behaviourClass );
+					return new CustomBehaviourQuery( behaviourClass, customBehaviour.stringToData( restArray ) );
 				}
 
 			} );
@@ -219,7 +220,7 @@ public final class DeleteByQuerySupport {
 				@Override
 				public String[] toString(DeletionQuery deletionQuery) {
 					CustomBehaviourQuery query = (CustomBehaviourQuery) deletionQuery;
-					String[] customData = customBehaviour( query.getBehaviourClass() ).toString( query );
+					String[] customData = customBehaviour( query.getBehaviourClass() ).dataToString( query.getData() );
 					String[] ret = new String[customData.length + 1];
 					ret[0] = query.getBehaviourClass();
 					System.arraycopy( customData, 0, ret, 1, customData.length );

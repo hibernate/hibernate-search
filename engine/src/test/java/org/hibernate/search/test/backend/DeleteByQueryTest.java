@@ -113,8 +113,8 @@ public class DeleteByQueryTest {
 		 * org.hibernate.search.util.impl.ScopedAnalyzer)
 		 */
 		@Override
-		public Query toLuceneQuery(CustomBehaviourQuery query, ScopedAnalyzer analyzerForEntity) {
-			String id = query.getData().toString();
+		public Query dataToLuceneQuery(Object data, ScopedAnalyzer analyzerForEntity) {
+			String id = data.toString();
 			return new TermQuery( new Term( "id", id ) );
 		}
 
@@ -123,8 +123,8 @@ public class DeleteByQueryTest {
 		 * @see org.hibernate.search.backend.CustomBehaviour#toString(org.hibernate.search.backend.CustomBehaviourQuery)
 		 */
 		@Override
-		public String[] toString(CustomBehaviourQuery query) {
-			return new String[] { query.getData().toString() };
+		public String[] dataToString(Object data) {
+			return new String[] { data.toString() };
 		}
 
 		/*
@@ -132,8 +132,8 @@ public class DeleteByQueryTest {
 		 * @see org.hibernate.search.backend.CustomBehaviour#fromString(java.lang.String[])
 		 */
 		@Override
-		public CustomBehaviourQuery fromString(String[] string) {
-			return new CustomBehaviourQuery( MyCustomBehaviour.class, string[0] );
+		public Object stringToData(String[] string) {
+			return string[0];
 		}
 
 	}

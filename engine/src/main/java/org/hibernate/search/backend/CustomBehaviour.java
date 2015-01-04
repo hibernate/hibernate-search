@@ -14,10 +14,10 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  */
 public interface CustomBehaviour {
 
-	Query toLuceneQuery(CustomBehaviourQuery query, ScopedAnalyzer analyzerForEntity);
+	Query dataToLuceneQuery(Object data, ScopedAnalyzer analyzerForEntity);
 
-	String[] toString(CustomBehaviourQuery query);
+	String[] dataToString(Object data);
 
-	CustomBehaviourQuery fromString(String[] string);
+	Object stringToData(String[] string);
 
 }
