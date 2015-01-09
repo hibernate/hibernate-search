@@ -101,6 +101,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final TimingSource timingSource;
 	private final SearchMapping mapping;
 	private final boolean indexMetadataIsComplete;
+	private final boolean isDeleteByTermEnforced;
 	private final boolean isIdProvidedImplicit;
 	private final String statisticsMBeanName;
 	private final IndexManagerFactory indexManagerFactory;
@@ -128,6 +129,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.mapping = state.getProgrammaticMapping();
 		this.statistics = new StatisticsImpl( this );
 		this.indexMetadataIsComplete = state.isIndexMetadataComplete();
+		this.isDeleteByTermEnforced = state.isDeleteByTermEnforced();
 		this.isIdProvidedImplicit = state.isIdProvidedImplicit();
 		this.indexManagerFactory = state.getIndexManagerFactory();
 		boolean statsEnabled = ConfigurationParseHelper.getBooleanValue(
@@ -492,6 +494,11 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@Override
 	public boolean isIndexMetadataComplete() {
 		return this.indexMetadataIsComplete;
+	}
+
+	@Override
+	public boolean isDeleteByTermEnforced() {
+		return this.isDeleteByTermEnforced;
 	}
 
 	@Override

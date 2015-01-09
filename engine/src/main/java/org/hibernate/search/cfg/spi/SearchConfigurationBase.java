@@ -42,6 +42,11 @@ public abstract class SearchConfigurationBase implements SearchConfiguration {
 	}
 
 	@Override
+	public boolean isDeleteByTermEnforced() {
+		return false;
+	}
+
+	@Override
 	public InstanceInitializer getInstanceInitializer() {
 		return DefaultInstanceInitializer.DEFAULT_INITIALIZER;
 	}

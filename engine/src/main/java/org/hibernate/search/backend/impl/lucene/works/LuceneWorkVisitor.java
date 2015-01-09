@@ -33,6 +33,10 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
 			this.updateDelegate = new UpdateExtWorkDelegate( workspace, addDelegate );
 		}
+		else if ( workspace.isDeleteByTermEnforced() ) {
+			this.deleteDelegate = new ByTermDeleteWorkDelegate( workspace );
+			this.updateDelegate = new ByTermUpdateWorkDelegate( workspace, addDelegate );
+		}
 		else {
 			this.deleteDelegate = new DeleteWorkDelegate( workspace );
 			this.updateDelegate = new UpdateWorkDelegate( deleteDelegate, addDelegate );
