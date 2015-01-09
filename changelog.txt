@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.1.Final (9-1-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1769] - SyncWorkProcessor leads to NoSuchElementException on empty WorkList
+
+** New Feature
+    * [HSEARCH-1770] - Make it possible for an integrator to the Engine module to enforce using single-term delete operations
+
+** Task
+    * [HSEARCH-1771] - Upgrade to Apache Lucene 4.10.3
+    * [HSEARCH-1772] - Upgrade to Hibernate ORM 4.3.8.Final
+
+
 Version 5.0.0.Final (16-12-2014)
 ------------------------
 
