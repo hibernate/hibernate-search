@@ -732,4 +732,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 247, value = "An indexed field defined on '%1$s:%2$s' tries to override the id field settings. The document id field settings cannot be modified. Use a different field name.")
 	SearchException fieldTriesToOverrideIdFieldSettings(String className, String propertyName);
 
+	@LogMessage(level = Level.TRACE)
+	@Message(id = 248, value = "WorkList should never be empty. Stacktrace below \n %s" )
+	void workListShouldNeverBeEmpty(String stackTrace);
+
 }
