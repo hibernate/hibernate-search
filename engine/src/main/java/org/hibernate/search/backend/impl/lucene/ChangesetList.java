@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.hibernate.search.backend.LuceneWork;
 
@@ -69,21 +70,21 @@ final class ChangesetList implements Iterable<LuceneWork> {
 
 		@Override
 		public boolean hasNext() {
+			// advance the outer until we find a non empty current or we reach the end of the outer
+			// to work around empty LuceneWork lists being passed
+			while ( ! current.hasNext() && outerIterator.hasNext() ) {
+				current = outerIterator.next().getWorkListIterator();
+			}
 			return current.hasNext() || outerIterator.hasNext();
 		}
 
 		@Override
 		public LuceneWork next() {
-			if ( current.hasNext() ) {
-				//advance the inner loop only
-				return current.next();
+			// force the position to an non empty current or the end of the flow
+			if ( ! hasNext() ) {
+				throw new NoSuchElementException( "Reached the end of the ChangesetList. Make sure to guard .next() with .hasNext()" );
 			}
-			else {
-				//advance outer loop first
-				Changeset next = outerIterator.next();
-				current = next.getWorkListIterator();
-				return current.next();
-			}
+			return current.next();
 		}
 
 		@Override
