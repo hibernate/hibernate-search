@@ -34,6 +34,10 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 			this.updateDelegate = new UpdateExtWorkDelegate( workspace, addDelegate );
 		}
 		else if ( workspace.isDeleteByTermEnforced() ) {
+			//TODO Cleanup: with upcoming enhancements of the DocumentBuilder we should be able
+			//to extrapolate some constant methods in there, and avoid needing so many different visitors.
+			//The difference with the visitors of the previous block is that these are not coupled to a
+			//specific type, allowing still dynamic discovery et al
 			this.deleteDelegate = new ByTermDeleteWorkDelegate( workspace );
 			this.updateDelegate = new ByTermUpdateWorkDelegate( workspace, addDelegate );
 		}
