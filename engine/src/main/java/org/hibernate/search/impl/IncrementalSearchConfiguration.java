@@ -110,6 +110,11 @@ public class IncrementalSearchConfiguration implements SearchConfiguration {
 	}
 
 	@Override
+	public boolean isDeleteByTermEnforced() {
+		return state.isDeleteByTermEnforced();
+	}
+
+	@Override
 	public boolean isIdProvidedImplicit() {
 		return state.isIdProvidedImplicit();
 	}

@@ -93,6 +93,8 @@ public interface SearchFactoryState {
 
 	boolean isIndexMetadataComplete();
 
+	boolean isDeleteByTermEnforced();
+
 	boolean isIdProvidedImplicit();
 
 	IndexManagerFactory getIndexManagerFactory();

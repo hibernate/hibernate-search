@@ -299,6 +299,7 @@ public class SearchFactoryBuilder {
 			factoryState.setInstanceInitializer( cfg.getInstanceInitializer() );
 			factoryState.setTimingSource( new DefaultTimingSource() );
 			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );
+			factoryState.setDeleteByTermEnforced( cfg.isDeleteByTermEnforced() );
 			factoryState.setTransactionManagerExpected( cfg.isTransactionManagerExpected() );
 			factoryState.setIdProvidedImplicit( cfg.isIdProvidedImplicit() );
 			factoryState.setIndexManagerFactory( cfg.getIndexManagerFactory() );
@@ -623,6 +624,11 @@ public class SearchFactoryBuilder {
 		@Override
 		public boolean isIndexMetadataComplete() {
 			return factoryState.isIndexMetadataComplete();
+		}
+
+		@Override
+		public boolean isDeleteByTermEnforced() {
+			return factoryState.isDeleteByTermEnforced();
 		}
 
 		@Override

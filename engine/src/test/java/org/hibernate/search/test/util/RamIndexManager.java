@@ -100,6 +100,12 @@ public class RamIndexManager extends DirectoryBasedIndexManager {
 		}
 
 		@Override
+		public boolean isDeleteByTermEnforced() {
+			return false;
+		}
+
+
+		@Override
 		public ServiceManager getServiceManager() {
 			return new ServiceManager() {
 				@Override

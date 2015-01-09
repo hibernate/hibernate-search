@@ -53,6 +53,7 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 	private SearchMapping programmaticMapping;
 	private boolean transactionsExpected = true;
 	private boolean indexMetadataComplete = true;
+	private boolean deleteByTermEnforced = false;
 	private boolean idProvidedImplicit = false;
 	private IndexManagerFactory indexManagerFactory = new DefaultIndexManagerFactory();
 
@@ -138,6 +139,15 @@ public class ManualConfiguration extends SearchConfigurationBase implements Sear
 
 	public void setIndexMetadataComplete(boolean indexMetadataComplete) {
 		this.indexMetadataComplete = indexMetadataComplete;
+	}
+
+	public void setDeleteByTermEnforced(boolean deleteByTermEnforced) {
+		this.deleteByTermEnforced = deleteByTermEnforced;
+	}
+
+	@Override
+	public boolean isDeleteByTermEnforced() {
+		return deleteByTermEnforced;
 	}
 
 	@Override

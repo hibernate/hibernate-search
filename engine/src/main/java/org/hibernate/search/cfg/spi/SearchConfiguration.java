@@ -122,6 +122,13 @@ public interface SearchConfiguration {
 	 */
 	boolean isIndexMetadataComplete();
 
+	/**
+	 * @return {@code true} if regardless of {@code isIndexMetadataComplete} and the number
+	 * of types present in the index it is safe to delete by term given that the underlying
+	 * store guarantees uniqueness of ids
+	 */
+	boolean isDeleteByTermEnforced();
+
 	InstanceInitializer getInstanceInitializer();
 
 	/**

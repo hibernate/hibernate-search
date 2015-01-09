@@ -109,6 +109,11 @@ public final class ReflectionReplacingSearchConfiguration implements SearchConfi
 	}
 
 	@Override
+	public boolean isDeleteByTermEnforced() {
+		return cfg.isDeleteByTermEnforced();
+	}
+
+	@Override
 	public boolean isIdProvidedImplicit() {
 		return cfg.isIdProvidedImplicit();
 	}

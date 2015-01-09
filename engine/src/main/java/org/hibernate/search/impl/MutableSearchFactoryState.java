@@ -75,6 +75,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private TimingSource timingSource;
 	private SearchMapping mapping;
 	private boolean indexMetadataIsComplete;
+	private boolean deleteByTermEnforced;
 	private boolean isIdProvidedImplicit;
 	private IndexManagerFactory indexManagerFactory;
 
@@ -98,6 +99,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		timingSource = oldFactoryState.getTimingSource();
 		mapping = oldFactoryState.getProgrammaticMapping();
 		indexMetadataIsComplete = oldFactoryState.isIndexMetadataComplete();
+		deleteByTermEnforced = oldFactoryState.isDeleteByTermEnforced();
 		isIdProvidedImplicit = oldFactoryState.isIdProvidedImplicit();
 		indexManagerFactory = oldFactoryState.getIndexManagerFactory();
 	}
@@ -296,6 +298,15 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	public void setIndexMetadataComplete(boolean indexMetadataIsComplete) {
 		this.indexMetadataIsComplete = indexMetadataIsComplete;
+	}
+
+	@Override
+	public boolean isDeleteByTermEnforced() {
+		return this.deleteByTermEnforced;
+	}
+
+	public void setDeleteByTermEnforced(boolean deleteByTermEnforced) {
+		this.deleteByTermEnforced = deleteByTermEnforced;
 	}
 
 	@Override

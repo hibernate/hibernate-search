@@ -46,13 +46,19 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 
 	public LuceneWorkVisitor(Workspace workspace) {
 		this.addDelegate = new AddWorkDelegate( workspace );
-		if ( workspace.areSingleTermDeletesSafe() ) {
-			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
-			this.updateDelegate = new UpdateExtWorkDelegate( workspace, addDelegate );
+		if ( workspace.isDeleteByTermEnforced() ) {
+			this.deleteDelegate = new ByTermDeleteWorkDelegate( workspace );
+			this.updateDelegate = new ByTermUpdateWorkDelegate( workspace, addDelegate );
 		}
 		else {
-			this.deleteDelegate = new DeleteWorkDelegate( workspace );
-			this.updateDelegate = new UpdateWorkDelegate( deleteDelegate, addDelegate );
+			if ( workspace.areSingleTermDeletesSafe() ) {
+				this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
+				this.updateDelegate = new UpdateExtWorkDelegate( workspace, addDelegate );
+			}
+			else {
+				this.deleteDelegate = new DeleteWorkDelegate( workspace );
+				this.updateDelegate = new UpdateWorkDelegate( deleteDelegate, addDelegate );
+			}
 		}
 		this.purgeAllDelegate = new PurgeAllWorkDelegate( workspace );
 		this.optimizeDelegate = new OptimizeWorkDelegate( workspace );

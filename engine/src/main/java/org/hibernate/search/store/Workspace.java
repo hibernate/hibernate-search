@@ -92,6 +92,8 @@ public interface Workspace {
 	 */
 	boolean areSingleTermDeletesSafe();
 
+	boolean isDeleteByTermEnforced();
+
 	/**
 	 * Some workspaces need this to determine for example the kind of flush operations which are safe
 	 * to apply. Generally used for statistics.

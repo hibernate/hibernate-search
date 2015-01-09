@@ -2,7 +2,7 @@
  * Hibernate, Relational Persistence for Idiomatic Java
  *
  * JBoss, Home of Professional Open Source
- * Copyright 2012 Red Hat Inc. and/or its affiliates and other contributors
+ * Copyright 2015 Red Hat Inc. and/or its affiliates and other contributors
  * as indicated by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -20,59 +20,59 @@
  */
 package org.hibernate.search.test.configuration;
 
+
 import org.hibernate.search.impl.MutableSearchFactory;
 import org.hibernate.search.test.util.ManualConfiguration;
 
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
-
+import static org.junit.Assert.assertEquals;
 
 /**
- * Verifies the global setting from {@link org.hibernate.search.cfg.spi.SearchConfiguration#isIndexMetadataComplete()}
- * affect the backends as expected.
+ * Test to force deleteByTerm on backend
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
+ * @author gustavonalle
  */
-public class IndexMetadataCompleteConfiguredTest extends BaseConfigurationTest {
+public class DeleteByTermEnforcementTest extends BaseConfigurationTest {
 
 	@Test
-	public void testDefaultImplementation() {
+	public void testEnforcement() {
 		ManualConfiguration cfg = new ManualConfiguration();
-		verifyIndexCompleteMetadataOption( true, cfg );
+		cfg.setDeleteByTermEnforced( true );
+
+		verifyDeleteByTerm( true, cfg );
 	}
 
 	@Test
-	public void testIndexMetadataCompleteFalse() {
+	public void testDefaults() {
 		ManualConfiguration cfg = new ManualConfiguration();
-		cfg.setIndexMetadataComplete( false );
-		verifyIndexCompleteMetadataOption( false, cfg );
+
+		verifyDeleteByTerm( false, cfg );
 	}
 
 	@Test
-	public void testIndexMetadataCompleteTrue() {
+	public void testWithMetadataComplete() {
 		ManualConfiguration cfg = new ManualConfiguration();
 		cfg.setIndexMetadataComplete( true );
-		verifyIndexCompleteMetadataOption( true, cfg );
+
+		verifyDeleteByTerm( false, cfg );
 	}
 
-	private void verifyIndexCompleteMetadataOption(boolean expectation, ManualConfiguration cfg) {
+	private void verifyDeleteByTerm(boolean enforced, ManualConfiguration cfg) {
 		MutableSearchFactory sf = getMutableSearchFactoryWithSingleEntity( cfg );
 		try {
-			assertEquals( expectation, extractWorkspace( sf, Document.class ).areSingleTermDeletesSafe() );
+			assertEquals( enforced, extractWorkspace( sf, Document.class ).isDeleteByTermEnforced() );
 
 			// trigger a SearchFactory rebuild:
 			sf.addClasses( Dvd.class, Book.class );
-			// DVD share the same index, so now it's always unsafe [always false no matter the global option]
-			assertEquals( false, extractWorkspace( sf, Dvd.class ).areSingleTermDeletesSafe() );
-			assertEquals( false, extractWorkspace( sf, Document.class ).areSingleTermDeletesSafe() );
 
-			// but still as expected for Book :
-			assertEquals( expectation, extractWorkspace( sf, Book.class ).areSingleTermDeletesSafe() );
+			assertEquals( enforced, extractWorkspace( sf, Book.class ).isDeleteByTermEnforced() );
+			assertEquals( enforced, extractWorkspace( sf, Dvd.class ).isDeleteByTermEnforced() );
+			assertEquals( enforced, extractWorkspace( sf, Document.class ).isDeleteByTermEnforced() );
 		}
 		finally {
 			sf.close();
+
 		}
 	}
-
 }
