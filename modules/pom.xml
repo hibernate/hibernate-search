@@ -46,7 +46,7 @@
         <jgroups.integration.slot>3.4</jgroups.integration.slot>
 
         <!-- Needs to match the VERSION being used by Infinispan -->
-        <hibernate-search-infinispan.version>${project.version}</hibernate-search-infinispan.version>
+        <hibernate-search-infinispan.version>4.5.3.Final</hibernate-search-infinispan.version>
 
         <!-- Needs to match the VERSION being used by Infinispan (if any) -->
         <jbossmarshalling.integration.slot>main</jbossmarshalling.integration.slot>
