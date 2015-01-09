@@ -299,6 +299,11 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 	}
 
 	@Override
+	public boolean isDeleteByTermEnforced() {
+		return delegate.isDeleteByTermEnforced();
+	}
+
+	@Override
 	public boolean isIdProvidedImplicit() {
 		return delegate.isIdProvidedImplicit();
 	}
