@@ -17,11 +17,11 @@ import org.hibernate.search.backend.LuceneWork;
  *
  * @author gustavonalle
  */
-final class ChangesetList implements Iterable<LuceneWork> {
+public final class ChangesetList implements Iterable<LuceneWork> {
 
 	private final Iterable<Changeset> changesets;
 
-	ChangesetList(Iterable<Changeset> changesets) {
+	public ChangesetList(Iterable<Changeset> changesets) {
 		this.changesets = changesets;
 	}
 
