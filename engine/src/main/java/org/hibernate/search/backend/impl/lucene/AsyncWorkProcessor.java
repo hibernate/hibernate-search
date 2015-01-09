@@ -6,10 +6,14 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
 /**
@@ -20,6 +24,8 @@ import org.hibernate.search.backend.LuceneWork;
  * @since 5.0
  */
 final class AsyncWorkProcessor implements WorkProcessor {
+
+	private static final Log log = LoggerFactory.make();
 
 	private volatile LuceneBackendResources resources;
 
@@ -34,6 +40,17 @@ final class AsyncWorkProcessor implements WorkProcessor {
 
 	@Override
 	public void submit(List<LuceneWork> workList, IndexingMonitor monitor) {
+		if ( workList.isEmpty() ) {
+			// only log this error at trace level until we properly fix HSEARCH-1769
+			if ( log.isTraceEnabled() ) {
+				StringWriter stackTraceStringWriter = new StringWriter();
+				PrintWriter stackTracePrintWriter = new PrintWriter( stackTraceStringWriter );
+				new Throwable().printStackTrace( stackTracePrintWriter );
+				log.workListShouldNeverBeEmpty( stackTraceStringWriter.toString() );
+			}
+			// skip that work
+			return;
+		}
 		LuceneBackendQueueTask luceneBackendQueueProcessor = new LuceneBackendQueueTask(
 				workList,
 				resources,
