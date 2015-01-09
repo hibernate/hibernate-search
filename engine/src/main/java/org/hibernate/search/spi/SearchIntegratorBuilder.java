@@ -296,6 +296,7 @@ public class SearchIntegratorBuilder {
 			factoryState.setTimingSource( new DefaultTimingSource() );
 			factoryState.setIndexMetadataComplete( cfg.isIndexMetadataComplete() );
 			factoryState.setTransactionManagerExpected( cfg.isTransactionManagerExpected() );
+			factoryState.setDeleteByTermEnforced( cfg.isDeleteByTermEnforced() );
 			factoryState.setIdProvidedImplicit( cfg.isIdProvidedImplicit() );
 		}
 	}
@@ -628,6 +629,11 @@ public class SearchIntegratorBuilder {
 		@Override
 		public boolean isIndexMetadataComplete() {
 			return factoryState.isIndexMetadataComplete();
+		}
+
+		@Override
+		public boolean isDeleteByTermEnforced() {
+			return factoryState.isDeleteByTermEnforced();
 		}
 
 		@Override

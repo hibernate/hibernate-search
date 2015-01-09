@@ -38,6 +38,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	private final DirectoryBasedIndexManager indexManager;
 
 	protected final IndexWriterHolder writerHolder;
+	private final boolean deleteByTermEnforced;
 	private boolean indexMetadataIsComplete;
 
 	/**
@@ -51,6 +52,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 		this.entitiesInIndexManager = indexManager.getContainedTypes();
 		this.writerHolder = new IndexWriterHolder( context.getErrorHandler(), indexManager );
 		this.indexMetadataIsComplete = PropertiesParseHelper.isIndexMetadataComplete( cfg, context );
+		this.deleteByTermEnforced = context.isDeleteByTermEnforced();
 	}
 
 	@Override
@@ -106,6 +108,11 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	@Override
 	public boolean areSingleTermDeletesSafe() {
 		return indexMetadataIsComplete && entitiesInIndexManager.size() == 1;
+	}
+
+	@Override
+	public boolean isDeleteByTermEnforced() {
+		return deleteByTermEnforced;
 	}
 
 	@Override
