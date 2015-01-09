@@ -791,6 +791,6 @@ public interface Log extends BasicLogger {
 	void luceneBackendInitializedAsynchronously(String indexName);
 
 	@LogMessage(level = Level.TRACE)
-	@Message(id = 234, value = "WorkList should never be empty. Stacktrace below \n %s" )
+	@Message(id = 248, value = "WorkList should never be empty. Stacktrace below \n %s" )
 	void workListShouldNeverBeEmpty(String stackTrace);
 }
