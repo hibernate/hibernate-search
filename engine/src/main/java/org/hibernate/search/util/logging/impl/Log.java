@@ -789,4 +789,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = 233, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
 	void luceneBackendInitializedAsynchronously(String indexName);
+
+	@LogMessage(level = Level.TRACE)
+	@Message(id = 234, value = "WorkList should never be empty. Stacktrace below \n %s" )
+	void workListShouldNeverBeEmpty(String stackTrace);
 }
