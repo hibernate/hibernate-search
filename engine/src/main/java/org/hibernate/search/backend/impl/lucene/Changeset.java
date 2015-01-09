@@ -35,14 +35,14 @@ import java.util.concurrent.locks.LockSupport;
  *
  * @author gustavonalle
  */
-final class Changeset {
+public final class Changeset {
 
 	private final List<LuceneWork> workList;
 	private final Thread producer;
 	private final IndexingMonitor monitor;
 	private volatile boolean processed = false;
 
-	Changeset(List<LuceneWork> workList, Thread producer, IndexingMonitor monitor) {
+	public Changeset(List<LuceneWork> workList, Thread producer, IndexingMonitor monitor) {
 		this.workList = workList;
 		this.producer = producer;
 		this.monitor = monitor;
