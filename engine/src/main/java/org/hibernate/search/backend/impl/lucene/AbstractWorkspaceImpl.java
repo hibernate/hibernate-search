@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
+import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexWriter;
+
+import org.hibernate.search.cfg.spi.IdUniquenessResolver;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
@@ -34,8 +38,8 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	private static final Log log = LoggerFactory.make();
 
 	private final OptimizerStrategy optimizerStrategy;
-	private final Set<Class<?>> entitiesInIndexManager;
 	private final DirectoryBasedIndexManager indexManager;
+	private final ServiceManager serviceManager;
 
 	protected final IndexWriterHolder writerHolder;
 	private final boolean deleteByTermEnforced;
@@ -49,10 +53,10 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	public AbstractWorkspaceImpl(DirectoryBasedIndexManager indexManager, WorkerBuildContext context, Properties cfg) {
 		this.indexManager = indexManager;
 		this.optimizerStrategy = indexManager.getOptimizerStrategy();
-		this.entitiesInIndexManager = indexManager.getContainedTypes();
 		this.writerHolder = new IndexWriterHolder( context.getErrorHandler(), indexManager );
 		this.indexMetadataIsComplete = PropertiesParseHelper.isIndexMetadataComplete( cfg, context );
 		this.deleteByTermEnforced = context.isDeleteByTermEnforced();
+		this.serviceManager = context.getServiceManager();
 	}
 
 	@Override
@@ -82,7 +86,10 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 
 	@Override
 	public Set<Class<?>> getEntitiesInIndexManager() {
-		return entitiesInIndexManager;
+		// Do not cache it as an IndexManager receiving a new type should return an updated list
+		// and will trigger a LuceneBackendResources rebuild and by side effect
+		// a new LuceneWorkVisitor which will need the new list
+		return Collections.unmodifiableSet( indexManager.getContainedTypes() );
 	}
 
 	@Override
@@ -107,12 +114,70 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 
 	@Override
 	public boolean areSingleTermDeletesSafe() {
-		return indexMetadataIsComplete && entitiesInIndexManager.size() == 1;
+		return indexMetadataIsComplete && getEntitiesInIndexManager().size() == 1;
 	}
 
 	@Override
 	public boolean isDeleteByTermEnforced() {
-		return deleteByTermEnforced;
+		// if artificially forced: go ahead
+		if ( deleteByTermEnforced ) {
+			return true;
+		}
+		// Optimize only if we have all the metadata
+		if ( indexMetadataIsComplete ) {
+			Set<Class<?>> entitiesInvolved = getEntitiesInIndexManager();
+			// a single entity is always safe
+			if ( entitiesInvolved.size() == 1 ) {
+				return true;
+			}
+			// ask the source of data for some extra info to be sure it's safe
+			IdUniquenessResolver idUniquenessResolver = this.serviceManager.requestService( IdUniquenessResolver.class );
+			try {
+				// Check all tuple of entities with one another with the following rules:
+				//
+				// either:
+				// 1. the id field name of one is not used as field name of the second
+				// 2. if they use JPA ids, the range of ids is shared for both entity types
+				//    i.e. two instances of either types are unique if and only if they have the same id value
+				for ( Class<?> firstEntity : entitiesInvolved ) {
+					DocumentBuilderIndexedEntity firstDocumentBuilder =
+							indexManager.getIndexBinding( firstEntity ).getDocumentBuilder();
+					String firstIdField = firstDocumentBuilder.getIdKeywordName();
+					boolean followingEntities = false;
+					for ( Class<?> secondEntity : entitiesInvolved ) {
+						// Skip all entities already processed and the same entity
+						if ( firstEntity == secondEntity ) {
+							followingEntities = true;
+						}
+						else if ( followingEntities ) {
+							//core of the validation rules
+							DocumentBuilderIndexedEntity secondDocumentBuilder =
+									indexManager.getIndexBinding( secondEntity ).getDocumentBuilder();
+							// both use JPA id and they share the same id uniqueness set
+							boolean uniqueIdEqualityMeansEntityEquality =
+									firstDocumentBuilder.getTypeMetadata().isJpaIdUsedAsDocumentId() &&
+									secondDocumentBuilder.getTypeMetadata().isJpaIdUsedAsDocumentId() &&
+									idUniquenessResolver.areIdsUniqueForClasses( firstEntity, secondEntity );
+							String secondIdField = secondDocumentBuilder.getIdKeywordName();
+							// id field collision?
+							boolean idFieldCollision =
+									firstDocumentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( secondIdField ) != null ||
+									secondDocumentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( firstIdField ) != null;
+							if ( !uniqueIdEqualityMeansEntityEquality && idFieldCollision ) {
+								return false;
+							}
+						}
+					}
+				}
+			}
+			finally {
+				this.serviceManager.releaseService( IdUniquenessResolver.class );
+			}
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override
