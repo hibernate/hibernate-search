@@ -47,7 +47,7 @@ public interface Workspace {
 	IndexWriter getIndexWriter();
 
 	/**
-	 * @return The unmodifiable set of entity types being indexed
+	 * @return The set of entity types being indexed
 	 * in the underlying IndexManager backing this Workspace.
 	 */
 	Set<Class<?>> getEntitiesInIndexManager();
