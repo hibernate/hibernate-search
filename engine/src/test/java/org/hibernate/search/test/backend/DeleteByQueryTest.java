@@ -108,17 +108,17 @@ public class DeleteByQueryTest {
 			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, true, false ) );
 			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, false, true ) );
 			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, true, true ) );
-			
+
 			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, false, false, 8 ) );
 			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, true, false, 8 ) );
 			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, false, true, 8 ) );
 			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, true, true, 8 ) );
-			
+
 			l.add( new NumRangeQuery( "floatField", 1F, 2F, false, false ) );
 			l.add( new NumRangeQuery( "floatField", 1F, 2F, true, false ) );
 			l.add( new NumRangeQuery( "floatField", 1F, 2F, false, true ) );
 			l.add( new NumRangeQuery( "floatField", 1F, 2F, true, true ) );
-			
+
 			l.add( new NumRangeQuery( "floatField", 1F, 2F, false, false, 8 ) );
 			l.add( new NumRangeQuery( "floatField", 1F, 2F, true, false, 8 ) );
 			l.add( new NumRangeQuery( "floatField", 1F, 2F, false, true, 8 ) );
@@ -130,17 +130,17 @@ public class DeleteByQueryTest {
 			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, true, false ) );
 			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, false, true ) );
 			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, true, true ) );
-			
+
 			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, false, false, 8 ) );
 			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, true, false, 8 ) );
 			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, false, true, 8 ) );
 			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, true, true, 8 ) );
-			
+
 			l.add( new NumRangeQuery( "doubleField", 1D, 2D, false, false ) );
 			l.add( new NumRangeQuery( "doubleField", 1D, 2D, true, false ) );
 			l.add( new NumRangeQuery( "doubleField", 1D, 2D, false, true ) );
 			l.add( new NumRangeQuery( "doubleField", 1D, 2D, true, true ) );
-			
+
 			l.add( new NumRangeQuery( "doubleField", 1D, 2D, false, false, 8 ) );
 			l.add( new NumRangeQuery( "doubleField", 1D, 2D, true, false, 8 ) );
 			l.add( new NumRangeQuery( "doubleField", 1D, 2D, false, true, 8 ) );

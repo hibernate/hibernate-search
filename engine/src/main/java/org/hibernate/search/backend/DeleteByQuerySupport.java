@@ -187,7 +187,7 @@ public final class DeleteByQuerySupport {
 					}
 					boolean minInclusive = Boolean.parseBoolean( string[4] );
 					boolean maxInclusive = Boolean.parseBoolean( string[5] );
-					Integer precisionStep = string[6].equals( "null" ) ? null : Integer.parseInt( string[6] );
+					Integer precisionStep = "null".equals( string[6] ) ? null : Integer.parseInt( string[6] );
 					return new NumRangeQuery( string[0], type, min, max, minInclusive, maxInclusive, precisionStep );
 				}
 
