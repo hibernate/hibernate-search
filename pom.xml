@@ -408,10 +408,15 @@
             </dependency>
             <dependency>
                 <groupId>org.infinispan</groupId>
-                <artifactId>infinispan-lucene-directory</artifactId>
+                <artifactId>infinispan-core</artifactId>
                 <version>${infinispanVersion}</version>
             </dependency>
             <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-lucene-directory</artifactId>
+                <version>${infinispanVersion}</version>
+            </dependency>
+             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-orm</artifactId>
                 <version>${project.version}</version>
