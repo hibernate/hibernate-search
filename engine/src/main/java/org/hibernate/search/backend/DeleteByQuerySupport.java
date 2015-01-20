@@ -17,6 +17,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -66,6 +67,62 @@ public final class DeleteByQuerySupport {
 
 			} );
 
+			map.put( NumRangeQuery.QUERY_KEY, new ToLuceneQuery() {
+
+				@Override
+				public Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity) {
+					NumRangeQuery query = (NumRangeQuery) deletionQuery;
+					Integer precisionStep = query.getPrecisionStep();
+					NumericRangeQuery<?> ret;
+					switch ( query.getType() ) {
+						case INT:
+							if ( precisionStep != null ) {
+								ret = NumericRangeQuery.newIntRange( query.getFieldName(), precisionStep, (Integer) query.getMin(), (Integer) query.getMax(),
+										query.isMinInclusive(), query.isMaxInclusive() );
+							}
+							else {
+								ret = NumericRangeQuery.newIntRange( query.getFieldName(), (Integer) query.getMin(), (Integer) query.getMax(),
+										query.isMinInclusive(), query.isMaxInclusive() );
+							}
+							break;
+						case LONG:
+							if ( precisionStep != null ) {
+								ret = NumericRangeQuery.newLongRange( query.getFieldName(), precisionStep, (Long) query.getMin(), (Long) query.getMax(),
+										query.isMinInclusive(), query.isMaxInclusive() );
+							}
+							else {
+								ret = NumericRangeQuery.newLongRange( query.getFieldName(), (Long) query.getMin(), (Long) query.getMax(),
+										query.isMinInclusive(), query.isMaxInclusive() );
+							}
+							break;
+						case FLOAT:
+							if ( precisionStep != null ) {
+								ret = NumericRangeQuery.newFloatRange( query.getFieldName(), precisionStep, (Float) query.getMin(), (Float) query.getMax(),
+										query.isMinInclusive(), query.isMaxInclusive() );
+							}
+							else {
+								ret = NumericRangeQuery.newFloatRange( query.getFieldName(), (Float) query.getMin(), (Float) query.getMax(),
+										query.isMinInclusive(), query.isMaxInclusive() );
+							}
+							break;
+						case DOUBLE:
+							if ( precisionStep != null ) {
+								ret = NumericRangeQuery.newDoubleRange( query.getFieldName(), precisionStep, (Double) query.getMin(), (Double) query.getMax(),
+										query.isMinInclusive(), query.isMaxInclusive() );
+							}
+							else {
+								ret = NumericRangeQuery.newDoubleRange( query.getFieldName(), (Double) query.getMin(), (Double) query.getMax(),
+										query.isMinInclusive(), query.isMaxInclusive() );
+							}
+							break;
+						default:
+							throw new AssertionError( "unknown/unsupported Number type!" );
+					}
+					return ret;
+				}
+
+			} );
+
 			TO_LUCENE_QUERY_CONVERTER = Collections.unmodifiableMap( map );
 		}
 	}
@@ -76,6 +133,7 @@ public final class DeleteByQuerySupport {
 			Map<Integer, Class<? extends DeletionQuery>> map = new HashMap<>();
 
 			map.put( SingularTermQuery.QUERY_KEY, SingularTermQuery.class );
+			map.put( NumRangeQuery.QUERY_KEY, NumRangeQuery.class );
 
 			SUPPORTED_TYPES = Collections.unmodifiableMap( map );
 		}
@@ -98,6 +156,43 @@ public final class DeleteByQuerySupport {
 
 			} );
 
+			map.put( NumRangeQuery.QUERY_KEY, new StringToQueryMapper() {
+
+				@Override
+				public DeletionQuery fromString(String[] string) {
+					if ( string.length != 7 ) {
+						throw new IllegalArgumentException( "for a NumericRangeQuery to work there have to be exactly 7 Arguments" );
+					}
+					NumRangeQuery.Type type = NumRangeQuery.Type.valueOf( string[1] );
+					Number min, max;
+					switch ( type ) {
+						case INT:
+							min = Integer.parseInt( string[2] );
+							max = Integer.parseInt( string[3] );
+							break;
+						case LONG:
+							min = Long.parseLong( string[2] );
+							max = Long.parseLong( string[3] );
+							break;
+						case FLOAT:
+							min = Float.parseFloat( string[2] );
+							max = Float.parseFloat( string[3] );
+							break;
+						case DOUBLE:
+							min = Double.parseDouble( string[2] );
+							max = Double.parseDouble( string[3] );
+							break;
+						default:
+							throw new AssertionError( "unknown/unsupported Number type!" );
+					}
+					boolean minInclusive = Boolean.parseBoolean( string[4] );
+					boolean maxInclusive = Boolean.parseBoolean( string[5] );
+					Integer precisionStep = string[6].equals( "null" ) ? null : Integer.parseInt( string[6] );
+					return new NumRangeQuery( string[0], type, min, max, minInclusive, maxInclusive, precisionStep );
+				}
+
+			} );
+
 			FROM_STRING = Collections.unmodifiableMap( map );
 		}
 	}
@@ -113,6 +208,22 @@ public final class DeleteByQuerySupport {
 				public String[] toString(DeletionQuery deletionQuery) {
 					SingularTermQuery query = (SingularTermQuery) deletionQuery;
 					return new String[] { query.getFieldName(), query.getValue() };
+				}
+
+			} );
+
+			map.put( NumRangeQuery.QUERY_KEY, new QueryToStringMapper() {
+
+				@Override
+				public String[] toString(DeletionQuery deletionQuery) {
+					NumRangeQuery query = (NumRangeQuery) deletionQuery;
+					// fieldName, type
+					// min, max
+					// minInclusive, maxInclusive
+					// precisionStep
+					return new String[] { query.getFieldName(), query.getType().toString(), String.valueOf( query.getMin() ), String.valueOf( query.getMax() ),
+							String.valueOf( query.isMinInclusive() ), String.valueOf( query.isMaxInclusive() ),
+							query.getPrecisionStep() != null ? String.valueOf( query.getPrecisionStep() ) : "null" };
 				}
 
 			} );
