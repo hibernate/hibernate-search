@@ -221,7 +221,7 @@ public class DeleteByQueryTest {
 				this.testForQuery( integrator, rangeQueries.get( i ), expectedCount.get( i ) );
 			}
 			catch (Throwable e) {
-				System.out.println( "ERROR " + rangeQueries.get( i ) + ". expected was: " + expectedCount.get( i ) );
+				System.out.println( "ERROR: " + rangeQueries.get( i ) + ". expected was: " + expectedCount.get( i ) );
 				throw e;
 			}
 		}
