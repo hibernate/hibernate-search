@@ -218,6 +218,9 @@
             <buffer-pool name="default"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:infinispan:2.0">
+            <cache-container name="membersCache" default-cache="cachedb">
+                <local-cache name="cachedb" />
+            </cache-container>
             <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
                 <local-cache name="passivation" batching="true">
                     <file-store passivation="true" purge="false"/>
