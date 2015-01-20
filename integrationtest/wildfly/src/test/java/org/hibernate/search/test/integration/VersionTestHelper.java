@@ -37,21 +37,28 @@ public class VersionTestHelper {
 	}
 
 	/**
+	 * @param optionalDependencies additional dependencies to include in the Manifest descriptor
 	 * @return the StringAsset to be used in a Manifest descriptor to enable the Hibernate-Search-ORM module
 	 */
-	public static Asset moduleDependencyManifest() {
+	public static Asset moduleDependencyManifest(String... optionalDependencies) {
+		String dependencies = wildflySearchModuleDependency;
+		for ( String dependency : optionalDependencies ) {
+			dependencies += ", " + dependency;
+		}
 		String manifest = Descriptors.create( ManifestDescriptor.class )
-				.attribute( "Dependencies", wildflySearchModuleDependency )
+				.attribute( "Dependencies", dependencies )
 				.exportAsString();
 		return new StringAsset( manifest );
 	}
 
 	/**
 	 * Adds the needed Manifest to a deployment to enable the Hibernate-Search-ORM module
-	 * @param archive
+	 *
+	 * @param optionalDependencies additional dependencies to include in the Manifest descriptor
+	 * @param archive it will contain the Manifest
 	 */
-	public static void addDependencyToSearchModule(Archive<?> archive) {
-		archive.add( VersionTestHelper.moduleDependencyManifest(), "META-INF/MANIFEST.MF" );
+	public static void addDependencyToSearchModule(Archive<?> archive, String... optionalDependencies) {
+		archive.add( VersionTestHelper.moduleDependencyManifest( optionalDependencies ), "META-INF/MANIFEST.MF" );
 	}
 
 	public static String getDependencyVersionLucene() {
