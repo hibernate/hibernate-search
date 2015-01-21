@@ -20,6 +20,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.BigDecimalBridge;
 import org.hibernate.search.bridge.builtin.BigIntegerBridge;
 import org.hibernate.search.bridge.builtin.BooleanBridge;
+import org.hibernate.search.bridge.builtin.ByteBridge;
 import org.hibernate.search.bridge.builtin.CharacterBridge;
 import org.hibernate.search.bridge.builtin.DoubleBridge;
 import org.hibernate.search.bridge.builtin.FloatBridge;
@@ -44,6 +45,7 @@ class BasicJDKTypesBridgeProvider implements BridgeProvider {
 	private static final TwoWayFieldBridge CHARACTER = new TwoWayString2FieldBridgeAdaptor( new CharacterBridge() );
 	private static final TwoWayFieldBridge DOUBLE = new TwoWayString2FieldBridgeAdaptor( new DoubleBridge() );
 	private static final TwoWayFieldBridge FLOAT = new TwoWayString2FieldBridgeAdaptor( new FloatBridge() );
+	private static final TwoWayFieldBridge BYTE = new TwoWayString2FieldBridgeAdaptor( new ByteBridge() );
 	private static final TwoWayFieldBridge SHORT = new TwoWayString2FieldBridgeAdaptor( new ShortBridge() );
 	private static final TwoWayFieldBridge INTEGER = new TwoWayString2FieldBridgeAdaptor( new IntegerBridge() );
 	private static final TwoWayFieldBridge LONG = new TwoWayString2FieldBridgeAdaptor( new LongBridge() );
@@ -69,6 +71,8 @@ class BasicJDKTypesBridgeProvider implements BridgeProvider {
 		bridges.put( double.class.getName(), DOUBLE );
 		bridges.put( Float.class.getName(), FLOAT );
 		bridges.put( float.class.getName(), FLOAT );
+		bridges.put( Byte.class.getName(), BYTE );
+		bridges.put( byte.class.getName(), BYTE );
 		bridges.put( Short.class.getName(), SHORT );
 		bridges.put( short.class.getName(), SHORT );
 		bridges.put( Integer.class.getName(), INTEGER );
