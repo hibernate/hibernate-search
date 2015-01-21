@@ -57,11 +57,12 @@ configure various aspects of the indexing process. Without `@Field` the property
 the indexing process.
 
 Hibernate Search tries to determine the best way to index your property. In most
-cases this will be as string, but for the types byte, short, int, long, double and float (and their respective
+cases this will be as string, but for the types int, long, double and float (and their respective
 Java wrapper types) Lucene's numeric field encoding (see <<numeric-field-annotation>>) is used.
 This numeric encoding uses a so called link:http://en.wikipedia.org/wiki/Trie[Trie structure] which
 allows for efficient range queries and sorting, resulting in query response times
-being orders of magnitude faster than with the plain string encoding.
+being orders of magnitude faster than with the plain string encoding. Byte and short properties
+will only be encoded in numeric fields if explicitly marked with the `@NumericField` annotation.
 
 [CAUTION]
 ====

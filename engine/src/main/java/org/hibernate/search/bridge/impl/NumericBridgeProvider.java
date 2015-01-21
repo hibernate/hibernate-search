@@ -7,12 +7,15 @@
 
 package org.hibernate.search.bridge.impl;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.util.impl.CollectionHelper;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -21,8 +24,15 @@ class NumericBridgeProvider extends ExtendedBridgeProvider {
 
 	private static final Map<String, NumericFieldBridge> numericBridges;
 
+	/**
+	 * Those numeric types for which a String field will be used by default; Only if explicitly marked via {@link NumericField}
+	 * they will be encoded numerically.
+	 */
+	// TODO HSEARCH-1779 Remove and use numeric fields for all number types by default
+	private static final Set<Class<?>> TYPES_USING_STRING_FIELD_BY_DEFAULT = CollectionHelper.<Class<?>>asSet( Short.class, short.class, Byte.class, byte.class );
+
 	static {
-		numericBridges = new HashMap<>();
+		numericBridges = new HashMap<>( 12 );
 		numericBridges.put( Byte.class.getName(), NumericFieldBridge.BYTE_FIELD_BRIDGE );
 		numericBridges.put( byte.class.getName(), NumericFieldBridge.BYTE_FIELD_BRIDGE );
 		numericBridges.put( Short.class.getName(), NumericFieldBridge.SHORT_FIELD_BRIDGE );
@@ -39,15 +49,20 @@ class NumericBridgeProvider extends ExtendedBridgeProvider {
 
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext bridgeContext) {
-		if ( numericBridges.containsKey( bridgeContext.getReturnType().getName() ) ) {
-
-			// document id should only be indexed numerically in case there is an explicit @NumericField
-			if ( bridgeContext.isId() && !bridgeContext.getAnnotatedElement().isAnnotationPresent( NumericField.class ) ) {
-				return null;
-			}
-
-			return numericBridges.get( bridgeContext.getReturnType().getName() );
+		// For id and short/byte use numeric fields only if explicitly requested via @NumericField
+		if ( !isMarkedAsNumericField( bridgeContext.getAnnotatedElement() ) &&
+				( bridgeContext.isId() || encodeWithStringFieldByDefault( bridgeContext.getReturnType() ) ) ) {
+			return null;
 		}
-		return null;
+
+		return numericBridges.get( bridgeContext.getReturnType().getName() );
+	}
+
+	private boolean isMarkedAsNumericField(AnnotatedElement annotatedElement) {
+		return annotatedElement.isAnnotationPresent( NumericField.class );
+	}
+
+	private boolean encodeWithStringFieldByDefault(Class<?> clazz) {
+		return TYPES_USING_STRING_FIELD_BY_DEFAULT.contains( clazz );
 	}
 }

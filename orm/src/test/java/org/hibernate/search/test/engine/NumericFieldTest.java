@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -140,7 +141,8 @@ public class NumericFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testShortDocumentIdMappedAsNumericField() {
+	@TestForIssue(jiraKey = "HSEARCH-997")
+	public void testShortDocumentIdExplicitlyMappedAsNumericField() {
 		Transaction tx = fullTextSession.beginTransaction();
 		try {
 			Query query = NumericFieldUtils.createNumericRangeQuery( "myId", (short) 1, (short) 1, true, true );
@@ -156,12 +158,30 @@ public class NumericFieldTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testByteDocumentIdMappedAsNumericField() {
+	@TestForIssue(jiraKey = "HSEARCH-997")
+	public void testByteDocumentIdExplicitlyMappedAsNumericField() {
 		Transaction tx = fullTextSession.beginTransaction();
 		try {
 			Query query = NumericFieldUtils.createNumericRangeQuery( "myId", (byte) 1, (byte) 1, true, true );
 			@SuppressWarnings("unchecked")
 			List<PointOfInterest> list = fullTextSession.createFullTextQuery( query, PointOfInterest.class )
+					.list();
+			Assert.assertEquals( 1, list.size() );
+			Assert.assertEquals( (byte) 1, list.iterator().next().getId() );
+		}
+		finally {
+			tx.commit();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-997")
+	public void testByteDocumentIdMappedAsStringFieldByDefault() {
+		Transaction tx = fullTextSession.beginTransaction();
+		try {
+			Query query = TermRangeQuery.newStringRange( "id", "1", "1", true, true );
+			@SuppressWarnings("unchecked")
+			List<Position> list = fullTextSession.createFullTextQuery( query, Position.class )
 					.list();
 			Assert.assertEquals( 1, list.size() );
 			Assert.assertEquals( (byte) 1, list.iterator().next().getId() );
@@ -192,7 +212,7 @@ public class NumericFieldTest extends SearchTestBase {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { PinPoint.class, Location.class, Coordinate.class, PointOfInterest.class };
+		return new Class<?>[] { PinPoint.class, Location.class, Coordinate.class, PointOfInterest.class, Position.class };
 	}
 
 	private Location doExactQuery(String fieldName, Object value) {
@@ -238,6 +258,10 @@ public class NumericFieldTest extends SearchTestBase {
 		fullTextSession.save( poi1 );
 		fullTextSession.save( poi2 );
 
+		Position position1 = new Position( (byte) 1, -20D, 20D );
+		Position position2 = new Position( (byte) 2, -30D, 30D );
+		fullTextSession.save( position1 );
+		fullTextSession.save( position2 );
 
 		tx.commit();
 		fullTextSession.clear();
@@ -263,6 +287,11 @@ public class NumericFieldTest extends SearchTestBase {
 		List<PointOfInterest> pois = fullTextSession.createCriteria( PointOfInterest.class ).list();
 		for ( PointOfInterest poi : pois ) {
 			fullTextSession.delete( poi );
+		}
+
+		List<Position> positions = fullTextSession.createCriteria( Position.class ).list();
+		for ( Position position : positions ) {
+			fullTextSession.delete( position );
 		}
 
 		tx.commit();
