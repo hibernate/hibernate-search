@@ -944,6 +944,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( fieldBridge instanceof NumericFieldBridge ) {
 			NumericFieldBridge numericFieldBridge = (NumericFieldBridge) fieldBridge;
 			switch ( numericFieldBridge ) {
+				case BYTE_FIELD_BRIDGE:
 				case SHORT_FIELD_BRIDGE:
 				case INT_FIELD_BRIDGE: {
 					return NumericEncodingType.INTEGER;
