@@ -32,6 +32,8 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.FullTextFilterDef;
+import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Latitude;
@@ -462,6 +464,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		// check for AnalyzerDefs annotations
 		checkForAnalyzerDefs( clazz, configContext );
+
+		// check for FullTextFilterDefs annotations
+		checkForFullTextFilterDefs( clazz, configContext );
 
 		// Check for any ClassBridges annotation.
 		ClassBridges classBridgesAnnotation = clazz.getAnnotation( ClassBridges.class );
@@ -1082,6 +1087,17 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		AnalyzerDef def = annotatedElement.getAnnotation( AnalyzerDef.class );
 		context.addAnalyzerDef( def, annotatedElement );
+	}
+
+	private void checkForFullTextFilterDefs(XAnnotatedElement annotatedElement, ConfigContext context) {
+		FullTextFilterDefs defs = annotatedElement.getAnnotation( FullTextFilterDefs.class );
+		if ( defs != null ) {
+			for ( FullTextFilterDef def : defs.value() ) {
+				context.addFullTextFilterDef( def, annotatedElement );
+			}
+		}
+		FullTextFilterDef def = annotatedElement.getAnnotation( FullTextFilterDef.class );
+		context.addFullTextFilterDef( def, annotatedElement );
 	}
 
 	private void checkForAnalyzerDiscriminator(XAnnotatedElement annotatedElement,

@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.engine.impl;
 
+import java.beans.Introspector;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,15 +27,20 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.Factory;
+import org.hibernate.search.annotations.FullTextFilterDef;
+import org.hibernate.search.annotations.Key;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.EntityDescriptor;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.DelegateNamedAnalyzer;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -60,6 +67,12 @@ public final class ConfigContext {
 	private static final String PROGRAMMATIC_ANALYZER_DEFINITION = "PROGRAMMATIC_ANALYZER_DEFINITION";
 
 	/**
+	 * Constant used as definition point for a global (programmatic) filter definition. In this case no annotated
+	 * element is available to be used as definition point.
+	 */
+	private static final String PROGRAMMATIC_FILTER_DEFINITION = "PROGRAMMATIC_FILTER_DEFINITION";
+
+	/**
 	 * Used to keep track of duplicated analyzer definitions. The key of the map is the analyzer definition
 	 * name and the value is a string defining the location of the definition. In most cases the fully specified class
 	 * name together with the annotated element name is used. See also {@link #PROGRAMMATIC_ANALYZER_DEFINITION}.
@@ -67,10 +80,23 @@ public final class ConfigContext {
 	private final Map<String, String> analyzerDefinitionPoints = new HashMap<String, String>();
 
 	/**
+	 * Used to keep track of duplicated filter definitions. The key of the map is the filter definition
+	 * name and the value is a string defining the location of the definition. In most cases the fully specified class
+	 * name together with the annotated element name is used.
+	 */
+	private final Map<String, String> filterDefinitionPoints = new HashMap<String, String>();
+
+	/**
 	 * Map of discovered analyzer definitions. The key of the map is the analyzer def name and the value is the
 	 * {@code AnalyzerDef} annotation.
 	 */
 	private final Map<String, AnalyzerDef> analyzerDefs = new HashMap<String, AnalyzerDef>();
+
+	/**
+	 * Map of discovered filter definitions. The key of the map is the filter def name and the value is the
+	 * {@code FilterDef} instance.
+	 */
+	private final Map<String, FilterDef> filterDefs = new HashMap<String, FilterDef>();
 
 	private final List<DelegateNamedAnalyzer> lazyAnalyzers = new ArrayList<DelegateNamedAnalyzer>();
 	private final Analyzer defaultAnalyzer;
@@ -112,8 +138,24 @@ public final class ConfigContext {
 		addAnalyzerDef( analyzerDef, buildAnnotationDefinitionPoint( annotatedElement ) );
 	}
 
+	/** Add a full-filter definition which was defined as annotation
+	 *
+	 * @param filterDef the filter defition annotation
+	 * @param annotatedElement the annotated element it was defined on
+	 */
+	public void addFullTextFilterDef(FullTextFilterDef filterDef, XAnnotatedElement annotatedElement) {
+		if ( filterDef == null ) {
+			return;
+		}
+		addFullTextFilterDef( filterDef, buildAnnotationDefinitionPoint( annotatedElement ) );
+	}
+
 	public void addGlobalAnalyzerDef(AnalyzerDef analyzerDef) {
 		addAnalyzerDef( analyzerDef, PROGRAMMATIC_ANALYZER_DEFINITION );
+	}
+
+	public void addGlobalFullTextFilterDef(FullTextFilterDef filterDef) {
+		addFullTextFilterDef( filterDef, PROGRAMMATIC_FILTER_DEFINITION );
 	}
 
 	private void addAnalyzerDef(AnalyzerDef analyzerDef, String annotationDefinitionPoint) {
@@ -180,6 +222,66 @@ public final class ConfigContext {
 		return luceneMatchVersion;
 	}
 
+	private void addFullTextFilterDef(FullTextFilterDef filterDef, String filterDefinitionPoint) {
+		String filterDefinitionName = filterDef.name();
+
+		if ( filterDefinitionPoints.containsKey( filterDefinitionPoint ) ) {
+			if ( !filterDefinitionPoints.get( filterDefinitionName ).equals( filterDefinitionPoint ) ) {
+				throw new SearchException( "Multiple filter definitions with the same name: " + filterDef.name() );
+			}
+		}
+		else {
+			filterDefinitionPoints.put( filterDefinitionName, filterDefinitionPoint );
+			addFilterDef( filterDef );
+		}
+	}
+
+	private void addFilterDef(FullTextFilterDef defAnn) {
+		FilterDef filterDef = new FilterDef( defAnn );
+		if ( filterDef.getImpl().equals( ShardSensitiveOnlyFilter.class ) ) {
+			//this is a placeholder don't process regularly
+			filterDefs.put( defAnn.name(), filterDef );
+			return;
+		}
+		try {
+			filterDef.getImpl().newInstance();
+		}
+		catch (IllegalAccessException e) {
+			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
+		}
+		catch (InstantiationException e) {
+			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
+		}
+		for ( Method method : filterDef.getImpl().getMethods() ) {
+			if ( method.isAnnotationPresent( Factory.class ) ) {
+				if ( filterDef.getFactoryMethod() != null ) {
+					throw new SearchException(
+							"Multiple @Factory methods found" + defAnn.name() + ": "
+									+ filterDef.getImpl().getName() + "." + method.getName()
+					);
+				}
+				ReflectionHelper.setAccessible( method );
+				filterDef.setFactoryMethod( method );
+			}
+			if ( method.isAnnotationPresent( Key.class ) ) {
+				if ( filterDef.getKeyMethod() != null ) {
+					throw new SearchException(
+							"Multiple @Key methods found" + defAnn.name() + ": "
+									+ filterDef.getImpl().getName() + "." + method.getName()
+					);
+				}
+				ReflectionHelper.setAccessible( method );
+				filterDef.setKeyMethod( method );
+			}
+
+			String name = method.getName();
+			if ( name.startsWith( "set" ) && method.getParameterTypes().length == 1 ) {
+				filterDef.addSetter( Introspector.decapitalize( name.substring( 3 ) ), method );
+			}
+		}
+		filterDefs.put( defAnn.name(), filterDef );
+	}
+
 	public Map<String, Analyzer> initLazyAnalyzers() {
 		Map<String, Analyzer> initializedAnalyzers = new HashMap<String, Analyzer>( analyzerDefs.size() );
 
@@ -208,6 +310,10 @@ public final class ConfigContext {
 			}
 		}
 		return Collections.unmodifiableMap( initializedAnalyzers );
+	}
+
+	public Map<String, FilterDef> initFilters() {
+		return Collections.unmodifiableMap( filterDefs );
 	}
 
 	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) {
