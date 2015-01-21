@@ -23,6 +23,11 @@ Hibernate new timer we recommend you start link:http://hibernate.org/quick-start
             entity configuration (`@Entity`, `@Id`, `@OneToMany`,...).
 |===============
 
+=== Migration notes
+
+If you are upgrading an existing application from an earlier version of Hibernate Search to the latest release,
+make sure to check the out the http://hibernate.org/search/documentation/migrate/5.0/[migration guide].
+
 === Required libraries
 
 The Hibernate Search library is split in several modules to allow you to pick the minimal set of
