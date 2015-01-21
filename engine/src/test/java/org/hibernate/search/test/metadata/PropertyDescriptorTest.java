@@ -22,9 +22,9 @@ import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.PropertyDescriptor;
 import org.hibernate.search.metadata.impl.IndexedTypeDescriptorImpl;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -101,11 +101,12 @@ public class PropertyDescriptorTest {
 		IndexedTypeDescriptor typeDescriptor = DescriptorTestHelper.getTypeDescriptor( metadataProvider, Snafu.class );
 
 		Set<PropertyDescriptor> propertyDescriptors = typeDescriptor.getIndexedProperties();
-		assertEquals( "There should be 5 properties defined in Snafu", 5, propertyDescriptors.size() );
+		assertEquals( "There should be 6 properties defined in Snafu", 6, propertyDescriptors.size() );
 		Set<String> expectedPropertyNames = new HashSet<String>();
 		expectedPropertyNames.add( "id" );
 		expectedPropertyNames.add( "snafu" );
 		expectedPropertyNames.add( "numericField" );
+		expectedPropertyNames.add( "numericShortField" );
 		expectedPropertyNames.add( "nullValue" );
 		expectedPropertyNames.add( "custom" );
 

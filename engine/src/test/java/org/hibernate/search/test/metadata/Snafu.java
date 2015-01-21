@@ -40,6 +40,10 @@ public class Snafu {
 	@NumericField(precisionStep = 16)
 	private int numericField;
 
+	@Field
+	@NumericField(precisionStep = 8)
+	private short numericShortField;
+
 	@Field(indexNullAs = "snafu")
 	private String nullValue;
 

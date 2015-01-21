@@ -8,9 +8,6 @@
 package org.hibernate.search.test.metadata;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Index;
@@ -18,6 +15,7 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.bridge.StringBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
@@ -25,12 +23,14 @@ import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.FieldSettingsDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -165,10 +165,35 @@ public class FieldDescriptorTest {
 		assertTrue( fieldDescriptor.getFieldBridge() instanceof StringBridge );
 	}
 
+	@Test
+	public void testFieldDescriptorShortNumericFieldBridge() {
+		FieldDescriptor fieldDescriptor = getFieldDescriptor( Snafu.class, "numericShortField" );
+
+		assertNotNull( fieldDescriptor.getFieldBridge() );
+		assertTrue( fieldDescriptor.getFieldBridge() instanceof NumericFieldBridge );
+
+		assertTrue( FieldSettingsDescriptor.Type.NUMERIC.equals( fieldDescriptor.getType() ) );
+
+		NumericFieldSettingsDescriptor numericFieldSettingsDescriptor = fieldDescriptor.as(
+				NumericFieldSettingsDescriptor.class
+		);
+		int expectedPrecisionStep = 8;
+		assertEquals(
+				"the numeric step should be " + expectedPrecisionStep,
+				expectedPrecisionStep,
+				numericFieldSettingsDescriptor.precisionStep()
+		);
+
+		NumericEncodingType expectedNumericEncodingType = NumericEncodingType.INTEGER;
+		assertEquals(
+				"the short numeric field should be encoded as " + expectedNumericEncodingType,
+				expectedNumericEncodingType,
+				numericFieldSettingsDescriptor.encodingType()
+		);
+	}
+
 	private FieldDescriptor getFieldDescriptor(Class<?> clazz, String fieldName) {
 		IndexedTypeDescriptor typeDescriptor = DescriptorTestHelper.getTypeDescriptor( metadataProvider, clazz );
 		return typeDescriptor.getIndexedField( fieldName );
 	}
 }
-
-

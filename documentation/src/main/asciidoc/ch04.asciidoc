@@ -57,7 +57,7 @@ configure various aspects of the indexing process. Without `@Field` the property
 the indexing process.
 
 Hibernate Search tries to determine the best way to index your property. In most
-cases this will be as string, but for the types int, long, double and float (and their respective
+cases this will be as string, but for the types short, int, long, double and float (and their respective
 Java wrapper types) Lucene's numeric field encoding (see <<numeric-field-annotation>>) is used.
 This numeric encoding uses a so called link:http://en.wikipedia.org/wiki/Trie[Trie structure] which
 allows for efficient range queries and sorting, resulting in query response times
@@ -168,7 +168,7 @@ indexing of null values (see JavaDocs of `LuceneOptions.indexNullAs()`).
 ===== @NumericField
 
 `@NumericField` is a companion annotation to `@Field`. It can be specified in the
-same scope as `@Field`, but only on properties of numeric type like int, long, double and float
+same scope as `@Field`, but only on properties of numeric type like short, int, long, double and float
 (and their respective Java wrapper types). It allows to define a custom `precisionStep` for the
 numeric encoding of the property value.
 
@@ -188,7 +188,8 @@ numeric encoding of the property value.
                   value is 4.
 |===============
 
-Lucene supports the numeric types: `Double`, `Long`, `Integer` and `Float`. Other numeric types
+Lucene supports the numeric types: `Double`, `Long`, `Integer` and `Float`. For properties of type
+`Short`, an `Integer` field will be used in the index. Other numeric types
 should use the default string encoding (via `@Field`), unless the application can deal with a
 potential loss in precision, in which case a custom `NumericFieldBridge` can be used. See
 <<example-custom-numericfieldbridge>>.
