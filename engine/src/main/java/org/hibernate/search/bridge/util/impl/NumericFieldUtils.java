@@ -11,7 +11,6 @@ import java.util.Date;
 
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -46,6 +45,9 @@ public final class NumericFieldUtils {
 
 		if ( numericClass.isAssignableFrom( Double.class ) ) {
 			return NumericRangeQuery.newDoubleRange( fieldName, (Double) from, (Double) to, includeLower, includeUpper );
+		}
+		if ( numericClass.isAssignableFrom( Short.class ) ) {
+			return NumericRangeQuery.newIntRange( fieldName, ( (Short) from ).intValue(), ( (Short) to ).intValue(), includeLower, includeUpper );
 		}
 		if ( numericClass.isAssignableFrom( Long.class ) ) {
 			return NumericRangeQuery.newLongRange( fieldName, (Long) from, (Long) to, includeLower, includeUpper );

@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
-
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -63,6 +62,7 @@ import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -71,7 +71,6 @@ import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
-import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
  * A metadata provider which extracts the required information from annotations.
@@ -945,6 +944,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		if ( fieldBridge instanceof NumericFieldBridge ) {
 			NumericFieldBridge numericFieldBridge = (NumericFieldBridge) fieldBridge;
 			switch ( numericFieldBridge ) {
+				case SHORT_FIELD_BRIDGE:
 				case INT_FIELD_BRIDGE: {
 					return NumericEncodingType.INTEGER;
 				}

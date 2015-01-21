@@ -17,9 +17,30 @@ import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
  * Stateless field bridges for the 4 different Numeric Field types
  *
  * @author Sanne Grinovero
+ * @author Gunnar Morling
  */
 public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
+	/**
+	 * Persists short properties in int index fields. Takes care of all the required conversion.
+	 */
+	SHORT_FIELD_BRIDGE {
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.INT_AS_SHORT;
+		}
+
+		@Override
+		public Object get(final String name, final Document document) {
+			final IndexableField field = document.getField( name );
+			return field != null ? field.numericValue().shortValue() : null;
+		}
+
+		@Override
+		protected void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
+			super.applyToLuceneOptions( luceneOptions, name, value.intValue(), document );
+		}
+	},
 	INT_FIELD_BRIDGE {
 		@Override
 		public FieldCacheLoadingType getFieldCacheLoadingType() {
@@ -63,7 +84,7 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 	}
 
 	@Override
-	public final Object get(final String name, final Document document) {
+	public Object get(final String name, final Document document) {
 		final IndexableField field = document.getField( name );
 		if ( field != null ) {
 			return field.numericValue();
@@ -73,7 +94,7 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 		}
 	}
 
-	protected final void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
+	protected void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
 		luceneOptions.addNumericFieldToDocument( name, value, document );
 	}
 

@@ -9,6 +9,7 @@ package org.hibernate.search.test.engine;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -70,14 +71,14 @@ public class Location {
 	@Field(store = Store.YES)
 	@NumericField
 	@FieldBridge(impl = CoordinatesPairFieldBridge.class)
-	private String coordinatePair = "1;2";
+	private final String coordinatePair = "1;2";
 
 	@Field
 	private String description;
 
 	@OneToMany(mappedBy = "location", cascade = { CascadeType.ALL })
 	@IndexedEmbedded
-	private Collection<PinPoint> pinPoints = new ArrayList<PinPoint>();
+	private final Collection<PinPoint> pinPoints = new ArrayList<PinPoint>();
 
 	@Fields({
 			@Field(name = "strMultiple"),
@@ -88,11 +89,19 @@ public class Location {
 	})
 	private Double multiple;
 
+	@Field(store = Store.YES)
+	@NumericField
+	private short importance;
+
+	@Field(store = Store.YES)
+	@NumericField
+	private Short fallbackImportance;
+
 	public Location() {
 	}
 
 	public Location(int id, Long counter, double latitude, Double longitude,
-					Integer ranking, String description, Double multiple, Country country, BigDecimal visibleStars) {
+					Integer ranking, String description, Double multiple, Country country, BigDecimal visibleStars, short importance) {
 		this.id = id;
 		this.counter = counter;
 		this.longitude = longitude;
@@ -102,6 +111,8 @@ public class Location {
 		this.multiple = multiple;
 		this.country = country;
 		this.visibleStars = visibleStars;
+		this.importance = importance;
+		this.fallbackImportance = importance;
 	}
 
 	public void addPinPoints(PinPoint... pinPoints) {
