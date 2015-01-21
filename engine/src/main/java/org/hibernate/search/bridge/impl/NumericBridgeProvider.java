@@ -23,6 +23,8 @@ class NumericBridgeProvider extends ExtendedBridgeProvider {
 
 	static {
 		numericBridges = new HashMap<>();
+		numericBridges.put( Byte.class.getName(), NumericFieldBridge.BYTE_FIELD_BRIDGE );
+		numericBridges.put( byte.class.getName(), NumericFieldBridge.BYTE_FIELD_BRIDGE );
 		numericBridges.put( Short.class.getName(), NumericFieldBridge.SHORT_FIELD_BRIDGE );
 		numericBridges.put( short.class.getName(), NumericFieldBridge.SHORT_FIELD_BRIDGE );
 		numericBridges.put( Integer.class.getName(), NumericFieldBridge.INT_FIELD_BRIDGE );

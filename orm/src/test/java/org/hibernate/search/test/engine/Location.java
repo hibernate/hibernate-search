@@ -97,11 +97,20 @@ public class Location {
 	@NumericField
 	private Short fallbackImportance;
 
+	@Field(store = Store.YES)
+	@NumericField
+	private byte popularity;
+
+	@Field(store = Store.YES)
+	@NumericField
+	private Byte fallbackPopularity;
+
+
 	public Location() {
 	}
 
 	public Location(int id, Long counter, double latitude, Double longitude,
-					Integer ranking, String description, Double multiple, Country country, BigDecimal visibleStars, short importance) {
+					Integer ranking, String description, Double multiple, Country country, BigDecimal visibleStars, short importance, byte popularity) {
 		this.id = id;
 		this.counter = counter;
 		this.longitude = longitude;
@@ -113,6 +122,8 @@ public class Location {
 		this.visibleStars = visibleStars;
 		this.importance = importance;
 		this.fallbackImportance = importance;
+		this.popularity = popularity;
+		this.fallbackPopularity = popularity;
 	}
 
 	public void addPinPoints(PinPoint... pinPoints) {

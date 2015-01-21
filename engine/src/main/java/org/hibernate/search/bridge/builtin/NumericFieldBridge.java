@@ -22,6 +22,26 @@ import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 
 	/**
+	 * Persists byte properties in int index fields. Takes care of all the required conversion.
+	 */
+	BYTE_FIELD_BRIDGE {
+		@Override
+		public FieldCacheLoadingType getFieldCacheLoadingType() {
+			return FieldCacheLoadingType.BYTE_AS_SHORT;
+		}
+
+		@Override
+		public Object get(final String name, final Document document) {
+			final IndexableField field = document.getField( name );
+			return field != null ? field.numericValue().byteValue() : null;
+		}
+
+		@Override
+		protected void applyToLuceneOptions(LuceneOptions luceneOptions, String name, Number value, Document document) {
+			super.applyToLuceneOptions( luceneOptions, name, value.intValue(), document );
+		}
+	},
+	/**
 	 * Persists short properties in int index fields. Takes care of all the required conversion.
 	 */
 	SHORT_FIELD_BRIDGE {

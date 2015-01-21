@@ -124,12 +124,13 @@ public class IndexedTypeDescriptorTest {
 		IndexedTypeDescriptor typeDescriptor = DescriptorTestHelper.getTypeDescriptor( metadataProvider, Snafu.class );
 
 		Set<PropertyDescriptor> propertyDescriptors = typeDescriptor.getIndexedProperties();
-		assertEquals( "There should be 6 properties defined in Snafu", 6, propertyDescriptors.size() );
+		assertEquals( "There should be 7 properties defined in Snafu", 7, propertyDescriptors.size() );
 		Set<String> expectedPropertyNames = new HashSet<String>();
 		expectedPropertyNames.add( "id" );
 		expectedPropertyNames.add( "snafu" );
 		expectedPropertyNames.add( "numericField" );
 		expectedPropertyNames.add( "numericShortField" );
+		expectedPropertyNames.add( "numericByteField" );
 		expectedPropertyNames.add( "nullValue" );
 		expectedPropertyNames.add( "custom" );
 

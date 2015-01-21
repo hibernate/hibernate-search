@@ -46,6 +46,9 @@ public final class NumericFieldUtils {
 		if ( numericClass.isAssignableFrom( Double.class ) ) {
 			return NumericRangeQuery.newDoubleRange( fieldName, (Double) from, (Double) to, includeLower, includeUpper );
 		}
+		if ( numericClass.isAssignableFrom( Byte.class ) ) {
+			return NumericRangeQuery.newIntRange( fieldName, ( (Byte) from ).intValue(), ( (Byte) to ).intValue(), includeLower, includeUpper );
+		}
 		if ( numericClass.isAssignableFrom( Short.class ) ) {
 			return NumericRangeQuery.newIntRange( fieldName, ( (Short) from ).intValue(), ( (Short) to ).intValue(), includeLower, includeUpper );
 		}

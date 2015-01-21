@@ -192,6 +192,33 @@ public class FieldDescriptorTest {
 		);
 	}
 
+	@Test
+	public void testFieldDescriptorByteNumericFieldBridge() {
+		FieldDescriptor fieldDescriptor = getFieldDescriptor( Snafu.class, "numericByteField" );
+
+		assertNotNull( fieldDescriptor.getFieldBridge() );
+		assertTrue( fieldDescriptor.getFieldBridge() instanceof NumericFieldBridge );
+
+		assertTrue( FieldSettingsDescriptor.Type.NUMERIC.equals( fieldDescriptor.getType() ) );
+
+		NumericFieldSettingsDescriptor numericFieldSettingsDescriptor = fieldDescriptor.as(
+				NumericFieldSettingsDescriptor.class
+		);
+		int expectedPrecisionStep = 4;
+		assertEquals(
+				"the numeric step should be " + expectedPrecisionStep,
+				expectedPrecisionStep,
+				numericFieldSettingsDescriptor.precisionStep()
+		);
+
+		NumericEncodingType expectedNumericEncodingType = NumericEncodingType.INTEGER;
+		assertEquals(
+				"the short numeric field should be encoded as " + expectedNumericEncodingType,
+				expectedNumericEncodingType,
+				numericFieldSettingsDescriptor.encodingType()
+		);
+	}
+
 	private FieldDescriptor getFieldDescriptor(Class<?> clazz, String fieldName) {
 		IndexedTypeDescriptor typeDescriptor = DescriptorTestHelper.getTypeDescriptor( metadataProvider, clazz );
 		return typeDescriptor.getIndexedField( fieldName );

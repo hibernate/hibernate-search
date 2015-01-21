@@ -73,7 +73,7 @@ public class CachedNumericIdTest extends SearchTestBase {
 		Country italy = new Country( "Italy", 39d );
 		for ( int i = 0; i < NUM_LOCATIONS; i++ ) {
 			session.persist( new Location( i, Long.valueOf( i ), 7 * i, Double.valueOf( 9 * i ), Integer
-					.valueOf( 100 - i ), String.valueOf( i ) + "42", null, italy, BigDecimal.ONE, (short) 5 ) );
+					.valueOf( 100 - i ), String.valueOf( i ) + "42", null, italy, BigDecimal.ONE, (short) 5, (byte) 10 ) );
 		}
 		transaction.commit();
 		session.close();
