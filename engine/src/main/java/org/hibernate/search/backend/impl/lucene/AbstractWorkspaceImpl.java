@@ -135,14 +135,20 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 			try {
 				// Check all tuple of entities with one another with the following rules:
 				//
-				// either:
-				// 1. the id field name of one is not used as field name of the second
-				// 2. if they use JPA ids, the range of ids is shared for both entity types
-				//    i.e. two instances of either types are unique if and only if they have the same id value
+				// if they use JPA ids, the range of ids is shared for both entity types
+				// i.e. two instances of either types are unique if and only if they have the same id value
+
+				// Note that we cannot apply this alternative following rule:
+				// "The id field name of one is not used as field name of the second"
+				// because we don't know for sure all the fields involved as FiedBridges can do a lot of things
+				// behind our back
+				// Once we have some new metadata, we can revisit
 				for ( Class<?> firstEntity : entitiesInvolved ) {
-					DocumentBuilderIndexedEntity firstDocumentBuilder =
-							indexManager.getIndexBinding( firstEntity ).getDocumentBuilder();
-					String firstIdField = firstDocumentBuilder.getIdKeywordName();
+					boolean firstEntityIsUsingJPAId =
+							indexManager.getIndexBinding( firstEntity )
+									.getDocumentBuilder()
+									.getTypeMetadata()
+									.isJpaIdUsedAsDocumentId();
 					boolean followingEntities = false;
 					for ( Class<?> secondEntity : entitiesInvolved ) {
 						// Skip all entities already processed and the same entity
@@ -151,19 +157,16 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 						}
 						else if ( followingEntities ) {
 							//core of the validation rules
-							DocumentBuilderIndexedEntity secondDocumentBuilder =
-									indexManager.getIndexBinding( secondEntity ).getDocumentBuilder();
+							boolean secondEntityIsUsingJPAId =
+									indexManager.getIndexBinding( secondEntity )
+											.getDocumentBuilder()
+											.getTypeMetadata()
+											.isJpaIdUsedAsDocumentId();
 							// both use JPA id and they share the same id uniqueness set
 							boolean uniqueIdEqualityMeansEntityEquality =
-									firstDocumentBuilder.getTypeMetadata().isJpaIdUsedAsDocumentId() &&
-									secondDocumentBuilder.getTypeMetadata().isJpaIdUsedAsDocumentId() &&
+									firstEntityIsUsingJPAId && secondEntityIsUsingJPAId &&
 									idUniquenessResolver.areIdsUniqueForClasses( firstEntity, secondEntity );
-							String secondIdField = secondDocumentBuilder.getIdKeywordName();
-							// id field collision?
-							boolean idFieldCollision =
-									firstDocumentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( secondIdField ) != null ||
-									secondDocumentBuilder.getTypeMetadata().getDocumentFieldMetadataFor( firstIdField ) != null;
-							if ( !uniqueIdEqualityMeansEntityEquality && idFieldCollision ) {
+							if ( !uniqueIdEqualityMeansEntityEquality ) {
 								return false;
 							}
 						}
