@@ -51,7 +51,11 @@ public class InfinispanIntegration {
 
 	/**
 	 * Configuration attribute to control if the writes to Index Metadata should be performed asynchronously.
-	 * Defaults to {@code "false"}. Setting this to {@code "true"} might improve performance but is highly experimental.
+	 * <p>
+	 * Defaults to {@code false} if the backend is configured as synchronous and defaults to {@code true} if the backend
+	 * is configured as asynchronous.
+	 * <p>
+	 * Setting this to {@code true} might improve performance but is highly experimental.
 	 */
 	public static final String WRITE_METADATA_ASYNC = "write_metadata_async";
 
