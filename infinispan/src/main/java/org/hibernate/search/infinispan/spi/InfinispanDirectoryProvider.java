@@ -11,8 +11,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.store.Directory;
-import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.apache.lucene.store.LockFactory;
+import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.AsyncDeleteExecutorService;
 import org.hibernate.search.infinispan.logging.impl.Log;
@@ -62,7 +63,8 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		lockingCacheName = InfinispanIntegration.getLockingCacheName( properties );
 		//Let it return null if it's not set, so that we can avoid applying any override.
 		chunkSize = ConfigurationParseHelper.getIntValue( properties, "chunk_size" );
-		writeFileListAsync = ConfigurationParseHelper.getBooleanValue( properties, InfinispanIntegration.WRITE_METADATA_ASYNC, false );
+		writeFileListAsync = getWriteFileListAsync( properties );
+
 		//Only override the default Infinispan LockDirectory if an explicit option is set:
 		if ( DirectoryProviderHelper.configurationExplicitlySetsLockFactory( properties ) ) {
 			File verifiedIndexDir = null;
@@ -75,6 +77,16 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 			}
 			indexWriterLockFactory = DirectoryProviderHelper.createLockFactory( verifiedIndexDir, properties, serviceManager );
 		}
+	}
+
+	private boolean getWriteFileListAsync(Properties properties) {
+		boolean backendConfiguredAsync = !BackendFactory.isConfiguredAsSync( properties );
+
+		return ConfigurationParseHelper.getBooleanValue(
+				properties,
+				InfinispanIntegration.WRITE_METADATA_ASYNC,
+				backendConfiguredAsync
+		);
 	}
 
 	@Override
