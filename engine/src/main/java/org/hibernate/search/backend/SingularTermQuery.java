@@ -16,19 +16,45 @@ public class SingularTermQuery implements DeletionQuery {
 	public static final int QUERY_KEY = 1;
 
 	private final String fieldName;
-	private final String value;
+	private final Object value;
+	private final Type type;
 
-	public SingularTermQuery(String key, String value) {
-		this.fieldName = key;
+	public SingularTermQuery(String fieldName, String value) {
+		this( fieldName, value, Type.STRING );
+	}
+
+	public SingularTermQuery(String fieldName, int value) {
+		this( fieldName, value, Type.INT );
+	}
+
+	public SingularTermQuery(String fieldName, long value) {
+		this( fieldName, value, Type.LONG );
+	}
+
+	public SingularTermQuery(String fieldName, float value) {
+		this( fieldName, value, Type.FLOAT );
+	}
+
+	public SingularTermQuery(String fieldName, double value) {
+		this( fieldName, value, Type.DOUBLE );
+	}
+
+	public SingularTermQuery(String fieldName, Object value, Type type) {
+		this.fieldName = fieldName;
 		this.value = value;
+		this.type = type;
 	}
 
 	public String getFieldName() {
 		return fieldName;
 	}
 
-	public String getValue() {
+	public Object getValue() {
 		return value;
+	}
+
+	public Type getType() {
+		return this.type;
 	}
 
 	@Override
@@ -41,15 +67,24 @@ public class SingularTermQuery implements DeletionQuery {
 		return "SingularTermQuery: +" + fieldName + ":" + value;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ( ( fieldName == null ) ? 0 : fieldName.hashCode() );
+		result = prime * result + ( ( type == null ) ? 0 : type.hashCode() );
 		result = prime * result + ( ( value == null ) ? 0 : value.hashCode() );
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if ( this == obj ) {
@@ -70,6 +105,9 @@ public class SingularTermQuery implements DeletionQuery {
 		else if ( !fieldName.equals( other.fieldName ) ) {
 			return false;
 		}
+		if ( type != other.type ) {
+			return false;
+		}
 		if ( value == null ) {
 			if ( other.value != null ) {
 				return false;
@@ -79,6 +117,10 @@ public class SingularTermQuery implements DeletionQuery {
 			return false;
 		}
 		return true;
+	}
+
+	public enum Type {
+		STRING, INT, LONG, FLOAT, DOUBLE
 	}
 
 }

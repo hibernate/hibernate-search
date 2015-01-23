@@ -21,9 +21,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.DeleteByQuerySupport;
 import org.hibernate.search.backend.DeletionQuery;
-import org.hibernate.search.backend.NumRangeQuery;
 import org.hibernate.search.backend.SingularTermQuery;
-import org.hibernate.search.backend.NumRangeQuery.Type;
 import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
@@ -51,100 +49,19 @@ public class DeleteByQueryTest {
 		List<DeletionQuery> l = new ArrayList<>();
 
 		l.add( new SingularTermQuery( "id", "123" ) );
-		l.addAll( this.buildRangeQueries() );
+		l.addAll( this.buildNumQueries() );
 
 		return l;
 	}
 
-	private List<NumRangeQuery> buildRangeQueries() {
-		List<NumRangeQuery> l = new ArrayList<>();
+	private List<SingularTermQuery> buildNumQueries() {
+		List<SingularTermQuery> l = new ArrayList<>();
 
 		{
-			l.add( new NumRangeQuery( "intField", Type.INT, 1, 2, false, false ) );
-			l.add( new NumRangeQuery( "intField", Type.INT, 1, 2, true, false ) );
-			l.add( new NumRangeQuery( "intField", Type.INT, 1, 2, false, true ) );
-			l.add( new NumRangeQuery( "intField", Type.INT, 1, 2, true, true ) );
-
-			l.add( new NumRangeQuery( "intField", Type.INT, 1, 2, false, false, 8 ) );
-			l.add( new NumRangeQuery( "intField", Type.INT, 1, 2, true, false, 8 ) );
-			l.add( new NumRangeQuery( "intField", Type.INT, 1, 2, false, true, 8 ) );
-			l.add( new NumRangeQuery( "intField", Type.INT, 1, 2, true, true, 8 ) );
-
-			l.add( new NumRangeQuery( "intField", 1, 2, false, false ) );
-			l.add( new NumRangeQuery( "intField", 1, 2, true, false ) );
-			l.add( new NumRangeQuery( "intField", 1, 2, false, true ) );
-			l.add( new NumRangeQuery( "intField", 1, 2, true, true ) );
-
-			l.add( new NumRangeQuery( "intField", 1, 2, false, false, 8 ) );
-			l.add( new NumRangeQuery( "intField", 1, 2, true, false, 8 ) );
-			l.add( new NumRangeQuery( "intField", 1, 2, false, true, 8 ) );
-			l.add( new NumRangeQuery( "intField", 1, 2, true, true, 8 ) );
-		}
-
-		{
-			l.add( new NumRangeQuery( "longField", Type.LONG, 1L, 2L, false, false ) );
-			l.add( new NumRangeQuery( "longField", Type.LONG, 1L, 2L, true, false ) );
-			l.add( new NumRangeQuery( "longField", Type.LONG, 1L, 2L, false, true ) );
-			l.add( new NumRangeQuery( "longField", Type.LONG, 1L, 2L, true, true ) );
-
-			l.add( new NumRangeQuery( "longField", Type.LONG, 1L, 2L, false, false, 8 ) );
-			l.add( new NumRangeQuery( "longField", Type.LONG, 1L, 2L, true, false, 8 ) );
-			l.add( new NumRangeQuery( "longField", Type.LONG, 1L, 2L, false, true, 8 ) );
-			l.add( new NumRangeQuery( "longField", Type.LONG, 1L, 2L, true, true, 8 ) );
-
-			l.add( new NumRangeQuery( "longField", 1L, 2L, false, false ) );
-			l.add( new NumRangeQuery( "longField", 1L, 2L, true, false ) );
-			l.add( new NumRangeQuery( "longField", 1L, 2L, false, true ) );
-			l.add( new NumRangeQuery( "longField", 1L, 2L, true, true ) );
-
-			l.add( new NumRangeQuery( "longField", 1L, 2L, false, false, 8 ) );
-			l.add( new NumRangeQuery( "longField", 1L, 2L, true, false, 8 ) );
-			l.add( new NumRangeQuery( "longField", 1L, 2L, false, true, 8 ) );
-			l.add( new NumRangeQuery( "longField", 1L, 2L, true, true, 8 ) );
-		}
-
-		{
-			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, false, false ) );
-			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, true, false ) );
-			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, false, true ) );
-			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, true, true ) );
-
-			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, false, false, 8 ) );
-			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, true, false, 8 ) );
-			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, false, true, 8 ) );
-			l.add( new NumRangeQuery( "floatField", Type.FLOAT, 1F, 2F, true, true, 8 ) );
-
-			l.add( new NumRangeQuery( "floatField", 1F, 2F, false, false ) );
-			l.add( new NumRangeQuery( "floatField", 1F, 2F, true, false ) );
-			l.add( new NumRangeQuery( "floatField", 1F, 2F, false, true ) );
-			l.add( new NumRangeQuery( "floatField", 1F, 2F, true, true ) );
-
-			l.add( new NumRangeQuery( "floatField", 1F, 2F, false, false, 8 ) );
-			l.add( new NumRangeQuery( "floatField", 1F, 2F, true, false, 8 ) );
-			l.add( new NumRangeQuery( "floatField", 1F, 2F, false, true, 8 ) );
-			l.add( new NumRangeQuery( "floatField", 1F, 2F, true, true, 8 ) );
-		}
-
-		{
-			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, false, false ) );
-			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, true, false ) );
-			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, false, true ) );
-			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, true, true ) );
-
-			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, false, false, 8 ) );
-			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, true, false, 8 ) );
-			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, false, true, 8 ) );
-			l.add( new NumRangeQuery( "doubleField", Type.DOUBLE, 1D, 2D, true, true, 8 ) );
-
-			l.add( new NumRangeQuery( "doubleField", 1D, 2D, false, false ) );
-			l.add( new NumRangeQuery( "doubleField", 1D, 2D, true, false ) );
-			l.add( new NumRangeQuery( "doubleField", 1D, 2D, false, true ) );
-			l.add( new NumRangeQuery( "doubleField", 1D, 2D, true, true ) );
-
-			l.add( new NumRangeQuery( "doubleField", 1D, 2D, false, false, 8 ) );
-			l.add( new NumRangeQuery( "doubleField", 1D, 2D, true, false, 8 ) );
-			l.add( new NumRangeQuery( "doubleField", 1D, 2D, false, true, 8 ) );
-			l.add( new NumRangeQuery( "doubleField", 1D, 2D, true, true, 8 ) );
+			l.add( new SingularTermQuery( "intField", 1 ) );
+			l.add( new SingularTermQuery( "longField", 1L ) );
+			l.add( new SingularTermQuery( "floatField", 1F ) );
+			l.add( new SingularTermQuery( "doubleField", 1D ) );
 		}
 
 		return l;
@@ -152,29 +69,10 @@ public class DeleteByQueryTest {
 
 	private List<Integer> expectedCount() {
 		List<Integer> l = new ArrayList<>();
-
-		for ( int i = 0; i < 4; ++i ) {
-			l.add( 2 );
-			l.add( 1 );
-			l.add( 1 );
-			l.add( 0 );
-
-			l.add( 2 );
-			l.add( 1 );
-			l.add( 1 );
-			l.add( 0 );
-
-			l.add( 2 );
-			l.add( 1 );
-			l.add( 1 );
-			l.add( 0 );
-
-			l.add( 2 );
-			l.add( 1 );
-			l.add( 1 );
-			l.add( 0 );
-		}
-
+		l.add( 1 );
+		l.add( 1 );
+		l.add( 1 );
+		l.add( 1 );
 		return l;
 	}
 
@@ -212,16 +110,16 @@ public class DeleteByQueryTest {
 	public void testNumRangeQuery() {
 		ExtendedSearchIntegrator integrator = this.factoryHolder.getSearchFactory();
 
-		List<NumRangeQuery> rangeQueries = this.buildRangeQueries();
+		List<SingularTermQuery> numQueries = this.buildNumQueries();
 		List<Integer> expectedCount = this.expectedCount();
-		assertEquals( expectedCount.size(), rangeQueries.size() );
+		assertEquals( expectedCount.size(), numQueries.size() );
 
-		for ( int i = 0; i < rangeQueries.size(); ++i ) {
+		for ( int i = 0; i < numQueries.size(); ++i ) {
 			try {
-				this.testForQuery( integrator, rangeQueries.get( i ), expectedCount.get( i ) );
+				this.testForQuery( integrator, numQueries.get( i ), expectedCount.get( i ) );
 			}
 			catch (Throwable e) {
-				System.out.println( "ERROR: " + rangeQueries.get( i ) + ". expected was: " + expectedCount.get( i ) );
+				System.out.println( "ERROR: " + numQueries.get( i ) + ". expected was: " + expectedCount.get( i ) );
 				throw e;
 			}
 		}

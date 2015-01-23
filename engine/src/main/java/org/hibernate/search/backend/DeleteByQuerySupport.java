@@ -17,10 +17,13 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.BytesRefBuilder;
+import org.apache.lucene.util.NumericUtils;
+import org.hibernate.search.backend.SingularTermQuery.Type;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 
 /**
@@ -45,80 +48,64 @@ public final class DeleteByQuerySupport {
 				@Override
 				public Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity) {
 					SingularTermQuery query = (SingularTermQuery) deletionQuery;
-					try {
-						TokenStream tokenStream = analyzerForEntity.tokenStream( query.getFieldName(), query.getValue() );
-						tokenStream.reset();
+					if ( query.getType() == Type.STRING ) {
 						try {
-							BooleanQuery booleanQuery = new BooleanQuery();
-							while ( tokenStream.incrementToken() ) {
-								String value = tokenStream.getAttribute( CharTermAttribute.class ).toString();
-								booleanQuery.add( new TermQuery( new Term( query.getFieldName(), value ) ), Occur.MUST );
+							TokenStream tokenStream = analyzerForEntity.tokenStream( query.getFieldName(), (String) query.getValue() );
+							tokenStream.reset();
+							try {
+								BooleanQuery booleanQuery = new BooleanQuery();
+								while ( tokenStream.incrementToken() ) {
+									String value = tokenStream.getAttribute( CharTermAttribute.class ).toString();
+									booleanQuery.add( new TermQuery( new Term( query.getFieldName(), value ) ), Occur.MUST );
+								}
+								return booleanQuery;
 							}
-							return booleanQuery;
+							finally {
+								tokenStream.close();
+							}
 						}
-						finally {
-							tokenStream.close();
+						catch (IOException e) {
+							throw new AssertionError( "no IOException can occur while using a TokenStream " + "that is generated via String" );
 						}
 					}
-					catch (IOException e) {
-						throw new AssertionError( "no IOException can occur while using a TokenStream " + "that is generated via String" );
+					else {
+						Type type = query.getType();
+						BytesRef valueAsBytes;
+						switch ( type ) {
+							case INT:
+							case FLOAT: {
+								int value;
+								if ( type == Type.FLOAT ) {
+									value = NumericUtils.floatToSortableInt( (Float) query.getValue() );
+								}
+								else {
+									value = (Integer) query.getValue();
+								}
+								BytesRefBuilder builder = new BytesRefBuilder();
+								NumericUtils.intToPrefixCoded( value, 0, builder );
+								valueAsBytes = builder.get();
+								break;
+							}
+							case LONG:
+							case DOUBLE: {
+								long value;
+								if ( type == Type.DOUBLE ) {
+									value = NumericUtils.doubleToSortableLong( (Double) query.getValue() );
+								}
+								else {
+									value = (Long) query.getValue();
+								}
+								BytesRefBuilder builder = new BytesRefBuilder();
+								NumericUtils.longToPrefixCoded( value, 0, builder );
+								valueAsBytes = builder.get();
+								break;
+							}
+							default:
+								throw new AssertionError( "has to be a Numeric Type at this point!" );
+						}
+						return new TermQuery( new Term( query.getFieldName(), valueAsBytes ) );
 					}
-				}
 
-			} );
-
-			map.put( NumRangeQuery.QUERY_KEY, new ToLuceneQuery() {
-
-				@Override
-				public Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity) {
-					NumRangeQuery query = (NumRangeQuery) deletionQuery;
-					Integer precisionStep = query.getPrecisionStep();
-					NumericRangeQuery<?> ret;
-					switch ( query.getType() ) {
-						case INT:
-							if ( precisionStep != null ) {
-								ret = NumericRangeQuery.newIntRange( query.getFieldName(), precisionStep, (Integer) query.getMin(), (Integer) query.getMax(),
-										query.isMinInclusive(), query.isMaxInclusive() );
-							}
-							else {
-								ret = NumericRangeQuery.newIntRange( query.getFieldName(), (Integer) query.getMin(), (Integer) query.getMax(),
-										query.isMinInclusive(), query.isMaxInclusive() );
-							}
-							break;
-						case LONG:
-							if ( precisionStep != null ) {
-								ret = NumericRangeQuery.newLongRange( query.getFieldName(), precisionStep, (Long) query.getMin(), (Long) query.getMax(),
-										query.isMinInclusive(), query.isMaxInclusive() );
-							}
-							else {
-								ret = NumericRangeQuery.newLongRange( query.getFieldName(), (Long) query.getMin(), (Long) query.getMax(),
-										query.isMinInclusive(), query.isMaxInclusive() );
-							}
-							break;
-						case FLOAT:
-							if ( precisionStep != null ) {
-								ret = NumericRangeQuery.newFloatRange( query.getFieldName(), precisionStep, (Float) query.getMin(), (Float) query.getMax(),
-										query.isMinInclusive(), query.isMaxInclusive() );
-							}
-							else {
-								ret = NumericRangeQuery.newFloatRange( query.getFieldName(), (Float) query.getMin(), (Float) query.getMax(),
-										query.isMinInclusive(), query.isMaxInclusive() );
-							}
-							break;
-						case DOUBLE:
-							if ( precisionStep != null ) {
-								ret = NumericRangeQuery.newDoubleRange( query.getFieldName(), precisionStep, (Double) query.getMin(), (Double) query.getMax(),
-										query.isMinInclusive(), query.isMaxInclusive() );
-							}
-							else {
-								ret = NumericRangeQuery.newDoubleRange( query.getFieldName(), (Double) query.getMin(), (Double) query.getMax(),
-										query.isMinInclusive(), query.isMaxInclusive() );
-							}
-							break;
-						default:
-							throw new AssertionError( "unknown/unsupported Number type!" );
-					}
-					return ret;
 				}
 
 			} );
@@ -133,7 +120,6 @@ public final class DeleteByQuerySupport {
 			Map<Integer, Class<? extends DeletionQuery>> map = new HashMap<>();
 
 			map.put( SingularTermQuery.QUERY_KEY, SingularTermQuery.class );
-			map.put( NumRangeQuery.QUERY_KEY, NumRangeQuery.class );
 
 			SUPPORTED_TYPES = Collections.unmodifiableMap( map );
 		}
@@ -148,47 +134,25 @@ public final class DeleteByQuerySupport {
 
 				@Override
 				public DeletionQuery fromString(String[] string) {
-					if ( string.length != 2 ) {
-						throw new IllegalArgumentException( "for a TermQuery to work there have to be " + "exactly 2 Arguments (fieldName & value" );
+					if ( string.length != 3 ) {
+						throw new IllegalArgumentException( "for a TermQuery to work there have to be " + "exactly 3 Arguments (type & fieldName & value" );
 					}
-					return new SingularTermQuery( string[0], string[1] );
-				}
-
-			} );
-
-			map.put( NumRangeQuery.QUERY_KEY, new StringToQueryMapper() {
-
-				@Override
-				public DeletionQuery fromString(String[] string) {
-					if ( string.length != 7 ) {
-						throw new IllegalArgumentException( "for a NumericRangeQuery to work there have to be exactly 7 Arguments" );
-					}
-					NumRangeQuery.Type type = NumRangeQuery.Type.valueOf( string[1] );
-					Number min, max;
+					Type type = Type.valueOf( string[0] );
 					switch ( type ) {
+						case STRING:
+							return new SingularTermQuery( string[1], string[2] );
 						case INT:
-							min = Integer.parseInt( string[2] );
-							max = Integer.parseInt( string[3] );
-							break;
-						case LONG:
-							min = Long.parseLong( string[2] );
-							max = Long.parseLong( string[3] );
-							break;
+							return new SingularTermQuery( string[1], Integer.parseInt( string[2] ) );
 						case FLOAT:
-							min = Float.parseFloat( string[2] );
-							max = Float.parseFloat( string[3] );
-							break;
+							return new SingularTermQuery( string[1], Float.parseFloat( string[2] ) );
+						case LONG:
+							return new SingularTermQuery( string[1], Long.parseLong( string[2] ) );
 						case DOUBLE:
-							min = Double.parseDouble( string[2] );
-							max = Double.parseDouble( string[3] );
-							break;
+							return new SingularTermQuery( string[1], Double.parseDouble( string[2] ) );
 						default:
-							throw new AssertionError( "unknown/unsupported Number type!" );
+							throw new AssertionError( "wrong Type!" );
 					}
-					boolean minInclusive = Boolean.parseBoolean( string[4] );
-					boolean maxInclusive = Boolean.parseBoolean( string[5] );
-					Integer precisionStep = "null".equals( string[6] ) ? null : Integer.parseInt( string[6] );
-					return new NumRangeQuery( string[0], type, min, max, minInclusive, maxInclusive, precisionStep );
+
 				}
 
 			} );
@@ -207,23 +171,7 @@ public final class DeleteByQuerySupport {
 				@Override
 				public String[] toString(DeletionQuery deletionQuery) {
 					SingularTermQuery query = (SingularTermQuery) deletionQuery;
-					return new String[] { query.getFieldName(), query.getValue() };
-				}
-
-			} );
-
-			map.put( NumRangeQuery.QUERY_KEY, new QueryToStringMapper() {
-
-				@Override
-				public String[] toString(DeletionQuery deletionQuery) {
-					NumRangeQuery query = (NumRangeQuery) deletionQuery;
-					// fieldName, type
-					// min, max
-					// minInclusive, maxInclusive
-					// precisionStep
-					return new String[] { query.getFieldName(), query.getType().toString(), String.valueOf( query.getMin() ), String.valueOf( query.getMax() ),
-							String.valueOf( query.isMinInclusive() ), String.valueOf( query.isMaxInclusive() ),
-							query.getPrecisionStep() != null ? String.valueOf( query.getPrecisionStep() ) : "null" };
+					return new String[] { query.getType().toString(), query.getFieldName(), String.valueOf( query.getValue() ) };
 				}
 
 			} );
