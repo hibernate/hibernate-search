@@ -33,9 +33,9 @@ import org.hibernate.search.annotations.TikaBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TikaMetadataProcessor;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
@@ -102,7 +102,7 @@ public class TikaBridgeTest extends SearchTestBase {
 				.addClass( Foo.class );
 		boolean throwException = false;
 		try {
-			SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( conf ).buildSearchFactory();
+			SearchIntegrator sf = new SearchIntegratorBuilder().configuration( conf ).buildSearchIntegrator();
 			sf.close();
 		}
 		catch (SearchException e) {

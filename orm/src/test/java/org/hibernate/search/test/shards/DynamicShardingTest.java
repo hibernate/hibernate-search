@@ -31,9 +31,9 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.hcore.impl.HibernateSessionFactoryService;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.ShardIdentifierProviderTemplate;
@@ -74,7 +74,7 @@ public class DynamicShardingTest extends SearchTestBase {
 
 	@Test
 	public void testDynamicCreationOfShards() throws Exception {
-		EntityIndexBinding entityIndexBinding = getSearchFactoryImpl().getIndexBindings().get( Animal.class );
+		EntityIndexBinding entityIndexBinding = getExtendedSearchIntegrator().getIndexBindings().get( Animal.class );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 0 );
 
 		insertAnimals( elephant );
@@ -111,15 +111,15 @@ public class DynamicShardingTest extends SearchTestBase {
 
 	@Test
 	public void testInitialiseDynamicShardsOnStartup() throws Exception {
-		EntityIndexBinding entityIndexBinding = getSearchFactoryImpl().getIndexBindings().get( Animal.class );
+		EntityIndexBinding entityIndexBinding = getExtendedSearchIntegrator().getIndexBindings().get( Animal.class );
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 0 );
 
 		insertAnimals( elephant, spider, bear );
 
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 
-		SearchFactoryImplementor newSearchFactory = getIndependentNewSearchFactory();
-		entityIndexBinding = newSearchFactory.getIndexBindings().get( Animal.class );
+		ExtendedSearchIntegrator integrator = getIndependentNewSearchIntegrator();
+		entityIndexBinding = integrator.getIndexBindings().get( Animal.class );
 
 		assertThat( entityIndexBinding.getIndexManagers() ).hasSize( 2 );
 	}
@@ -170,7 +170,7 @@ public class DynamicShardingTest extends SearchTestBase {
 		session.clear();
 	}
 
-	private SearchFactoryImplementor getIndependentNewSearchFactory() {
+	private ExtendedSearchIntegrator getIndependentNewSearchIntegrator() {
 		// build a new independent SessionFactory to verify that the shards are available at restart
 		Configuration config = new Configuration();
 
@@ -188,7 +188,7 @@ public class DynamicShardingTest extends SearchTestBase {
 
 		SessionFactory newSessionFactory = config.buildSessionFactory();
 		FullTextSession fullTextSession = Search.getFullTextSession( newSessionFactory.openSession() );
-		return fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
+		return fullTextSession.getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
 	}
 
 	public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate {

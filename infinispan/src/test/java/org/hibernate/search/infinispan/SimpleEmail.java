@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -36,7 +35,6 @@ public class SimpleEmail {
 	public String message = "";
 
 	@Field(analyze = Analyze.NO)
-	@NumericField
 	public Integer sequential;
 
 }

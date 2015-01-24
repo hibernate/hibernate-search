@@ -14,8 +14,9 @@ import junit.framework.AssertionFailedError;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.infinispan.impl.DefaultCacheManagerService;
+import org.hibernate.search.infinispan.spi.InfinispanDirectoryProvider;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -113,8 +114,8 @@ public final class ClusterTestHelper {
 	 * @return the number of nodes as seen by the current node
 	 */
 	public static int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
-		SearchIntegrator searchFactory = node.getSearchFactory().unwrap( SearchIntegrator.class );
-		EntityIndexBinding indexBinding = searchFactory.getIndexBinding( entityType );
+		SearchIntegrator integrator = node.getSearchFactory().unwrap( SearchIntegrator.class );
+		EntityIndexBinding indexBinding = integrator.getIndexBinding( entityType );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();

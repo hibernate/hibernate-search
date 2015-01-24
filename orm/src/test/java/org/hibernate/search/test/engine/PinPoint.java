@@ -6,32 +6,33 @@
  */
 package org.hibernate.search.test.engine;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
 import org.hibernate.search.annotations.ContainedIn;
-import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
-
 /**
- * author: Gustavo Fernandes
+ * @author Gustavo Fernandes
  */
 @Entity
 @Indexed (index = "numeric_field_test")
 public class PinPoint {
 
-	@DocumentId @NumericField @Id
+	@Id
+	@Field(name = "numeric_id")
+	@NumericField(forField = "numeric_id")
 	private int id;
 
-	@Field( store = Store.YES ) @NumericField
+	@Field(store = Store.YES)
 	private Integer stars;
 
-	@ManyToOne @ContainedIn
+	@ManyToOne
+	@ContainedIn
 	private Location location;
 
 	public PinPoint(int id, int stars, Location location) {

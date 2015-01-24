@@ -10,8 +10,8 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,16 +63,16 @@ public class JGroupsConfigurationTest {
 	}
 
 	/**
-	 * Attempts to start a SearchFactory, and make sure we close it if it happens to start
+	 * Attempts to start a SearchIntegrator, and make sure we close it if it happens to start
 	 * correctly.
 	 * @param cfg a configuration to try booting
 	 * @throws Throwable
 	 */
 	private static void bootConfiguration(SearchConfigurationForTest cfg) throws Throwable {
 		cfg.addClass( Dvd.class );
-		SearchFactoryImplementor buildSearchFactory = null;
+		SearchIntegrator searchIntegrator = null;
 		try {
-			buildSearchFactory = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+			searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 		}
 		catch (SearchException se) {
 			//we know we're getting a generic failure, but we want to make assert on the details message of
@@ -80,8 +80,8 @@ public class JGroupsConfigurationTest {
 			throw se.getCause();
 		}
 		finally {
-			if ( buildSearchFactory != null ) {
-				buildSearchFactory.close();
+			if ( searchIntegrator != null ) {
+				searchIntegrator.close();
 			}
 		}
 	}

@@ -11,6 +11,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.locks.LockSupport;
 
@@ -65,6 +67,18 @@ final class SyncWorkProcessor implements WorkProcessor {
 	 * @param monitor for statistics collection
 	 */
 	public void submit(List<LuceneWork> workList, IndexingMonitor monitor) {
+		//avoid empty work lists as workaround for HSEARCH-1769
+		if ( workList.isEmpty() ) {
+			// only log this error at trace level until we properly fix HSEARCH-1769
+			if ( log.isTraceEnabled() ) {
+				StringWriter stackTraceStringWriter = new StringWriter();
+				PrintWriter stackTracePrintWriter = new PrintWriter( stackTraceStringWriter );
+				new Throwable().printStackTrace( stackTracePrintWriter );
+				log.workListShouldNeverBeEmpty( stackTraceStringWriter.toString() );
+			}
+			// skip that work
+			return;
+		}
 		Changeset changeset = new Changeset( workList, Thread.currentThread(), monitor );
 		transferQueue.add( changeset );
 		wakeUpConsumer();

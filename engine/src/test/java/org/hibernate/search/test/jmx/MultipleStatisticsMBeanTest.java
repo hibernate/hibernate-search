@@ -8,6 +8,7 @@ package org.hibernate.search.test.jmx;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
@@ -19,10 +20,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 
@@ -54,41 +55,39 @@ public class MultipleStatisticsMBeanTest {
 	@Test
 	public void testDefaultRegistration() throws Exception {
 		String suffix = null;
-		SearchFactoryImplementor searchFactory = createSearchFactoryUsingJndiPrefix( suffix );
-		testStatisticsMBeanRegistered( suffix );
-		searchFactory.close();
+		try ( SearchIntegrator searchFactory = createSearchIntegratorUsingJndiPrefix( suffix ) ) {
+			testStatisticsMBeanRegistered( suffix );
+		}
 	}
 
 	@Test
 	public void testRegistrationWithSuffix() throws Exception {
 		String suffix = "myapp";
-		SearchFactoryImplementor searchFactory = createSearchFactoryUsingJndiPrefix( suffix );
-		testStatisticsMBeanRegistered( suffix );
-		searchFactory.close();
+		try ( SearchIntegrator searchFactory = createSearchIntegratorUsingJndiPrefix( suffix ) ) {
+			testStatisticsMBeanRegistered( suffix );
+		}
 	}
 
 	@Test
 	public void testMultipleMbeanRegistration() throws Exception {
 		String suffixApp1 = "app-1";
-		SearchFactoryImplementor factory1 = createSearchFactoryUsingJndiPrefix( suffixApp1 );
-		testStatisticsMBeanRegistered( suffixApp1 );
+		try ( SearchIntegrator factory1 = createSearchIntegratorUsingJndiPrefix( suffixApp1 ) ) {
+			testStatisticsMBeanRegistered( suffixApp1 );
 
-		String suffixApp2 = "app-2";
-		SearchFactoryImplementor factory2 = createSearchFactoryUsingJndiPrefix( suffixApp2 );
-		testStatisticsMBeanRegistered( suffixApp2 );
-
-		factory1.close();
-		factory2.close();
+			String suffixApp2 = "app-2";
+			try ( SearchIntegrator factory2 = createSearchIntegratorUsingJndiPrefix( suffixApp2 ) ) {
+				testStatisticsMBeanRegistered( suffixApp2 );
+			}
+		}
 	}
 
 	@Test
 	public void testStatisticMBeanGetsUnregistered() throws Exception {
 		String suffix = "myapp";
+		try ( SearchIntegrator searchFactory = createSearchIntegratorUsingJndiPrefix( suffix ) ) {
+			testStatisticsMBeanRegistered( suffix );
+		}
 
-		SearchFactoryImplementor searchFactory = createSearchFactoryUsingJndiPrefix( suffix );
-		testStatisticsMBeanRegistered( suffix );
-
-		searchFactory.close();
 		testStatisticsMBeanUnregistered( suffix );
 	}
 
@@ -114,7 +113,7 @@ public class MultipleStatisticsMBeanTest {
 		assertEquals( JMXRegistrar.StatisticsInfo.class.getName(), mBean.getClassName() );
 	}
 
-	private SearchFactoryImplementor createSearchFactoryUsingJndiPrefix(String suffix) {
+	private SearchIntegrator createSearchIntegratorUsingJndiPrefix(String suffix) {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addProperty( "hibernate.session_factory_name", "java:comp/SessionFactory" )
 				.addProperty( "hibernate.jndi.class", "org.osjava.sj.SimpleContextFactory" )
@@ -126,7 +125,7 @@ public class MultipleStatisticsMBeanTest {
 			configuration.addProperty( Environment.JMX_BEAN_SUFFIX, suffix );
 		}
 
-		return new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		return new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 	}
 }
 

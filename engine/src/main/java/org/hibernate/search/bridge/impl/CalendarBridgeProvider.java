@@ -8,11 +8,14 @@
 package org.hibernate.search.bridge.impl;
 
 import java.lang.reflect.AnnotatedElement;
+import java.util.Calendar;
 
+import org.hibernate.search.annotations.CalendarBridge;
+import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.builtin.CalendarBridge;
-import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.builtin.NumericEncodingCalendarBridge;
+import org.hibernate.search.bridge.builtin.StringEncodingCalendarBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -22,48 +25,77 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * As built-in provider, no Service Loader file is used: the {@code BridgeFactory} does access it
  * after the custom bridge providers found.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 class CalendarBridgeProvider extends ExtendedBridgeProvider {
 	private static final Log LOG = LoggerFactory.make();
 
-	private static final FieldBridge CALENDAR_YEAR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_YEAR );
-	private static final FieldBridge CALENDAR_MONTH = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MONTH );
-	private static final FieldBridge CALENDAR_DAY = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_DAY );
-	private static final FieldBridge CALENDAR_HOUR = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_HOUR );
-	private static final FieldBridge CALENDAR_MINUTE = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MINUTE );
-	private static final FieldBridge CALENDAR_SECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_SECOND );
-	static final FieldBridge CALENDAR_MILLISECOND = new TwoWayString2FieldBridgeAdaptor( CalendarBridge.CALENDAR_MILLISECOND );
-
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
-		if ( annotatedElement.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
-			Resolution resolution = annotatedElement.getAnnotation( org.hibernate.search.annotations.CalendarBridge.class )
-					.resolution();
-			return getCalendarField( resolution );
+		if ( Calendar.class.isAssignableFrom( context.getReturnType() ) ) {
+			if ( annotatedElement.isAnnotationPresent( org.hibernate.search.annotations.CalendarBridge.class ) ) {
+				CalendarBridge dateBridgeAnnotation = annotatedElement.getAnnotation(
+						org.hibernate.search.annotations.CalendarBridge.class
+				);
+
+				Resolution resolution = dateBridgeAnnotation.resolution();
+				EncodingType encodingType = dateBridgeAnnotation.encoding();
+				return getDateFieldBridge( resolution, encodingType );
+			}
+			else {
+				return getDateFieldBridge( Resolution.MILLISECOND, EncodingType.NUMERIC );
+			}
 		}
 		return null;
 	}
 
-	private FieldBridge getCalendarField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return CALENDAR_YEAR;
-			case MONTH:
-				return CALENDAR_MONTH;
-			case DAY:
-				return CALENDAR_DAY;
-			case HOUR:
-				return CALENDAR_HOUR;
-			case MINUTE:
-				return CALENDAR_MINUTE;
-			case SECOND:
-				return CALENDAR_SECOND;
-			case MILLISECOND:
-				return CALENDAR_MILLISECOND;
-			default:
-				throw LOG.unknownResolution( resolution.toString() );
+	private FieldBridge getDateFieldBridge(Resolution resolution, EncodingType encodingType) {
+		switch ( encodingType ) {
+			case NUMERIC: {
+				switch ( resolution ) {
+					case YEAR:
+						return NumericEncodingCalendarBridge.DATE_YEAR;
+					case MONTH:
+						return NumericEncodingCalendarBridge.DATE_MONTH;
+					case DAY:
+						return NumericEncodingCalendarBridge.DATE_DAY;
+					case HOUR:
+						return NumericEncodingCalendarBridge.DATE_HOUR;
+					case MINUTE:
+						return NumericEncodingCalendarBridge.DATE_MINUTE;
+					case SECOND:
+						return NumericEncodingCalendarBridge.DATE_SECOND;
+					case MILLISECOND:
+						return NumericEncodingCalendarBridge.DATE_MILLISECOND;
+					default:
+						throw LOG.unknownResolution( resolution.toString() );
+				}
+			}
+			case STRING: {
+				switch ( resolution ) {
+					case YEAR:
+						return StringEncodingCalendarBridge.DATE_YEAR;
+					case MONTH:
+						return StringEncodingCalendarBridge.DATE_MONTH;
+					case DAY:
+						return StringEncodingCalendarBridge.DATE_DAY;
+					case HOUR:
+						return StringEncodingCalendarBridge.DATE_HOUR;
+					case MINUTE:
+						return StringEncodingCalendarBridge.DATE_MINUTE;
+					case SECOND:
+						return StringEncodingCalendarBridge.DATE_SECOND;
+					case MILLISECOND:
+						return StringEncodingCalendarBridge.DATE_MILLISECOND;
+					default:
+						throw LOG.unknownResolution( resolution.toString() );
+				}
+			}
+			default: {
+				throw LOG.unknownEncodingType( encodingType.name() );
+			}
 		}
 	}
 }

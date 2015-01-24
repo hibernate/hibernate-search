@@ -16,9 +16,9 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.MoreLikeThisTermination;
 import org.hibernate.search.query.dsl.MoreLikeThisToEntityContentAndTermination;
 import org.hibernate.search.util.logging.impl.Log;
@@ -66,9 +66,9 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 
 	public Query createQuery() {
 		Query query;
-		final SearchFactoryImplementor searchFactory = queryContext.getFactory();
+		final ExtendedSearchIntegrator searchIntegrator = queryContext.getFactory();
 		final DocumentBuilderIndexedEntity documentBuilder = Helper.getDocumentBuilder( queryContext );
-		IndexReader indexReader = searchFactory.getIndexReaderAccessor().open( queryContext.getEntityType() );
+		IndexReader indexReader = searchIntegrator.getIndexReaderAccessor().open( queryContext.getEntityType() );
 		// retrieving the docId and building the more like this query form the term vectors must be using the same index reader
 		try {
 			String[] fieldNames = getAllCompatibleFieldNames( documentBuilder );
@@ -76,7 +76,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 				// Use all compatible fields when comparingAllFields is used
 				fieldsContext.addAll( fieldNames );
 			}
-			query = new MoreLikeThisBuilder( documentBuilder, searchFactory )
+			query = new MoreLikeThisBuilder( documentBuilder, searchIntegrator )
 					.compatibleFieldNames( fieldNames )
 					.fieldsContext( fieldsContext )
 					.queryContext( queryContext )
@@ -87,7 +87,7 @@ public abstract class ConnectedMoreLikeThisQueryBuilder {
 					.createQuery();
 		}
 		finally {
-			searchFactory.getIndexReaderAccessor().close( indexReader );
+			searchIntegrator.getIndexReaderAccessor().close( indexReader );
 		}
 		//TODO implement INPUT.READER
 		//TODO implement INOUT.STRING

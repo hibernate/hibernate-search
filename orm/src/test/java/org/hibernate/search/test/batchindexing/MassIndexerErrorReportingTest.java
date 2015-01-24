@@ -9,8 +9,8 @@ package org.hibernate.search.test.batchindexing;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.errorhandling.MockErrorHandler;
 import org.jboss.byteman.contrib.bmunit.BMRule;
@@ -28,8 +28,8 @@ public class MassIndexerErrorReportingTest extends SearchTestBase {
 			action = "throw new NullPointerException(\"Byteman created NPE\")",
 			name = "testMassIndexerErrorsReported")
 	public void testMassIndexerErrorsReported() throws InterruptedException {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		MockErrorHandler mockErrorHandler = getErrorHandler( searchFactory );
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		MockErrorHandler mockErrorHandler = getErrorHandler( integrator );
 
 		FullTextSession fullTextSession = prepareSomeData( this );
 
@@ -43,8 +43,8 @@ public class MassIndexerErrorReportingTest extends SearchTestBase {
 		Assert.assertEquals( "Byteman created NPE", exception.getMessage() );
 	}
 
-	static MockErrorHandler getErrorHandler(SearchFactoryImplementor searchFactory) {
-		ErrorHandler errorHandler = searchFactory.getErrorHandler();
+	static MockErrorHandler getErrorHandler(SearchIntegrator integrator) {
+		ErrorHandler errorHandler = integrator.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		MockErrorHandler mockErrorHandler = (MockErrorHandler) errorHandler;
 		return mockErrorHandler;

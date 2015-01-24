@@ -13,13 +13,11 @@ import java.util.Collection;
 import org.apache.lucene.index.CheckIndex;
 import org.apache.lucene.index.CheckIndex.Status;
 import org.apache.lucene.store.Directory;
-
 import org.hibernate.Session;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.test.performance.scenario.TestContext;
@@ -46,8 +44,8 @@ public class CheckerLuceneIndex {
 
 		Session s = ctx.sf.openSession();
 		FullTextSession fts = Search.getFullTextSession( s );
-		SearchFactoryImplementor sfi = fts.getSearchFactory().unwrap( SearchFactoryImplementor.class );
-		Collection<IndexManager> indexManagers = sfi.getIndexManagerHolder().getIndexManagers();
+		ExtendedSearchIntegrator integrator = fts.getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
+		Collection<IndexManager> indexManagers = integrator.getIndexManagerHolder().getIndexManagers();
 
 		for ( IndexManager indexManager : indexManagers ) {
 			DirectoryBasedIndexManager directoryBasedIndexManager = (DirectoryBasedIndexManager) indexManager;

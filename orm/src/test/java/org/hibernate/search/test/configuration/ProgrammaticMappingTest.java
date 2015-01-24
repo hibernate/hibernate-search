@@ -13,37 +13,39 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.SpatialQueryBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -73,7 +75,6 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
 		org.apache.lucene.search.Query luceneQuery = parser.parse( "" + address.getAddressId() );
-		System.out.println( luceneQuery.toString() );
 		FullTextQuery query = s.createFullTextQuery( luceneQuery );
 		assertEquals( "documentId does not work properly", 1, query.getResultSize() );
 
@@ -280,9 +281,21 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
-		org.apache.lucene.search.Query luceneQuery = parser.parse( "date-created:20091115 OR blog-entry-created:20091115" );
-		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
+		long searchTimeStamp = DateTools.round( date.getTime(), DateTools.Resolution.DAY );
+		BooleanQuery booleanQuery = new BooleanQuery();
+		booleanQuery.add(
+				NumericRangeQuery.newLongRange(
+						"date-created", searchTimeStamp, searchTimeStamp, true, true
+				), BooleanClause.Occur.SHOULD
+		);
+		booleanQuery.add(
+				NumericRangeQuery.newLongRange(
+						"blog-entry-created", searchTimeStamp, searchTimeStamp, true, true
+				), BooleanClause.Occur.SHOULD
+		);
+
+		FullTextQuery query = s.createFullTextQuery( booleanQuery )
+				.setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 3 results", 3, query.getResultSize() );
 
 		@SuppressWarnings( "unchecked" )
@@ -303,17 +316,17 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 		Address address = new Address();
 		address.setStreet1( "Peachtree Rd NE" );
 		address.setStreet2( "Peachtnot Rd NE" );
-		Calendar c = GregorianCalendar.getInstance();
-		c.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
-		c.set( 2009, Calendar.NOVEMBER, 15);
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTimeZone( TimeZone.getTimeZone( "GMT" ) ); //for the sake of tests
+		calendar.set( 2009, Calendar.NOVEMBER, 15 );
 
-		address.setLastUpdated( c );
+		address.setLastUpdated( calendar );
 		s.persist( address );
 
 		address = new Address();
 		address.setStreet1( "Peachtnot Rd NE" );
 		address.setStreet2( "Peachtree Rd NE" );
-		address.setLastUpdated( c );
+		address.setLastUpdated( calendar );
 		s.persist( address );
 
 		tx.commit();
@@ -322,8 +335,11 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 
 		tx = s.beginTransaction();
 
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.standardAnalyzer );
-		org.apache.lucene.search.Query luceneQuery = parser.parse( "last-updated:20091115" );
+		long searchTimeStamp = DateTools.round( calendar.getTime().getTime(), DateTools.Resolution.DAY );
+		org.apache.lucene.search.Query luceneQuery = NumericRangeQuery.newLongRange(
+				"last-updated", searchTimeStamp, searchTimeStamp, true, true
+		);
+
 		FullTextQuery query = s.createFullTextQuery( luceneQuery ).setProjection( FullTextQuery.THIS, FullTextQuery.SCORE );
 		assertEquals( "expecting 2 results", 2, query.getResultSize() );
 
@@ -340,7 +356,7 @@ public class ProgrammaticMappingTest extends SearchTestBase {
 	@Test
 	public void testProvidedIdMapping() throws Exception {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
-		SearchFactoryImplementor sf = fullTextSession.getSearchFactory().unwrap( SearchFactoryImplementor.class );
+		SearchIntegrator sf = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
 
 		ProvidedIdEntry person1 = new ProvidedIdEntry();
 		person1.setName( "Big Goat" );

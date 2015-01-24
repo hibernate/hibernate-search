@@ -7,7 +7,6 @@
 package org.hibernate.search.test.engine;
 
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 
 import javax.persistence.Embeddable;
@@ -19,7 +18,6 @@ import javax.persistence.Embeddable;
 public class Country {
 
 	@Field( store = Store.YES )
-	@NumericField
 	private double idh;
 
 	@Field( store = Store.YES )

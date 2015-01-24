@@ -10,7 +10,7 @@ import java.util.Properties;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.MassIndexer;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Contains methods that can be used to create a {@link MassIndexer}.
@@ -33,7 +33,7 @@ public interface MassIndexerFactory {
 	/**
 	 * Create an instance of a {@link MassIndexer}.
 	 *
-	 * @param searchFactory
+	 * @param searchIntegrator
 	 *            the Hibernate Search factory
 	 * @param sessionFactory
 	 *            the {@link org.hibernate.Session} factory
@@ -41,7 +41,7 @@ public interface MassIndexerFactory {
 	 *            the classes of the entities that are going to be indexed
 	 * @return a new MassIndexer
 	 */
-	MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
+	MassIndexer createMassIndexer(SearchIntegrator searchIntegrator, SessionFactoryImplementor sessionFactory,
 			Class<?>... entities);
 
 }

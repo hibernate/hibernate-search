@@ -53,7 +53,7 @@ public class PropertyDescriptorImpl implements PropertyDescriptor {
 
 		PropertyDescriptorImpl that = (PropertyDescriptorImpl) o;
 
-		if ( !name.equals( that.name ) ) {
+		if ( name != null ? !name.equals( that.name ) : that.name != null ) {
 			return false;
 		}
 
@@ -62,7 +62,7 @@ public class PropertyDescriptorImpl implements PropertyDescriptor {
 
 	@Override
 	public int hashCode() {
-		return name.hashCode();
+		return name != null ? name.hashCode() : 0;
 	}
 
 	@Override

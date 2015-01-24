@@ -9,12 +9,12 @@ package org.hibernate.search.hcore.util.impl;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.hcore.impl.SearchFactoryReference;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Static helper class to retrieve the instance of the current {@code SearchFactory} / {@code SearchFactoryImplementor}.
+ * Static helper class to retrieve the instance of the current {@code Searchintegrator} / {@code ExtendedSearchintegrator}.
  *
  * <p>
  * <b>Note</b>:<br/>
@@ -29,19 +29,19 @@ public class ContextHelper {
 	private ContextHelper() {
 	}
 
-	public static SearchFactoryImplementor getSearchFactory(Session session) {
-		return getSearchFactoryBySessionImplementor( (SessionImplementor) session );
+	public static ExtendedSearchIntegrator getSearchintegrator(Session session) {
+		return getSearchintegratorBySessionImplementor( (SessionImplementor) session );
 	}
 
-	public static SearchFactoryImplementor getSearchFactoryBySessionImplementor(SessionImplementor session) {
-		return getSearchFactoryBySFI( session.getFactory() );
+	public static ExtendedSearchIntegrator getSearchintegratorBySessionImplementor(SessionImplementor session) {
+		return getSearchintegratorBySFI( session.getFactory() );
 	}
 
-	public static SearchFactoryImplementor getSearchFactoryBySFI(SessionFactoryImplementor sfi) {
+	public static ExtendedSearchIntegrator getSearchintegratorBySFI(SessionFactoryImplementor sfi) {
 		final SearchFactoryReference factoryReference = sfi.getServiceRegistry()
 			.getService( SearchFactoryReference.class );
 		if ( factoryReference != null ) {
-			return factoryReference.getSearchFactory();
+			return factoryReference.getSearchIntegrator();
 		}
 		else {
 			throw LoggerFactory.make().searchFactoryReferenceServiceNotFound();

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.spi;
 
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 
@@ -19,10 +19,10 @@ import org.hibernate.search.indexes.impl.IndexManagerHolder;
  */
 public interface BuildContext {
 	/**
-	 * Returns the {@code SessionFactoryImplementor} instance. Do not use until after the initialize and/or start method is
+	 * Returns the {@code ExtendedSearchintegrator} instance. Do not use until after the initialize and/or start method is
 	 * fully executed.
 	 *
-	 * Implementations should not cache values provided by the {@code SessionFactoryImplementor}, but rather access them
+	 * Implementations should not cache values provided by the {@code ExtendedSearchintegrator}, but rather access them
 	 * each time, because the configuration can be dynamically updated and new changes made available.
 	 *
 	 * For example, prefer:
@@ -41,7 +41,7 @@ public interface BuildContext {
 	 * </pre>
 	 * where directoryProviders is a class variable.
 	 */
-	SearchFactoryImplementor getUninitializedSearchFactory();
+	ExtendedSearchIntegrator getUninitializedSearchIntegrator();
 
 	/**
 	 * Returns the configured indexing strategy (<i>event</i> vs <i>manual</i>).

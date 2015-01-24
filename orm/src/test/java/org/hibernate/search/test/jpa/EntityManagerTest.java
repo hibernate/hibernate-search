@@ -6,16 +6,15 @@
  */
 package org.hibernate.search.test.jpa;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.testsupport.TestConstants;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,80 +22,100 @@ import static org.junit.Assert.assertEquals;
  * @author Emmanuel Bernard
  */
 public class EntityManagerTest extends JPATestCase {
+	private FullTextEntityManager em;
+	private Bretzel bretzel;
 
-	@Test
-	public void testMassIndexer() throws Exception {
-		// index a Bretzel
-		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+	@Before
+	public void setUp() {
+		super.setUp();
+
+		em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
-		Bretzel bretzel = new Bretzel( 23, 34 );
+		bretzel = new Bretzel( 23, 34 );
 		em.persist( bretzel );
 		em.getTransaction().commit();
 		em.clear();
-
-		// verify against index
-		assertEquals( 1, countBretzelsViaIndex( em ) );
-		em.purgeAll( Bretzel.class );
-
-		// clear index
-		em.flushToIndexes();
-
-		// verify Bretzel removed from index
-		assertEquals( 0, countBretzelsViaIndex( em ) );
-
-		// re-index
-		em.createIndexer( Bretzel.class ).startAndWait();
-		assertEquals( 1, countBretzelsViaIndex( em ) );
 	}
 
 	@Test
-	public void testQuery() throws Exception {
-		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
+	public void testMassIndexer() throws Exception {
+		// verify against index
+		assertEquals( "At the beginning of the test there should be an indexed Bretzel", 1, countBretzelsViaIndex( em ) );
+
+		// clear index
+		em.purgeAll( Bretzel.class );
+		em.flushToIndexes();
+
+		// verify Bretzel removed from index
+		assertEquals( "The index should be empty after an purge and flush", 0, countBretzelsViaIndex( em ) );
+
+		// re-index
+		em.createIndexer( Bretzel.class ).startAndWait();
+
+		assertEquals( "After re-indexing the bretzel should be indexed again", 1, countBretzelsViaIndex( em ) );
+	}
+
+	@Test
+	public void testNonMatchingQueryDoesReturnEmptyResults() throws Exception {
 		em.getTransaction().begin();
-		Bretzel bretzel = new Bretzel( 23, 34 );
-		em.persist( bretzel );
-		em.getTransaction().commit();
-		em.clear();
-		em.getTransaction().begin();
-		QueryParser parser = new QueryParser( getTargetLuceneVersion(), "title", TestConstants.stopAnalyzer );
-		Query query = parser.parse( "saltQty:noword" );
+
+		Query query = NumericRangeQuery.newIntRange( "saltQty", 0, 0, true, true );
 		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
-		query = new TermQuery( new Term( "saltQty", "23" ) );
-		assertEquals( "getResultList", 1, em.createFullTextQuery( query ).getResultList().size() );
+
+		em.getTransaction().commit();
+	}
+
+	@Test
+	public void testGetResultList() throws Exception {
+		em.getTransaction().begin();
+
+		Query query = NumericRangeQuery.newIntRange( "saltQty", 23, 23, true, true );
+		assertEquals( "getResultList should return a result", 1, em.createFullTextQuery( query ).getResultList().size() );
+
+		em.getTransaction().commit();
+	}
+
+	@Test
+	public void testGetSingleResult() throws Exception {
+		em.getTransaction().begin();
+
+		Query query = NumericRangeQuery.newIntRange( "saltQty", 23, 23, true, true );
 		assertEquals(
-				"getSingleResult and object retrieval", 23,
+				"getSingleResult should return a result", 23,
 				( (Bretzel) em.createFullTextQuery( query ).getSingleResult() ).getSaltQty()
 		);
-		assertEquals( 1, em.createFullTextQuery( query ).getResultSize() );
 		em.getTransaction().commit();
+	}
 
-		em.clear();
-
+	@Test
+	public void testGetResultSize() throws Exception {
 		em.getTransaction().begin();
-		em.remove( em.find( Bretzel.class, bretzel.getId() ) );
+
+		Query query = NumericRangeQuery.newIntRange( "saltQty", 23, 23, true, true );
+		assertEquals( "Wrong result size", 1, em.createFullTextQuery( query ).getResultSize() );
+
 		em.getTransaction().commit();
-		em.close();
 	}
 
 	@Test
 	public void testIndex() {
-		FullTextEntityManager em = Search.getFullTextEntityManager( factory.createEntityManager() );
 		em.getTransaction().begin();
-		Bretzel bretzel = new Bretzel( 23, 34 );
-		em.persist( bretzel );
-		em.getTransaction().commit();
-		em.clear();
 
-		//Not really a unit test but a test that shows the method call without failing
-		//FIXME port the index test
-		em.getTransaction().begin();
+		// verify against index
+		assertEquals( "At the beginning of the test there should be an indexed Bretzel", 1, countBretzelsViaIndex( em ) );
+
+		// clear index
+		em.purgeAll( Bretzel.class );
+		em.flushToIndexes();
+
+		// verify Bretzel removed from index
+		assertEquals( "The index should be empty after an purge and flush", 0, countBretzelsViaIndex( em ) );
+
+		// re-index manually
 		em.index( em.find( Bretzel.class, bretzel.getId() ) );
 		em.getTransaction().commit();
 
-		em.getTransaction().begin();
-		em.remove( em.find( Bretzel.class, bretzel.getId() ) );
-		em.getTransaction().commit();
-		em.close();
+		assertEquals( "After re-indexing the bretzel should be indexed again", 1, countBretzelsViaIndex( em ) );
 	}
 
 	@Override

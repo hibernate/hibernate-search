@@ -7,6 +7,7 @@
 
 package org.hibernate.search.bridge.builtin;
 
+import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.bridge.StringBridge;
 
 /**
@@ -18,16 +19,17 @@ public class DefaultStringBridge implements StringBridge {
 
 	public static final DefaultStringBridge INSTANCE = new DefaultStringBridge();
 
-	private DefaultStringBridge() {
-		//don't create instances
-	}
-
 	@Override
 	public String objectToString(Object object) {
 		if ( object == null ) {
 			return null;
 		}
 		return object.toString();
+	}
+
+	@Factory
+	public DefaultStringBridge getInstance() {
+		return INSTANCE;
 	}
 
 }

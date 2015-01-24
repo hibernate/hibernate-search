@@ -14,16 +14,14 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Session;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.NRTIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -94,8 +92,8 @@ public class BasicNRTFunctionalityTest extends SearchTestBase {
 
 	@Test
 	public void testMultipleEntitiesPerIndex() throws Exception {
-		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( (SessionFactoryImplementor) getSessionFactory() );
-		IndexManager documentsIndexManager = searchFactoryBySFI.getIndexManagerHolder().getIndexManager( "Documents" );
+		ExtendedSearchIntegrator integrator = ContextHelper.getSearchintegratorBySFI( (SessionFactoryImplementor) getSessionFactory() );
+		IndexManager documentsIndexManager = integrator.getIndexManagerHolder().getIndexManager( "Documents" );
 		Assert.assertNotNull( documentsIndexManager );
 		Assert.assertTrue( documentsIndexManager.getClass().equals( org.hibernate.search.indexes.impl.NRTIndexManager.class ) );
 		NRTIndexManager indexManager = (NRTIndexManager) documentsIndexManager;
@@ -158,7 +156,7 @@ public class BasicNRTFunctionalityTest extends SearchTestBase {
 		s.getTransaction().commit();
 		s.close();
 
-		ErrorHandler errorHandler = searchFactoryBySFI.getErrorHandler();
+		ErrorHandler errorHandler = integrator.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		MockErrorHandler mockErrorHandler = (MockErrorHandler)errorHandler;
 		Assert.assertNull( "Errors detected in the backend!", mockErrorHandler.getLastException() );

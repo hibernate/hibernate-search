@@ -14,7 +14,6 @@ import javax.persistence.Table;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 
 /**
  * @author Emmanuel Bernard
@@ -26,12 +25,14 @@ public class TShirt {
 	@Id
 	@DocumentId
 	private int id;
+
 	@Field
 	private String logo;
+
 	@Column(name = "size_")
 	private String size;
+
 	@Field
-	@NumericField
 	@Column(name = "length_")
 	private double length;
 

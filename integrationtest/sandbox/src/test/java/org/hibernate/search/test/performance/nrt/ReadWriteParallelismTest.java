@@ -25,8 +25,8 @@ import org.hibernate.search.annotations.Norms;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -63,10 +63,10 @@ public class ReadWriteParallelismTest {
 
 	@Test
 	public void testPropertiesIndexing() throws InterruptedException {
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		SearchIntegrator integrator = sfHolder.getSearchFactory();
 		ThreadPoolExecutor threadPool = Executors.newFixedThreadPool( THREAD_NUMBER, "ReadWriteParallelismTest" );
 		for ( int i = 0; i < THREAD_NUMBER; i++ ) {
-			threadPool.execute( new Task( searchFactory, i ) );
+			threadPool.execute( new Task( integrator, i ) );
 		}
 		threadPool.shutdown();
 		//Time to warmup only:
@@ -104,8 +104,8 @@ public class ReadWriteParallelismTest {
 		tc.end();
 	}
 
-	private static void verifyMatches(SearchFactoryImplementor searchFactory, int expectedMatches, Query query) {
-		List<EntityInfo> queryEntityInfos = searchFactory.createHSQuery()
+	private static void verifyMatches(SearchIntegrator searchIntegrator, int expectedMatches, Query query) {
+		List<EntityInfo> queryEntityInfos = searchIntegrator.createHSQuery()
 				.luceneQuery( query )
 				.targetedEntities( Arrays.asList( new Class<?>[]{ Book.class } ) )
 				.queryEntityInfos();
@@ -115,27 +115,27 @@ public class ReadWriteParallelismTest {
 	private static class Task implements Runnable {
 
 		private final int threadId;
-		private final SearchFactoryImplementor searchFactory;
+		private final SearchIntegrator integrator;
 
-		public Task(SearchFactoryImplementor searchFactory, int threadId) {
-			this.searchFactory = searchFactory;
+		public Task(SearchIntegrator integrator, int threadId) {
+			this.integrator = integrator;
 			this.threadId = threadId;
 		}
 
 		@Override
 		public void run() {
-			final Worker worker = searchFactory.getWorker();
+			final Worker worker = integrator.getWorker();
 			final String title = "Volume N' " + Integer.toString( threadId );
 			final Integer bookId = Integer.valueOf( threadId );
 			final Query query = new TermQuery( new Term( "title", title ) );
 			try {
 				while ( running.get() ) {
 					cyclesCompleted.incrementAndGet();
-					verifyMatches( searchFactory, 0, query );
+					verifyMatches( integrator, 0, query );
 					writeABook( bookId, title, worker );
-					verifyMatches( searchFactory, 1, query );
+					verifyMatches( integrator, 1, query );
 					deleteABook( bookId, worker );
-					verifyMatches( searchFactory, 0, query );
+					verifyMatches( integrator, 0, query );
 				}
 			}
 			catch (RuntimeException re) {

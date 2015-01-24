@@ -9,7 +9,7 @@ package org.hibernate.search.backend.impl.lucene;
 import java.util.Properties;
 
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

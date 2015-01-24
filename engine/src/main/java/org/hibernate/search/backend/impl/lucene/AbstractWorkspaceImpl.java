@@ -15,7 +15,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
@@ -38,6 +38,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	private final DirectoryBasedIndexManager indexManager;
 
 	protected final IndexWriterHolder writerHolder;
+	private final boolean deleteByTermEnforced;
 	private boolean indexMetadataIsComplete;
 
 	/**
@@ -51,6 +52,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 		this.entitiesInIndexManager = indexManager.getContainedTypes();
 		this.writerHolder = new IndexWriterHolder( context.getErrorHandler(), indexManager );
 		this.indexMetadataIsComplete = PropertiesParseHelper.isIndexMetadataComplete( cfg, context );
+		this.deleteByTermEnforced = context.isDeleteByTermEnforced();
 	}
 
 	@Override
@@ -106,6 +108,11 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	@Override
 	public boolean areSingleTermDeletesSafe() {
 		return indexMetadataIsComplete && entitiesInIndexManager.size() == 1;
+	}
+
+	@Override
+	public boolean isDeleteByTermEnforced() {
+		return deleteByTermEnforced;
 	}
 
 	@Override

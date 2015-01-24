@@ -46,6 +46,11 @@
             <filtered>true</filtered>
         </file>
         <file>
+            <source>${module.xml.basedir}/search/serialization-avro/module.xml</source>
+            <outputDirectory>/org/hibernate/search/serialization-avro/${hibernate.search.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
             <source>${module.xml.basedir}/search/infinispan-storage/module.xml</source>
             <outputDirectory>/org/hibernate/search/infinispan-storage/${infinispan.integration.slot}</outputDirectory>
             <filtered>true</filtered>
@@ -56,23 +61,21 @@
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>org/hibernate/search/engine/${hibernate.search.version}</outputDirectory>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-engine</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/search/serialization-avro/${hibernate.search.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
                 <include>org.hibernate:hibernate-search-serialization-avro</include>
             </includes>
-            <excludes>
-                <exclude>org.apache.lucene:*</exclude>
-                <exclude>org.hibernate.common:*</exclude>
-                <exclude>org.slf4j:slf4j-api:*</exclude>
-                <exclude>org.jboss.logging:*</exclude>
-                <exclude>org.jboss.spec.javax.transaction:*</exclude>
-                <exclude>org.jgroups:jgroups</exclude>
-                <exclude>org.infinispan:*</exclude>
-                <exclude>org.apache.commons:*</exclude>
-                <exclude>org.apache.avro:*</exclude>
-            </excludes>
         </dependencySet>
 
         <dependencySet>

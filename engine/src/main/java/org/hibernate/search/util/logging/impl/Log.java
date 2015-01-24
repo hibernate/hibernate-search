@@ -30,6 +30,7 @@ import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.TRACE;
 import static org.jboss.logging.Logger.Level.WARN;
+import static org.jboss.logging.Logger.Level.DEBUG;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -646,7 +647,7 @@ public interface Log extends BasicLogger {
 	SearchException detectInfiniteTypeLoopInIndexedEmbedded(String elementClass, String rootEntity, String path);
 
 	@Message(id = 222, value = "The SearchFactory was not initialized" )
-	SearchException searchFactoryNotInitialized();
+	SearchException searchIntegratorNotInitialized();
 
 	@Message(id = 223, value = "The Service org.hibernate.search.hcore.impl.SearchFactoryReference was not found in the Hibernate ORM Service Registry."
 			+ " This might be caused by the Hibernate ORM classloader not having visibility on Hibernate Search" )
@@ -673,19 +674,66 @@ public interface Log extends BasicLogger {
 	@Message(id = 229, value = "Property " + Environment.INDEX_FLUSH_INTERVAL + "for the index '%s' needs to be positive." )
 	SearchException flushIntervalNeedsToBePositive(String indexName);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 230, value = "Starting sync consumer thread for index '%s'" )
 	void startingSyncConsumerThread(String indexName);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 231, value = "Stopping sync consumer thread for index '%s'" )
 	void stoppingSyncConsumerThread(String indexName);
 
+	@Message(id = 232, value = "The specified query '%s' contains a numeric sub query which targets the string encoded field(s) '%s'. Check your query or try limiting the targeted entities." )
+	SearchException stringEncodedFieldsAreTargetedWithNumericQuery(String query, String numericFields);
+
+	@Message(id = 233, value = "The specified query '%s' contains a string based sub query which targets the numeric encoded field(s) '%s'. Check your query or try limiting the targeted entities." )
+	SearchException numericEncodedFieldsAreTargetedWithStringQuery(String query, String numericFields);
+
+	@Message(id = 234, value = "None of the specified entity types ('%s') or any of their subclasses are indexed." )
+	IllegalArgumentException targetedEntityTypesNotIndexed(String targetedEntities);
+
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 232, value = "Backend for index '%s' started: using a Synchronous batching backend." )
+	@Message(id = 235, value = "Backend for index '%s' started: using a Synchronous batching backend." )
 	void luceneBackendInitializedSynchronously(String indexName);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 233, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
+	@Message(id = 236, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
 	void luceneBackendInitializedAsynchronously(String indexName);
+
+	@Message(id = 237, value = "Cannot create numeric range query for field '%s', since from and to values are null" )
+	SearchException rangeQueryWithNullToAndFromValue(String fieldName);
+
+	@Message(id = 238, value = "Cannot create numeric range query for field '%s', since values are not numeric (Date, int, long, short or double)")
+	SearchException numericRangeQueryWithNonNumericToAndFromValues(String fieldName);
+
+	@Message(id = 239, value = "Unknown field encoding type: %1$s")
+	AssertionFailure unknownEncodingType(String encoding);
+
+	@Message(id = 240, value = "Unable to parse value '%2$s' of field '%1$s' into a Date")
+	SearchException invalidStringDateFieldInDocument(String fieldName, String value);
+
+	@Message(id = 241, value = "Multiple @Factory methods defined in %s")
+	SearchException multipleFactoryMethodsInClass(String className);
+
+	@Message(id = 242, value = "Search requires '%s' to have a public no-arg constructor in order to instantiate it")
+	SearchException noPublicNoArgConstructor(String className);
+
+	@Message(id = 243, value = "Unable to access class '%s'")
+	SearchException unableToAccessClass(String className);
+
+	@Message(id = 244, value = "Factory methods must return an object. '%1$s#%2$s' does not")
+	SearchException factoryMethodsMustReturnAnObject(String className, String methodName);
+
+	@Message(id = 245, value = "Unable to access method '%1$s#%2$s'")
+	SearchException unableToAccessMethod(String className, String methodName);
+
+	@Message(id = 246, value = "An exception occurred while invoking '%1$s#%2$s'")
+	SearchException exceptionDuringFactoryMethodExecution(@Cause Exception e, String className, String methodName);
+
+	@Message(id = 247, value = "An indexed field defined on '%1$s:%2$s' tries to override the id field settings. The document id field settings cannot be modified. Use a different field name.")
+	SearchException fieldTriesToOverrideIdFieldSettings(String className, String propertyName);
+
+	@LogMessage(level = Level.TRACE)
+	@Message(id = 248, value = "WorkList should never be empty. Stacktrace below \n %s" )
+	void workListShouldNeverBeEmpty(String stackTrace);
+
 }

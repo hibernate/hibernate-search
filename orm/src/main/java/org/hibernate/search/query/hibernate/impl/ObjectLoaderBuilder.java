@@ -11,14 +11,13 @@ import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
@@ -33,7 +32,7 @@ public class ObjectLoaderBuilder {
 	private Criteria criteria;
 	private List<Class<?>> targetedEntities;
 	private SessionImplementor session;
-	private SearchFactoryImplementor searchFactoryImplementor;
+	private ExtendedSearchIntegrator extendedIntegrator;
 	private Set<Class<?>> indexedTargetedEntities;
 	private TimeoutManager timeoutManager;
 	private ObjectLookupMethod lookupMethod;
@@ -74,14 +73,14 @@ public class ObjectLoaderBuilder {
 
 	private Loader getMultipleEntitiesLoader() {
 		final MultiClassesQueryLoader multiClassesLoader = new MultiClassesQueryLoader();
-		multiClassesLoader.init( (Session) session, searchFactoryImplementor, getObjectInitializer(), timeoutManager );
+		multiClassesLoader.init( (Session) session, extendedIntegrator, getObjectInitializer(), timeoutManager );
 		multiClassesLoader.setEntityTypes( indexedTargetedEntities );
 		return multiClassesLoader;
 	}
 
 	private Loader getSingleEntityLoader() {
 		final QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( (Session) session, searchFactoryImplementor, getObjectInitializer(), timeoutManager );
+		queryLoader.init( (Session) session, extendedIntegrator, getObjectInitializer(), timeoutManager );
 		queryLoader.setEntityType( targetedEntities.iterator().next() );
 		return queryLoader;
 	}
@@ -94,7 +93,7 @@ public class ObjectLoaderBuilder {
 		if ( criteria instanceof CriteriaImpl ) {
 			String targetEntity = ( (CriteriaImpl) criteria ).getEntityOrClassName();
 			if ( entityType == null ) {
-				ServiceManager serviceManager = searchFactoryImplementor.getServiceManager();
+				ServiceManager serviceManager = extendedIntegrator.getServiceManager();
 				try {
 					ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 					entityType = classLoaderService.classForName( targetEntity );
@@ -113,7 +112,7 @@ public class ObjectLoaderBuilder {
 			}
 		}
 		QueryLoader queryLoader = new QueryLoader();
-		queryLoader.init( (Session) session, searchFactoryImplementor, getObjectInitializer(), timeoutManager );
+		queryLoader.init( (Session) session, extendedIntegrator, getObjectInitializer(), timeoutManager );
 		queryLoader.setEntityType( entityType );
 		queryLoader.setCriteria( criteria );
 		return queryLoader;
@@ -124,8 +123,8 @@ public class ObjectLoaderBuilder {
 		return this;
 	}
 
-	public ObjectLoaderBuilder searchFactory(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public ObjectLoaderBuilder searchFactory(ExtendedSearchIntegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator;
 		return this;
 	}
 

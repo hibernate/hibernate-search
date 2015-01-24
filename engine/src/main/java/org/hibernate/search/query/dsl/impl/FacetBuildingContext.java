@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
@@ -36,7 +36,7 @@ class FacetBuildingContext<T> {
 			Date.class
 		);
 
-	private final SearchFactoryImplementor factory;
+	private final ExtendedSearchIntegrator factory;
 	private final Class<?> entityType;
 
 	private String name;
@@ -52,7 +52,7 @@ class FacetBuildingContext<T> {
 	private int maxFacetCount = -1;
 	private DocumentBuilderIndexedEntity documentBuilder;
 
-	public FacetBuildingContext(SearchFactoryImplementor factory, Class<?> entityType) {
+	public FacetBuildingContext(ExtendedSearchIntegrator factory, Class<?> entityType) {
 		this.factory = factory;
 		this.entityType = entityType;
 	}

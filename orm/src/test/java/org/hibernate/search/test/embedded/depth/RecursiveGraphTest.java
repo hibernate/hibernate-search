@@ -21,9 +21,8 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.backend.LeakingLuceneBackend;
@@ -79,8 +78,7 @@ public class RecursiveGraphTest extends SearchTestBase {
 		final SearchConfigurationForTest configuration = new HibernateManualConfiguration()
 				.addClass( BrokenMammal.class );
 		try {
-			SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( configuration )
-					.buildSearchFactory();
+			new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 		}
 		catch (SearchException e) {
 			assertThat( e.getMessage() ).contains( "HSEARCH000221" );

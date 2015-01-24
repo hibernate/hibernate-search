@@ -18,7 +18,7 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
 
@@ -72,7 +72,7 @@ public class CustomMassIndexerFactoryTest extends SearchTestBase {
 		}
 
 		@Override
-		public MassIndexer createMassIndexer(SearchFactoryImplementor searchFactory, SessionFactoryImplementor sessionFactory,
+		public MassIndexer createMassIndexer(SearchIntegrator searchFactory, SessionFactoryImplementor sessionFactory,
 				Class<?>... entities) {
 			return new NoopMassIndexer( configurationReadable );
 		}

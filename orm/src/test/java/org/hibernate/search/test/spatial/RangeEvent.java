@@ -9,7 +9,6 @@ package org.hibernate.search.test.spatial;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.spatial.Coordinates;
@@ -39,10 +38,9 @@ public class RangeEvent {
 	Date date;
 
 	@Field(store = Store.YES, index = Index.YES)
-	@NumericField
 	double latitude;
+
 	@Field(store = Store.YES, index = Index.YES)
-	@NumericField
 	double longitude;
 
 	@Spatial

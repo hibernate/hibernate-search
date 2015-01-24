@@ -14,7 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.transaction.spi.TransactionFactory;
 import org.hibernate.event.spi.EventSource;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -34,10 +34,10 @@ public class BatchTransactionalContext {
 	final ErrorHandler errorHandler;
 	final TransactionManager transactionManager;
 	final TransactionFactory<?> transactionFactory;
-	final SearchFactoryImplementor searchFactoryImplementor;
+	final ExtendedSearchIntegrator extendedIntegrator;
 
-	public BatchTransactionalContext(SearchFactoryImplementor searchFactoryImplementor, SessionFactoryImplementor sessionFactory, ErrorHandler errorHandler) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public BatchTransactionalContext(ExtendedSearchIntegrator extendedIntegrator, SessionFactoryImplementor sessionFactory, ErrorHandler errorHandler) {
+		this.extendedIntegrator = extendedIntegrator;
 		this.factory = sessionFactory;
 		this.errorHandler = errorHandler;
 		this.transactionManager = lookupTransactionManager( factory );

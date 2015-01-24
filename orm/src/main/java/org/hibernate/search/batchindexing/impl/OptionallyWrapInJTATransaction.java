@@ -35,7 +35,7 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 	private final boolean wrapInTransaction;
 
 	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext, SessionAwareRunnable sessionAwareRunnable) {
-		super( batchContext.searchFactoryImplementor );
+		super( batchContext.extendedIntegrator );
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
 		 *  - whether or not we need to start the JTA transaction
@@ -48,7 +48,7 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 	}
 
 	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext, StatelessSessionAwareRunnable statelessSessionAwareRunnable) {
-		super( batchContext.searchFactoryImplementor );
+		super( batchContext.extendedIntegrator );
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
 		 *  - whether or not we need to start the JTA transaction

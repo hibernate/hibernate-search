@@ -26,8 +26,8 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
@@ -114,8 +114,8 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public Directory getDirectory(Class<?> clazz) {
-		SearchFactoryImplementor searchFactoryBySFI = ContextHelper.getSearchFactoryBySFI( (SessionFactoryImplementor) sessionFactory );
-		IndexManager[] indexManagers = searchFactoryBySFI.getIndexBinding( clazz ).getIndexManagers();
+		ExtendedSearchIntegrator integrator = ContextHelper.getSearchintegratorBySFI( (SessionFactoryImplementor) sessionFactory );
+		IndexManager[] indexManagers = integrator.getIndexBinding( clazz ).getIndexManagers();
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];
 		return indexManager.getDirectoryProvider().getDirectory();
 	}
@@ -141,8 +141,8 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	}
 
 	@Override
-	public SearchFactoryImplementor getSearchFactoryImpl() {
-		return getSearchFactory().unwrap( SearchFactoryImplementor.class );
+	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
+		return getSearchFactory().unwrap( ExtendedSearchIntegrator.class );
 	}
 
 	@Override

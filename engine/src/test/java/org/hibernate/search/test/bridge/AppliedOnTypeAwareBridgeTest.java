@@ -21,8 +21,8 @@ import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.ParameterizedBridge;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	@Test
 	public void testTypeIsSetForField() {
-		SearchFactoryImplementor searchFactory = createSearchFactory( Foo.class );
+		SearchIntegrator searchFactory = createSearchIntegrator( Foo.class );
 
 		Foo foo = new Foo( 0l );
 
@@ -49,7 +49,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	@Test
 	public void testTypeIsSetForGetter() {
-		SearchFactoryImplementor searchFactory = createSearchFactory( Bar.class );
+		SearchIntegrator searchFactory = createSearchIntegrator( Bar.class );
 
 		Bar bar = new Bar( 0l );
 
@@ -61,7 +61,7 @@ public class AppliedOnTypeAwareBridgeTest {
 
 	@Test
 	public void testTypeIsSetForClass() {
-		SearchFactoryImplementor searchFactory = createSearchFactory( Snafu.class );
+		SearchIntegrator searchFactory = createSearchIntegrator( Snafu.class );
 
 		Snafu snafu = new Snafu( 0l );
 
@@ -71,12 +71,11 @@ public class AppliedOnTypeAwareBridgeTest {
 		tc.end();
 	}
 
-
-	private SearchFactoryImplementor createSearchFactory(Class<?> clazz) {
+	private SearchIntegrator createSearchIntegrator(Class<?> clazz) {
 		SearchConfigurationForTest configuration = new SearchConfigurationForTest()
 				.addClass( clazz );
 
-		return new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		return new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 	}
 
 	@Indexed

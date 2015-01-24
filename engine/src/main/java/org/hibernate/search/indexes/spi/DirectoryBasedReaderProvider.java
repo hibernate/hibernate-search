@@ -8,8 +8,6 @@ package org.hibernate.search.indexes.spi;
 
 import java.util.Properties;
 
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */

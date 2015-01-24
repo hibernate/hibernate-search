@@ -138,10 +138,10 @@
 
         <!-- Dependency versions -->
         <slf4jVersion>1.6.4</slf4jVersion>
-        <luceneVersion>4.10.2</luceneVersion>
-        <infinispanVersion>7.0.0.Final</infinispanVersion>
-        <jgroupsVersion>3.6.0.Final</jgroupsVersion>
-        <hibernateVersion>4.3.7.Final</hibernateVersion>
+        <luceneVersion>4.10.3</luceneVersion>
+        <infinispanVersion>7.0.2.Final</infinispanVersion>
+        <jgroupsVersion>3.6.1.Final</jgroupsVersion>
+        <hibernateVersion>4.3.8.Final</hibernateVersion>
         <hibernateCommonsAnnotationVersion>4.0.5.Final</hibernateCommonsAnnotationVersion>
         <tikaVersion>1.4</tikaVersion>
         <bytemanVersion>2.1.4</bytemanVersion>
@@ -436,6 +436,12 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-testing</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-documentation</artifactId>
+                <type>pom</type>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

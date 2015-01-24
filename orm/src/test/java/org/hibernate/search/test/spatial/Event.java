@@ -9,7 +9,6 @@ package org.hibernate.search.test.spatial;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.SpatialMode;
 import org.hibernate.search.annotations.Store;
@@ -40,11 +39,9 @@ public class Event {
 	Date date;
 
 	@Field(store = Store.YES, index = Index.YES)
-	@NumericField
 	double latitude;
 
 	@Field(store = Store.YES, index = Index.YES)
-	@NumericField
 	double longitude;
 
 	@Spatial(spatialMode = SpatialMode.HASH)

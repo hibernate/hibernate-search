@@ -11,15 +11,15 @@ import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
-import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.metadata.FieldDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.PropertyDescriptor;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -124,11 +124,13 @@ public class IndexedTypeDescriptorTest {
 		IndexedTypeDescriptor typeDescriptor = DescriptorTestHelper.getTypeDescriptor( metadataProvider, Snafu.class );
 
 		Set<PropertyDescriptor> propertyDescriptors = typeDescriptor.getIndexedProperties();
-		assertEquals( "There should be 5 properties defined in Snafu", 5, propertyDescriptors.size() );
+		assertEquals( "There should be 7 properties defined in Snafu", 7, propertyDescriptors.size() );
 		Set<String> expectedPropertyNames = new HashSet<String>();
 		expectedPropertyNames.add( "id" );
 		expectedPropertyNames.add( "snafu" );
 		expectedPropertyNames.add( "numericField" );
+		expectedPropertyNames.add( "numericShortField" );
+		expectedPropertyNames.add( "numericByteField" );
 		expectedPropertyNames.add( "nullValue" );
 		expectedPropertyNames.add( "custom" );
 

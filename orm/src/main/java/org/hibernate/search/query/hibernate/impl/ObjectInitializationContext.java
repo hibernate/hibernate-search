@@ -8,8 +8,7 @@ package org.hibernate.search.query.hibernate.impl;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 
 /**
@@ -20,7 +19,7 @@ import org.hibernate.search.query.engine.spi.TimeoutManager;
 public class ObjectInitializationContext {
 	private final Criteria criteria;
 	private final Class<?> entityType;
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final TimeoutManager timeoutManager;
 	private final Session session;
 
@@ -28,18 +27,18 @@ public class ObjectInitializationContext {
 	 * @param criteria A user specified {@code Criteria query} or {@code null}.
 	 * See also {@link org.hibernate.search.FullTextQuery#setCriteriaQuery(org.hibernate.Criteria)}.
 	 * @param targetedEntityType The entity type targeted explicitly by the user
-	 * @param searchFactoryImplementor Handle to the search factory
+	 * @param extendedIntegrator Handle to the search factory
 	 * @param timeoutManager Handle to the timeout manager
 	 * @param session Handle to the ORM session
 	 */
 	public ObjectInitializationContext(Criteria criteria,
 			Class<?> targetedEntityType,
-			SearchFactoryImplementor searchFactoryImplementor,
+			ExtendedSearchIntegrator extendedIntegrator,
 			TimeoutManager timeoutManager,
 			Session session) {
 		this.criteria = criteria;
 		this.entityType = targetedEntityType;
-		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutManager = timeoutManager;
 		this.session = session;
 	}
@@ -52,8 +51,8 @@ public class ObjectInitializationContext {
 		return entityType;
 	}
 
-	public SearchFactoryImplementor getSearchFactoryImplementor() {
-		return searchFactoryImplementor;
+	public ExtendedSearchIntegrator getExtendedSearchintegrator() {
+		return extendedIntegrator;
 	}
 
 	public TimeoutManager getTimeoutManager() {

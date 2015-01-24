@@ -18,6 +18,41 @@ public interface NumericFieldSettingsDescriptor extends FieldSettingsDescriptor 
 	 * @return the numeric precision step for this numeric field.
 	 */
 	int precisionStep();
+
+	/**
+	 * @return the type of numeric field
+	 */
+	NumericEncodingType encodingType();
+
+	/**
+	 * Defines different logical field types
+	 */
+	public enum NumericEncodingType {
+		/**
+		 * An integer encoded numeric field
+		 */
+		INTEGER,
+
+		/**
+		 * An long encoded numeric field
+		 */
+		LONG,
+
+		/**
+		 * An float encoded numeric field
+		 */
+		FLOAT,
+
+		/**
+		 * An double encoded numeric field
+		 */
+		DOUBLE,
+
+		/**
+		 * The encoding type of the numeric field is not known due to the use of a custom bridge
+		 */
+		UNKNOWN
+	}
 }
 
 

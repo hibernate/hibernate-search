@@ -6,23 +6,25 @@
  */
 package org.hibernate.search.test.jpa;
 
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
+import org.junit.Test;
+
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.test.SerializationTestHelper;
 import org.hibernate.search.testsupport.TestConstants;
-import org.junit.Test;
+import org.hibernate.search.testsupport.TestForIssue;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Serialization test for entity manager. HSEARCH-117.
+ * Serialization test for entity manager.
  *
  * @author Hardy Ferentschik
  */
+@TestForIssue(jiraKey = "HSEARCH-117")
 public class EntityManagerSerializationTest extends JPATestCase {
 
 	/**
@@ -72,11 +74,11 @@ public class EntityManagerSerializationTest extends JPATestCase {
 				"title",
 				TestConstants.stopAnalyzer
 		);
-		Query query = parser.parse( "saltQty:noword" );
+		Query query = NumericRangeQuery.newIntRange( "saltQty", 0, 0, true, true );
 		assertEquals( 0, em.createFullTextQuery( query ).getResultList().size() );
 
 		// execute a matching query
-		query = new TermQuery( new Term( "saltQty", "23" ) );
+		query = NumericRangeQuery.newIntRange( "saltQty", 23, 23, true, true );
 		assertEquals(
 				"getResultList", 1, em.createFullTextQuery( query )
 				.getResultList().size()

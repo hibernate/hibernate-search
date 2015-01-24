@@ -10,9 +10,8 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.apache.lucene.index.IndexReader;
-
+import org.hibernate.search.engine.impl.ImmutableSearchFactory;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.impl.ImmutableSearchFactory;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.reader.impl.MultiReaderFactory;

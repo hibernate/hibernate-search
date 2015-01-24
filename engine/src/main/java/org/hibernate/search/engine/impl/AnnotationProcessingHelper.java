@@ -23,7 +23,6 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.TermVector;
 import org.hibernate.search.engine.BoostStrategy;
-import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 import java.lang.annotation.Annotation;

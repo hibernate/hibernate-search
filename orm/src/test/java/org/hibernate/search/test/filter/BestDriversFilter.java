@@ -28,7 +28,7 @@ public class BestDriversFilter extends Filter {
 		OpenBitSet bitSet = new OpenBitSet( reader.maxDoc() );
 		DocsEnum termDocsEnum = reader.termDocsEnum( new Term( "score", "5" ) );
 		if ( termDocsEnum == null ) {
-			return bitSet;//All bits already correctly set
+			return bitSet; // All bits already correctly set
 		}
 		while ( termDocsEnum.nextDoc() != DocsEnum.NO_MORE_DOCS ) {
 			final int docID = termDocsEnum.docID();

@@ -10,10 +10,10 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.IndexReaderAccessor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.stat.Statistics;
 
 
@@ -25,64 +25,64 @@ import org.hibernate.search.stat.Statistics;
  */
 final class SearchFactoryImpl implements SearchFactory {
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final SearchIntegrator searchIntegrator;
 
-	public SearchFactoryImpl(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public SearchFactoryImpl(SearchIntegrator searchIntegrator) {
+		this.searchIntegrator = searchIntegrator;
 	}
 
 	@Override
 	public void optimize() {
-		searchFactoryImplementor.optimize();
+		searchIntegrator.optimize();
 	}
 
 	@Override
 	public void optimize(Class<?> entityType) {
-		searchFactoryImplementor.optimize( entityType );
+		searchIntegrator.optimize( entityType );
 	}
 
 	@Override
 	public Analyzer getAnalyzer(String name) {
-		return searchFactoryImplementor.getAnalyzer( name );
+		return searchIntegrator.getAnalyzer( name );
 	}
 
 	@Override
 	public Analyzer getAnalyzer(Class<?> clazz) {
-		return searchFactoryImplementor.getAnalyzer( clazz );
+		return searchIntegrator.getAnalyzer( clazz );
 	}
 
 	@Override
 	public QueryContextBuilder buildQueryBuilder() {
-		return searchFactoryImplementor.buildQueryBuilder();
+		return searchIntegrator.buildQueryBuilder();
 	}
 
 	@Override
 	public Statistics getStatistics() {
-		return searchFactoryImplementor.getStatistics();
+		return searchIntegrator.getStatistics();
 	}
 
 	@Override
 	public IndexReaderAccessor getIndexReaderAccessor() {
-		return searchFactoryImplementor.getIndexReaderAccessor();
+		return searchIntegrator.getIndexReaderAccessor();
 	}
 
 	@Override
 	public IndexedTypeDescriptor getIndexedTypeDescriptor(Class<?> entityType) {
-		return searchFactoryImplementor.getIndexedTypeDescriptor( entityType );
+		return searchIntegrator.getIndexedTypeDescriptor( entityType );
 	}
 
 	@Override
 	public Set<Class<?>> getIndexedTypes() {
-		return searchFactoryImplementor.getIndexedTypes();
+		return searchIntegrator.getIndexedTypes();
 	}
 
 	@Override
 	public <T> T unwrap(Class<T> cls) {
-		if ( SearchFactoryImplementor.class.isAssignableFrom( cls ) ) {
-			return (T) searchFactoryImplementor;
+		if ( SearchIntegrator.class.isAssignableFrom( cls ) ) {
+			return (T) searchIntegrator;
 		}
 		else {
-			return searchFactoryImplementor.unwrap( cls );
+			return searchIntegrator.unwrap( cls );
 		}
 	}
 

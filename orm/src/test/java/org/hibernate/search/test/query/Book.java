@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
@@ -98,7 +99,7 @@ public class Book {
 	}
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
-	@DateBridge(resolution = Resolution.SECOND)
+	@DateBridge(resolution = Resolution.SECOND, encoding = EncodingType.STRING)
 	public Date getPublicationDate() {
 		return publicationDate;
 	}

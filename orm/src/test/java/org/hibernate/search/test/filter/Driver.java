@@ -14,11 +14,13 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.builtin.IntegerBridge;
 
 /**
  * @author Emmanuel Bernard
@@ -55,12 +57,17 @@ public class Driver {
 	@Id
 	@DocumentId
 	private int id;
+
 	@Field(analyze = Analyze.YES)
 	private String name;
+
 	@Field(analyze = Analyze.NO)
 	private String teacher;
+
 	@Field(analyze = Analyze.NO)
+	@FieldBridge(impl = IntegerBridge.class)
 	private int score;
+
 	@Field(analyze = Analyze.NO)
 	@DateBridge(resolution = Resolution.YEAR)
 	private Date delivery;

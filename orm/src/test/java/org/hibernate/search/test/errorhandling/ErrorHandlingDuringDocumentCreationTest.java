@@ -14,8 +14,8 @@ import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.progessmonitor.AssertingMassIndexerProgressMonitor;
 import org.hibernate.search.testsupport.TestForIssue;
@@ -72,8 +72,8 @@ public class ErrorHandlingDuringDocumentCreationTest extends SearchTestBase {
 	}
 
 	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		ErrorHandler errorHandler = searchFactory.getErrorHandler();
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		ErrorHandler errorHandler = integrator.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		return (MockErrorHandler) errorHandler;
 	}

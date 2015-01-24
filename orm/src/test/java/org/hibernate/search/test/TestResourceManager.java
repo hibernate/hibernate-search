@@ -16,7 +16,7 @@ import org.hibernate.SessionFactory;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Interface defining ORM and Search infrastructure methods a test base class needs to offer.
@@ -39,7 +39,7 @@ public interface TestResourceManager {
 
 	SearchFactory getSearchFactory();
 
-	SearchFactoryImplementor getSearchFactoryImpl();
+	SearchIntegrator getExtendedSearchIntegrator();
 
 	Directory getDirectory(Class<?> clazz);
 

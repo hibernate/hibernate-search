@@ -22,7 +22,7 @@ import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;
@@ -44,17 +44,17 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
 public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 	private static Log log = LoggerFactory.make();
 
-	private final SearchFactoryImplementor searchFactory;
+	private final ExtendedSearchIntegrator searchIntegrator;
 	private final SerializationProvider provider;
 
-	public LuceneWorkSerializerImpl(SerializationProvider provider, SearchFactoryImplementor searchFactory) {
+	public LuceneWorkSerializerImpl(SerializationProvider provider, ExtendedSearchIntegrator searchIntegrator) {
 		this.provider = provider;
-		this.searchFactory = searchFactory;
+		this.searchIntegrator = searchIntegrator;
 		if ( provider == null ) {
 			throw log.parametersShouldNotBeNull( "provider" );
 		}
-		if ( searchFactory == null ) {
-			throw log.parametersShouldNotBeNull( "searchFactory" );
+		if ( searchIntegrator == null ) {
+			throw log.parametersShouldNotBeNull( "searchIntegrator" );
 		}
 	}
 
@@ -133,7 +133,7 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 	public List<LuceneWork> toLuceneWorks(byte[] data) {
 		try {
 			Deserializer deserializer = provider.getDeserializer();
-			LuceneWorkHydrator hydrator = new LuceneWorkHydrator( searchFactory );
+			LuceneWorkHydrator hydrator = new LuceneWorkHydrator( searchIntegrator );
 			deserializer.deserialize( data, hydrator );
 			return hydrator.getLuceneWorks();
 		}

@@ -21,6 +21,7 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
@@ -29,7 +30,6 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoadingExceptio
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -55,9 +55,9 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-	public static Serializable getDocumentId(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, ConversionContext conversionContext) {
+	public static Serializable getDocumentId(ExtendedSearchIntegrator extendedIntegrator, Class<?> clazz, Document document, ConversionContext conversionContext) {
 		final DocumentBuilderIndexedEntity builderIndexedEntity = getDocumentBuilder(
-				searchFactoryImplementor,
+				extendedIntegrator,
 				clazz
 		);
 		final TwoWayFieldBridge fieldBridge = builderIndexedEntity.getIdBridge();
@@ -74,13 +74,13 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-	public static String getDocumentIdName(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder( searchFactoryImplementor, clazz );
+	public static String getDocumentIdName(ExtendedSearchIntegrator extendedIntegrator, Class<?> clazz) {
+		DocumentBuilderIndexedEntity documentBuilder = getDocumentBuilder( extendedIntegrator, clazz );
 		return documentBuilder.getIdentifierName();
 	}
 
-	public static Object[] getDocumentFields(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz, Document document, String[] fields, ConversionContext conversionContext) {
-		DocumentBuilderIndexedEntity builderIndexedEntity = getDocumentBuilder( searchFactoryImplementor, clazz );
+	public static Object[] getDocumentFields(ExtendedSearchIntegrator extendedIntegrator, Class<?> clazz, Document document, String[] fields, ConversionContext conversionContext) {
+		DocumentBuilderIndexedEntity builderIndexedEntity = getDocumentBuilder( extendedIntegrator, clazz );
 		final int fieldNbr = fields.length;
 		Object[] result = new Object[fieldNbr];
 		Arrays.fill( result, NOT_SET );
@@ -144,7 +144,7 @@ public final class DocumentBuilderHelper {
 			for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
 				final String fieldName = fieldMetadata.getName();
 				int matchingPosition = getFieldPosition( fields, fieldName );
-				if ( matchingPosition != -1 ) {
+				if ( matchingPosition != -1 && result[matchingPosition] == NOT_SET ) {
 					contextualBridge.pushProperty( fieldName );
 					try {
 						populateResult(
@@ -183,7 +183,7 @@ public final class DocumentBuilderHelper {
 		//process class bridges
 		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
 			int matchingPosition = getFieldPosition( fields, fieldMetadata.getName() );
-			if ( matchingPosition != -1 ) {
+			if ( matchingPosition != -1 && result[matchingPosition] == NOT_SET ) {
 				populateResult(
 						fieldMetadata.getName(),
 						fieldMetadata.getFieldBridge(),
@@ -255,8 +255,8 @@ public final class DocumentBuilderHelper {
 		return -1;
 	}
 
-	private static DocumentBuilderIndexedEntity getDocumentBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> clazz) {
-		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding(
+	private static DocumentBuilderIndexedEntity getDocumentBuilder(ExtendedSearchIntegrator extendedIntegrator, Class<?> clazz) {
+		EntityIndexBinding entityIndexBinding = extendedIntegrator.getIndexBinding(
 				clazz
 		);
 		if ( entityIndexBinding == null ) {
