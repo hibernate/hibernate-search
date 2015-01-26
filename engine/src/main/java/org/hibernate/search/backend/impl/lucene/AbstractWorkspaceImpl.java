@@ -163,6 +163,7 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 											.getTypeMetadata()
 											.isJpaIdUsedAsDocumentId();
 							// both use JPA id and they share the same id uniqueness set
+							// the boolean evaluation in important: only call areIdsUniqueForClasses if absolutely necessary
 							boolean uniqueIdEqualityMeansEntityEquality =
 									firstEntityIsUsingJPAId && secondEntityIsUsingJPAId &&
 									idUniquenessResolver.areIdsUniqueForClasses( firstEntity, secondEntity );
