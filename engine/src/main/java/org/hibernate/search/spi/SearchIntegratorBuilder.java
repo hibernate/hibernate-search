@@ -39,7 +39,6 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.Version;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
@@ -50,8 +49,10 @@ import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.engine.impl.MutableSearchFactoryState;
 import org.hibernate.search.engine.impl.ReflectionReplacingSearchConfiguration;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -67,8 +68,8 @@ import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
@@ -571,16 +572,28 @@ public class SearchIntegratorBuilder {
 	}
 
 	private ErrorHandler createErrorHandler(SearchConfiguration searchConfiguration) {
-		String errorHandlerClassName = searchConfiguration.getProperty( Environment.ERROR_HANDLER );
-		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
+		Object configuredErrorHandler = searchConfiguration.getProperties().get( Environment.ERROR_HANDLER );
+
+		if ( configuredErrorHandler == null ) {
 			return new LogErrorHandler();
 		}
-		else if ( "log".equals( errorHandlerClassName.trim() ) ) {
+		if ( configuredErrorHandler instanceof String ) {
+			return createErrorHandlerFromString( (String) configuredErrorHandler, searchConfiguration.getClassLoaderService() );
+		}
+		else if ( configuredErrorHandler instanceof ErrorHandler ) {
+			return (ErrorHandler) configuredErrorHandler;
+		}
+		else {
+			throw log.unsupportedErrorHandlerConfigurationValueType( configuredErrorHandler.getClass() );
+		}
+	}
+
+	private ErrorHandler createErrorHandlerFromString(String errorHandlerClassName, ClassLoaderService classLoaderService) {
+		if ( StringHelper.isEmpty( errorHandlerClassName ) || "log".equals( errorHandlerClassName.trim() ) ) {
 			return new LogErrorHandler();
 		}
 		else {
-			Class<?> errorHandlerClass = searchConfiguration.getClassLoaderService()
-					.classForName( errorHandlerClassName );
+			Class<?> errorHandlerClass = classLoaderService.classForName( errorHandlerClassName );
 			return ClassLoaderHelper.instanceFromClass(
 					ErrorHandler.class,
 					errorHandlerClass,

@@ -931,6 +931,8 @@ hibernate.search.error_handler = CustomerErrorHandler
 ----
 ====
 
+Alternatively, an ErrorHandler instance may be passed via the configuration value map used when bootstrapping Hibernate Search programmatically.
+
 === Lucene configuration
 
 Even though Hibernate Search will try to shield you as much as possible from Lucene specifics, there

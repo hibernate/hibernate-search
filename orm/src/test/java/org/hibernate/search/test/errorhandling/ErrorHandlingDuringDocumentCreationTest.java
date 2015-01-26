@@ -8,7 +8,6 @@ package org.hibernate.search.test.errorhandling;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.Search;
@@ -74,7 +73,7 @@ public class ErrorHandlingDuringDocumentCreationTest extends SearchTestBase {
 	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
 		SearchIntegrator integrator = getExtendedSearchIntegrator();
 		ErrorHandler errorHandler = integrator.getErrorHandler();
-		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
+		Assert.assertEquals( MockErrorHandler.class, errorHandler.getClass() );
 		return (MockErrorHandler) errorHandler;
 	}
 

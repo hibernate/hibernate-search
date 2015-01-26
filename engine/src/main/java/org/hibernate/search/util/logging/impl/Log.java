@@ -22,15 +22,16 @@ import org.hibernate.search.exception.SearchException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.TRACE;
 import static org.jboss.logging.Logger.Level.WARN;
-import static org.jboss.logging.Logger.Level.DEBUG;
 
 /**
  * Log abstraction layer for Hibernate Search on top of JBoss Logging.
@@ -739,4 +740,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.INFO)
 	@Message(id = 249, value = "Cannot do fast deletes on index '%s'. Entities in this index are conflicting or the index can accept unknown entities." )
 	void singleTermDeleteDisabled(String indexName);
+
+	@Message(id = 250, value = "Unsupported value type for configuration property " + Environment.ERROR_HANDLER + ": %1$s")
+	SearchException unsupportedErrorHandlerConfigurationValueType(@FormatWith(ClassObjectFormatter.class) Class<?> errorHandlerValueType);
 }
