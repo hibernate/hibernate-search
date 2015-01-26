@@ -55,7 +55,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = ERROR)
 	@Message(id = 16, value = "Incorrect message type: %1$s")
-	void incorrectMessageType(Class<?> messageType);
+	void incorrectMessageType(@FormatWith(ClassFormatter.class) Class<?> messageType);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
@@ -92,11 +92,11 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 25, value = "Service provider has been used but not released: %1$s")
-	void serviceProviderNotReleased(Class<?> class1);
+	void serviceProviderNotReleased(@FormatWith(ClassFormatter.class) Class<?> class1);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 26, value = "Fail to properly stop service: %1$s")
-	void stopServiceFailed(Class<?> class1, @Cause Exception e);
+	void stopServiceFailed(@FormatWith(ClassFormatter.class) Class<?> class1, @Cause Exception e);
 
 	@LogMessage(level = INFO)
 	@Message(id = 27, value = "Going to reindex %d entities")
@@ -177,12 +177,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 45, value = "@ContainedIn is pointing to an entity having @ProvidedId: %1$s. " +
 			"This is not supported, indexing of contained in entities will be skipped. " +
 			"Indexed data of the embedded object might become out of date in objects of type ")
-	void containedInPointsToProvidedId(Class<?> objectClass);
+	void containedInPointsToProvidedId(@FormatWith(ClassFormatter.class) Class<?> objectClass);
 
 	@LogMessage(level = WARN)
 	@Message(id = 46,
 			value = "FieldCache was enabled on class %1$s but for this type of identifier we can't extract values from the FieldCache: cache disabled")
-	void cannotExtractValueForIdentifier(Class<?> beanClass);
+	void cannotExtractValueForIdentifier(@FormatWith(ClassFormatter.class) Class<?> beanClass);
 
 	@LogMessage(level = WARN)
 	@Message(id = 47, value = "Unable to close JMS connection for %1$s")
@@ -248,7 +248,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = ERROR)
 	@Message(id = 68, value = "Unable to retrieve object from message: %1$s")
-	void unableToRetrieveObjectFromMessage(Class<?> messageClass, @Cause Exception e);
+	void unableToRetrieveObjectFromMessage(@FormatWith(ClassFormatter.class) Class<?> messageClass, @Cause Exception e);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 69, value = "Illegal object retrieved from message")
@@ -298,7 +298,7 @@ public interface Log extends BasicLogger {
 	SearchException unableToReadSerializedLuceneWorks(@Cause Throwable e);
 
 	@Message(id = 85, value = "Attribute type is not recognized and not serializable: %1$s")
-	SearchException attributeNotRecognizedNorSerializable(Class<?> attributeType);
+	SearchException attributeNotRecognizedNorSerializable(@FormatWith(ClassFormatter.class) Class<?> attributeType);
 
 	@Message(id = 86, value = "Unknown attribute serialized representation: %1$s")
 	SearchException unknownAttributeSerializedRepresentation(String name);
@@ -316,14 +316,14 @@ public interface Log extends BasicLogger {
 	SearchException conversionFromReaderToStringNotYetImplemented();
 
 	@Message(id = 93, value = "Unknown Field type: %1$s")
-	SearchException unknownFieldType(Class<?> fieldType);
+	SearchException unknownFieldType(@FormatWith(ClassFormatter.class) Class<?> fieldType);
 
 	@Message(id = 94,
 			value = "Cannot serialize custom Fieldable '%1$s'. Must be NumericField, Field or a Serializable Fieldable implementation.")
-	SearchException cannotSerializeCustomField(Class<?> fieldType);
+	SearchException cannotSerializeCustomField(@FormatWith(ClassFormatter.class) Class<?> fieldType);
 
 	@Message(id = 95, value = "Fail to serialize object of type %1$s")
-	SearchException failToSerializeObject(Class<?> type, @Cause Throwable e);
+	SearchException failToSerializeObject(@FormatWith(ClassFormatter.class) Class<?> type, @Cause Throwable e);
 
 	@Message(id = 96, value = "Fail to deserialize object")
 	SearchException failToDeserializeObject(@Cause Throwable e);
@@ -412,15 +412,15 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = TRACE)
 	@Message(id = 125, value = "Interceptor enforces skip index operation %2$s on instance of class %1$s")
-	void forceSkipIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+	void forceSkipIndexOperationViaInterception(@FormatWith(ClassFormatter.class) Class<?> entityClass, WorkType type);
 
 	@LogMessage(level = TRACE)
 	@Message(id = 126, value = "Interceptor enforces removal of index data instead of index operation %2$s on instance of class %1$s")
-	void forceRemoveOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+	void forceRemoveOnIndexOperationViaInterception(@FormatWith(ClassFormatter.class) Class<?> entityClass, WorkType type);
 
 	@LogMessage(level = TRACE)
 	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
-	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+	void forceUpdateOnIndexOperationViaInterception(@FormatWith(ClassFormatter.class) Class<?> entityClass, WorkType type);
 
 	@Message(id = 131, value = "The field '%1$s#%2$s' used for the spatial query is not configured as spatial field. Check the proper use of @Spatial respectively SpatialFieldBridge")
 	SearchException targetedFieldNotSpatial(String className, String fieldName);
@@ -463,7 +463,7 @@ public interface Log extends BasicLogger {
 	SearchException unableToGetInputStreamFromBlob(@Cause Throwable e);
 
 	@Message(id = 151, value = "Unable to get input stream from object of type %1$s")
-	SearchException unsupportedTikaBridgeType(Class<?> objectType);
+	SearchException unsupportedTikaBridgeType(@FormatWith(ClassFormatter.class) Class<?> objectType);
 
 	@Message(id = 152, value = "File %1$s does not exist")
 	SearchException fileDoesNotExist(String fileName);
@@ -546,10 +546,10 @@ public interface Log extends BasicLogger {
 	String massIndexerUnableToIndexInstance(String clazz, String value);
 
 	@Message(id = 184, value = "Cannot define an entity with 0 shard on '%1$s'")
-	SearchException entityWithNoShard(Class<?> type);
+	SearchException entityWithNoShard(@FormatWith(ClassFormatter.class) Class<?> type);
 
 	@Message(id = 186, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinding is not assignable to WorkerBuilderContext. Actual class is %1$s")
-	SearchException assertionFailureCannotCastToWorkerBuilderContext(Class<?> type);
+	SearchException assertionFailureCannotCastToWorkerBuilderContext(@FormatWith(ClassFormatter.class) Class<?> type);
 
 	@Message(id = 189, value = "Multiple entities are sharing the same index but are declaring an " +
 			"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
@@ -591,19 +591,19 @@ public interface Log extends BasicLogger {
 	SearchException incorrectEditDistance();
 
 	@Message(id = 202, value = "Unable to find entity $1%s with id $2%s")
-	SearchException entityWithIdNotFound(Class<?> entityType, String id);
+	SearchException entityWithIdNotFound(@FormatWith(ClassFormatter.class) Class<?> entityType, String id);
 
 	@Message(id = 203, value = "No field from %s can be used for More Like This queries. They are neither stored or including the term vectors.")
-	SearchException noFieldCompatibleForMoreLikeThis(Class<?> entityType);
+	SearchException noFieldCompatibleForMoreLikeThis(@FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 205, value = "An IOException happened while accessing the Lucene indexes related to '%1$s'")
-	SearchException ioExceptionOnIndexOfEntity(@Cause IOException e, Class<?> entityType);
+	SearchException ioExceptionOnIndexOfEntity(@Cause IOException e, @FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 206, value = "MoreLikeThis queries require a TFIDFSimilarity for entity '$1%s'")
-	SearchException requireTFIDFSimilarity(Class<?> beanClass);
+	SearchException requireTFIDFSimilarity(@FormatWith(ClassFormatter.class) Class<?> beanClass);
 
 	@Message(id = 207, value = "Field %s of entity %s cannot be used in a MoreLikeThis query: the term vector (preferred) or the value itself need to be stored.")
-	SearchException fieldNotStoredNorTermVectorCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+	SearchException fieldNotStoredNorTermVectorCannotBeUsedInMoreLikeThis(String fieldName, @FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 208, value = "ClassLoaderService cannot be provided via SearchConfiguration#getProvidedServices. Use SearchConfiguration#getClassLoaderService!")
 	SearchException classLoaderServiceContainedInProvidedServicesException();
@@ -621,10 +621,10 @@ public interface Log extends BasicLogger {
 	String massIndexerExceptionWhileTransformingIds();
 
 	@Message(id = 213, value = "Field %s of entity %s cannot be used in a MoreLikeThis query. Ids and embedded ids are excluded.")
-	SearchException fieldIdCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+	SearchException fieldIdCannotBeUsedInMoreLikeThis(String fieldName, @FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 214, value = "Field %s of entity %s cannot be used in a MoreLikeThis query. Numeric fields are not considered for the moment.")
-	SearchException numericFieldCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+	SearchException numericFieldCannotBeUsedInMoreLikeThis(String fieldName, @FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 215, value = "Multiple matching FieldBridges found for %s of return type %s: %s" )
 	SearchException multipleMatchingFieldBridges(XMember member, XClass memberType, String listOfFieldBridges);
