@@ -371,7 +371,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 
 		// finally add all other document fields
-		Set<String> processedFieldNames = new HashSet<String>();
+		Set<String> processedFieldNames = new HashSet<>();
 		buildDocumentFields(
 				instance,
 				doc,
@@ -385,11 +385,6 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return doc;
 	}
 
-	/**
-	 * @param inheritedBoost Boost inherited from the parent structure of the given instance: the document-level boost
-	 * in case of a top-level field, the product of the document-level boost and the boost(s) of the parent
-	 * embeddable(s) in case of an embedded field
-	 */
 	private void addTenantIdIfRequired(String tenantId, Document doc) {
 		if ( tenantId != null ) {
 			Field tenantIdField = new Field(
@@ -415,6 +410,11 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return type;
 	}
 
+	/**
+	 * @param inheritedBoost Boost inherited from the parent structure of the given instance: the document-level boost
+	 * in case of a top-level field, the product of the document-level boost and the boost(s) of the parent
+	 * embeddable(s) in case of an embedded field
+	 */
 	private void buildDocumentFields(Object instance,
 			Document doc,
 			TypeMetadata typeMetadata,
@@ -427,80 +427,37 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
 
-		// process the class bridges
-		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
-			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
-			final String fieldName = fieldMetadata.getName();
-			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
-			conversionContext.pushProperty( fieldName );
-			try {
-				oneWayConversionContext.set(
-						fieldName,
-						unproxiedInstance,
-						doc,
-						typeMetadata.getClassLuceneOptions( fieldMetadata, inheritedBoost )
-				);
-			}
-			finally {
-				conversionContext.popProperty();
-			}
-		}
-
-		// process the indexed fields
-		XMember previousMember = null;
-		Object currentFieldValue = null;
-		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
-			XMember member = propertyMetadata.getPropertyAccessor();
-			if ( previousMember != member ) {
-				currentFieldValue = unproxy(
-						ReflectionHelper.getMemberValue( unproxiedInstance, member ),
-						objectInitializer
-				);
-				previousMember = member;
-				if ( member.isCollection() ) {
-					if ( currentFieldValue instanceof Collection ) {
-						objectInitializer.initializeCollection( (Collection<?>) currentFieldValue );
-					}
-					else if ( currentFieldValue instanceof Map ) {
-						objectInitializer.initializeMap( (Map<?, ?>) currentFieldValue );
-					}
-				}
-			}
-
-			try {
-				conversionContext.pushProperty( propertyMetadata.getPropertyAccessorName() );
-
-				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
-					final FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
-					final String fieldName = fieldMetadata.getName();
-					final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
-
-					oneWayConversionContext.set(
-							fieldName,
-							currentFieldValue,
-							doc,
-							typeMetadata.getFieldLuceneOptions( propertyMetadata, fieldMetadata, currentFieldValue, inheritedBoost )
-					);
-				}
-			}
-			finally {
-				conversionContext.popProperty();
-			}
-		}
+		buildDocumentFieldForClassBridges( doc, typeMetadata, conversionContext, inheritedBoost, unproxiedInstance );
+		buildDocumentFieldsForProperties(
+				doc, typeMetadata, conversionContext, objectInitializer, inheritedBoost, unproxiedInstance
+		);
 
 		// allow analyzer override for the fields added by the class and field bridges
 		allowAnalyzerDiscriminatorOverride(
 				doc, typeMetadata, fieldToAnalyzerMap, processedFieldNames, unproxiedInstance
 		);
 
-		// recursively process embedded objects
+		buildDocumentFieldsForEmbeddedObjects(
+				doc, typeMetadata, fieldToAnalyzerMap, processedFieldNames, conversionContext, objectInitializer,
+				inheritedBoost,
+				unproxiedInstance
+		);
+	}
+
+	private void buildDocumentFieldsForEmbeddedObjects(Document doc,
+			TypeMetadata typeMetadata,
+			Map<String, String> fieldToAnalyzerMap,
+			Set<String> processedFieldNames,
+			ConversionContext conversionContext,
+			InstanceInitializer objectInitializer,
+			float inheritedBoost,
+			Object unproxiedInstance) {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
 			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
 			conversionContext.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
 			try {
 				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-
 				if ( value == null ) {
 					processEmbeddedNullValue( doc, embeddedTypeMetadata, conversionContext );
 					continue;
@@ -570,6 +527,76 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 										+ embeddedTypeMetadata.getEmbeddedContainer()
 						);
 				}
+			}
+			finally {
+				conversionContext.popProperty();
+			}
+		}
+	}
+
+	private void buildDocumentFieldsForProperties(Document doc,
+			TypeMetadata typeMetadata,
+			ConversionContext conversionContext,
+			InstanceInitializer objectInitializer,
+			float documentBoost,
+			Object unproxiedInstance) {
+		XMember previousMember = null;
+		Object currentFieldValue = null;
+		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
+			XMember member = propertyMetadata.getPropertyAccessor();
+			if ( previousMember != member ) {
+				currentFieldValue = unproxy(
+						ReflectionHelper.getMemberValue( unproxiedInstance, member ),
+						objectInitializer
+				);
+				previousMember = member;
+				if ( member.isCollection() ) {
+					if ( currentFieldValue instanceof Collection ) {
+						objectInitializer.initializeCollection( (Collection) currentFieldValue );
+					}
+					else if ( currentFieldValue instanceof Map ) {
+						objectInitializer.initializeMap( (Map) currentFieldValue );
+					}
+				}
+			}
+
+			try {
+				conversionContext.pushProperty( propertyMetadata.getPropertyAccessorName() );
+
+				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+					final FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
+					final String fieldName = fieldMetadata.getName();
+					final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
+
+					oneWayConversionContext.set(
+							fieldName,
+							currentFieldValue,
+							doc,
+							typeMetadata.getFieldLuceneOptions( propertyMetadata, fieldMetadata, currentFieldValue, documentBoost )
+					);
+				}
+			}
+			finally {
+				conversionContext.popProperty();
+			}
+		}
+	}
+
+	private void buildDocumentFieldForClassBridges(Document doc,
+			TypeMetadata typeMetadata,
+			ConversionContext conversionContext, float documentBoost, Object unproxiedInstance) {
+		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
+			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
+			final String fieldName = fieldMetadata.getName();
+			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
+			conversionContext.pushProperty( fieldName );
+			try {
+				oneWayConversionContext.set(
+						fieldName,
+						unproxiedInstance,
+						doc,
+						typeMetadata.getClassLuceneOptions( fieldMetadata, documentBoost )
+				);
 			}
 			finally {
 				conversionContext.popProperty();
