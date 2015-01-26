@@ -204,7 +204,7 @@ public class QueryHits {
 
 		final TopDocsCollector<?> topDocCollector;
 		final TotalHitCountCollector hitCountCollector;
-		Collector collector = null;
+		Collector collector;
 		if ( maxDocs != 0 ) {
 			topDocCollector = createTopDocCollector( maxDocs );
 			hitCountCollector = null;
@@ -282,7 +282,7 @@ public class QueryHits {
 			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
 			if ( timeoutLeft != null ) {
 				if ( timeoutLeft == 0l ) {
-					if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT && timeoutManager.isTimedOut() ) {
+					if ( timeoutManager.isTimedOut() ) {
 						timeoutManager.forceTimedOut();
 						timeoutAt0 = true;
 					}

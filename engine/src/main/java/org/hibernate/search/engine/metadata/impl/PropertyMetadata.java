@@ -48,7 +48,7 @@ public class PropertyMetadata {
 	}
 
 	private Map<String, DocumentFieldMetadata> createDocumentFieldMetadataMap(Set<DocumentFieldMetadata> fieldMetadataSet) {
-		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<String, DocumentFieldMetadata>();
+		Map<String, DocumentFieldMetadata> tmpMap = new HashMap<>();
 		for ( DocumentFieldMetadata documentFieldMetadata : fieldMetadataSet ) {
 			tmpMap.put( documentFieldMetadata.getName(), documentFieldMetadata );
 		}
@@ -88,7 +88,7 @@ public class PropertyMetadata {
 				ReflectionHelper.setAccessible( propertyAccessor );
 			}
 			this.propertyAccessor = propertyAccessor;
-			this.fieldMetadataSet = new HashSet<DocumentFieldMetadata>();
+			this.fieldMetadataSet = new HashSet<>();
 		}
 
 		public Builder dynamicBoostStrategy(BoostStrategy boostStrategy) {

@@ -426,7 +426,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * @param searcher The index searcher.
 	 * @param n Number of documents to retrieve
 	 *
-	 * @return An instance of <code>QueryHits</code> wrapping the Lucene query and the matching documents.
+	 * @return An instance of {@code QueryHits} wrapping the Lucene query and the matching documents.
 	 *
 	 * @throws IOException in case there is an error executing the lucene search.
 	 */

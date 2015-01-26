@@ -21,6 +21,8 @@ import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.search.testsupport.TestForIssue;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -121,8 +123,8 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 		assertFacetCounts( facetList, new int[] { 5, 4, 4 } );
 	}
 
-	// see also HSEARCH-776
 	@Test
+	@TestForIssue( jiraKey = "HSEARCH-776")
 	public void testMaxFacetCounts() throws Exception {
 		FacetingRequest request = queryBuilder( Car.class ).facet()
 				.name( facetName )
