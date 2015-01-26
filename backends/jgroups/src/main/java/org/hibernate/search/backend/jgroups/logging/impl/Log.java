@@ -119,6 +119,6 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	void jgroupsBlockWaitingForAck(String indexName, boolean block);
 
 	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 23, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
-			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
+			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/5.0/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
 }
