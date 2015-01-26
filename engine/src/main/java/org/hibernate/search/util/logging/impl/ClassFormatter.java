@@ -7,15 +7,16 @@
 package org.hibernate.search.util.logging.impl;
 
 /**
- * Used with JBoss Logging to display class names in log messages.
+ * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith} to display {@link Class} names in log
+ * messages.
  *
  * @author Gunnar Morling
  */
-public class ClassObjectFormatter {
+public class ClassFormatter {
 
 	private final String stringRepresentation;
 
-	public ClassObjectFormatter(Class<?> clazz) {
+	public ClassFormatter(Class<?> clazz) {
 		this.stringRepresentation = clazz.getName();
 	}
 

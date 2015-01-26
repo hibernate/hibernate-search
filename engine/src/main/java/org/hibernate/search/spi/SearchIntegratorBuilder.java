@@ -589,7 +589,7 @@ public class SearchIntegratorBuilder {
 	}
 
 	private ErrorHandler createErrorHandlerFromString(String errorHandlerClassName, ClassLoaderService classLoaderService) {
-		if ( StringHelper.isEmpty( errorHandlerClassName ) || "log".equals( errorHandlerClassName.trim() ) ) {
+		if ( StringHelper.isEmpty( errorHandlerClassName ) || ErrorHandler.LOG.equals( errorHandlerClassName.trim() ) ) {
 			return new LogErrorHandler();
 		}
 		else {

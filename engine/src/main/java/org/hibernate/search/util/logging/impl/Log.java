@@ -742,5 +742,5 @@ public interface Log extends BasicLogger {
 	void singleTermDeleteDisabled(String indexName);
 
 	@Message(id = 250, value = "Unsupported value type for configuration property " + Environment.ERROR_HANDLER + ": %1$s")
-	SearchException unsupportedErrorHandlerConfigurationValueType(@FormatWith(ClassObjectFormatter.class) Class<?> errorHandlerValueType);
+	SearchException unsupportedErrorHandlerConfigurationValueType(@FormatWith(ClassFormatter.class) Class<?> errorHandlerValueType);
 }
