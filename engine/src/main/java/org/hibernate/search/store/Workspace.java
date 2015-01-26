@@ -69,15 +69,23 @@ public interface Workspace {
 	void flush();
 
 	/**
-	 * Return true if it's safe to perform index delete operations using only the identifier term.
-	 * This can be more efficient but can not work if there are multiple indexed types in the same
-	 * index possibly sharing the same id term, or if the index might contain entity types we don't
-	 * know.
+	 * Returns true if one and only one entity type is stored in the targeted index.
+	 * This allows to use delete by the identifier term which is much faster.
 	 *
-	 * @return true if it's safe to do the single term operation.
+	 * This method should really be named {@code isSingleClassInIndex} but that's a public contract.
 	 */
 	boolean areSingleTermDeletesSafe();
 
+	/**
+	 * Returns true if either the configuration guarantees that one can use delete by term on all indexes
+	 * or if we ensure that entity types stored in the index return positive to {@link org.hibernate.search.cfg.spi.IdUniquenessResolver}
+	 * and that the document id and JPA id are the same property.
+	 *
+	 * This allows to use delete by identifier term in a safe way and is much more efficient.
+	 * If unsure, we will delete taking the class field into account to avoid unwanted document deletions.
+	 *
+	 * The method should really be named {@code isDeleteByTermEnforcedOrSafe} but that's a public contract.
+	 */
 	boolean isDeleteByTermEnforced();
 
 	/**
