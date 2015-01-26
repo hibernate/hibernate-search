@@ -187,4 +187,9 @@ public abstract class AbstractWorkspaceImpl implements Workspace {
 	public void flush() {
 		getCommitPolicy().onFlush();
 	}
+
+	@Override
+	public String getIndexName() {
+		return this.indexManager.getIndexName();
+	}
 }

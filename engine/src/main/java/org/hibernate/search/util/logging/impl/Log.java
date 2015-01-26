@@ -736,4 +736,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 248, value = "WorkList should never be empty. Stacktrace below \n %s" )
 	void workListShouldNeverBeEmpty(String stackTrace);
 
+	@LogMessage(level = Level.INFO)
+	@Message(id = 249, value = "Cannot do fast deletes on index '%s'. Entities in this index are conflicting or the index can accept unknown entities." )
+	void singleTermDeleteDisabled(String indexName);
 }

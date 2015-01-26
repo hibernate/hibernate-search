@@ -93,4 +93,9 @@ public interface Workspace {
 	 */
 	CommitPolicy getCommitPolicy();
 
+	/**
+	 * Returns the name of the index this workspace is being used for.
+	 */
+	String getIndexName();
+
 }
