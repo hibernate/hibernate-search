@@ -68,4 +68,9 @@ public class StandardFilterKey extends FilterKey {
 		}
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "StandardFilterKey [parameters=" + parameters + "]";
+	}
 }
