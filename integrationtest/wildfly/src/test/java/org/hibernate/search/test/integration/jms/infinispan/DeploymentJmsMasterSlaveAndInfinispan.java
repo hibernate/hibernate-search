@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.integration.jms.infinispan;
 
-import java.io.File;
-
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
 import org.hibernate.search.test.integration.jms.infinispan.controller.MembersCache;
@@ -25,7 +23,8 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
 
 /**
- * Create deployments for JMS Master/Slave configuration integration tests.
+ * Create deployments for JMS Master/Slave configuration integration tests
+ * storing the index in Infinispan.
  * Make sure to test for a secured JMS environment.
  *
  * @author Davide D'Alto
@@ -37,15 +36,15 @@ public final class DeploymentJmsMasterSlaveAndInfinispan {
 		//not allowed
 	}
 
-	public static Archive<?> createMaster(String deploymentName, int refreshPeriod, File tmpDir) throws Exception {
-		return baseArchive( deploymentName, masterPersistenceXml( deploymentName, refreshPeriod, tmpDir ) )
+	public static Archive<?> createMaster(String deploymentName) throws Exception {
+		return baseArchive( deploymentName, masterPersistenceXml( deploymentName ) )
 				.addClass( RegistrationMdb.class )
 				.addAsWebInfResource( hornetqJmsXml(), "hornetq-jms.xml" )
 				;
 	}
 
-	public static Archive<?> createSlave(String deploymentName, int refreshPeriod, File tmpDir) throws Exception {
-		return baseArchive( deploymentName, slavePersistenceXml( deploymentName, refreshPeriod, tmpDir ) );
+	public static Archive<?> createSlave(String deploymentName) throws Exception {
+		return baseArchive( deploymentName, slavePersistenceXml( deploymentName ) );
 	}
 
 	private static WebArchive baseArchive(String name, PersistenceDescriptor unitDef) throws Exception {
@@ -57,14 +56,14 @@ public final class DeploymentJmsMasterSlaveAndInfinispan {
 		return webArchive;
 	}
 
-	private static PersistenceDescriptor masterPersistenceXml(String name, int refreshPeriod, File tmpDir)
+	private static PersistenceDescriptor masterPersistenceXml(String name)
 			throws Exception {
-		return commonUnitDef( name, "filesystem-master", refreshPeriod, tmpDir ).up().up();
+		return commonUnitDef( name ).up().up();
 	}
 
-	private static PersistenceDescriptor slavePersistenceXml(String name, int refreshPeriod, File tmpDir)
+	private static PersistenceDescriptor slavePersistenceXml(String name)
 			throws Exception {
-		return commonUnitDef( name, "filesystem-slave", refreshPeriod, tmpDir )
+		return commonUnitDef( name )
 					.createProperty()
 						.name( "hibernate.search.default.worker.backend" )
 						.value( "jms" )
@@ -93,8 +92,7 @@ public final class DeploymentJmsMasterSlaveAndInfinispan {
 				.up();
 	}
 
-	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(
-			String name, String directoryProvider, int refreshPeriod, File tmpDir) throws Exception {
+	private static Properties<PersistenceUnit<PersistenceDescriptor>> commonUnitDef(String name) throws Exception {
 		return Descriptors.create( PersistenceDescriptor.class )
 				.createPersistenceUnit()
 					.name( "pu-" + name )
@@ -110,19 +108,7 @@ public final class DeploymentJmsMasterSlaveAndInfinispan {
 							.up()
 						.createProperty()
 							.name( "hibernate.search.default.directory_provider" )
-							.value( directoryProvider )
-							.up()
-						.createProperty()
-							.name( "hibernate.search.default.sourceBase" )
-							.value( tmpDir.getAbsolutePath() + "-sourceBase" )
-							.up()
-						.createProperty()
-							.name( "hibernate.search.default.indexBase" )
-							.value( tmpDir.getAbsolutePath() + "-" + name )
-							.up()
-						.createProperty()
-							.name( "hibernate.search.default.refresh" )
-							.value( String.valueOf( refreshPeriod ) )
+							.value( "infinispan" )
 							.up()
 						.createProperty()
 							.name( "hibernate.search.default.worker.execution" )

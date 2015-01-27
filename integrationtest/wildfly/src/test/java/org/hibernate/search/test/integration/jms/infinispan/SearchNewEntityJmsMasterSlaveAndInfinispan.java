@@ -22,7 +22,7 @@ import org.jboss.arquillian.junit.InSequence;
 import org.junit.Test;
 
 /**
- * Test that the JMS backend can used at the same time with Infinispan.
+ * Test that the JMS backend can be used at the same time with Infinispan.
  * <p>
  * Search dependencies are not added to the archives.
  *
@@ -31,21 +31,16 @@ import org.junit.Test;
 public abstract class SearchNewEntityJmsMasterSlaveAndInfinispan {
 
 	/**
-	 * Affects how often the Master and Slave directories should start the refresh copy work
-	 */
-	static final int REFRESH_PERIOD_IN_SEC = 2;
-
-	/**
 	 * Idle loop to wait for results to be transmitted
 	 */
 	private static final int SLEEP_TIME_FOR_SYNCHRONIZATION = 50;
 
 	/**
-	 * Multiplier on top of REFRESH_PERIOD_IN_SEC we can wait before considering the test failed.
+	 * Multiplier to how long we can wait before considering the test failed.
 	 */
 	private static final int MAX_PERIOD_RETRIES = 5;
 
-	private static final int MAX_SEARCH_ATTEMPTS = ( MAX_PERIOD_RETRIES * REFRESH_PERIOD_IN_SEC * 1000 / SLEEP_TIME_FOR_SYNCHRONIZATION );
+	private static final int MAX_SEARCH_ATTEMPTS = ( MAX_PERIOD_RETRIES * 1000 / SLEEP_TIME_FOR_SYNCHRONIZATION );
 
 	@Inject
 	RegistrationController memberRegistration;
