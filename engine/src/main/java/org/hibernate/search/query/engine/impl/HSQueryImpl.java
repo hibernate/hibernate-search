@@ -786,13 +786,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			try {
 				filter = (Filter) def.getFactoryMethod().invoke( instance );
 			}
-			catch (IllegalAccessException e) {
-				throw new SearchException(
-						"Unable to access @Factory method: "
-								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
-				);
-			}
-			catch (InvocationTargetException e) {
+			catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SearchException(
 						"Unable to access @Factory method: "
 								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
@@ -800,7 +794,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 			catch (ClassCastException e) {
 				throw new SearchException(
-						"@Key method does not return a org.apache.lucene.search.Filter class: "
+						"Factory method does not return a org.apache.lucene.search.Filter class: "
 								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
 				);
 			}

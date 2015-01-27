@@ -743,4 +743,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 250, value = "Unsupported value type for configuration property " + Environment.ERROR_HANDLER + ": %1$s")
 	SearchException unsupportedErrorHandlerConfigurationValueType(@FormatWith(ClassFormatter.class) Class<?> errorHandlerValueType);
+
+	@Message(id = 251, value = "Unable to set filter parameter '%2$s' on filter class %1$s")
+	SearchException unableToSetFilterParameter(Class<?> filterClass, String parameterName, @Cause Exception e);
 }
