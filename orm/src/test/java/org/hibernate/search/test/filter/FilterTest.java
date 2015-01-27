@@ -97,7 +97,7 @@ public class FilterTest extends SearchTestBase {
 		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cacheinstancetest" );
 		ftQuery.getResultSize();
-//		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 ); //uncomment this when solving HSEARCH-818
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 );
 	}
 
 	@Test
