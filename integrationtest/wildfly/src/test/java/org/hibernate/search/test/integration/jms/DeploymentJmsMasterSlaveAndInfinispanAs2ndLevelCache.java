@@ -4,11 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.integration.jms.infinispan;
+package org.hibernate.search.test.integration.jms;
+
+import javax.persistence.SharedCacheMode;
 
 import org.hibernate.search.test.integration.jms.controller.RegistrationController;
 import org.hibernate.search.test.integration.jms.controller.RegistrationMdb;
-import org.hibernate.search.test.integration.jms.infinispan.controller.MembersCache;
+import org.hibernate.search.test.integration.jms.controller.StatisticsController;
 import org.hibernate.search.test.integration.jms.model.RegisteredMember;
 import org.hibernate.search.test.integration.jms.util.RegistrationConfiguration;
 import org.jboss.shrinkwrap.api.Archive;
@@ -24,15 +26,15 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
 
 /**
  * Create deployments for JMS Master/Slave configuration integration tests
- * storing the index in Infinispan.
+ * using infinispan as index storage.
  * Make sure to test for a secured JMS environment.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
  */
-public final class DeploymentJmsMasterSlaveAndInfinispan {
+public final class DeploymentJmsMasterSlaveAndInfinispanAs2ndLevelCache {
 
-	private DeploymentJmsMasterSlaveAndInfinispan() {
+	private DeploymentJmsMasterSlaveAndInfinispanAs2ndLevelCache() {
 		//not allowed
 	}
 
@@ -50,7 +52,7 @@ public final class DeploymentJmsMasterSlaveAndInfinispan {
 	private static WebArchive baseArchive(String name, PersistenceDescriptor unitDef) throws Exception {
 		WebArchive webArchive = ShrinkWrap
 				.create( WebArchive.class, name + ".war" )
-				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, SearchNewEntityJmsMasterSlaveAndInfinispan.class, MembersCache.class )
+				.addClasses( RegistrationController.class, RegisteredMember.class, RegistrationConfiguration.class, SearchNewEntityJmsMasterSlave.class, StatisticsController.class )
 				.addAsResource( new StringAsset( unitDef.exportAsString() ), "META-INF/persistence.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 		return webArchive;
@@ -113,6 +115,16 @@ public final class DeploymentJmsMasterSlaveAndInfinispan {
 						.createProperty()
 							.name( "hibernate.search.default.worker.execution" )
 							.value( "sync" )
+							.up()
+						// Activate 2nd level cache and caching everything by default
+						.createProperty()
+							.name( "javax.persistence.sharedCache.mode" )
+							.value( SharedCacheMode.ALL.name() )
+							.up()
+						// Enable the statistics so that we can check if the cache is used
+						.createProperty()
+							.name( "hibernate.generate_statistics" )
+							.value( "true" )
 							.up();
 	}
 
