@@ -759,22 +759,30 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			return null;
 		}
 
-		Object instance = createFilterInstance( fullTextFilter, def );
-		FilterKey key = createFilterKey( def, instance, fullTextFilter );
+		if ( !cacheInstance( def.getCacheMode() ) ) {
+			Object filterOrFactory = createFilterInstance( fullTextFilter, def );
+			return createFilter( def, filterOrFactory );
+		}
+		else {
+			return createOrGetLuceneFilterFromCache( fullTextFilter, def );
+		}
+	}
+
+	private Filter createOrGetLuceneFilterFromCache(FullTextFilterImpl fullTextFilter, FilterDef def) {
+		// Avoiding the filter/factory instantiation, unless needed for key determination or actual filter creation
+		boolean hasCustomKey = def.getKeyMethod() != null;
+		Object filterOrFactory = hasCustomKey ? createFilterInstance( fullTextFilter, def ) : null;
+
+		FilterKey key = createFilterKey( def, filterOrFactory, fullTextFilter );
 
 		// try to get the filter out of the cache
-		Filter filter = cacheInstance( def.getCacheMode() ) ?
-				extendedIntegrator.getFilterCachingStrategy().getCachedFilter( key ) :
-				null;
+		Filter filter = extendedIntegrator.getFilterCachingStrategy().getCachedFilter( key );
 
 		if ( filter == null ) {
-			filter = createFilter( def, instance );
-
-			// add filter to cache if we have to
-			if ( cacheInstance( def.getCacheMode() ) ) {
-				extendedIntegrator.getFilterCachingStrategy().addCachedFilter( key, filter );
-			}
+			filter = createFilter( def, hasCustomKey ? filterOrFactory : createFilterInstance( fullTextFilter, def ) );
+			extendedIntegrator.getFilterCachingStrategy().addCachedFilter( key, filter );
 		}
+
 		return filter;
 	}
 
@@ -782,11 +790,11 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return def.getImpl().equals( ShardSensitiveOnlyFilter.class );
 	}
 
-	private Filter createFilter(FilterDef def, Object instance) {
+	private Filter createFilter(FilterDef def, Object filterOrFactory) {
 		Filter filter;
 		if ( def.getFactoryMethod() != null ) {
 			try {
-				filter = (Filter) def.getFactoryMethod().invoke( instance );
+				filter = (Filter) def.getFactoryMethod().invoke( filterOrFactory );
 			}
 			catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SearchException(
@@ -803,7 +811,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		}
 		else {
 			try {
-				filter = (Filter) instance;
+				filter = (Filter) filterOrFactory;
 			}
 			catch (ClassCastException e) {
 				throw new SearchException(
@@ -836,18 +844,15 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return filter;
 	}
 
-	private FilterKey createFilterKey(FilterDef def, Object instance, FullTextFilterImpl fullTextFilter) {
+	private FilterKey createFilterKey(FilterDef def, Object filterOrFactory, FullTextFilterImpl fullTextFilter) {
 		FilterKey key = null;
-		if ( !cacheInstance( def.getCacheMode() ) ) {
-			return key; // if the filter is not cached there is no key!
-		}
 
 		if ( def.getKeyMethod() == null ) {
 			key = createDefaultFilterKey( fullTextFilter );
 		}
 		else {
 			try {
-				key = (FilterKey) def.getKeyMethod().invoke( instance );
+				key = (FilterKey) def.getKeyMethod().invoke( filterOrFactory );
 			}
 			catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SearchException(
