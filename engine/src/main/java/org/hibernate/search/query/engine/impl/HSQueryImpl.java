@@ -14,33 +14,35 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.filter.FullTextFilter;
-import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.exception.SearchException;
+import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.annotations.FieldCacheType;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.filter.StandardFilterKey;
-import org.hibernate.search.filter.impl.ChainedFilter;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterKey;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
+import org.hibernate.search.filter.impl.ChainedFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
@@ -751,14 +753,14 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
 		 */
 		FilterDef def = extendedIntegrator.getFilterDefinition( fullTextFilter.getName() );
-		//def can never be null, ti's guarded by enableFullTextFilter(String)
+		//def can never be null, it's guarded by enableFullTextFilter(String)
 
 		if ( isPreQueryFilterOnly( def ) ) {
 			return null;
 		}
 
 		Object instance = createFilterInstance( fullTextFilter, def );
-		FilterKey key = createFilterKey( def, instance );
+		FilterKey key = createFilterKey( def, instance, fullTextFilter );
 
 		// try to get the filter out of the cache
 		Filter filter = cacheInstance( def.getCacheMode() ) ?
@@ -834,28 +836,14 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return filter;
 	}
 
-	private FilterKey createFilterKey(FilterDef def, Object instance) {
+	private FilterKey createFilterKey(FilterDef def, Object instance, FullTextFilterImpl fullTextFilter) {
 		FilterKey key = null;
 		if ( !cacheInstance( def.getCacheMode() ) ) {
 			return key; // if the filter is not cached there is no key!
 		}
 
 		if ( def.getKeyMethod() == null ) {
-			key = new FilterKey() {
-				@Override
-				public int hashCode() {
-					return getImpl().hashCode();
-				}
-
-				@Override
-				public boolean equals(Object obj) {
-					if ( !( obj instanceof FilterKey ) ) {
-						return false;
-					}
-					FilterKey that = (FilterKey) obj;
-					return this.getImpl().equals( that.getImpl() );
-				}
-			};
+			key = createDefaultFilterKey( fullTextFilter );
 		}
 		else {
 			try {
@@ -883,14 +871,25 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return wrapperKey;
 	}
 
+	/**
+	 * Builds a {@link StandardFilterKey} based on the names and values of all the given filter's parameters.
+	 */
+	private FilterKey createDefaultFilterKey(FullTextFilterImpl fullTextFilter) {
+		StandardFilterKey key = new StandardFilterKey();
+
+		// Using the tree map to ensure the same parameter sets passed in several invocations are processed in the same order
+		for ( Entry<String, Object> parameter : new TreeMap<>( fullTextFilter.getParameters() ).entrySet() ) {
+			key.addParameter( parameter.getKey() );
+			key.addParameter( parameter.getValue() );
+		}
+
+		return key;
+	}
+
 	private Object createFilterInstance(FullTextFilterImpl fullTextFilter, FilterDef def) {
 		final Object instance = ClassLoaderHelper.instanceFromClass( Object.class, def.getImpl(), "@FullTextFilterDef" );
 		for ( Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet() ) {
 			def.invoke( entry.getKey(), instance, entry.getValue() );
-		}
-		if ( cacheInstance( def.getCacheMode() ) && def.getKeyMethod() == null && fullTextFilter.getParameters()
-				.size() > 0 ) {
-			throw new SearchException( "Filter with parameters and no @Key method: " + fullTextFilter.getName() );
 		}
 		return instance;
 	}
