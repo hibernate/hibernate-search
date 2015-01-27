@@ -34,10 +34,10 @@ import org.hibernate.search.bridge.builtin.IntegerBridge;
 				impl = SecurityFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "fieldConstraintFilter-1",
-				impl = FieldConstraintFilter.class,
+				impl = FieldConstraintFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "fieldConstraintFilter-2",
-				impl = FieldConstraintFilter.class,
+				impl = FieldConstraintFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		//Filter factory with parameters
 		@FullTextFilterDef(name = "cacheresultstest",
