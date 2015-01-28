@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.index.IndexableField;
-import org.hibernate.search.backend.DeleteByQuerySupport;
 import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;

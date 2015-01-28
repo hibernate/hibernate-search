@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.spi;
 
 import org.hibernate.search.backend.DeletionQuery;
-import org.hibernate.search.backend.DeleteByQuerySupport;
+import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 
 /**
  * Delete via a serializable query

@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.apache.lucene.util.AttributeImpl;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.backend.DeleteByQuerySupport;
+import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
