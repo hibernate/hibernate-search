@@ -23,6 +23,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * context bound list of operations instead of sending all changes directly to the backend.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
+ * @author Martin Braun
  */
 public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {
 

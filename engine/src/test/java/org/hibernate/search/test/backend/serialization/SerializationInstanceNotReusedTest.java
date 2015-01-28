@@ -85,7 +85,7 @@ public class SerializationInstanceNotReusedTest {
 
 	private byte[] makeSomeSerializedWork() {
 		//Random: we won't deserialize this
-		return new byte[]{ 0, 1, 2 };
+		return new byte[]{ 0, 1, 2};
 	}
 
 	private List<LuceneWork> makeSomeWork() {

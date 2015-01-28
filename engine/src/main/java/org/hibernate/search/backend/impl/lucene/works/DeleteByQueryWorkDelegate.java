@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.impl.lucene.works;
 
+import java.io.IOException;
+
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -47,7 +49,9 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 		final Class<?> entityType = work.getEntityClass();
 		final DeletionQuery query = deleteWork.getDeletionQuery();
 
-		log.tracef( "Removing all %s matching Query: %s", entityType.toString(), query.toString() );
+		if ( log.isTraceEnabled() ) {
+			log.tracef( "Removing all %s matching Query: %s", entityType.toString(), query.toString() );
+		}
 
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
@@ -84,7 +88,7 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 		try {
 			writer.deleteDocuments( entityDeletionQuery );
 		}
-		catch (Exception e) {
+		catch (IOException e) {
 			String message = String.format( "unable to remove all %s matching Query: %s", entityType.toString(), query.toString() );
 			throw new SearchException( message, e );
 		}

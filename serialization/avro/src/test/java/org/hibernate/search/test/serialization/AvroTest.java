@@ -121,12 +121,12 @@ public class AvroTest {
 		classReferences.add( AvroTest.class.getName() );
 
 		List<GenericRecord> fieldables = new ArrayList<GenericRecord>( 1 );
-		// custom fieldable
+		//custom fieldable
 		GenericRecord customFieldable = new GenericData.Record( custonFieldableSchema );
 		customFieldable.put( "instance", ByteBuffer.wrap( serializableSample ) );
 		fieldables.add( customFieldable );
 
-		// numeric fields
+		//numeric fields
 		GenericRecord numericField = createNumeric( intFieldSchema );
 		numericField.put( "value", 3 );
 		fieldables.add( numericField );
@@ -140,7 +140,7 @@ public class AvroTest {
 		numericField.put( "value", 2.3d );
 		fieldables.add( numericField );
 
-		// fields
+		//fields
 		GenericRecord field = createField( binarySchema );
 		field.put( "offset", 0 );
 		field.put( "length", 10 );
@@ -234,17 +234,17 @@ public class AvroTest {
 				System.out.println( result );
 
 				assertThat( result ).isNotNull();
-				// operations
+				//operations
 				assertThat( result.get( "operations" ) ).isNotNull().isInstanceOf( List.class );
 				List<?> ops = (List<?>) result.get( "operations" );
 				assertThat( ops ).hasSize( 5 );
 
-				// Flush
+				//Flush
 				assertThat( ops.get( 2 ) ).isInstanceOf( GenericRecord.class );
 				GenericRecord flushOp = (GenericRecord) ops.get( 2 );
 				assertThat( flushOp.getSchema().getName() ).isEqualTo( "Flush" );
 
-				// Delete
+				//Delete
 				assertThat( ops.get( 3 ) ).isInstanceOf( GenericRecord.class );
 				GenericRecord deleteOp = (GenericRecord) ops.get( 3 );
 				assertThat( deleteOp.getSchema().getName() ).isEqualTo( "Delete" );
@@ -252,7 +252,7 @@ public class AvroTest {
 				assertThat( actual ).isInstanceOf( Long.class );
 				assertThat( actual ).isEqualTo( Long.valueOf( 30 ) );
 
-				// Add
+				//Add
 				assertThat( ops.get( 4 ) ).isInstanceOf( GenericRecord.class );
 				GenericRecord addOp = (GenericRecord) ops.get( 4 );
 				assertThat( addOp.getSchema().getName() ).isEqualTo( "Add" );
@@ -264,20 +264,20 @@ public class AvroTest {
 				bb.get( copy );
 				assertThat( serializableSample ).isEqualTo( copy );
 
-				// fieldToAnalyzerMap
+				//fieldToAnalyzerMap
 				assertThat( addOp.get( "fieldToAnalyzerMap" ) ).isInstanceOf( Map.class );
 				assertThat( (Map) addOp.get( "fieldToAnalyzerMap" ) ).hasSize( 2 );
 
-				// document
+				//document
 				assertThat( addOp.get( "document" ) ).isNotNull();
 				GenericRecord document = (GenericRecord) addOp.get( "document" );
 				assertThat( document.get( "boost" ) ).isEqualTo( 2.3f );
 
-				// numeric fields
+				//numeric fields
 				assertThat( document.get( "fieldables" ) ).isNotNull().isInstanceOf( List.class );
 				List<?> fields = (List<?>) document.get( "fieldables" );
 
-				assertThat( fields ).hasSize( 9 ); // custom + 4 numerics + 4 fields
+				assertThat( fields ).hasSize( 9 ); //custom + 4 numerics + 4 fields
 
 				field = (GenericRecord) fields.get( 0 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "CustomFieldable" );
@@ -298,7 +298,7 @@ public class AvroTest {
 				assertThat( field.get( "value" ) ).isEqualTo( 2.3d );
 				assertNumericField( field );
 
-				// fields
+				//fields
 				field = (GenericRecord) fields.get( 5 );
 				assertThat( field.getSchema().getName() ).isEqualTo( "BinaryField" );
 				assertThat( field.get( "value" ) ).isInstanceOf( ByteBuffer.class );

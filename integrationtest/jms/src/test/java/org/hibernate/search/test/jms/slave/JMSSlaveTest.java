@@ -43,7 +43,7 @@ import static org.junit.Assert.assertEquals;
 public class JMSSlaveTest extends SearchTestBase {
 
 	/**
-	 * Name of the test queue as found in JNDI (see jndi.properties).
+	 * Name of the test queue as found in JNDI  (see jndi.properties).
 	 */
 	private static final String QUEUE_NAME = "queue/searchtest";
 
@@ -176,10 +176,11 @@ public class JMSSlaveTest extends SearchTestBase {
 		cfg.setProperty( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_CONNECTION_FACTORY, CONNECTION_FACTORY_NAME );
 		cfg.setProperty( "hibernate.search.default." + JmsBackendQueueProcessor.JMS_QUEUE, QUEUE_NAME );
 
-		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of
-		// jndi properties to create the InitialContext
+		// use the hibernate.search.worker.jndi prefix to pass a whole bunch of jndi properties to create the InitialContext
 		// for the queue processor
-		cfg.setProperty( "hibernate.search.default.worker.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory" );
+		cfg.setProperty(
+				"hibernate.search.default.worker.jndi.class", "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+		);
 		cfg.setProperty( "hibernate.search.default.worker.jndi.url", "vm://localhost" );
 		cfg.setProperty( "hibernate.search.default.worker.jndi.connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
 		cfg.setProperty( "hibernate.search.default.worker.jndi.queue.queue/searchtest", "searchQueue" );
@@ -187,12 +188,16 @@ public class JMSSlaveTest extends SearchTestBase {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] { TShirt.class };
+		return new Class[] {
+				TShirt.class
+		};
 	}
 
 	private Context getJndiInitialContext() throws NamingException {
 		Properties props = new Properties();
-		props.setProperty( Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory" );
+		props.setProperty(
+				Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+		);
 		props.setProperty( Context.PROVIDER_URL, "vm://localhost" );
 		props.setProperty( "connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
 		props.setProperty( "queue.queue/searchtest", "searchQueue" );

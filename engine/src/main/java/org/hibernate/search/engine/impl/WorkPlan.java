@@ -43,9 +43,10 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
+ * @author Martin Braun
  * @since 3.3
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings( { "rawtypes", "unchecked" })
 public class WorkPlan {
 
 	private static final Log log = LoggerFactory.make();
@@ -57,8 +58,8 @@ public class WorkPlan {
 	private final InstanceInitializer instanceInitializer;
 
 	/**
-	 * most work is split in two, some other might cancel one or more existing works, we don't track the number
-	 * accurately as that's not needed.
+	 * most work is split in two, some other might cancel one or more existing works,
+	 * we don't track the number accurately as that's not needed.
 	 */
 	private int approximateWorkQueueSize = 0;
 
@@ -88,8 +89,8 @@ public class WorkPlan {
 	}
 
 	/**
-	 * Returns an approximation of the amount of work in the queue. This is meant for resource control for auto flushing
-	 * of large pending batches.
+	 * Returns an approximation of the amount of work in the queue.
+	 * This is meant for resource control for auto flushing of large pending batches.
 	 *
 	 * @return the approximation
 	 * @see org.hibernate.search.cfg.Environment#QUEUEINGPROCESSOR_BATCHSIZE
@@ -100,6 +101,7 @@ public class WorkPlan {
 
 	/**
 	 * @param entityClass The entity class for which to retrieve the work
+	 *
 	 * @return returns (and creates if needed) the {@code PerClassWork} from the {@link #byClass} map.
 	 */
 	private PerClassWork getClassWork(Class<?> entityClass) {
@@ -112,7 +114,8 @@ public class WorkPlan {
 	}
 
 	/**
-	 * Makes sure that all additional work needed because of containedIn is added to the work plan.
+	 * Makes sure that all additional work needed because of containedIn
+	 * is added to the work plan.
 	 */
 	public void processContainedInAndPrepareExecution() {
 		PerClassWork[] worksFromEvents = new PerClassWork[byClass.size()];
@@ -156,16 +159,17 @@ public class WorkPlan {
 	class PerClassWork {
 
 		/**
-		 * We further organize work per entity identifier so that we can cancel or adapt work being done on the same
-		 * entities. This map uses as key what we originally received as {@link Work#getId()} if the type is annotated
-		 * with @ProvidedId, otherwise it uses the value pointed to by
+		 * We further organize work per entity identifier so that we can cancel or adapt work being done
+		 * on the same entities.
+		 * This map uses as key what we originally received as {@link Work#getId()} if the type
+		 * is annotated with @ProvidedId, otherwise it uses the value pointed to by
 		 * {@link org.hibernate.search.annotations.DocumentId} or as last attempt {@code javax.persistence.Id}.
 		 */
 		private final Map<Serializable, PerEntityWork> entityById = new HashMap<Serializable, PerEntityWork>();
 
 		/**
-		 * When a PurgeAll operation is send on the type, we can remove all previously scheduled work and remember that
-		 * the first operation on the index is going to be a purge all.
+		 * When a PurgeAll operation is send on the type, we can remove all previously scheduled work
+		 * and remember that the first operation on the index is going to be a purge all.
 		 */
 		private boolean purgeAll = false;
 
@@ -196,7 +200,8 @@ public class WorkPlan {
 		}
 
 		/**
-		 * Adds a work to the current plan. The entityClass of the work must be of the type managed by this.
+		 * Adds a work to the current plan. The entityClass of the work must be of the
+		 * type managed by this.
 		 *
 		 * @param work the {@code Work} instance to add to the plan
 		 */
@@ -222,9 +227,11 @@ public class WorkPlan {
 		}
 
 		/**
-		 * We need to make a difference on which value is used as identifier according to use case and mapping options
+		 * We need to make a difference on which value is used as identifier
+		 * according to use case and mapping options
 		 *
 		 * @param work The work instance from which to extract the id
+		 *
 		 * @return the appropriate id to use for this work
 		 */
 		private Serializable extractProperId(Work work) {
@@ -234,12 +241,12 @@ public class WorkPlan {
 			}
 
 			Object entity = work.getEntity();
-			// 1) entity is null for purge operation, which requires to trust
-			// the work id
+			// 1) entity is null for purge operation, which requires to trust the work id
 			// 2) types mapped as provided id require to use the work id
-			// 3) when Hibernate identifier rollback is used && this identifier
-			// is our same id source, we need to get the value from work id
-			if ( entity == null || documentBuilder.requiresProvidedId() || ( work.isIdentifierWasRolledBack() && documentBuilder.isIdMatchingJpaId() ) ) {
+			// 3) when Hibernate identifier rollback is used && this identifier is our same id source, we need to get the value from work id
+			if ( entity == null
+					|| documentBuilder.requiresProvidedId()
+					|| ( work.isIdentifierWasRolledBack() && documentBuilder.isIdMatchingJpaId() ) ) {
 				return work.getId();
 			}
 			else {
@@ -248,7 +255,8 @@ public class WorkPlan {
 		}
 
 		/**
-		 * Enqueues all work needed to be performed according to current state into the LuceneWork queue.
+		 * Enqueues all work needed to be performed according to current state into
+		 * the LuceneWork queue.
 		 *
 		 * @param luceneQueue work will be appended to this list
 		 */
@@ -269,9 +277,11 @@ public class WorkPlan {
 		}
 
 		/**
-		 * Starts processing the {@code ContainedIn} annotation for all instances stored in {@link #entityById}. This
-		 * processing must be performed when no more work is being collected by the event system. The processing might
-		 * recursively add more work to the plan.
+		 * Starts processing the {@code ContainedIn} annotation for all instances stored in
+		 * {@link #entityById}.
+		 *
+		 * This processing must be performed when no more work is being collected by the event
+		 * system. The processing might recursively add more work to the plan.
 		 */
 		public void processContainedInAndPrepareExecution() {
 			Entry<String, PerEntityWork>[] entityInstancesFrozenView = new Entry[entityById.size()];
@@ -283,9 +293,8 @@ public class WorkPlan {
 		}
 
 		/**
-		 * Method to continue the recursion for ContainedIn processing, as started by
-		 * {@link #processContainedInAndPrepareExecution()} Additional work that needs to be processed will be added to
-		 * this same WorkPlan.
+		 * Method to continue the recursion for ContainedIn processing, as started by {@link #processContainedInAndPrepareExecution()}
+		 * Additional work that needs to be processed will be added to this same WorkPlan.
 		 *
 		 * @param value the instance to be processed
 		 */
@@ -306,11 +315,10 @@ public class WorkPlan {
 						else {
 							operation = IndexingOverride.APPLY_DEFAULT;
 						}
-						// TODO there is a small duplication with some of
-						// TransactionalWorker.interceptWork
-						// but what would be a proper factored solution?
+						//TODO there is a small duplication with some of TransactionalWorker.interceptWork
+						//     but what would be a proper factored solution?
 						switch ( operation ) {
-						// we are planning an update by default
+							//we are planning an update by default
 							case UPDATE:
 							case APPLY_DEFAULT:
 								entityWork = new PerEntityWork( value );
@@ -321,7 +329,7 @@ public class WorkPlan {
 								break;
 							case REMOVE:
 								log.forceRemoveOnIndexOperationViaInterception( entityClass, WorkType.UPDATE );
-								Work work = new Work( value, extractedId, WorkType.DELETE );
+								Work work = new Work(value, extractedId, WorkType.DELETE);
 								entityWork = new PerEntityWork( work );
 								entityById.put( extractedId, entityWork );
 								break;
@@ -334,8 +342,7 @@ public class WorkPlan {
 					// else nothing to do as it's being processed already
 				}
 				else {
-					// this branch for @ContainedIn recursive work of
-					// non-indexed entities
+					// this branch for @ContainedIn recursive work of non-indexed entities
 					// as they don't have an indexingId
 					documentBuilder.appendContainedInWorkForInstance( value, WorkPlan.this, depth );
 				}
@@ -343,36 +350,43 @@ public class WorkPlan {
 		}
 
 		private EntityIndexingInterceptor getEntityInterceptor() {
-			EntityIndexBinding indexBindingForEntity = extendedIntegrator.getIndexBinding( entityClass );
+			EntityIndexBinding indexBindingForEntity = extendedIntegrator.getIndexBinding(
+					entityClass
+			);
 			return indexBindingForEntity != null ? indexBindingForEntity.getEntityIndexingInterceptor() : null;
 		}
 	}
 
 	/**
-	 * Keeps track of what needs to be done Lucene wise for each entity. Each entity might need to be deleted from the
-	 * index, added to the index, or both; in this case delete will be performed first.
+	 * Keeps track of what needs to be done Lucene wise for each entity.
+	 * Each entity might need to be deleted from the index, added to the index,
+	 * or both; in this case delete will be performed first.
 	 */
 	private static class PerEntityWork {
 
 		private Object entity;
 
 		/**
-		 * When true, the Lucene Document representing this entity will be deleted from the index.
+		 * When true, the Lucene Document representing this entity will be deleted
+		 * from the index.
 		 */
 		private boolean delete = false;
 
 		/**
-		 * When true, the entity will be converted to a Lucene Document and added to the index.
+		 * When true, the entity will be converted to a Lucene Document and added
+		 * to the index.
 		 */
 		private boolean add = false;
 
 		/**
-		 * Needed to stop recursion for processing ContainedIn of already processed instances.
+		 * Needed to stop recursion for processing ContainedIn
+		 * of already processed instances.
 		 */
 		private boolean containedInProcessed = false;
 
 		/**
-		 * Constructor to force an update of the entity even without having a specific Work instance for it.
+		 * Constructor to force an update of the entity even without
+		 * having a specific Work instance for it.
 		 *
 		 * @param entity the instance which needs to be updated in the index
 		 */
@@ -385,7 +399,8 @@ public class WorkPlan {
 		}
 
 		/**
-		 * Prepares the initial state of planned changes according to the type of work being fired.
+		 * Prepares the initial state of planned changes according
+		 * to the type of work being fired.
 		 *
 		 * @param work the work instance
 		 */
@@ -422,9 +437,11 @@ public class WorkPlan {
 		}
 
 		/**
-		 * Has different effects depending on the new type of work needed and the previous scheduled work. This way we
-		 * never store more than a plan for each entity and order of final execution is irrelevant, what matters is the
-		 * order in which the work is added to the plan.
+		 * Has different effects depending on the new type of work needed
+		 * and the previous scheduled work.
+		 * This way we never store more than a plan for each entity and order
+		 * of final execution is irrelevant, what matters is the order in which the
+		 * work is added to the plan.
 		 *
 		 * @param work the work instance to add
 		 */
@@ -435,8 +452,7 @@ public class WorkPlan {
 				case INDEX:
 				case UPDATE:
 					if ( add && !delete ) {
-						// noop: the entity was newly created in this same unit of
-						// work
+						// noop: the entity was newly created in this same unit of work
 						// so it needs to be added no need to delete
 					}
 					else {
@@ -444,8 +460,7 @@ public class WorkPlan {
 						delete = true;
 					}
 					break;
-				case ADD: // Is the only operation which doesn't imply a
-							// delete-before-add
+				case ADD: // Is the only operation which doesn't imply a delete-before-add
 					add = true;
 					// leave delete flag as-is
 					break;
@@ -483,19 +498,20 @@ public class WorkPlan {
 		 * @param entityBuilder the DocumentBuilder for this type
 		 * @param luceneQueue the queue collecting all changes
 		 */
-		public void enqueueLuceneWork(Class entityClass, Serializable indexingId, AbstractDocumentBuilder entityBuilder, List<LuceneWork> luceneQueue,
-				ConversionContext conversionContext) {
+		public void enqueueLuceneWork(Class entityClass, Serializable indexingId, AbstractDocumentBuilder entityBuilder,
+				List<LuceneWork> luceneQueue, ConversionContext conversionContext) {
 			if ( add || delete ) {
 				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue, conversionContext );
 			}
 		}
 
 		/**
-		 * Works via recursion passing the WorkPlan over, so that additional work can be planned according to the needs
-		 * of ContainedIn processing.
+		 * Works via recursion passing the WorkPlan over, so that additional work can be planned
+		 * according to the needs of ContainedIn processing.
 		 *
 		 * @param entityBuilder the DocumentBuilder for this type
 		 * @param workplan the current WorkPlan, used for recursion
+		 *
 		 * @see org.hibernate.search.annotations.ContainedIn
 		 */
 		public void processContainedIn(AbstractDocumentBuilder entityBuilder, WorkPlan workplan) {
@@ -509,19 +525,25 @@ public class WorkPlan {
 	}
 
 	/**
-	 * Get and cache the DocumentBuilder for this type. Being this a perClassWork we can fetch it once.
+	 * Get and cache the DocumentBuilder for this type. Being this a perClassWork
+	 * we can fetch it once.
 	 *
 	 * @param extendedIntegrator the search factory (implementor)
 	 * @param entityClass the entity type for which to retrieve the document builder
+	 *
 	 * @return the DocumentBuilder for this type
 	 */
 	private static AbstractDocumentBuilder getEntityBuilder(ExtendedSearchIntegrator extendedIntegrator, Class<?> entityClass) {
 		EntityIndexBinding entityIndexBinding = extendedIntegrator.getIndexBinding( entityClass );
 		if ( entityIndexBinding == null ) {
-			DocumentBuilderContainedEntity entityBuilder = extendedIntegrator.getDocumentBuilderContainedEntity( entityClass );
+			DocumentBuilderContainedEntity entityBuilder = extendedIntegrator.getDocumentBuilderContainedEntity(
+					entityClass
+			);
 			if ( entityBuilder == null ) {
 				// should never happen but better be safe than sorry
-				throw new SearchException( "Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass );
+				throw new SearchException(
+						"Unable to perform work. Entity Class is not @Indexed nor hosts @ContainedIn: " + entityClass
+				);
 			}
 			else {
 				return entityBuilder;

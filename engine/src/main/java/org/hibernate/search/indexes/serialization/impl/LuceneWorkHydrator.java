@@ -92,7 +92,11 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addPurgeAllLuceneWork(String entityClassName) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, "entity class", searchIntegrator.getServiceManager() );
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				"entity class",
+				searchIntegrator.getServiceManager()
+		);
 		results.add( new PurgeAllLuceneWork( entityClass ) );
 	}
 
@@ -108,23 +112,48 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addDeleteLuceneWork(String entityClassName, ConversionContext conversionContext) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, "entity class", searchIntegrator.getServiceManager() );
-		LuceneWork result = new DeleteLuceneWork( id, objectIdInString( entityClass, id, conversionContext ), entityClass );
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				"entity class",
+				searchIntegrator.getServiceManager()
+		);
+		LuceneWork result = new DeleteLuceneWork(
+				id,
+				objectIdInString( entityClass, id, conversionContext ),
+				entityClass
+		);
 		results.add( result );
 		id = null;
 	}
 
 	@Override
 	public void addDeleteByQueryLuceneWork(String entityClassName, DeletionQuery deletionQuery) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, "entity class", searchIntegrator.getServiceManager() );
-		LuceneWork result = new DeleteByQueryLuceneWork( entityClass, deletionQuery );
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				"entity class",
+				searchIntegrator.getServiceManager()
+		);
+		LuceneWork result = new DeleteByQueryLuceneWork(
+				entityClass,
+				deletionQuery
+		);
 		this.results.add( result );
 	}
 
 	@Override
 	public void addAddLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, "entity class", searchIntegrator.getServiceManager() );
-		LuceneWork result = new AddLuceneWork( id, objectIdInString( entityClass, id, conversionContext ), entityClass, getLuceneDocument(), fieldToAnalyzerMap );
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				"entity class",
+				searchIntegrator.getServiceManager()
+		);
+		LuceneWork result = new AddLuceneWork(
+				id,
+				objectIdInString( entityClass, id, conversionContext ),
+				entityClass,
+				getLuceneDocument(),
+				fieldToAnalyzerMap
+		);
 		results.add( result );
 		clearDocument();
 		id = null;
@@ -132,9 +161,18 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addUpdateLuceneWork(String entityClassName, Map<String, String> fieldToAnalyzerMap, ConversionContext conversionContext) {
-		Class<?> entityClass = ClassLoaderHelper.classForName( entityClassName, "entity class", searchIntegrator.getServiceManager() );
-		LuceneWork result = new UpdateLuceneWork( id, objectIdInString( entityClass, id, conversionContext ), entityClass, getLuceneDocument(),
-				fieldToAnalyzerMap );
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				"entity class",
+				searchIntegrator.getServiceManager()
+		);
+		LuceneWork result = new UpdateLuceneWork(
+				id,
+				objectIdInString( entityClass, id, conversionContext ),
+				entityClass,
+				getLuceneDocument(),
+				fieldToAnalyzerMap
+		);
 		results.add( result );
 		clearDocument();
 		id = null;
@@ -146,43 +184,39 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void defineDocument() {
-		// Document level boost is not available anymore: is this method still needed?
+		//Document level boost is not available anymore: is this method still needed?
 		getLuceneDocument();
 	}
 
 	@Override
 	public void addFieldable(byte[] instanceAsByte) {
-		// FIXME implementors of IndexableField ARE NOT SERIALIZABLE :-(
+		//FIXME implementors of IndexableField ARE NOT SERIALIZABLE :-(
 		getLuceneDocument().add( (IndexableField) toSerializable( instanceAsByte, loader ) );
 	}
 
 	@Override
-	public void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms,
-			boolean omitTermFreqAndPositions) {
+	public void addIntNumericField(int value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		final IntField numField = new IntField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
-	public void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms,
-			boolean omitTermFreqAndPositions) {
+	public void addLongNumericField(long value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		final LongField numField = new LongField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
-	public void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms,
-			boolean omitTermFreqAndPositions) {
+	public void addFloatNumericField(float value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		final FloatField numField = new FloatField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
 	}
 
 	@Override
-	public void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms,
-			boolean omitTermFreqAndPositions) {
+	public void addDoubleNumericField(double value, String name, int precisionStep, SerializableStore store, boolean indexed, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		final DoubleField numField = new DoubleField( name, value, getStore( store ) );
 		numField.setBoost( boost );
 		getLuceneDocument().add( numField );
@@ -195,11 +229,10 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector,
-			float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
-		FieldType type = identifyFieldType( store == SerializableStore.YES, // if stored
-				index != SerializableIndex.NO, // if indexed
-				index == SerializableIndex.ANALYZED || index == SerializableIndex.ANALYZED_NO_NORMS, // if analyzed
+	public void addFieldWithStringData(String name, String value, SerializableStore store, SerializableIndex index, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
+		FieldType type = identifyFieldType( store == SerializableStore.YES, //if stored
+				index != SerializableIndex.NO, //if indexed
+				index == SerializableIndex.ANALYZED || index == SerializableIndex.ANALYZED_NO_NORMS, //if analyzed
 				termVector, omitNorms, omitTermFreqAndPositions );
 		Field luceneField = new Field( name, value, type );
 		luceneField.setBoost( boost );
@@ -220,8 +253,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	@Override
-	public void addFieldWithSerializableReaderData(String name, byte[] valueAsByte, SerializableTermVector termVector, float boost, boolean omitNorms,
-			boolean omitTermFreqAndPositions) {
+	public void addFieldWithSerializableReaderData(String name, byte[] valueAsByte, SerializableTermVector termVector, float boost, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		FieldType type = identifyFieldType( false, true, true, termVector, omitNorms, omitTermFreqAndPositions );
 		Reader value = (Reader) toSerializable( valueAsByte, loader );
 		Field luceneField = new Field( name, value, type );
@@ -241,7 +273,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	@Override
 	public void addTokenTrackingAttribute(List<Integer> positions) {
-		// TokenTrackingAttribute is no longer available
+		//TokenTrackingAttribute is no longer available
 		throw new SearchException( "Serialization of TokenTrackingAttribute is no longer supported" );
 	}
 
@@ -320,8 +352,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		return documentBuilder.objectToString( documentBuilder.getIdKeywordName(), id, conversionContext );
 	}
 
-	private FieldType identifyFieldType(boolean stored, boolean indexed, boolean analyzed, SerializableTermVector termVector, boolean omitNorms,
-			boolean omitTermFreqAndPositions) {
+	private FieldType identifyFieldType(boolean stored, boolean indexed, boolean analyzed, SerializableTermVector termVector, boolean omitNorms, boolean omitTermFreqAndPositions) {
 		final FieldType type = new FieldType();
 		type.setStored( stored );
 		type.setIndexed( indexed );

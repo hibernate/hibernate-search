@@ -158,7 +158,10 @@ public class JMSMasterTest extends SearchTestBase {
 	private void sendMessage(List<LuceneWork> queue) throws Exception {
 		ObjectMessage message = getQueueSession().createObjectMessage();
 		final String indexName = org.hibernate.search.test.jms.master.TShirt.class.getName();
-		message.setStringProperty( Environment.INDEX_NAME_JMS_PROPERTY, indexName );
+		message.setStringProperty(
+				Environment.INDEX_NAME_JMS_PROPERTY,
+				indexName
+		);
 		IndexManager indexManager = getExtendedSearchIntegrator().getIndexManagerHolder().getIndexManager( indexName );
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
 		message.setObject( data );
@@ -185,7 +188,10 @@ public class JMSMasterTest extends SearchTestBase {
 
 	private Context getJndiInitialContext() throws NamingException {
 		Properties props = new Properties();
-		props.setProperty( Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory" );
+		props.setProperty(
+				Context.INITIAL_CONTEXT_FACTORY,
+				"org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+		);
 		props.setProperty( Context.PROVIDER_URL, "vm://localhost" );
 		props.setProperty( "connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
 		props.setProperty( "queue.queue/searchtest", "searchQueue" );
@@ -200,7 +206,9 @@ public class JMSMasterTest extends SearchTestBase {
 	 */
 	private List<LuceneWork> createDocumentAndWorkQueue(TShirt shirt) {
 		Document doc = new Document();
-		Field field = new Field( ProjectionConstants.OBJECT_CLASS, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED );
+		Field field = new Field(
+				ProjectionConstants.OBJECT_CLASS, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED
+		);
 		doc.add( field );
 		field = new Field( "id", "1", Field.Store.YES, Field.Index.ANALYZED );
 		doc.add( field );
@@ -208,7 +216,9 @@ public class JMSMasterTest extends SearchTestBase {
 		doc.add( field );
 		DoubleField numField = new DoubleField( "length", shirt.getLength(), Field.Store.NO );
 		doc.add( numField );
-		LuceneWork luceneWork = new AddLuceneWork( shirt.getId(), String.valueOf( shirt.getId() ), shirt.getClass(), doc );
+		LuceneWork luceneWork = new AddLuceneWork(
+				shirt.getId(), String.valueOf( shirt.getId() ), shirt.getClass(), doc
+		);
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
 		queue.add( luceneWork );
 		return queue;
@@ -216,7 +226,6 @@ public class JMSMasterTest extends SearchTestBase {
 
 	/**
 	 * Create a test object without triggering indexing. Use SQL directly.
-	 *
 	 * @return a <code>TShirt</code> test object.
 	 * @throws SQLException in case the insert fails.
 	 */
@@ -228,7 +237,9 @@ public class JMSMasterTest extends SearchTestBase {
 			@Override
 			public void execute(Connection connection) throws SQLException {
 				final Statement statement = connection.createStatement();
-				statement.executeUpdate( "insert into TShirt_Master(id, logo, size_, length_) values( 1, 'JBoss balls', 'large', 23.2)" );
+				statement.executeUpdate(
+						"insert into TShirt_Master(id, logo, size_, length_) values( 1, 'JBoss balls', 'large', 23.2)"
+				);
 				statement.close();
 			}
 		} );
@@ -278,6 +289,8 @@ public class JMSMasterTest extends SearchTestBase {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] { TShirt.class };
+		return new Class[] {
+				TShirt.class
+		};
 	}
 }
