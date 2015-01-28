@@ -42,4 +42,9 @@ public class FullTextFilterImpl implements FullTextFilterImplementor {
 	public Map<String, Object> getParameters() {
 		return parameters;
 	}
+
+	@Override
+	public String toString() {
+		return "FullTextFilterImpl [name=" + name + ", parameters=" + parameters + "]";
+	}
 }

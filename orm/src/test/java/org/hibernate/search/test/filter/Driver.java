@@ -7,6 +7,7 @@
 package org.hibernate.search.test.filter;
 
 import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -34,10 +35,13 @@ import org.hibernate.search.bridge.builtin.IntegerBridge;
 				impl = SecurityFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "fieldConstraintFilter-1",
-				impl = FieldConstraintFilter.class,
+				impl = FieldConstraintFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "fieldConstraintFilter-2",
-				impl = FieldConstraintFilter.class,
+				impl = FieldConstraintFilterFactory.class,
+				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
+		@FullTextFilterDef(name = "cacheinstancewithoutkeymethodtest",
+				impl = FieldConstraintFilterWithoutKeyMethod.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		//Filter factory with parameters
 		@FullTextFilterDef(name = "cacheresultstest",
@@ -45,6 +49,9 @@ import org.hibernate.search.bridge.builtin.IntegerBridge;
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "cacheinstancetest",
 				impl = InstanceBasedExcludeAllFilter.class,
+				cache = FilterCacheModeType.INSTANCE_ONLY),
+		@FullTextFilterDef(name = "cacheinstancefromfactorywithoutkeymethodtest",
+				impl = FieldConstraintFilterFactoryWithoutKeyMethod.class,
 				cache = FilterCacheModeType.INSTANCE_ONLY),
 		@FullTextFilterDef(name = "empty",
 				impl = NullReturningEmptyFilter.class,
