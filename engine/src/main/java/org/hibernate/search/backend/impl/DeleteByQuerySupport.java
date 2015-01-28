@@ -26,6 +26,7 @@ import org.apache.lucene.util.NumericUtils;
 import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.SingularTermQuery;
 import org.hibernate.search.backend.SingularTermQuery.Type;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 
 /**
@@ -67,7 +68,7 @@ public final class DeleteByQuerySupport {
 							}
 						}
 						catch (IOException e) {
-							throw new AssertionError( "no IOException can occur while using a TokenStream " + "that is generated via String" );
+							throw new AssertionFailure( "no IOException can occur while using a TokenStream that is generated via String" );
 						}
 					}
 					else {
