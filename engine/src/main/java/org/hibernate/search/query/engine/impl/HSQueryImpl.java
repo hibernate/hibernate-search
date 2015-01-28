@@ -14,9 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -44,6 +42,7 @@ import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.ChainedFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
+import org.hibernate.search.filter.impl.DefaultFilterKey;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -848,7 +847,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		FilterKey key = null;
 
 		if ( def.getKeyMethod() == null ) {
-			key = createDefaultFilterKey( fullTextFilter );
+			key = new DefaultFilterKey( def.getName(), fullTextFilter.getParameters() );
 		}
 		else {
 			try {
@@ -866,26 +865,15 @@ public class HSQueryImpl implements HSQuery, Serializable {
 								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
 				);
 			}
-		}
-		key.setImpl( def.getImpl() );
 
-		//Make sure Filters are isolated by filter def name
-		StandardFilterKey wrapperKey = new StandardFilterKey();
-		wrapperKey.addParameter( def.getName() );
-		wrapperKey.addParameter( key );
-		return wrapperKey;
-	}
+			key.setImpl( def.getImpl() );
 
-	/**
-	 * Builds a {@link StandardFilterKey} based on the names and values of all the given filter's parameters.
-	 */
-	private FilterKey createDefaultFilterKey(FullTextFilterImpl fullTextFilter) {
-		StandardFilterKey key = new StandardFilterKey();
+			//Make sure Filters are isolated by filter def name
+			StandardFilterKey wrapperKey = new StandardFilterKey();
+			wrapperKey.addParameter( def.getName() );
+			wrapperKey.addParameter( key );
 
-		// Using the tree map to ensure the same parameter sets passed in several invocations are processed in the same order
-		for ( Entry<String, Object> parameter : new TreeMap<>( fullTextFilter.getParameters() ).entrySet() ) {
-			key.addParameter( parameter.getKey() );
-			key.addParameter( parameter.getValue() );
+			key = wrapperKey;
 		}
 
 		return key;
