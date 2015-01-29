@@ -9,46 +9,62 @@ package org.hibernate.search.indexes.serialization.javaserialization.impl;
 import java.util.List;
 
 import org.apache.lucene.util.AttributeImpl;
-import org.hibernate.search.exception.SearchException;
+
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
 import org.hibernate.search.indexes.serialization.spi.LuceneWorksBuilder;
 
 /**
+ * A work deserializer which uses Java's native serialization mechanism.
+ *
+ * Note:
+ * <p>
+ * Since the underlying Lucene classes are not serializable, we need to create serializable wrapper classes
+ * for all Lucene classes which we need to transfer. These wrapper classes get populated during serialization and then
+ * used at de-serialization to re-create the appropriate Lucene classes.
+ * </p>
+ *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Hardy Ferentschik
  */
-public class JavaSerializationDeserializer implements Deserializer {
+public class NativeJavaDeserializer implements Deserializer {
 
 	@Override
-	public void deserialize(byte[] data, LuceneWorksBuilder hydrator) {
+	public void deserialize(byte[] data, LuceneWorksBuilder luceneWorksBuilder) {
 		Message message = SerializationHelper.toInstance( data, Message.class );
 		final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 		for ( Operation operation : message.getOperations() ) {
 			if ( operation instanceof OptimizeAll ) {
-				hydrator.addOptimizeAll();
+				luceneWorksBuilder.addOptimizeAll();
 			}
 			else if ( operation instanceof PurgeAll ) {
 				PurgeAll safeOperation = (PurgeAll) operation;
-				hydrator.addPurgeAllLuceneWork( safeOperation.getClass().getName() );
+				luceneWorksBuilder.addPurgeAllLuceneWork( safeOperation.getEntityClassName() );
 			}
 			else if ( operation instanceof Flush ) {
-				hydrator.addFlush();
+				luceneWorksBuilder.addFlush();
 			}
 			else if ( operation instanceof Delete ) {
 				Delete safeOperation = (Delete) operation;
-				hydrator.addId( safeOperation.getId() );
-				hydrator.addDeleteLuceneWork(
+				if ( safeOperation.getId() instanceof byte[] ) {
+					luceneWorksBuilder.addIdAsJavaSerialized( (byte[])safeOperation.getId() );
+				}
+				else {
+					luceneWorksBuilder.addId( safeOperation.getId() );
+				}
+				luceneWorksBuilder.addDeleteLuceneWork(
 						safeOperation.getEntityClassName(),
 						conversionContext
 				);
 			}
 			else if ( operation instanceof Add ) {
 				Add safeOperation = (Add) operation;
-				buildLuceneDocument( safeOperation.getDocument(), hydrator );
-				hydrator.addId( safeOperation.getId() );
-				hydrator.addAddLuceneWork(
+				buildLuceneDocument( safeOperation.getDocument(), luceneWorksBuilder );
+				luceneWorksBuilder.addId( safeOperation.getId() );
+				luceneWorksBuilder.addAddLuceneWork(
 						safeOperation.getEntityClassName(),
 						safeOperation.getFieldToAnalyzerMap(),
 						conversionContext
@@ -56,9 +72,9 @@ public class JavaSerializationDeserializer implements Deserializer {
 			}
 			else if ( operation instanceof Update ) {
 				Update safeOperation = (Update) operation;
-				buildLuceneDocument( safeOperation.getDocument(), hydrator );
-				hydrator.addId( safeOperation.getId() );
-				hydrator.addUpdateLuceneWork(
+				buildLuceneDocument( safeOperation.getDocument(), luceneWorksBuilder );
+				luceneWorksBuilder.addId( safeOperation.getId() );
+				luceneWorksBuilder.addUpdateLuceneWork(
 						safeOperation.getEntityClassName(),
 						safeOperation.getFieldToAnalyzerMap(),
 						conversionContext

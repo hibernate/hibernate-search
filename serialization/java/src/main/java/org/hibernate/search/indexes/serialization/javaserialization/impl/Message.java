@@ -7,24 +7,21 @@
 package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 /**
- * A message is made of:
- * - a protocol version number
- * - a set of operations
- *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Hardy Feretnschik
  */
 
 public class Message implements Serializable {
-	private Set<Operation> operations;
+	private List<Operation> operations;
 
-	public Message(Set<Operation> operations) {
+	public Message(List<Operation> operations) {
 		this.operations = operations;
 	}
 
-	public Set<Operation> getOperations() {
+	public List<Operation> getOperations() {
 		return operations;
 	}
 }

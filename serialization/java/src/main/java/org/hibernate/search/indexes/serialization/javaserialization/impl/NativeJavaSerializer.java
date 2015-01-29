@@ -7,10 +7,9 @@
 package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.LuceneWork;
@@ -24,13 +23,13 @@ import org.hibernate.search.indexes.serialization.spi.Serializer;
  */
 public class NativeJavaSerializer implements Serializer {
 	private Serializable id;
-	private Set<Operation> ops;
-	private Set<SerializableFieldable> serialFields;
+	private List<Operation> ops;
+	private List<SerializableFieldable> serialFields;
 	private SerializableDocument currentDocument;
 
 	@Override
 	public void luceneWorks(List<LuceneWork> works) {
-		ops = new HashSet<Operation>( works.size() );
+		ops = new ArrayList<>( works.size() );
 	}
 
 	@Override
@@ -103,7 +102,7 @@ public class NativeJavaSerializer implements Serializer {
 
 	@Override
 	public void fields(List<IndexableField> fields) {
-		serialFields = new HashSet<SerializableFieldable>( fields.size() );
+		serialFields = new ArrayList<>( fields.size() );
 	}
 
 	@Override

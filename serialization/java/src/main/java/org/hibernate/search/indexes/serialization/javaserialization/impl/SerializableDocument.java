@@ -7,20 +7,20 @@
 package org.hibernate.search.indexes.serialization.javaserialization.impl;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class SerializableDocument implements Serializable {
 
-	private Set<SerializableFieldable> fieldables;
+	private List<SerializableFieldable> fieldables;
 
-	public SerializableDocument(Set<SerializableFieldable> fieldables) {
+	public SerializableDocument(List<SerializableFieldable> fieldables) {
 		this.fieldables = fieldables;
 	}
 
-	public Set<SerializableFieldable> getFieldables() {
+	public List<SerializableFieldable> getFieldables() {
 		return fieldables;
 	}
 
