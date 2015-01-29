@@ -92,7 +92,7 @@ public class FilterTest extends SearchTestBase {
 		ftQuery.enableFullTextFilter( "cacheinstancetest" );
 		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 );
 		assertEquals( "Should filter out all", 0, ftQuery.getResultSize() );
-		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 ); // HSEARCH-818 : would be even better if it was still at 1 here, reusing what was created at SearchFactory build time
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 );
 
 		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cacheinstancetest" );
@@ -157,7 +157,7 @@ public class FilterTest extends SearchTestBase {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-295")
 	public void testFiltersWithoutKeyMethodShouldBeCachedByAllParameterNamesAndValues() {
-		// TODO HSEARCH-818 Discarding all instantiations stemming from SF bootstrap
+		// Discarding all instantiations stemming from SF bootstrap
 		FieldConstraintFilterWithoutKeyMethod.getInstances().clear();
 
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
