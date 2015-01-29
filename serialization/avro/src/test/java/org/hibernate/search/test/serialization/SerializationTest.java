@@ -24,10 +24,12 @@ import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.util.AttributeImpl;
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.SingularTermQuery;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
@@ -90,6 +92,7 @@ public class SerializationTest {
 		works.add( new OptimizeLuceneWork( RemoteEntity.class ) ); //class won't be send over
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
 		works.add( new PurgeAllLuceneWork( RemoteEntity.class ) );
+		works.add( new DeleteByQueryLuceneWork(RemoteEntity.class, new SingularTermQuery("key", "value")));
 		works.add( new DeleteLuceneWork( 123l, "123", RemoteEntity.class ) );
 		works.add( new DeleteLuceneWork( "Sissi", "Sissi", RemoteEntity.class ) );
 		works.add(

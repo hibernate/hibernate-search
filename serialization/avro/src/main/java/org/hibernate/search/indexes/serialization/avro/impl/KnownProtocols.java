@@ -25,14 +25,15 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 final class KnownProtocols {
 
 	/**
-	 * Latest protocol version is 1.1
+	 * Latest protocol version is 1.2
 	 */
 	static final int MAJOR_VERSION = 1;
-	static final int LATEST_MINOR_VERSION = 1;
+	static final int LATEST_MINOR_VERSION = 2;
 
 	private static final Log log = LoggerFactory.make( Log.class );
 	private volatile Protocol v1_0 = null;
 	private volatile Protocol v1_1 = null;
+	private volatile Protocol v1_2 = null;
 	private volatile boolean warned = false;
 
 	Protocol getProtocol(int majorVersion, int minorVersion) {
@@ -43,6 +44,9 @@ final class KnownProtocols {
 					MAJOR_VERSION,
 					LATEST_MINOR_VERSION
 			);
+		}
+		if ( minorVersion == 2 ) {
+			return getV1_2();
 		}
 		if ( minorVersion == 1 ) {
 			return getV1_1();
@@ -88,6 +92,21 @@ final class KnownProtocols {
 				}
 				p = new ProtocolBuilderV1_1().build();
 				v1_1 = p;
+			}
+		}
+		return p;
+	}
+
+	private Protocol getV1_2() {
+		Protocol p = v1_2;
+		if ( p == null ) {
+			synchronized (this) {
+				p = v1_2;
+				if ( p != null ) {
+					return p;
+				}
+				p = new ProtocolBuilderV1_2().build();
+				v1_2 = p;
 			}
 		}
 		return p;

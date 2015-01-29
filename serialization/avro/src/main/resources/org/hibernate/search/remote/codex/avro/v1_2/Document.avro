@@ -1,0 +1,21 @@
+{
+    "name": "Document",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "boost",
+            "type": "float"
+        },
+
+        {
+            "name": "fieldables",
+            "type": {
+                "type": "array",
+                "items": ["CustomFieldable",
+                        "NumericIntField", "NumericLongField", "NumericFloatField", "NumericDoubleField",
+                        "BinaryField", "StringField", "TokenStreamField", "ReaderField"
+                        ]
+            }
+        }
+    ]
+}

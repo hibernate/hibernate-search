@@ -13,7 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;
@@ -23,6 +25,7 @@ import org.hibernate.search.indexes.serialization.spi.Serializer;
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class NativeJavaSerializer implements Serializer {
+
 	private Serializable id;
 	private Set<Operation> ops;
 	private Set<SerializableFieldable> serialFields;
@@ -93,6 +96,12 @@ public class NativeJavaSerializer implements Serializer {
 	public void addUpdate(String entityClassName, Map<String, String> fieldToAnalyzerMap) {
 		ops.add( new Update( entityClassName, id, currentDocument, fieldToAnalyzerMap ) );
 		clearDocument();
+	}
+
+	@Override
+	public void addDeleteByQuery(String entityClassName, DeletionQuery deletionQuery) {
+		DeleteByQuerySupport.QueryToStringMapper mapper = DeleteByQuerySupport.TO_STRING.get( deletionQuery.getQueryKey() );
+		ops.add( new DeleteByQuery( entityClassName, deletionQuery.getQueryKey(), mapper.toString( deletionQuery ) ) );
 	}
 
 	@Override

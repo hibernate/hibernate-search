@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +39,17 @@ import org.junit.Test;
  */
 public class AvroTest {
 
+	@Test
+	public void test1_1() throws Exception {
+		this.experimentWithAvro( "org/hibernate/search/remote/codex/avro/v1_1/", false );
+	}
 
 	@Test
-	public void experimentWithAvro() throws Exception {
-		String root = "org/hibernate/search/remote/codex/avro/v1_1/";
+	public void test1_2() throws Exception {
+		this.experimentWithAvro( "org/hibernate/search/remote/codex/avro/v1_2/", true );
+	}
+
+	public void experimentWithAvro(String root, boolean checkDeleteByQuery) throws Exception {
 		parseSchema( root + "attribute/TokenTrackingAttribute.avro", "attribute/TokenTrackingAttribute" );
 		parseSchema( root + "attribute/CharTermAttribute.avro", "attribute/CharTermAttribute" );
 		parseSchema( root + "attribute/PayloadAttribute.avro", "attribute/PayloadAttribute" );
@@ -71,7 +79,9 @@ public class AvroTest {
 		parseSchema( root + "operation/Add.avro", "operation/Add" );
 		parseSchema( root + "operation/Update.avro", "operation/Update" );
 		parseSchema( root + "Message.avro", "Message" );
-
+		if ( checkDeleteByQuery ) {
+			parseSchema( root + "operation/DeleteByQuery.avro", "operation/DeleteByQuery" );
+		}
 
 		String filename = root + "Works.avpr";
 		Protocol protocol = parseProtocol( filename, "Works" );
@@ -153,7 +163,7 @@ public class AvroTest {
 		positions.add( 2 );
 		positions.add( 3 );
 		positions.add( 4 );
-		attr.put( "positions", positions);
+		attr.put( "positions", positions );
 		attrs.add( attr );
 		attrs.add( ByteBuffer.wrap( serializableSample ) );
 
@@ -183,12 +193,21 @@ public class AvroTest {
 		GenericRecord delete = new GenericData.Record( deleteSchema );
 		delete.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		id = new GenericData.Record( idSchema );
-		id.put( "value", new Long(30) );
+		id.put( "value", new Long( 30 ) );
 		delete.put( "id", id );
 
 		GenericRecord purgeAll = new GenericData.Record( purgeAllSchema );
 		purgeAll.put( "class", classReferences.indexOf( AvroTest.class.getName() ) );
 		GenericRecord optimizeAll = new GenericData.Record( optimizeAllSchema );
+
+		if ( checkDeleteByQuery ) {
+			final Schema deleteByQuerySchema = protocol.getType( "DeleteByQuery" );
+
+			GenericRecord deleteByQuery = new GenericData.Record( deleteByQuerySchema );
+			deleteByQuery.put( "class", AvroTest.class );
+			deleteByQuery.put( "key", classReferences.indexOf( AvroTest.class.getName() ) );
+			deleteByQuery.put( "query", Arrays.asList( new String[] { "key", "value" } ) );
+		}
 
 		GenericRecord flush = new GenericData.Record( flushSchema );
 
@@ -198,7 +217,6 @@ public class AvroTest {
 		operations.add( flush );
 		operations.add( delete );
 		operations.add( add );
-
 
 		GenericRecord message = new GenericData.Record( messageSchema );
 		message.put( "classReferences", classReferences );

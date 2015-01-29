@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.lucene.util.AttributeImpl;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
@@ -43,6 +44,11 @@ public class JavaSerializationDeserializer implements Deserializer {
 						safeOperation.getEntityClassName(),
 						conversionContext
 				);
+			}
+			else if ( operation instanceof DeleteByQuery ) {
+				DeleteByQuery safeOperation = (DeleteByQuery) operation;
+				DeleteByQuerySupport.StringToQueryMapper mapper = DeleteByQuerySupport.FROM_STRING.get( safeOperation.getKey() );
+				hydrator.addDeleteByQueryLuceneWork( safeOperation.getEntityClassName(), mapper.fromString( safeOperation.getQuery() ) );
 			}
 			else if ( operation instanceof Add ) {
 				Add safeOperation = (Add) operation;

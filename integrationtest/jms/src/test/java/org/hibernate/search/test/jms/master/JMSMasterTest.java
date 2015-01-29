@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
@@ -28,9 +29,7 @@ import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.cfg.Environment;
@@ -38,8 +37,11 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.SingularTermQuery;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.After;
@@ -49,7 +51,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests  that the Master node in a JMS cluster can properly process messages placed onto the queue.
+ * Tests that the Master node in a JMS cluster can properly process messages placed onto the queue.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -58,7 +60,7 @@ import static org.junit.Assert.assertEquals;
 public class JMSMasterTest extends SearchTestBase {
 
 	/**
-	 * Name of the test queue as found in JNDI  (see jndi.properties).
+	 * Name of the test queue as found in JNDI (see jndi.properties).
 	 */
 	private static final String QUEUE_NAME = "queue/searchtest";
 
@@ -86,16 +88,66 @@ public class JMSMasterTest extends SearchTestBase {
 		// need to sleep to give JMS processing and indexing time
 		Thread.sleep( 1000 );
 
-		FullTextSession ftSess = Search.getFullTextSession( openSession() );
-		ftSess.getTransaction().begin();
-		QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
-		Query luceneQuery = parser.parse( "logo:jboss" );
-		org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
-		List result = query.list();
-		assertEquals( 1, result.size() );
-		ftSess.delete( result.get( 0 ) );
-		ftSess.getTransaction().commit();
-		ftSess.close();
+		{
+			FullTextSession ftSess = Search.getFullTextSession( openSession() );
+			ftSess.getTransaction().begin();
+			QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+			Query luceneQuery = parser.parse( "logo:jboss" );
+			org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
+			List result = query.list();
+			assertEquals( 1, result.size() );
+			ftSess.delete( result.get( 0 ) );
+			ftSess.purgeAll( TShirt.class );
+			ftSess.getTransaction().commit();
+
+			Thread.sleep( 1000 );
+
+			ftSess.close();
+		}
+
+		{
+			shirt = createObjectWithSQL();
+			queue = createDocumentAndWorkQueue( shirt );
+
+			registerMessageListener();
+			sendMessage( queue );
+
+			// need to sleep to give JMS processing and indexing time
+			Thread.sleep( 1000 );
+
+			{
+				FullTextSession ftSess = Search.getFullTextSession( openSession() );
+				ftSess.getTransaction().begin();
+				QueryParser parser = new QueryParser( TestConstants.getTargetLuceneVersion(), "id", TestConstants.stopAnalyzer );
+				Query luceneQuery = parser.parse( "logo:jboss" );
+				{
+					org.hibernate.Query query = ftSess.createFullTextQuery( luceneQuery );
+					List result = query.list();
+					assertEquals( 1, result.size() );
+				}
+				ftSess.getTransaction().commit();
+				ftSess.close();
+			}
+
+			{
+				DeleteByQueryLuceneWork work = new DeleteByQueryLuceneWork( TShirt.class, new SingularTermQuery( "logo", "jboss" ) );
+				List<LuceneWork> l = new ArrayList<>();
+				l.add( work );
+				this.registerMessageListener();
+				this.sendMessage( l );
+			}
+
+			Thread.sleep( 1000 );
+
+			{
+				HSQuery hsQuery = this.getExtendedSearchIntegrator().createHSQuery()
+						.luceneQuery( this.getExtendedSearchIntegrator().buildQueryBuilder().forEntity( TShirt.class ).get().all().createQuery() );
+				List<Class<?>> l = new ArrayList<>( 1 );
+				l.add( TShirt.class );
+				hsQuery.targetedEntities( l );
+				assertEquals( 0, hsQuery.queryResultSize() );
+			}
+		}
 	}
 
 	private void registerMessageListener() throws Exception {
@@ -108,7 +160,8 @@ public class JMSMasterTest extends SearchTestBase {
 		final String indexName = org.hibernate.search.test.jms.master.TShirt.class.getName();
 		message.setStringProperty(
 				Environment.INDEX_NAME_JMS_PROPERTY,
-				indexName );
+				indexName
+		);
 		IndexManager indexManager = getExtendedSearchIntegrator().getIndexManagerHolder().getIndexManager( indexName );
 		byte[] data = indexManager.getSerializer().toSerializedModel( queue );
 		message.setObject( data );
@@ -136,7 +189,8 @@ public class JMSMasterTest extends SearchTestBase {
 	private Context getJndiInitialContext() throws NamingException {
 		Properties props = new Properties();
 		props.setProperty(
-				Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+				Context.INITIAL_CONTEXT_FACTORY,
+				"org.apache.activemq.jndi.ActiveMQInitialContextFactory"
 		);
 		props.setProperty( Context.PROVIDER_URL, "vm://localhost" );
 		props.setProperty( "connectionFactoryNames", "ConnectionFactory, java:/ConnectionFactory" );
@@ -148,7 +202,6 @@ public class JMSMasterTest extends SearchTestBase {
 	 * Manually create the work queue. This lists gets send by the Slaves to the Master for indexing.
 	 *
 	 * @param shirt The shirt to index
-	 *
 	 * @return A manually create <code>LuceneWork</code> list.
 	 */
 	private List<LuceneWork> createDocumentAndWorkQueue(TShirt shirt) {
@@ -157,7 +210,7 @@ public class JMSMasterTest extends SearchTestBase {
 				ProjectionConstants.OBJECT_CLASS, shirt.getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED
 		);
 		doc.add( field );
-		field = new Field( "id", "1", Field.Store.YES, Field.Index.NOT_ANALYZED );
+		field = new Field( "id", "1", Field.Store.YES, Field.Index.ANALYZED );
 		doc.add( field );
 		field = new Field( "logo", shirt.getLogo(), Field.Store.NO, Field.Index.ANALYZED );
 		doc.add( field );
@@ -173,15 +226,14 @@ public class JMSMasterTest extends SearchTestBase {
 
 	/**
 	 * Create a test object without triggering indexing. Use SQL directly.
-	 *
 	 * @return a <code>TShirt</code> test object.
-	 *
 	 * @throws SQLException in case the insert fails.
 	 */
 	private TShirt createObjectWithSQL() throws SQLException {
 		Session s = openSession();
 		s.getTransaction().begin();
 		s.doWork( new Work() {
+
 			@Override
 			public void execute(Connection connection) throws SQLException {
 				final Statement statement = connection.createStatement();

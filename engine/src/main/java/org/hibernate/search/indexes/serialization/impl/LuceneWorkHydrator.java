@@ -34,10 +34,12 @@ import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
@@ -57,6 +59,7 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
  */
 public class LuceneWorkHydrator implements LuceneWorksBuilder {
+
 	private static final Log log = LoggerFactory.make();
 
 	private ExtendedSearchIntegrator searchIntegrator;
@@ -121,6 +124,20 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		);
 		results.add( result );
 		id = null;
+	}
+
+	@Override
+	public void addDeleteByQueryLuceneWork(String entityClassName, DeletionQuery deletionQuery) {
+		Class<?> entityClass = ClassLoaderHelper.classForName(
+				entityClassName,
+				"entity class",
+				searchIntegrator.getServiceManager()
+		);
+		LuceneWork result = new DeleteByQueryLuceneWork(
+				entityClass,
+				deletionQuery
+		);
+		this.results.add( result );
 	}
 
 	@Override
@@ -346,7 +363,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		type.setStoreTermVectorPositions( termVector == SerializableTermVector.WITH_POSITIONS || termVector == SerializableTermVector.WITH_POSITIONS_OFFSETS );
 		type.setOmitNorms( omitNorms );
 		type.setIndexOptions( omitTermFreqAndPositions ? IndexOptions.DOCS_ONLY : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS );
-		return type	;
+		return type;
 	}
 
 	private Field.Store getStore(SerializableStore store) {

@@ -15,10 +15,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-
 import org.hibernate.search.backend.impl.CommitPolicy;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.backend.AddLuceneWork;
+import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
@@ -321,6 +321,12 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 		@Override
 		public FlushStrategyNeed getDelegate(FlushLuceneWork flushLuceneWork) {
 			return FlushStrategyNeed.FLUSH_WRITES_AND_DELETES;
+		}
+
+		@Override
+		public FlushStrategyNeed getDelegate(
+				DeleteByQueryLuceneWork deleteByQueryLuceneWork) {
+			return FlushStrategyNeed.FLUSH_DELETIONS;
 		}
 	}
 
