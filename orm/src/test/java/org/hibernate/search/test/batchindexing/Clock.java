@@ -48,4 +48,15 @@ public class Clock {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append( "[" );
+		builder.append( id );
+		builder.append( "," );
+		builder.append( brand );
+		builder.append( "]" );
+		return builder.toString();
+	}
 }
