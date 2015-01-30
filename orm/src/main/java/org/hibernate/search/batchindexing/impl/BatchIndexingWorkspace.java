@@ -57,6 +57,8 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	private final int idFetchSize;
 
+	private final String tenantId;
+
 	public BatchIndexingWorkspace(ExtendedSearchIntegrator extendedIntegrator,
 								SessionFactoryImplementor sessionFactory,
 								Class<?> entityType,
@@ -67,10 +69,12 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 								MassIndexerProgressMonitor monitor,
 								BatchBackend backend,
 								long objectsLimit,
-								int idFetchSize) {
+								int idFetchSize,
+								String tenantId) {
 		super( extendedIntegrator );
 		this.indexedType = entityType;
 		this.idFetchSize = idFetchSize;
+		this.tenantId = tenantId;
 		this.idNameOfIndexedType = extendedIntegrator.getIndexBinding( entityType )
 				.getDocumentBuilder()
 				.getIdentifierName();
@@ -99,7 +103,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	public void runWithErrorHandler() {
 		try {
 			final ErrorHandler errorHandler = extendedIntegrator.getErrorHandler();
-			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( extendedIntegrator, sessionFactory, errorHandler );
+			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( extendedIntegrator, sessionFactory, errorHandler, tenantId );
 			//first start the consumers, then the producers (reverse order):
 			//from primary keys to LuceneWork ADD operations:
 			startTransformationToLuceneWork( transactionalContext, errorHandler );
@@ -125,8 +129,10 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 				new IdentifierProducer(
 						primaryKeyStream, sessionFactory,
 						objectLoadingBatchSize, indexedType, monitor,
-						objectsLimit, errorHandler, idFetchSize
-				));
+						objectsLimit, errorHandler, idFetchSize,
+						tenantId
+				),
+				tenantId);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
 		try {
@@ -142,8 +148,10 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 				new IdentifierConsumerDocumentProducer(
 						primaryKeyStream, monitor, sessionFactory, producerEndSignal,
 						cacheMode, indexedType, extendedIntegrator,
-						idNameOfIndexedType, backend, errorHandler
-				));
+						idNameOfIndexedType, backend, errorHandler,
+						tenantId
+				),
+				tenantId);
 		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {

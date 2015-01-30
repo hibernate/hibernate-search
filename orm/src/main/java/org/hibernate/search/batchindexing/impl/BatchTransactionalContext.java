@@ -36,11 +36,11 @@ public class BatchTransactionalContext {
 	final TransactionFactory<?> transactionFactory;
 	final ExtendedSearchIntegrator extendedIntegrator;
 
-	public BatchTransactionalContext(ExtendedSearchIntegrator extendedIntegrator, SessionFactoryImplementor sessionFactory, ErrorHandler errorHandler) {
+	public BatchTransactionalContext(ExtendedSearchIntegrator extendedIntegrator, SessionFactoryImplementor sessionFactory, ErrorHandler errorHandler, String tenantId) {
 		this.extendedIntegrator = extendedIntegrator;
 		this.factory = sessionFactory;
 		this.errorHandler = errorHandler;
-		this.transactionManager = lookupTransactionManager( factory );
+		this.transactionManager = lookupTransactionManager( factory, tenantId );
 		this.transactionFactory = lookupTransactionFactory( factory );
 	}
 
@@ -48,8 +48,10 @@ public class BatchTransactionalContext {
 		return sessionFactory.getServiceRegistry().getService( TransactionFactory.class );
 	}
 
-	private static TransactionManager lookupTransactionManager(SessionFactoryImplementor sessionFactory) {
-		final Session session = sessionFactory.openSession();
+	private static TransactionManager lookupTransactionManager(SessionFactoryImplementor sessionFactory, String tenantId) {
+		final Session session = tenantId == null
+				? sessionFactory.openSession()
+				: sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession();
 		try {
 			EventSource eventSource = (EventSource)session;
 			return eventSource
