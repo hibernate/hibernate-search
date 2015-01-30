@@ -160,3 +160,45 @@ The name of this strategy is `not-shared`.
 You can write your own reader strategy that suits your application needs by implementing
 org.hibernate.search.reader.ReaderProvider. The implementation must be thread safe.
 
+[[search-architecture-multitenancy]]
+=== Multi-tenancy
+
+==== What is multi-tenancy?
+
+The term multi-tenancy in general is applied to software development to indicate anarchitecture in 
+which a single running instance of an application simultaneously serves multiple clients (tenants).
+This is highly common in SaaS solutions.
+Isolating information (data, customizations, etc) pertaining to the various tenants is a particular
+challenge in these systems.
+This includes the data owned by each tenant stored in the database.
+You will find more details on how to enable multi-tenancy in the
+link:$$http://docs.jboss.org/hibernate/orm/4.3/devguide/en-US/html/ch16.html$$[Hibernate ORM developer's guide].
+
+You can create a full-text search session in the following way:
+
+.Create a FullTextSession with a tenant identifier
+====
+[cource, JAVA]
+----
+Session session = sessionFactory.withOptions().tenantIdentifier("client-A").openSession();
+FullTextSession fullTextSession = Search.getFullTextSession(session);
+----
+====
+
+The FullTextSession will be bound to the specific tenant ("client-A" in the example)
+and the mass indexer will only index the entities associated to that tenant identifier.
+
+==== Limitations
+
+Integration of full automatic support for multi-tenancy has not been implemented yet.
+You will need to take some limitations into account:
+
+1. Queries won't be filtered automatically per tenant.
+   Hibernate Search will run the query on all the entries in the index.
+   If you need to filter per tenant you need to store the tenant identifier for each
+   document and filter on it.
+
+2. The purge operation won't consider the tenant,
+   it will delete all the documents in the index of the specific type,
+   ignoring the tenant identifier in the session.
+
