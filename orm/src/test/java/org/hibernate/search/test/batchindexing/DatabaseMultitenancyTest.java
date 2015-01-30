@@ -134,6 +134,40 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		assertThat( list ).onProperty( "brand" ).containsOnly( GEOCHRON_MODELS );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1792")
+	@Ignore
+	public void shouldOnlyPurgeTheEntitiesOfTheSelecedTenant() {
+		purgeAll( Clock.class, GEOCHRON_TID );
+
+		List<Clock> list = searchAll( METAMEC_TID );
+		assertThat( list ).onProperty( "brand" ).containsOnly( METAMEC_MODELS );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1792")
+	@Ignore
+	public void shouldOnlyReturnResultsOfTheSpecificTenant() throws Exception {
+		purgeAll( Clock.class, GEOCHRON_TID );
+		purgeAll( Clock.class, METAMEC_TID );
+		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
+
+		List<Clock> list = searchAll( METAMEC_TID );
+		assertThat( list ).isEmpty();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1792")
+	@Ignore
+	public void shouldSearchOtherTenantsDocuments() throws Exception {
+		purgeAll( Clock.class, GEOCHRON_TID );
+		purgeAll( Clock.class, METAMEC_TID );
+		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
+
+		List<Clock> list = searchModel( "geochron", METAMEC_TID );
+		assertThat( list ).isEmpty();
+	}
+
 	private List<Clock> searchModel(String searchString, String tenantId) {
 		FullTextSession session = Search.getFullTextSession( openSessionWithTenantId( tenantId ) );
 		QueryBuilder queryBuilder = session.getSearchFactory().buildQueryBuilder().forEntity( Clock.class ).get();
