@@ -453,7 +453,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 144, value = "FieldBridge passed in is not an instance of %1$s")
 	SearchException fieldBridgeNotAnInstanceof(String className);
 
-	@Message(id = 146, value = "The query string '%2$s' applied on field '%1$s' has no meaningfull tokens to be matched. Validate the query input " +
+	@Message(id = 146, value = "The query string '%2$s' applied on field '%1$s' has no meaningful tokens to be matched. Validate the query input " +
 			"against the Analyzer applied on this field.")
 	EmptyQueryException queryWithNoTermsAfterAnalysis(String field, String searchTerm);
 
