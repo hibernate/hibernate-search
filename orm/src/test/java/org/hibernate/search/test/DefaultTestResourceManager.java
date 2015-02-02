@@ -13,11 +13,9 @@ import java.util.UUID;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.store.Directory;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
@@ -25,12 +23,12 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.testsupport.TestConstants;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -55,7 +53,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private boolean needsConfigurationRebuild;
 
 	public DefaultTestResourceManager(Class<?>[] annotatedClasses) {
-		this.annotatedClasses = annotatedClasses;
+		this.annotatedClasses = annotatedClasses == null ? new Class<?>[0] : annotatedClasses;
 		this.cfg = new Configuration();
 		this.baseIndexDir = createBaseIndexDir();
 		this.needsConfigurationRebuild = true;
