@@ -28,7 +28,7 @@ public class ConnectedMoreLikeThisMatchingContext implements MoreLikeThisOpenedM
 		this.queryCustomizer = queryCustomizer;
 		this.queryContext = queryContext;
 		this.moreLikeThisContext = moreLikeThisContext;
-		this.fieldsContext = new FieldsContext( fieldNames );
+		this.fieldsContext = new FieldsContext( fieldNames, queryContext );
 	}
 
 	@Override

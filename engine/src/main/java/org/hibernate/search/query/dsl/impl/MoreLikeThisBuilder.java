@@ -45,8 +45,8 @@ import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.DocumentBuilderHelper;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.AssertionFailure;
@@ -56,8 +56,8 @@ import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
-import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ID;
 import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ENTITY;
+import static org.hibernate.search.query.dsl.impl.ConnectedMoreLikeThisQueryBuilder.INPUT_TYPE.ID;
 
 /**
  * Class inspired and code copied from Apache Lucene MoreLikeThis class.
@@ -473,7 +473,7 @@ public class MoreLikeThisBuilder<T> {
 			throws IOException {
 		String fieldName = fieldContext.getField();
 		Analyzer analyzer = queryContext.getQueryAnalyzer();
-		if ( fieldContext.isIgnoreAnalyzer() ) {
+		if ( !fieldContext.applyAnalyzer() ) {
 			// essentially does the Reader to String conversion for us
 			analyzer = PassThroughAnalyzer.INSTANCE;
 		}
