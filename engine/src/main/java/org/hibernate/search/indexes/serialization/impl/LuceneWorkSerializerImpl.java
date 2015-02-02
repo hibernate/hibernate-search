@@ -13,6 +13,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FieldType.NumericType;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.AddLuceneWork;
@@ -173,6 +174,13 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 						throw log.unknownNumericFieldType( dataType );
 				}
 			}
+
+			FieldInfo.DocValuesType docValuesType = fieldType.docValueType();
+			if ( docValuesType != null ) {
+				serializeDocValues( serializer, (Field) fieldable );
+				continue;
+			}
+
 			else if (fieldable instanceof Field) {
 				Field safeField = (Field) fieldable;
 				//FIXME it seems like in new Field implementation it's possible to have multiple data types at the same time. Investigate?
@@ -201,6 +209,43 @@ public class LuceneWorkSerializerImpl implements LuceneWorkSerializer {
 			}
 		}
 		serializer.addDocument();
+	}
+
+	private void serializeDocValues(Serializer serializer, Field field) {
+		FieldInfo.DocValuesType docValuesType = field.fieldType().docValueType();
+		switch ( docValuesType ) {
+			// data is a long value
+			case NUMERIC: {
+				serializer.addDocValuesFieldWithNumericValue(
+						field.numericValue().longValue(), new LuceneFieldContext( field )
+				);
+				break;
+			}
+			case SORTED_NUMERIC: {
+				serializer.addDocValuesFieldWithNumericValue(
+						field.numericValue().longValue(), new LuceneFieldContext( field )
+				);
+				break;
+			}
+
+			// data is ByteRef
+			case BINARY: {
+				serializer.addDocValuesFieldWithBinaryValue( new LuceneFieldContext( field ) );
+				break;
+			}
+			case SORTED: {
+				serializer.addDocValuesFieldWithBinaryValue( new LuceneFieldContext( field ) );
+				break;
+			}
+			case SORTED_SET: {
+				serializer.addDocValuesFieldWithBinaryValue( new LuceneFieldContext( field ) );
+				break;
+			}
+			default: {
+				// in case Lucene is going to add more in coming releases
+				throw log.unknownDocValuesTypeType( docValuesType.toString() );
+			}
+		}
 	}
 
 	@Override

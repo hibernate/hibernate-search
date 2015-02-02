@@ -349,6 +349,28 @@ public class AvroSerializer implements Serializer {
 	}
 
 	@Override
+	public void addDocValuesFieldWithBinaryValue(LuceneFieldContext context) {
+		GenericRecord record = new GenericData.Record( protocol.getType( "BinaryDocValuesField" ) );
+		record.put( "name", context.getName() );
+		record.put( "type", context.getDocValuesType() );
+
+		BytesRef binaryValue = context.getBinaryValue();
+		record.put( "value", ByteBuffer.wrap( binaryValue.bytes, binaryValue.offset, binaryValue.length ) );
+		record.put( "offset", 0 );
+		record.put( "length", binaryValue.length );
+		fieldables.add( record );
+	}
+
+	@Override
+	public void addDocValuesFieldWithNumericValue(long value, LuceneFieldContext context) {
+		GenericRecord record = new GenericData.Record( protocol.getType( "NumericDocValuesField" ) );
+		record.put( "name", context.getName() );
+		record.put( "type", context.getDocValuesType() );
+		record.put( "value", value );
+		fieldables.add( record );
+	}
+
+	@Override
 	public void addDocument() {
 		document = new GenericData.Record( protocol.getType( "Document" ) );
 		//backwards compatibility: we used to have a boost here in Lucene 3 / Hibernate Search 4.x

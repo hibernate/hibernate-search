@@ -239,6 +239,22 @@ public class AvroDeserializer implements Deserializer {
 						asBoolean( field, "omitTermFreqAndPositions" )
 				);
 			}
+			else if ( "BinaryDocValuesField".equals( schema ) ) {
+				hydrator.addDocValuesFieldWithBinaryData(
+						asString( field, "name" ),
+						asString( field, "type" ),
+						asByteArray( field, "value" ),
+						asInt( field, "offset" ),
+						asInt( field, "length" )
+				);
+			}
+			else if ( "NumericDocValuesField".equals( schema ) ) {
+				hydrator.addDocValuesFieldWithNumericData(
+						asString( field, "name" ),
+						asString( field, "type" ),
+						asLong( field, "value" )
+				);
+			}
 			else {
 				throw log.cannotDeserializeField( schema );
 			}

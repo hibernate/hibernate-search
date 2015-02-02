@@ -1,0 +1,10 @@
+{
+    "name": "DocValuesType",
+    "type": "enum",
+    "symbols" : ["NUMERIC",
+                "SORTED_NUMERIC",
+                "BINARY",
+                "SORTED",
+                "SORTED_SET"]
+}
+

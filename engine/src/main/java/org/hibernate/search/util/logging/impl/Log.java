@@ -756,4 +756,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 254, value = "Unknown indexing mode: %1$s")
 	SearchException unknownIndexingMode(String indexingMode);
+
+	@Message(id = 255, value = "Unknown DocValues type: %1$s")
+	SearchException unknownDocValuesTypeType(String docValuesType);
+
+	@Message(id = 256, value = "'%1$s' is an unexpected type for a binary doc value")
+	SearchException unexpectedBinaryDocValuesTypeType(String docValuesType);
+
+	@Message(id = 257, value = "'%1$s' is an unexpected type for a numeric doc value")
+	SearchException unexpectedNumericDocValuesTypeType(String docValuesType);
+
 }

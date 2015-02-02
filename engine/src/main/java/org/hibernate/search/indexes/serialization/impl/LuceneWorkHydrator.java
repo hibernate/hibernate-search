@@ -19,6 +19,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.TypeAttributeImpl;
+import org.apache.lucene.document.BinaryDocValuesField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
@@ -26,7 +27,12 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.document.SortedDocValuesField;
+import org.apache.lucene.document.SortedNumericDocValuesField;
+import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.document.StoredField;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
@@ -317,6 +323,57 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	private void clearAttributes() {
 		attributes = new ArrayList<AttributeImpl>();
+	}
+
+	@Override
+	public void addDocValuesFieldWithBinaryData(String name, String type, byte[] value, int offset, int length) {
+		FieldInfo.DocValuesType docValuesType = Enum.valueOf(
+				FieldInfo.DocValuesType.class, type
+		);
+		Field docValuesField;
+		switch ( docValuesType ) {
+			// data is ByteRef
+			case BINARY: {
+				docValuesField = new BinaryDocValuesField( name, new BytesRef( value, offset, length ) );
+				break;
+			}
+			case SORTED: {
+				docValuesField = new SortedDocValuesField( name, new BytesRef( value, offset, length ) );
+				break;
+			}
+			case SORTED_SET: {
+				docValuesField = new SortedSetDocValuesField( name, new BytesRef( value, offset, length ) );
+				break;
+			}
+			default: {
+				// in case Lucene is going to add more in coming releases
+				throw log.unexpectedBinaryDocValuesTypeType( type );
+			}
+		}
+		getLuceneDocument().add( docValuesField );
+	}
+
+	@Override
+	public void addDocValuesFieldWithNumericData(String name, String type, long value) {
+		FieldInfo.DocValuesType docValuesType = Enum.valueOf(
+				FieldInfo.DocValuesType.class, type
+		);
+		Field docValuesField;
+		switch ( docValuesType ) {
+			case NUMERIC: {
+				docValuesField = new NumericDocValuesField( name, value );
+				break;
+			}
+			case SORTED_NUMERIC: {
+				docValuesField = new SortedNumericDocValuesField( name, value );
+				break;
+			}
+			default: {
+				// in case Lucene is going to add more in coming releases
+				throw log.unexpectedBinaryDocValuesTypeType( type );
+			}
+		}
+		getLuceneDocument().add( docValuesField );
 	}
 
 	private Document getLuceneDocument() {

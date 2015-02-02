@@ -74,4 +74,8 @@ public interface LuceneWorksBuilder {
 	void addOffsetAttribute(int startOffset, int endOffset);
 
 	void addToken();
+
+	void addDocValuesFieldWithBinaryData(String name, String type, byte[] value, int offset, int length);
+
+	void addDocValuesFieldWithNumericData(String name, String type, long value);
 }
