@@ -16,22 +16,27 @@ import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
  */
 public class FieldContext {
 	private final String field;
+	private final boolean isIdField;
 	private boolean ignoreAnalyzer;
 	private final QueryCustomizer fieldCustomizer;
 	private boolean ignoreFieldBridge;
 	private FieldBridge fieldBridge;
 
-	public FieldContext(String field) {
+	public FieldContext(String field, QueryBuildingContext queryContext) {
 		this.field = field;
 		this.fieldCustomizer = new QueryCustomizer();
+		isIdField = Helper.getDocumentBuilder( queryContext ).getIdKeywordName().equals( field );
 	}
 
 	public String getField() {
 		return field;
 	}
 
-	public boolean isIgnoreAnalyzer() {
-		return ignoreAnalyzer;
+	/**
+	 * Whether to analyze the given field value or not.
+	 */
+	public boolean applyAnalyzer() {
+		return !ignoreAnalyzer && !isIdField;
 	}
 
 	public void setIgnoreAnalyzer(boolean ignoreAnalyzer) {
@@ -68,5 +73,11 @@ public class FieldContext {
 		else {
 			return documentBuilder.objectToString( field, value, conversionContext );
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "FieldContext [field=" + field + ", fieldBridge=" + fieldBridge + ", fieldCustomizer=" + fieldCustomizer + ", ignoreAnalyzer=" + ignoreAnalyzer
+				+ ", ignoreFieldBridge=" + ignoreFieldBridge + "]";
 	}
 }
