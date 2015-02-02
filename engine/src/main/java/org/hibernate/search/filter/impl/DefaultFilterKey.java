@@ -18,6 +18,9 @@ import org.hibernate.search.filter.FilterKey;
  *
  * @author Gunnar Morling
  */
+// The deprecated public type FilterKey is extended here to plug the new mechanism of automatic key determination into
+// the existing key handling routine. DefaultFilterKey will be the one and only key type as of Hibernate Search 6.
+@SuppressWarnings("deprecation")
 public final class DefaultFilterKey extends FilterKey {
 
 	private final String filterDefName;

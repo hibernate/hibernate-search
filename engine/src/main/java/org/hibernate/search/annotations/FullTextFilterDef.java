@@ -39,11 +39,6 @@ public @interface FullTextFilterDef {
 	 * The given class must define a no-args constructor and a JavaBeans setter method for each parameter to be passed
 	 * via {@link org.hibernate.search.filter.FullTextFilter#setParameter(String, Object)}.
 	 * <p>
-	 * It may optionally declare a parameterless method annotated with {@link Key} returning the
-	 * {@link org.hibernate.search.filter.FilterKey} to be used for caching the Lucene filters created from this filter
-	 * definition. If no such method exists, a cache key will be built from the names and values of all the filter's
-	 * parameters.
-	 * <p>
 	 * The Lucene filter created by this filter definition must be thread-safe.
 	 *
 	 * @return A class implementing {@code Filter} or a filter factory class

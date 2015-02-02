@@ -1345,45 +1345,8 @@ public class SecurityFilterFactory {
 ----
 ====
 
-By default filters will be cached once created, based on all their parameter names and values.
-Optionally you can provide a custom filter key implementation, which e.g. may be beneficial in terms of memory consumption.
-To do so, declare a method annotated with `@Key`, returning a `FilterKey` object:
-
-.Providing a custom filter key
-====
-[source, JAVA]
-----
-public class SecurityFilterFactory {
-
-    private Integer level;
-
-    // setLevel(), getFilter() ...
-
-    @Key
-    public FilterKey getKey() {
-        StandardFilterKey key = new StandardFilterKey();
-        key.addParameter( level );
-        return key;
-    }
-}
-----
-====
-
-The returned filter key object must implement equals() / hashCode() so that 2 keys are equal if and only
-if the given Filter types are the same and the set of parameters are the same. In other words, 2
-filter keys are equal if and only if the filters from which the keys are generated can be
-interchanged. The key object is used as a key in the cache mechanism.
-
-In most cases, using the `StandardFilterKey` implementation will be good enough. It delegates the
-`equals()` / `hashCode()` implementation to each of the parameters equals and hashCode methods.
-
-Note that a `@Key` method is generally not needed. You still may consider to add one if the default implementation is not efficient enough.
-No key method is needed at all if
-
-* you disabled the filter caching system (enabled by default)
-* your filter has no parameters
-
-As mentioned before the defined filters are per default cached and the cache uses a combination of
+Filters will be cached once created, based on all their parameter names and values.
+Caching happens using a combination of
 hard and soft references to allow disposal of memory when needed. The hard reference cache keeps
 track of the most recently used filters and transforms the ones least used to SoftReferences when
 needed. Once the limit of the hard reference cache is reached additional filters are cached as
