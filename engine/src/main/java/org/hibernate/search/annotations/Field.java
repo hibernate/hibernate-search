@@ -29,12 +29,14 @@ import java.lang.annotation.Target;
 public @interface Field {
 
 	/**
-	 * Default value for {@link #indexNullAs} parameter. Indicates that {@code null} values should not be indexed.
+	 * Default value for the {@link #indexNullAs} parameter. Indicates that {@code null} values should not be indexed.
 	 */
 	String DO_NOT_INDEX_NULL = "__DO_NOT_INDEX_NULL__";
 
 	/**
-	 * Value for {@link #indexNullAs} parameter indicating that {@code null} values should not indexed using the
+	 * Value for the {@link #indexNullAs} parameter indicating that {@code null} values should be indexed using the null
+	 * token given through the {@link org.hibernate.search.cfg.Environment#DEFAULT_NULL_TOKEN} configuration property.
+	 * If no value is given for that property, the token {@code _null_} will be used.
 	 */
 	String DEFAULT_NULL_TOKEN = "__DEFAULT_NULL_TOKEN__";
 
