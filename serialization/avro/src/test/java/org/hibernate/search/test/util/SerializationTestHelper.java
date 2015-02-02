@@ -4,12 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.test.serialization;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+package org.hibernate.search.test.util;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -38,24 +33,32 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
+import org.junit.Assert;
+
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
-import org.junit.Assert;
 
-final class AvroTestHelpers {
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-	private AvroTestHelpers() {
+public final class SerializationTestHelper {
+
+	private SerializationTestHelper() {
 		//Utility class: not meant to be constructed
 	}
 
-	static List<List<AttributeImpl>> buildTokenSteamWithAttributes() {
-		List<List<AttributeImpl>> tokens = new ArrayList<List<AttributeImpl>>();
+	public static List<List<AttributeImpl>> buildTokenStreamWithAttributes() {
+		List<List<AttributeImpl>> tokens = new ArrayList<>();
 		tokens.add( new ArrayList<AttributeImpl>() );
 
 		CharTermAttributeImpl charAttr = new CharTermAttributeImpl();
@@ -88,7 +91,14 @@ final class AvroTestHelpers {
 		return tokens;
 	}
 
-	static void assertLuceneWork(LuceneWork work, LuceneWork copy) {
+	public static void assertLuceneWorkList(List<LuceneWork> expectedWorkList, List<LuceneWork> actualWorkList) {
+		assertThat( actualWorkList ).hasSize( expectedWorkList.size() );
+		for ( int index = 0; index < expectedWorkList.size(); index++ ) {
+			SerializationTestHelper.assertLuceneWork( expectedWorkList.get( index ), actualWorkList.get( index ) );
+		}
+	}
+
+	public static void assertLuceneWork(LuceneWork work, LuceneWork copy) {
 		assertThat( copy ).isInstanceOf( work.getClass() );
 		if ( work instanceof OptimizeLuceneWork ) {
 			assertNotNull( copy );
@@ -106,31 +116,37 @@ final class AvroTestHelpers {
 		else if ( work instanceof UpdateLuceneWork ) {
 			assertUpdate( (UpdateLuceneWork) work, (UpdateLuceneWork) copy );
 		}
+		else if ( work instanceof FlushLuceneWork ) {
+			assertFlush( (FlushLuceneWork) work, (FlushLuceneWork) copy );
+		}
 		else {
 			fail( "unexpected type" );
 		}
 	}
 
 	private static void assertAdd(AddLuceneWork work, AddLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
-		assertThat( work.getId() ).as( "Add.getId is not copied" ).isEqualTo( copy.getId() );
-		assertThat( work.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
-		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
-				.isEqualTo( copy.getFieldToAnalyzerMap() );
+		assertThat( copy.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( work.getEntityClass() );
+		assertThat( copy.getId() ).as( "Add.getId is not copied" ).isEqualTo( work.getId() );
+		assertThat( copy.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( work.getIdInString() );
+		assertThat( copy.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
+				.isEqualTo( work.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
 	}
 
 	private static void assertUpdate(UpdateLuceneWork work, UpdateLuceneWork copy) {
-		assertThat( work.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( copy.getEntityClass() );
-		assertThat( work.getId() ).as( "Add.getId is not copied" ).isEqualTo( copy.getId() );
-		assertThat( work.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( copy.getIdInString() );
-		assertThat( work.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
-				.isEqualTo( copy.getFieldToAnalyzerMap() );
+		assertThat( copy.getEntityClass() ).as( "Add.getEntityClass is not copied" ).isEqualTo( work.getEntityClass() );
+		assertThat( copy.getId() ).as( "Add.getId is not copied" ).isEqualTo( work.getId() );
+		assertThat( copy.getIdInString() ).as( "Add.getIdInString is not the same" ).isEqualTo( work.getIdInString() );
+		assertThat( copy.getFieldToAnalyzerMap() ).as( "Add.getFieldToAnalyzerMap is not the same" )
+				.isEqualTo( work.getFieldToAnalyzerMap() );
 		assertDocument( work.getDocument(), copy.getDocument() );
 	}
 
 	private static void assertDocument(Document original, Document copy) {
-		assertThat( original.getFields().size() ).isEqualTo( copy.getFields().size() );
+		assertEquals(
+				"The serialized and de-serialized work list differ in size", original.getFields().size(),
+				copy.getFields().size()
+		);
 		for ( int index = 0; index < original.getFields().size(); index++ ) {
 			IndexableField field = original.getFields().get( index );
 			IndexableField fieldCopy = copy.getFields().get( index );
@@ -149,19 +165,19 @@ final class AvroTestHelpers {
 	}
 
 	private static void assertFieldType(FieldType copy, FieldType original) {
-		assertThat( original.omitNorms() ).isEqualTo( copy.omitNorms() );
-		assertThat( original.storeTermVectorOffsets() ).isEqualTo( copy.storeTermVectorOffsets() );
-		assertThat( original.storeTermVectorPayloads() ).isEqualTo( copy.storeTermVectorPayloads() );
-		assertThat( original.storeTermVectorOffsets() ).isEqualTo( copy.storeTermVectorOffsets() );
-		assertThat( original.docValueType() ).isEqualTo( copy.docValueType() );
-		assertThat( original.indexed() ).isEqualTo( copy.indexed() );
-		assertThat( original.indexOptions() ).isEqualTo( copy.indexOptions() );
-		assertThat( original.numericPrecisionStep() ).isEqualTo( copy.numericPrecisionStep() );
-		assertThat( original.numericType() ).isEqualTo( copy.numericType() );
-		assertThat( original.stored() ).isEqualTo( copy.stored() );
-		assertThat( original.storeTermVectors() ).isEqualTo( copy.storeTermVectors() );
-		assertThat( original.tokenized() ).isEqualTo( copy.tokenized() );
-		assertThat( original.toString() ).isEqualTo( copy.toString() );
+		assertThat( copy.omitNorms() ).isEqualTo( original.omitNorms() );
+		assertThat( copy.storeTermVectorOffsets() ).isEqualTo( original.storeTermVectorOffsets() );
+		assertThat( copy.storeTermVectorPayloads() ).isEqualTo( original.storeTermVectorPayloads() );
+		assertThat( copy.storeTermVectorOffsets() ).isEqualTo( original.storeTermVectorOffsets() );
+		assertThat( copy.docValueType() ).isEqualTo( original.docValueType() );
+		assertThat( copy.indexed() ).isEqualTo( original.indexed() );
+		assertThat( copy.indexOptions() ).isEqualTo( original.indexOptions() );
+		assertThat( copy.numericPrecisionStep() ).isEqualTo( original.numericPrecisionStep() );
+		assertThat( copy.numericType() ).isEqualTo( original.numericType() );
+		assertThat( copy.stored() ).isEqualTo( original.stored() );
+		assertThat( copy.storeTermVectors() ).isEqualTo( original.storeTermVectors() );
+		assertThat( copy.tokenized() ).isEqualTo( original.tokenized() );
+		assertThat( copy.toString() ).isEqualTo( original.toString() );
 	}
 
 	private static boolean compareTokenStreams(TokenStream original, TokenStream copy) {
@@ -272,7 +288,12 @@ final class AvroTestHelpers {
 				.isEqualTo( copy.getEntityClass() );
 	}
 
-	static class SerializableStringReader extends Reader implements Serializable {
+	private static void assertFlush(FlushLuceneWork work, FlushLuceneWork copy) {
+		assertThat( copy.getEntityClass() ).as( "FlushLuceneWork.getEntityClass is not copied" )
+				.isEqualTo( work.getEntityClass() );
+	}
+
+	public static class SerializableStringReader extends Reader implements Serializable {
 		private boolean read = false;
 
 		@Override

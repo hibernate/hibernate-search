@@ -753,4 +753,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 253, value = "To use '%1$s' as a locking strategy, an indexBase path must be set")
 	SearchException indexBasePathRequiredForLockingStrategy(String strategy);
+
+	@Message(id = 254, value = "Unknown DocValues type: %1$s")
+	SearchException unknownDocValuesTypeType(String docValuesType);
+
+	@Message(id = 255, value = "'%1$s' is an unexpected type for a binary doc value")
+	SearchException unexpectedBinaryDocValuesTypeType(String docValuesType);
+
+	@Message(id = 256, value = "'%1$s' is an unexpected type for a numeric doc value")
+	SearchException unexpectedNumericDocValuesTypeType(String docValuesType);
 }

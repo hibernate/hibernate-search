@@ -11,17 +11,21 @@ import java.io.Serializable;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.serialization.impl.CopyTokenStream;
 import org.hibernate.search.indexes.serialization.impl.SerializationHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public final class LuceneFieldContext {
+	private static Log log = LoggerFactory.make();
 
 	private final Field field;
 	private final FieldType fieldType;
@@ -72,6 +76,34 @@ public final class LuceneFieldContext {
 				return SerializableTermVector.YES;
 			default:
 				throw new SearchException( "Unable to convert Field.TermVector value into serializable TermVector: " + vector);
+		}
+	}
+
+	public SerializableDocValuesType getDocValuesType() {
+		FieldInfo.DocValuesType docValuesType = field.fieldType().docValueType();
+		switch ( docValuesType ) {
+			// data is a long value
+			case NUMERIC: {
+				return SerializableDocValuesType.NUMERIC;
+			}
+			case SORTED_NUMERIC: {
+				return SerializableDocValuesType.SORTED_NUMERIC;
+			}
+
+			// data is ByteRef
+			case BINARY: {
+				return SerializableDocValuesType.BINARY;
+			}
+			case SORTED: {
+				return SerializableDocValuesType.SORTED;
+			}
+			case SORTED_SET: {
+				return SerializableDocValuesType.SORTED_SET;
+			}
+			default: {
+				// in case Lucene is going to add more in coming releases
+				throw log.unknownDocValuesTypeType( docValuesType.toString() );
+			}
 		}
 	}
 
