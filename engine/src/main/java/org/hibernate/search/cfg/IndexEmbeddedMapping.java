@@ -16,8 +16,8 @@ public class IndexEmbeddedMapping {
 
 	private final SearchMapping mapping;
 	private final Map<String,Object> indexEmbedded;
-	private EntityDescriptor entity;
-	private PropertyDescriptor property;
+	private final EntityDescriptor entity;
+	private final PropertyDescriptor property;
 
 	public IndexEmbeddedMapping(SearchMapping mapping, PropertyDescriptor property, EntityDescriptor entity) {
 		this.mapping = mapping;
@@ -39,6 +39,11 @@ public class IndexEmbeddedMapping {
 
 	public IndexEmbeddedMapping depth(int depth) {
 		this.indexEmbedded.put( "depth", depth );
+		return this;
+	}
+
+	public IndexEmbeddedMapping includeEmbeddedObjectId(boolean includeEmbeddedObjectId) {
+		this.indexEmbedded.put( "includeEmbeddedObjectId", includeEmbeddedObjectId );
 		return this;
 	}
 
