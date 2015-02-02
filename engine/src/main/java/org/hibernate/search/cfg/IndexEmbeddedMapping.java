@@ -47,6 +47,11 @@ public class IndexEmbeddedMapping {
 		return this;
 	}
 
+	public IndexEmbeddedMapping indexNullAs(String nullToken) {
+		this.indexEmbedded.put( "indexNullAs", nullToken );
+		return this;
+	}
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping( name, type, entity, mapping );
 	}
@@ -62,5 +67,4 @@ public class IndexEmbeddedMapping {
 	public FieldMapping field() {
 		return new FieldMapping( property, entity, mapping );
 	}
-
 }

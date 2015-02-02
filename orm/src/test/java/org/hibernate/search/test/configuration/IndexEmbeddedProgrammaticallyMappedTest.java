@@ -12,6 +12,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.TestConstants;
 import org.junit.Test;
@@ -59,6 +60,40 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 		}
 	}
 
+	@Test
+	public void canSetIndexNullAsProgrammatically() throws Exception {
+		try (FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
+			// given
+			builder.fluentMapping()
+				.entity( Address.class)
+					.indexed()
+					.property( "addressId", ElementType.METHOD )
+						.documentId()
+							.name( "id" )
+					.property( "country", ElementType.METHOD )
+						.indexEmbedded()
+							.indexNullAs( IndexedEmbedded.DEFAULT_NULL_TOKEN );
+
+			setupTestData( builder );
+
+			FullTextSession s = builder.openFullTextSession();
+
+			// when
+			QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+			org.apache.lucene.search.Query luceneQuery = parser.parse( "country:" + "_null_" );
+
+			Transaction tx = s.beginTransaction();
+
+			// then
+			FullTextQuery query = s.createFullTextQuery( luceneQuery );
+			assertEquals( 1, query.getResultSize() );
+			assertEquals( "Alice Donellis", ( (Address) query.list().iterator().next() ).getOwner() );
+
+			tx.commit();
+			s.close();
+		}
+	}
+
 	@SuppressWarnings("resource")
 	private FullTextSessionBuilder getFullTextSessionBuilder() {
 		return new FullTextSessionBuilder()
@@ -73,12 +108,16 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 		Address bobsPlace = new Address();
 		bobsPlace.setOwner( "Bob McRobb" );
 
+		Address alicesPlace = new Address();
+		alicesPlace.setOwner( "Alice Donellis" );
+
 		Country scotland = new Country();
 		scotland.setName( "Scotland" );
 		bobsPlace.setCountry( scotland );
 		scotland.getAddresses().add( bobsPlace );
 
 		s.persist( bobsPlace );
+		s.persist( alicesPlace );
 		s.persist( scotland );
 
 		tx.commit();
