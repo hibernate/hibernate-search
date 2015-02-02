@@ -6,39 +6,33 @@
  */
 package org.hibernate.search.test.query.dsl;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.junit.Assert;
-
-import org.apache.lucene.document.DateTools;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.core.StopFilterFactory;
 import org.apache.lucene.analysis.ngram.NGramFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
-import org.apache.lucene.analysis.core.StopFilterFactory;
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
-
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.bridge.builtin.impl.String2FieldBridgeAdaptor;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
@@ -50,8 +44,14 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
@@ -67,6 +67,7 @@ public class DSLTest extends SearchTestBase {
 	private FullTextSession fullTextSession;
 	private Date february;
 
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -75,6 +76,7 @@ public class DSLTest extends SearchTestBase {
 		indexTestData();
 	}
 
+	@Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
@@ -778,7 +780,7 @@ public class DSLTest extends SearchTestBase {
 		Query query = builder.all().createQuery();
 		List<?> results = fullTextSession.createFullTextQuery( query, Object.class ).list();
 
-		assertEquals( "expected all instances of all indexed types", 7, results.size() );
+		assertEquals( "expected all instances of all indexed types", 10, results.size() );
 
 		transaction.commit();
 	}
@@ -823,6 +825,69 @@ public class DSLTest extends SearchTestBase {
 		finally {
 			transaction.commit();
 		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1791")
+	public void testUsingMatchQueryOnNumericDocumentIdGeneratesTermQuery() throws Exception {
+		// making sure a string based TermQuery is used
+		QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb.keyword()
+				.onField( "id" )
+				.matching( 1 )
+				.createQuery();
+		assertTrue( "A string based TermQuery is expected, but got a " + query.getClass(), query instanceof TermQuery );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1791")
+	public void testUsingRangeQueryOnNumericDocumentIdGeneratesTermRangeQuery() throws Exception {
+		QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb.range()
+				.onField( "id" )
+				.from( 1 )
+				.to( 3 )
+				.createQuery();
+		assertTrue(
+				"A string based TermQuery is expected, but got a " + query.getClass(), query instanceof TermRangeQuery
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1791")
+	public void testUsingMatchingQueryOnNumericFieldCreatesNumericRangeQuery() throws Exception {
+		// making sure a NumericRangeQuery is used
+		QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Day.class ).get();
+
+		Query query = monthQb.keyword()
+				.onField( "idNumeric" )
+				.matching( 2 )
+				.createQuery();
+
+		assertTrue(
+				"A NumericRangeQuery is expected, but got a " + query.getClass(), query instanceof NumericRangeQuery
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1791")
+	public void testUseMatchQueryOnEmbeddedNumericIdCreatesTermQuery() throws Exception {
+		QueryBuilder coffeeQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Coffee.class ).get();
+
+		Query query = coffeeQb.keyword()
+				.onField( "brand.id" )
+				.matching( 1 )
+				.createQuery();
+
+		assertTrue(
+				"A TermQuery is expected, but got a " + query.getClass(), query instanceof TermQuery
+		);
 	}
 
 	private void outputQueryAndResults(boolean outputLogs, Coffee originalInstance, Query mltQuery, List<Object[]> results) {
@@ -893,6 +958,21 @@ public class DSLTest extends SearchTestBase {
 		car = new SportsCar( 2, "Morris", 180 );
 		fullTextSession.persist( car );
 
+		Day day = new Day( 1, 1 );
+		fullTextSession.persist( day );
+
+		day = new Day( 2, 2 );
+		fullTextSession.persist( day );
+
+		CoffeeBrand brand = new CoffeeBrand();
+		brand.setName( "Tasty, Inc." );
+		fullTextSession.persist( brand );
+
+		Coffee coffee = new Coffee();
+		coffee.setName( "Peruvian Gold" );
+		coffee.setBrand( brand );
+		fullTextSession.persist( coffee );
+
 		tx.commit();
 		fullTextSession.clear();
 	}
@@ -904,7 +984,10 @@ public class DSLTest extends SearchTestBase {
 				POI.class,
 				Car.class,
 				SportsCar.class,
-				Animal.class
+				Animal.class,
+				Day.class,
+				CoffeeBrand.class,
+				Coffee.class
 		};
 	}
 
