@@ -94,6 +94,52 @@ public class IndexEmbeddedProgrammaticallyMappedTest {
 		}
 	}
 
+	@Test
+	public void canSetIncludePathsProgrammatically() throws Exception {
+		try (FullTextSessionBuilder builder = getFullTextSessionBuilder() ) {
+			// given
+			builder.fluentMapping()
+				.entity( Address.class)
+					.indexed()
+					.property( "addressId", ElementType.METHOD )
+						.documentId()
+							.name( "id" )
+					.property( "country", ElementType.METHOD )
+						.indexEmbedded()
+							.includePaths( "id", "name" )
+				.entity( Country.class)
+					.indexed()
+						.property( "name", ElementType.METHOD )
+							.field();
+
+			setupTestData( builder );
+
+			FullTextSession s = builder.openFullTextSession();
+
+			// when
+			QueryParser parser = new QueryParser( "id", TestConstants.standardAnalyzer );
+			org.apache.lucene.search.Query luceneQuery = parser.parse( "country.id:1" );
+
+			Transaction tx = s.beginTransaction();
+
+			// then
+			FullTextQuery query = s.createFullTextQuery( luceneQuery );
+			assertEquals( 1, query.getResultSize() );
+			assertEquals( "Bob McRobb", ( (Address) query.list().iterator().next() ).getOwner() );
+
+			// when
+			luceneQuery = parser.parse( "country.name:Scotland" );
+
+			// then
+			query = s.createFullTextQuery( luceneQuery );
+			assertEquals( 1, query.getResultSize() );
+			assertEquals( "Bob McRobb", ( (Address) query.list().iterator().next() ).getOwner() );
+
+			tx.commit();
+			s.close();
+		}
+	}
+
 	@SuppressWarnings("resource")
 	private FullTextSessionBuilder getFullTextSessionBuilder() {
 		return new FullTextSessionBuilder()

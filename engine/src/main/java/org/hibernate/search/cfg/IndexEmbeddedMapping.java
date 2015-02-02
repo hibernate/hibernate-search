@@ -12,6 +12,13 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
+/**
+ * Configures index-embedded association.
+ *
+ * @author Emmanuel Bernard
+ * @author Gunnar Morling
+ * @see org.hibernate.search.annotations.IndexedEmbedded
+ */
 public class IndexEmbeddedMapping {
 
 	private final SearchMapping mapping;
@@ -50,6 +57,24 @@ public class IndexEmbeddedMapping {
 	public IndexEmbeddedMapping indexNullAs(String nullToken) {
 		this.indexEmbedded.put( "indexNullAs", nullToken );
 		return this;
+	}
+
+	public IndexEmbeddedMapping includePaths(String firstPath, String... furtherPaths) {
+		this.indexEmbedded.put( "includePaths", merge( firstPath, furtherPaths ) );
+		return this;
+	}
+
+	private String[] merge(String firstPath, String... furtherPaths) {
+		if ( furtherPaths == null ) {
+			return new String[] { firstPath };
+		}
+		else {
+			String[] paths = new String[1 + furtherPaths.length];
+			paths[0] = firstPath;
+			System.arraycopy( furtherPaths, 0, paths, 1, furtherPaths.length );
+
+			return paths;
+		}
 	}
 
 	public PropertyMapping property(String name, ElementType type) {
