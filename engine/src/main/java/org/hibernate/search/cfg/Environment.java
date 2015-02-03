@@ -218,6 +218,37 @@ public final class Environment {
 	 */
 	public static final String INDEX_NAME_JMS_PROPERTY = "HSearchIndexName";
 
+	/**
+	 * Option for setting the locking strategy to be used for locking Lucene directories. Supported values are:
+	 * <ul>
+	 * <li><code>simple</code></li>
+	 * <li><code>native</code></li>
+	 * <li><code>single</code></li>
+	 * <li><code>none</code></li>
+	 * <li>The fully-qualified name of a custom {@link org.hibernate.search.store.LockFactoryProvider} implementation.</li>
+	 * </ul>
+	 * Can be given globally or for specific indexes:
+	 * <ul>
+	 * <li><code>hibernate.search.default.locking_strategy=simple</code></li>
+	 * <li><code>hibernate.search.Books.locking_strategy=org.custom.components.MyLockingFactory</code></li>
+	 * </ul>
+	 */
+	public static final String LOCKING_STRATEGY = "locking_strategy";
+
+	/**
+	 * Option for setting the base directory for storing Lucene indexes when working with file-system based directories.
+	 * To be given globally:
+	 * <p>
+	 * <code>hibernate.search.default.indexBase=/var/lucene/indexes</code>
+	 */
+	public static final String INDEX_BASE_PROP_NAME = "indexBase";
+
+	/**
+	 * Option for specifying an index name for specific entities. To be given per entity:
+	 * <p>
+	 * <code>hibernate.search.com.example.Furniture.indexName=FurnitureIndex</code>
+	 */
+	public static final String INDEX_NAME_PROP_NAME = "indexName";
 
 	public static final Map<Class<? extends Service>, String> DEFAULT_SERVICES_MAP;
 	// TODO for now we hard code the default services. This could/should be made configurable (HF)
