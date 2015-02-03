@@ -15,6 +15,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -24,6 +25,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Gunnar Morling
  */
+@TestForIssue(jiraKey = "HSEARCH-1764")
 public class IndexEmbeddedProgrammaticallyMappedTest {
 
 	@Test
