@@ -18,11 +18,11 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.AsyncDeleteExecutorService;
 import org.hibernate.search.infinispan.logging.impl.Log;
+import org.hibernate.search.infinispan.util.logging.impl.LoggerFactory;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.spi.DirectoryHelper;
 import org.hibernate.search.store.spi.LockFactoryCreator;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.infinispan.Cache;
 import org.infinispan.lucene.directory.DirectoryBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -35,7 +35,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
  */
 public class InfinispanDirectoryProvider implements org.hibernate.search.store.DirectoryProvider<Directory> {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make();
 
 	private ServiceManager serviceManager;
 	private String directoryProviderName;
