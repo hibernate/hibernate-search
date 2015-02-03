@@ -232,6 +232,7 @@
                             org.hibernate.search.stat;version="${project.version}",
                             org.hibernate.search.stat.spi;version="${project.version}",
                             org.hibernate.search.store;version="${project.version}",
+                            org.hibernate.search.store.spi;version="${project.version}",
                             org.hibernate.search.store.optimization;version="${project.version}",
                             org.hibernate.search.util;version="${project.version}",
                             org.hibernate.search.util.impl;version="${project.version}",

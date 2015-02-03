@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
-import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.spi.DirectoryHelper;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -45,7 +45,7 @@ public class FSDirectoryProvider implements DirectoryProvider<FSDirectory> {
 	public void initialize(String directoryProviderName, Properties properties, BuildContext context) {
 		// on "manual" indexing skip read-write check on index directory
 		boolean manual = "manual".equals( context.getIndexingStrategy() );
-		File indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, !manual );
+		File indexDir = DirectoryHelper.getVerifiedIndexDir( directoryProviderName, properties, !manual );
 		try {
 			indexName = indexDir.getCanonicalPath();
 			//this is cheap so it's not done in start()

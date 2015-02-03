@@ -18,13 +18,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.store.FSDirectory;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.spi.DirectoryHelper;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
-
-import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
@@ -71,7 +71,7 @@ public class FSMasterDirectoryProvider implements DirectoryProvider<FSDirectory>
 		//source guessing
 		sourceDir = DirectoryProviderHelper.getSourceDirectory( directoryProviderName, properties, true );
 		log.debugf( "Source directory: %s", sourceDir.getPath() );
-		indexDir = DirectoryProviderHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
+		indexDir = DirectoryHelper.getVerifiedIndexDir( directoryProviderName, properties, true );
 		log.debugf( "Index directory: %s", indexDir.getPath() );
 		try {
 			indexName = indexDir.getCanonicalPath();

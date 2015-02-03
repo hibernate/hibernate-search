@@ -9,12 +9,15 @@ package org.hibernate.search.store.impl;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.RAMDirectory;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.spi.DirectoryHelper;
+import org.hibernate.search.store.spi.LockFactoryCreator;
 
 /**
  * Use a Lucene RAMDirectory
@@ -40,15 +43,21 @@ public class RAMDirectoryProvider implements DirectoryProvider<RAMDirectory> {
 	@Override
 	public void start(DirectoryBasedIndexManager indexManager) {
 		try {
-			directory.setLockFactory( DirectoryProviderHelper.createLockFactory( null, properties, serviceManager ) );
+			LockFactory lockFactory = serviceManager
+					.requestService( LockFactoryCreator.class )
+					.createLockFactory( null, properties );
+
+			directory.setLockFactory( lockFactory );
 			properties = null;
-			DirectoryProviderHelper.initializeIndexIfNeeded( directory );
+			DirectoryHelper.initializeIndexIfNeeded( directory );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Unable to initialize index: " + indexName, e );
 		}
+		finally {
+			serviceManager.releaseService( LockFactoryCreator.class );
+		}
 	}
-
 
 	@Override
 	public RAMDirectory getDirectory() {

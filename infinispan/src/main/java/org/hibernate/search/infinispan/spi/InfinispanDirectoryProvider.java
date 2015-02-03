@@ -13,12 +13,14 @@ import java.util.Properties;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockFactory;
 import org.hibernate.search.backend.BackendFactory;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.impl.AsyncDeleteExecutorService;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.store.impl.DirectoryProviderHelper;
+import org.hibernate.search.store.spi.DirectoryHelper;
+import org.hibernate.search.store.spi.LockFactoryCreator;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.infinispan.Cache;
@@ -66,16 +68,25 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 		writeFileListAsync = getWriteFileListAsync( properties );
 
 		//Only override the default Infinispan LockDirectory if an explicit option is set:
-		if ( DirectoryProviderHelper.configurationExplicitlySetsLockFactory( properties ) ) {
+		if ( configurationExplicitlySetsLockFactory( properties ) ) {
 			File verifiedIndexDir = null;
-			if ( DirectoryProviderHelper.isNativeLockingStrategy( properties ) ) {
-				verifiedIndexDir = DirectoryProviderHelper.getVerifiedIndexDir(
+			if ( isNativeLockingStrategy( properties ) ) {
+				verifiedIndexDir = DirectoryHelper.getVerifiedIndexDir(
 						directoryProviderName,
 						properties,
 						true
 				);
 			}
-			indexWriterLockFactory = DirectoryProviderHelper.createLockFactory( verifiedIndexDir, properties, serviceManager );
+			indexWriterLockFactory = getLockFactory( verifiedIndexDir, properties );
+		}
+	}
+
+	private LockFactory getLockFactory(File indexDir, Properties properties) {
+		try {
+			return serviceManager.requestService( LockFactoryCreator.class ).createLockFactory( indexDir, properties );
+		}
+		finally {
+			serviceManager.releaseService( LockFactoryCreator.class );
 		}
 	}
 
@@ -87,6 +98,18 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 				InfinispanIntegration.WRITE_METADATA_ASYNC,
 				backendConfiguredAsync
 		);
+	}
+
+	/**
+	 * @param dirConfiguration the properties representing the configuration for this index
+	 * @return {@code true} if the configuration contains an override for the locking_strategy
+	 */
+	private boolean configurationExplicitlySetsLockFactory(Properties dirConfiguration) {
+		return dirConfiguration.getProperty( Environment.LOCKING_STRATEGY ) != null;
+	}
+
+	private boolean isNativeLockingStrategy(Properties dirConfiguration) {
+		return "native".equals( dirConfiguration.getProperty( Environment.LOCKING_STRATEGY ) );
 	}
 
 	@Override
@@ -108,7 +131,7 @@ public class InfinispanDirectoryProvider implements org.hibernate.search.store.D
 			directoryBuildContext.overrideWriteLocker( indexWriterLockFactory );
 		}
 		directory = directoryBuildContext.create();
-		DirectoryProviderHelper.initializeIndexIfNeeded( directory );
+		DirectoryHelper.initializeIndexIfNeeded( directory );
 		log.debugf( "Initialized Infinispan index: '%s'", directoryProviderName );
 	}
 

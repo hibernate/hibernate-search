@@ -12,30 +12,17 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
-import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
-import org.apache.lucene.store.NativeFSLockFactory;
-import org.apache.lucene.store.NoLockFactory;
 import org.apache.lucene.store.SimpleFSDirectory;
-import org.apache.lucene.store.SimpleFSLockFactory;
-import org.apache.lucene.store.SingleInstanceLockFactory;
-import org.apache.lucene.util.Version;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.store.LockFactoryProvider;
+import org.hibernate.search.store.spi.DirectoryHelper;
+import org.hibernate.search.store.spi.LockFactoryCreator;
+import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -51,10 +38,7 @@ public final class DirectoryProviderHelper {
 	private static final String ROOT_INDEX_PROP_NAME = "sourceBase";
 	private static final String RELATIVE_INDEX_PROP_NAME = "source";
 	private static final String COPY_BUFFER_SIZE_PROP_NAME = "buffer_size_on_copy";
-	private static final String LOCKING_STRATEGY_PROP_NAME = "locking_strategy";
 	private static final String FS_DIRECTORY_TYPE_PROP_NAME = "filesystem_access_type";
-	private static final String INDEX_BASE_PROP_NAME = "indexBase";
-	private static final String INDEX_NAME_PROP_NAME = "indexName";
 	private static final String REFRESH_PROP_NAME = "refresh";
 	private static final String RETRY_INITIALIZE_PROP_NAME = "retry_initialize_period";
 
@@ -114,7 +98,7 @@ public final class DirectoryProviderHelper {
 	 * @throws java.io.IOException if an error
 	 */
 	public static FSDirectory createFSIndex(File indexDir, Properties properties, ServiceManager serviceManager) throws IOException {
-		LockFactory lockFactory = createLockFactory( indexDir, properties, serviceManager );
+		LockFactory lockFactory = getLockFactory( indexDir, properties, serviceManager );
 		FSDirectoryType fsDirectoryType = FSDirectoryType.getType( properties );
 		FSDirectory fsDirectory = fsDirectoryType.getDirectory( indexDir, null );
 
@@ -122,118 +106,17 @@ public final class DirectoryProviderHelper {
 		// throw an exception if it's different than a previous setting.
 		fsDirectory.setLockFactory( lockFactory );
 		log.debugf( "Initialize index: '%s'", indexDir.getAbsolutePath() );
-		initializeIndexIfNeeded( fsDirectory );
+		DirectoryHelper.initializeIndexIfNeeded( fsDirectory );
 		return fsDirectory;
 	}
 
-	/**
-	 * Initialize the Lucene Directory if it isn't already.
-	 *
-	 * @param directory the Directory to initialize
-	 * @throws SearchException in case of lock acquisition timeouts, IOException, or if a corrupt index is found
-	 */
-	public static void initializeIndexIfNeeded(Directory directory) {
-		//version doesn't really matter as we won't use the Analyzer
-		Version version = Environment.DEFAULT_LUCENE_MATCH_VERSION;
-		SimpleAnalyzer analyzer = new SimpleAnalyzer( version );
+	private static LockFactory getLockFactory(File indexDir, Properties properties, ServiceManager serviceManager) {
 		try {
-			if ( ! DirectoryReader.indexExists( directory ) ) {
-				try {
-					IndexWriterConfig iwriterConfig = new IndexWriterConfig( version, analyzer ).setOpenMode( OpenMode.CREATE );
-					//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
-					//for distributed indexes (Infinispan but probably also NFS and similar)
-					iwriterConfig.setWriteLockTimeout( 2000 );
-					IndexWriter iw = new IndexWriter( directory, iwriterConfig );
-					iw.close();
-				}
-				catch (LockObtainFailedException lofe) {
-					log.lockingFailureDuringInitialization( directory.toString() );
-				}
-			}
-		}
-		catch (IOException e) {
-			throw new SearchException( "Could not initialize index", e );
+			return serviceManager.requestService( LockFactoryCreator.class ).createLockFactory( indexDir, properties );
 		}
 		finally {
-			analyzer.close();
+			serviceManager.releaseService( LockFactoryCreator.class );
 		}
-	}
-
-	/**
-	 * @param dirConfiguration the properties representing the configuration for this index
-	 * @return {@code true} if the configuration contains an override for the locking_strategy
-	 */
-	public static boolean configurationExplicitlySetsLockFactory(Properties dirConfiguration) {
-		return dirConfiguration.getProperty( LOCKING_STRATEGY_PROP_NAME ) != null;
-	}
-
-	public static boolean isNativeLockingStrategy(Properties dirConfiguration) {
-		return "native".equals( dirConfiguration.getProperty( LOCKING_STRATEGY_PROP_NAME ) );
-	}
-
-	/**
-	 * Creates a LockFactory as selected in the configuration for the
-	 * DirectoryProvider.
-	 * The SimpleFSLockFactory and NativeFSLockFactory need a File to know
-	 * where to stock the filesystem based locks; other implementations
-	 * ignore this parameter.
-	 *
-	 * @param indexDir the directory to use to store locks, if needed by implementation
-	 * @param dirConfiguration the configuration of current DirectoryProvider
-	 * @return the LockFactory as configured, or a SimpleFSLockFactory
-	 *         in case of configuration errors or as a default.
-	 */
-	public static LockFactory createLockFactory(File indexDir, Properties dirConfiguration, ServiceManager serviceManager) {
-		//For FS-based indexes default to "native", default to "single" otherwise.
-		String defaultStrategy = indexDir == null ? "single" : "native";
-		String lockFactoryName = dirConfiguration.getProperty( LOCKING_STRATEGY_PROP_NAME, defaultStrategy );
-		if ( "simple".equals( lockFactoryName ) ) {
-			if ( indexDir == null ) {
-				throw new SearchException( "To use \"simple\" as a LockFactory strategy an indexBase path must be set" );
-			}
-			return new SimpleFSLockFactory( indexDir );
-		}
-		else if ( "native".equals( lockFactoryName ) ) {
-			if ( indexDir == null ) {
-				throw new SearchException( "To use \"native\" as a LockFactory strategy an indexBase path must be set" );
-			}
-			return new NativeFSLockFactory( indexDir );
-		}
-		else if ( "single".equals( lockFactoryName ) ) {
-			return new SingleInstanceLockFactory();
-		}
-		else if ( "none".equals( lockFactoryName ) ) {
-			return NoLockFactory.getNoLockFactory();
-		}
-		else {
-			LockFactoryProvider lockFactoryFactory = ClassLoaderHelper.instanceFromName(
-					LockFactoryProvider.class,
-					lockFactoryName,
-					LOCKING_STRATEGY_PROP_NAME,
-					serviceManager
-			);
-			return lockFactoryFactory.createLockFactory( indexDir, dirConfiguration );
-		}
-	}
-
-	/**
-	 * Verify the index directory exists and is writable,
-	 * or creates it if not existing.
-	 *
-	 * @param annotatedIndexName The index name declared on the @Indexed annotation
-	 * @param properties The properties may override the indexname.
-	 * @param verifyIsWritable Verify the directory is writable
-	 * @return the File representing the Index Directory
-	 * @throws SearchException if any.
-	 */
-	public static File getVerifiedIndexDir(String annotatedIndexName, Properties properties, boolean verifyIsWritable) {
-		String indexBase = properties.getProperty( INDEX_BASE_PROP_NAME, "." );
-		String indexName = properties.getProperty( INDEX_NAME_PROP_NAME, annotatedIndexName );
-		File baseIndexDir = new File( indexBase );
-		makeSanityCheckedDirectory( baseIndexDir, indexName, verifyIsWritable );
-		File indexDir = new File( baseIndexDir, indexName );
-		makeSanityCheckedDirectory( indexDir, indexName, verifyIsWritable );
-		return indexDir;
 	}
 
 	/**
@@ -243,7 +126,7 @@ public final class DirectoryProviderHelper {
 	 *
 	 * @throws SearchException
 	 */
-	private static void makeSanityCheckedDirectory(File directory, String indexName, boolean verifyIsWritable) {
+	public static void makeSanityCheckedDirectory(File directory, String indexName, boolean verifyIsWritable) {
 		if ( !directory.exists() ) {
 			log.indexDirectoryNotFoundCreatingNewOne( directory.getAbsolutePath() );
 			//if not existing, create the full path
