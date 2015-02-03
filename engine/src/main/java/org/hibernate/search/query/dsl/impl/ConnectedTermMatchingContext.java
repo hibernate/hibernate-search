@@ -25,7 +25,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext, FieldB
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.termContext = termContext;
-		this.fieldsContext = new FieldsContext( new String[] { field } );
+		this.fieldsContext = new FieldsContext( new String[] { field }, queryContext );
 	}
 
 	public ConnectedTermMatchingContext(TermQueryContext termContext,
@@ -33,7 +33,7 @@ public class ConnectedTermMatchingContext implements TermMatchingContext, FieldB
 		this.queryContext = queryContext;
 		this.queryCustomizer = queryCustomizer;
 		this.termContext = termContext;
-		this.fieldsContext = new FieldsContext( fields );
+		this.fieldsContext = new FieldsContext( fields, queryContext );
 	}
 
 	@Override
