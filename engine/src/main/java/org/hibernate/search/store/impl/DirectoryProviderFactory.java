@@ -51,7 +51,7 @@ public final class DirectoryProviderFactory {
 		defaultProviderClasses.put( "infinispan", "org.hibernate.search.infinispan.spi.InfinispanDirectoryProvider" );
 	}
 
-	public static DirectoryProvider<?> createDirectoryProvider(String directoryProviderName, Properties indexProps, WorkerBuildContext context) {
+	public static DirectoryProvider<?> createDirectoryProvider(String indexName, Properties indexProps, WorkerBuildContext context) {
 		String className = indexProps.getProperty( "directory_provider", "" );
 		String maybeShortCut = className.toLowerCase();
 
@@ -76,7 +76,7 @@ public final class DirectoryProviderFactory {
 			);
 		}
 		try {
-			provider.initialize( directoryProviderName, indexProps, context );
+			provider.initialize( indexName, indexProps, context );
 		}
 		catch (Exception e) {
 			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );

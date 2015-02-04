@@ -26,13 +26,13 @@ import org.hibernate.search.spi.BuildContext;
 public interface DirectoryProvider<TDirectory extends Directory> {
 
 	/**
-	 * @param directoryProviderName
+	 * @param indexName
 	 * @param properties
 	 * @param context
 	 *
 	 * get the information to initialize the directory and build its hashCode/equals method
 	 */
-	void initialize(String directoryProviderName, Properties properties, BuildContext context);
+	void initialize(String indexName, Properties properties, BuildContext context);
 
 	/**
 	 * Executed after initialize, this method set up the heavy process of starting up the DirectoryProvider
