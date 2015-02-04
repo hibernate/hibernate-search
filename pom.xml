@@ -37,6 +37,7 @@
         <module>integrationtest/wildfly</module>
         <module>integrationtest/performance</module>
         <module>integrationtest/osgi/karaf-features</module>
+        <module>integrationtest/osgi/karaf-it</module>
         <module>integrationtest/sandbox</module>
     </modules>
 
@@ -88,6 +89,12 @@
             <name>Sanne Grinovero</name>
             <email>sanne@hibernate.org</email>
             <url>http://in.relation.to/Bloggers/Sanne</url>
+        </developer>
+        <developer>
+            <id>gunnarmorling</id>
+            <name>Gunnar Morling</name>
+            <email>gunnar@hibernate.org</email>
+            <url>http://in.relation.to/Bloggers/Gunnar</url>
         </developer>
     </developers>
 
