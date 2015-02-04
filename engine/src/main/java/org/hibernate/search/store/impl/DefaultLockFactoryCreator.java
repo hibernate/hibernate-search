@@ -16,11 +16,12 @@ import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.LockFactoryProvider;
 import org.hibernate.search.store.spi.LockFactoryCreator;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * The one and only {@link LockFactoryCreator}.
@@ -30,6 +31,8 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Gunnar Morling
  */
 public class DefaultLockFactoryCreator implements LockFactoryCreator {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private ServiceManager serviceManager;
 
@@ -45,13 +48,13 @@ public class DefaultLockFactoryCreator implements LockFactoryCreator {
 		String lockFactoryName = dirConfiguration.getProperty( Environment.LOCKING_STRATEGY, defaultStrategy );
 		if ( "simple".equals( lockFactoryName ) ) {
 			if ( indexDir == null ) {
-				throw new SearchException( "To use \"simple\" as a LockFactory strategy an indexBase path must be set" );
+				throw LOG.indexBasePathRequiredForLockingStrategy( "simple" );
 			}
 			return new SimpleFSLockFactory( indexDir );
 		}
 		else if ( "native".equals( lockFactoryName ) ) {
 			if ( indexDir == null ) {
-				throw new SearchException( "To use \"native\" as a LockFactory strategy an indexBase path must be set" );
+				throw LOG.indexBasePathRequiredForLockingStrategy( "native" );
 			}
 			return new NativeFSLockFactory( indexDir );
 		}

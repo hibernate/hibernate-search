@@ -19,6 +19,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.EmptyQueryException;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.store.DirectoryProvider;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -745,5 +746,11 @@ public interface Log extends BasicLogger {
 	SearchException unsupportedErrorHandlerConfigurationValueType(@FormatWith(ClassFormatter.class) Class<?> errorHandlerValueType);
 
 	@Message(id = 251, value = "Unable to set filter parameter '%2$s' on filter class %1$s")
-	SearchException unableToSetFilterParameter(Class<?> filterClass, String parameterName, @Cause Exception e);
+	SearchException unableToSetFilterParameter(@FormatWith(ClassFormatter.class) Class<?> filterClass, String parameterName, @Cause Exception e);
+
+	@Message(id = 252, value = "Unable to initialize directory provider %1$s for index %2$s")
+	SearchException cannotInitializeDirectoryProvider(@FormatWith(ClassFormatter.class) Class<? extends DirectoryProvider> directoryProviderType, String indexName, @Cause Exception e);
+
+	@Message(id = 253, value = "To use '%1$s' as a locking strategy, an indexBase path must be set")
+	SearchException indexBasePathRequiredForLockingStrategy(String strategy);
 }
