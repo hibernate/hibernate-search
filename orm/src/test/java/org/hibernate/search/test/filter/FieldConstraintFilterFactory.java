@@ -11,15 +11,22 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
-
+import org.hibernate.search.annotations.Factory;
+import org.hibernate.search.annotations.Key;
+import org.hibernate.search.filter.FilterKey;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 
-public class FieldConstraintFilter {
+/**
+ * Creates a filter for a given field.
+ *
+ * @author Hardy Ferentschik
+ */
+public class FieldConstraintFilterFactory {
 	private String field;
 	private String value;
 
-	@org.hibernate.search.annotations.Factory
+	@Factory
 	public Filter buildFilter() {
 		Query q = new TermQuery( new Term( field, value ) );
 		Filter filter = new QueryWrapperFilter( q );
@@ -35,8 +42,8 @@ public class FieldConstraintFilter {
 		this.value = value;
 	}
 
-	@org.hibernate.search.annotations.Key
-	public org.hibernate.search.filter.FilterKey getKey() {
+	@Key
+	public FilterKey getKey() {
 		StandardFilterKey key = new StandardFilterKey();
 		key.addParameter( field );
 		key.addParameter( value );

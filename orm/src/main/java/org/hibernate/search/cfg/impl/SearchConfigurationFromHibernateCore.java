@@ -7,6 +7,7 @@
 package org.hibernate.search.cfg.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -16,6 +17,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.cfg.spi.IdUniquenessResolver;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
@@ -32,6 +34,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 	private final org.hibernate.cfg.Configuration cfg;
 	private final ClassLoaderService classLoaderService;
+	private final Map<Class<? extends Service>, Object> providedServices;
 	private ReflectionManager reflectionManager;
 
 
@@ -48,6 +51,9 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 			throw new NullPointerException( "ClassLoaderService is null" );
 		}
 		this.classLoaderService = new DelegatingClassLoaderService( hibernateClassLoaderService );
+		Map<Class<? extends Service>, Object> providedServices = new HashMap<>( 1 );
+		providedServices.put( IdUniquenessResolver.class, new HibernateCoreIdUniquenessResolver( cfg ) );
+		this.providedServices = Collections.unmodifiableMap( providedServices );
 	}
 
 	@Override
@@ -95,7 +101,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 	@Override
 	public Map<Class<? extends Service>, Object> getProvidedServices() {
-		return Collections.emptyMap();
+		return providedServices;
 	}
 
 	@Override

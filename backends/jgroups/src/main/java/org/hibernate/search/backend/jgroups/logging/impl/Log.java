@@ -9,8 +9,10 @@ package org.hibernate.search.backend.jgroups.logging.impl;
 import java.util.Properties;
 
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.logging.impl.ClassFormatter;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -79,7 +81,7 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	void jGroupsClosingChannelError(@Cause Exception toLog);
 
 	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 13, value = "Object injected for JGroups channel in %1$s is of an unexpected type %2$s (expecting org.jgroups.JChannel)")
-	SearchException jGroupsChannelInjectionError(String channelInject, @Cause Exception e, Class<?> actualType);
+	SearchException jGroupsChannelInjectionError(String channelInject, @Cause Exception e, @FormatWith(ClassFormatter.class) Class<?> actualType);
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 14, value = "Starting JGroups channel using configuration '%1$s'")
@@ -117,6 +119,6 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 	void jgroupsBlockWaitingForAck(String indexName, boolean block);
 
 	@Message(id = JGROUPS_BACKEND_MESSAGES_START_ID + 23, value = "JGroups channel configuration should be specified in the global section [hibernate.search.services.jgroups.], " +
-			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/4.1/reference/en-US/html_single/#jgroups-backend")
+			"not as an IndexManager property for index '%1$s'. See http://docs.jboss.org/hibernate/search/5.0/reference/en-US/html_single/#jgroups-backend")
 	SearchException legacyJGroupsConfigurationDefined(String indexName);
 }

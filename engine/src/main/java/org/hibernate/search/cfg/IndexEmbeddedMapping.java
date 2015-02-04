@@ -12,12 +12,19 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
+/**
+ * Configures index-embedded association.
+ *
+ * @author Emmanuel Bernard
+ * @author Gunnar Morling
+ * @see org.hibernate.search.annotations.IndexedEmbedded
+ */
 public class IndexEmbeddedMapping {
 
 	private final SearchMapping mapping;
 	private final Map<String,Object> indexEmbedded;
-	private EntityDescriptor entity;
-	private PropertyDescriptor property;
+	private final EntityDescriptor entity;
+	private final PropertyDescriptor property;
 
 	public IndexEmbeddedMapping(SearchMapping mapping, PropertyDescriptor property, EntityDescriptor entity) {
 		this.mapping = mapping;
@@ -42,6 +49,34 @@ public class IndexEmbeddedMapping {
 		return this;
 	}
 
+	public IndexEmbeddedMapping includeEmbeddedObjectId(boolean includeEmbeddedObjectId) {
+		this.indexEmbedded.put( "includeEmbeddedObjectId", includeEmbeddedObjectId );
+		return this;
+	}
+
+	public IndexEmbeddedMapping indexNullAs(String nullToken) {
+		this.indexEmbedded.put( "indexNullAs", nullToken );
+		return this;
+	}
+
+	public IndexEmbeddedMapping includePaths(String firstPath, String... furtherPaths) {
+		this.indexEmbedded.put( "includePaths", merge( firstPath, furtherPaths ) );
+		return this;
+	}
+
+	private String[] merge(String firstPath, String... furtherPaths) {
+		if ( furtherPaths == null ) {
+			return new String[] { firstPath };
+		}
+		else {
+			String[] paths = new String[1 + furtherPaths.length];
+			paths[0] = firstPath;
+			System.arraycopy( furtherPaths, 0, paths, 1, furtherPaths.length );
+
+			return paths;
+		}
+	}
+
 	public PropertyMapping property(String name, ElementType type) {
 		return new PropertyMapping( name, type, entity, mapping );
 	}
@@ -57,5 +92,4 @@ public class IndexEmbeddedMapping {
 	public FieldMapping field() {
 		return new FieldMapping( property, entity, mapping );
 	}
-
 }

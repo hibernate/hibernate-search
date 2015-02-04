@@ -10,12 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements a filter key using all injected parameters to compute
- * equals and hashCode
- * the order the parameters are added is significant
- *
- * @author Emmanuel Bernard
+ * @deprecated Custom filter keys are deprecated and are scheduled for removal in Hibernate Search 6. As of Hibernate
+ * Search 5.1, keys for caching Lucene filters are calculated automatically based on the given filter parameters.
  */
+@Deprecated
 public class StandardFilterKey extends FilterKey {
 	private final List<Object> parameters = new ArrayList<Object>();
 	private boolean implSet;
@@ -67,5 +65,10 @@ public class StandardFilterKey extends FilterKey {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "StandardFilterKey [parameters=" + parameters + "]";
 	}
 }

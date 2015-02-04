@@ -16,32 +16,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.filter.FullTextFilter;
-import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.exception.SearchException;
+import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.annotations.FieldCacheType;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.FilterDef;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.filter.StandardFilterKey;
-import org.hibernate.search.filter.impl.ChainedFilter;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.filter.FilterKey;
+import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.filter.FullTextFilterImplementor;
 import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
+import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
+import org.hibernate.search.filter.impl.ChainedFilter;
 import org.hibernate.search.filter.impl.FullTextFilterImpl;
+import org.hibernate.search.filter.impl.DefaultFilterKey;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
@@ -751,28 +752,36 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		 * as FilterCachingStrategy ensure a memory barrier between concurrent thread calls
 		 */
 		FilterDef def = extendedIntegrator.getFilterDefinition( fullTextFilter.getName() );
-		//def can never be null, ti's guarded by enableFullTextFilter(String)
+		//def can never be null, it's guarded by enableFullTextFilter(String)
 
 		if ( isPreQueryFilterOnly( def ) ) {
 			return null;
 		}
 
-		Object instance = createFilterInstance( fullTextFilter, def );
-		FilterKey key = createFilterKey( def, instance );
+		if ( !cacheInstance( def.getCacheMode() ) ) {
+			Object filterOrFactory = createFilterInstance( fullTextFilter, def );
+			return createFilter( def, filterOrFactory );
+		}
+		else {
+			return createOrGetLuceneFilterFromCache( fullTextFilter, def );
+		}
+	}
+
+	private Filter createOrGetLuceneFilterFromCache(FullTextFilterImpl fullTextFilter, FilterDef def) {
+		// Avoiding the filter/factory instantiation, unless needed for key determination or actual filter creation
+		boolean hasCustomKey = def.getKeyMethod() != null;
+		Object filterOrFactory = hasCustomKey ? createFilterInstance( fullTextFilter, def ) : null;
+
+		FilterKey key = createFilterKey( def, filterOrFactory, fullTextFilter );
 
 		// try to get the filter out of the cache
-		Filter filter = cacheInstance( def.getCacheMode() ) ?
-				extendedIntegrator.getFilterCachingStrategy().getCachedFilter( key ) :
-				null;
+		Filter filter = extendedIntegrator.getFilterCachingStrategy().getCachedFilter( key );
 
 		if ( filter == null ) {
-			filter = createFilter( def, instance );
-
-			// add filter to cache if we have to
-			if ( cacheInstance( def.getCacheMode() ) ) {
-				extendedIntegrator.getFilterCachingStrategy().addCachedFilter( key, filter );
-			}
+			filter = createFilter( def, hasCustomKey ? filterOrFactory : createFilterInstance( fullTextFilter, def ) );
+			extendedIntegrator.getFilterCachingStrategy().addCachedFilter( key, filter );
 		}
+
 		return filter;
 	}
 
@@ -780,19 +789,13 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return def.getImpl().equals( ShardSensitiveOnlyFilter.class );
 	}
 
-	private Filter createFilter(FilterDef def, Object instance) {
+	private Filter createFilter(FilterDef def, Object filterOrFactory) {
 		Filter filter;
 		if ( def.getFactoryMethod() != null ) {
 			try {
-				filter = (Filter) def.getFactoryMethod().invoke( instance );
+				filter = (Filter) def.getFactoryMethod().invoke( filterOrFactory );
 			}
-			catch (IllegalAccessException e) {
-				throw new SearchException(
-						"Unable to access @Factory method: "
-								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
-				);
-			}
-			catch (InvocationTargetException e) {
+			catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SearchException(
 						"Unable to access @Factory method: "
 								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
@@ -800,14 +803,14 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			}
 			catch (ClassCastException e) {
 				throw new SearchException(
-						"@Key method does not return a org.apache.lucene.search.Filter class: "
+						"Factory method does not return a org.apache.lucene.search.Filter class: "
 								+ def.getImpl().getName() + "." + def.getFactoryMethod().getName(), e
 				);
 			}
 		}
 		else {
 			try {
-				filter = (Filter) instance;
+				filter = (Filter) filterOrFactory;
 			}
 			catch (ClassCastException e) {
 				throw new SearchException(
@@ -840,32 +843,15 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		return filter;
 	}
 
-	private FilterKey createFilterKey(FilterDef def, Object instance) {
+	private FilterKey createFilterKey(FilterDef def, Object filterOrFactory, FullTextFilterImpl fullTextFilter) {
 		FilterKey key = null;
-		if ( !cacheInstance( def.getCacheMode() ) ) {
-			return key; // if the filter is not cached there is no key!
-		}
 
 		if ( def.getKeyMethod() == null ) {
-			key = new FilterKey() {
-				@Override
-				public int hashCode() {
-					return getImpl().hashCode();
-				}
-
-				@Override
-				public boolean equals(Object obj) {
-					if ( !( obj instanceof FilterKey ) ) {
-						return false;
-					}
-					FilterKey that = (FilterKey) obj;
-					return this.getImpl().equals( that.getImpl() );
-				}
-			};
+			key = new DefaultFilterKey( def.getName(), fullTextFilter.getParameters() );
 		}
 		else {
 			try {
-				key = (FilterKey) def.getKeyMethod().invoke( instance );
+				key = (FilterKey) def.getKeyMethod().invoke( filterOrFactory );
 			}
 			catch (IllegalAccessException | InvocationTargetException e) {
 				throw new SearchException(
@@ -879,24 +865,24 @@ public class HSQueryImpl implements HSQuery, Serializable {
 								+ def.getImpl().getName() + "." + def.getKeyMethod().getName()
 				);
 			}
-		}
-		key.setImpl( def.getImpl() );
 
-		//Make sure Filters are isolated by filter def name
-		StandardFilterKey wrapperKey = new StandardFilterKey();
-		wrapperKey.addParameter( def.getName() );
-		wrapperKey.addParameter( key );
-		return wrapperKey;
+			key.setImpl( def.getImpl() );
+
+			//Make sure Filters are isolated by filter def name
+			StandardFilterKey wrapperKey = new StandardFilterKey();
+			wrapperKey.addParameter( def.getName() );
+			wrapperKey.addParameter( key );
+
+			key = wrapperKey;
+		}
+
+		return key;
 	}
 
 	private Object createFilterInstance(FullTextFilterImpl fullTextFilter, FilterDef def) {
 		final Object instance = ClassLoaderHelper.instanceFromClass( Object.class, def.getImpl(), "@FullTextFilterDef" );
 		for ( Map.Entry<String, Object> entry : fullTextFilter.getParameters().entrySet() ) {
 			def.invoke( entry.getKey(), instance, entry.getValue() );
-		}
-		if ( cacheInstance( def.getCacheMode() ) && def.getKeyMethod() == null && fullTextFilter.getParameters()
-				.size() > 0 ) {
-			throw new SearchException( "Filter with parameters and no @Key method: " + fullTextFilter.getName() );
 		}
 		return instance;
 	}

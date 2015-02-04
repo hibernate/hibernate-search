@@ -136,7 +136,7 @@ of a `Directory` to store the index files. Hibernate Search handles the initiali
 configuration of a Lucene `Directory` instance via a `DirectoryProvider`. In this tutorial we will
 use a a directory provider which stores the index on the file system. This will give us the ability to
 inspect the Lucene indexes created by Hibernate Search (eg via
-link:http://code.google.com/p/luke/[Luke]). Once you have a working configuration you can start
+link:https://github.com/DmitryKey/luke/[Luke]). Once you have a working configuration you can start
 experimenting with other directory providers (see <<search-configuration-directory>>).
 You also have to specify the default base directory for all indexes via
 `hibernate.search.default.indexBase`. This defines the path where indexes are stored.
@@ -327,7 +327,7 @@ fullTextEntityManager.createIndexer().startAndWait();
 After executing the above code, you should be able to see a Lucene index under `/var/lucene/indexes/example.Book`
 (or based on a different path depending how you configured the property `hibernate.search.default.directory_provider`).
 
-Go ahead an inspect this index with link:http://code.google.com/p/luke/[Luke]:
+Go ahead an inspect this index with link:https://github.com/DmitryKey/luke/[Luke]:
 it will help you to understand how Hibernate Search works.
 
 === Searching

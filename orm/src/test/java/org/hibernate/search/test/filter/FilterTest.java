@@ -15,19 +15,20 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Session;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.test.filter.Employee.Role;
+import org.hibernate.search.test.filter.FieldConstraintFilterFactoryWithoutKeyMethod.BuildFilterInvocation;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -91,12 +92,121 @@ public class FilterTest extends SearchTestBase {
 		ftQuery.enableFullTextFilter( "cacheinstancetest" );
 		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 1 );
 		assertEquals( "Should filter out all", 0, ftQuery.getResultSize() );
-		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 ); // HSEARCH-818 : would be even better if it was still at 1 here, reusing what was created at SearchFactory build time
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 );
 
 		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		ftQuery.enableFullTextFilter( "cacheinstancetest" );
 		ftQuery.getResultSize();
-//		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 ); //uncomment this when solving HSEARCH-818
+		InstanceBasedExcludeAllFilter.assertConstructorInvoked( 2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-295")
+	public void testFiltersCreatedByFactoryWithoutKeyMethodShouldBeCachedByAllParameterNamesAndValues() {
+		assertEquals( 0, FieldConstraintFilterFactoryWithoutKeyMethod.getBuiltFilters().size() );
+
+		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		assertEquals( "No filter should happen", 3, ftQuery.getResultSize() );
+
+		// 1. Creating one filter
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancefromfactorywithoutkeymethodtest" )
+			.setParameter( "field", "teacher" )
+			.setParameter( "value", "andre" );
+
+		assertEquals( 1, ftQuery.getResultSize() );
+		assertThat( FieldConstraintFilterFactoryWithoutKeyMethod.getBuiltFilters() ).containsExactly( new BuildFilterInvocation( "teacher", "andre" ) );
+
+		// 2. Creating another filter with other param value
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancefromfactorywithoutkeymethodtest" )
+			.setParameter( "field", "teacher" )
+			.setParameter( "value", "max" );
+
+		assertEquals( 1, ftQuery.getResultSize() );
+		assertThat( FieldConstraintFilterFactoryWithoutKeyMethod.getBuiltFilters() ).containsExactly(
+				new BuildFilterInvocation( "teacher", "andre" ),
+				new BuildFilterInvocation( "teacher", "max" )
+		);
+
+		// 3. Creating the first filter again, should be obtained from cache
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancefromfactorywithoutkeymethodtest" )
+			.setParameter( "field", "teacher" )
+			.setParameter( "value", "andre" );
+
+		assertEquals( 1, ftQuery.getResultSize() );
+		assertThat( FieldConstraintFilterFactoryWithoutKeyMethod.getBuiltFilters() ).containsExactly(
+				new BuildFilterInvocation( "teacher", "andre" ),
+				new BuildFilterInvocation( "teacher", "max" )
+		);
+
+		// 4. Creating the first filter again, just using different parameter order, should be obtained from cache
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancefromfactorywithoutkeymethodtest" )
+			.setParameter( "value", "andre" )
+			.setParameter( "field", "teacher" );
+
+		assertEquals( 1, ftQuery.getResultSize() );
+		assertThat( FieldConstraintFilterFactoryWithoutKeyMethod.getBuiltFilters() ).containsExactly(
+				new BuildFilterInvocation( "teacher", "andre" ),
+				new BuildFilterInvocation( "teacher", "max" )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-295")
+	public void testFiltersWithoutKeyMethodShouldBeCachedByAllParameterNamesAndValues() {
+		// Discarding all instantiations stemming from SF bootstrap
+		FieldConstraintFilterWithoutKeyMethod.getInstances().clear();
+
+		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		assertEquals( "No filter should happen", 3, ftQuery.getResultSize() );
+
+		// 1. Creating one filter
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancewithoutkeymethodtest" )
+			.setParameter( "field", "teacher" )
+			.setParameter( "value", "andre" );
+
+		assertEquals( 1, ftQuery.getResultSize() );
+		assertThat( FieldConstraintFilterWithoutKeyMethod.getInstances() ).containsExactly( new FieldConstraintFilterWithoutKeyMethod( "teacher", "andre" ) );
+
+		// 2. Creating another filter with other param value
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancewithoutkeymethodtest" )
+			.setParameter( "field", "teacher" )
+			.setParameter( "value", "max" );
+
+		assertEquals( 1, ftQuery.getResultSize() );
+		assertThat( FieldConstraintFilterWithoutKeyMethod.getInstances() ).containsExactly(
+				new FieldConstraintFilterWithoutKeyMethod( "teacher", "andre" ),
+				new FieldConstraintFilterWithoutKeyMethod( "teacher", "max" )
+		);
+
+		// 3. Creating the first filter again, should be obtained from cache
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancewithoutkeymethodtest" )
+			.setParameter( "field", "teacher" )
+			.setParameter( "value", "andre" );
+
+		assertEquals( 1, ftQuery.getResultSize() );
+		assertThat( FieldConstraintFilterWithoutKeyMethod.getInstances() ).containsExactly(
+				new FieldConstraintFilterWithoutKeyMethod( "teacher", "andre" ),
+				new FieldConstraintFilterWithoutKeyMethod( "teacher", "max" )
+		);
+
+		// 4. Creating the first filter again, just using different parameter order, should be obtained from cache
+		ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
+		ftQuery.enableFullTextFilter( "cacheinstancewithoutkeymethodtest" )
+			.setParameter( "value", "andre" )
+			.setParameter( "field", "teacher" );
+
+		assertEquals( 1, ftQuery.getResultSize() );
+		assertThat( FieldConstraintFilterWithoutKeyMethod.getInstances() ).containsExactly(
+				new FieldConstraintFilterWithoutKeyMethod( "teacher", "andre" ),
+				new FieldConstraintFilterWithoutKeyMethod( "teacher", "max" )
+		);
 	}
 
 	@Test
@@ -160,6 +270,16 @@ public class FilterTest extends SearchTestBase {
 	}
 
 	@Test
+	public void testFilterDefinedOnSuperClass() {
+		TermQuery query = new TermQuery( new Term( "employer", "Red Hat" ) );
+		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Employee.class );
+		ftQuery.enableFullTextFilter( "roleFilter" )
+				.setParameter( "role", Role.ADMINISTRATOR );
+
+		assertEquals( "Should find the filter defined in the super class", 1, ftQuery.getResultSize() );
+	}
+
+	@Test
 	public void testUnknownFilterNameThrowsException() {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( query, Driver.class );
 		try {
@@ -201,6 +321,29 @@ public class FilterTest extends SearchTestBase {
 		driver.setScore( 5 );
 		driver.setTeacher( "max" );
 		s.persist( driver );
+
+		String employer = "Red Hat";
+		Employee employee = new FullTimeEmployee();
+		employee.setId( 1 );
+		employee.setFullName( "John D Doe" );
+		employee.setRole( Role.ADMINISTRATOR );
+		employee.setEmployer( employer );
+		s.persist( employee );
+
+		employee = new FullTimeEmployee();
+		employee.setId( 2 );
+		employee.setFullName( "Mary S. Doe" );
+		employee.setRole( Role.DEVELOPER );
+		employee.setEmployer( employer );
+		s.persist( employee );
+
+		employee = new PartTimeEmployee();
+		employee.setId( 3 );
+		employee.setFullName( "Dave Connor" );
+		employee.setRole( Role.CONSULTANT );
+		employee.setEmployer( employer );
+		s.persist( employee );
+
 		s.getTransaction().commit();
 	}
 
@@ -226,7 +369,9 @@ public class FilterTest extends SearchTestBase {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Driver.class,
-				Soap.class
+				Soap.class,
+				FullTimeEmployee.class,
+				PartTimeEmployee.class
 		};
 	}
 

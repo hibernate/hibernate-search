@@ -14,11 +14,15 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.store.Workspace;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Sanne Grinovero
  */
 public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final AddWorkDelegate addDelegate;
 	private final DeleteWorkDelegate deleteDelegate;
@@ -44,6 +48,7 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 		else {
 			this.deleteDelegate = new DeleteWorkDelegate( workspace );
 			this.updateDelegate = new UpdateWorkDelegate( deleteDelegate, addDelegate );
+			log.singleTermDeleteDisabled( workspace.getIndexName() );
 		}
 		this.purgeAllDelegate = new PurgeAllWorkDelegate( workspace );
 		this.optimizeDelegate = new OptimizeWorkDelegate( workspace );

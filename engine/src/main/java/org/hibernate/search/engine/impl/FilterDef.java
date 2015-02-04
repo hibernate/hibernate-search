@@ -11,10 +11,12 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A wrapper class which encapsulates all required information to create a defined filter.
@@ -23,9 +25,12 @@ import org.hibernate.search.util.impl.ReflectionHelper;
  */
 //TODO serialization
 public class FilterDef {
+
+	private static final Log LOG = LoggerFactory.make();
+
 	private Method factoryMethod;
 	private Method keyMethod;
-	private Map<String, Method> setters = new HashMap<String, Method>();
+	private final Map<String, Method> setters = new HashMap<String, Method>();
 	private final FilterCacheModeType cacheMode;
 	private final Class<?> impl;
 	private final String name;
@@ -77,15 +82,15 @@ public class FilterDef {
 		try {
 			method.invoke( filter, parameterValue );
 		}
-		catch (IllegalAccessException e) {
-			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: " + this.impl, e );
+		catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+			throw LOG.unableToSetFilterParameter( impl, parameterName, e );
 		}
-		catch (InvocationTargetException e) {
-			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: " + this.impl, e );
-		}
-		catch (IllegalArgumentException e) {
-			throw new SearchException( "Unable to set Filter parameter: " + parameterName + " on filter class: "
-					+ this.impl + " : " + e.getMessage(), e );
-		}
+	}
+
+	@Override
+	public String toString() {
+		return "FilterDef [name=" + name + ", impl=" + impl + ", cacheMode=" + cacheMode + ", factoryMethod="
+				+ ( factoryMethod != null ? factoryMethod.getName() : null ) + ", keyMethod=" + ( keyMethod != null ? keyMethod.getName() : null )
+				+ ", setters=" + setters.keySet() + "]";
 	}
 }

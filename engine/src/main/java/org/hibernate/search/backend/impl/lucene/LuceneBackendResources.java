@@ -33,7 +33,7 @@ public final class LuceneBackendResources {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final LuceneWorkVisitor visitor;
+	private volatile LuceneWorkVisitor visitor;
 	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
 	private final int maxQueueLength;
@@ -48,7 +48,6 @@ public final class LuceneBackendResources {
 		this.indexName = indexManager.getIndexName();
 		this.errorHandler = context.getErrorHandler();
 		this.workspace = workspace;
-		this.visitor = new LuceneWorkVisitor( workspace );
 		this.maxQueueLength = PropertiesParseHelper.extractMaxQueueSize( indexName, props );
 		ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 		readLock = readWriteLock.readLock();
@@ -59,7 +58,6 @@ public final class LuceneBackendResources {
 		this.indexName = previous.indexName;
 		this.errorHandler = previous.errorHandler;
 		this.workspace = previous.workspace;
-		this.visitor = new LuceneWorkVisitor( workspace );
 		this.maxQueueLength = previous.maxQueueLength;
 		this.asyncIndexingExecutor = previous.asyncIndexingExecutor;
 		this.readLock = previous.readLock;
@@ -96,6 +94,9 @@ public final class LuceneBackendResources {
 	}
 
 	public LuceneWorkVisitor getVisitor() {
+		if ( visitor == null ) {
+			visitor = new LuceneWorkVisitor( workspace );
+		}
 		return visitor;
 	}
 

@@ -7,8 +7,6 @@
 
 package org.hibernate.search.spi;
 
-import java.beans.Introspector;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,11 +25,9 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
-import org.hibernate.search.annotations.Factory;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Key;
 import org.hibernate.search.backend.impl.BatchedQueueingProcessor;
 import org.hibernate.search.backend.impl.QueueingProcessor;
 import org.hibernate.search.backend.impl.WorkerFactory;
@@ -39,7 +35,6 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
 import org.hibernate.search.engine.Version;
-import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
 import org.hibernate.search.engine.impl.FilterDef;
@@ -50,8 +45,10 @@ import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.engine.impl.MutableSearchFactoryState;
 import org.hibernate.search.engine.impl.ReflectionReplacingSearchConfiguration;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.metadata.impl.AnnotationMetadataProvider;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
@@ -63,17 +60,15 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
-import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.MRUFilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -309,7 +304,7 @@ public class SearchIntegratorBuilder {
 		ConfigContext configContext = new ConfigContext( searchConfiguration, buildContext, searchMapping );
 
 		initProgrammaticAnalyzers( configContext, searchConfiguration.getReflectionManager() );
-		initProgrammaticallyDefinedFilterDef( searchConfiguration.getReflectionManager() );
+		initProgrammaticallyDefinedFilterDef( configContext, searchConfiguration.getReflectionManager() );
 		final PolymorphicIndexHierarchy indexingHierarchy = factoryState.getIndexHierarchy();
 		final Map<Class<?>, EntityIndexBinding> documentBuildersIndexedEntities = factoryState.getIndexBindings();
 		final Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities = factoryState.getDocumentBuildersContainedEntities();
@@ -354,8 +349,6 @@ public class SearchIntegratorBuilder {
 					documentBuildersContainedEntities.put( mappedClass, documentBuilder );
 				}
 			}
-			bindFilterDefs( mappedXClass );
-			//TODO should analyzer def for classes at their same level???
 		}
 
 		IndexManagerHolder indexesFactory = factoryState.getAllIndexesManager();
@@ -399,6 +392,8 @@ public class SearchIntegratorBuilder {
 				documentBuildersIndexedEntities,
 				documentBuildersContainedEntities
 		);
+
+		factoryState.setFilterDefinitions( configContext.initFilters() );
 		factoryState.setAnalyzers( configContext.initLazyAnalyzers() );
 	}
 
@@ -452,77 +447,6 @@ public class SearchIntegratorBuilder {
 		return map;
 	}
 
-	private void bindFilterDefs(XClass mappedXClass) {
-		FullTextFilterDef defAnn = mappedXClass.getAnnotation( FullTextFilterDef.class );
-		if ( defAnn != null ) {
-			bindFilterDef( defAnn, mappedXClass );
-		}
-		FullTextFilterDefs defsAnn = mappedXClass.getAnnotation( FullTextFilterDefs.class );
-		if ( defsAnn != null ) {
-			for ( FullTextFilterDef def : defsAnn.value() ) {
-				bindFilterDef( def, mappedXClass );
-			}
-		}
-	}
-
-	private void bindFilterDef(FullTextFilterDef defAnn, XClass mappedXClass) {
-		if ( factoryState.getFilterDefinitions().containsKey( defAnn.name() ) ) {
-			throw new SearchException(
-					"Multiple definition of @FullTextFilterDef.name=" + defAnn.name() + ": "
-							+ mappedXClass.getName()
-			);
-		}
-
-		bindFullTextFilterDef( defAnn );
-	}
-
-	private void bindFullTextFilterDef(FullTextFilterDef defAnn) {
-		FilterDef filterDef = new FilterDef( defAnn );
-		final Map<String, FilterDef> filterDefinition = factoryState.getFilterDefinitions();
-		if ( filterDef.getImpl().equals( ShardSensitiveOnlyFilter.class ) ) {
-			//this is a placeholder don't process regularly
-			filterDefinition.put( defAnn.name(), filterDef );
-			return;
-		}
-		try {
-			filterDef.getImpl().newInstance();
-		}
-		catch (IllegalAccessException e) {
-			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
-		}
-		catch (InstantiationException e) {
-			throw new SearchException( "Unable to create Filter class: " + filterDef.getImpl().getName(), e );
-		}
-		for ( Method method : filterDef.getImpl().getMethods() ) {
-			if ( method.isAnnotationPresent( Factory.class ) ) {
-				if ( filterDef.getFactoryMethod() != null ) {
-					throw new SearchException(
-							"Multiple @Factory methods found" + defAnn.name() + ": "
-									+ filterDef.getImpl().getName() + "." + method.getName()
-					);
-				}
-				ReflectionHelper.setAccessible( method );
-				filterDef.setFactoryMethod( method );
-			}
-			if ( method.isAnnotationPresent( Key.class ) ) {
-				if ( filterDef.getKeyMethod() != null ) {
-					throw new SearchException(
-							"Multiple @Key methods found" + defAnn.name() + ": "
-									+ filterDef.getImpl().getName() + "." + method.getName()
-					);
-				}
-				ReflectionHelper.setAccessible( method );
-				filterDef.setKeyMethod( method );
-			}
-
-			String name = method.getName();
-			if ( name.startsWith( "set" ) && method.getParameterTypes().length == 1 ) {
-				filterDef.addSetter( Introspector.decapitalize( name.substring( 3 ) ), method );
-			}
-		}
-		filterDefinition.put( defAnn.name(), filterDef );
-	}
-
 	private void initProgrammaticAnalyzers(ConfigContext context, ReflectionManager reflectionManager) {
 		final Map<?, ?> defaults = reflectionManager.getDefaults();
 
@@ -536,7 +460,7 @@ public class SearchIntegratorBuilder {
 		}
 	}
 
-	private void initProgrammaticallyDefinedFilterDef(ReflectionManager reflectionManager) {
+	private void initProgrammaticallyDefinedFilterDef(ConfigContext context, ReflectionManager reflectionManager) {
 		Map<?, ?> defaults = reflectionManager.getDefaults();
 		FullTextFilterDef[] filterDefs = (FullTextFilterDef[]) defaults.get( FullTextFilterDefs.class );
 		if ( filterDefs != null && filterDefs.length != 0 ) {
@@ -545,7 +469,7 @@ public class SearchIntegratorBuilder {
 				if ( filterDefinitions.containsKey( defAnn.name() ) ) {
 					throw new SearchException( "Multiple definition of @FullTextFilterDef.name=" + defAnn.name() );
 				}
-				bindFullTextFilterDef( defAnn );
+				context.addGlobalFullTextFilterDef( defAnn );
 			}
 		}
 	}
@@ -571,16 +495,28 @@ public class SearchIntegratorBuilder {
 	}
 
 	private ErrorHandler createErrorHandler(SearchConfiguration searchConfiguration) {
-		String errorHandlerClassName = searchConfiguration.getProperty( Environment.ERROR_HANDLER );
-		if ( StringHelper.isEmpty( errorHandlerClassName ) ) {
+		Object configuredErrorHandler = searchConfiguration.getProperties().get( Environment.ERROR_HANDLER );
+
+		if ( configuredErrorHandler == null ) {
 			return new LogErrorHandler();
 		}
-		else if ( "log".equals( errorHandlerClassName.trim() ) ) {
+		if ( configuredErrorHandler instanceof String ) {
+			return createErrorHandlerFromString( (String) configuredErrorHandler, searchConfiguration.getClassLoaderService() );
+		}
+		else if ( configuredErrorHandler instanceof ErrorHandler ) {
+			return (ErrorHandler) configuredErrorHandler;
+		}
+		else {
+			throw log.unsupportedErrorHandlerConfigurationValueType( configuredErrorHandler.getClass() );
+		}
+	}
+
+	private ErrorHandler createErrorHandlerFromString(String errorHandlerClassName, ClassLoaderService classLoaderService) {
+		if ( StringHelper.isEmpty( errorHandlerClassName ) || ErrorHandler.LOG.equals( errorHandlerClassName.trim() ) ) {
 			return new LogErrorHandler();
 		}
 		else {
-			Class<?> errorHandlerClass = searchConfiguration.getClassLoaderService()
-					.classForName( errorHandlerClassName );
+			Class<?> errorHandlerClass = classLoaderService.classForName( errorHandlerClassName );
 			return ClassLoaderHelper.instanceFromClass(
 					ErrorHandler.class,
 					errorHandlerClass,
