@@ -12,10 +12,10 @@ import java.util.Properties;
 import org.apache.lucene.store.LockFactory;
 
 /**
- * To use a custom implementation of org.apache.lucene.store.LockFactory
+ * To use a custom implementation of {@link org.apache.lucene.store.LockFactory}
  * you need to implement this interface and define the fully qualified
  * classname of the factory implementation as a DirectoryProvider parameter
- * for the locking_strategy key.
+ * for the {@link org.hibernate.search.cfg.Environment#LOCKING_STRATEGY} key.
  * The implementation must have a no-arg constructor.
  *
  * @author Sanne Grinovero

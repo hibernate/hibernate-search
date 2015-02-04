@@ -10,11 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Create a Lucene directory provider which can be configured
@@ -34,6 +35,8 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
  * @author Sanne Grinovero
  */
 public final class DirectoryProviderFactory {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private static final Map<String, String> defaultProviderClasses;
 
@@ -79,7 +82,7 @@ public final class DirectoryProviderFactory {
 			provider.initialize( indexName, indexProps, context );
 		}
 		catch (Exception e) {
-			throw new SearchException( "Unable to initialize directory provider: " + directoryProviderName, e );
+			throw LOG.cannotInitializeDirectoryProvider( provider.getClass(), indexName, e );
 		}
 		return provider;
 	}
