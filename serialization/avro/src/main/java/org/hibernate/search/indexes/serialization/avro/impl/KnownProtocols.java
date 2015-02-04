@@ -47,7 +47,8 @@ public final class KnownProtocols {
 		}
 		if ( minorVersion == 2 ) {
 			return getV1_2();
-		} else if ( minorVersion == 1 ) {
+		}
+		else if ( minorVersion == 1 ) {
 			return getV1_1();
 		}
 		else if ( minorVersion == 0 ) {

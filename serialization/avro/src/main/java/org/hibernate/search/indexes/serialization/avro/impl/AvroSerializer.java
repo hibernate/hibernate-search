@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.indexes.serialization.avro.impl;
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -48,7 +49,6 @@ import static org.hibernate.search.indexes.serialization.impl.SerializationHelpe
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public class AvroSerializer implements Serializer {
-
 	private static final Log log = LoggerFactory.make();
 
 	private GenericRecord idRecord;
@@ -85,6 +85,17 @@ public class AvroSerializer implements Serializer {
 		GenericRecord purgeAll = new GenericData.Record( protocol.getType( "PurgeAll" ) );
 		purgeAll.put( "class", classRef );
 		operations.add( purgeAll );
+	}
+
+	@Override
+	public void addDeleteByQuery(String entityClassName, DeletionQuery deletionQuery) {
+		int classRef = getClassReference( entityClassName );
+		GenericRecord deleteByQuery = new GenericData.Record( protocol.getType( "DeleteByQuery" ) );
+		deleteByQuery.put( "class", classRef );
+		deleteByQuery.put( "key", deletionQuery.getQueryKey() );
+		DeleteByQuerySupport.QueryToStringMapper mapper = DeleteByQuerySupport.getQueryToStringMapper( deletionQuery.getQueryKey() );
+		deleteByQuery.put( "query", Arrays.asList( mapper.toString( deletionQuery ) ) );
+		operations.add( deleteByQuery );
 	}
 
 	private int getClassReference(String entityClassName) {
@@ -140,17 +151,6 @@ public class AvroSerializer implements Serializer {
 		delete.put( "id", idRecord );
 		operations.add( delete );
 		idRecord = null;
-	}
-
-	@Override
-	public void addDeleteByQuery(String entityClassName, DeletionQuery deletionQuery) {
-		int classRef = getClassReference( entityClassName );
-		GenericRecord deleteByQuery = new GenericData.Record( protocol.getType( "DeleteByQuery" ) );
-		deleteByQuery.put( "class", classRef );
-		deleteByQuery.put( "key", deletionQuery.getQueryKey() );
-		DeleteByQuerySupport.QueryToStringMapper mapper = DeleteByQuerySupport.getQueryToStringMapper( deletionQuery.getQueryKey() );
-		deleteByQuery.put( "query", Arrays.asList( mapper.toString( deletionQuery ) ) );
-		operations.add( deleteByQuery );
 	}
 
 	@Override
@@ -399,5 +399,4 @@ public class AvroSerializer implements Serializer {
 		document = null;
 		fieldables = null;
 	}
-
 }

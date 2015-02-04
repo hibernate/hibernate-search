@@ -13,7 +13,7 @@
             "name": "operations",
             "type": {
                 "type": "array",
-                "items": ["OptimizeAll", "PurgeAll", "Flush", "Delete", "Add", "Update"]
+                "items": ["OptimizeAll", "PurgeAll", "Flush", "Delete", "Add", "Update", "DeleteByQuery"]
             }
         }
     ]
