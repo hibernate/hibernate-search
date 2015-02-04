@@ -8,9 +8,9 @@ package org.hibernate.search.testsupport.setup;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
@@ -30,7 +30,7 @@ public class BuildContextForTest implements BuildContext {
 	}
 
 	@Override
-	public SearchFactoryImplementor getUninitializedSearchFactory() {
+	public ExtendedSearchIntegrator getUninitializedSearchIntegrator() {
 		return null;
 	}
 

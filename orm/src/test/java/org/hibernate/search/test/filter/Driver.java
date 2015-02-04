@@ -7,6 +7,7 @@
 package org.hibernate.search.test.filter;
 
 import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -14,11 +15,13 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.FilterCacheModeType;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.bridge.builtin.IntegerBridge;
 
 /**
  * @author Emmanuel Bernard
@@ -32,10 +35,13 @@ import org.hibernate.search.annotations.Resolution;
 				impl = SecurityFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "fieldConstraintFilter-1",
-				impl = FieldConstraintFilter.class,
+				impl = FieldConstraintFilterFactory.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "fieldConstraintFilter-2",
-				impl = FieldConstraintFilter.class,
+				impl = FieldConstraintFilterFactory.class,
+				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
+		@FullTextFilterDef(name = "cacheinstancewithoutkeymethodtest",
+				impl = FieldConstraintFilterWithoutKeyMethod.class,
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		//Filter factory with parameters
 		@FullTextFilterDef(name = "cacheresultstest",
@@ -43,6 +49,9 @@ import org.hibernate.search.annotations.Resolution;
 				cache = FilterCacheModeType.INSTANCE_AND_DOCIDSETRESULTS),
 		@FullTextFilterDef(name = "cacheinstancetest",
 				impl = InstanceBasedExcludeAllFilter.class,
+				cache = FilterCacheModeType.INSTANCE_ONLY),
+		@FullTextFilterDef(name = "cacheinstancefromfactorywithoutkeymethodtest",
+				impl = FieldConstraintFilterFactoryWithoutKeyMethod.class,
 				cache = FilterCacheModeType.INSTANCE_ONLY),
 		@FullTextFilterDef(name = "empty",
 				impl = NullReturningEmptyFilter.class,
@@ -55,12 +64,17 @@ public class Driver {
 	@Id
 	@DocumentId
 	private int id;
+
 	@Field(analyze = Analyze.YES)
 	private String name;
+
 	@Field(analyze = Analyze.NO)
 	private String teacher;
+
 	@Field(analyze = Analyze.NO)
+	@FieldBridge(impl = IntegerBridge.class)
 	private int score;
+
 	@Field(analyze = Analyze.NO)
 	@DateBridge(resolution = Resolution.YEAR)
 	private Date delivery;

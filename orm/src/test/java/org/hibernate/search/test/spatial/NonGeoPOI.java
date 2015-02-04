@@ -9,7 +9,6 @@ package org.hibernate.search.test.spatial;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 
 import javax.persistence.Entity;
@@ -33,10 +32,9 @@ public class NonGeoPOI {
 	String type;
 
 	@Field(store = Store.YES, index = Index.YES)
-	@NumericField
 	Double latitude;
+
 	@Field(store = Store.YES, index = Index.YES)
-	@NumericField
 	Double longitude;
 
 	public NonGeoPOI(Integer id, String name, Double latitude, Double longitude, String type) {

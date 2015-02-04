@@ -20,11 +20,11 @@ import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 	@Test
 	public void testErrorHandling() {
 		MockErrorHandler mockErrorHandler = getErrorHandlerAndAssertCorrectTypeIsUsed();
-		EntityIndexBinding mappingForEntity = getSearchFactoryImpl().getIndexBinding( Foo.class );
+		EntityIndexBinding mappingForEntity = getExtendedSearchIntegrator().getIndexBinding( Foo.class );
 		IndexManager indexManager = mappingForEntity.getIndexManagers()[0];
 
 		List<LuceneWork> queue = new ArrayList<LuceneWork>();
@@ -86,8 +86,8 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 	}
 
 	private MockErrorHandler getErrorHandlerAndAssertCorrectTypeIsUsed() {
-		SearchFactoryImplementor searchFactory = getSearchFactoryImpl();
-		ErrorHandler errorHandler = searchFactory.getErrorHandler();
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		ErrorHandler errorHandler = integrator.getErrorHandler();
 		Assert.assertTrue( errorHandler instanceof MockErrorHandler );
 		return (MockErrorHandler)errorHandler;
 	}

@@ -7,15 +7,18 @@
 package org.hibernate.search.indexes.interceptor;
 
 /**
- * This interceptor is called upon indexing operations to optionally change the behavior.
- * Implementations must be thread safe and should have a no-arg constructor.
- *
- * Typical use case include so called soft deletes.
- *
+ * This interceptor is called upon indexing operations to optionally change the indexing behavior.
+ * <p>
  * The interceptor is applied to a MassIndexer operation, but is ignored when using
- * the explicit indexing control API such <code>org.hibernate.search.FullTextSession.index(T)</code>
- * or <code>purge</code>, <purgeAll>.
- *
+ * the explicit indexing control API such {@code org.hibernate.search.FullTextSession.index(T)
+ * or {@code purge} and  {@code purgeAll}.
+ * </p>
+ * <p>
+ * Implementations must be thread-safe and should have a no-arg constructor.
+ * </p>
+ * <p>
+ * Typical use cases include the so called soft delete.
+ * </p>
  * @hsearch.experimental {@link IndexingOverride} might be updated
  *
  * @author Emmanuel Bernard <emmanuel@hibernate.org>

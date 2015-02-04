@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.hcore.impl;
 
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
 
 /**
  * This Service lives in the ServiceRegistry controlled by Hibernate ORM to
- * allow to lookup the SearchFactory from the context of ORM code (for example,
+ * allow to lookup the ExtendedSearchintegrator from the context of ORM code (for example,
  * when a user wraps the current Session into a FullTextSession).
  *
  * @author Sanne Grinovero
@@ -20,19 +20,19 @@ import org.hibernate.service.Service;
  */
 public final class SearchFactoryReference implements Service {
 
-	private volatile SearchFactoryImplementor searchFactoryImplementor;
+	private volatile ExtendedSearchIntegrator extendedIntegrator;
 
-	public void initialize(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
+	public void initialize(ExtendedSearchIntegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator;
 	}
 
-	public SearchFactoryImplementor getSearchFactory() {
-		final SearchFactoryImplementor value = this.searchFactoryImplementor;
+	public ExtendedSearchIntegrator getSearchIntegrator() {
+		final ExtendedSearchIntegrator value = this.extendedIntegrator;
 		if ( value != null ) {
 			return value;
 		}
 		else {
-			throw LoggerFactory.make().searchFactoryNotInitialized();
+			throw LoggerFactory.make().searchIntegratorNotInitialized();
 		}
 	}
 

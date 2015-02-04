@@ -9,7 +9,7 @@ package org.hibernate.search.bridge;
 import org.apache.lucene.document.Document;
 
 /**
- * A <code>FieldBridge</code> able to convert the index representation back into an object without losing information.
+ * A {@code FieldBridge} able to convert the index representation back into an object without losing information.
  * Any bridge expected to process a document id should implement this interface.
  *
  * @author Emmanuel Bernard

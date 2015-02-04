@@ -10,16 +10,15 @@ import java.lang.annotation.ElementType;
 import java.util.Arrays;
 
 import org.junit.Assert;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.annotations.ProvidedId;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.junit.Rule;
@@ -142,10 +141,10 @@ public class ImplicitProvidedIdTest {
 	 * @param fieldName The expected name of the ID field
 	 */
 	private void storeBooksViaProvidedId(SearchConfigurationForTest cfg, String fieldName, boolean matchTitle) {
-		SearchFactoryImplementor sf = null;
+		SearchIntegrator searchIntegrator = null;
 		try {
 			//Should fail right here when @ProvidedId is not enabled:
-			sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+			searchIntegrator = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 
 			Book book = new Book();
 			book.title = "Less is nice";
@@ -154,10 +153,10 @@ public class ImplicitProvidedIdTest {
 			String isbn = "some entity-external id";
 			Work work = new Work( book, isbn, WorkType.ADD, false );
 			TransactionContextForTest tc = new TransactionContextForTest();
-			sf.getWorker().performWork( work, tc );
+			searchIntegrator.getWorker().performWork( work, tc );
 			tc.end();
 
-			QueryBuilder queryBuilder = sf.buildQueryBuilder()
+			QueryBuilder queryBuilder = searchIntegrator.buildQueryBuilder()
 					.forEntity( Book.class )
 					.get();
 
@@ -167,15 +166,15 @@ public class ImplicitProvidedIdTest {
 				.matching( matchTitle ? book.title : isbn )
 				.createQuery();
 
-			int queryResultSize = sf.createHSQuery()
+			int queryResultSize = searchIntegrator.createHSQuery()
 					.luceneQuery( query )
 					.targetedEntities( Arrays.asList( new Class<?>[]{ Book.class } ) )
 					.queryResultSize();
 			Assert.assertEquals( 1, queryResultSize );
 		}
 		finally {
-			if ( sf != null ) {
-				sf.close();
+			if ( searchIntegrator != null ) {
+				searchIntegrator.close();
 			}
 		}
 	}

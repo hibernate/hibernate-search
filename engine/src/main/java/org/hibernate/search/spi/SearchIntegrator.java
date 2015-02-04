@@ -14,6 +14,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.IndexReaderAccessor;
+import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
@@ -32,7 +33,7 @@ import org.hibernate.search.stat.Statistics;
  * @author Emmanuel Bernard
  * @hsearch.experimental
  */
-public interface SearchIntegrator {
+public interface SearchIntegrator extends AutoCloseable {
 
 	/**
 	 * Returns the entity to index binding for the given type.
@@ -45,7 +46,7 @@ public interface SearchIntegrator {
 	EntityIndexBinding getIndexBinding(Class<?> entityType);
 
 	/**
-	 * Add the following classes to the SearchFactory. If these classes are new to the SearchFactory this
+	 * Add the following classes to the SearchIntegrator. If these classes are new to the SearchIntegrator this
 	 * will trigger a reconfiguration.
 	 */
 	void addClasses(Class<?>... classes);
@@ -61,7 +62,7 @@ public interface SearchIntegrator {
 	HSQuery createHSQuery();
 
 	/**
-	 * @return true if the SearchFactory was stopped
+	 * @return true if the SearchIntegrator was stopped
 	 */
 	boolean isStopped();
 
@@ -69,7 +70,7 @@ public interface SearchIntegrator {
 	 * Used to catch exceptions in all synchronous operations; but default they are logged, the user
 	 * can configure alternative error management means.
 	 *
-	 * @return the configured ErrorHandler, global to the SearchFactory
+	 * @return the configured ErrorHandler, global to the SearchIntegrator
 	 */
 	ErrorHandler getErrorHandler();
 
@@ -130,7 +131,7 @@ public interface SearchIntegrator {
 	/**
 	 * Provides access to the IndexReader API
 	 *
-	 * @return the IndexReaderAccessor for this SearchFactory
+	 * @return the IndexReaderAccessor for this SearchIntegrator
 	 */
 	IndexReaderAccessor getIndexReaderAccessor();
 
@@ -175,5 +176,7 @@ public interface SearchIntegrator {
 	 * Shuts down all workers and releases all resources.
 	 */
 	void close();
+
+	IndexManager getIndexManager(String indexName);
 
 }

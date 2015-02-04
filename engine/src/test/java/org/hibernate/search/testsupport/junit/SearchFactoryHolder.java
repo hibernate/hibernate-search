@@ -15,12 +15,13 @@ import org.junit.Assert;
 import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
 import org.hibernate.search.cfg.SearchMapping;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.rules.ExternalResource;
 
@@ -37,7 +38,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	private final Properties configuration;
 	private final Map<Class<? extends Service>,Service> providedServices = new HashMap<>();
 
-	private SearchFactoryImplementor[] searchImplementors;
+	private SearchIntegrator[] searchIntegrator;
 	private int numberOfSessionFactories = 1;
 
 	public SearchFactoryHolder(Class<?>... entities) {
@@ -50,19 +51,19 @@ public class SearchFactoryHolder extends ExternalResource {
 		this.configuration = new Properties();
 	}
 
-	public SearchFactoryImplementor getSearchFactory() {
-		return searchImplementors[0];
+	public ExtendedSearchIntegrator getSearchFactory() {
+		return searchIntegrator[0].unwrap( ExtendedSearchIntegrator.class );
 	}
 
 	@Override
 	protected void before() throws Throwable {
-		searchImplementors = new SearchFactoryImplementor[numberOfSessionFactories];
+		searchIntegrator = new SearchIntegrator[numberOfSessionFactories];
 		for ( int i = 0; i < numberOfSessionFactories; i++ ) {
-			searchImplementors[i] = createSearchFactory();
+			searchIntegrator[i] = createSearchFactory();
 		}
 	}
 
-	private SearchFactoryImplementor createSearchFactory() {
+	private SearchIntegrator createSearchFactory() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
 		cfg.setProgrammaticMapping( buildMappingDefinition );
 		for ( Entry<Class<? extends Service>, Service> entry : providedServices.entrySet() ) {
@@ -74,20 +75,20 @@ public class SearchFactoryHolder extends ExternalResource {
 		for ( Class<?> c : entities ) {
 			cfg.addClass( c );
 		}
-		return new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		return new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator();
 	}
 
 	@Override
 	protected void after() {
-		if ( searchImplementors != null ) {
-			for ( SearchFactoryImplementor sf : searchImplementors ) {
+		if ( searchIntegrator != null ) {
+			for ( SearchIntegrator sf : searchIntegrator ) {
 				sf.close();
 			}
 		}
 	}
 
 	public SearchFactoryHolder withProperty(String key, Object value) {
-		Assert.assertNull( "SearchFactory already initialized", searchImplementors );
+		Assert.assertNull( "SearchIntegrator already initialized", searchIntegrator );
 		configuration.put( key, value );
 		return this;
 	}

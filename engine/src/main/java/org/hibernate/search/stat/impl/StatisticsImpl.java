@@ -28,8 +28,8 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.Version;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -55,14 +55,14 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	private final Lock readLock;
 	private final Lock writeLock;
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final ExtendedSearchIntegrator extendedIntegrator;
 
-	public StatisticsImpl(SearchFactoryImplementor searchFactoryImplementor) {
+	public StatisticsImpl(ExtendedSearchIntegrator extendedIntegrator) {
 		ReadWriteLock lock = new ReentrantReadWriteLock();
 		readLock = lock.readLock();
 		writeLock = lock.writeLock();
 
-		this.searchFactoryImplementor = searchFactoryImplementor;
+		this.extendedIntegrator = extendedIntegrator;
 	}
 
 	@Override
@@ -198,7 +198,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	@Override
 	public Set<String> getIndexedClassNames() {
 		Set<String> indexedClasses = new HashSet<String>();
-		for ( Class clazz : searchFactoryImplementor.getIndexBindings().keySet() ) {
+		for ( Class clazz : extendedIntegrator.getIndexBindings().keySet() ) {
 			indexedClasses.add( clazz.getName() );
 		}
 		return indexedClasses;
@@ -207,7 +207,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	@Override
 	public int getNumberOfIndexedEntities(String entity) {
 		Class<?> clazz = getEntityClass( entity );
-		IndexReader indexReader = searchFactoryImplementor.getIndexReaderAccessor().open( clazz );
+		IndexReader indexReader = extendedIntegrator.getIndexReaderAccessor().open( clazz );
 		try {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			BooleanQuery boolQuery = new BooleanQuery();
@@ -224,7 +224,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 			}
 		}
 		finally {
-			searchFactoryImplementor.getIndexReaderAccessor().close( indexReader );
+			extendedIntegrator.getIndexReaderAccessor().close( indexReader );
 		}
 	}
 
@@ -240,7 +240,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 	private Class<?> getEntityClass(String entity) {
 		Class<?> clazz;
 		try {
-			clazz = ClassLoaderHelper.classForName( entity, searchFactoryImplementor.getServiceManager() );
+			clazz = ClassLoaderHelper.classForName( entity, extendedIntegrator.getServiceManager() );
 		}
 		catch (ClassLoadingException e) {
 			throw new IllegalArgumentException( entity + "not a indexed entity" );

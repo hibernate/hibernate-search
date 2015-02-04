@@ -12,7 +12,7 @@ import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
 import org.hibernate.search.backend.impl.lucene.ScheduledCommitPolicy;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.CountingErrorHandler;
@@ -91,7 +91,7 @@ public class ScheduledCommitPolicyTest {
 
 	private class IndexingFinishedCondition implements Condition {
 		private final int docs;
-		private final SearchFactoryImplementor searchFactory;
+		private final ExtendedSearchIntegrator searchFactory;
 		private IndexingFinishedCondition(SearchFactoryHolder searchFactoryHolder, int docs) {
 			this.searchFactory = searchFactoryHolder.getSearchFactory();
 			this.docs = docs;

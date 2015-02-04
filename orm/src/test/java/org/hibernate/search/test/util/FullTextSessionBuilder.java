@@ -186,7 +186,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 		if ( sessionFactory == null ) {
 			build();
 		}
-		return ImplementationFactory.createSearchFactory( ContextHelper.getSearchFactoryBySFI( sessionFactory ) );
+		return ImplementationFactory.createSearchFactory( ContextHelper.getSearchintegratorBySFI( sessionFactory ) );
 	}
 
 	/**

@@ -6,18 +6,7 @@
  */
 package org.hibernate.search.test.configuration;
 
-import java.lang.annotation.ElementType;
-
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.backend.impl.lucene.AbstractWorkspaceImpl;
-import org.hibernate.search.backend.impl.lucene.LuceneBackendQueueProcessor;
-import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.impl.MutableSearchFactory;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.engine.impl.MutableSearchFactory;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Test;
 
@@ -30,7 +19,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public class IndexMetadataCompleteConfiguredTest {
+public class IndexMetadataCompleteConfiguredTest extends BaseConfigurationTest {
 
 	@Test
 	public void testDefaultImplementation() {
@@ -53,15 +42,7 @@ public class IndexMetadataCompleteConfiguredTest {
 	}
 
 	private void verifyIndexCompleteMetadataOption(boolean expectation, SearchConfigurationForTest cfg) {
-		SearchMapping mapping = new SearchMapping();
-		mapping
-			.entity( Document.class ).indexed().indexName( "index1" )
-			.property( "id", ElementType.FIELD ).documentId()
-			.property( "title", ElementType.FIELD ).field()
-			;
-		cfg.setProgrammaticMapping( mapping );
-		cfg.addClass( Document.class );
-		MutableSearchFactory sf = (MutableSearchFactory) new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
+		MutableSearchFactory sf = getMutableSearchFactoryWithSingleEntity( cfg );
 		try {
 			assertEquals( expectation, extractWorkspace( sf, Document.class ).areSingleTermDeletesSafe() );
 
@@ -79,27 +60,4 @@ public class IndexMetadataCompleteConfiguredTest {
 		}
 	}
 
-	private static AbstractWorkspaceImpl extractWorkspace(MutableSearchFactory sf, Class<?> type) {
-		EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( type );
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
-		LuceneBackendQueueProcessor backend = (LuceneBackendQueueProcessor) indexManager.getBackendQueueProcessor();
-		return backend.getIndexResources().getWorkspace();
-	}
-
-	public static final class Document {
-		long id;
-		String title;
-	}
-
-	@Indexed(index = "index1")
-	public static final class Dvd {
-		@DocumentId long id;
-		@Field String title;
-	}
-
-	@Indexed(index = "index2")
-	public static final class Book {
-		@DocumentId long id;
-		@Field String title;
-	}
 }

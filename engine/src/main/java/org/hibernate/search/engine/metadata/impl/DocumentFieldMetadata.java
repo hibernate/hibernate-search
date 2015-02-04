@@ -12,6 +12,8 @@ import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
 
+import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
+
 /**
  * Encapsulating the metadata for a single document field.
  *
@@ -30,6 +32,7 @@ public class DocumentFieldMetadata {
 	private final String nullToken;
 	private final boolean isNumeric;
 	private final int precisionStep;
+	private final NumericEncodingType numericEncodingType;
 
 	private DocumentFieldMetadata(Builder builder) {
 		this.fieldName = builder.fieldName;
@@ -44,6 +47,7 @@ public class DocumentFieldMetadata {
 		this.nullToken = builder.nullToken;
 		this.isNumeric = builder.isNumeric;
 		this.precisionStep = builder.precisionStep;
+		this.numericEncodingType = builder.numericEncodingType;
 	}
 
 	public String getName() {
@@ -88,23 +92,27 @@ public class DocumentFieldMetadata {
 		return precisionStep;
 	}
 
+	public NumericEncodingType getNumericEncodingType() {
+		return numericEncodingType;
+	}
+
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder( "DocumentFieldMetadata{" );
-		sb.append( "fieldName='" ).append( fieldName ).append( '\'' );
-		sb.append( ", store=" ).append( store );
-		sb.append( ", index=" ).append( index );
-		sb.append( ", termVector=" ).append( termVector );
-		sb.append( ", fieldBridge=" ).append( fieldBridge );
-		sb.append( ", boost=" ).append( boost );
-		sb.append( ", analyzer=" ).append( analyzer );
-		sb.append( ", isId=" ).append( isId );
-		sb.append( ", isIdInEmbedded=" ).append( isIdInEmbedded );
-		sb.append( ", nullToken='" ).append( nullToken ).append( '\'' );
-		sb.append( ", numeric=" ).append( isNumeric );
-		sb.append( ", precisionStep=" ).append( precisionStep );
-		sb.append( '}' );
-		return sb.toString();
+		return "DocumentFieldMetadata{" +
+				"fieldName='" + fieldName + '\'' +
+				", store=" + store +
+				", index=" + index +
+				", termVector=" + termVector +
+				", fieldBridge=" + fieldBridge +
+				", boost=" + boost +
+				", analyzer=" + analyzer +
+				", isId=" + isId +
+				", isIdInEmbedded=" + isIdInEmbedded +
+				", nullToken='" + nullToken + '\'' +
+				", isNumeric=" + isNumeric +
+				", precisionStep=" + precisionStep +
+				", encodingType=" + numericEncodingType +
+				'}';
 	}
 
 	public static class Builder {
@@ -123,6 +131,7 @@ public class DocumentFieldMetadata {
 		private String nullToken;
 		private boolean isNumeric;
 		private int precisionStep = NumericField.PRECISION_STEP_DEFAULT;
+		private NumericEncodingType numericEncodingType;
 
 		public Builder(String fieldName,
 				Store store,
@@ -175,8 +184,20 @@ public class DocumentFieldMetadata {
 			return this;
 		}
 
+		public Builder numericEncodingType(NumericEncodingType numericEncodingType) {
+			this.numericEncodingType = numericEncodingType;
+			return this;
+		}
+
 		public DocumentFieldMetadata build() {
 			return new DocumentFieldMetadata( this );
+		}
+
+		@Override
+		public String toString() {
+			return "Builder{" +
+					"fieldName='" + fieldName + '\'' +
+					'}';
 		}
 	}
 }

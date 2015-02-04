@@ -29,6 +29,18 @@ public enum FieldCacheLoadingType {
 			return new StringFieldLoadingStrategy( fieldName );
 		}
 	},
+	BYTE_AS_SHORT {
+		@Override
+		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
+			return new IntFieldAsByteLoadingStrategy( fieldName );
+		}
+	},
+	INT_AS_SHORT {
+		@Override
+		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {
+			return new IntFieldAsShortLoadingStrategy( fieldName );
+		}
+	},
 	INT {
 		@Override
 		public FieldLoadingStrategy createLoadingStrategy(String fieldName) {

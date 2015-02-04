@@ -210,6 +210,7 @@
                             org.hibernate.search.cfg.spi;version="${project.version}",
                             org.hibernate.search.engine;version="${project.version}",
                             org.hibernate.search.engine.spi;version="${project.version}",
+                            org.hibernate.search.engine.integration.impl;version="${project.version}",
                             org.hibernate.search.engine.service.classloading.spi;version="${project.version}",
                             org.hibernate.search.engine.service.classloading.impl;version="${project.version}",
                             org.hibernate.search.engine.service.spi;version="${project.version}",

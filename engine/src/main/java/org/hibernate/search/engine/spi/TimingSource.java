@@ -27,7 +27,7 @@ public interface TimingSource {
 	long getMonotonicTimeEstimate();
 
 	/**
-	 * Invoked on SearchFactory shutdown. There is no start method as it's expected to be lazily initialized
+	 * Invoked on SearchIntegrator shutdown. There is no start method as it's expected to be lazily initialized
 	 */
 	void stop();
 

@@ -7,10 +7,18 @@
 package org.hibernate.search.exception;
 
 /**
+ * Implementations handle errors and exceptions occurring during indexing.
+ *
  * @author Amin Mohammed-Coleman
  * @since 3.2
  */
 public interface ErrorHandler {
+
+	/**
+	 * Special value to be used for the {@link org.hibernate.search.cfg.Environment#ERROR_HANDLER} configuration
+	 * property in order to activate the logging of all errors/exceptions occurring.
+	 */
+	String LOG = "log";
 
 	void handle(ErrorContext context);
 

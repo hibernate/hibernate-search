@@ -9,7 +9,7 @@ package org.hibernate.search.testsupport.indexmanager;
 import java.util.Properties;
 
 import org.apache.lucene.search.similarities.DefaultSimilarity;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.WorkerBuildContextForTest;
 

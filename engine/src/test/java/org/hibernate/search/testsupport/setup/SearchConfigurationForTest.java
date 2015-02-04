@@ -18,7 +18,7 @@ import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.search.spi.DefaultInstanceInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.testsupport.TestConstants;
 
@@ -38,11 +38,12 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 	private SearchMapping programmaticMapping;
 	private boolean transactionsExpected = true;
 	private boolean indexMetadataComplete = true;
+	private boolean deleteByTermEnforced = false;
 	private boolean idProvidedImplicit = false;
 	private ClassLoaderService classLoaderService;
 
 	public SearchConfigurationForTest() {
-		this( SimpleInitializer.INSTANCE );
+		this( DefaultInstanceInitializer.DEFAULT_INITIALIZER );
 	}
 
 	public SearchConfigurationForTest(InstanceInitializer init) {
@@ -130,6 +131,15 @@ public class SearchConfigurationForTest extends SearchConfigurationBase implemen
 
 	public void setIndexMetadataComplete(boolean indexMetadataComplete) {
 		this.indexMetadataComplete = indexMetadataComplete;
+	}
+
+	public void setDeleteByTermEnforced(boolean deleteByTermEnforced) {
+		this.deleteByTermEnforced = deleteByTermEnforced;
+	}
+
+	@Override
+	public boolean isDeleteByTermEnforced() {
+		return deleteByTermEnforced;
 	}
 
 	@Override

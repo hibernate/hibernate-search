@@ -20,7 +20,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
@@ -77,9 +77,9 @@ public class RetryInitializeTest {
 		assertNotNull( scheduledPeriod );
 		assertEquals( Long.valueOf( 12000L ), scheduledPeriod );
 
-		SearchIntegrator searchFactory = slave.getSearchFactory().unwrap( SearchIntegrator.class );
+		SearchIntegrator integrator = slave.getSearchFactory().unwrap( SearchIntegrator.class );
 
-		EntityIndexBinding snowIndexBinder = searchFactory.getIndexBinding( SnowStorm.class );
+		EntityIndexBinding snowIndexBinder = integrator.getIndexBinding( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexManagers[0];

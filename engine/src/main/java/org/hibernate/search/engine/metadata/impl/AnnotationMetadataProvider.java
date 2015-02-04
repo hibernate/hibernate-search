@@ -32,6 +32,8 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.FullTextFilterDef;
+import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Latitude;
@@ -44,21 +46,25 @@ import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Spatials;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.annotations.TermVector;
+import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.DefaultStringBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.NullEncodingTwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.impl.BridgeFactory;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
+import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.impl.ConfigContext;
+import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
@@ -158,10 +164,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private void createPropertyMetadataForEmbeddedId(XProperty member, TypeMetadata.Builder typeMetadataBuilder, ConfigContext configContext, String fieldName) {
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.YES );
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( TermVector.NO );
-		FieldBridge fieldBridge = bridgeFactory.guessType(
-				null,
-				null,
+		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				member,
+				true,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -213,11 +218,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			parseContext.setExplicitDocumentId( true );
 		}
 
-		NumericField numericFieldAnn = member.getAnnotation( NumericField.class );
-		FieldBridge idBridge = bridgeFactory.guessType(
-				null,
-				numericFieldAnn,
+		FieldBridge idBridge = bridgeFactory.buildFieldBridge(
 				member,
+				true,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -462,6 +465,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		// check for AnalyzerDefs annotations
 		checkForAnalyzerDefs( clazz, configContext );
 
+		// check for FullTextFilterDefs annotations
+		checkForFullTextFilterDefs( clazz, configContext );
+
 		// Check for any ClassBridges annotation.
 		ClassBridges classBridgesAnnotation = clazz.getAnnotation( ClassBridges.class );
 		if ( classBridgesAnnotation != null ) {
@@ -562,10 +568,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		Store store = spatialAnnotation.store();
 		Field.Index index = AnnotationProcessingHelper.getIndex( Index.YES, Analyze.NO, Norms.NO );
 		Field.TermVector termVector = Field.TermVector.NO;
-		FieldBridge fieldBridge = bridgeFactory.guessType(
-				null,
-				null,
+		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				member,
+				false,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -854,8 +859,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		XProperty member = propertyMetadataBuilder.getPropertyAccessor();
 
 		if ( isPropertyTransient( member, configContext ) ) {
-			//If the indexed values are derived from a Transient field, we can't rely on dirtyness of properties.
-			//Only applies on JPA mapped entities.
+			// If the indexed values are derived from a Transient field, we can't rely on dirtiness of properties.
+			// Only applies on JPA mapped entities.
 			typeMetadataBuilder.disableStateInspectionOptimization();
 		}
 
@@ -868,10 +873,10 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 		Field.TermVector termVector = AnnotationProcessingHelper.getTermVector( fieldAnnotation.termVector() );
 
-		FieldBridge fieldBridge = bridgeFactory.guessType(
+		FieldBridge fieldBridge = bridgeFactory.buildFieldBridge(
 				fieldAnnotation,
-				numericFieldAnnotation,
 				member,
+				false,
 				reflectionManager,
 				configContext.getServiceManager()
 		);
@@ -889,28 +894,86 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				index
 		);
 
-		DocumentFieldMetadata.Builder fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
-				fieldName,
-				store,
-				index,
-				termVector
-		)
-				.boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
-				.fieldBridge( fieldBridge )
-				.analyzer( analyzer )
-				.indexNullAs( nullToken );
+		DocumentFieldMetadata.Builder fieldMetadataBuilder;
 
-		if ( numericFieldAnnotation != null ) {
-			fieldMetadataBuilder.numeric()
-					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) );
+		// if we are having a numeric value make sure to mark the metadata and set the precision
+		// also numeric values don't need to be analyzed and norms are omitted (see also org.apache.lucene.document.LongField)
+		if ( isNumericField( numericFieldAnnotation, fieldBridge ) ) {
+			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
+					fieldName,
+					store,
+					Field.Index.NOT_ANALYZED_NO_NORMS,
+					termVector
+			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
+					.fieldBridge( fieldBridge )
+					.analyzer( analyzer )
+					.indexNullAs( nullToken )
+					.numeric()
+					.precisionStep( AnnotationProcessingHelper.getPrecisionStep( numericFieldAnnotation ) )
+					.numericEncodingType( determineNumericFieldEncoding( fieldBridge ) );
+		}
+		else {
+			fieldMetadataBuilder = new DocumentFieldMetadata.Builder(
+					fieldName,
+					store,
+					index,
+					termVector
+			).boost( AnnotationProcessingHelper.getBoost( member, fieldAnnotation ) )
+					.fieldBridge( fieldBridge )
+					.analyzer( analyzer )
+					.indexNullAs( nullToken );
 		}
 
 		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
-
 		// keep track of collection role names for ORM integration optimization based on collection update events
 		parseContext.collectUnqualifiedCollectionRole( member.getName() );
+	}
+
+	private boolean isNumericField(NumericField numericFieldAnnotation, FieldBridge fieldBridge) {
+		if ( fieldBridge instanceof ContainerBridge ) {
+			fieldBridge = ( (ContainerBridge) fieldBridge ).getElementBridge();
+		}
+
+		// either @NumericField is specified explicitly or we are dealing with a implicit numeric value encoded via a numeric
+		// field bridge
+		return numericFieldAnnotation != null || fieldBridge instanceof NumericFieldBridge || fieldBridge instanceof NumericEncodingDateBridge;
+	}
+
+	private NumericEncodingType determineNumericFieldEncoding(FieldBridge fieldBridge) {
+		if ( fieldBridge instanceof ContainerBridge ) {
+			fieldBridge = ( (ContainerBridge) fieldBridge ).getElementBridge();
+		}
+
+		if ( fieldBridge instanceof NumericFieldBridge ) {
+			NumericFieldBridge numericFieldBridge = (NumericFieldBridge) fieldBridge;
+			switch ( numericFieldBridge ) {
+				case BYTE_FIELD_BRIDGE:
+				case SHORT_FIELD_BRIDGE:
+				case INT_FIELD_BRIDGE: {
+					return NumericEncodingType.INTEGER;
+				}
+				case LONG_FIELD_BRIDGE: {
+					return NumericEncodingType.LONG;
+				}
+				case DOUBLE_FIELD_BRIDGE: {
+					return NumericEncodingType.DOUBLE;
+				}
+				case FLOAT_FIELD_BRIDGE: {
+					return NumericEncodingType.FLOAT;
+				}
+				default: {
+					return NumericEncodingType.UNKNOWN;
+				}
+			}
+		}
+
+		if ( fieldBridge instanceof NumericEncodingDateBridge ) {
+			return NumericEncodingType.LONG;
+		}
+
+		return NumericEncodingType.UNKNOWN;
 	}
 
 	private String determineNullToken(org.hibernate.search.annotations.Field fieldAnnotation, ConfigContext context) {
@@ -1024,6 +1087,17 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 		AnalyzerDef def = annotatedElement.getAnnotation( AnalyzerDef.class );
 		context.addAnalyzerDef( def, annotatedElement );
+	}
+
+	private void checkForFullTextFilterDefs(XAnnotatedElement annotatedElement, ConfigContext context) {
+		FullTextFilterDefs defs = annotatedElement.getAnnotation( FullTextFilterDefs.class );
+		if ( defs != null ) {
+			for ( FullTextFilterDef def : defs.value() ) {
+				context.addFullTextFilterDef( def, annotatedElement );
+			}
+		}
+		FullTextFilterDef def = annotatedElement.getAnnotation( FullTextFilterDef.class );
+		context.addFullTextFilterDef( def, annotatedElement );
 	}
 
 	private void checkForAnalyzerDiscriminator(XAnnotatedElement annotatedElement,

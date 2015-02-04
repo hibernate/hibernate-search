@@ -7,7 +7,7 @@
 package org.hibernate.search.test.configuration;
 
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.IndexShardingStrategy;
@@ -59,11 +59,11 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 
 	@Test
 	public void testCorrectNumberOfShardsDetected() {
-		EntityIndexBinding indexBindingForDocument = getSearchFactoryImpl().getIndexBinding( Document.class );
+		EntityIndexBinding indexBindingForDocument = getExtendedSearchIntegrator().getIndexBinding( Document.class );
 		IndexManager[] documentManagers = indexBindingForDocument.getIndexManagers();
 		assertNotNull( documentManagers);
 		assertEquals( 4, documentManagers.length );
-		EntityIndexBinding indexBindingForBooks = getSearchFactoryImpl().getIndexBinding( Book.class );
+		EntityIndexBinding indexBindingForBooks = getExtendedSearchIntegrator().getIndexBinding( Book.class );
 		IndexManager[] bookManagers = indexBindingForBooks.getIndexManagers();
 		assertNotNull( bookManagers );
 		assertEquals( 2, bookManagers.length );
@@ -71,14 +71,14 @@ public class ShardsConfigurationTest extends ConfigurationReadTestCase {
 
 	@Test
 	public void testSelectionOfShardingStrategy() {
-		IndexShardingStrategy shardingStrategy = getSearchFactoryImpl().getIndexBinding( Document.class ).getSelectionStrategy();
+		IndexShardingStrategy shardingStrategy = getExtendedSearchIntegrator().getIndexBinding( Document.class ).getSelectionStrategy();
 		assertNotNull( shardingStrategy );
 		assertEquals( shardingStrategy.getClass(), UselessShardingStrategy.class );
 	}
 
 	@Test
 	public void testShardingSettingsInherited() {
-		IndexManager[] indexManagers = getSearchFactoryImpl().getIndexBindings().get( Document.class ).getIndexManagers();
+		IndexManager[] indexManagers = getExtendedSearchIntegrator().getIndexBindings().get( Document.class ).getIndexManagers();
 		assertTrue( getDirectoryProvider( indexManagers[0] ) instanceof RAMDirectoryProvider );
 		assertTrue( getDirectoryProvider( indexManagers[1] ) instanceof FSDirectoryProvider );
 		assertTrue( getDirectoryProvider( indexManagers[2] ) instanceof RAMDirectoryProvider );

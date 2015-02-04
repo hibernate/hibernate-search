@@ -13,16 +13,25 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines the temporal resolution of a given field
- * Date are stored as String in GMT
+ * Defines the temporal resolution and encoding type of a {@code java.util.Date} field.
+ *
+ * <p>
+ * </b>Note:</b> Dates are encoded in the GMT timezone.
+ * </p>
  *
  * @author Emmanuel Bernard
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Documented
-//TODO allow pattern like yyyyMMdd?
-//TODO allow base timezone?
 public @interface DateBridge {
+	/**
+	 * @return the resolution for the annotated date. The date will be rounded to the specified resolution.
+	 */
 	Resolution resolution();
+
+	/**
+	 * @return the encoding type for the annotated date.
+	 */
+	EncodingType encoding() default EncodingType.NUMERIC;
 }

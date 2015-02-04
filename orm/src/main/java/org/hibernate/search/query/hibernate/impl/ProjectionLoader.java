@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.transform.ResultTransformer;
@@ -33,18 +33,18 @@ public class ProjectionLoader implements Loader {
 
 	@Override
 	public void init(Session session,
-					SearchFactoryImplementor searchFactoryImplementor,
+					ExtendedSearchIntegrator extendedIntegrator,
 					ObjectInitializer objectInitializer,
 					TimeoutManager timeoutManager) {
 	}
 
 	public void init(Session session,
-					SearchFactoryImplementor searchFactoryImplementor,
+					ExtendedSearchIntegrator extendedIntegrator,
 					ResultTransformer transformer,
 					ObjectLoaderBuilder loaderBuilder,
 					String[] aliases,
 					TimeoutManager timeoutManager) {
-		init( session, searchFactoryImplementor, null, timeoutManager ); // TODO why do we call this method?
+		init( session, extendedIntegrator, null, timeoutManager ); // TODO why do we call this method?
 		this.transformer = transformer;
 		this.aliases = aliases;
 		this.loaderBuilder = loaderBuilder;

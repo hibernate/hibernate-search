@@ -11,16 +11,15 @@ import java.util.List;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
-
+import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
@@ -59,6 +58,10 @@ public class NumericFieldTest extends SearchTestBase {
 		// Range Queries including lower and upper bounds
 		assertEquals( "Query id ", 3, numericQueryFor( "overriddenFieldName", 1, 3 ).size() );
 		assertEquals( "Query by double range", 3, numericQueryFor( "latitude", -10d, 10d ).size() );
+		assertEquals( "Query by short range", 3, numericQueryFor( "importance", (short) 11, (short) 13 ).size() );
+		assertEquals( "Query by Short range", 3, numericQueryFor( "fallbackImportance", Short.valueOf( "11" ), Short.valueOf( "13" ) ).size() );
+		assertEquals( "Query by byte range", 3, numericQueryFor( "popularity", (byte) 21, (byte) 23 ).size() );
+		assertEquals( "Query by Byte range", 3, numericQueryFor( "fallbackPopularity", Byte.valueOf( "21" ), Byte.valueOf( "23" ) ).size() );
 		assertEquals( "Query by integer range", 4, numericQueryFor( "ranking", 1, 2 ).size() );
 		assertEquals( "Query by long range", 3, numericQueryFor( "myCounter", 1L, 3L ).size() );
 		assertEquals( "Query by multi-fields", 2, numericQueryFor( "strMultiple", 0.7d, 0.9d ).size() );
@@ -77,6 +80,8 @@ public class NumericFieldTest extends SearchTestBase {
 		// Exact Matching Queries
 		assertEquals( "Query id exact", 1, doExactQuery( "overriddenFieldName", 1 ).getId() );
 		assertEquals( "Query double exact", 2, doExactQuery( "latitude", -10d ).getId() );
+		assertEquals( "Query short exact", 3, doExactQuery( "importance", 12 ).getId() );
+		assertEquals( "Query byte exact", 3, doExactQuery( "popularity", 22 ).getId() );
 		assertEquals( "Query integer exact", 3, doExactQuery( "longitude", -20d ).getId() );
 		assertEquals( "Query long exact", 4, doExactQuery( "myCounter", 4L ).getId() );
 		assertEquals( "Query multifield exact", 5, doExactQuery( "strMultiple", 0.1d ).getId() );
@@ -118,15 +123,68 @@ public class NumericFieldTest extends SearchTestBase {
 			Assert.assertEquals( 1, list.size() );
 			Object[] firstProjection = (Object[]) list.get( 0 );
 			Assert.assertEquals( 1, firstProjection.length );
-			Assert.assertEquals( Double.valueOf( -20d ), firstProjection[0] );
+			Assert.assertEquals( -20d, firstProjection[0] );
 			List listAgain = fullTextSession.createFullTextQuery( latitudeQuery, Location.class )
-					.setProjection( "coordinatePair_x", "coordinatePair_y" )
+					.setProjection( "coordinatePair_x", "coordinatePair_y", "importance", "popularity" )
 					.list();
 			Assert.assertEquals( 1, listAgain.size() );
 			Object[] secondProjection = (Object[]) listAgain.get( 0 );
-			Assert.assertEquals( 2, secondProjection.length );
-			Assert.assertEquals( Double.valueOf( 1d ), secondProjection[0] );
-			Assert.assertEquals( Double.valueOf( 2d ), secondProjection[1] );
+			Assert.assertEquals( 4, secondProjection.length );
+			Assert.assertEquals( 1d, secondProjection[0] );
+			Assert.assertEquals( 2d, secondProjection[1] );
+			Assert.assertEquals( (short) 10, secondProjection[2] );
+			Assert.assertEquals( (byte) 20, secondProjection[3] );
+		}
+		finally {
+			tx.commit();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-997")
+	public void testShortDocumentIdExplicitlyMappedAsNumericField() {
+		Transaction tx = fullTextSession.beginTransaction();
+		try {
+			Query query = NumericFieldUtils.createNumericRangeQuery( "myId", (short) 1, (short) 1, true, true );
+			@SuppressWarnings("unchecked")
+			List<Coordinate> list = fullTextSession.createFullTextQuery( query, Coordinate.class )
+					.list();
+			Assert.assertEquals( 1, list.size() );
+			Assert.assertEquals( (short) 1, list.iterator().next().getId() );
+		}
+		finally {
+			tx.commit();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-997")
+	public void testByteDocumentIdExplicitlyMappedAsNumericField() {
+		Transaction tx = fullTextSession.beginTransaction();
+		try {
+			Query query = NumericFieldUtils.createNumericRangeQuery( "myId", (byte) 1, (byte) 1, true, true );
+			@SuppressWarnings("unchecked")
+			List<PointOfInterest> list = fullTextSession.createFullTextQuery( query, PointOfInterest.class )
+					.list();
+			Assert.assertEquals( 1, list.size() );
+			Assert.assertEquals( (byte) 1, list.iterator().next().getId() );
+		}
+		finally {
+			tx.commit();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-997")
+	public void testByteDocumentIdMappedAsStringFieldByDefault() {
+		Transaction tx = fullTextSession.beginTransaction();
+		try {
+			Query query = TermRangeQuery.newStringRange( "id", "1", "1", true, true );
+			@SuppressWarnings("unchecked")
+			List<Position> list = fullTextSession.createFullTextQuery( query, Position.class )
+					.list();
+			Assert.assertEquals( 1, list.size() );
+			Assert.assertEquals( (byte) 1, list.iterator().next().getId() );
 		}
 		finally {
 			tx.commit();
@@ -154,7 +212,7 @@ public class NumericFieldTest extends SearchTestBase {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class<?>[] { PinPoint.class, Location.class };
+		return new Class<?>[] { PinPoint.class, Location.class, Coordinate.class, PointOfInterest.class, Position.class };
 	}
 
 	private Location doExactQuery(String fieldName, Object value) {
@@ -174,21 +232,36 @@ public class NumericFieldTest extends SearchTestBase {
 
 	private void prepareData() {
 		Transaction tx = fullTextSession.beginTransaction();
-		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), BigDecimal.ONE );
+		Location loc1 = new Location( 1, 1L, -20d, -40d, 1, "Random text", 1.5d, countryFor( "England", 0.947 ), BigDecimal.ONE, (short) 10, (byte) 20 );
 		loc1.addPinPoints( new PinPoint( 1, 4, loc1 ), new PinPoint( 2, 5, loc1 ) );
 
-		Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), BigDecimal.ONE );
+		Location loc2 = new Location( 2, 2L, -10d, -30d, 1, "Some text", 0.786d, countryFor( "Italy", 0.951 ), BigDecimal.ONE, (short) 11, (byte) 21 );
 		loc2.addPinPoints( new PinPoint( 3, 1, loc2 ), new PinPoint( 4, 2, loc2 ) );
 
-		Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), BigDecimal.TEN );
-		Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), BigDecimal.ONE );
-		Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), BigDecimal.ONE );
+		Location loc3 = new Location( 3, 3L, 0d, -20d, 1, "A text", 0.86d, countryFor( "Brazil", 0.813 ), BigDecimal.TEN, (short) 12, (byte) 22 );
+		Location loc4 = new Location( 4, 4L, 10d, 0d, 2, "Any text", 0.99d, countryFor( "France", 0.872 ), BigDecimal.ONE, (short) 13, (byte) 23 );
+		Location loc5 = new Location( 5, 5L, 20d, 20d, 3, "Random text", 0.1d, countryFor( "India", 0.612 ), BigDecimal.ONE, (short) 14, (byte) 24 );
 
 		fullTextSession.save( loc1 );
 		fullTextSession.save( loc2 );
 		fullTextSession.save( loc3 );
 		fullTextSession.save( loc4 );
 		fullTextSession.save( loc5 );
+
+		Coordinate coordinate1 = new Coordinate( (short) 1, -20D, 20D );
+		Coordinate coordinate2 = new Coordinate( (short) 2, -30D, 30D );
+		fullTextSession.save( coordinate1 );
+		fullTextSession.save( coordinate2 );
+
+		PointOfInterest poi1 = new PointOfInterest( (byte) 1, -20D, 20D );
+		PointOfInterest poi2 = new PointOfInterest( (byte) 2, -30D, 30D );
+		fullTextSession.save( poi1 );
+		fullTextSession.save( poi2 );
+
+		Position position1 = new Position( (byte) 1, -20D, 20D );
+		Position position2 = new Position( (byte) 2, -30D, 30D );
+		fullTextSession.save( position1 );
+		fullTextSession.save( position2 );
 
 		tx.commit();
 		fullTextSession.clear();
@@ -198,12 +271,29 @@ public class NumericFieldTest extends SearchTestBase {
 		return new Country( name, idh );
 	}
 
+	@SuppressWarnings("unchecked")
 	private void cleanData() {
 		Transaction tx = fullTextSession.beginTransaction();
 		List<Location> locations = fullTextSession.createCriteria( Location.class ).list();
 		for ( Location location : locations ) {
 			fullTextSession.delete( location );
 		}
+
+		List<Coordinate> coordinates = fullTextSession.createCriteria( Coordinate.class ).list();
+		for ( Coordinate coordinate : coordinates ) {
+			fullTextSession.delete( coordinate );
+		}
+
+		List<PointOfInterest> pois = fullTextSession.createCriteria( PointOfInterest.class ).list();
+		for ( PointOfInterest poi : pois ) {
+			fullTextSession.delete( poi );
+		}
+
+		List<Position> positions = fullTextSession.createCriteria( Position.class ).list();
+		for ( Position position : positions ) {
+			fullTextSession.delete( position );
+		}
+
 		tx.commit();
 		fullTextSession.close();
 	}

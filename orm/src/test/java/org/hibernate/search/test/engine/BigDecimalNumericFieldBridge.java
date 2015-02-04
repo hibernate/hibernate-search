@@ -21,7 +21,7 @@ public class BigDecimalNumericFieldBridge implements FieldBridge, TwoWayFieldBri
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
 			BigDecimal decimalValue = (BigDecimal) value;
-			Long indexedValue = Long.valueOf( decimalValue.multiply( storeFactor ).longValue() );
+			Long indexedValue = decimalValue.multiply( storeFactor ).longValue();
 			luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
 		}
 	}

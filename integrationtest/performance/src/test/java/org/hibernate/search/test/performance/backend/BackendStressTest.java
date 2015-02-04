@@ -9,7 +9,7 @@ package org.hibernate.search.test.performance.backend;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.Worker;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.backend.lucene.Condition;
 import org.hibernate.search.test.backend.lucene.Quote;
 import org.hibernate.search.test.backend.lucene.StopTimer;
@@ -162,7 +162,7 @@ public class BackendStressTest {
 
 	@Test
 	public void testRun() throws Exception {
-		SearchFactoryImplementor searchFactoryImplementor = sfHolderSync.getSearchFactory();
+		SearchIntegrator searchIntegrator = sfHolderSync.getSearchFactory();
 
 		ThreadPoolExecutor executor = Executors.newFixedThreadPool( numberOfThreads, "BackendStressTest" );
 
@@ -171,12 +171,12 @@ public class BackendStressTest {
 		StopTimer timer = new StopTimer();
 
 		for ( int i = 0; i < numberOfThreads; i++ ) {
-			futures.add( executor.submit( new Task( searchFactoryImplementor ) ) );
+			futures.add( executor.submit( new Task( searchIntegrator ) ) );
 		}
 
 		waitForAll( futures );
 
-		assertConditionMet( new MinimumSizeCondition( searchFactoryImplementor ) );
+		assertConditionMet( new MinimumSizeCondition( searchIntegrator ) );
 
 		timer.stop();
 
@@ -194,15 +194,15 @@ public class BackendStressTest {
 	 */
 	class MinimumSizeCondition implements Condition {
 		final int expectedSize;
-		private final SearchFactoryImplementor searchFactoryImplementor;
+		private final SearchIntegrator integrator;
 
-		MinimumSizeCondition(SearchFactoryImplementor searchFactoryImplementor) {
-			this.searchFactoryImplementor = searchFactoryImplementor;
+		MinimumSizeCondition(SearchIntegrator integrator) {
+			this.integrator = integrator;
 			expectedSize = workLog.calculateIndexSize();
 		}
 		@Override
 		public boolean evaluate() {
-			int size = searchFactoryImplementor
+			int size = integrator
 					.createHSQuery()
 					.luceneQuery( new MatchAllDocsQuery() )
 					.targetedEntities( Arrays.<Class<?>>asList( Quote.class ) )
@@ -214,16 +214,16 @@ public class BackendStressTest {
 	}
 
 	class Task implements Runnable {
-		private final SearchFactoryImplementor searchFactory;
+		private final SearchIntegrator integrator;
 
-		public Task(SearchFactoryImplementor searchFactory) {
-			this.searchFactory = searchFactory;
+		public Task(SearchIntegrator integrator) {
+			this.integrator = integrator;
 		}
 
 		@Override
 		public void run() {
 			for ( int i = 1; i <= docsPerThread; i++ ) {
-				final Worker worker = searchFactory.getWorker();
+				final Worker worker = integrator.getWorker();
 				Work work = workLog.generateNewWork();
 				TransactionContextForTest tc = new TransactionContextForTest();
 				worker.performWork( work, tc );

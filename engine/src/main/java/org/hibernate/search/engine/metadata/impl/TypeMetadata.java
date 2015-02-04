@@ -24,9 +24,9 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.engine.BoostStrategy;
+import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.util.impl.PassThroughAnalyzer;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
 import org.hibernate.search.util.logging.impl.Log;
@@ -453,6 +453,18 @@ public class TypeMetadata {
 		}
 
 		public Builder addProperty(PropertyMetadata propertyMetadata) {
+			if ( idPropertyMetadata != null && idPropertyMetadata.getPropertyAccessorName() != null ) {
+				// the id property is always a single field
+				String idFieldName = idPropertyMetadata.getFieldMetadata().get( 0 ).getName();
+				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+					if ( idFieldName.equals( fieldMetadata.getName() ) ) {
+						throw log.fieldTriesToOverrideIdFieldSettings(
+								propertyMetadata.getPropertyAccessor().getDeclaringClass().getName(),
+								propertyMetadata.getPropertyAccessor().getName()
+						);
+					}
+				}
+			}
 			this.propertyMetadataList.add( propertyMetadata );
 			return this;
 		}

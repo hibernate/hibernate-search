@@ -41,6 +41,10 @@ public class RegistrationController {
 		return em.createQuery( "DELETE FROM RegisteredMember" ).executeUpdate();
 	}
 
+	public RegisteredMember findById(Long id) {
+		return em.find( RegisteredMember.class, id );
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<RegisteredMember> search(String name) {
 		FullTextEntityManager fullTextEm = Search.getFullTextEntityManager( em );

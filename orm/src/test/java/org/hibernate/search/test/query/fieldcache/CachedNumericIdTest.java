@@ -13,15 +13,13 @@ import java.util.List;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.cfg.Configuration;
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.engine.Country;
@@ -75,7 +73,7 @@ public class CachedNumericIdTest extends SearchTestBase {
 		Country italy = new Country( "Italy", 39d );
 		for ( int i = 0; i < NUM_LOCATIONS; i++ ) {
 			session.persist( new Location( i, Long.valueOf( i ), 7 * i, Double.valueOf( 9 * i ), Integer
-					.valueOf( 100 - i ), String.valueOf( i ) + "42", null, italy, BigDecimal.ONE ) );
+					.valueOf( 100 - i ), String.valueOf( i ) + "42", null, italy, BigDecimal.ONE, (short) 5, (byte) 10 ) );
 		}
 		transaction.commit();
 		session.close();

@@ -20,6 +20,10 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexableField;
 
+import org.hibernate.search.bridge.builtin.NumericEncodingCalendarBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.StringEncodingDateBridge;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -39,15 +43,14 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
-import org.hibernate.search.impl.ConfigContext;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
 import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
@@ -84,7 +87,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	/**
-	 * Flag indicating whether {@link org.apache.lucene.search.Searcher#visitDocument(int, org.apache.lucene.document.FieldSelector)}
+	 * Flag indicating whether {@link org.apache.lucene.search.IndexSearcher#doc(int, org.apache.lucene.index.StoredFieldVisitor)}
 	 * can be used in order to retrieve documents. This is only safe to do if we know that
 	 * all involved bridges are implementing <code>TwoWayStringBridge</code>. See HSEARCH-213.
 	 */
@@ -737,23 +740,19 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	/**
-	 * Checks whether all involved bridges are two way string bridges. If so we can optimize document retrieval
-	 * by using <code>FieldSelector</code>. See HSEARCH-213.
+	 * Checks whether all involved bridges allow to optimize document retrieval by using
+	 * {@code FieldSelector} (see HSEARCH-213).
 	 */
 	private void checkAllowFieldSelection() {
 		allowFieldSelectionInProjection = true;
-		if ( !( getIdBridge() instanceof TwoWayStringBridge
-				|| getIdBridge() instanceof TwoWayString2FieldBridgeAdaptor
-				|| getIdBridge() instanceof NumericFieldBridge ) ) {
+		if ( fieldBridgeProhibitsFieldSelectionInProjection( getIdBridge() ) ) {
 			allowFieldSelectionInProjection = false;
 			return;
 		}
 		for ( PropertyMetadata propertyMetadata : getMetadata().getAllPropertyMetadata() ) {
 			for ( DocumentFieldMetadata documentFieldMetadata : propertyMetadata.getFieldMetadata() ) {
 				FieldBridge bridge = documentFieldMetadata.getFieldBridge();
-				if ( !( bridge instanceof TwoWayStringBridge
-						|| bridge instanceof TwoWayString2FieldBridgeAdaptor
-						|| bridge instanceof NumericFieldBridge ) ) {
+				if ( fieldBridgeProhibitsFieldSelectionInProjection( bridge ) ) {
 					allowFieldSelectionInProjection = false;
 					return;
 				}
@@ -761,13 +760,20 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 		for ( DocumentFieldMetadata fieldMetadata : getMetadata().getClassBridgeMetadata() ) {
 			FieldBridge bridge = fieldMetadata.getFieldBridge();
-			if ( !( bridge instanceof TwoWayStringBridge
-					|| bridge instanceof TwoWayString2FieldBridgeAdaptor
-					|| bridge instanceof NumericFieldBridge ) ) {
+			if ( fieldBridgeProhibitsFieldSelectionInProjection( bridge ) ) {
 				allowFieldSelectionInProjection = false;
 				return;
 			}
 		}
+	}
+
+	private boolean fieldBridgeProhibitsFieldSelectionInProjection(FieldBridge bridge) {
+		return !( bridge instanceof TwoWayStringBridge
+				|| bridge instanceof TwoWayString2FieldBridgeAdaptor
+				|| bridge instanceof NumericFieldBridge
+				|| bridge instanceof NumericEncodingCalendarBridge
+				|| bridge instanceof NumericEncodingDateBridge
+				|| bridge instanceof StringEncodingDateBridge );
 	}
 
 	/**

@@ -9,13 +9,12 @@ package org.hibernate.search.test.configuration;
 import java.lang.annotation.ElementType;
 
 import org.junit.Assert;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.ExplicitOnlyOptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
@@ -75,15 +74,11 @@ public class OptimizerStrategyLoadTest {
 			;
 		cfg.setProgrammaticMapping( mapping );
 		cfg.addClass( Document.class );
-		SearchFactoryImplementor sf = new SearchFactoryBuilder().configuration( cfg ).buildSearchFactory();
-		try {
+		try ( SearchIntegrator sf = new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator() ) {
 			EntityIndexBinding indexBindingForEntity = sf.getIndexBinding( Document.class );
 			DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBindingForEntity.getIndexManagers()[0];
 			OptimizerStrategy optimizerStrategy = indexManager.getOptimizerStrategy();
 			Assert.assertTrue( type.isAssignableFrom( optimizerStrategy.getClass() ) );
-		}
-		finally {
-			sf.close();
 		}
 	}
 

@@ -17,9 +17,9 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.infinispan.ClusterSharedConnectionProvider;
-import org.hibernate.search.infinispan.impl.InfinispanDirectoryProvider;
+import org.hibernate.search.infinispan.spi.InfinispanDirectoryProvider;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.util.FullTextSessionBuilder;
@@ -109,8 +109,8 @@ public class SharedIndexTest {
 	 * @return
 	 */
 	protected int clusterSize(FullTextSessionBuilder node, Class<?> entityType) {
-		SearchIntegrator searchFactory = node.getSearchFactory().unwrap( SearchIntegrator.class );
-		EntityIndexBinding indexBinding = searchFactory.getIndexBinding( Toaster.class );
+		SearchIntegrator integrator = node.getSearchFactory().unwrap( SearchIntegrator.class );
+		EntityIndexBinding indexBinding = integrator.getIndexBinding( Toaster.class );
 		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) indexBinding.getIndexManagers()[0];
 		InfinispanDirectoryProvider directoryProvider = (InfinispanDirectoryProvider) indexManager.getDirectoryProvider();
 		EmbeddedCacheManager cacheManager = directoryProvider.getCacheManager();

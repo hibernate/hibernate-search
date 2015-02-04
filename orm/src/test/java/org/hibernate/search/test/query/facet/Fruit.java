@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 
 /**
  * @author Hardy Ferentschik
@@ -30,7 +29,6 @@ public class Fruit {
 	private String name;
 
 	@Field(analyze = Analyze.NO)
-	@NumericField
 	private Double price;
 
 	public Fruit() {

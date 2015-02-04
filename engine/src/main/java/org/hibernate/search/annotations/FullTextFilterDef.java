@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.annotations;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Documented;
 
 /**
  * Defines a FullTextFilter that can be optionally applied to
@@ -23,21 +23,25 @@ import java.lang.annotation.Documented;
 @Target( { ElementType.TYPE } )
 @Documented
 public @interface FullTextFilterDef {
+
 	/**
 	 * @return the filter name. Must be unique across all mappings for a given persistence unit
 	 */
 	String name();
 
 	/**
-	 * Either implements {@link org.apache.lucene.search.Filter}
-	 * or contains a <code>@Factory</code> method returning one.
-	 * The generated <code>Filter</code> must be thread-safe.
+	 * The implementation of this filter definition. May be
+	 * <ul>
+	 * <li>a class implementing {@link org.apache.lucene.search.Filter} or</li>
+	 * <li>a filter factory class, defining a method annotated with {@link Factory} which has no parameters and returns
+	 * a {@code Filter} instance.</li>
+	 * </ul>
+	 * The given class must define a no-args constructor and a JavaBeans setter method for each parameter to be passed
+	 * via {@link org.hibernate.search.filter.FullTextFilter#setParameter(String, Object)}.
+	 * <p>
+	 * The Lucene filter created by this filter definition must be thread-safe.
 	 *
-	 * If the filter accept parameters, an <code>@Key</code> method must be present as well.
-	 *
-	 * @return a class which either implements <code>Filter</code> directly or contains a method annotated with
-	 * <code>@Factory</code>.
-	 *
+	 * @return A class implementing {@code Filter} or a filter factory class
 	 */
 	Class<?> impl();
 

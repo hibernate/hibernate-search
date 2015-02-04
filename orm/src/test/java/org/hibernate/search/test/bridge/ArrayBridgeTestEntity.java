@@ -22,7 +22,6 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
@@ -73,7 +72,7 @@ public class ArrayBridgeTestEntity {
 		this.name = name;
 	}
 
-	@Field(indexNullAs = NULL_TOKEN)
+	@Field(indexNullAs = NULL_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
 	@IndexedEmbedded(indexNullAs = NULL_EMBEDDED)
 	@OrderColumn
@@ -87,8 +86,7 @@ public class ArrayBridgeTestEntity {
 		this.nullIndexed = nullIndexed;
 	}
 
-	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN)
-	@NumericField
+	@Field(store = Store.YES, indexNullAs = NULL_NUMERIC_TOKEN, analyze = Analyze.NO)
 	@ElementCollection
 	@IndexedEmbedded(prefix = "embeddedNum", indexNullAs = NULL_EMBEDDED_NUMERIC)
 	@OrderColumn
@@ -119,7 +117,6 @@ public class ArrayBridgeTestEntity {
 	@Field(store = Store.YES)
 	@ElementCollection
 	@IndexedEmbedded
-	@NumericField
 	@OrderColumn
 	@CollectionTable(name = "NumericNullNotIndexed", joinColumns = @JoinColumn(name = "array_id"))
 	@Column(name = "numericNullNotIndexed")

@@ -1,6 +1,79 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.0.1.Final (9-1-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1769] - SyncWorkProcessor leads to NoSuchElementException on empty WorkList
+
+** New Feature
+    * [HSEARCH-1770] - Make it possible for an integrator to the Engine module to enforce using single-term delete operations
+
+** Task
+    * [HSEARCH-1771] - Upgrade to Apache Lucene 4.10.3
+    * [HSEARCH-1772] - Upgrade to Hibernate ORM 4.3.8.Final
+
+
+Version 5.0.0.Final (16-12-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1759] - Ambiguous mapping on Id field should be disallowed
+    * [HSEARCH-1760] - Projection on the "Id" keyword should not be repeated again as a normal field when an "id" field exists as well
+
+** Improvement
+    * [HSEARCH-1757] - Allow usage of Factory annotation to create FieldBridge instances
+
+** Task
+    * [HSEARCH-1682] - Document the need to optionally download the JBoss Modules from Infinispan
+    * [HSEARCH-1755] - Constructor of DefaultStringBridge needs to be public in order to be used via @FieldBridge
+    * [HSEARCH-1756] - Make sure documentation gets included in dist bundles
+    * [HSEARCH-1758] - Fallback strategy for RangeQuery builder should not necessarily pick a keyword based range query
+
+
+Version 5.0.0.CR2 (11-12-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-1744] - NumericFieldBridge#objectToString does not check for null
+    * [HSEARCH-1751] - Extend NumericFieldSettingsDescriptor to expose the numeric encoding type
+    * [HSEARCH-1752] - StringEncodingDateBridge does not comply with the TwoWayFieldBridge contract
+
+** Improvement
+    * [HSEARCH-642] - Support for only manual indexing of particular entity types
+    * [HSEARCH-1747] - Reduce verbosity of logging message for start/stop of backend threads
+    * [HSEARCH-1749] - Separate the Avro Serialization module into its own isolated JBoss Module
+    * [HSEARCH-1750] - Rename SearchMappingBuilder to SearchMappingHelper
+
+** Task
+    * [HSEARCH-1743] - Rename SearchFactoryImplementor to ExtendedSearchIntegrator
+    * [HSEARCH-1746] - Update Infinispan to 7.0.2.Final and JGroups to 3.6.1.Final
+    * [HSEARCH-1754] - Speedup execution of InfinispanNativeLockFactoryTest: no need for a cluster
+
+
+Version 5.0.0.CR1 (8-12-2014)
+------------------------
+
+** Bug
+    * [HSEARCH-968] - Index dates as numeric fields
+    * [HSEARCH-1734] - The locking_strategy property is ignored when using the Infinispan Directory
+    * [HSEARCH-1735] - Background threads should not be started when not required
+    * [HSEARCH-1737] - Locking strategy "native" ignoring "index base" on Infinispan Directory
+
+** Improvement
+    * [HSEARCH-763] - Index numeric properties by using @NumericField by default
+    * [HSEARCH-1738] - Can prevent some I/O by aggressively exiting the FieldSelector visitor
+    * [HSEARCH-1741] - Various documentation improvements
+
+** Task
+    * [HSEARCH-1673] - Define and verify a clearly limited SPI for Infinispan Query
+    * [HSEARCH-1730] - Move all .impl classes in hibernate-search-engine into engine.impl
+    * [HSEARCH-1733] - Upgrade to WildFly 8.2.0.Final
+    * [HSEARCH-1739] - Rename SearchFactoryBuilder to SearchIntegrationBuilder
+    * [HSEARCH-1740] - Move SearchFactoryImplementor out of the SPI package
+
+
 Version 5.0.0.Beta3 (20-11-2014)
 ------------------------
 

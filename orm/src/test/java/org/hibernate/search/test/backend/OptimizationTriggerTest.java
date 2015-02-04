@@ -7,17 +7,15 @@
 package org.hibernate.search.test.backend;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.store.optimization.impl.IncrementalOptimizerStrategy;
 import org.hibernate.search.test.SearchTestBase;
@@ -95,8 +93,8 @@ public class OptimizationTriggerTest extends SearchTestBase {
 	}
 
 	private DirectoryBasedIndexManager getSingleIndexManager(Class<?> clazz) {
-		SearchFactoryImplementor searchFactory = getSearchFactory().unwrap( SearchFactoryImplementor.class );
-		EntityIndexBinding indexBindingForEntity = searchFactory.getIndexBinding( clazz );
+		SearchIntegrator searchIntegrator = getSearchFactory().unwrap( SearchIntegrator.class );
+		EntityIndexBinding indexBindingForEntity = searchIntegrator.getIndexBinding( clazz );
 		IndexManager[] indexManagers = indexBindingForEntity.getIndexManagers();
 		assertEquals( 1, indexManagers.length );
 		return (DirectoryBasedIndexManager) indexManagers[0];

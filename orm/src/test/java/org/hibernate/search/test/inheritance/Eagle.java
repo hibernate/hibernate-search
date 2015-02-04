@@ -19,15 +19,15 @@ import org.hibernate.search.annotations.Store;
 @Entity
 @Indexed
 public class Eagle extends Bird {
-	private WingType wingYype;
+	private WingType wingType;
 
 	@Field(analyze = Analyze.NO, store = Store.YES)
-	public WingType getWingYype() {
-		return wingYype;
+	public WingType getWingType() {
+		return wingType;
 	}
 
-	public void setWingYype(WingType wingYype) {
-		this.wingYype = wingYype;
+	public void setWingType(WingType wingType) {
+		this.wingType = wingType;
 	}
 
 	public enum WingType {

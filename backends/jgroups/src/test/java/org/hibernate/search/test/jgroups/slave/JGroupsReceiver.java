@@ -14,8 +14,8 @@ import org.jgroups.ReceiverAdapter;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.jgroups.impl.MessageSerializationHelper;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * @author Lukasz Moren
@@ -24,10 +24,10 @@ public class JGroupsReceiver extends ReceiverAdapter {
 
 	public static volatile int queues;
 	public static volatile int works;
-	private SearchFactoryImplementor searchFactory;
+	private final SearchIntegrator integrator;
 
-	public JGroupsReceiver(SearchFactoryImplementor searchFactory) {
-		this.searchFactory = searchFactory;
+	public JGroupsReceiver(SearchIntegrator integrator) {
+		this.integrator = integrator;
 	}
 
 	public static void reset() {
@@ -43,7 +43,7 @@ public class JGroupsReceiver extends ReceiverAdapter {
 			final int bufferLength = message.getLength();
 			String indexName = MessageSerializationHelper.extractIndexName( messageOffset, rawBuffer );
 			byte[] serializedQueue = MessageSerializationHelper.extractSerializedQueue( messageOffset, bufferLength, rawBuffer );
-			IndexManager indexManager = searchFactory.getIndexManagerHolder().getIndexManager( indexName );
+			IndexManager indexManager = integrator.getIndexManager( indexName );
 			List<LuceneWork> queue = indexManager.getSerializer().toLuceneWorks( serializedQueue );
 			queues++;
 			works += queue.size();

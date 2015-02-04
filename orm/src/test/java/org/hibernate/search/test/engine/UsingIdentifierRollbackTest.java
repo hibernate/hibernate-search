@@ -12,7 +12,7 @@ import org.hibernate.Session;
 
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.embedded.depth.PersonWithBrokenSocialSecurityNumber;
@@ -33,8 +33,8 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 
 	@Test
 	public void testEntityDeletionWithoutIdentifier() {
-		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
-		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		MockErrorHandler errorHandler = (MockErrorHandler) integrator.getErrorHandler();
 
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();
@@ -54,8 +54,8 @@ public class UsingIdentifierRollbackTest extends SearchTestBase {
 
 	@Test
 	public void testRolledBackIdentifiersOnUnusualDocumentId() {
-		SearchFactoryImplementor searchFactoryImpl = getSearchFactoryImpl();
-		MockErrorHandler errorHandler = (MockErrorHandler) searchFactoryImpl.getErrorHandler();
+		SearchIntegrator integrator = getExtendedSearchIntegrator();
+		MockErrorHandler errorHandler = (MockErrorHandler) integrator.getErrorHandler();
 
 		Session s = getSessionFactory().openSession();
 		s.getTransaction().begin();

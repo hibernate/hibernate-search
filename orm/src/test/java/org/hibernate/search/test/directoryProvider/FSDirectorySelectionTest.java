@@ -11,16 +11,14 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MMapDirectory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.SimpleFSDirectory;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
@@ -69,8 +67,8 @@ public class FSDirectorySelectionTest extends SearchTestBase {
 		Session session = factory.openSession();
 
 		FullTextSession fullTextSession = Search.getFullTextSession( session );
-		SearchIntegrator searchIntegrator = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
-		EntityIndexBinding snowIndexBinder = searchIntegrator.getIndexBinding( SnowStorm.class );
+		SearchIntegrator integrator = fullTextSession.getSearchFactory().unwrap( SearchIntegrator.class );
+		EntityIndexBinding snowIndexBinder = integrator.getIndexBinding( SnowStorm.class );
 		IndexManager[] indexManagers = snowIndexBinder.getIndexManagers();
 		assertTrue( "Wrong number of directory providers", indexManagers.length == 1 );
 

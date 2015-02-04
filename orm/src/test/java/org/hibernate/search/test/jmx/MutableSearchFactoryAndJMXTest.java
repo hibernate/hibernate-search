@@ -9,7 +9,7 @@ package org.hibernate.search.test.jmx;
 import java.io.File;
 
 import org.hibernate.search.cfg.Environment;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.test.util.HibernateManualConfiguration;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -34,10 +34,10 @@ public class MutableSearchFactoryAndJMXTest {
 				.addProperty( "hibernate.jndi.org.osjava.sj.jndi.shared", "true" )
 				.addProperty( Environment.JMX_ENABLED, "true" );
 
-		new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 
 		// if there are problems with the JMX registration there will be an exception when the new factory is build
-		new SearchFactoryBuilder().configuration( configuration ).buildSearchFactory();
+		new SearchIntegratorBuilder().configuration( configuration ).buildSearchIntegrator();
 	}
 }
 

@@ -201,37 +201,6 @@ ensures that the query uses the same term transformation than the indexing (lowe
 stemming and so on). If the analyzing process generates several terms for a given word, a boolean
 query is used with the `SHOULD` logic (roughly an `OR` logic).
 
-Let's see how you can search a property that is not of type string.
-
-====
-[source, JAVA]
-----
-@Entity
-@Indexed
-public class Myth {
-  @Field(analyze = Analyze.NO)
-  @DateBridge(resolution = Resolution.YEAR)
-  public Date getCreationDate() { return creationDate; }
-  public Date setCreationDate(Date creationDate) { this.creationDate = creationDate; }
-  private Date creationDate;
-
-  // ...
-}
-
-Date birthdate = ...;
-Query luceneQuery = mythQb.keyword().onField("creationDate").matching(birthdate).createQuery();
-----
-====
-
-[NOTE]
-====
-In plain Lucene, you would have had to convert the Date object to its string representation (in this
-case the year).
-====
-
-This conversion works for any object, not just Date, provided that the FieldBridge has an
-objectToString method (and all built-in `FieldBridge` implementations do).
-
 We make the example a little more advanced now and have a look at how to search a field that uses
 ngram analyzers. ngram analyzers index succession of ngrams of your words which helps to recover
 from user typos. For example the 3-grams of the word hibernate are hib, ibe, ber, rna, nat, ate.
@@ -255,18 +224,15 @@ from user typos. For example the 3-grams of the word hibernate are hib, ibe, ber
 @Indexed
 public class Myth {
   @Field(analyzer=@Analyzer(definition="ngram")
-  @DateBridge(resolution = Resolution.YEAR)
   public String getName() { return name; }
-  public String setName(Date name) { this.name = name; }
+  public String setName(String name) { this.name = name; }
   private String name;
 
   ...
 }
 
-Date birthdate = ...;
 Query luceneQuery = mythQb.keyword().onField("name").matching("Sisiphus")
    .createQuery();
-
 ----
 ====
 
@@ -274,13 +240,11 @@ The matching word "Sisiphus" will be lower-cased and then split into 3-grams: si
 hus. Each of these n-gram will be part of the query. We will then be able to find the Sysiphus myth
 (with a `y`). All that is transparently done for you.
 
-
 [NOTE]
 ====
 If for some reason you do not want a specific field to use the field bridge or the analyzer you can
 call the `ignoreAnalyzer()` or `ignoreFieldBridge()` functions.
 ====
-
 
 To search for multiple possible words in the same field, simply add them all in the matching clause.
 
@@ -1319,7 +1283,6 @@ whose score is 5. In this example the specified filter implements the
 If your Filter creation requires additional steps or if the filter you want to use does not have a
 no-arg constructor, you can use the factory pattern:
 
-
 .Creating a filter using the factory pattern
 ====
 [source, JAVA]
@@ -1356,7 +1319,7 @@ fullTextQuery.enableFullTextFilter("security").setParameter("level", 5);
 ----
 ====
 
-Each parameter name should have an associated setter on either the filter or filter factory of the
+Each parameter must have an associated setter on either the filter or filter factory of the
 targeted named filter definition.
 
 .Using parameters in the actual filter implementation
@@ -1373,38 +1336,17 @@ public class SecurityFilterFactory {
         this.level = level;
     }
 
-    @Key
-    public FilterKey getKey() {
-        StandardFilterKey key = new StandardFilterKey();
-        key.addParameter( level );
-        return key;
-    }
-
     @Factory
     public Filter getFilter() {
-        Query query = new TermQuery( new Term("level", level.toString() ) );
+        Query query = new TermQuery( new Term( "level", level.toString() ) );
         return new CachingWrapperFilter( new QueryWrapperFilter(query) );
     }
 }
 ----
 ====
 
-Note the method annotated `@Key` returning a `FilterKey` object. The returned object has a special
-contract: the key object must implement equals() / hashCode() so that 2 keys are equal if and only
-if the given Filter types are the same and the set of parameters are the same. In other words, 2
-filter keys are equal if and only if the filters from which the keys are generated can be
-interchanged. The key object is used as a key in the cache mechanism.
-
-`@Key` methods are needed only if:
-
-
-* you enabled the filter caching system (enabled by default)
-* your filter has parameters
-
-In most cases, using the `StandardFilterKey` implementation will be good enough. It delegates the
-`equals()` / `hashCode()` implementation to each of the parameters equals and hashCode methods.
-
-As mentioned before the defined filters are per default cached and the cache uses a combination of
+Filters will be cached once created, based on all their parameter names and values.
+Caching happens using a combination of
 hard and soft references to allow disposal of memory when needed. The hard reference cache keeps
 track of the most recently used filters and transforms the ones least used to SoftReferences when
 needed. Once the limit of the hard reference cache is reached additional filters are cached as
@@ -1564,7 +1506,7 @@ a sharded environment.
 [[query-faceting]]
 === Faceting
 
-link:$$http://en.wikipedia.org/wiki/Faceted_search$$[Faceted search] is a technique which allows to
+link:http://en.wikipedia.org/wiki/Faceted_search[Faceted search] is a technique which allows to
 divide the results of a query into multiple categories. This categorization includes the calculation
 of hit counts for each category and the ability to further restrict search results based on these
 facets (categories). <<example-amazon-facets>> shows a faceting example. The search for 'Hibernate
@@ -1584,7 +1526,7 @@ In Hibernate Search the classes `QueryBuilder` and `FullTextQuery` are the entry
 API. The former allows to create faceting requests whereas the latter gives access to the so called
 `FacetManager`. With the help of the `FacetManager` faceting requests can be applied on a query and
 selected facets can be added to an existing query in order to refine search results. The following
-sections will describe the faceting process in more detail. The examples will use the entity Cd as
+sections will describe the faceting process in more detail. The examples will use the entity `Cd` as
 shown in <<example-faceting-entity>>:
 
 [[example-faceting-entity]]
@@ -1625,14 +1567,14 @@ public class Cd {
 [[section-creating-faceting-request]]
 ==== Creating a faceting request
 
-The first step towards a faceted search is to create the FacetingRequest. Currently two types of
+The first step towards a faceted search is to create the `FacetingRequest`. Currently two types of
 faceting requests are supported. The first type is called _discrete faceting_ and the second type
 _range faceting_ request.
 
 [[discrete-faceting-request]]
 ===== Discrete faceting request
 
-In the case of a discrete faceting request you start with giving the request a unique name. This
+In the case of a discrete faceting request, you start with giving the request a unique name. This
 name will later be used to retrieve the facet values (see <<section-interpreting-facet-result>>).
 Then you need to specify on which index field you want to categorize on and which faceting options
 to apply. An example for a discrete faceting request can be seen in <<example-discrete-faceting>>:
@@ -1658,7 +1600,7 @@ FacetingRequest labelFacetingRequest = builder.facet()
 ====
 
 When executing this faceting request a `Facet` instance will be created for each discrete value for
-the indexed field label. The `Facet` instance will record the actual field value including how often
+the indexed field `label`. The `Facet` instance will record the actual field value including how often
 this particular field value occurs within the original query results. Parameters `orderedBy`,
 `includeZeroCounts` and `maxFacetCount` are optional and can be applied on any faceting request.
 Parameter `orderedBy` allows to specify in which order the created facets will be returned. The
@@ -1666,31 +1608,36 @@ default is `FacetSortOrder.COUNT_DESC`, but you can also sort on the field value
 `includeZeroCount` determines whether facets with a count of 0 will be included in the result (by
 default they are) and `maxFacetCount` allows to limit the maximum amount of facets returned.
 
-
 [NOTE]
 ====
-There are several preconditions an indexed field has to meet in order to categorize (facet) on it.
-The indexed property must be of type String, Date or a subtype of Number; also null values should be
-avoided. Finally the property has to be indexed with Analyze.NO and you can not use it in
-combination with @NumericField. When you need these other options we suggest to index the property
-twice and use the appropriate field depending on the use case:
-====
+There are several preconditions an indexed field has to meet in order to categorize (facet) on it:
+
+* The indexed property must be of type `String`, `Date` or of the numeric type int, long, double or
+float (or their respective Java wrapper types).
+
+* For numeric and date values you need to make sure that the values are string encoded by explicitly
+specifying a non numeric field bridge via `@Field.bridge` or `@FieldBridge`. The package `org.
+hibernate.search.bridge.builtin` contains a set of bridges which encode numbers as strings, for
+example `org.hibernate.search.bridge.builtin.IntegerBridge`.
+
+* The property has to be indexed with Analyze.NO.
+
+* _null_ values should be avoided.
+
+When you need conflicting options, we suggest to index the property twice and use the appropriate
+ field depending on the use case:
+
 [source, JAVA]
 ----
-// ...
 @Fields({
-  @Field( name="price" ),
-  @Field( name="price_facet", analyze=Analyze.NO )
-})
-@NumericFields({
-  @NumericField( forField="price" )
+  @Field(name="price"),
+  @Field(name="price_facet",
+         analyze=Analyze.NO,
+         bridge=@FieldBridge(impl = IntegerBridge.class))
 })
 private int price;
-// ...
 ----
 ====
-====
-
 
 [[range-faceting-request]]
 ===== Creating a range faceting request
@@ -1726,15 +1673,16 @@ FacetingRequest priceFacetingRequest = builder.facet()
 ==== Setting the facet sort order
 
 The result of applying a faceting request is a list of Facet instances as seen in
-<<example-applying-faceting>>. The order within the list is given by the `FacetSortOrder` parameter specified
-via orderedBy when creating the faceting request. The default value is `FacetSortOrder.COUNT_DESC`,
-meaning facets are ordered by their count in descending order (highest count first). Other values
-are `COUNT_ASC`, `FIELD_VALUE` and `RANGE_DEFINITION_ORDER`. `COUNT_ASC` returns the facets in ascending
-count order whereas `FIELD_VALUE` will return them in alphabetical order of the facet/category value
-(see <<section-interpreting-facet-result>>). `RANGE_DEFINITION_ORDER` only applies for range faceting
-request and returns the facets in the same order in which the ranges are defined. For
-<<example-range-faceting>> this would mean the facet for the range of below 1000 would be returned first,
-followed by the facet for the range 1001 to 1500 and finally the facet for above 1500.
+<<example-applying-faceting>>. The order within the list is given by the `FacetSortOrder` parameter
+specified via `orderedBy` when creating the faceting request. The default value is
+`FacetSortOrder.COUNT_DESC`, meaning facets are ordered by their count in descending order (highest
+count first). Other values are `COUNT_ASC`, `FIELD_VALUE` and `RANGE_DEFINITION_ORDER`. `COUNT_ASC`
+returns the facets in ascending count order whereas `FIELD_VALUE` will return them in alphabetical
+order of the facet/category value (see <<section-interpreting-facet-result>>).
+`RANGE_DEFINITION_ORDER` only applies for range faceting request and returns the facets in the same
+order in which the ranges are defined. For <<example-range-faceting>> this would mean the facet for
+the range of below 1000 would be returned first, followed by the facet for the range 1001 to 1500
+and finally the facet for above 1500.
 
 [[section-applying-faceting-request]]
 ==== Applying a faceting request

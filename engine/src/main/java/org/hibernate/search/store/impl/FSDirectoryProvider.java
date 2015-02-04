@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.lucene.store.FSDirectory;
-
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.util.logging.impl.Log;
 

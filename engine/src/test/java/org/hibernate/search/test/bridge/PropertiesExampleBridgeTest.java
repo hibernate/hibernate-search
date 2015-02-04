@@ -10,11 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
@@ -32,7 +31,7 @@ public class PropertiesExampleBridgeTest {
 
 	@Test
 	public void testPropertiesIndexing() {
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 		Assert.assertNotNull( searchFactory.getIndexManagerHolder().getIndexManager( "all" ) );
 
 		{

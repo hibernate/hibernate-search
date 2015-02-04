@@ -8,63 +8,95 @@
 package org.hibernate.search.bridge.impl;
 
 import java.lang.reflect.AnnotatedElement;
+import java.util.Date;
 
+import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.builtin.DateBridge;
-import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
+import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
+import org.hibernate.search.bridge.builtin.StringEncodingDateBridge;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
- * Built-in {@link org.hibernate.search.bridge.spi.BridgeProvider} handling date bridging
- * when {@code @DateBridge} is involved.
+ * Built-in {@link org.hibernate.search.bridge.spi.BridgeProvider} handling date bridging when {@code @DateBridge} is involved.
+ *
  * As built-in provider, no Service Loader file is used: the {@code BridgeFactory} does access it
  * after the custom bridge providers found.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard
+ * @author Hardy Ferentschik
  */
 class DateBridgeProvider extends ExtendedBridgeProvider {
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private static final FieldBridge DATE_YEAR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_YEAR );
-	private static final FieldBridge DATE_MONTH = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MONTH );
-	private static final FieldBridge DATE_DAY = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_DAY );
-	private static final FieldBridge DATE_HOUR = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_HOUR );
-	private static final FieldBridge DATE_MINUTE = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_MINUTE );
-	private static final FieldBridge DATE_SECOND = new TwoWayString2FieldBridgeAdaptor( DateBridge.DATE_SECOND );
-	static final FieldBridge DATE_MILLISECOND = new TwoWayString2FieldBridgeAdaptor(DateBridge.DATE_MILLISECOND );
-
 	@Override
 	public FieldBridge provideFieldBridge(ExtendedBridgeProviderContext context) {
 		AnnotatedElement annotatedElement = context.getAnnotatedElement();
-		if ( annotatedElement.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
-			Resolution resolution = annotatedElement.getAnnotation( org.hibernate.search.annotations.DateBridge.class )
-					.resolution();
-			return getDateField( resolution );
+		if ( Date.class.isAssignableFrom( context.getReturnType() ) ) {
+			if ( annotatedElement.isAnnotationPresent( org.hibernate.search.annotations.DateBridge.class ) ) {
+				DateBridge dateBridgeAnnotation = annotatedElement.getAnnotation(
+						org.hibernate.search.annotations.DateBridge.class
+				);
+
+				Resolution resolution = dateBridgeAnnotation.resolution();
+				EncodingType encodingType = dateBridgeAnnotation.encoding();
+				return getDateFieldBridge( resolution, encodingType );
+			}
+			else {
+				return getDateFieldBridge( Resolution.MILLISECOND, EncodingType.NUMERIC );
+			}
 		}
 		return null;
 	}
 
-	private FieldBridge getDateField(Resolution resolution) {
-		switch ( resolution ) {
-			case YEAR:
-				return DATE_YEAR;
-			case MONTH:
-				return DATE_MONTH;
-			case DAY:
-				return DATE_DAY;
-			case HOUR:
-				return DATE_HOUR;
-			case MINUTE:
-				return DATE_MINUTE;
-			case SECOND:
-				return DATE_SECOND;
-			case MILLISECOND:
-				return DATE_MILLISECOND;
-			default:
-				throw LOG.unknownResolution( resolution.toString() );
+	private FieldBridge getDateFieldBridge(Resolution resolution, EncodingType encodingType) {
+		switch ( encodingType ) {
+			case NUMERIC: {
+				switch ( resolution ) {
+					case YEAR:
+						return NumericEncodingDateBridge.DATE_YEAR;
+					case MONTH:
+						return NumericEncodingDateBridge.DATE_MONTH;
+					case DAY:
+						return NumericEncodingDateBridge.DATE_DAY;
+					case HOUR:
+						return NumericEncodingDateBridge.DATE_HOUR;
+					case MINUTE:
+						return NumericEncodingDateBridge.DATE_MINUTE;
+					case SECOND:
+						return NumericEncodingDateBridge.DATE_SECOND;
+					case MILLISECOND:
+						return NumericEncodingDateBridge.DATE_MILLISECOND;
+					default:
+						throw LOG.unknownResolution( resolution.toString() );
+				}
+			}
+			case STRING: {
+				switch ( resolution ) {
+					case YEAR:
+						return StringEncodingDateBridge.DATE_YEAR;
+					case MONTH:
+						return StringEncodingDateBridge.DATE_MONTH;
+					case DAY:
+						return StringEncodingDateBridge.DATE_DAY;
+					case HOUR:
+						return StringEncodingDateBridge.DATE_HOUR;
+					case MINUTE:
+						return StringEncodingDateBridge.DATE_MINUTE;
+					case SECOND:
+						return StringEncodingDateBridge.DATE_SECOND;
+					case MILLISECOND:
+						return StringEncodingDateBridge.DATE_MILLISECOND;
+					default:
+						throw LOG.unknownResolution( resolution.toString() );
+				}
+			}
+			default: {
+				throw LOG.unknownEncodingType( encodingType.name() );
+			}
 		}
 	}
 }

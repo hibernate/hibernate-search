@@ -9,11 +9,10 @@ package org.hibernate.search.test.programmaticmapping;
 import java.lang.annotation.ElementType;
 
 import org.junit.Assert;
-
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.cfg.SearchMapping;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +32,7 @@ public class MutatingSearchFactoryTest {
 
 	@Test
 	public void mutationTest() {
-		SearchFactoryImplementor searchFactory = sfHolder.getSearchFactory();
+		ExtendedSearchIntegrator searchFactory = sfHolder.getSearchFactory();
 
 		Assert.assertNull( searchFactory.getIndexManagerHolder().getIndexManager( "phoneNumbersIndex" ) );
 		searchFactory.addClasses( TelephoneRecord.class );

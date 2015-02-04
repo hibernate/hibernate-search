@@ -14,10 +14,11 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.engine.impl.GroupingManager;
 import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.spi.SearchIntegrator;
 
 /**
  * Defines and executes an Hibernate Search query (wrapping a Lucene query).
@@ -28,7 +29,7 @@ import org.hibernate.search.spatial.Coordinates;
  * The typical usage is as follow
  * <pre>
  * {@code  //get query object
- * HSQuery query = searchFactoryIngegrator.createHSQuery();
+ * HSQuery query = searchIntegrator.createHSQuery();
  * //configure query object
  * query
  * .luceneQuery( luceneQuery )
@@ -222,20 +223,20 @@ public interface HSQuery extends ProjectionConstants {
 	void disableFullTextFilter(String name);
 
 	/**
-	 * <p>getSearchFactoryImplementor.</p>
+	 * <p>getExtendedSearchIntegrator.</p>
 	 *
-	 * @return the {@code SearchFactoryImplementor} instance
+	 * @return the {@code ExtendedSearchintegrator} instance
 	 * @deprecated should be at most SearchIntegrator, preferably removed altogether
 	 */
 	@Deprecated
-	SearchFactoryImplementor getSearchFactoryImplementor();
+	ExtendedSearchIntegrator getExtendedSearchIntegrator();
 
 	/**
 	 * <p>afterDeserialise.</p>
 	 *
-	 * @param searchFactory a {@link org.hibernate.search.engine.spi.SearchFactoryImplementor} object.
+	 * @param integrator a {@link org.hibernate.search.spi.SearchIntegrator} object.
 	 */
-	void afterDeserialise(SearchFactoryImplementor searchFactory);
+	void afterDeserialise(SearchIntegrator integrator);
 
 	/**
 	 * <p>setSpatialParameters.</p>

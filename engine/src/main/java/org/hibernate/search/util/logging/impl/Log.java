@@ -22,10 +22,12 @@ import org.hibernate.search.exception.SearchException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.TRACE;
@@ -53,7 +55,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = ERROR)
 	@Message(id = 16, value = "Incorrect message type: %1$s")
-	void incorrectMessageType(Class<?> messageType);
+	void incorrectMessageType(@FormatWith(ClassFormatter.class) Class<?> messageType);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
@@ -90,11 +92,11 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 25, value = "Service provider has been used but not released: %1$s")
-	void serviceProviderNotReleased(Class<?> class1);
+	void serviceProviderNotReleased(@FormatWith(ClassFormatter.class) Class<?> class1);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 26, value = "Fail to properly stop service: %1$s")
-	void stopServiceFailed(Class<?> class1, @Cause Exception e);
+	void stopServiceFailed(@FormatWith(ClassFormatter.class) Class<?> class1, @Cause Exception e);
 
 	@LogMessage(level = INFO)
 	@Message(id = 27, value = "Going to reindex %d entities")
@@ -175,12 +177,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 45, value = "@ContainedIn is pointing to an entity having @ProvidedId: %1$s. " +
 			"This is not supported, indexing of contained in entities will be skipped. " +
 			"Indexed data of the embedded object might become out of date in objects of type ")
-	void containedInPointsToProvidedId(Class<?> objectClass);
+	void containedInPointsToProvidedId(@FormatWith(ClassFormatter.class) Class<?> objectClass);
 
 	@LogMessage(level = WARN)
 	@Message(id = 46,
 			value = "FieldCache was enabled on class %1$s but for this type of identifier we can't extract values from the FieldCache: cache disabled")
-	void cannotExtractValueForIdentifier(Class<?> beanClass);
+	void cannotExtractValueForIdentifier(@FormatWith(ClassFormatter.class) Class<?> beanClass);
 
 	@LogMessage(level = WARN)
 	@Message(id = 47, value = "Unable to close JMS connection for %1$s")
@@ -246,7 +248,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = ERROR)
 	@Message(id = 68, value = "Unable to retrieve object from message: %1$s")
-	void unableToRetrieveObjectFromMessage(Class<?> messageClass, @Cause Exception e);
+	void unableToRetrieveObjectFromMessage(@FormatWith(ClassFormatter.class) Class<?> messageClass, @Cause Exception e);
 
 	@LogMessage(level = ERROR)
 	@Message(id = 69, value = "Illegal object retrieved from message")
@@ -296,7 +298,7 @@ public interface Log extends BasicLogger {
 	SearchException unableToReadSerializedLuceneWorks(@Cause Throwable e);
 
 	@Message(id = 85, value = "Attribute type is not recognized and not serializable: %1$s")
-	SearchException attributeNotRecognizedNorSerializable(Class<?> attributeType);
+	SearchException attributeNotRecognizedNorSerializable(@FormatWith(ClassFormatter.class) Class<?> attributeType);
 
 	@Message(id = 86, value = "Unknown attribute serialized representation: %1$s")
 	SearchException unknownAttributeSerializedRepresentation(String name);
@@ -314,14 +316,14 @@ public interface Log extends BasicLogger {
 	SearchException conversionFromReaderToStringNotYetImplemented();
 
 	@Message(id = 93, value = "Unknown Field type: %1$s")
-	SearchException unknownFieldType(Class<?> fieldType);
+	SearchException unknownFieldType(@FormatWith(ClassFormatter.class) Class<?> fieldType);
 
 	@Message(id = 94,
 			value = "Cannot serialize custom Fieldable '%1$s'. Must be NumericField, Field or a Serializable Fieldable implementation.")
-	SearchException cannotSerializeCustomField(Class<?> fieldType);
+	SearchException cannotSerializeCustomField(@FormatWith(ClassFormatter.class) Class<?> fieldType);
 
 	@Message(id = 95, value = "Fail to serialize object of type %1$s")
-	SearchException failToSerializeObject(Class<?> type, @Cause Throwable e);
+	SearchException failToSerializeObject(@FormatWith(ClassFormatter.class) Class<?> type, @Cause Throwable e);
 
 	@Message(id = 96, value = "Fail to deserialize object")
 	SearchException failToDeserializeObject(@Cause Throwable e);
@@ -410,15 +412,15 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = TRACE)
 	@Message(id = 125, value = "Interceptor enforces skip index operation %2$s on instance of class %1$s")
-	void forceSkipIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+	void forceSkipIndexOperationViaInterception(@FormatWith(ClassFormatter.class) Class<?> entityClass, WorkType type);
 
 	@LogMessage(level = TRACE)
 	@Message(id = 126, value = "Interceptor enforces removal of index data instead of index operation %2$s on instance of class %1$s")
-	void forceRemoveOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+	void forceRemoveOnIndexOperationViaInterception(@FormatWith(ClassFormatter.class) Class<?> entityClass, WorkType type);
 
 	@LogMessage(level = TRACE)
 	@Message(id = 128, value = "Interceptor enforces update of index data instead of index operation %2$s on instance of class %1$s")
-	void forceUpdateOnIndexOperationViaInterception(Class<?> entityClass, WorkType type);
+	void forceUpdateOnIndexOperationViaInterception(@FormatWith(ClassFormatter.class) Class<?> entityClass, WorkType type);
 
 	@Message(id = 131, value = "The field '%1$s#%2$s' used for the spatial query is not configured as spatial field. Check the proper use of @Spatial respectively SpatialFieldBridge")
 	SearchException targetedFieldNotSpatial(String className, String fieldName);
@@ -461,7 +463,7 @@ public interface Log extends BasicLogger {
 	SearchException unableToGetInputStreamFromBlob(@Cause Throwable e);
 
 	@Message(id = 151, value = "Unable to get input stream from object of type %1$s")
-	SearchException unsupportedTikaBridgeType(Class<?> objectType);
+	SearchException unsupportedTikaBridgeType(@FormatWith(ClassFormatter.class) Class<?> objectType);
 
 	@Message(id = 152, value = "File %1$s does not exist")
 	SearchException fileDoesNotExist(String fileName);
@@ -475,7 +477,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 155, value = "Unable to configure %1$s")
 	SearchException unableToConfigureTikaBridge(String bridgeName, @Cause Throwable e);
 
-	@Message(id = 156, value = "Cannot read %1$s field from a %2$s object : does getter exists and is it public ?")
+	@Message(id = 156, value = "Cannot read %1$s field from a %2$s object: does getter exist and is it public ?")
 	SearchException cannotReadFieldForClass(String fieldName, String className);
 
 	@Message(id = 157, value = "Class %1$s does not implement the Coordinates interface")
@@ -544,10 +546,10 @@ public interface Log extends BasicLogger {
 	String massIndexerUnableToIndexInstance(String clazz, String value);
 
 	@Message(id = 184, value = "Cannot define an entity with 0 shard on '%1$s'")
-	SearchException entityWithNoShard(Class<?> type);
+	SearchException entityWithNoShard(@FormatWith(ClassFormatter.class) Class<?> type);
 
 	@Message(id = 186, value = "[AssertionFailure: open a bug report] SearchFactory from entityIndexBinding is not assignable to WorkerBuilderContext. Actual class is %1$s")
-	SearchException assertionFailureCannotCastToWorkerBuilderContext(Class<?> type);
+	SearchException assertionFailureCannotCastToWorkerBuilderContext(@FormatWith(ClassFormatter.class) Class<?> type);
 
 	@Message(id = 189, value = "Multiple entities are sharing the same index but are declaring an " +
 			"inconsistent Similarity. When overriding default Similarity make sure that all types sharing a same index " +
@@ -589,19 +591,19 @@ public interface Log extends BasicLogger {
 	SearchException incorrectEditDistance();
 
 	@Message(id = 202, value = "Unable to find entity $1%s with id $2%s")
-	SearchException entityWithIdNotFound(Class<?> entityType, String id);
+	SearchException entityWithIdNotFound(@FormatWith(ClassFormatter.class) Class<?> entityType, String id);
 
 	@Message(id = 203, value = "No field from %s can be used for More Like This queries. They are neither stored or including the term vectors.")
-	SearchException noFieldCompatibleForMoreLikeThis(Class<?> entityType);
+	SearchException noFieldCompatibleForMoreLikeThis(@FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 205, value = "An IOException happened while accessing the Lucene indexes related to '%1$s'")
-	SearchException ioExceptionOnIndexOfEntity(@Cause IOException e, Class<?> entityType);
+	SearchException ioExceptionOnIndexOfEntity(@Cause IOException e, @FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 206, value = "MoreLikeThis queries require a TFIDFSimilarity for entity '$1%s'")
-	SearchException requireTFIDFSimilarity(Class<?> beanClass);
+	SearchException requireTFIDFSimilarity(@FormatWith(ClassFormatter.class) Class<?> beanClass);
 
 	@Message(id = 207, value = "Field %s of entity %s cannot be used in a MoreLikeThis query: the term vector (preferred) or the value itself need to be stored.")
-	SearchException fieldNotStoredNorTermVectorCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+	SearchException fieldNotStoredNorTermVectorCannotBeUsedInMoreLikeThis(String fieldName, @FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 208, value = "ClassLoaderService cannot be provided via SearchConfiguration#getProvidedServices. Use SearchConfiguration#getClassLoaderService!")
 	SearchException classLoaderServiceContainedInProvidedServicesException();
@@ -619,10 +621,10 @@ public interface Log extends BasicLogger {
 	String massIndexerExceptionWhileTransformingIds();
 
 	@Message(id = 213, value = "Field %s of entity %s cannot be used in a MoreLikeThis query. Ids and embedded ids are excluded.")
-	SearchException fieldIdCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+	SearchException fieldIdCannotBeUsedInMoreLikeThis(String fieldName, @FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 214, value = "Field %s of entity %s cannot be used in a MoreLikeThis query. Numeric fields are not considered for the moment.")
-	SearchException numericFieldCannotBeUsedInMoreLikeThis(String fieldName, Class<?> entityType);
+	SearchException numericFieldCannotBeUsedInMoreLikeThis(String fieldName, @FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(id = 215, value = "Multiple matching FieldBridges found for %s of return type %s: %s" )
 	SearchException multipleMatchingFieldBridges(XMember member, XClass memberType, String listOfFieldBridges);
@@ -646,7 +648,7 @@ public interface Log extends BasicLogger {
 	SearchException detectInfiniteTypeLoopInIndexedEmbedded(String elementClass, String rootEntity, String path);
 
 	@Message(id = 222, value = "The SearchFactory was not initialized" )
-	SearchException searchFactoryNotInitialized();
+	SearchException searchIntegratorNotInitialized();
 
 	@Message(id = 223, value = "The Service org.hibernate.search.hcore.impl.SearchFactoryReference was not found in the Hibernate ORM Service Registry."
 			+ " This might be caused by the Hibernate ORM classloader not having visibility on Hibernate Search" )
@@ -673,19 +675,75 @@ public interface Log extends BasicLogger {
 	@Message(id = 229, value = "Property " + Environment.INDEX_FLUSH_INTERVAL + "for the index '%s' needs to be positive." )
 	SearchException flushIntervalNeedsToBePositive(String indexName);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 230, value = "Starting sync consumer thread for index '%s'" )
 	void startingSyncConsumerThread(String indexName);
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 231, value = "Stopping sync consumer thread for index '%s'" )
 	void stoppingSyncConsumerThread(String indexName);
 
+	@Message(id = 232, value = "The specified query '%s' contains a numeric sub query which targets the string encoded field(s) '%s'. Check your query or try limiting the targeted entities." )
+	SearchException stringEncodedFieldsAreTargetedWithNumericQuery(String query, String numericFields);
+
+	@Message(id = 233, value = "The specified query '%s' contains a string based sub query which targets the numeric encoded field(s) '%s'. Check your query or try limiting the targeted entities." )
+	SearchException numericEncodedFieldsAreTargetedWithStringQuery(String query, String numericFields);
+
+	@Message(id = 234, value = "None of the specified entity types ('%s') or any of their subclasses are indexed." )
+	IllegalArgumentException targetedEntityTypesNotIndexed(String targetedEntities);
+
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 232, value = "Backend for index '%s' started: using a Synchronous batching backend." )
+	@Message(id = 235, value = "Backend for index '%s' started: using a Synchronous batching backend." )
 	void luceneBackendInitializedSynchronously(String indexName);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = 233, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
+	@Message(id = 236, value = "Backend for index '%s' started: using an Asynchronous backend with periodic commits." )
 	void luceneBackendInitializedAsynchronously(String indexName);
+
+	@Message(id = 237, value = "Cannot create numeric range query for field '%s', since from and to values are null" )
+	SearchException rangeQueryWithNullToAndFromValue(String fieldName);
+
+	@Message(id = 238, value = "Cannot create numeric range query for field '%s', since values are not numeric (Date, int, long, short or double)")
+	SearchException numericRangeQueryWithNonNumericToAndFromValues(String fieldName);
+
+	@Message(id = 239, value = "Unknown field encoding type: %1$s")
+	AssertionFailure unknownEncodingType(String encoding);
+
+	@Message(id = 240, value = "Unable to parse value '%2$s' of field '%1$s' into a Date")
+	SearchException invalidStringDateFieldInDocument(String fieldName, String value);
+
+	@Message(id = 241, value = "Multiple @Factory methods defined in %s")
+	SearchException multipleFactoryMethodsInClass(String className);
+
+	@Message(id = 242, value = "Search requires '%s' to have a public no-arg constructor in order to instantiate it")
+	SearchException noPublicNoArgConstructor(String className);
+
+	@Message(id = 243, value = "Unable to access class '%s'")
+	SearchException unableToAccessClass(String className);
+
+	@Message(id = 244, value = "Factory methods must return an object. '%1$s#%2$s' does not")
+	SearchException factoryMethodsMustReturnAnObject(String className, String methodName);
+
+	@Message(id = 245, value = "Unable to access method '%1$s#%2$s'")
+	SearchException unableToAccessMethod(String className, String methodName);
+
+	@Message(id = 246, value = "An exception occurred while invoking '%1$s#%2$s'")
+	SearchException exceptionDuringFactoryMethodExecution(@Cause Exception e, String className, String methodName);
+
+	@Message(id = 247, value = "An indexed field defined on '%1$s:%2$s' tries to override the id field settings. The document id field settings cannot be modified. Use a different field name.")
+	SearchException fieldTriesToOverrideIdFieldSettings(String className, String propertyName);
+
+	@LogMessage(level = Level.TRACE)
+	@Message(id = 248, value = "WorkList should never be empty. Stacktrace below \n %s" )
+	void workListShouldNeverBeEmpty(String stackTrace);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = 249, value = "Cannot do fast deletes on index '%s'. Entities in this index are conflicting or the index can accept unknown entities." )
+	void singleTermDeleteDisabled(String indexName);
+
+	@Message(id = 250, value = "Unsupported value type for configuration property " + Environment.ERROR_HANDLER + ": %1$s")
+	SearchException unsupportedErrorHandlerConfigurationValueType(@FormatWith(ClassFormatter.class) Class<?> errorHandlerValueType);
+
+	@Message(id = 251, value = "Unable to set filter parameter '%2$s' on filter class %1$s")
+	SearchException unableToSetFilterParameter(Class<?> filterClass, String parameterName, @Cause Exception e);
 }

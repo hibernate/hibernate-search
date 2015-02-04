@@ -21,9 +21,9 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -39,7 +39,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 	protected static final String JNDI_PREFIX = Environment.WORKER_PREFIX + "jndi.";
 	private Queue jmsQueue;
 	private String indexName;
-	private SearchFactoryImplementor searchFactory;
+	private SearchIntegrator integrator;
 	private QueueConnection connection;
 
 	public static final String JMS_CONNECTION_FACTORY = Environment.WORKER_PREFIX + "jms.connection_factory";
@@ -56,7 +56,7 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 		this.indexManager = indexManager;
 		this.jmsQueueName = props.getProperty( JMS_QUEUE );
 		this.indexName = indexManager.getIndexName();
-		this.searchFactory = context.getUninitializedSearchFactory();
+		this.integrator = context.getUninitializedSearchIntegrator();
 		QueueConnectionFactory factory = initializeJMSQueueConnectionFactory( props );
 		this.jmsQueue = initializeJMSQueue( factory, props );
 		this.connection = initializeJMSConnection( factory, props );
@@ -74,8 +74,8 @@ public abstract class JmsBackendQueueProcessor implements BackendQueueProcessor 
 		return indexName;
 	}
 
-	public SearchFactoryImplementor getSearchFactory() {
-		return searchFactory;
+	public SearchIntegrator getSearchIntegrator() {
+		return integrator;
 	}
 
 	@Override

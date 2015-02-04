@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.cfg.spi.IndexManagerFactory;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.spi.IndexManager;
@@ -29,7 +29,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 	private final Similarity similarityInstance;
 	private final ShardIdentifierProvider shardIdentityProvider;
 	private final Properties properties;
-	private final SearchFactoryImplementor searchFactory;
+	private final ExtendedSearchIntegrator extendedIntegrator;
 	private final IndexManagerHolder indexManagerHolder;
 	private final String rootDirectoryProviderName;
 	private DocumentBuilderIndexedEntity documentBuilder;
@@ -41,14 +41,14 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 			Similarity similarityInstance,
 			EntityIndexingInterceptor entityIndexingInterceptor,
 			Properties properties,
-			SearchFactoryImplementor searchFactoryImplementor,
+			ExtendedSearchIntegrator extendedIntegrator,
 			IndexManagerHolder indexManagerHolder,
 			String rootDirectoryProviderName) {
 		this.shardIdentityProvider = shardIdentityProvider;
 		this.similarityInstance = similarityInstance;
 		this.entityIndexingInterceptor = entityIndexingInterceptor;
 		this.properties = properties;
-		this.searchFactory = searchFactoryImplementor;
+		this.extendedIntegrator = extendedIntegrator;
 		// TODO
 		this.indexManagerFactory = indexManagerFactory;
 		this.indexManagerHolder = indexManagerHolder;
@@ -111,8 +111,8 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 		return properties;
 	}
 
-	public SearchFactoryImplementor getSearchFactory() {
-		return searchFactory;
+	public ExtendedSearchIntegrator getSearchintegrator() {
+		return extendedIntegrator;
 	}
 
 	public IndexManagerFactory getIndexManagerFactory() {
@@ -125,7 +125,7 @@ public class DynamicShardingEntityIndexBinding implements MutableEntityIndexBind
 				entitySimilarity,
 				entityIndexingInterceptor,
 				properties,
-				searchFactory,
+				extendedIntegrator,
 				indexManagerHolder,
 				rootDirectoryProviderName
 		);

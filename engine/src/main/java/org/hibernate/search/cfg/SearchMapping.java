@@ -16,12 +16,17 @@ import java.util.Set;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
 /**
+ * Allows to configure indexing and search related aspects of a domain model using a fluent Java API. This API can be
+ * used instead of or in conjunction with the annotation based configuration via
+ * {@link org.hibernate.search.annotations.Indexed} etc. In case of conflicts the programmatic configuration for an
+ * element takes precedence over the annotation-based configuration.
+ *
  * @author Emmanuel Bernard
  */
 public class SearchMapping {
-	private Set<Map<String, Object>> analyzerDefs = new HashSet<Map<String, Object>>();
-	private Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
-	private Map<Class<?>, EntityDescriptor> entities = new HashMap<Class<?>, EntityDescriptor>();
+	private final Set<Map<String, Object>> analyzerDefs = new HashSet<Map<String, Object>>();
+	private final Set<Map<String, Object>> fullTextFilterDefs = new HashSet<Map<String, Object>>();
+	private final Map<Class<?>, EntityDescriptor> entities = new HashMap<Class<?>, EntityDescriptor>();
 
 	public Set<Map<String, Object>> getAnalyzerDefs() {
 		return analyzerDefs;

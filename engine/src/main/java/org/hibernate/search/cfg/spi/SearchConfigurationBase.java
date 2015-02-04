@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.cfg.spi;
 
-import org.hibernate.search.impl.SimpleInitializer;
+import org.hibernate.search.spi.DefaultInstanceInitializer;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
@@ -42,8 +42,13 @@ public abstract class SearchConfigurationBase implements SearchConfiguration {
 	}
 
 	@Override
+	public boolean isDeleteByTermEnforced() {
+		return false;
+	}
+
+	@Override
 	public InstanceInitializer getInstanceInitializer() {
-		return SimpleInitializer.INSTANCE;
+		return DefaultInstanceInitializer.DEFAULT_INITIALIZER;
 	}
 
 	@Override

@@ -11,10 +11,9 @@ import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**
- * Service interface to implement to allow custom bridges to be
- * auto discovered.
+ * Service interface to allow custom bridges to be auto discovered.
  *
- * It must have a default constructor and a file named
+ * Implementations of this interface must have a default constructor and a file named
  * {@code META-INF/services/org.hibernate.search.bridge.spi.BridgeProvider}
  * should contain the fully qualified class name of the bridge provider
  * implementation. When several implementations are present in a given JAR,
@@ -26,7 +25,7 @@ import org.hibernate.search.engine.service.spi.ServiceManager;
 public interface BridgeProvider {
 
 	/**
-	 * Return a {@link org.hibernate.search.bridge.FieldBridge} instance if the provider can
+	 * @return a {@link org.hibernate.search.bridge.FieldBridge} instance if the provider can
 	 * build a bridge for the calling context. {@code null} otherwise.
 	 */
 	FieldBridge provideFieldBridge(BridgeProviderContext bridgeProviderContext);
@@ -34,13 +33,17 @@ public interface BridgeProvider {
 	interface BridgeProviderContext {
 
 		/**
-		 * Member return type seeking a bridge.
+		 * Returns the type of the indexed member/property.
+		 *
+		 * @return the type of the indexed member
 		 */
 		Class<?> getReturnType();
 
 		/**
 		 * Provides access to the {@code ServiceManager} and gives access to
 		 * Hibernate Search services like the {@code ClassLoaderService}.
+		 *
+		 * @return the Hibernate Search {@code ServiceManager}
 		 */
 		ServiceManager getServiceManager();
 	}

@@ -10,17 +10,17 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.junit.Assert;
-
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.spi.SearchFactoryBuilder;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
+import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.testsupport.leakdetection.FileMonitoringDirectory;
@@ -34,12 +34,12 @@ import org.junit.Test;
  */
 public class AllFilesClosedTest {
 
-	private SearchFactoryImplementor searchFactory;
+	private SearchIntegrator searchIntegrator;
 
 	@Test
 	public void testFileHandlesReleased() {
 		//We initialize the SearchFactory in the test itself as we want to test it's state *after* shutdown
-		searchFactory = initializeSearchFactory();
+		searchIntegrator = initializeSearchFactory();
 		//extract the directories now, as they won't be available after SearchFactory#close :
 		FileMonitoringDirectory directoryOne = getDirectory( "index1" );
 		FileMonitoringDirectory directoryTwo = getDirectory( "index2" );
@@ -53,7 +53,7 @@ public class AllFilesClosedTest {
 			// directoryOne is using resource pooling
 		}
 		finally {
-			searchFactory.close();
+			searchIntegrator.close();
 		}
 		assertAllFilesClosed( directoryOne );
 		assertAllFilesClosed( directoryTwo );
@@ -90,7 +90,8 @@ public class AllFilesClosedTest {
 	}
 
 	private FileMonitoringDirectory getDirectory(String indexName) {
-		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) searchFactory.getIndexManagerHolder().getIndexManager( indexName );
+		ExtendedSearchIntegrator implementor = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
+		DirectoryBasedIndexManager indexManager = (DirectoryBasedIndexManager) implementor.getIndexManagerHolder().getIndexManager( indexName );
 		FileMonitoringDirectoryProvider directoryProvider = (FileMonitoringDirectoryProvider) indexManager.getDirectoryProvider();
 		FileMonitoringDirectory directory = (FileMonitoringDirectory) directoryProvider.getDirectory();
 		return directory;
@@ -117,7 +118,7 @@ public class AllFilesClosedTest {
 	 * @param expected number of elements found in the index
 	 */
 	private void assertElementsInIndex(int expected) {
-		HSQuery hsQuery = searchFactory.createHSQuery();
+		HSQuery hsQuery = searchIntegrator.createHSQuery();
 		hsQuery
 			.luceneQuery( new MatchAllDocsQuery() )
 			.targetedEntities( Arrays.asList( new Class<?>[]{ Book.class, Dvd.class } ) );
@@ -142,11 +143,11 @@ public class AllFilesClosedTest {
 	private void storeObject(Object entity, Serializable id) {
 		Work work = new Work( entity, id, WorkType.UPDATE, false );
 		TransactionContextForTest tc = new TransactionContextForTest();
-		searchFactory.getWorker().performWork( work, tc );
+		searchIntegrator.getWorker().performWork( work, tc );
 		tc.end();
 	}
 
-	protected SearchFactoryImplementor initializeSearchFactory() {
+	protected SearchIntegrator initializeSearchFactory() {
 		SearchConfigurationForTest cfg = new SearchConfigurationForTest()
 			.addProperty( "hibernate.search.default.directory_provider", FileMonitoringDirectoryProvider.class.getName() )
 			.addProperty( "hibernate.search.default.reader.strategy", "shared" )
@@ -156,9 +157,9 @@ public class AllFilesClosedTest {
 			.addClass( Dvd.class )
 			;
 		overrideProperties( cfg ); //allow extending tests with different configuration
-		return new SearchFactoryBuilder()
+		return new SearchIntegratorBuilder()
 			.configuration( cfg )
-			.buildSearchFactory();
+			.buildSearchIntegrator();
 	}
 
 	protected void overrideProperties(SearchConfigurationForTest cfg) {

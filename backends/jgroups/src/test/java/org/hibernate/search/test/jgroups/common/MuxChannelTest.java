@@ -33,8 +33,8 @@ public abstract class MuxChannelTest extends JGroupsCommonTest {
 
 	@Test
 	public void testMuxDispatcher() throws Exception {
-		SearchIntegrator searchFactory = getSearchFactory().unwrap( SearchIntegrator.class );
-		MessageSenderService sender = searchFactory.getServiceManager().requestService( MessageSenderService.class );
+		SearchIntegrator integrator = getSearchFactory().unwrap( SearchIntegrator.class );
+		MessageSenderService sender = integrator.getServiceManager().requestService( MessageSenderService.class );
 		Assert.assertNotNull( sender );
 		String className = sender.getClass().getName();
 		Assert.assertTrue( "Wrong sender instance: " + className, className.contains( "DispatchMessageSender" ) );

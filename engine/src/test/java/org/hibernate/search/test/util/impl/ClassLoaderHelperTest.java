@@ -12,7 +12,7 @@ import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.testsupport.analyzer.BarAnalyzer;
 import org.hibernate.search.testsupport.analyzer.FooAnalyzer;
@@ -57,7 +57,7 @@ public class ClassLoaderHelperTest {
 		);
 		wrappingTestFromClass(
 				"Wrong configuration of default similarity: " +
-						"class org.hibernate.search.indexes.impl.DirectoryBasedIndexManager " +
+						"class org.hibernate.search.indexes.spi.DirectoryBasedIndexManager " +
 						"is not a subtype of org.apache.lucene.search.similarities.Similarity",
 				Similarity.class, DirectoryBasedIndexManager.class, "default similarity"
 		);

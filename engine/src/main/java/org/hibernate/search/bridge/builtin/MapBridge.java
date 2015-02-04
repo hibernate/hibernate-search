@@ -9,6 +9,8 @@ package org.hibernate.search.bridge.builtin;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
+
+import org.hibernate.search.bridge.ContainerBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
@@ -19,23 +21,18 @@ import org.hibernate.search.bridge.LuceneOptions;
  *
  * @author Davide D'Alto
  */
-public class MapBridge implements FieldBridge {
+public class MapBridge implements FieldBridge, ContainerBridge {
 
 	private final FieldBridge bridge;
 
 	/**
-	 * @param bridge
-	 *            the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of a {@link java.util.Map} object.
+	 * @param bridge  the {@link org.hibernate.search.bridge.FieldBridge} used for each entry of a {@link java.util.Map} object.
 	 */
 	public MapBridge(FieldBridge bridge) {
 		this.bridge = bridge;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.hibernate.search.bridge.FieldBridge#set(java.lang.String, java.lang.Object, org.apache.lucene.document.Document, org.hibernate.search.bridge.LuceneOptions)
-	 */
+
 	@Override
 	public void set(String fieldName, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
@@ -43,15 +40,19 @@ public class MapBridge implements FieldBridge {
 		}
 	}
 
-	protected void indexNotNullMap(String name, Object value, Document document, LuceneOptions luceneOptions) {
+	@Override
+	public FieldBridge getElementBridge() {
+		return bridge;
+	}
+
+	private void indexNotNullMap(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		Iterable<?> collection = ((Map<?,?>) value).values();
 		for ( Object entry : collection ) {
 			indexEntry( name, entry, document, luceneOptions );
 		}
 	}
 
-	protected void indexEntry(String fieldName, Object entry, Document document, LuceneOptions luceneOptions) {
+	private void indexEntry(String fieldName, Object entry, Document document, LuceneOptions luceneOptions) {
 		bridge.set( fieldName, entry, document, luceneOptions );
 	}
-
 }

@@ -9,8 +9,7 @@ package org.hibernate.search.store;
 import java.util.Properties;
 
 import org.apache.lucene.store.Directory;
-
-import org.hibernate.search.indexes.impl.DirectoryBasedIndexManager;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.spi.BuildContext;
 
 /**

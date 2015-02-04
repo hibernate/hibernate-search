@@ -22,11 +22,11 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.DepthValidator;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor;
 import org.hibernate.search.indexes.interceptor.IndexingOverride;
 import org.hibernate.search.spi.InstanceInitializer;
@@ -49,7 +49,7 @@ public class WorkPlan {
 
 	private final HashMap<Class<?>, PerClassWork> byClass = new HashMap<Class<?>, PerClassWork>();
 
-	private final SearchFactoryImplementor searchFactoryImplementor;
+	private final ExtendedSearchIntegrator extendedIntegrator;
 
 	private final InstanceInitializer instanceInitializer;
 
@@ -59,9 +59,9 @@ public class WorkPlan {
 	 */
 	private int approximateWorkQueueSize = 0;
 
-	public WorkPlan(SearchFactoryImplementor searchFactoryImplementor) {
-		this.searchFactoryImplementor = searchFactoryImplementor;
-		this.instanceInitializer = searchFactoryImplementor.getInstanceInitializer();
+	public WorkPlan(ExtendedSearchIntegrator extendedIntegrator) {
+		this.extendedIntegrator = extendedIntegrator;
+		this.instanceInitializer = extendedIntegrator.getInstanceInitializer();
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class WorkPlan {
 		 */
 		PerClassWork(Class<?> clazz) {
 			this.entityClass = clazz;
-			this.documentBuilder = getEntityBuilder( searchFactoryImplementor, clazz );
+			this.documentBuilder = getEntityBuilder( extendedIntegrator, clazz );
 			this.containedInOnly = documentBuilder instanceof DocumentBuilderContainedEntity;
 		}
 
@@ -336,7 +336,7 @@ public class WorkPlan {
 		}
 
 		private EntityIndexingInterceptor getEntityInterceptor() {
-			EntityIndexBinding indexBindingForEntity = searchFactoryImplementor.getIndexBinding(
+			EntityIndexBinding indexBindingForEntity = extendedIntegrator.getIndexBinding(
 					entityClass
 			);
 			return indexBindingForEntity != null ? indexBindingForEntity.getEntityIndexingInterceptor() : null;
@@ -510,15 +510,15 @@ public class WorkPlan {
 	 * Get and cache the DocumentBuilder for this type. Being this a perClassWork
 	 * we can fetch it once.
 	 *
-	 * @param searchFactoryImplementor the search factory (implementor)
+	 * @param extendedIntegrator the search factory (implementor)
 	 * @param entityClass the entity type for which to retrieve the document builder
 	 *
 	 * @return the DocumentBuilder for this type
 	 */
-	private static AbstractDocumentBuilder getEntityBuilder(SearchFactoryImplementor searchFactoryImplementor, Class<?> entityClass) {
-		EntityIndexBinding entityIndexBinding = searchFactoryImplementor.getIndexBinding( entityClass );
+	private static AbstractDocumentBuilder getEntityBuilder(ExtendedSearchIntegrator extendedIntegrator, Class<?> entityClass) {
+		EntityIndexBinding entityIndexBinding = extendedIntegrator.getIndexBinding( entityClass );
 		if ( entityIndexBinding == null ) {
-			DocumentBuilderContainedEntity entityBuilder = searchFactoryImplementor.getDocumentBuilderContainedEntity(
+			DocumentBuilderContainedEntity entityBuilder = extendedIntegrator.getDocumentBuilderContainedEntity(
 					entityClass
 			);
 			if ( entityBuilder == null ) {

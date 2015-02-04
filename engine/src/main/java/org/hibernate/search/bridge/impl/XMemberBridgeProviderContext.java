@@ -11,7 +11,6 @@ import java.lang.reflect.AnnotatedElement;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 
 /**
@@ -25,15 +24,18 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 	private final Class<?> returnTypeElement;
 	private final String memberName;
 	private final ServiceManager serviceManager;
-	private final NumericField numericField;
+	private final boolean isId;
 
-	public XMemberBridgeProviderContext(XMember member, NumericField numericField, ReflectionManager reflectionManager, ServiceManager serviceManager) {
+	public XMemberBridgeProviderContext(XMember member,
+			boolean isId,
+			ReflectionManager reflectionManager,
+			ServiceManager serviceManager) {
 		this.annotatedElement = new XMemberToAnnotatedElementAdaptor( member );
 		// For arrays and collection, return the type of the contained elements
 		this.returnTypeElement = reflectionManager.toClass( member.getElementClass() );
 		this.memberName = member.getName();
 		this.serviceManager = serviceManager;
-		this.numericField = numericField;
+		this.isId = isId;
 	}
 
 	@Override
@@ -47,11 +49,6 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 	}
 
 	@Override
-	public NumericField getNumericField() {
-		return numericField;
-	}
-
-	@Override
 	public String getMemberName() {
 		return memberName;
 	}
@@ -61,4 +58,8 @@ class XMemberBridgeProviderContext implements ExtendedBridgeProvider.ExtendedBri
 		return serviceManager;
 	}
 
+	@Override
+	public boolean isId() {
+		return isId;
+	}
 }
