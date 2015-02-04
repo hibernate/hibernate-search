@@ -10,6 +10,7 @@ package org.hibernate.search.query.dsl.impl;
 import org.hibernate.search.query.dsl.AllContext;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.FacetContext;
+import org.hibernate.search.query.dsl.GroupingContext;
 import org.hibernate.search.query.dsl.MoreLikeThisContext;
 import org.hibernate.search.query.dsl.PhraseContext;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -60,6 +61,11 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 		return new ConnectedFacetContext( new FacetBuildingContext( context.getFactory(), context.getEntityType() ) );
 	}
 
+	@Override
+	public GroupingContext group() {
+		return new ConnectedGroupingContext(new GroupingBuildingContext());
+	}
+	
 	@Override
 	public SpatialContext spatial() {
 		return new ConnectedSpatialContext( context );

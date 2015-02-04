@@ -93,6 +93,7 @@ public class ProvidedIdTest {
 				lowLevelSearcher, null, null,
 				new TimeoutManagerImpl( luceneQuery, QueryTimeoutException.DEFAULT_TIMEOUT_EXCEPTION_FACTORY, sf.getTimingSource() ),
 				null,
+				null,
 				false,
 				null,
 				null,

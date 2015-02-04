@@ -16,6 +16,7 @@ import org.apache.lucene.search.Sort;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.SearchFactoryImplementor;
 import org.hibernate.search.filter.FullTextFilter;
+import org.hibernate.search.query.engine.impl.GroupingManager;
 import org.hibernate.search.spatial.Coordinates;
 
 /**
@@ -155,6 +156,11 @@ public interface HSQuery extends ProjectionConstants {
 	 */
 	FacetManager getFacetManager();
 
+	/**
+	 * @return the grouping related manager
+	 */
+	GroupingManager getGroupingManager();
+	
 	/**
 	 * @return the underlying Lucene query
 	 */

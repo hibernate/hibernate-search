@@ -11,14 +11,13 @@ import java.util.concurrent.TimeUnit;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
-
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
+import org.hibernate.search.query.engine.impl.GroupingManager;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.transform.ResultTransformer;
@@ -136,6 +135,11 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 */
 	FacetManager getFacetManager();
 
+	/**
+	 * @return the manager for grouping the results.
+	 */
+	GroupingManager getGroupingManager();
+	
 	/**
 	 * Return the Lucene {@link org.apache.lucene.search.Explanation}
 	 * object describing the score computation for the matching object/document

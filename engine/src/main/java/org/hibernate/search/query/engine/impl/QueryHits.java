@@ -8,6 +8,7 @@ package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,16 +27,25 @@ import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
+import org.apache.lucene.search.grouping.GroupDocs;
+import org.apache.lucene.search.grouping.SearchGroup;
+import org.apache.lucene.search.grouping.TopGroups;
+import org.apache.lucene.search.grouping.term.TermSecondPassGroupingCollector;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Counter;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.collector.impl.FacetCollector;
 import org.hibernate.search.query.collector.impl.FieldCacheCollector;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
+import org.hibernate.search.query.collector.impl.GroupingCollector;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.grouping.GroupingRequest;
+import org.hibernate.search.query.grouping.GroupingResult;
+import org.hibernate.search.query.grouping.SimpleGroup;
+import org.hibernate.search.query.grouping.SimpleGroupingResult;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.DistanceCollector;
 
@@ -54,12 +64,16 @@ public class QueryHits {
 	private final Filter filter;
 	private final Sort sort;
 	private final Map<String, FacetingRequestImpl> facetRequests;
+	private final GroupingRequest grouping;
 	private final TimeoutManagerImpl timeoutManager;
 
 	private int totalHits;
 	private TopDocs topDocs;
 	private Map<String, List<Facet>> facetMap;
 	private List<FacetCollector> facetCollectors;
+	
+	private GroupingCollector groupingCollector;
+	
 	private DistanceCollector distanceCollector = null;
 
 	private final boolean enableFieldCacheOnClassName;
@@ -85,6 +99,7 @@ public class QueryHits {
 					Sort sort,
 					TimeoutManagerImpl timeoutManager,
 					Map<String, FacetingRequestImpl> facetRequests,
+					GroupingRequest grouping,
 					boolean enableFieldCacheOnTypes,
 					FieldCacheCollectorFactory idFieldCollector,
 					TimeoutExceptionFactory timeoutExceptionFactory,
@@ -92,7 +107,7 @@ public class QueryHits {
 					String spatialFieldName)
 			throws IOException {
 		this(
-				searcher, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager, facetRequests,
+				searcher, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager, facetRequests, grouping,
 				enableFieldCacheOnTypes, idFieldCollector, timeoutExceptionFactory, spatialSearchCenter, spatialFieldName
 		);
 	}
@@ -103,6 +118,7 @@ public class QueryHits {
 					Integer n,
 					TimeoutManagerImpl timeoutManager,
 					Map<String, FacetingRequestImpl> facetRequests,
+					GroupingRequest grouping,
 					boolean enableFieldCacheOnTypes,
 					FieldCacheCollectorFactory idFieldCollector,
 					TimeoutExceptionFactory timeoutExceptionFactory,
@@ -114,6 +130,7 @@ public class QueryHits {
 		this.filter = filter;
 		this.sort = sort;
 		this.facetRequests = facetRequests;
+		this.grouping = grouping;
 		this.enableFieldCacheOnClassName = enableFieldCacheOnTypes;
 		this.idFieldCollectorFactory = idFieldCollector;
 		this.timeoutExceptionFactory = timeoutExceptionFactory;
@@ -212,6 +229,7 @@ public class QueryHits {
 			collector = optionallyEnableFieldCacheOnTypes( collector, totalMaxDocs, maxDocs );
 			collector = optionallyEnableFieldCacheOnIds( collector, totalMaxDocs, maxDocs );
 			collector = optionallyEnableFacetingCollectors( collector );
+			collector = optionallyEnableGroupingCollectors( collector );
 			collector = optionallyEnableDistanceCollector( collector, maxDocs );
 		}
 		else {
@@ -266,7 +284,62 @@ public class QueryHits {
 
 		return facetCollectors.get( facetCollectors.size() - 1 );
 	}
-
+	
+	private Collector optionallyEnableGroupingCollectors(Collector collector) throws IOException {
+		// add grouping collector to collector chain
+		if (grouping != null) {
+			groupingCollector = new GroupingCollector(collector, grouping);
+			collector = groupingCollector;
+		}
+		return collector;
+	}
+	
+	public GroupingResult getGroupingResult() throws IOException {
+		final SimpleGroupingResult groupingResult = new SimpleGroupingResult();
+		if (groupingCollector != null) {
+			final TopGroups<BytesRef> topGroups = getTopGroups();
+			if (topGroups != null) {
+			   // get the top groups by the second pass collector
+			   groupingResult.setTotalGroupCount(groupingCollector.getTotalGroupCount());
+			   groupingResult.setTotalGroupedHitCount(topGroups.totalGroupedHitCount);
+			   groupingResult.setTotalHitCount(topGroups.totalHitCount);
+			   
+			   // extract usefull information from top groups
+			   for (GroupDocs<BytesRef> nextGroup : topGroups.groups) {
+				   final SimpleGroup group = new SimpleGroup();
+				   for (int i = 0; i < nextGroup.scoreDocs.length; i++) {
+					   group.setScoreDocs(nextGroup.scoreDocs);
+				   }
+				   group.setTotalHits(nextGroup.totalHits);
+				   group.setValue(nextGroup.groupValue.utf8ToString());
+				   
+				   groupingResult.addGroup(group);
+			   }
+			}
+		}
+		
+		return groupingResult;
+	}
+	
+	private TopGroups<BytesRef> getTopGroups() throws IOException {
+		// get the grouping data from the first pass group collector
+		final GroupingRequest grouping = groupingCollector.getGrouping();
+					
+		final Collection<SearchGroup<BytesRef>> topGroups = groupingCollector.getTopGroups(grouping.getGroupOffset(), true);
+		// run the second pass collector only when the first collector return top groups
+		if (topGroups != null) {
+			final TermSecondPassGroupingCollector secondGrouping = new TermSecondPassGroupingCollector(
+					grouping.getFieldName(), topGroups,
+					grouping.getGroupSort(), grouping.getWithinGroupSort(),
+					grouping.getMaxDocsPerGroup(), true, true, true);
+			searcher.search(filter, secondGrouping);
+			
+			return secondGrouping.getTopGroups(0);
+		}
+		
+		return null;
+	}
+	
 	private Collector optionallyEnableDistanceCollector(Collector collector, int maxDocs) {
 		if ( spatialFieldName == null || spatialFieldName.isEmpty() || spatialSearchCenter == null ) {
 			return collector;
