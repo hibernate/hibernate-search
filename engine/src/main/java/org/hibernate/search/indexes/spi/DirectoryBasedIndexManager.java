@@ -45,7 +45,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	private static Log log = LoggerFactory.make();
 
 	private String indexName;
-	private DirectoryProvider directoryProvider;
+	private DirectoryProvider<?> directoryProvider;
 	private Similarity similarity;
 	private BackendQueueProcessor backend;
 	private OptimizerStrategy optimizer;
@@ -165,7 +165,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	//Not exposed on the interface
-	public DirectoryProvider getDirectoryProvider() {
+	public DirectoryProvider<?> getDirectoryProvider() {
 		return directoryProvider;
 	}
 
@@ -193,7 +193,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		return PropertiesParseHelper.createDirectoryBasedReaderProvider( this, cfg, buildContext );
 	}
 
-	protected DirectoryProvider createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {
+	protected DirectoryProvider<?> createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {
 		return DirectoryProviderFactory.createDirectoryProvider( indexName, cfg, buildContext );
 	}
 
