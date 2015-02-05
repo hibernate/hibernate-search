@@ -8,10 +8,19 @@ package org.hibernate.search.test.integration.osgi;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicLong;
+
 import javax.inject.Inject;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,22 +33,21 @@ import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.SearchFactory;
-import org.hibernate.search.engine.Version;
+import org.osgi.framework.wiring.BundleRevision;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 /**
  * A basic integration test that executes Hibernate Search in Apache Karaf using
@@ -64,8 +72,6 @@ public class HibernateSearchWithKarafIT {
 	 */
 	private static final boolean DEBUG = false;
 
-	private String currentVersion = Version.getVersionString();
-
 	@Inject
 	private BundleContext bundleContext;
 
@@ -86,6 +92,13 @@ public class HibernateSearchWithKarafIT {
 				.type( "xml" )
 				.versionAsInProject();
 
+		MavenUrlReference hibernateSearchFeature = maven()
+				.groupId( "org.hibernate" )
+				.artifactId( "hibernate-search-integrationtest-osgi-features" )
+				.classifier( "features" )
+				.type( "xml" )
+				.versionAsInProject();
+
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
 		return new Option[] {
@@ -100,10 +113,7 @@ public class HibernateSearchWithKarafIT {
 					.ignoreRemoteShell()
 					.ignoreLocalConsole() ,
 				features( karafStandardRepo, "scr" ),
-				features(
-						"mvn:org.hibernate/hibernate-search-integrationtest-osgi-features/" + currentVersion + "/xml/features",
-						"hibernate-search"
-				),
+				features( hibernateSearchFeature, "hibernate-search" ),
 
 				// configure Aries transaction manager
 				editConfigurationFilePut(
@@ -136,6 +146,24 @@ public class HibernateSearchWithKarafIT {
 	@After
 	public void tearDown() {
 		bundleContext.ungetService( serviceReference );
+	}
+
+	/**
+	 * Starts all bundles to make sure there are no "uses constraint violations" caused by packages exported from the
+	 * bundles contributed by the HSEARCH Karaf feature.
+	 */
+	@Test
+	@TestForIssue(jiraKey="HSEARCH-1774")
+	public void testStartingAllBundles() throws Exception {
+		for ( Bundle bundle : bundleContext.getBundles() ) {
+			if ( !isFragmentBundle( bundle ) ) {
+				bundle.start();
+			}
+		}
+	}
+
+	private boolean isFragmentBundle(Bundle bundle) {
+		return ( bundle.adapt( BundleRevision.class ).getTypes() & BundleRevision.TYPE_FRAGMENT ) != 0;
 	}
 
 	@Test
