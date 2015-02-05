@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.backend.impl.batch.BatchBackend;
+import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.ErrorHandler;
