@@ -25,10 +25,13 @@ import org.junit.Before;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.manualsource.WorkLoadManager;
+import org.hibernate.search.manualsource.impl.ObjectInitializerContext;
 import org.hibernate.search.manualsource.impl.WorkLoadManagerImpl;
+import org.hibernate.search.manualsource.source.EntityKeyForLoad;
 import org.hibernate.search.manualsource.source.EntitySourceContext;
 import org.hibernate.search.manualsource.source.EntitySourceContextBuilder;
 import org.hibernate.search.manualsource.source.IdExtractor;
+import org.hibernate.search.manualsource.source.ObjectInitializer;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 
@@ -37,6 +40,7 @@ import org.hibernate.search.util.impl.FileHelper;
  */
 public abstract class ManualSourceTestBase {
 	private WorkLoadManager workLoadManager;
+	private EntitySourceContextBuilder entitySourceContextBuilder;
 	private File baseIndexDir;
 
 	@Before
@@ -49,10 +53,12 @@ public abstract class ManualSourceTestBase {
 		properties.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		configure( properties );
 		List<Class<?>> classes = Arrays.asList( getAnnotatedClasses() );
+		entitySourceContextBuilder = new MapBasedEntitySource();
 		workLoadManager = new WorkLoadManagerImpl(
 				classes,
-				new MapBasedEntitySource(),
+				entitySourceContextBuilder,
 				new NameBasedIdExtractor( classes ),
+				new MapBasedObjectInitializer(),
 				properties );
 	}
 
@@ -60,6 +66,10 @@ public abstract class ManualSourceTestBase {
 	public void tearDown() throws Exception {
 		workLoadManager.close();
 		FileHelper.delete( getBaseIndexDir() );
+	}
+
+	public EntitySourceContextBuilder getEntitySourceContextBuilder() {
+		return entitySourceContextBuilder;
 	}
 
 	public WorkLoadManager getWorkLoadManager() {
@@ -130,6 +140,20 @@ public abstract class ManualSourceTestBase {
 				return (T) database;
 			}
 			return null;
+		}
+	}
+
+	public static class MapBasedObjectInitializer implements ObjectInitializer {
+
+		@Override
+		public void initializeObjects(List<EntityKeyForLoad> keys, Map<EntityKeyForLoad, Object> idsToObjects, Context context) {
+			ConcurrentHashMap database = context.getEntitySourceContext().unwrap( ConcurrentHashMap.class );
+			for ( EntityKeyForLoad key : keys ) {
+				Object entity = database.get( key.getId() );
+				if ( entity != null ) {
+					idsToObjects.put( key, entity );
+				}
+			}
 		}
 	}
 }

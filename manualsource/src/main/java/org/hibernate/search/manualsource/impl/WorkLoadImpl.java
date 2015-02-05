@@ -18,6 +18,7 @@ import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.manualsource.FullTextQuery;
 import org.hibernate.search.manualsource.SearchFactory;
 import org.hibernate.search.manualsource.WorkLoad;
 import org.hibernate.search.manualsource.backend.impl.BatchTransactionContext;
@@ -56,8 +57,11 @@ public class WorkLoadImpl implements WorkLoad {
 		if ( !transactionInProgress ) {
 			throw new IllegalStateException( "No work load batching started" );
 		}
-		synchronization.beforeCompletion();
-		synchronization.afterCompletion( Status.STATUS_COMMITTED );
+		// query only workloads do not enlist synchronization
+		if ( synchronization != null ) {
+			synchronization.beforeCompletion();
+			synchronization.afterCompletion( Status.STATUS_COMMITTED );
+		}
 		transactionInProgress = false;
 		synchronization = null; //TODO not sure if the sync should be cleared
 	}
@@ -66,14 +70,17 @@ public class WorkLoadImpl implements WorkLoad {
 		if ( !transactionInProgress ) {
 			throw new IllegalStateException( "No work load batching started" );
 		}
-		synchronization.afterCompletion( Status.STATUS_ROLLEDBACK );
+		// query only workloads do not enlist synchronization
+		if ( synchronization != null ) {
+			synchronization.afterCompletion( Status.STATUS_ROLLEDBACK );
+		}
 		transactionInProgress = false;
 		synchronization = null; //TODO not sure if the sync should be cleared
 	}
 
 	@Override
-	public Object createFullTextQuery(Query luceneQuery, Class<?>... entities) {
-		return null;
+	public FullTextQuery createFullTextQuery(Query luceneQuery, Class<?>... entities) {
+		return new FullTextQueryImpl( luceneQuery, entities, this );
 	}
 
 	@Override

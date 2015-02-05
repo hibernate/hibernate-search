@@ -26,6 +26,7 @@ import org.hibernate.search.manualsource.WorkLoadManager;
 import org.hibernate.search.manualsource.source.EntitySourceContext;
 import org.hibernate.search.manualsource.source.EntitySourceContextBuilder;
 import org.hibernate.search.manualsource.source.IdExtractor;
+import org.hibernate.search.manualsource.source.ObjectInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 
@@ -44,11 +45,13 @@ public class WorkLoadManagerImpl implements WorkLoadManager {
 
 	private ExtendedSearchIntegrator searchIntegrator;
 	private IdExtractor idExtractor;
+	private ObjectInitializer objectInitializer;
 
 	public WorkLoadManagerImpl(
 			List<Class<?>> classes,
 			EntitySourceContextBuilder entitySourceContextBuilder,
 			IdExtractor idExtractor,
+			ObjectInitializer objectInitializer,
 			Properties properties) {
 		SearchIntegrator builtSearchIntegrator = new SearchIntegratorBuilder()
 				.configuration( new WorkLoadSearchConfiguration( classes, properties ) )
@@ -56,6 +59,7 @@ public class WorkLoadManagerImpl implements WorkLoadManager {
 		this.searchIntegrator = builtSearchIntegrator.unwrap( ExtendedSearchIntegrator.class );
 		this.entitySourceContextBuilder = entitySourceContextBuilder;
 		this.idExtractor = idExtractor;
+		this.objectInitializer = objectInitializer;
 	}
 
 	@Override
@@ -83,6 +87,10 @@ public class WorkLoadManagerImpl implements WorkLoadManager {
 	// getter method used by WorkLoadImpl
 	public IdExtractor getIdExtractor() {
 		return idExtractor;
+	}
+
+	public ObjectInitializer getObjectInitializer() {
+		return objectInitializer;
 	}
 
 	private static class WorkLoadSearchConfiguration extends SearchConfigurationBase {

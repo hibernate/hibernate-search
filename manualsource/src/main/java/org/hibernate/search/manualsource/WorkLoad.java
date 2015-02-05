@@ -64,7 +64,7 @@ public interface WorkLoad {
 	 *
 	 * @throws IllegalArgumentException if entityType is <code>null</code> or not a class or superclass annotated with <code>@Indexed</code>.
 	 */
-	Object createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
+	FullTextQuery createFullTextQuery(org.apache.lucene.search.Query luceneQuery, Class<?>... entities);
 
 	/**
 	 * Force the (re)indexing of a given <b>managed</b> object.
