@@ -225,7 +225,7 @@ public final class ConfigContext {
 	private void addFullTextFilterDef(FullTextFilterDef filterDef, String filterDefinitionPoint) {
 		String filterDefinitionName = filterDef.name();
 
-		if ( filterDefinitionPoints.containsKey( filterDefinitionPoint ) ) {
+		if ( filterDefinitionPoints.containsKey( filterDefinitionName ) ) {
 			if ( !filterDefinitionPoints.get( filterDefinitionName ).equals( filterDefinitionPoint ) ) {
 				throw new SearchException( "Multiple filter definitions with the same name: " + filterDef.name() );
 			}

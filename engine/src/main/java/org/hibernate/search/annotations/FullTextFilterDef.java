@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.TYPE } )
+@Target( { ElementType.PACKAGE, ElementType.TYPE } )
 @Documented
 public @interface FullTextFilterDef {
 

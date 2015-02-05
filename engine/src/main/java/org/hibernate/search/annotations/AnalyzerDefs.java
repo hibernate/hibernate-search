@@ -19,7 +19,7 @@ import java.lang.annotation.Documented;
  * @author Emmanuel Bernard
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
+@Target({ ElementType.PACKAGE, ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Documented
 public @interface AnalyzerDefs {
 	AnalyzerDef[] value();

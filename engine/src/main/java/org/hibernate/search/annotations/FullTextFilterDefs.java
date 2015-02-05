@@ -18,7 +18,7 @@ import java.lang.annotation.Documented;
  * @author Emmanuel Bernard
  */
 @Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.TYPE } )
+@Target( { ElementType.PACKAGE, ElementType.TYPE } )
 @Documented
 public @interface FullTextFilterDefs {
 	FullTextFilterDef[] value();
