@@ -14,20 +14,20 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
- * Represent a Serializable Lucene unit work
+ * Represent a unit of work to be applied against the Lucene index.
  *
- * WARNING: This class aims to be serializable and passed in an asynchronous way across VMs
- *          any non backward compatible serialization change should be done with great care
- *          and publically announced. Specifically, new versions of Hibernate Search should be
- *          able to handle changes produced by older versions of Hibernate Search if reasonably possible.
- *          That is why each subclass susceptible to be pass along have a magic serialization number.
- *          NOTE: we are relying on Lucene's Document to play nice unfortunately
+ * <p>
+ * Note:<br/>
+ * Instances of this class are passed between Virtual Machines when a master/slave
+ * configuration of Search is used. It is the responsibility of the {@code LuceneWorkSerializer} respectively
+ * {@code SerializationProvider} to serialize and de-serialize {@code LuceneWork} instances.
+ * </p>
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public abstract class LuceneWork implements Serializable {
+public abstract class LuceneWork {
 
 	private final Document document;
 	private final Class<?> entityClass;

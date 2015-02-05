@@ -16,7 +16,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
 /**
  * @author Emmanuel Bernard
  */
-public class AddLuceneWork extends LuceneWork implements Serializable {
+public class AddLuceneWork extends LuceneWork {
 
 	private static final long serialVersionUID = -2450349312813297371L;
 

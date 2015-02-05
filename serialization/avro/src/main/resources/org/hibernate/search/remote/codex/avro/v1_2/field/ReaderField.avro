@@ -1,0 +1,30 @@
+{
+    "name": "ReaderField",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "value",
+            "type": "bytes"
+        },
+        {
+            "name": "termVector",
+            "type": "TermVector"
+        },
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "boost",
+            "type": "float"
+        },
+        {
+            "name": "omitNorms",
+            "type": "boolean"
+        },
+        {
+            "name": "omitTermFreqAndPositions",
+            "type": "boolean"
+        }
+    ]
+}

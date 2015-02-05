@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend;
 
-import java.io.Serializable;
-
 import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
@@ -15,7 +13,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  *
  * @author John Griffin
  */
-public class PurgeAllLuceneWork extends LuceneWork implements Serializable {
+public class PurgeAllLuceneWork extends LuceneWork {
 
 	private static final long serialVersionUID = 8124091288284011715L;
 

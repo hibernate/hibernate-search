@@ -8,6 +8,8 @@ package org.hibernate.search.indexes.serialization.avro.impl;
 
 import java.util.Properties;
 
+import org.apache.avro.Protocol;
+
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.indexes.serialization.avro.logging.impl.Log;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
@@ -41,25 +43,20 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * It is mandatory if only message's {@code code minor version is < current version}.
  * </p>
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @author Hardy Ferentschik
  */
 public class AvroSerializationProvider implements SerializationProvider, Startable {
 
 	private static final Log log = LoggerFactory.make( Log.class );
 
 	private final KnownProtocols protocols;
-
-	public static int getMajorVersion() {
-		return KnownProtocols.MAJOR_VERSION;
-	}
-
-	public static int getMinorVersion() {
-		return KnownProtocols.LATEST_MINOR_VERSION;
-	}
+	private final Protocol protocol;
 
 	public AvroSerializationProvider() {
-		log.serializationProtocol( getMajorVersion(), getMinorVersion() );
 		this.protocols = new KnownProtocols();
+		this.protocol = protocols.getLatestProtocol();
+		log.serializationProtocol( KnownProtocols.MAJOR_VERSION, KnownProtocols.LATEST_MINOR_VERSION );
 	}
 
 	@Override
@@ -68,7 +65,7 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 
 	@Override
 	public Serializer getSerializer() {
-		return new AvroSerializer( protocols.getLatestProtocol() );
+		return new AvroSerializer( protocol );
 	}
 
 	@Override
@@ -78,6 +75,6 @@ public class AvroSerializationProvider implements SerializationProvider, Startab
 
 	@Override
 	public String toString() {
-		return "Avro SerializationProvider v" + getMajorVersion() + "." + getMinorVersion();
+		return "Avro SerializationProvider v" + KnownProtocols.MAJOR_VERSION + "." + KnownProtocols.LATEST_MINOR_VERSION;
 	}
 }
