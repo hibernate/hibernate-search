@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend;
 
-import java.io.Serializable;
-
 import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
@@ -18,7 +16,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  * @author Andrew Hahn
  * @author Emmanuel Bernard
  */
-public class OptimizeLuceneWork extends LuceneWork implements Serializable {
+public class OptimizeLuceneWork extends LuceneWork {
 
 	public static final OptimizeLuceneWork INSTANCE = new OptimizeLuceneWork();
 
