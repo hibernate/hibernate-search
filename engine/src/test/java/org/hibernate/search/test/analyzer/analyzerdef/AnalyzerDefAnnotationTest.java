@@ -17,10 +17,14 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.TokenizerDef;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test that the {@link org.hibernate.search.annotations.AnalyzerDef} annotation can be read by the engine
@@ -29,6 +33,9 @@ import org.junit.Test;
  * @author Davide D'Alto
  */
 public class AnalyzerDefAnnotationTest {
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
 	public SearchFactoryHolder sfHolder = new SearchFactoryHolder( Sample.class );
@@ -49,6 +56,15 @@ public class AnalyzerDefAnnotationTest {
 		assertThat( analyzers.keySet() ).containsOnly( "package-analyzer", "class-analyzer" );
 	}
 
+	@Test
+	public void shouldNotBePossibleToHaveTwoAnalyzerDefsWithTheSameName() throws Exception {
+		thrown.expect( SearchException.class );
+
+		SearchConfigurationForTest cfg = new SearchConfigurationForTest();
+		cfg.addClass( SampleWithError.class );
+		new SearchIntegratorBuilder().configuration( cfg ).buildSearchIntegrator().close();
+	}
+
 	private void assertAnalyzerExists(String analyzerName) {
 		Analyzer analyzer = sfHolder.getSearchFactory().getAnalyzer( analyzerName );
 		assertThat( analyzer ).isNotNull();
@@ -66,5 +82,19 @@ public class AnalyzerDefAnnotationTest {
 
 		@Field
 		String description;
+	}
+
+	@Indexed
+	@AnalyzerDef(
+			name = "package-analyzer",
+			tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class)
+	)
+	static class SampleWithError {
+
+		@DocumentId
+		final long id = 1;
+
+		@Field
+		final String description = "";
 	}
 }
