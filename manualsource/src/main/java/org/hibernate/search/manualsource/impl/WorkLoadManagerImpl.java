@@ -23,6 +23,8 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
 import org.hibernate.search.manualsource.WorkLoad;
 import org.hibernate.search.manualsource.WorkLoadManager;
+import org.hibernate.search.manualsource.source.EntitySourceContext;
+import org.hibernate.search.manualsource.source.EntitySourceContextBuilder;
 import org.hibernate.search.manualsource.source.IdExtractor;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
@@ -38,20 +40,32 @@ public class WorkLoadManagerImpl implements WorkLoadManager {
 		Version.touch();
 	}
 
+	private final EntitySourceContextBuilder entitySourceContextBuilder;
+
 	private ExtendedSearchIntegrator searchIntegrator;
 	private IdExtractor idExtractor;
 
-	public WorkLoadManagerImpl(List<Class<?>> classes, IdExtractor idExtractor, Properties properties) {
+	public WorkLoadManagerImpl(
+			List<Class<?>> classes,
+			EntitySourceContextBuilder entitySourceContextBuilder,
+			IdExtractor idExtractor,
+			Properties properties) {
 		SearchIntegrator builtSearchIntegrator = new SearchIntegratorBuilder()
 				.configuration( new WorkLoadSearchConfiguration( classes, properties ) )
 				.buildSearchIntegrator();
 		this.searchIntegrator = builtSearchIntegrator.unwrap( ExtendedSearchIntegrator.class );
+		this.entitySourceContextBuilder = entitySourceContextBuilder;
 		this.idExtractor = idExtractor;
 	}
 
 	@Override
 	public WorkLoad createWorkLoad() {
-		return new WorkLoadImpl( this );
+		return new WorkLoadImpl( this, entitySourceContextBuilder.buildEntitySourceContextForWorkLoad() );
+	}
+
+	@Override
+	public WorkLoad createWorkLoad(EntitySourceContext entitySourceContext) {
+		return new WorkLoadImpl( this, entitySourceContext );
 	}
 
 	@Override

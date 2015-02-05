@@ -21,6 +21,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.manualsource.SearchFactory;
 import org.hibernate.search.manualsource.WorkLoad;
 import org.hibernate.search.manualsource.backend.impl.BatchTransactionContext;
+import org.hibernate.search.manualsource.source.EntitySourceContext;
 
 /**
  * This class represents an indexing work load with the ability to batch via the
@@ -30,14 +31,16 @@ import org.hibernate.search.manualsource.backend.impl.BatchTransactionContext;
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public class WorkLoadImpl implements WorkLoad {
+	private final EntitySourceContext entitySourceContext;
 	private Synchronization synchronization;
 	private BatchTransactionContext transactionContext;
 	private boolean transactionInProgress = false;
 	private WorkLoadManagerImpl workLoadManager;
 
-	public WorkLoadImpl(WorkLoadManagerImpl workLoadManager) {
+	public WorkLoadImpl(WorkLoadManagerImpl workLoadManager, EntitySourceContext entitySourceContext) {
 		this.transactionContext = new BatchTransactionContext( this );
 		this.workLoadManager = workLoadManager;
+		this.entitySourceContext = entitySourceContext;
 	}
 
 
@@ -131,6 +134,14 @@ public class WorkLoadImpl implements WorkLoad {
 	@Override
 	public <T> void purgeAll(Class<T> entityType) {
 		purge( entityType, null );
+	}
+
+	public EntitySourceContext getEntitySourceContext() {
+		return entitySourceContext;
+	}
+
+	public WorkLoadManagerImpl getWorkLoadManager() {
+		return workLoadManager;
 	}
 
 	// internal methods

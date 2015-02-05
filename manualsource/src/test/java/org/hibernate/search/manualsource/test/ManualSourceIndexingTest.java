@@ -29,6 +29,7 @@ public class ManualSourceIndexingTest extends ManualSourceTestBase {
 		Properties properties = new Properties();
 		WorkLoadManager workLoadManager = new WorkLoadManagerImpl(
 				classes,
+				new MapBasedEntitySource(),
 				new NameBasedIdExtractor( classes ),
 				properties
 		);

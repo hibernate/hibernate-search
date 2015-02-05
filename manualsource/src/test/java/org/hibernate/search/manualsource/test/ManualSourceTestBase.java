@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.junit.After;
@@ -25,6 +26,8 @@ import org.junit.Before;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.manualsource.WorkLoadManager;
 import org.hibernate.search.manualsource.impl.WorkLoadManagerImpl;
+import org.hibernate.search.manualsource.source.EntitySourceContext;
+import org.hibernate.search.manualsource.source.EntitySourceContextBuilder;
 import org.hibernate.search.manualsource.source.IdExtractor;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
@@ -46,7 +49,11 @@ public abstract class ManualSourceTestBase {
 		properties.setProperty( Environment.ANALYZER_CLASS, StopAnalyzer.class.getName() );
 		configure( properties );
 		List<Class<?>> classes = Arrays.asList( getAnnotatedClasses() );
-		workLoadManager = new WorkLoadManagerImpl( classes, new NameBasedIdExtractor( classes ), properties );
+		workLoadManager = new WorkLoadManagerImpl(
+				classes,
+				new MapBasedEntitySource(),
+				new NameBasedIdExtractor( classes ),
+				properties );
 	}
 
 	@After
@@ -104,6 +111,25 @@ public abstract class ManualSourceTestBase {
 			catch (InvocationTargetException e) {
 				throw new RuntimeException( "Oops", e );
 			}
+		}
+	}
+
+	public static class MapBasedEntitySource implements EntitySourceContextBuilder, EntitySourceContext {
+
+		private ConcurrentHashMap<Serializable, Object> database = new ConcurrentHashMap<>(  );
+
+		@Override
+		public EntitySourceContext buildEntitySourceContextForWorkLoad() {
+			// We don't really have per workload context, so share it
+			return this;
+		}
+
+		@Override
+		public <T> T unwrap(Class<T> cls) {
+			if ( ConcurrentHashMap.class.isAssignableFrom( cls ) ) {
+				return (T) database;
+			}
+			return null;
 		}
 	}
 }

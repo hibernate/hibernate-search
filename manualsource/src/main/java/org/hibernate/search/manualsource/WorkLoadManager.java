@@ -7,6 +7,8 @@
 
 package org.hibernate.search.manualsource;
 
+import org.hibernate.search.manualsource.source.EntitySourceContext;
+
 /**
  * Thread-safe.
  *
@@ -14,6 +16,11 @@ package org.hibernate.search.manualsource;
  */
 public interface WorkLoadManager {
 	public WorkLoad createWorkLoad();
+
+	/**
+	 * Overrides the EntitySourceContext instance provided by the builder.
+	 */
+	public WorkLoad createWorkLoad(EntitySourceContext entitySourceContext);
 
 	public void close();
 }
