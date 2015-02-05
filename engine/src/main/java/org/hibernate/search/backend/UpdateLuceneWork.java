@@ -20,7 +20,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  * @since 4.0
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class UpdateLuceneWork extends LuceneWork implements Serializable {
+public class UpdateLuceneWork extends LuceneWork {
 
 	private static final long serialVersionUID = -5267394465359187688L;
 

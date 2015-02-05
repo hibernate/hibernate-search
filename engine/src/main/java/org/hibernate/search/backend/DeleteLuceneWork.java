@@ -13,7 +13,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
 /**
  * @author Emmanuel Bernard
  */
-public class DeleteLuceneWork extends LuceneWork implements Serializable {
+public class DeleteLuceneWork extends LuceneWork {
 
 	private static final long serialVersionUID = -854604138119230246L;
 
