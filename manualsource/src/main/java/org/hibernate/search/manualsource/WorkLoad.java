@@ -31,7 +31,7 @@ public interface WorkLoad {
 	 *
 	 * @throws java.lang.IllegalStateException if a batch was already started
 	 */
-	public void startBatch();
+	void startBatch();
 
 	/**
 	 * Commits a batch and execute all indexing operations.
@@ -39,7 +39,7 @@ public interface WorkLoad {
 	 *
 	 * @throws java.lang.IllegalStateException if a batch was not started
 	 */
-	public void commitBatch();
+	void commitBatch();
 
 	/**
 	 * Cancels a batch. All indexing operations are discarded.
@@ -47,7 +47,7 @@ public interface WorkLoad {
 	 *
 	 * @throws java.lang.IllegalStateException if a batch was not started
 	 */
-	public void endBatch();
+	void endBatch();
 
 	// entity indexing and querying methods
 	// TODO should we make the difference between add, update vs index and delete vs purge?

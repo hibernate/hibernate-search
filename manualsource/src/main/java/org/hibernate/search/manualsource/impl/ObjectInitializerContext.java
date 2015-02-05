@@ -7,8 +7,6 @@
 
 package org.hibernate.search.manualsource.impl;
 
-import java.sql.Time;
-
 import org.hibernate.search.manualsource.source.EntitySourceContext;
 import org.hibernate.search.manualsource.source.ObjectInitializer;
 import org.hibernate.search.query.engine.spi.TimeoutManager;

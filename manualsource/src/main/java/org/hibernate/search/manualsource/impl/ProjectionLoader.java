@@ -10,14 +10,11 @@ package org.hibernate.search.manualsource.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Session;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.manualsource.WorkLoad;
 import org.hibernate.search.manualsource.source.ObjectInitializer;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
-import org.hibernate.transform.ResultTransformer;
 
 /**
  * Implementation of the {@code Loader} interface used for loading entities which are projected via
@@ -35,16 +32,16 @@ public class ProjectionLoader implements Loader {
 
 	@Override
 	public void init(WorkLoadImpl workLoad,
-					 ExtendedSearchIntegrator extendedSearchIntegrator,
-					 ObjectInitializer objectInitializer,
-					 TimeoutManager timeoutManager) {
+					ExtendedSearchIntegrator extendedSearchIntegrator,
+					ObjectInitializer objectInitializer,
+					TimeoutManager timeoutManager) {
 	}
 
 	public void init(WorkLoadImpl workLoad,
-					 ExtendedSearchIntegrator extendedSearchIntegrator,
-					 ObjectLoaderBuilder loaderBuilder,
-					 String[] aliases,
-					 TimeoutManager timeoutManager) {
+					ExtendedSearchIntegrator extendedSearchIntegrator,
+					ObjectLoaderBuilder loaderBuilder,
+					String[] aliases,
+					TimeoutManager timeoutManager) {
 		init( workLoad, extendedSearchIntegrator, null, timeoutManager ); // TODO why do we call this method?
 		this.aliases = aliases;
 		this.loaderBuilder = loaderBuilder;

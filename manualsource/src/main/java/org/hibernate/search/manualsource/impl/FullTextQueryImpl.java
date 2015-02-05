@@ -16,12 +16,10 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 
-import org.hibernate.Session;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.manualsource.FullTextQuery;
-import org.hibernate.search.manualsource.WorkLoad;
 import org.hibernate.search.manualsource.source.ObjectInitializer;
 import org.hibernate.search.query.engine.QueryTimeoutException;
 import org.hibernate.search.query.engine.spi.EntityInfo;
@@ -48,8 +46,8 @@ public class FullTextQueryImpl implements FullTextQuery {
 	 * Constructs a  <code>FullTextQueryImpl</code> instance.
 	 */
 	public FullTextQueryImpl(org.apache.lucene.search.Query query,
-							 Class<?>[] classes,
-							 WorkLoadImpl workLoad) {
+							Class<?>[] classes,
+							WorkLoadImpl workLoad) {
 		workLoadImpl = workLoad;
 
 		ExtendedSearchIntegrator extendedIntegrator = workLoad.getWorkLoadManager().getSearchIntegrator();
@@ -240,9 +238,9 @@ public class FullTextQueryImpl implements FullTextQuery {
 	private static final Loader noLoader = new Loader() {
 		@Override
 		public void init(WorkLoadImpl workLoad,
-						 ExtendedSearchIntegrator extendedIntegrator,
-						 ObjectInitializer objectInitializer,
-						 TimeoutManager timeoutManager) {
+						ExtendedSearchIntegrator extendedIntegrator,
+						ObjectInitializer objectInitializer,
+						TimeoutManager timeoutManager) {
 		}
 
 		@Override

@@ -25,7 +25,6 @@ import org.junit.Before;
 
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.manualsource.WorkLoadManager;
-import org.hibernate.search.manualsource.impl.ObjectInitializerContext;
 import org.hibernate.search.manualsource.impl.WorkLoadManagerImpl;
 import org.hibernate.search.manualsource.source.EntityKeyForLoad;
 import org.hibernate.search.manualsource.source.EntitySourceContext;
@@ -126,7 +125,7 @@ public abstract class ManualSourceTestBase {
 
 	public static class MapBasedEntitySource implements EntitySourceContextBuilder, EntitySourceContext {
 
-		private ConcurrentHashMap<Serializable, Object> database = new ConcurrentHashMap<>(  );
+		private ConcurrentHashMap<Serializable, Object> database = new ConcurrentHashMap<>();
 
 		@Override
 		public EntitySourceContext buildEntitySourceContextForWorkLoad() {

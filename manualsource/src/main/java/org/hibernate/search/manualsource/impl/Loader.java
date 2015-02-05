@@ -9,9 +9,7 @@ package org.hibernate.search.manualsource.impl;
 
 import java.util.List;
 
-import org.hibernate.Session;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.manualsource.WorkLoad;
 import org.hibernate.search.manualsource.source.ObjectInitializer;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.TimeoutManager;

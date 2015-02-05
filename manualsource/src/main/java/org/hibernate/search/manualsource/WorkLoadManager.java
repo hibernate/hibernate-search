@@ -15,12 +15,12 @@ import org.hibernate.search.manualsource.source.EntitySourceContext;
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public interface WorkLoadManager {
-	public WorkLoad createWorkLoad();
+	WorkLoad createWorkLoad();
 
 	/**
 	 * Overrides the EntitySourceContext instance provided by the builder.
 	 */
-	public WorkLoad createWorkLoad(EntitySourceContext entitySourceContext);
+	WorkLoad createWorkLoad(EntitySourceContext entitySourceContext);
 
-	public void close();
+	void close();
 }

@@ -8,13 +8,9 @@
 package org.hibernate.search.manualsource.backend.impl;
 
 import java.io.Serializable;
-
-import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
-import org.hibernate.HibernateException;
 import org.hibernate.search.backend.TransactionContext;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.manualsource.impl.WorkLoadImpl;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

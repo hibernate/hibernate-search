@@ -39,9 +39,9 @@ public class MultiClassesQueryLoader extends AbstractLoader {
 
 	@Override
 	public void init(WorkLoadImpl workLoad,
-					 ExtendedSearchIntegrator extendedSearchIntegrator,
-					 ObjectInitializer objectInitializer,
-					 TimeoutManager timeoutManager) {
+					ExtendedSearchIntegrator extendedSearchIntegrator,
+					ObjectInitializer objectInitializer,
+					TimeoutManager timeoutManager) {
 		super.init( workLoad, extendedSearchIntegrator );
 		this.extendedIntegrator = extendedSearchIntegrator;
 		this.timeoutManager = timeoutManager;

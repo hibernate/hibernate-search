@@ -17,8 +17,6 @@ import org.apache.lucene.search.Sort;
 
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.filter.FullTextFilter;
-import org.hibernate.search.query.DatabaseRetrievalMethod;
-import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.spatial.Coordinates;
 
@@ -32,7 +30,7 @@ public interface FullTextQuery extends ProjectionConstants {
 	 * Return an iterator on the results.
 	 * Retrieve the object one by one (initialize it during the next() operation)
 	 */
-	public Iterator iterate();
+	Iterator iterate();
 
 	/**
 	 * Return the query results as a <tt>List</tt>. If the query contains
@@ -42,7 +40,7 @@ public interface FullTextQuery extends ProjectionConstants {
 	 * @return the result list
 	 */
 	//TODO use the JPA names?
-	public List list();
+	List list();
 
 	/**
 	 * Allows to let lucene sort the results. This is useful when you have
