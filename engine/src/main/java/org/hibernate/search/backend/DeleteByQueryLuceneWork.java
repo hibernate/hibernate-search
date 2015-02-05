@@ -16,7 +16,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  *
  * @author Martin Braun
  */
-public class DeleteByQueryLuceneWork extends LuceneWork implements Serializable {
+public class DeleteByQueryLuceneWork extends LuceneWork implements {
 
 	private final DeletionQuery deletionQuery;
 
