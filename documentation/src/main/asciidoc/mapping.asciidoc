@@ -1818,15 +1818,13 @@ A calling context is represented by the BridgeContext object and represents the 
 which we are looking for a bridge. BridgeContext gives access to the return type of the indexed
 property as well as the ServiceManager which gives access to the ClassLoaderService for everything
 class loader related.
-====
+
 [source, JAVA]
 ----
 ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 //use the classLoaderService
 serviceManager.releaseService( ClassLoaderService.class );
 ----
-====
-
 ====
 
 [[search-mapping-indexinginterceptor]]
