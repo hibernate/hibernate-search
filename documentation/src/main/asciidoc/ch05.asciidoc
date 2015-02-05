@@ -1245,9 +1245,9 @@ Declaring filters is done through the `@FullTextFilterDef` annotation.
 You can use  `@FullTextFilterDef` or `@FullTextFilterDefs` on any:
 *`@Indexed` entity regardless of the query the filter is later applied to
 * Parent class of an `@Indexed` entity
-* package-info.java containing an `@Indexed` entity
+* package-info.java of a package containing an `@Indexed` entity
 
-This implies that filter definitions are global and their names must be unique.o
+This implies that filter definitions are global and their names must be unique.
 A `SearchException` is thrown in case two different `@FullTextFilterDef` annotations
 with the same name are defined. Each named filter has to
 specify its actual filter implementation.

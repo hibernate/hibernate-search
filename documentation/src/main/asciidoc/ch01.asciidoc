@@ -423,10 +423,10 @@ To find out more about the factory classes available
 you can either browse the Lucene JavaDoc or read the corresponding section on the
 link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki].
 
-You can use  `@AnalyzerDef` or `@AnalyzerDefs` on any:
+You can use `@AnalyzerDef` or `@AnalyzerDefs` on any:
 *`@Indexed` entity regardless of where the analyzer is applied to;
 * parent class of an `@Indexed` entity;
-* package-info.java containing an `@Indexed` entity.
+* package-info.java of a package containing an `@Indexed` entity.
 
 This implies that analyzer definitions are global and their names must be unique.
 
