@@ -62,6 +62,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 	private final ErrorHandler errorHandler;
 	private final BatchBackend backend;
 	private final CountDownLatch producerEndSignal;
+	private final String tenantId;
 
 	public IdentifierConsumerDocumentProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
@@ -70,7 +71,8 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 			CountDownLatch producerEndSignal,
 			CacheMode cacheMode, Class<?> type,
 			ExtendedSearchIntegrator searchFactory,
-			String idName, BatchBackend backend, ErrorHandler errorHandler) {
+			String idName, BatchBackend backend, ErrorHandler errorHandler,
+			String tenantId) {
 		this.source = fromIdentifierListToEntities;
 		this.monitor = monitor;
 		this.sessionFactory = sessionFactory;
@@ -81,6 +83,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 		this.errorHandler = errorHandler;
 		this.producerEndSignal = producerEndSignal;
 		this.entityIndexBindings = searchFactory.getIndexBindings();
+		this.tenantId = tenantId;
 		log.trace( "created" );
 	}
 
@@ -89,7 +92,12 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 		log.trace( "started" );
 		Session session = upperSession;
 		if ( upperSession == null ) {
-			session = sessionFactory.openSession();
+			if ( tenantId == null ) {
+				session = sessionFactory.openSession();
+			}
+			else {
+				session = sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession();
+			}
 		}
 		session.setFlushMode( FlushMode.MANUAL );
 		session.setCacheMode( cacheMode );

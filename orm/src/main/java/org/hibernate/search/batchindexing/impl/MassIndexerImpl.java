@@ -12,10 +12,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
-
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.MassIndexer;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
+import org.hibernate.search.batchindexing.spi.MassIndexerWithTenant;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.jmx.impl.JMXRegistrar;
 import org.hibernate.search.spi.SearchIntegrator;
@@ -31,7 +31,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class MassIndexerImpl implements MassIndexer {
+public class MassIndexerImpl implements MassIndexerWithTenant {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -51,6 +51,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private boolean optimizeAfterPurge = true;
 	private MassIndexerProgressMonitor monitor;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
+	private String tenantIdentifier;
 
 	protected MassIndexerImpl(SearchIntegrator searchIntegrator, SessionFactoryImplementor sessionFactory, Class<?>... entities) {
 		this.extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
@@ -181,6 +182,12 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	@Override
+	public MassIndexerWithTenant tenantIdentifier(String tenantIdentifier) {
+		this.tenantIdentifier = tenantIdentifier;
+		return this;
+	}
+
+	@Override
 	public Future<?> start() {
 		BatchCoordinator coordinator = createCoordinator();
 		ExecutorService executor = Executors.newFixedThreadPool( 1, "batch coordinator" );
@@ -208,7 +215,7 @@ public class MassIndexerImpl implements MassIndexer {
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor, idFetchSize
+				monitor, idFetchSize, tenantIdentifier
 		);
 	}
 
