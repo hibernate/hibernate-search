@@ -230,6 +230,7 @@
                             org.hibernate.search.query.engine.spi;version="${project.version}",
                             org.hibernate.search.query.facet;version="${project.version}",
                             org.hibernate.search.query.fieldcache;version="${project.version}",
+                            org.hibernate.search.query.grouping;version="${project.version}",
                             org.hibernate.search.spatial;version="${project.version}",
                             org.hibernate.search.spatial.impl;version="${project.version}",
                             org.hibernate.search.spi;version="${project.version}",
