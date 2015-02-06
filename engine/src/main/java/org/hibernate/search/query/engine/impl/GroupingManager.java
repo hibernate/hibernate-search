@@ -1,3 +1,9 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
@@ -14,35 +20,35 @@ import org.hibernate.search.query.grouping.GroupingResult;
 public class GroupingManager {
 
 	private GroupingRequest grouping;
-	
+
 	private GroupingResult groupingResult;
-	
+
 	/**
 	 * The query from which this manager was retrieved
 	 */
 	private final HSQueryImpl query;
-	
+
 	GroupingManager(HSQueryImpl query) {
 		this.query = query;
 	}
-	
+
 	public void group(GroupingRequest grouping) {
 		this.grouping = grouping;
 	}
-	
+
 	public GroupingRequest getGrouping() {
 		return grouping;
 	}
-	
+
 	public void setGroupingResult(GroupingResult groupingResult) throws IOException {
 		this.groupingResult = groupingResult;
 	}
-	
+
 	public GroupingResult getGroupingResult() throws IOException {
 		DocumentExtractor queryDocumentExtractor = query.queryDocumentExtractor();
-		this.groupingResult.init(queryDocumentExtractor);
+		this.groupingResult.init( queryDocumentExtractor );
 		queryDocumentExtractor.close();
-		
+
 		return groupingResult;
 	}
 }

@@ -21,81 +21,65 @@ import org.junit.Test;
  * @author Sascha Grebe
  */
 public class SimpleGroupingTest extends AbstractGroupingTest {
-	
+
 	private final String indexFieldName = "color";
-	
+
 	@Test
 	public void testSimpleGrouping() throws Exception {
-		final GroupingRequest request = queryBuilder( Car.class ).group()
-				.onField( indexFieldName )
-				.topGroupCount(10)
-				.createGroupingRequest();
-		
+		final GroupingRequest request = queryBuilder( Car.class ).group().onField( indexFieldName ).topGroupCount( 10 ).createGroupingRequest();
+
 		final FullTextQuery query = queryHondaWithGrouping( request );
-		
+
 		final GroupingResult groups = query.getGroupingManager().getGroupingResult();
 		assertEquals( "Wrong number of total groups", 5, groups.getTotalGroupCount().intValue() );
 	}
 
 	@Test
 	public void testWithMaxGroupLimit() throws Exception {
-		final GroupingRequest request = queryBuilder( Car.class ).group()
-				.onField( indexFieldName )
-				.topGroupCount(1)
-				.createGroupingRequest();
-		
+		final GroupingRequest request = queryBuilder( Car.class ).group().onField( indexFieldName ).topGroupCount( 1 ).createGroupingRequest();
+
 		final FullTextQuery query = queryHondaWithGrouping( request );
-		
+
 		final GroupingResult groups = query.getGroupingManager().getGroupingResult();
 		assertEquals( "Wrong number of total groups", 5, groups.getTotalGroupCount().intValue() );
 		assertEquals( "Wrong number of returned groups", 1, groups.getGroups().size() );
 	}
-	
+
 	@Test
 	public void testWithMaxDocPerGroupLimit() throws Exception {
-		final GroupingRequest request = queryBuilder( Car.class ).group()
-				.onField( indexFieldName )
-				.topGroupCount(2)
-				.maxDocsPerGroup(1)
+		final GroupingRequest request = queryBuilder( Car.class ).group().onField( indexFieldName ).topGroupCount( 2 ).maxDocsPerGroup( 1 )
 				.createGroupingRequest();
-		
+
 		final FullTextQuery query = queryHondaWithGrouping( request );
-		
+
 		final GroupingResult groups = query.getGroupingManager().getGroupingResult();
 		assertEquals( "Wrong number of total groups", 5, groups.getTotalGroupCount().intValue() );
 		// returns the sum of docs in group no matter how many loaded
 		assertEquals( "Wrong number of total hits in groups", 6, groups.getTotalGroupedHitCount() );
 	}
-	
+
 	@Test
 	public void testWithGroupOffset() throws Exception {
-		final GroupingRequest request = queryBuilder( Car.class ).group()
-				.onField( indexFieldName )
-				.topGroupCount(2)
-				.groupOffset(3)
-				.createGroupingRequest();
-		
+		final GroupingRequest request = queryBuilder( Car.class ).group().onField( indexFieldName ).topGroupCount( 2 ).groupOffset( 3 ).createGroupingRequest();
+
 		final FullTextQuery query = queryHondaWithGrouping( request );
-		
+
 		final GroupingResult groups = query.getGroupingManager().getGroupingResult();
 		// returns the sum of docs in group no matter how many loaded
 		assertEquals( "Wrong number of total hits in groups", 4, groups.getTotalGroupedHitCount() );
 	}
-	
+
 	@Test
 	public void testOmmitTotalHitCount() throws Exception {
-		final GroupingRequest request = queryBuilder( Car.class ).group()
-				.onField( indexFieldName )
-				.topGroupCount(10)
-				.calculateTotalGroupCount(false)
+		final GroupingRequest request = queryBuilder( Car.class ).group().onField( indexFieldName ).topGroupCount( 10 ).calculateTotalGroupCount( false )
 				.createGroupingRequest();
-		
+
 		final FullTextQuery query = queryHondaWithGrouping( request );
-		
+
 		final GroupingResult groups = query.getGroupingManager().getGroupingResult();
 		assertNull( "Wrong number of total hits in groups", groups.getTotalGroupCount() );
 	}
-	
+
 	private FullTextQuery queryHondaWithGrouping(GroupingRequest request) {
 		Query luceneQuery = queryBuilder( Car.class ).keyword().onField( "make" ).matching( "Honda" ).createQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
@@ -115,7 +99,7 @@ public class SimpleGroupingTest extends AbstractGroupingTest {
 				}
 			}
 		}
-		
+
 		Car car = new Car( "Honda", "yellow", 2407 );
 		session.save( car );
 
@@ -127,8 +111,6 @@ public class SimpleGroupingTest extends AbstractGroupingTest {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] {
-				Car.class
-		};
+		return new Class[] { Car.class };
 	}
 }

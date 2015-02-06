@@ -21,9 +21,9 @@ import org.hibernate.search.query.grouping.GroupingRequest;
  * @author Hardy Ferentschik
  */
 public class GroupingCollector extends TermFirstPassGroupingCollector {
-	
+
 	private GroupingRequest grouping;
-	
+
 	/**
 	 * The next collector in the delegation chain
 	 */
@@ -33,40 +33,41 @@ public class GroupingCollector extends TermFirstPassGroupingCollector {
 	 * We need to use all groups collector only for the total group count to make sure no group is missed.
 	 */
 	private final TermAllGroupsCollector allGroupsCollector;
-	
+
 	public GroupingCollector(Collector nextInChainCollector, GroupingRequest grouping) throws IOException {
-		super(grouping.getFieldName(), grouping.getGroupSort(), grouping.getGroupOffset() + grouping.getTopGroupCount());
+		super( grouping.getFieldName(), grouping.getGroupSort(), grouping.getGroupOffset() + grouping.getTopGroupCount() );
 		this.grouping = grouping;
-		
+
 		// total group count calculation can be parameterized.
-		if (grouping.isCalculateTotalGroupCount()) {
-			this.allGroupsCollector = new TotalGroupCountCollector(nextInChainCollector, grouping);
+		if ( grouping.isCalculateTotalGroupCount() ) {
+			this.allGroupsCollector = new TotalGroupCountCollector( nextInChainCollector, grouping );
 			this.nextInChainCollector = this.allGroupsCollector;
-		} else {
+		}
+		else {
 			this.allGroupsCollector = null;
 			this.nextInChainCollector = nextInChainCollector;
 		}
 	}
-	
+
 	public GroupingRequest getGrouping() {
 		return grouping;
 	}
-	
+
 	@Override
 	public void setNextReader(AtomicReaderContext context) throws IOException {
-		super.setNextReader(context);
+		super.setNextReader( context );
 		nextInChainCollector.setNextReader( context );
 	}
 
 	@Override
 	public void collect(int doc) throws IOException {
-		super.collect(doc);
+		super.collect( doc );
 		nextInChainCollector.collect( doc );
 	}
 
 	@Override
 	public void setScorer(Scorer scorer) throws IOException {
-		super.setScorer(scorer);
+		super.setScorer( scorer );
 		nextInChainCollector.setScorer( scorer );
 	}
 
@@ -77,9 +78,10 @@ public class GroupingCollector extends TermFirstPassGroupingCollector {
 	}
 
 	public Integer getTotalGroupCount() {
-		if (allGroupsCollector != null) {
+		if ( allGroupsCollector != null ) {
 			return allGroupsCollector.getGroupCount();
-		} else {
+		}
+		else {
 			return null;
 		}
 	}

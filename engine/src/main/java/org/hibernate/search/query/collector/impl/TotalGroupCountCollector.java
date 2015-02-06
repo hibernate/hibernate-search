@@ -1,3 +1,9 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
 package org.hibernate.search.query.collector.impl;
 
 import java.io.IOException;
@@ -9,32 +15,32 @@ import org.apache.lucene.search.grouping.term.TermAllGroupsCollector;
 import org.hibernate.search.query.grouping.GroupingRequest;
 
 public class TotalGroupCountCollector extends TermAllGroupsCollector {
-	
+
 	/**
 	 * The next collector in the delegation chain
 	 */
 	private final Collector nextInChainCollector;
-	
+
 	public TotalGroupCountCollector(Collector nextInChainCollector, GroupingRequest grouping) {
-		super(grouping.getFieldName());
+		super( grouping.getFieldName() );
 		this.nextInChainCollector = nextInChainCollector;
 	}
-	
+
 	@Override
 	public void setNextReader(AtomicReaderContext context) throws IOException {
-		super.setNextReader(context);
+		super.setNextReader( context );
 		nextInChainCollector.setNextReader( context );
 	}
 
 	@Override
 	public void collect(int doc) throws IOException {
-		super.collect(doc);
+		super.collect( doc );
 		nextInChainCollector.collect( doc );
 	}
 
 	@Override
 	public void setScorer(Scorer scorer) throws IOException {
-		super.setScorer(scorer);
+		super.setScorer( scorer );
 		nextInChainCollector.setScorer( scorer );
 	}
 

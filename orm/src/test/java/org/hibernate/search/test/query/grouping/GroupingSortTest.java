@@ -26,82 +26,77 @@ import org.junit.Test;
  * @author Sascha Grebe
  */
 public class GroupingSortTest extends AbstractGroupingTest {
-	
+
 	private final String indexFieldName = "color";
-	
+
 	@Test
 	public void testSortGroupsByColor() throws Exception {
-		testSortGroupsByColor(false);
+		testSortGroupsByColor( false );
 	}
-	
+
 	@Test
 	public void testSortGroupsByColorInverted() throws Exception {
-		testSortGroupsByColor(true);
+		testSortGroupsByColor( true );
 	}
-	
+
 	private void testSortGroupsByColor(boolean invert) throws Exception {
-		final GroupingRequest request = queryBuilder( Car.class ).group()
-				.onField( indexFieldName )
-				.topGroupCount(10)
-				.groupSort(new Sort(new SortField(indexFieldName, Type.STRING, invert)))
-				.createGroupingRequest();
-		
+		final GroupingRequest request = queryBuilder( Car.class ).group().onField( indexFieldName ).topGroupCount( 10 )
+				.groupSort( new Sort( new SortField( indexFieldName, Type.STRING, invert ) ) ).createGroupingRequest();
+
 		final FullTextQuery query = queryHondaWithGrouping( request );
-		
+
 		final GroupingResult groups = query.getGroupingManager().getGroupingResult();
-		
+
 		// check groups sorted by color
 		Group lastGroup = null;
-		for (Group nextGroup : groups.getGroups()) {
-			if (lastGroup != null && !invert) {
-				assertTrue(lastGroup.getValue().compareTo(nextGroup.getValue()) < 0);
-				
-			} else if (lastGroup != null && invert) {
-				assertTrue(lastGroup.getValue().compareTo(nextGroup.getValue()) > 0);
-				
+		for ( Group nextGroup : groups.getGroups() ) {
+			if ( lastGroup != null && !invert ) {
+				assertTrue( lastGroup.getValue().compareTo( nextGroup.getValue() ) < 0 );
+
+			}
+			else if ( lastGroup != null && invert ) {
+				assertTrue( lastGroup.getValue().compareTo( nextGroup.getValue() ) > 0 );
+
 			}
 			lastGroup = nextGroup;
 		}
 	}
-	
+
 	@Test
 	public void testSortEntitiesInGroupByCubicCapacity() throws Exception {
-		testSortEntitiesInGroupByCubicCapacity(false);
+		testSortEntitiesInGroupByCubicCapacity( false );
 	}
-	
+
 	@Test
 	public void testSortEntitiesInGroupByCubicCapacityInvert() throws Exception {
-		testSortEntitiesInGroupByCubicCapacity(true);
+		testSortEntitiesInGroupByCubicCapacity( true );
 	}
 
 	public void testSortEntitiesInGroupByCubicCapacity(boolean invert) throws Exception {
-		final GroupingRequest request = queryBuilder( Car.class ).group()
-				.onField( indexFieldName )
-				.topGroupCount(10)
-				.maxDocsPerGroup(10)
-				.withinGroupSort(new Sort(new SortField("cubicCapacity", Type.INT, invert)))
-				.createGroupingRequest();
-		
+		final GroupingRequest request = queryBuilder( Car.class ).group().onField( indexFieldName ).topGroupCount( 10 ).maxDocsPerGroup( 10 )
+				.withinGroupSort( new Sort( new SortField( "cubicCapacity", Type.INT, invert ) ) ).createGroupingRequest();
+
 		final FullTextQuery query = queryHondaWithGrouping( request );
-		
+
 		final GroupingResult groups = query.getGroupingManager().getGroupingResult();
-		
+
 		// check entities in groups sorted by cubic capacity
-		for (Group nextGroup : groups.getGroups()) {
+		for ( Group nextGroup : groups.getGroups() ) {
 			final Session session = this.getSession();
 			Car lastCar = null;
-			for (EntityInfo nextEntityInfo : nextGroup.getHits()) {
-				final Car car = (Car) session.load(nextEntityInfo.getClazz(), nextEntityInfo.getId());
-				if (lastCar != null && !invert) {
-					assertTrue(lastCar.getCubicCapacity() < car.getCubicCapacity());
-				} else if (lastCar != null && invert) {
-					assertTrue(lastCar.getCubicCapacity() > car.getCubicCapacity());
+			for ( EntityInfo nextEntityInfo : nextGroup.getHits() ) {
+				final Car car = (Car) session.load( nextEntityInfo.getClazz(), nextEntityInfo.getId() );
+				if ( lastCar != null && !invert ) {
+					assertTrue( lastCar.getCubicCapacity() < car.getCubicCapacity() );
+				}
+				else if ( lastCar != null && invert ) {
+					assertTrue( lastCar.getCubicCapacity() > car.getCubicCapacity() );
 				}
 				lastCar = car;
 			}
 		}
 	}
-	
+
 	private FullTextQuery queryHondaWithGrouping(GroupingRequest request) {
 		Query luceneQuery = queryBuilder( Car.class ).keyword().onField( "make" ).matching( "Honda" ).createQuery();
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
@@ -121,7 +116,7 @@ public class GroupingSortTest extends AbstractGroupingTest {
 				}
 			}
 		}
-		
+
 		Car car = new Car( "Honda", "yellow", 2407 );
 		session.save( car );
 
@@ -133,8 +128,6 @@ public class GroupingSortTest extends AbstractGroupingTest {
 
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
-		return new Class[] {
-				Car.class
-		};
+		return new Class[] { Car.class };
 	}
 }

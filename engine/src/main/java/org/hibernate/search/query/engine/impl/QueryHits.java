@@ -287,56 +287,54 @@ public class QueryHits {
 	
 	private Collector optionallyEnableGroupingCollectors(Collector collector) throws IOException {
 		// add grouping collector to collector chain
-		if (grouping != null) {
-			groupingCollector = new GroupingCollector(collector, grouping);
+		if ( grouping != null ) {
+			groupingCollector = new GroupingCollector( collector, grouping );
 			collector = groupingCollector;
 		}
 		return collector;
 	}
-	
+
 	public GroupingResult getGroupingResult() throws IOException {
 		final SimpleGroupingResult groupingResult = new SimpleGroupingResult();
-		if (groupingCollector != null) {
+		if ( groupingCollector != null ) {
 			final TopGroups<BytesRef> topGroups = getTopGroups();
-			if (topGroups != null) {
-			   // get the top groups by the second pass collector
-			   groupingResult.setTotalGroupCount(groupingCollector.getTotalGroupCount());
-			   groupingResult.setTotalGroupedHitCount(topGroups.totalGroupedHitCount);
-			   groupingResult.setTotalHitCount(topGroups.totalHitCount);
-			   
-			   // extract usefull information from top groups
-			   for (GroupDocs<BytesRef> nextGroup : topGroups.groups) {
-				   final SimpleGroup group = new SimpleGroup();
-				   for (int i = 0; i < nextGroup.scoreDocs.length; i++) {
-					   group.setScoreDocs(nextGroup.scoreDocs);
-				   }
-				   group.setTotalHits(nextGroup.totalHits);
-				   group.setValue(nextGroup.groupValue.utf8ToString());
-				   
-				   groupingResult.addGroup(group);
-			   }
+			if ( topGroups != null ) {
+				// get the top groups by the second pass collector
+				groupingResult.setTotalGroupCount( groupingCollector.getTotalGroupCount() );
+				groupingResult.setTotalGroupedHitCount( topGroups.totalGroupedHitCount );
+				groupingResult.setTotalHitCount( topGroups.totalHitCount );
+
+				// extract usefull information from top groups
+				for ( GroupDocs<BytesRef> nextGroup : topGroups.groups ) {
+					final SimpleGroup group = new SimpleGroup();
+					for ( int i = 0; i < nextGroup.scoreDocs.length; i++ ) {
+						group.setScoreDocs( nextGroup.scoreDocs );
+					}
+					group.setTotalHits( nextGroup.totalHits );
+					group.setValue( nextGroup.groupValue.utf8ToString() );
+
+					groupingResult.addGroup( group );
+				}
 			}
 		}
-		
+
 		return groupingResult;
 	}
-	
+
 	private TopGroups<BytesRef> getTopGroups() throws IOException {
 		// get the grouping data from the first pass group collector
 		final GroupingRequest grouping = groupingCollector.getGrouping();
-					
-		final Collection<SearchGroup<BytesRef>> topGroups = groupingCollector.getTopGroups(grouping.getGroupOffset(), true);
+
+		final Collection<SearchGroup<BytesRef>> topGroups = groupingCollector.getTopGroups( grouping.getGroupOffset(), true );
 		// run the second pass collector only when the first collector return top groups
-		if (topGroups != null) {
-			final TermSecondPassGroupingCollector secondGrouping = new TermSecondPassGroupingCollector(
-					grouping.getFieldName(), topGroups,
-					grouping.getGroupSort(), grouping.getWithinGroupSort(),
-					grouping.getMaxDocsPerGroup(), true, true, true);
-			searcher.search(filter, secondGrouping);
-			
-			return secondGrouping.getTopGroups(0);
+		if ( topGroups != null ) {
+			final TermSecondPassGroupingCollector secondGrouping = new TermSecondPassGroupingCollector( grouping.getFieldName(), topGroups,
+					grouping.getGroupSort(), grouping.getWithinGroupSort(), grouping.getMaxDocsPerGroup(), true, true, true );
+			searcher.search( filter, secondGrouping );
+
+			return secondGrouping.getTopGroups( 0 );
 		}
-		
+
 		return null;
 	}
 	

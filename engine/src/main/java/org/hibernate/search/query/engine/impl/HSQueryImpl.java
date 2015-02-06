@@ -118,7 +118,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutExceptionFactory = extendedIntegrator.getDefaultTimeoutExceptionFactory();
 		this.facetManager = new FacetManagerImpl( this );
-		this.groupingManager = new GroupingManager(this);
+		this.groupingManager = new GroupingManager( this );
 	}
 
 	@Override

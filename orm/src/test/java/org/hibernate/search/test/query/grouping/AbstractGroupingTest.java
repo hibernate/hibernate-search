@@ -28,15 +28,15 @@ import static org.junit.Assert.assertEquals;
  * @author Hardy Ferentschik
  */
 public abstract class AbstractGroupingTest extends SearchTestBase {
-	
+
 	public static final String[] colors = { "red", "black", "white", "blue" };
 
 	public static final String[] makes = { "Honda", "Toyota", "BMW", "Mercedes" };
 
 	public static final int[] ccs = { 3398, 2407, 2831 };
-	
+
 	protected FullTextSession fullTextSession;
-	
+
 	protected Transaction tx;
 
 	@Override
