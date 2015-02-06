@@ -26,7 +26,7 @@ import org.junit.Test;
  * <p>
  * Search dependencies are not added to the archives.
  *
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public abstract class SearchNewEntityJmsMasterSlave {
 

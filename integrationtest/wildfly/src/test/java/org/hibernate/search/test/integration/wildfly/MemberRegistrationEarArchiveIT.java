@@ -34,7 +34,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Example of an integration test using JBoss AS 7 and Arquillian.
+ * Test basic Hibernate Search configuration (RAM directory provider), deployed on an application server as an EAR
+ * containing all the required library dependencies.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero

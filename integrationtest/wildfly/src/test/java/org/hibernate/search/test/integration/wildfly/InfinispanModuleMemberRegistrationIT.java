@@ -36,7 +36,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test the Hibernate Search module in Wildfly combined with an Infinispan Directory usage.
+ * Test basic Hibernate Search configuration (RAM directory provider), deployed on an application server as an EAR
+ * containing all the required library dependencies.
  *
  * @author Sanne Grinovero
  */

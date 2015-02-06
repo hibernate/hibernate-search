@@ -22,11 +22,15 @@ import org.jboss.arquillian.junit.InSequence;
 import org.junit.Test;
 
 /**
- * Test that the JMS backend can be used at the same time with Infinispan.
+ * Test integration between JMS+Infinispan and an additional Infinispan cache that might exists.
  * <p>
- * Search dependencies are not added to the archives.
+ * It will:
+ * <ul>
+ * <li>add members in a node and search for them in a different node;
+ * <li>add something to an infinispan cache in a node and get it in a different node.
+ * </ul>
  *
- * @author Davide D'Alto <davide@hibernate.org>
+ * @author Davide D'Alto
  */
 public abstract class SearchNewEntityJmsMasterSlaveAndInfinispan {
 
