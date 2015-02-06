@@ -44,12 +44,15 @@ public interface BuildContext {
 	ExtendedSearchIntegrator getUninitializedSearchIntegrator();
 
 	/**
-	 * Returns the configured indexing strategy (<i>event</i> vs <i>manual</i>).
-	 *
-	 * @return hte configured indexing strategy
-	 * @see org.hibernate.search.cfg.Environment#INDEXING_STRATEGY
+	 * @deprecated Scheduled for removal. Use {@link #getIndexingMode()} instead.
 	 */
+	@Deprecated
 	String getIndexingStrategy();
+
+	/**
+	 * Returns the current indexing strategy as specified via {@link org.hibernate.search.cfg.Environment#INDEXING_STRATEGY}.
+	 */
+	IndexingMode getIndexingMode();
 
 	/**
 	 * Access the {@code ServiceManager}.

@@ -753,4 +753,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 253, value = "To use '%1$s' as a locking strategy, an indexBase path must be set")
 	SearchException indexBasePathRequiredForLockingStrategy(String strategy);
+
+	@Message(id = 254, value = "Unknown indexing mode: %1$s")
+	SearchException unknownIndexingMode(String indexingMode);
 }

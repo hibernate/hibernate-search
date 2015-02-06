@@ -175,8 +175,13 @@ public interface SearchIntegrator extends AutoCloseable {
 	/**
 	 * Shuts down all workers and releases all resources.
 	 */
+	@Override
 	void close();
 
 	IndexManager getIndexManager(String indexName);
 
+	/**
+	 * Returns the current indexing strategy as specified via {@link org.hibernate.search.cfg.Environment#INDEXING_STRATEGY}.
+	 */
+	IndexingMode getIndexingMode();
 }
