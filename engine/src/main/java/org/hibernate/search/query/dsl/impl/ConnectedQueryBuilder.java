@@ -65,7 +65,7 @@ public class ConnectedQueryBuilder implements QueryBuilder {
 	public GroupingContext group() {
 		return new ConnectedGroupingContext(new GroupingBuildingContext());
 	}
-	
+
 	@Override
 	public SpatialContext spatial() {
 		return new ConnectedSpatialContext( context );

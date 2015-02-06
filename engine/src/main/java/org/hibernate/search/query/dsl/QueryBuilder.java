@@ -64,11 +64,11 @@ public interface QueryBuilder {
 
 	/**
 	 * Build a grouping query.
-	 * 
+	 *
 	 * @return the grouping context for building the grouping query.
 	 */
 	GroupingContext group();
-	
+
 	/**
 	 * Build a spatial query.
 	 */

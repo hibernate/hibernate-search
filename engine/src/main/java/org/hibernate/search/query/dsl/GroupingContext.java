@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.query.dsl;
 
+/**
+ * @author Sascha Grebe
+ */
 public interface GroupingContext {
 
 	/**
 	 * Group by the given field name.
-	 * 
+	 *
 	 * @param fieldName The field name.
 	 * @return The parameter context.
 	 */

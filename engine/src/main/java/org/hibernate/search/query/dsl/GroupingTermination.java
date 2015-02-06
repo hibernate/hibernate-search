@@ -8,11 +8,14 @@ package org.hibernate.search.query.dsl;
 
 import org.hibernate.search.query.grouping.GroupingRequest;
 
+/**
+ * @author Sascha Grebe
+ */
 public interface GroupingTermination {
 
 	/**
 	 * Create the final grouping request.
-	 * 
+	 *
 	 * @return The grouping request.
 	 */
 	GroupingRequest createGroupingRequest();

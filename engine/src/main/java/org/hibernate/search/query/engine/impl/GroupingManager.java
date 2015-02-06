@@ -14,7 +14,7 @@ import org.hibernate.search.query.grouping.GroupingResult;
 
 /**
  * The manager used for all grouping related operation.
- * 
+ *
  * @author Sascha Grebe
  */
 public class GroupingManager {

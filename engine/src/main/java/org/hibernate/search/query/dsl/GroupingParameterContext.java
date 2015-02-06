@@ -8,11 +8,14 @@ package org.hibernate.search.query.dsl;
 
 import org.apache.lucene.search.Sort;
 
+/**
+ * @author Sascha Grebe
+ */
 public interface GroupingParameterContext extends GroupingTermination {
 
 	/**
 	 * The sorting of the groups.
-	 * 
+	 *
 	 * @param groupSort
 	 * @return
 	 */
@@ -20,7 +23,7 @@ public interface GroupingParameterContext extends GroupingTermination {
 
 	/**
 	 * The sorting within the group.
-	 * 
+	 *
 	 * @param withinGroupSort
 	 * @return
 	 */
@@ -28,7 +31,7 @@ public interface GroupingParameterContext extends GroupingTermination {
 
 	/**
 	 * The maimum number of fetched documents per group. Needs to be greater than 0. The default is 1.
-	 * 
+	 *
 	 * @param maxDocsPerGroup
 	 * @return
 	 */
@@ -36,7 +39,7 @@ public interface GroupingParameterContext extends GroupingTermination {
 
 	/**
 	 * The offset of the first group (skip the first n groups). Used for pagination.
-	 * 
+	 *
 	 * @param groupOffset
 	 * @return
 	 */

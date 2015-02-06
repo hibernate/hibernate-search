@@ -10,7 +10,7 @@ import org.apache.lucene.search.Sort;
 
 /**
  * The grouping request which contains all parameters used for grouping the results.
- * 
+ *
  * @author Sascha Grebe
  */
 public class GroupingRequest {
@@ -52,7 +52,7 @@ public class GroupingRequest {
 
 	/**
 	 * The field name which is used for grouping.
-	 * 
+	 *
 	 * @return The field name which is used for grouping.
 	 */
 	public String getFieldName() {
@@ -61,7 +61,7 @@ public class GroupingRequest {
 
 	/**
 	 * The field name which is used for grouping.
-	 * 
+	 *
 	 * @param fieldName The field name which is used for grouping.
 	 */
 	public void setFieldName(String fieldName) {
@@ -70,7 +70,7 @@ public class GroupingRequest {
 
 	/**
 	 * The maximum hits per group.
-	 * 
+	 *
 	 * @return The maximum hits per group.
 	 */
 	public int getMaxDocsPerGroup() {
@@ -79,7 +79,7 @@ public class GroupingRequest {
 
 	/**
 	 * The maximum hits per group.
-	 * 
+	 *
 	 * @param maxDocsPerGroup The maximum hits per group.
 	 */
 	public void setMaxDocsPerGroup(int maxDocsPerGroup) {
@@ -88,7 +88,7 @@ public class GroupingRequest {
 
 	/**
 	 * The maximum count of returned groups.
-	 * 
+	 *
 	 * @return The maximum count of returned groups.
 	 */
 	public int getTopGroupCount() {
@@ -97,7 +97,7 @@ public class GroupingRequest {
 
 	/**
 	 * The maximum count of returned groups.
-	 * 
+	 *
 	 * @param topGroupCount The maximum count of returned groups.
 	 */
 	public void setTopGroupCount(int topGroupCount) {
@@ -106,7 +106,7 @@ public class GroupingRequest {
 
 	/**
 	 * The sorting of the groups.
-	 * 
+	 *
 	 * @return The sorting of the groups.
 	 */
 	public Sort getGroupSort() {
@@ -115,7 +115,7 @@ public class GroupingRequest {
 
 	/**
 	 * The sorting of the groups.
-	 * 
+	 *
 	 * @param groupSort The sorting of the groups.
 	 */
 	public void setGroupSort(Sort groupSort) {
@@ -124,7 +124,7 @@ public class GroupingRequest {
 
 	/**
 	 * The sorting withing each group.
-	 * 
+	 *
 	 * @return The sorting withing each group.
 	 */
 	public Sort getWithinGroupSort() {
@@ -133,7 +133,7 @@ public class GroupingRequest {
 
 	/**
 	 * The sorting withing each group.
-	 * 
+	 *
 	 * @param withinGroupSort The sorting withing each group.
 	 */
 	public void setWithinGroupSort(Sort withinGroupSort) {
@@ -142,7 +142,7 @@ public class GroupingRequest {
 
 	/**
 	 * Indicator whether the total group count shall be calculated.
-	 * 
+	 *
 	 * @param calculateTotalGroupCount Indicator whether the total group count shall be calculated.
 	 */
 	public void setCalculateTotalGroupCount(boolean calculateTotalGroupCount) {
@@ -151,7 +151,7 @@ public class GroupingRequest {
 
 	/**
 	 * Indicator whether the total group count shall be calculated.
-	 * 
+	 *
 	 * @return Indicator whether the total group count shall be calculated.
 	 */
 	public boolean isCalculateTotalGroupCount() {
@@ -160,7 +160,7 @@ public class GroupingRequest {
 
 	/**
 	 * The count of groups to be skiped.
-	 * 
+	 *
 	 * @return The count of groups to be skiped.
 	 */
 	public int getGroupOffset() {
@@ -169,7 +169,7 @@ public class GroupingRequest {
 
 	/**
 	 * The count of groups to be skiped.
-	 * 
+	 *
 	 * @param groupOffset The count of groups to be skiped.
 	 */
 	public void setGroupOffset(int groupOffset) {

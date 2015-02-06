@@ -14,7 +14,7 @@ import org.hibernate.search.query.engine.spi.EntityInfo;
 
 /**
  * Contains the values of a single group.
- * 
+ *
  * @author Sascha Grebe
  */
 public interface Group {
@@ -36,7 +36,7 @@ public interface Group {
 
 	/**
 	 * Extract the entity infos from the found documents.
-	 * 
+	 *
 	 * @param extractor The document extractor.
 	 * @throws IOException
 	 */

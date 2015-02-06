@@ -71,9 +71,9 @@ public class QueryHits {
 	private TopDocs topDocs;
 	private Map<String, List<Facet>> facetMap;
 	private List<FacetCollector> facetCollectors;
-	
+
 	private GroupingCollector groupingCollector;
-	
+
 	private DistanceCollector distanceCollector = null;
 
 	private final boolean enableFieldCacheOnClassName;
@@ -284,7 +284,7 @@ public class QueryHits {
 
 		return facetCollectors.get( facetCollectors.size() - 1 );
 	}
-	
+
 	private Collector optionallyEnableGroupingCollectors(Collector collector) throws IOException {
 		// add grouping collector to collector chain
 		if ( grouping != null ) {
@@ -337,7 +337,7 @@ public class QueryHits {
 
 		return null;
 	}
-	
+
 	private Collector optionallyEnableDistanceCollector(Collector collector, int maxDocs) {
 		if ( spatialFieldName == null || spatialFieldName.isEmpty() || spatialSearchCenter == null ) {
 			return collector;

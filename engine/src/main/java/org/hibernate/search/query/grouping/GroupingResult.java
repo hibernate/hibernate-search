@@ -13,7 +13,7 @@ import org.hibernate.search.query.engine.spi.DocumentExtractor;
 
 /**
  * Contains the results requested by the grouping request.
- * 
+ *
  * @author Sascha Grebe
  */
 public interface GroupingResult {
@@ -40,7 +40,7 @@ public interface GroupingResult {
 
 	/**
 	 * Load the entity infos into groups by the found documents
-	 * 
+	 *
 	 * @param extractor The document extractor
 	 */
 	void init(DocumentExtractor extractor) throws IOException;
