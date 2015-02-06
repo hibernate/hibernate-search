@@ -7,14 +7,15 @@
 package org.hibernate.search.indexes.serialization.spi;
 
 /**
- * Contract between Hibernate Search and the Deserializer.
- * All the LuceneWork construction is delegated to methods of
- * PluggableSerializationLuceneWorkSerializer.
+ * Contract between Hibernate Search and the {@code LuceneWork} deserializer.
  *
- * After deserialize is call, Hibernate Search will
- * extract the built List of LuceneWork
+ * All {@code LuceneWork} construction is delegated to methods of {@code LuceneWorksBuilder}.
+ * After {@code deserialize} is called, Hibernate Search will
+ * extract the built List of {@code LuceneWork} instances.
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @see org.hibernate.search.indexes.serialization.impl.LuceneWorkHydrator
+ *
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public interface Deserializer {
 	void deserialize(byte[] data, LuceneWorksBuilder hydrator);

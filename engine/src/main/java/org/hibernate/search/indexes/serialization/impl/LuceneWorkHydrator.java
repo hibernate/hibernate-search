@@ -60,7 +60,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.toSerializable;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * Default implementation of the {@code LuceneWorksBuilder}. An instance is passed to the
+ * {@link org.hibernate.search.indexes.serialization.spi.Deserializer#deserialize(byte[] , LuceneWorksBuilder )} method
+ * of the de-serializer of a given {@link org.hibernate.search.indexes.serialization.spi.SerializationProvider}.
+ *
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private static final Log log = LoggerFactory.make();
@@ -75,7 +79,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	public LuceneWorkHydrator(ExtendedSearchIntegrator searchIntegrator) {
 		this.searchIntegrator = searchIntegrator;
-		this.results = new ArrayList<LuceneWork>();
+		this.results = new ArrayList<>();
 		this.loader = Thread.currentThread().getContextClassLoader();
 	}
 
@@ -238,7 +242,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	private void clearTokens() {
-		tokens = new ArrayList<List<AttributeImpl>>();
+		tokens = new ArrayList<>();
 	}
 
 	@Override
@@ -321,10 +325,6 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		clearAttributes();
 	}
 
-	private void clearAttributes() {
-		attributes = new ArrayList<AttributeImpl>();
-	}
-
 	@Override
 	public void addDocValuesFieldWithBinaryData(String name, String type, byte[] value, int offset, int length) {
 		FieldInfo.DocValuesType docValuesType = Enum.valueOf(
@@ -376,6 +376,10 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		getLuceneDocument().add( docValuesField );
 	}
 
+	private void clearAttributes() {
+		attributes = new ArrayList<>();
+	}
+
 	private Document getLuceneDocument() {
 		if ( luceneDocument == null ) {
 			luceneDocument = new Document();
@@ -419,14 +423,14 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	public List<AttributeImpl> getAttributes() {
 		if ( attributes == null ) {
-			attributes = new ArrayList<AttributeImpl>();
+			attributes = new ArrayList<>();
 		}
 		return attributes;
 	}
 
 	public List<List<AttributeImpl>> getTokens() {
 		if ( tokens == null ) {
-			tokens = new ArrayList<List<AttributeImpl>>();
+			tokens = new ArrayList<>();
 		}
 		return tokens;
 	}

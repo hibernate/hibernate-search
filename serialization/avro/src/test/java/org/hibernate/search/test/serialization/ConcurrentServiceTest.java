@@ -23,12 +23,13 @@ import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner.TaskFactory;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
+
 import static org.junit.Assert.assertEquals;
 
 /**
  * Verify behaviour of the AvroSerializationProvider when used concurrently
  *
- * @author Sanne Grinovero <sanne@hibernate.org> (C) 2014 Red Hat Inc.
+ * @author Sanne Grinovero &lt;sanne@hibernate.org&gt; (C) 2014 Red Hat Inc.
  */
 @TestForIssue(jiraKey = "HSEARCH-1637")
 public class ConcurrentServiceTest {

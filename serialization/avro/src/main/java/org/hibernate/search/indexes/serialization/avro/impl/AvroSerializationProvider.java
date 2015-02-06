@@ -41,7 +41,8 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * It is mandatory if only message's {@code code minor version is < current version}.
  * </p>
  *
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @author Hardy Ferentschik
  */
 public class AvroSerializationProvider implements SerializationProvider, Startable {
 

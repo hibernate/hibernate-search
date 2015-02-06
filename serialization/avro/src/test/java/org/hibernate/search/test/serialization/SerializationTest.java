@@ -44,7 +44,8 @@ import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ * @author Hardy Ferentschik
  */
 public class SerializationTest {
 

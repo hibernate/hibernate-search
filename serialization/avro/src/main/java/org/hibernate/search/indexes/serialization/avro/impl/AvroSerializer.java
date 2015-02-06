@@ -44,7 +44,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.toByteArray;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public class AvroSerializer implements Serializer {
 	private static final Log log = LoggerFactory.make();
@@ -54,16 +54,17 @@ public class AvroSerializer implements Serializer {
 	private List<GenericRecord> operations;
 	private List<String> classReferences;
 	private GenericRecord document;
+
 	private final Protocol protocol;
 
 	public AvroSerializer(Protocol protocol) {
 		this.protocol = protocol;
-		this.classReferences = new ArrayList<String>();
+		this.classReferences = new ArrayList<>();
 	}
 
 	@Override
 	public void luceneWorks(List<LuceneWork> works) {
-		operations = new ArrayList<GenericRecord>( works.size() );
+		operations = new ArrayList<>( works.size() );
 	}
 
 	@Override
@@ -169,10 +170,10 @@ public class AvroSerializer implements Serializer {
 	@Override
 	public byte[] serialize() {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
-		out.write( AvroSerializationProvider.getMajorVersion() );
-		out.write( AvroSerializationProvider.getMinorVersion() );
+		out.write( KnownProtocols.MAJOR_VERSION);
+		out.write( KnownProtocols.LATEST_MINOR_VERSION );
 		Schema msgSchema = protocol.getType( "Message" );
-		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<GenericRecord>( msgSchema );
+		GenericDatumWriter<GenericRecord> writer = new GenericDatumWriter<>( msgSchema );
 		BinaryEncoder encoder = EncoderFactory.get().directBinaryEncoder( out, null );
 		GenericRecord message = new GenericData.Record( msgSchema );
 		message.put( "classReferences", classReferences );
@@ -190,17 +191,17 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void fields(List<IndexableField> fields) {
-		fieldables = new ArrayList<GenericRecord>( fields.size() );
+		fieldables = new ArrayList<>( fields.size() );
 	}
 
 	@Override
 	public void addIntNumericField(int value, LuceneNumericFieldContext context) {
-		GenericRecord numericField = createNumericfield( "NumericIntField", context );
+		GenericRecord numericField = createNumericField( "NumericIntField", context );
 		numericField.put( "value", value );
 		fieldables.add( numericField );
 	}
 
-	private GenericRecord createNumericfield(String schemaName, LuceneNumericFieldContext context) {
+	private GenericRecord createNumericField(String schemaName, LuceneNumericFieldContext context) {
 		GenericRecord numericField = new GenericData.Record( protocol.getType( schemaName ) );
 		numericField.put( "name", context.getName() );
 		numericField.put( "precisionStep", context.getPrecisionStep() );
@@ -214,21 +215,21 @@ public class AvroSerializer implements Serializer {
 
 	@Override
 	public void addLongNumericField(long value, LuceneNumericFieldContext context) {
-		GenericRecord numericField = createNumericfield( "NumericLongField", context );
+		GenericRecord numericField = createNumericField( "NumericLongField", context );
 		numericField.put( "value", value );
 		fieldables.add( numericField );
 	}
 
 	@Override
 	public void addFloatNumericField(float value, LuceneNumericFieldContext context) {
-		GenericRecord numericField = createNumericfield( "NumericFloatField", context );
+		GenericRecord numericField = createNumericField( "NumericFloatField", context );
 		numericField.put( "value", value );
 		fieldables.add( numericField );
 	}
 
 	@Override
 	public void addDoubleNumericField(double value, LuceneNumericFieldContext context) {
-		GenericRecord numericField = createNumericfield( "NumericDoubleField", context );
+		GenericRecord numericField = createNumericField( "NumericDoubleField", context );
 		numericField.put( "value", value );
 		fieldables.add( numericField );
 	}
@@ -267,9 +268,9 @@ public class AvroSerializer implements Serializer {
 	public void addFieldWithTokenStreamData(LuceneFieldContext context) {
 		GenericRecord field = createNormalField( "TokenStreamField", context );
 		List<List<AttributeImpl>> stream = context.getTokenStream().getStream();
-		List<List<Object>> value = new ArrayList<List<Object>>( stream.size() );
+		List<List<Object>> value = new ArrayList<>( stream.size() );
 		for ( List<AttributeImpl> attrs : stream ) {
-			List<Object> elements = new ArrayList<Object>( attrs.size() );
+			List<Object> elements = new ArrayList<>( attrs.size() );
 			for ( AttributeImpl attr : attrs ) {
 				elements.add( buildAttributeImpl( attr ) );
 			}
