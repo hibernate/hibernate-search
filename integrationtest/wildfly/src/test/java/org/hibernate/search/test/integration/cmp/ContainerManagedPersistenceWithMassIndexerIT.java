@@ -31,6 +31,8 @@ import static org.junit.Assert.assertTrue;
 import static org.hibernate.search.test.integration.VersionTestHelper.addDependencyToSearchModule;
 
 /**
+ * Test the use of the mass indexer in container managed transactions.
+ *
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HSEARCH-640")

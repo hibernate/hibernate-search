@@ -21,8 +21,10 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.runner.RunWith;
 
 /**
- * Execute the tests in {@link SearchNewEntityJmsMasterSlave} adding the the dependencies as jars in the
- * deployments.
+ * Test Hibernate Search JMS configuration (file-system directory provider), deployed on an application server as a WAR
+ * containing the required library dependencies.
+ * <p>
+ * Executes the test in {@link SearchNewEntityJmsMasterSlave}.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
