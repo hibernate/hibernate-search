@@ -139,7 +139,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 	 * @return the manager for grouping the results.
 	 */
 	GroupingManager getGroupingManager();
-	
+
 	/**
 	 * Return the Lucene {@link org.apache.lucene.search.Explanation}
 	 * object describing the score computation for the matching object/document

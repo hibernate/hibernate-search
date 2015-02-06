@@ -331,7 +331,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	public GroupingManager getGroupingManager() {
 		return hSearchQuery.getGroupingManager();
 	}
-	
+
 	@Override
 	public FullTextQuery setTimeout(int timeout) {
 		return setTimeout( timeout, TimeUnit.SECONDS );
