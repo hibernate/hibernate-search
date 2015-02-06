@@ -16,7 +16,7 @@ import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.CacheMode;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
-import org.hibernate.search.backend.impl.batch.BatchBackend;
+import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

@@ -15,6 +15,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.spi.IndexingMode;
 
 /**
  * A {@code BuildContext} implementation for running tests.
@@ -22,7 +23,6 @@ import org.hibernate.search.spi.BuildContext;
  * @author Hardy Ferentschik
  */
 public class BuildContextForTest implements BuildContext {
-	private static final String INDEXING_STRATEGY_EVENT = "event";
 	private final SearchConfiguration searchConfiguration;
 
 	public BuildContextForTest(SearchConfiguration searchConfiguration) {
@@ -36,7 +36,12 @@ public class BuildContextForTest implements BuildContext {
 
 	@Override
 	public String getIndexingStrategy() {
-		return INDEXING_STRATEGY_EVENT;
+		return IndexingMode.EVENT.toExternalRepresentation();
+	}
+
+	@Override
+	public IndexingMode getIndexingMode() {
+		return IndexingMode.EVENT;
 	}
 
 	@Override

@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.hibernate.search.backend.impl.batch.BatchBackend;
-import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.impl.FilterDef;
 import org.hibernate.search.engine.spi.DocumentBuilderContainedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -46,13 +44,9 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 
 	FilterDef getFilterDefinition(String name);
 
-	String getIndexingStrategy();
-
 	int getFilterCacheBitResultsSize();
 
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
-
-	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
 
 	boolean isJMXEnabled();
 

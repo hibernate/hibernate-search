@@ -80,6 +80,9 @@ public abstract class AbstractDocumentBuilder {
 		optimizationBlackList.addAll( typeMetadata.getOptimizationBlackList() );
 	}
 
+	/**
+	 * @param contextualBridge Context used for exception preparation during bridge invocations. May be {@code null}.
+	 */
 	public abstract void addWorkToQueue(Class<?> entityClass,
 			Object entity, Serializable id,
 			boolean delete,

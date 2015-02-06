@@ -19,17 +19,9 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexableField;
-
-import org.hibernate.search.bridge.builtin.NumericEncodingCalendarBridge;
-import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.builtin.StringEncodingDateBridge;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.ProvidedId;
@@ -43,14 +35,22 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingCalendarBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.StringEncodingDateBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
 import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
@@ -212,6 +212,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 	@Override
 	public void addWorkToQueue(Class<?> entityClass, Object entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
+		contextualBridge = getOrDefault( contextualBridge );
+
 		DocumentFieldMetadata idFieldMetadata = idPropertyMetadata.getFieldMetadata( idFieldName );
 		String idInString = objectToString( getIdBridge(), idFieldMetadata.getName(), id, contextualBridge );
 		if ( delete && !add ) {
@@ -273,8 +275,15 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return stringValue;
 	}
 
+	/**
+	 * Creates an operation object triggering the addition of the given entity to the index.
+	 *
+	 * @param contextualBridge Context used for exception preparation during bridge invocations. May be {@code null}.
+	 */
 	public AddLuceneWork createAddWork(Class<?> entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext conversionContext) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
+		conversionContext = getOrDefault( conversionContext );
+
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext, null );
 		final AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
@@ -286,9 +295,16 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return addWork;
 	}
 
+	/**
+	 * Creates an operation object triggering an index update for the given entity.
+	 *
+	 * @param contextualBridge Context used for exception preparation during bridge invocations. May be {@code null}.
+	 */
 	public UpdateLuceneWork createUpdateWork(Class entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge, null );
+		ConversionContext conversionContext = getOrDefault( contextualBridge );
+
+		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext, null );
 		final UpdateLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
 			addWork = new UpdateLuceneWork( id, idInString, entityClass, doc );
@@ -323,6 +339,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		if ( objectInitializer == null ) {
 			objectInitializer = getInstanceInitializer();
 		}
+
+		conversionContext = getOrDefault( conversionContext );
 
 		Document doc = new Document();
 		final Class<?> entityType = objectInitializer.getClass( instance );
@@ -662,6 +680,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			throw new AssertionFailure( "Field name should not be null" );
 		}
 
+		conversionContext = getOrDefault( conversionContext );
+
 		final DocumentFieldMetadata idFieldMetaData = idPropertyMetadata.getFieldMetadata( idFieldName );
 		final FieldBridge bridge = fieldName.equals( idFieldMetaData.getName() ) ?
 				getIdBridge() :
@@ -684,6 +704,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 
 		final Class<? extends FieldBridge> bridgeClass = bridge.getClass();
 
+		conversionContext = getOrDefault( conversionContext );
+
 		if ( TwoWayFieldBridge.class.isAssignableFrom( bridgeClass ) ) {
 			return objectToString( (TwoWayFieldBridge) bridge, fieldName, value, conversionContext );
 		}
@@ -693,6 +715,10 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		else {
 			throw log.fieldBridgeNotTwoWay( bridgeClass, fieldName, getBeanXClass() );
 		}
+	}
+
+	private ConversionContext getOrDefault(ConversionContext conversionContext) {
+		return conversionContext != null ? conversionContext : new ContextualExceptionBridgeHelper();
 	}
 
 	private FieldBridge getNullBridge(EmbeddedTypeMetadata embeddedTypeMetadata, String fieldName) {
