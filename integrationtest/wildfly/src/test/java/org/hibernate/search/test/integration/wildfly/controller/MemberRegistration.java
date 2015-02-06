@@ -43,6 +43,14 @@ public class MemberRegistration {
 		initNewMember();
 	}
 
+	public void deleteAll() {
+		@SuppressWarnings("unchecked")
+		List<Member> members = em.createQuery( "FROM Member" ).getResultList();
+		for ( Member member : members ) {
+			em.remove( member );
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Member> search(String name) {
 		Query luceneQuery = em.getSearchFactory().buildQueryBuilder()
@@ -56,6 +64,15 @@ public class MemberRegistration {
 	@PostConstruct
 	public void initNewMember() {
 		newMember = new Member();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Member> searchAll() {
+		Query luceneQuery = em.getSearchFactory().buildQueryBuilder()
+				.forEntity( Member.class ).get().all()
+				.createQuery();
+
+		return em.createFullTextQuery( luceneQuery ).getResultList();
 	}
 
 }
