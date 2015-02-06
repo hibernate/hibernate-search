@@ -23,9 +23,10 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.filter.FilterCachingStrategy;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
+import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 
 /**
@@ -37,7 +38,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 
 	private Map<Class<?>, DocumentBuilderContainedEntity> documentBuildersContainedEntities;
 	private Map<Class<?>, EntityIndexBinding> indexBindingsPerEntity;
-	private String indexingStrategy;
+	private IndexingMode indexingMode;
 	private Worker worker;
 	private BackendQueueProcessor backendQueueProcessor;
 	private Map<String, FilterDef> filterDefinitions;
@@ -60,7 +61,7 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private IndexManagerFactory indexManagerFactory;
 
 	public void copyStateFromOldFactory(SearchFactoryState oldFactoryState) {
-		indexingStrategy = oldFactoryState.getIndexingStrategy();
+		indexingMode = oldFactoryState.getIndexingMode();
 		indexBindingsPerEntity = oldFactoryState.getIndexBindings();
 		documentBuildersContainedEntities = oldFactoryState.getDocumentBuildersContainedEntities();
 		worker = oldFactoryState.getWorker();
@@ -104,8 +105,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	}
 
 	@Override
-	public String getIndexingStrategy() {
-		return indexingStrategy;
+	public IndexingMode getIndexingMode() {
+		return indexingMode;
 	}
 
 	@Override
@@ -155,8 +156,8 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.indexBindingsPerEntity = documentBuildersIndexedEntities;
 	}
 
-	public void setIndexingStrategy(String indexingStrategy) {
-		this.indexingStrategy = indexingStrategy;
+	public void setIndexingMode(IndexingMode indexingMode) {
+		this.indexingMode = indexingMode;
 	}
 
 	public void setWorker(Worker worker) {

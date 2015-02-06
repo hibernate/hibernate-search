@@ -46,8 +46,6 @@ public interface ExtendedSearchIntegrator extends SearchIntegrator {
 
 	FilterDef getFilterDefinition(String name);
 
-	String getIndexingStrategy();
-
 	int getFilterCacheBitResultsSize();
 
 	Set<Class<?>> getIndexedTypesPolymorphic(Class<?>[] classes);
