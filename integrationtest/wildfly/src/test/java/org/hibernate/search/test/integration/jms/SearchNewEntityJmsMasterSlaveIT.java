@@ -47,6 +47,7 @@ public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSla
 			libraryFiles.add( dependency( "org.hibernate:hibernate-search-serialization-java:" + currentVersion ) );
 			libraryFiles.add( dependency( "org.apache.lucene:lucene-core:" + VersionTestHelper.getDependencyVersionLucene() ) );
 			libraryFiles.add( dependency( "org.apache.lucene:lucene-analyzers-common:" + VersionTestHelper.getDependencyVersionLucene()) );
+			libraryFiles.add( dependency( "org.apache.lucene:lucene-grouping:" + VersionTestHelper.getDependencyVersionLucene()) );
 			libraryFiles.add( dependency( "org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations() ) );
 			return libraryFiles.toArray( new File[0] );
 		}
