@@ -37,7 +37,7 @@ public interface QueryBuilder {
 	/**
 	 * Build a phrase query (see {@link org.apache.lucene.search.PhraseQuery}).
 	 *
-	 * @return a {@code PhraseContext} instance for building the range query
+	 * @return a {@code PhraseContext} instance for building the phrase query
 	 */
 	PhraseContext phrase();
 

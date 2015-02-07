@@ -13,16 +13,16 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.engine.service.spi.Stoppable;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.infinispan.logging.impl.Log;
 import org.hibernate.search.infinispan.spi.CacheManagerService;
+import org.hibernate.search.infinispan.util.impl.JNDIHelper;
+import org.hibernate.search.infinispan.util.logging.impl.LoggerFactory;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.impl.JNDIHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -36,7 +36,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
  */
 public class DefaultCacheManagerService implements CacheManagerService, Startable, Stoppable {
 
-	private static final Log log = LoggerFactory.make( Log.class );
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * If no configuration is defined an no JNDI lookup name is provided, than a new Infinispan CacheManager

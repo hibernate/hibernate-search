@@ -16,12 +16,11 @@ import java.util.List;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
 
 /**
  * @author Emmanuel Bernard
@@ -36,7 +35,7 @@ final class Helper {
 	 * return the analyzed value for a given field. If several terms are created, an exception is raised.
 	 */
 	static String getAnalyzedTerm(String fieldName, String value, String name, Analyzer queryAnalyzer, FieldContext fieldContext) {
-		if ( fieldContext.isIgnoreAnalyzer() ) {
+		if ( !fieldContext.applyAnalyzer() ) {
 			return value;
 		}
 

@@ -13,7 +13,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.backend.impl.batch.BatchBackend;
+import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.SearchMapping;
@@ -34,12 +34,13 @@ import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.dsl.QueryContextBuilder;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
+import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
-import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.SearchIntegrator;
+import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.spi.StatisticsImplementor;
 
@@ -120,10 +121,18 @@ public class MutableSearchFactory implements ExtendedSearchIntegratorWithShareab
 		return this;
 	}
 
+	@Override
+	@Deprecated
 	public String getIndexingStrategy() {
-		return delegate.getIndexingStrategy();
+		return delegate.getIndexingMode().toExternalRepresentation();
 	}
 
+	@Override
+	public IndexingMode getIndexingMode() {
+		return delegate.getIndexingMode();
+	}
+
+	@Override
 	public void close() {
 		delegate.close();
 	}

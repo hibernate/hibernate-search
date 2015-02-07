@@ -7,6 +7,8 @@
 package org.hibernate.search.test.integration.jms;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +20,8 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenFormatStage;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenStrategyStage;
 import org.junit.runner.RunWith;
 
 /**
@@ -41,22 +45,51 @@ public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSla
 		private static File[] init() {
 			final String currentVersion = Version.getVersionString();
 			Set<File> libraryFiles = new HashSet<>();
-			libraryFiles.add( dependency( "org.hibernate:hibernate-search-orm:" + currentVersion ) );
-			libraryFiles.add( dependency( "org.hibernate:hibernate-search-engine:" + currentVersion ) );
-			libraryFiles.add( dependency( "org.hibernate:hibernate-search-backend-jms:" + currentVersion ) );
-			libraryFiles.add( dependency( "org.hibernate:hibernate-search-serialization-java:" + currentVersion ) );
-			libraryFiles.add( dependency( "org.apache.lucene:lucene-core:" + VersionTestHelper.getDependencyVersionLucene() ) );
-			libraryFiles.add( dependency( "org.apache.lucene:lucene-analyzers-common:" + VersionTestHelper.getDependencyVersionLucene()) );
-			libraryFiles.add( dependency( "org.apache.lucene:lucene-grouping:" + VersionTestHelper.getDependencyVersionLucene()) );
-			libraryFiles.add( dependency( "org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations() ) );
-			return libraryFiles.toArray( new File[0] );
+			libraryFiles.addAll( dependency( "org.hibernate:hibernate-search-orm:" + currentVersion, false ) );
+			libraryFiles.addAll( dependency( "org.hibernate:hibernate-search-engine:" + currentVersion, false ) );
+			libraryFiles.addAll( dependency( "org.hibernate:hibernate-search-backend-jms:" + currentVersion, false ) );
+			// adding avro using transitive dependency resolution to avoid hard coded of dependencies and their version
+			libraryFiles.addAll(
+					dependency( "org.hibernate:hibernate-search-serialization-avro:" + currentVersion, true )
+			);
+			libraryFiles.addAll(
+					dependency(
+							"org.apache.lucene:lucene-core:" + VersionTestHelper.getDependencyVersionLucene(), false
+					)
+			);
+			libraryFiles.addAll(
+					dependency(
+							"org.apache.lucene:lucene-analyzers-common:" + VersionTestHelper.getDependencyVersionLucene(),
+							false
+					)
+			);
+			libraryFiles.addAll(
+					dependency(
+							"org.apache.lucene:lucene-grouping:" + VersionTestHelper.getDependencyVersionLucene(),
+							false
+					)
+			);
+			libraryFiles.addAll(
+					dependency(
+							"org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations(),
+							false
+					)
+			);
+			return libraryFiles.toArray( new File[libraryFiles.size()] );
 		}
 
-		private static File dependency(String mavenName) {
-			return Maven.resolver()
-					.resolve( mavenName )
-					.withoutTransitivity()
-					.asSingleFile();
+		private static Collection<File> dependency(String gav, boolean transitive) {
+			MavenStrategyStage mavenStrategyStage = Maven.resolver().resolve( gav );
+
+			MavenFormatStage mavenFormatStage;
+			if ( transitive ) {
+				mavenFormatStage = mavenStrategyStage.withTransitivity();
+			}
+			else {
+				mavenFormatStage = mavenStrategyStage.withoutTransitivity();
+			}
+
+			return Arrays.asList( mavenFormatStage.asFile() );
 		}
 	}
 

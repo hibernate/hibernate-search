@@ -134,16 +134,6 @@
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional/clustering/serialization-javastandard</outputDirectory>
-            <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-search-serialization-java</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>/dist/lib/provided</outputDirectory>
             <scope>provided</scope>

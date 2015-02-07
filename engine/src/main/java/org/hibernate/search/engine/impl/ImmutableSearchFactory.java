@@ -13,8 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.hibernate.search.backend.impl.batch.BatchBackend;
 import org.hibernate.search.backend.impl.batch.DefaultBatchBackend;
+import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
@@ -48,11 +48,12 @@ import org.hibernate.search.query.dsl.impl.ConnectedQueryContextBuilder;
 import org.hibernate.search.query.engine.impl.HSQueryImpl;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
+import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.spi.InstanceInitializer;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.ExtendedSearchIntegratorWithShareableState;
+import org.hibernate.search.spi.impl.PolymorphicIndexHierarchy;
 import org.hibernate.search.spi.impl.SearchFactoryState;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.stat.impl.StatisticsImpl;
@@ -92,7 +93,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	private final boolean transactionManagerExpected;
 	private final IndexManagerHolder allIndexesManager;
 	private final ErrorHandler errorHandler;
-	private final String indexingStrategy;
+	private final IndexingMode indexingMode;
 	private final ServiceManager serviceManager;
 	private final boolean enableDirtyChecks;
 	private final DefaultIndexReaderAccessor indexReaderAccessor;
@@ -117,7 +118,7 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 		this.filterCachingStrategy = state.getFilterCachingStrategy();
 		this.filterDefinitions = state.getFilterDefinitions();
 		this.indexHierarchy = state.getIndexHierarchy();
-		this.indexingStrategy = state.getIndexingStrategy();
+		this.indexingMode = state.getIndexingMode();
 		this.worker = state.getWorker();
 		this.serviceManager = state.getServiceManager();
 		this.transactionManagerExpected = state.isTransactionManagerExpected();
@@ -191,8 +192,14 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	}
 
 	@Override
+	@Deprecated
 	public String getIndexingStrategy() {
-		return indexingStrategy;
+		return indexingMode.toExternalRepresentation();
+	}
+
+	@Override
+	public IndexingMode getIndexingMode() {
+		return indexingMode;
 	}
 
 	@Override

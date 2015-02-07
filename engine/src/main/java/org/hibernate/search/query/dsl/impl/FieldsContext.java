@@ -22,12 +22,14 @@ public class FieldsContext implements Iterable<FieldContext> {
 
 	public static final String[] NO_FIELD = new String[0];
 
+	private final QueryBuildingContext queryContext;
 	private final List<FieldContext> fieldContexts;
 	//when a varargs of fields are passed, apply the same customization for all.
 	//keep the index of the first context in this queue
 	private int firstOfContext;
 
-	public FieldsContext(String[] fieldNames) {
+	public FieldsContext(String[] fieldNames, QueryBuildingContext queryContext) {
+		this.queryContext = queryContext;
 		firstOfContext = 0;
 		if ( fieldNames == null ) {
 			fieldNames = NO_FIELD;
@@ -44,7 +46,7 @@ public class FieldsContext implements Iterable<FieldContext> {
 	}
 
 	private void doAdd(String fieldName) {
-		fieldContexts.add( new FieldContext( fieldName ) );
+		fieldContexts.add( new FieldContext( fieldName, queryContext ) );
 	}
 
 	public void addAll(String... fieldNames) {

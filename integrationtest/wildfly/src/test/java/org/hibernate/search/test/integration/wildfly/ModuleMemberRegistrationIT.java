@@ -62,7 +62,6 @@ public class ModuleMemberRegistrationIT {
 					.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
 					.createProperty().name( "hibernate.search.default.lucene_version" ).value( "LUCENE_CURRENT" ).up()
 					.createProperty().name( "hibernate.search.default.directory_provider" ).value( "ram" ).up()
-					.createProperty().name( "hibernate.search.autoregister_listeners" ).value( "true" ).up()
 				.up().up()
 			.exportAsString();
 		return new StringAsset( persistenceXml );

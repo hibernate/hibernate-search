@@ -43,8 +43,9 @@ import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.spi.AbstractDocumentBuilder;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
-import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.util.impl.Maps;
+import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -66,8 +67,6 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		Serializable {
 
 	private static final Log log = LoggerFactory.make();
-	private static final String INDEXING_STRATEGY_MANUAL = "manual";
-	private static final String INDEXING_STRATEGY_EVENT = "event";
 
 	private boolean disabled;
 	private boolean skipDirtyChecks = true;
@@ -191,11 +190,11 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	 */
 	public void initialize(ExtendedSearchIntegrator extendedIntegrator) {
 		this.extendedIntegrator = extendedIntegrator;
-		String indexingStrategy = extendedIntegrator.getIndexingStrategy();
-		if ( INDEXING_STRATEGY_EVENT.equals( indexingStrategy ) ) {
+
+		if ( extendedIntegrator.getIndexingMode() == IndexingMode.EVENT ) {
 			disabled = extendedIntegrator.getIndexBindings().size() == 0;
 		}
-		else if ( INDEXING_STRATEGY_MANUAL.equals( indexingStrategy ) ) {
+		else if ( extendedIntegrator.getIndexingMode() == IndexingMode.MANUAL ) {
 			disabled = true;
 		}
 

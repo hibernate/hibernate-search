@@ -19,6 +19,7 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttributeImpl;
 import org.apache.lucene.analysis.tokenattributes.TypeAttributeImpl;
+import org.apache.lucene.document.BinaryDocValuesField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
@@ -26,7 +27,12 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.document.SortedDocValuesField;
+import org.apache.lucene.document.SortedNumericDocValuesField;
+import org.apache.lucene.document.SortedSetDocValuesField;
 import org.apache.lucene.document.StoredField;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
@@ -54,7 +60,11 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.toSerializable;
 
 /**
- * @author Emmanuel Bernard <emmanuel@hibernate.org>
+ * Default implementation of the {@code LuceneWorksBuilder}. An instance is passed to the
+ * {@link org.hibernate.search.indexes.serialization.spi.Deserializer#deserialize(byte[] , LuceneWorksBuilder )} method
+ * of the de-serializer of a given {@link org.hibernate.search.indexes.serialization.spi.SerializationProvider}.
+ *
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	private static final Log log = LoggerFactory.make();
@@ -69,7 +79,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	public LuceneWorkHydrator(ExtendedSearchIntegrator searchIntegrator) {
 		this.searchIntegrator = searchIntegrator;
-		this.results = new ArrayList<LuceneWork>();
+		this.results = new ArrayList<>();
 		this.loader = Thread.currentThread().getContextClassLoader();
 	}
 
@@ -232,7 +242,7 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 	}
 
 	private void clearTokens() {
-		tokens = new ArrayList<List<AttributeImpl>>();
+		tokens = new ArrayList<>();
 	}
 
 	@Override
@@ -315,8 +325,59 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 		clearAttributes();
 	}
 
+	@Override
+	public void addDocValuesFieldWithBinaryData(String name, String type, byte[] value, int offset, int length) {
+		FieldInfo.DocValuesType docValuesType = Enum.valueOf(
+				FieldInfo.DocValuesType.class, type
+		);
+		Field docValuesField;
+		switch ( docValuesType ) {
+			// data is ByteRef
+			case BINARY: {
+				docValuesField = new BinaryDocValuesField( name, new BytesRef( value, offset, length ) );
+				break;
+			}
+			case SORTED: {
+				docValuesField = new SortedDocValuesField( name, new BytesRef( value, offset, length ) );
+				break;
+			}
+			case SORTED_SET: {
+				docValuesField = new SortedSetDocValuesField( name, new BytesRef( value, offset, length ) );
+				break;
+			}
+			default: {
+				// in case Lucene is going to add more in coming releases
+				throw log.unexpectedBinaryDocValuesTypeType( type );
+			}
+		}
+		getLuceneDocument().add( docValuesField );
+	}
+
+	@Override
+	public void addDocValuesFieldWithNumericData(String name, String type, long value) {
+		FieldInfo.DocValuesType docValuesType = Enum.valueOf(
+				FieldInfo.DocValuesType.class, type
+		);
+		Field docValuesField;
+		switch ( docValuesType ) {
+			case NUMERIC: {
+				docValuesField = new NumericDocValuesField( name, value );
+				break;
+			}
+			case SORTED_NUMERIC: {
+				docValuesField = new SortedNumericDocValuesField( name, value );
+				break;
+			}
+			default: {
+				// in case Lucene is going to add more in coming releases
+				throw log.unexpectedBinaryDocValuesTypeType( type );
+			}
+		}
+		getLuceneDocument().add( docValuesField );
+	}
+
 	private void clearAttributes() {
-		attributes = new ArrayList<AttributeImpl>();
+		attributes = new ArrayList<>();
 	}
 
 	private Document getLuceneDocument() {
@@ -362,14 +423,14 @@ public class LuceneWorkHydrator implements LuceneWorksBuilder {
 
 	public List<AttributeImpl> getAttributes() {
 		if ( attributes == null ) {
-			attributes = new ArrayList<AttributeImpl>();
+			attributes = new ArrayList<>();
 		}
 		return attributes;
 	}
 
 	public List<List<AttributeImpl>> getTokens() {
 		if ( tokens == null ) {
-			tokens = new ArrayList<List<AttributeImpl>>();
+			tokens = new ArrayList<>();
 		}
 		return tokens;
 	}

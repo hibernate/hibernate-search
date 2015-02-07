@@ -33,12 +33,12 @@ public class ConnectedRangeMatchingContext implements RangeMatchingContext, Fiel
 		this.queryCustomizer = queryCustomizer;
 		this.rangeContext = new RangeQueryContext();
 		this.fieldContexts = new ArrayList<FieldContext>(4);
-		this.fieldContexts.add( new FieldContext( fieldName ) );
+		this.fieldContexts.add( new FieldContext( fieldName, queryContext ) );
 	}
 
 	@Override
 	public RangeMatchingContext andField(String field) {
-		this.fieldContexts.add( new FieldContext( field ) );
+		this.fieldContexts.add( new FieldContext( field, queryContext ) );
 		this.firstOfContext = fieldContexts.size() - 1;
 		return this;
 	}

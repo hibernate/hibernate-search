@@ -22,17 +22,18 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  * @since 5.0
  */
-final class KnownProtocols {
+public final class KnownProtocols {
 
 	/**
-	 * Latest protocol version is 1.1
+	 * Latest protocol version is 1.2
 	 */
-	static final int MAJOR_VERSION = 1;
-	static final int LATEST_MINOR_VERSION = 1;
+	public static final int MAJOR_VERSION = 1;
+	public static final int LATEST_MINOR_VERSION = 2;
 
 	private static final Log log = LoggerFactory.make( Log.class );
 	private volatile Protocol v1_0 = null;
 	private volatile Protocol v1_1 = null;
+	private volatile Protocol v1_2 = null;
 	private volatile boolean warned = false;
 
 	Protocol getProtocol(int majorVersion, int minorVersion) {
@@ -44,7 +45,10 @@ final class KnownProtocols {
 					LATEST_MINOR_VERSION
 			);
 		}
-		if ( minorVersion == 1 ) {
+		if ( minorVersion == 2 ) {
+			return getV1_2();
+		}
+		else if ( minorVersion == 1 ) {
 			return getV1_1();
 		}
 		else if ( minorVersion == 0 ) {
@@ -55,11 +59,11 @@ final class KnownProtocols {
 				warned = true;
 				log.unexpectedMinorProtocolVersion( majorVersion, minorVersion, LATEST_MINOR_VERSION );
 			}
-			return getV1_1();
+			return getV1_2();
 		}
 	}
 
-	Protocol getLatestProtocol() {
+	public Protocol getLatestProtocol() {
 		return getProtocol( MAJOR_VERSION, LATEST_MINOR_VERSION );
 	}
 
@@ -88,6 +92,21 @@ final class KnownProtocols {
 				}
 				p = new ProtocolBuilderV1_1().build();
 				v1_1 = p;
+			}
+		}
+		return p;
+	}
+
+	private Protocol getV1_2() {
+		Protocol p = v1_2;
+		if ( p == null ) {
+			synchronized (this) {
+				p = v1_2;
+				if ( p != null ) {
+					return p;
+				}
+				p = new ProtocolBuilderV1_2().build();
+				v1_2 = p;
 			}
 		}
 		return p;

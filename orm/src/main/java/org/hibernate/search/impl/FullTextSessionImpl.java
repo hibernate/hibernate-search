@@ -28,6 +28,7 @@ import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 import org.hibernate.search.batchindexing.spi.MassIndexerFactory;
+import org.hibernate.search.batchindexing.spi.MassIndexerWithTenant;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
@@ -154,7 +155,11 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
 		MassIndexerFactory massIndexerFactory = createMassIndexerFactory();
-		return massIndexerFactory.createMassIndexer( getSearchIntegrator(), getFactory(), types );
+		MassIndexer massIndexer = massIndexerFactory.createMassIndexer( getSearchIntegrator(), getFactory(), types );
+		if ( massIndexer instanceof MassIndexerWithTenant ) {
+			( (MassIndexerWithTenant) massIndexer ).tenantIdentifier( getTenantIdentifier() );
+		}
+		return massIndexer;
 	}
 
 	@Override

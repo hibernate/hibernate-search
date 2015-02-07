@@ -70,6 +70,10 @@ public interface Serializer {
 
 	void addFieldWithSerializableFieldable(byte[] fieldable);
 
+	void addDocValuesFieldWithBinaryValue(LuceneFieldContext luceneFieldContext);
+
+	void addDocValuesFieldWithNumericValue(long value, LuceneFieldContext luceneFieldContext);
+
 	void addDocument();
 
 }

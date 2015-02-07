@@ -9,7 +9,9 @@ package org.hibernate.search.spi;
 import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.backend.spi.Worker;
+import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.exception.ErrorHandler;
@@ -175,8 +177,15 @@ public interface SearchIntegrator extends AutoCloseable {
 	/**
 	 * Shuts down all workers and releases all resources.
 	 */
+	@Override
 	void close();
 
 	IndexManager getIndexManager(String indexName);
 
+	/**
+	 * Returns the current indexing strategy as specified via {@link org.hibernate.search.cfg.Environment#INDEXING_STRATEGY}.
+	 */
+	IndexingMode getIndexingMode();
+
+	BatchBackend makeBatchBackend(MassIndexerProgressMonitor progressMonitor);
 }

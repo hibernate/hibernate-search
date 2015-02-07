@@ -4,27 +4,27 @@ Emmanuel Bernard; Hardy Ferentschik; Gustavo Fernandes; Sanne Grinovero; Nabeel 
 :toc:
 :docinfo:
 
-include::pr01.asciidoc[]
+include::preface.asciidoc[]
 
 :numbered:
-include::ch01.asciidoc[]
+include::getting-started.asciidoc[]
 
-include::ch02.asciidoc[]
+include::architecture.asciidoc[]
 
-include::ch03.asciidoc[]
+include::configuration.asciidoc[]
 
-include::ch04.asciidoc[]
+include::mapping.asciidoc[]
 
-include::ch05.asciidoc[]
+include::query.asciidoc[]
 
-include::ch06.asciidoc[]
+include::manual-index.asciidoc[]
 
-include::ch07.asciidoc[]
+include::index-optimization.asciidoc[]
 
-include::ch08.asciidoc[]
+include::monitoring.asciidoc[]
 
-include::ch09.asciidoc[]
+include::spatial.asciidoc[]
 
-include::ch10.asciidoc[]
+include::advanced-features.asciidoc[]
 
-include::ch11.asciidoc[]
+include::further-reading.asciidoc[]

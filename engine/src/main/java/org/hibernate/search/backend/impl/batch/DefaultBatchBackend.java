@@ -16,6 +16,7 @@ import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
 import org.hibernate.search.backend.impl.TransactionalSelectionVisitor;
 import org.hibernate.search.backend.impl.WorkQueuePerIndexSplitter;
+import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.indexes.spi.IndexManager;

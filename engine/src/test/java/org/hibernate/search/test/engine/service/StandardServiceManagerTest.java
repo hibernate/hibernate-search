@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.test.engine.service;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.impl.StandardServiceManager;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.impl.IndexManagerHolder;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.spi.IndexingMode;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
@@ -197,6 +198,11 @@ public class StandardServiceManagerTest {
 
 		@Override
 		public String getIndexingStrategy() {
+			return null;
+		}
+
+		@Override
+		public IndexingMode getIndexingMode() {
 			return null;
 		}
 

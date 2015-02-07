@@ -1,0 +1,26 @@
+{
+    "name": "BinaryDocValuesField",
+    "type": "record",
+    "fields" : [
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "value",
+            "type": "bytes"
+        },
+        {
+            "name": "offset",
+            "type": "int"
+        },
+        {
+            "name": "length",
+            "type": "int"
+        },
+        {
+            "name": "type",
+            "type": "DocValuesType"
+        }
+    ]
+}

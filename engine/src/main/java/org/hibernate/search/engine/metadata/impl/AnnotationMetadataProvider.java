@@ -7,6 +7,8 @@
 
 package org.hibernate.search.engine.metadata.impl;
 
+import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,10 +19,12 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
+import org.hibernate.annotations.common.reflection.ClassLoadingException;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
+import org.hibernate.annotations.common.reflection.XPackage;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.Analyze;
@@ -61,7 +65,6 @@ import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.AnnotationProcessingHelper;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
-import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
@@ -71,8 +74,6 @@ import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFieldName;
 
 /**
  * A metadata provider which extracts the required information from annotations.
@@ -107,6 +108,8 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		parseContext.processingClass( xClass );
 		parseContext.setCurrentClass( xClass );
 
+		inizializePackageLevelAnnotations( packageInfo( clazz ), configContext );
+
 		initializeClass(
 				typeMetadataBuilder,
 				true,
@@ -118,6 +121,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		);
 
 		return typeMetadataBuilder.build();
+	}
+
+	private XPackage packageInfo(Class<?> clazz) {
+		try {
+			return reflectionManager.packageForName( clazz.getPackage().getName() );
+		}
+		catch (ClassNotFoundException | ClassLoadingException e) {
+			// ClassNotFoundException: should not happen at this point
+			// ClassLoadingExceptionn: Package does not contain a package-info.java
+			log.debugf( "package-info not found for %s", e, clazz );
+			return null;
+		}
 	}
 
 	@Override
@@ -437,6 +452,13 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 						)
 				);
 			}
+		}
+	}
+
+	private void inizializePackageLevelAnnotations(XPackage xPackage, ConfigContext configContext) {
+		if ( xPackage != null ) {
+			checkForAnalyzerDefs( xPackage, configContext );
+			checkForFullTextFilterDefs( xPackage, configContext );
 		}
 	}
 

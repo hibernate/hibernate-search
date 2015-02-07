@@ -46,6 +46,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final ErrorHandler errorHandler;
+	private final String tenantId;
 
 	/**
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
@@ -55,13 +56,14 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	 * @param monitor to monitor indexing progress
 	 * @param objectsLimit if not zero
 	 * @param errorHandler how to handle unexpected errors
+	 * @param tenantId
 	 */
 	public IdentifierProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
 			SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
 			Class<?> indexedType, MassIndexerProgressMonitor monitor,
-			long objectsLimit, ErrorHandler errorHandler, int idFetchSize) {
+			long objectsLimit, ErrorHandler errorHandler, int idFetchSize, String tenantId) {
 				this.destination = fromIdentifierListToEntities;
 				this.sessionFactory = sessionFactory;
 				this.batchSize = objectLoadingBatchSize;
@@ -70,6 +72,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 				this.objectsLimit = objectsLimit;
 				this.errorHandler = errorHandler;
 				this.idFetchSize = idFetchSize;
+				this.tenantId = tenantId;
 				log.trace( "created" );
 	}
 
@@ -91,7 +94,12 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private void inTransactionWrapper(StatelessSession upperSession) throws Exception {
 		StatelessSession session = upperSession;
 		if ( upperSession == null ) {
-			session = sessionFactory.openStatelessSession();
+			if ( tenantId == null ) {
+				session = sessionFactory.openStatelessSession();
+			}
+			else {
+				session = sessionFactory.withStatelessOptions().tenantIdentifier( tenantId ).openStatelessSession();
+			}
 		}
 		try {
 			Transaction transaction = session.getTransaction();

@@ -10,7 +10,6 @@ import javax.transaction.SystemException;
 
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
-
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -33,8 +32,9 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 	private final StatelessSessionAwareRunnable statelessSessionAwareRunnable;
 	private final BatchTransactionalContext batchContext;
 	private final boolean wrapInTransaction;
+	private final String tenantId;
 
-	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext, SessionAwareRunnable sessionAwareRunnable) {
+	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext, SessionAwareRunnable sessionAwareRunnable, String tenantId) {
 		super( batchContext.extendedIntegrator );
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
@@ -43,11 +43,12 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 		 */
 		this.batchContext = batchContext;
 		this.sessionAwareRunnable = sessionAwareRunnable;
+		this.tenantId = tenantId;
 		this.statelessSessionAwareRunnable = null;
 		this.wrapInTransaction = batchContext.wrapInTransaction();
 	}
 
-	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext, StatelessSessionAwareRunnable statelessSessionAwareRunnable) {
+	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext, StatelessSessionAwareRunnable statelessSessionAwareRunnable, String tenantId) {
 		super( batchContext.extendedIntegrator );
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
@@ -56,6 +57,7 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 		 */
 		this.batchContext = batchContext;
 		this.sessionAwareRunnable = null;
+		this.tenantId = tenantId;
 		this.statelessSessionAwareRunnable = statelessSessionAwareRunnable;
 		this.wrapInTransaction = batchContext.wrapInTransaction();
 	}
@@ -66,12 +68,17 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 			final Session session;
 			final StatelessSession statelessSession;
 			if ( sessionAwareRunnable != null ) {
-				session = batchContext.factory.openSession();
+				if ( tenantId == null ) {
+					session = batchContext.factory.openSession();
+				}
+				else {
+					session = batchContext.factory.withOptions().tenantIdentifier( tenantId ).openSession();
+				}
 				statelessSession = null;
 			}
 			else {
 				session = null;
-				statelessSession = batchContext.factory.openStatelessSession();
+				statelessSession = batchContext.factory.withStatelessOptions().tenantIdentifier( tenantId ).openStatelessSession();
 			}
 
 			batchContext.transactionManager.begin();
