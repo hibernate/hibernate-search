@@ -766,7 +766,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 257, value = "'%1$s' is an unexpected type for a numeric doc value")
 	SearchException unexpectedNumericDocValuesTypeType(String docValuesType);
-	
+
 	@Message(id = 258, value = "Unable to delete all %s matching Query: %s")
 	SearchException unableToDeleteByQuery(Class<?> entityClass, DeletionQuery deletionQuery, @Cause Exception e );
 

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend;
 
-import java.io.Serializable;
-
 import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
@@ -16,7 +14,7 @@ import org.hibernate.search.backend.impl.WorkVisitor;
  *
  * @author Martin Braun
  */
-public class DeleteByQueryLuceneWork extends LuceneWork implements {
+public class DeleteByQueryLuceneWork extends LuceneWork {
 
 	private final DeletionQuery deletionQuery;
 
