@@ -17,8 +17,8 @@ import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.filter.FullTextFilter;
 import org.hibernate.search.query.DatabaseRetrievalMethod;
 import org.hibernate.search.query.ObjectLookupMethod;
-import org.hibernate.search.query.engine.impl.GroupingManager;
 import org.hibernate.search.query.engine.spi.FacetManager;
+import org.hibernate.search.query.engine.spi.GroupingManager;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.transform.ResultTransformer;
 

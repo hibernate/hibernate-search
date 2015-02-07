@@ -51,6 +51,7 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.GroupingManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
@@ -118,7 +119,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutExceptionFactory = extendedIntegrator.getDefaultTimeoutExceptionFactory();
 		this.facetManager = new FacetManagerImpl( this );
-		this.groupingManager = new GroupingManager( this );
+		this.groupingManager = new GroupingManagerImpl( this );
 	}
 
 	@Override
