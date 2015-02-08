@@ -298,6 +298,7 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/wildflyConfig</directory>
+                                    <filtering>true</filtering>
                                 </resource>
                             </resources>
                         </configuration>
@@ -314,6 +315,7 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/wildflyConfig</directory>
+                                    <filtering>true</filtering>
                                 </resource>
                             </resources>
                         </configuration>

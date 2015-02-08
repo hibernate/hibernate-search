@@ -36,8 +36,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test the Hibernate Search module in Wildfly combined with an Infinispan Directory usage.
+ * Deploys two WARs on two different containers using Infinispan as directory provider to share the index.
  *
+ * @author Davide D'Alto
  * @author Sanne Grinovero
  */
 @RunWith(Arquillian.class)
@@ -72,7 +73,7 @@ public class InfinispanModuleMemberRegistrationIT {
 				.version( "2.0" )
 				.createPersistenceUnit()
 				.name( "primary" )
-				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+				.jtaDataSource( "java:jboss/datasources/H2SharedDS" )
 				.getOrCreateProperties()
 				.createProperty()
 				.name( "hibernate.hbm2ddl.auto" )
@@ -115,17 +116,11 @@ public class InfinispanModuleMemberRegistrationIT {
 	}
 
 	@Test @InSequence(value = 2) @OperateOnDeployment("dep.active-2")
-	public void testNewMemberSearch() throws Exception {
-		Member newMember = memberRegistration.getNewMember();
-		newMember.setName( "Peter O'Tall" );
-		newMember.setEmail( "peter@mailinator.com" );
-		newMember.setPhoneNumber( "4643646643" );
-		memberRegistration.register();
+	public void testSearch() throws Exception {
+		List<Member> search = memberRegistration.search( "Davide" );
 
-		List<Member> search = memberRegistration.search( "Peter" );
-
-		assertFalse( "Expected at least one result after the indexing", search.isEmpty() );
-		assertEquals( "Search hasn't found a new member", newMember.getName(), search.get( 0 ).getName() );
+		assertFalse( "Member inserted by container 1 not found", search.isEmpty() );
+		assertEquals( "Found the wrong Member", "Davide D'Alto", search.get( 0 ).getName() );
 	}
 
 	@Test @InSequence(value = 3) @OperateOnDeployment("dep.active-2")
@@ -134,5 +129,13 @@ public class InfinispanModuleMemberRegistrationIT {
 
 		assertNotNull( "Search should never return null", search );
 		assertTrue( "Search results should be empty", search.isEmpty() );
+	}
+
+	@Test @InSequence(value = 4) @OperateOnDeployment("dep.active-2")
+	public void cleanDatabase() {
+		memberRegistration.deleteAll();
+		List<Member> search = memberRegistration.searchAll();
+
+		assertTrue( "All the entries should have been removed", search.isEmpty() );
 	}
 }

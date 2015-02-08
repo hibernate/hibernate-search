@@ -14,8 +14,12 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.runner.RunWith;
 
 /**
- * Execute the tests in {@link SearchNewEntityJmsMasterSlaveAndInfinispan} using the modules in JBoss AS to add the required
- * dependencies.
+ * Test Hibernate Search configured for using JMS+Infinispan on an application server, deployed as a WAR, using the
+ * MANIFEST.MF to include the required dependencies via JBoss Modules.
+ * <p>
+ * In this scenario we are also specifying a dependency to "org.infinispan"
+ * <p>
+ * The tests are in {@link SearchNewEntityJmsMasterSlaveAndInfinispan}.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero

@@ -33,7 +33,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test the hibernate search module in JBoss AS.
+ * Test basic Hibernate Search configuration (RAM directory provider), deployed on an application server as a WAR and
+ * using the MANIFEST.MF to include the required dependencies via JBoss Modules.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
