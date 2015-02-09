@@ -17,8 +17,9 @@
         <!-- Note that the JGroups transport uses sensible defaults if no configuration
             property is defined. See the JGroupsTransport javadocs for more flags.
             jgroups-udp.xml is the default stack bundled in the Infinispan core jar: integration
-            and tuning are tested by Infinispan. -->
-      <stack-file name="default-jgroups-udp" path="default-configs/default-jgroups-udp.xml" />
+            and tuning are tested by Infinispan.
+            We use the TCP version as it doesn't require system configuration to work correctly on OSX. -->
+      <stack-file name="default-jgroups-udp" path="default-configs/default-jgroups-tcp.xml" />
     </jgroups>
 
     <cache-container name="HibernateSearch" default-cache="default" statistics="false" shutdown-hook="DONT_REGISTER">
