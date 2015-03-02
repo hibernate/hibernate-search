@@ -99,9 +99,12 @@ public class ConcurrentRunner {
 		public void run() {
 			try {
 				startLatch.await(); // Maximize chances of working concurrently on the Serializer
-				userRunnable.run();
+				//Prevent more work to be scheduled if something failed already
+				if ( somethingFailed.get() == false ) {
+					userRunnable.run();
+				}
 			}
-			catch (InterruptedException | RuntimeException e) {
+			catch (InterruptedException | RuntimeException | AssertionError e) {
 				e.printStackTrace();
 				somethingFailed.set( true );
 			}
