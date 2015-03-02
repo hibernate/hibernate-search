@@ -107,8 +107,7 @@ public final class DocumentBuilderHelper {
 			}
 		}
 
-		final TypeMetadata metadata = builderIndexedEntity.getMetadata();
-		processFieldsForProjection( metadata, fields, result, document, conversionContext );
+		processFieldsForProjection( builderIndexedEntity, fields, result, document, conversionContext );
 		return result;
 	}
 
@@ -138,7 +137,28 @@ public final class DocumentBuilderHelper {
 		}
 	}
 
-	private static void processFieldsForProjection(TypeMetadata typeMetadata, String[] fields, Object[] result, Document document, ConversionContext contextualBridge) {
+	private static void processFieldsForProjection(DocumentBuilderIndexedEntity builderIndexedEntity, String[] fields, Object[] result, Document document, ConversionContext conversionContext) {
+		final TypeMetadata metadata = builderIndexedEntity.getMetadata();
+
+		//First try setting each projected field considering mapping metadata to apply (inverse) field bridges:
+		processMetadataRecursivelyForProjections( metadata, fields, result, document, conversionContext );
+
+		//If we still didn't know the value using any bridge, return the raw value or string:
+		//Important: make sure this happens as last step of projections! See also HSEARCH-1786
+		for ( int index = 0; index < result.length; index++ ) {
+			if ( result[index] == NOT_SET ) {
+				result[index] = null; // make sure we never return NOT_SET
+				if ( document != null ) {
+					IndexableField field = document.getField( fields[index] );
+					if ( field != null ) {
+						result[index] = extractObjectFromFieldable( field );
+					}
+				}
+			}
+		}
+	}
+
+	private static void processMetadataRecursivelyForProjections(TypeMetadata typeMetadata, String[] fields, Object[] result, Document document, ConversionContext contextualBridge) {
 		//process base fields
 		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
 			for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
@@ -170,7 +190,7 @@ public final class DocumentBuilderHelper {
 			if ( embeddedTypeMetadata.getEmbeddedContainer() == EmbeddedTypeMetadata.Container.OBJECT ) {
 				contextualBridge.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
 				try {
-					processFieldsForProjection(
+					processMetadataRecursivelyForProjections(
 							embeddedTypeMetadata, fields, result, document, contextualBridge
 					);
 				}
@@ -193,19 +213,6 @@ public final class DocumentBuilderHelper {
 						contextualBridge,
 						matchingPosition
 				);
-			}
-		}
-
-		//If we still didn't know the value using any bridge, return the raw value or string:
-		for ( int index = 0; index < result.length; index++ ) {
-			if ( result[index] == NOT_SET ) {
-				result[index] = null; // make sure we never return NOT_SET
-				if ( document != null ) {
-					IndexableField field = document.getField( fields[index] );
-					if ( field != null ) {
-						result[index] = extractObjectFromFieldable( field );
-					}
-				}
 			}
 		}
 	}
