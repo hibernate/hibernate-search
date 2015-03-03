@@ -9,6 +9,7 @@ package org.hibernate.search.engine.impl;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
@@ -41,9 +42,9 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 	private IndexingMode indexingMode;
 	private Worker worker;
 	private BackendQueueProcessor backendQueueProcessor;
-	private Map<String, FilterDef> filterDefinitions;
+	private Map<String, FilterDef> filterDefinitions = new ConcurrentHashMap<>();
 	private FilterCachingStrategy filterCachingStrategy;
-	private Map<String, Analyzer> analyzers;
+	private Map<String, Analyzer> analyzers = new ConcurrentHashMap<>();
 	private int cacheBitResultsSize;
 	private Properties configurationProperties;
 	private PolymorphicIndexHierarchy indexHierarchy;
@@ -168,16 +169,16 @@ public class MutableSearchFactoryState implements SearchFactoryState {
 		this.backendQueueProcessor = backendQueueProcessor;
 	}
 
-	public void setFilterDefinitions(Map<String, FilterDef> filterDefinitions) {
-		this.filterDefinitions = filterDefinitions;
+	public void addFilterDefinitions(Map<String, FilterDef> filterDefinitions) {
+		this.filterDefinitions.putAll( filterDefinitions );
 	}
 
 	public void setFilterCachingStrategy(FilterCachingStrategy filterCachingStrategy) {
 		this.filterCachingStrategy = filterCachingStrategy;
 	}
 
-	public void setAnalyzers(Map<String, Analyzer> analyzers) {
-		this.analyzers = analyzers;
+	public void addAnalyzers(Map<String, Analyzer> analyzers) {
+		this.analyzers.putAll( analyzers );
 	}
 
 	public void setCacheBitResultsSize(int cacheBitResultsSize) {
