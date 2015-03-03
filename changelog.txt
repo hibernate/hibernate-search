@@ -1,6 +1,50 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.1.0.Final (3-3-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-818] - Cacheable instance filters are created multiple times before being cached
+    * [HSEARCH-1649] - MassIndexer not compatible with ORM multitenancy
+    * [HSEARCH-1774] - Osgi Paxexam tests passing even if bundle not resolved
+    * [HSEARCH-1775] - Osgi resolution error on hibernate-search-infinispan bundle
+    * [HSEARCH-1786] - Projection on properties from embedded types returns String rather than the mapped type
+    * [HSEARCH-1791] - QueryBuilder produces a NumericRange query for id fields
+    * [HSEARCH-1796] - SearchNewEntityJmsMasterSlaveUsingInfinispanAs2ndCacheAndModulesIT fails on OS X
+
+** Deprecation
+    * [HSEARCH-1785] - Deprecate annotation org.hibernate.search.annotations.Key
+
+** Improvement
+    * [HSEARCH-633] - Allow definition of annotations at package-level in package-info.java
+    * [HSEARCH-997] - Add short and byte numeric bridges
+    * [HSEARCH-1663] - Packages not exported from osgi bundles
+    * [HSEARCH-1763] - Inherit @FullTextFilterDef from superclass
+    * [HSEARCH-1767] - Multiple entity types sharing the index shouldn't necessarily prevent single-term deletions
+    * [HSEARCH-1778] - Add reference to migration notes to reference guide
+    * [HSEARCH-1780] - Update link to Luke in documentation
+    * [HSEARCH-1801] - Rename Asciidoc files from chxx to topic name for more documentation flexibility
+
+** New Feature
+    * [HSEARCH-295] - Generate the "right" FilterKey instance even on parameterized filters
+    * [HSEARCH-1624] - Injection of an instance of ErrorHandler
+    * [HSEARCH-1698] - Async backends using Infinispan should enable Directory option writeFileListAsynchronously
+    * [HSEARCH-1764] - Programmatically defining includeEmbeddedObjectId for embedded entities
+    * [HSEARCH-1795] - Allow for the serialization of DocValues as part of the LuceneWork serialization
+
+** Task
+    * [HSEARCH-1324] - Create integration tests using  a combination of JBoss Modules, Infinispan and JMS
+    * [HSEARCH-1784] - Introduce CheckStyle rule to ban usage of java.lang.AssertionError
+    * [HSEARCH-1798] - Create integration test with WildFly that deploys an EAR with Hibernate Search
+    * [HSEARCH-1805] - Removing Serializable from LuceneWork
+    * [HSEARCH-1806] - Deleting implementation of serialization protocol using native Java serialization
+    * [HSEARCH-1819] - Upgrade to Apache Lucene 4.10.4
+    * [HSEARCH-1820] - Upgrade to Infinispan 7.1.1.Final and JGroups 3.6.2.Final
+    * [HSEARCH-1821] - Require Maven 3.2.3 minimum to run the builds
+    * [HSEARCH-1822] - The OSGi example features.xml is missing exports for org.tartarus to enable snowball analyzers
+
+
 Version 5.0.1.Final (9-1-2015)
 ------------------------
 
