@@ -10,7 +10,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-search-parent</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Search Aggregator</name>
@@ -136,7 +136,7 @@
 
     <properties>
         <!-- Slot definitions for JBoss Modules (both generated and consumed modules) -->
-        <hibernate.search.module.slot>5.0</hibernate.search.module.slot>
+        <hibernate.search.module.slot>5.1</hibernate.search.module.slot>
         <infinispan.module.slot>ispn-7.1</infinispan.module.slot>
         <lucene.module.slot>4.10</lucene.module.slot>
         <jgroups.module.slot>ispn-7.1</jgroups.module.slot>
