@@ -526,7 +526,8 @@ public class ImmutableSearchFactory implements ExtendedSearchIntegratorWithShare
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T unwrap(Class<T> cls) {
-		if ( SearchIntegrator.class.isAssignableFrom( cls ) || ExtendedSearchIntegrator.class.isAssignableFrom( cls ) ) {
+		if ( SearchIntegrator.class.isAssignableFrom( cls ) || ExtendedSearchIntegrator.class.isAssignableFrom( cls )
+				|| SearchFactoryState.class.isAssignableFrom( cls ) ) {
 			return (T) this;
 		}
 		else {
