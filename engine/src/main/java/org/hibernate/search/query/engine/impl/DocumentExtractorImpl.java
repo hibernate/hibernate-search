@@ -250,7 +250,7 @@ public class DocumentExtractorImpl implements DocumentExtractor {
 				else if ( ProjectionConstants.THIS.equals( projection[x] ) ) {
 					//THIS could be projected more than once
 					//THIS loading delayed to the Loader phase
-					entityInfo.getIndexesOfThis().add( x );
+					entityInfo.setIndexesOfThis( x );
 				}
 			}
 		}

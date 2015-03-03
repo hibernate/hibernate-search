@@ -7,8 +7,9 @@
 package org.hibernate.search.query.engine.impl;
 
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.search.query.engine.spi.EntityInfo;
 
@@ -39,7 +40,19 @@ public class EntityInfoImpl implements EntityInfo {
 	 */
 	private final Object[] projection;
 
-	private final List<Integer> indexesOfThis = new LinkedList<Integer>();
+	/**
+	 * The indexes of the projection which should refer to projection "THIS";
+	 * lazily initialised, as we expect this to not be frequently used.
+	 */
+	private Set<Integer> indexesOfThis = Collections.EMPTY_SET;
+
+	@Override
+	public void setIndexesOfThis(int x) {
+		if ( indexesOfThis == Collections.EMPTY_SET ) {
+			indexesOfThis = new HashSet<Integer>();
+		}
+		indexesOfThis.add( Integer.valueOf( x ) );
+	}
 
 	@Override
 	public Class<?> getClazz() {
@@ -62,7 +75,7 @@ public class EntityInfoImpl implements EntityInfo {
 	}
 
 	@Override
-	public List<Integer> getIndexesOfThis() {
+	public Iterable<Integer> getIndexesOfThis() {
 		return indexesOfThis;
 	}
 
