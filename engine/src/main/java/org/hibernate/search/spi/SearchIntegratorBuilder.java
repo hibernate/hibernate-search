@@ -275,7 +275,6 @@ public class SearchIntegratorBuilder {
 			rootFactory = new MutableSearchFactory();
 			factoryState.setDocumentBuildersIndexedEntities( new ConcurrentHashMap<Class<?>, EntityIndexBinding>() );
 			factoryState.setDocumentBuildersContainedEntities( new ConcurrentHashMap<Class<?>, DocumentBuilderContainedEntity>() );
-			factoryState.setFilterDefinitions( new ConcurrentHashMap<String, FilterDef>() );
 			factoryState.setIndexHierarchy( new PolymorphicIndexHierarchy() );
 			factoryState.setConfigurationProperties( cfg.getProperties() );
 			factoryState.setServiceManager(
@@ -393,8 +392,8 @@ public class SearchIntegratorBuilder {
 				documentBuildersContainedEntities
 		);
 
-		factoryState.setFilterDefinitions( configContext.initFilters() );
-		factoryState.setAnalyzers( configContext.initLazyAnalyzers() );
+		factoryState.addFilterDefinitions( configContext.initFilters() );
+		factoryState.addAnalyzers( configContext.initLazyAnalyzers() );
 	}
 
 	/**
