@@ -63,6 +63,11 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		fieldBridge.set( name, value, document, luceneOptions );
+		if ( value == null ) {
+			luceneOptions.addFieldToDocument( name, nullMarker, document );
+		}
+		else {
+			fieldBridge.set( name, value, document, luceneOptions );
+		}
 	}
 }
