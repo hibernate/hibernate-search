@@ -21,13 +21,13 @@ import java.lang.annotation.Target;
  * via range queries. This is known as the {@code SpatialMode.RANGE} approach.
  *
  * Otherwise, they can be indexed using a spatial hash index. This is known as the
- * @code SpatialMode.HASH} approach. The size of the grid can be adjusted with {@code topSpatialHashLevel}
+ * {@code SpatialMode.HASH} approach. The size of the grid can be adjusted with {@code topSpatialHashLevel}
  * and {@code bottomSpatialHashLevel}.
  *
  * For more information on which model to use, read the Hibernate Search reference documentation.
  *
  * If your longitude and latitude information are hosted on free properties,
- * Add {@code &#064;Spatial} on the entity (class-level). The {@link Latitude} and {@link Longitude}
+ * Add {@code @Spatial} on the entity (class-level). The {@link Latitude} and {@link Longitude}
  * annotations must mark the properties.
  *
  * <pre>
