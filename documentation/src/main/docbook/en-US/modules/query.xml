@@ -2144,7 +2144,7 @@ public class Essay {
       <itemizedlist>
         <listitem>
           <para><constant>CLASS</constant>: Hibernate Search will use a Lucene
-          FieldCache to improve peformance of the Class type extraction from
+          FieldCache to improve performance of the Class type extraction from
           the index.</para>
 
           <para>This value is enabled by default, and is what Hibernate Search
@@ -2190,7 +2190,7 @@ public class Essay {
 
       <para>For the ID FieldCache to be used, the ids of targeted entities
       must be using a <classname>TwoWayFieldBridge</classname> (as all
-      builting bridges), and all types being loaded in a specific query must
+      built-in bridges), and all types being loaded in a specific query must
       use the fieldname for the id, and have ids of the same type (this is
       evaluated at each Query execution).</para>
     </section>

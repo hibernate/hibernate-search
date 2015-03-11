@@ -231,7 +231,7 @@ public class Hotel {
     <title>Implementing the Coordinates interface</title>
 
     <para>Instead of using the <literal>@</literal><classname>Latitude</classname>
-    and <literal>@</literal><classname>Longitue</classname> annotations
+    and <literal>@</literal><classname>Longitude</classname> annotations
     you can choose to implement the <classname>org.hibernate.search.spatial.Coordinates</classname>
     interface.</para>
 
@@ -306,7 +306,7 @@ public class Event {
 </programlisting>
     </example>
     <para>When using this form the <literal>@</literal><classname>Spatial</classname>
-    <literal>.name</literal> automatically defaults to the propery name.</para>
+    <literal>.name</literal> automatically defaults to the property name.</para>
   </section>
    </section>
 

@@ -270,7 +270,7 @@ public class Essay {
         <classname>@DocumentId</classname>, but only on
         <classname>Integer</classname>, <classname>Long</classname>,
         <classname>Float</classname> or <classname>Double</classname>
-        properties. When used, the annoated property will be indexed using a
+        properties. When used, the annotated property will be indexed using a
         <ulink url="http://en.wikipedia.org/wiki/Trie">Trie structure</ulink>.
         This enables efficient range queries and sorting, resulting in query
         response times being orders of magnitude faster than the same query
@@ -348,7 +348,7 @@ public class Essay {
         <classname>@FieldBridge</classname>. <classname>@Field</classname> is
         required to mark the property for being indexed (a standalone
         <classname>@NumericField</classname> is never allowed).
-        <classname>@NumericField</classname> might be ommited in this specific
+        <classname>@NumericField</classname> might be omitted in this specific
         case, because the used <classname>@FieldBridge</classname> annotation
         refers already to a <classname>NumericFieldBridge</classname>
         instance. However, the use of <classname>@NumericField</classname> is
@@ -890,7 +890,7 @@ public class Human {
 
           <listitem>
             <para><literal>parents.parents.parents.name</literal> - as
-            additional path as specifyed by
+            additional path as specified by
             <methodname>includePaths</methodname>. The first
             <literal>parents.</literal> is inferred from the field name, the
             remaining path is the attribute of
@@ -971,7 +971,7 @@ public class Essay {
       <para>The <literal>@Boost </literal>annotation used in <xref
       linkend="section-boost-annotation"/> defines a static boost factor which
       is independent of the state of of the indexed entity at runtime.
-      However, there are usecases in which the boost factor may depend on the
+      However, there are use cases in which the boost factor may depend on the
       actual state of the entity. In this case you can use the
       <literal>@DynamicBoost </literal>annotation together with an
       accompanying custom <classname>BoostStrategy</classname>.</para>
@@ -1030,7 +1030,7 @@ public class VIPBoostStrategy implements BoostStrategy {
 
     <para><literal>Analysis</literal> is the process of converting text into
     single terms (words) and can be considered as one of the key features of a
-    fulltext search engine. Lucene uses the concept of
+    full-text search engine. Lucene uses the concept of
     <classname>Analyzer</classname>s to control this process. In the following
     section we cover the multiple ways Hibernate Search offers to configure
     the analyzers.</para>
@@ -1141,7 +1141,7 @@ public class MyEntity {
         distribution of Hibernate Search provides these dependencies in its
         <filename>lib/optional</filename> directory. Have a look at <xref
         linkend="table-available-tokenizers"/> and <xref
-        linkend="table-available-filters"/> to see which anaylzers and filters
+        linkend="table-available-filters"/> to see which analyzers and filters
         have additional dependencies</para>
 
         <para>Prior to Search version 3.3.0.Beta2 it was required to add the
@@ -1595,7 +1595,7 @@ public class BlogEntry {
       instead of class level. In this case the value represents the current
       value of this property.</para>
 
-      <para>An implemention of the <classname>Discriminator</classname>
+      <para>An implementation of the <classname>Discriminator</classname>
       interface has to return the name of an existing analyzer definition or
       <classname>null</classname> if the default analyzer should not be
       overridden. <xref linkend="example-analyzer-discriminator"/> assumes
@@ -2109,7 +2109,7 @@ private Date date;                </programlisting>
         <classname>LuceneOptions</classname> helper; this helper will apply
         the options you have selected on <literal>@Field</literal>, like
         <literal>Store</literal> or <literal>TermVector</literal>, or apply
-        the choosen <classname>@Boost</classname> value. It is especially
+        the chosen <classname>@Boost</classname> value. It is especially
         useful to encapsulate the complexity of <literal>COMPRESS</literal>
         implementations. Even though it is recommended to delegate to
         <classname>LuceneOptions</classname> to add fields to the
@@ -2446,14 +2446,14 @@ public class MyClass{
       </listitem>
 
       <listitem>
-        <para>some automatization process requires the dynamic mapping of many
+        <para>some automation process requires the dynamic mapping of many
         entities sharing common traits</para>
       </listitem>
     </itemizedlist>
 
     <para>While it has been a popular demand in the past, the Hibernate team
     never found the idea of an XML alternative to annotations appealing due to
-    it's heavy duplication, lack of code refactoring safety, because it did
+    its heavy duplication, lack of code refactoring safety, because it did
     not cover all the use case spectrum and because we are in the 21st century
     :)</para>
 
@@ -2788,7 +2788,7 @@ public class Address {
  @Id
  @GeneratedValue
  @DocumentId(name="id")
- pubblic Long getAddressId() {...};
+ public Long getAddressId() {...};
 
  @Fields({
       @Field(store=Store.YES, analyzer=@Analyzer(definition="en")),
@@ -2894,7 +2894,7 @@ public class Address {
       <methodname>prefix</methodname> as seen in the example below:</para>
 
       <example>
-        <title>Programmatically defining embedded entites</title>
+        <title>Programmatically defining embedded entities</title>
 
         <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
@@ -3160,7 +3160,7 @@ public class Address {
       shown in the next example:</para>
 
       <example>
-        <title>Defining class briges using API</title>
+        <title>Defining class bridges using API</title>
 
         <programlisting language="JAVA" role="JAVA">SearchMapping mapping = new SearchMapping();
 
