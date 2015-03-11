@@ -274,7 +274,7 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
             before changing this setting. Even though
             <classname>NIOFSDirectory</classname> or
             <classname>MMapDirectory</classname> can bring substantial
-            performace boosts they also have their issues.</para></entry>
+            performance boosts they also have their issues.</para></entry>
           </row>
 
           <row>
@@ -324,7 +324,7 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
             before changing this setting. Even though
             <classname>NIOFSDirectory</classname> or
             <classname>MMapDirectory</classname> can bring substantial
-            performace boosts they also have their issues.</para></entry>
+            performance boosts they also have their issues.</para></entry>
           </row>
 
           <row>
@@ -388,7 +388,7 @@ hibernate.search.Actions.directory_provider = com.acme.hibernate.CustomDirectory
             before changing this setting. Even though
             <classname>NIOFSDirectory</classname> or
             <classname>MMapDirectory</classname> can bring substantial
-            performace boosts they also have their issues.</para></entry>
+            performance boosts they also have their issues.</para></entry>
           </row>
 
           <row>
@@ -1222,7 +1222,7 @@ EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", pro
     <para>Even though Hibernate Search will try to shield you as much as
     possible from Lucene specifics, there are several Lucene specifics which
     can be directly configured, either for performance reasons or for
-    satisfying a specific usecase. The following sections discuss these
+    satisfying a specific use case. The following sections discuss these
     configuration options.</para>
 
     <section id="lucene-indexing-performance" revision="3">
@@ -1816,7 +1816,7 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
     <title>Metadata API</title>
 
     <para>After looking at all these different configuration options, it is
-    time to have a look at an API which allows you to prorgammatically access
+    time to have a look at an API which allows you to programmatically access
     parts of the configuration. Via the metadata API you can determine the
     indexed types and also how they are mapped (see <xref
     linkend="search-mapping"/>) to the index structure. The entry point into
@@ -1824,8 +1824,8 @@ hibernate.search.Books.locking_strategy = org.custom.components.MyLockingFactory
     methods, namely <methodname>getIndexedTypes()</methodname> and
     <methodname>getIndexedTypeDescriptor(Class&lt;?&gt;)</methodname>. The
     former returns a set of all indexed type, where as the latter allows to
-    retrieve a so called <classname>IndexedTypeDescriptor</classname>for a
-    gven type. This descriptor allows you determine whether the type is
+    retrieve a so called <classname>IndexedTypeDescriptor</classname> for a
+    given type. This descriptor allows you determine whether the type is
     indexed at all and, if so, whether the index is for example sharded or not
     (see <xref linkend="advanced-features-sharding"/>). It also
     allows you to determine the static boost of the type (see <xref

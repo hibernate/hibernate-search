@@ -281,7 +281,7 @@ public class Author {
 
     <para>Without projections, Hibernate Search will per default execute a
     Lucene query in order to find the database identifiers of the entities
-    matching the query critera and use these identifiers to retrieve managed
+    matching the query criteria and use these identifiers to retrieve managed
     objects from the database. The decision for or against projection has to
     be made on a case to case basis. The default behaviour is recommended
     since it returns managed objects whereas projections only return object
@@ -290,7 +290,7 @@ public class Author {
     <para>Note that <literal>index=Index.YES</literal>,
     <literal>analyze=Analyze.YES</literal> and
     <literal>store=Store.NO</literal> are the default values for these
-    paramters and could be ommited.</para>
+    parameters and could be ommitted.</para>
 
     <para>After this short look under the hood let's go back to annotating the
     <classname>Book</classname> class. Another annotation we have not yet
@@ -426,7 +426,7 @@ fullTextEntityManager.createIndexer().startAndWait();</programlisting>
       <programlisting language="JAVA" role="JAVA">FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 
-// create native Lucene query unsing the query DSL
+// create native Lucene query using the query DSL
 // alternatively you can write the Lucene query using the Lucene query parser
 // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
 QueryBuilder qb = fullTextSession.getSearchFactory()
@@ -456,7 +456,7 @@ FullTextEntityManager fullTextEntityManager =
     org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 em.getTransaction().begin();
 
-// create native Lucene query unsing the query DSL
+// create native Lucene query using the query DSL
 // alternatively you can write the Lucene query using the Lucene query parser
 // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
 QueryBuilder qb = fullTextEntityManager.getSearchFactory()
@@ -525,7 +525,7 @@ em.close();</programlisting>
     <classname>SnowballPorterFilterFactory</classname>. The standard tokenizer
     splits words at punctuation characters and hyphens while keeping email
     addresses and internet hostnames intact. It is a good general purpose
-    tokenizer. The lowercase filter lowercases the letters in each token
+    tokenizer. The lowercase filter converts to lowercase the letters in each token
     whereas the snowball filter finally applies language specific
     stemming.</para>
 

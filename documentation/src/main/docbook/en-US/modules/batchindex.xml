@@ -117,7 +117,7 @@ tx.commit(); //index changes are applied at commit time    </programlisting>
 
     <para>As is the case with method <methodname>FullTextSession.index(T
     entity)</methodname>, also <methodname>purge</methodname> and
-    <methodname>purgeAll</methodname> are considered explicit indexinging
+    <methodname>purgeAll</methodname> are considered explicit indexing
     operations: any registered <classname>EntityIndexingInterceptor</classname>
     won't be applied. For more information on <classname>EntityIndexingInterceptor</classname>
     see <xref linkend="search-mapping-indexinginterceptor"/>.</para>
@@ -172,7 +172,7 @@ tx.commit(); //index changes are applied at commit time    </programlisting>
       <classname>FullTextSession</classname>.<methodname>purgeAll()</methodname>
       and
       <classname>FullTextSession</classname>.<methodname>index()</methodname>,
-      however there are some memory and efficiency contraints. For maximum
+      however there are some memory and efficiency constraints. For maximum
       efficiency Hibernate Search batches index operations and executes them
       at commit time. If you expect to index a lot of data you need to be
       careful about memory consumption since all documents are kept in a queue

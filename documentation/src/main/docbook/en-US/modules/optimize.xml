@@ -88,7 +88,7 @@
   and
   <classname>MassIndexer</classname>.<methodname>optimizeOnFinish</methodname>
   respectively. The initial optimization is actually very cheap as it is
-  performed on an emtpy index: its purpose is to release the storage space
+  performed on an empty index: its purpose is to release the storage space
   occupied by the old index.</para>
 
   <section>
@@ -137,7 +137,7 @@ hibernate.search.Animal.optimizer.transaction_limit.max = 50</programlisting>
     <para>If none of these parameters are defined, no optimization is
     processed automatically.</para>
 
-    <para>The default implementation of OptimizerStrategy can be overriden by
+    <para>The default implementation of OptimizerStrategy can be overridden by
     implementing
     <literal>org.hibernate.search.store.optimization.OptimizerStrategy</literal>
     and setting the <literal>optimizer.implementation</literal> property to
