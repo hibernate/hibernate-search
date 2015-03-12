@@ -915,7 +915,7 @@ Some of the analyzers and filters will require additional dependencies. For exam
 snowball stemmer you have to also include the `lucene-snowball` jar and for the
 PhoneticFilterFactory you need the link:http://commons.apache.org/codec[commons-codec] jar. Your
 distribution of Hibernate Search provides these dependencies in its _lib/optional_ directory. Have a
-look at <<table-available-tokenizers>> and <<table-available-filters>> to see which anaylzers and
+look at <<table-available-tokenizers>> and <<table-available-filters>> to see which analyzers and
 filters have additional dependencies
 
 Prior to Hibernate Search 5 it was required to add the Apache Solr dependency to your project as
@@ -2013,10 +2013,10 @@ sometimes more convenient to use a different approach:
 
 
 * the same entity is mapped differently depending on deployment needs (customization for clients)
-* some automatization process requires the dynamic mapping of many entities sharing common traits
+* some automation process requires the dynamic mapping of many entities sharing common traits
 
 While it has been a popular demand in the past, the Hibernate team never found the idea of an XML
-alternative to annotations appealing due to it's heavy duplication, lack of code refactoring safety,
+alternative to annotations appealing due to its heavy duplication, lack of code refactoring safety,
 because it did not cover all the use case spectrum and because we are in the 21st century :)
 
 The idea of a programmatic API was much more appealing and has now become a reality. You can
@@ -2332,7 +2332,7 @@ public class Address {
  @Id
  @GeneratedValue
  @DocumentId(name="id")
- pubblic Long getAddressId() {...};
+ public Long getAddressId() {...};
 
  @Fields({
       @Field(store=Store.YES, analyzer=@Analyzer(definition="en")),

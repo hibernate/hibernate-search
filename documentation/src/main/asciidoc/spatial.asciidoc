@@ -1,7 +1,7 @@
 [[spatial]]
 == Spatial
 
-With the spatial extensions you can combine fulltext queries with distance restrictions, filter results based on distances
+With the spatial extensions you can combine full-text queries with distance restrictions, filter results based on distances
 or sort results on such a distance criteria.
 
 The spatial support of Hibernate Search has the following goals:
@@ -122,7 +122,7 @@ public class Hotel {
 
 ==== Implementing the Coordinates interface
 
-Instead of using the `@Latitude` and `@Longitue` annotations you can choose to implement the
+Instead of using the `@Latitude` and `@Longitude` annotations you can choose to implement the
 `org.hibernate.search.spatial.Coordinates` interface.
 
 .Implementing the Coordinates interface
@@ -213,7 +213,7 @@ When using this form the `@Spatial.name` automatically defaults to the property 
 You can use the Hibernate Search query DSL to build a query to search around a pair of coordinates (latitude, longitude)
 or around a bean implementing the `Coordinates` interface.
 
-As with any fulltext query, the spatial query creation flow looks like:
+As with any full-text query, the spatial query creation flow looks like:
 
 . retrieve a `QueryBuilder` from the `SearchFactory`
 . use the DSL to build a spatial query, defining search center and radius
