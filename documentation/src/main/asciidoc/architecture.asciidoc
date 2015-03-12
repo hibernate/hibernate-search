@@ -29,7 +29,7 @@ your own IndexManager implementation (see <<configuration-indexmanager>>).
 
 Once the index is created, you can search for entities and return lists of managed entities saving
 you the tedious object to Lucene Document mapping. The same persistence context is shared between
-Hibernate and Hibernate Search. As a matter of fact, the FullTextSession is built on top of the
+Hibernate and Hibernate Search. As a matter of fact, the `FullTextSession` is built on top of the
 Hibernate Session so that the application code can use the unified org.hibernate.Query or
 javax.persistence.Query APIs exactly the same way a HQL, JPA-QL or native query would do.
 

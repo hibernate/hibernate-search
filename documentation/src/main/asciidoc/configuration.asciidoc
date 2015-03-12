@@ -193,7 +193,7 @@ by this DirectoryProvider. Allowed values are `auto` (the default value, selects
 non Windows systems, SimpleFSDirectory on Windows), `simple` (SimpleFSDirectory),
 `nio` (NIOFSDirectory), `mmap` (MMapDirectory). Make sure to refer to Javadocs of these Directory
 implementations before changing this setting. Even though NIOFSDirectory or MMapDirectory can bring
-substantial performace boosts they also have their issues.
+substantial performance boosts they also have their issues.
 
 |filesystem-master: File system based directory.
 
@@ -225,7 +225,7 @@ this DirectoryProvider. Allowed values are `auto` (the default value, selects NI
 Windows systems, SimpleFSDirectory on Windows), `simple` (SimpleFSDirectory),
 `nio` (NIOFSDirectory), `mmap` (MMapDirectory). Make sure to refer to Javadocs of these
 Directory implementations before changing this setting. Even though NIOFSDirectory or MMapDirectory
-can bring substantial performace boosts they also have their issues.
+can bring substantial performance boosts they also have their issues.
 
 |filesystem-slave: File system based directory.
 
@@ -256,7 +256,7 @@ defaults to 16MB.
 in the source directory before failing. Waiting 5 seconds between each try.
 `retry_initialize_period` : optional, set an integer value in seconds to enable the retry initialize
 feature: if the slave can't find the master index it will try again until it's found in background,
-without preventing the application to start: fullText queries performed before the index is
+without preventing the application to start: full-text queries performed before the index is
 initialized are not blocked but will return empty results. When not enabling the option or
 explicitly setting it to zero it will fail with an exception instead of scheduling a retry timer.
 To prevent the application from starting without an invalid index but still control an
@@ -266,7 +266,7 @@ used by this DirectoryProvider. Allowed values are `auto` (the default value, se
 on non Windows systems, SimpleFSDirectory on Windows), `simple` (SimpleFSDirectory), `nio`
 (NIOFSDirectory), `mmap` (MMapDirectory). Make sure to refer to Javadocs of these Directory
 implementations before changing this setting. Even though NIOFSDirectory or MMapDirectory can bring
-substantial performace boosts they also have their issues.
+substantial performance boosts they also have their issues.
 
 |infinispan: Infinispan based directory.
 
@@ -937,7 +937,7 @@ Alternatively, an ErrorHandler instance may be passed via the configuration valu
 
 Even though Hibernate Search will try to shield you as much as possible from Lucene specifics, there
 are several Lucene specifics which can be directly configured, either for performance reasons or for
-satisfying a specific usecase. The following sections discuss these configuration options.
+satisfying a specific use case. The following sections discuss these configuration options.
 
 [[lucene-indexing-performance]]
 
@@ -1270,7 +1270,7 @@ Hibernate Search, make sure to apply the same value too.
 === Metadata API
 
 After looking at all these different configuration options, it is time to have a look at an API
-which allows you to prorgammatically access parts of the configuration. Via the metadata API you can
+which allows you to programmatically access parts of the configuration. Via the metadata API you can
 determine the indexed types and also how they are mapped (see <<search-mapping>>) to the index
 structure. The entry point into this API is the SearchFactory. It offers two methods, namely
 `getIndexedTypes()` and `getIndexedTypeDescriptor(Class<?>)`. The former returns a set of all

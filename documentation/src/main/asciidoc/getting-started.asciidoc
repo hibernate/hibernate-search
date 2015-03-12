@@ -345,7 +345,7 @@ the indexed fields, execute it and return a list of `Book` instances.
 FullTextSession fullTextSession = Search.getFullTextSession(session);
 Transaction tx = fullTextSession.beginTransaction();
 
-// create native Lucene query unsing the query DSL
+// create native Lucene query using the query DSL
 // alternatively you can write the Lucene query using the Lucene query parser
 // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
 QueryBuilder qb = fullTextSession.getSearchFactory()
@@ -377,7 +377,7 @@ FullTextEntityManager fullTextEntityManager =
     org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 em.getTransaction().begin();
 
-// create native Lucene query unsing the query DSL
+// create native Lucene query using the query DSL
 // alternatively you can write the Lucene query using the Lucene query parser
 // or the Lucene programmatic API. The Hibernate Search DSL is recommended though
 QueryBuilder qb = fullTextEntityManager.getSearchFactory()
@@ -446,7 +446,8 @@ distribution.
 In the example below a `StandardTokenizerFactory` is used followed by two filter factories,
 `LowerCaseFilterFactory` and `SnowballPorterFilterFactory`. The standard tokenizer splits words at
 punctuation characters and hyphens while keeping email addresses and internet hostnames intact. It
-is a good general purpose tokenizer. The lowercase filter lowercases the letters in each token
+is a good general purpose tokenizer.
+The lowercase filter converts to lowercase the letters in each token
 whereas the snowball filter finally applies language specific stemming.
 
 Generally, when using the Analyzer Framework you have to start with a tokenizer followed by an
