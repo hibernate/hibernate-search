@@ -766,4 +766,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 257, value = "'%1$s' is an unexpected type for a numeric doc value")
 	SearchException unexpectedNumericDocValuesTypeType(String docValuesType);
 
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = 258, value = "Attempting to load a field named '%s' from the Lucene Document. This Document instance doesn't have such a field." )
+	void loadingNonExistentField(String name);
+
 }
