@@ -67,11 +67,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	public void sessionFactoryCreated(SessionFactory factory) {
 		boolean failedBoot = true;
 		try {
-			final SessionFactoryImplementor factoryImplementor = (SessionFactoryImplementor) factory;
+			HibernateSessionFactoryService sessionService = new DefaultHibernateSessionFactoryService( factory );
 			configurationService.getProperties().put( SESSION_FACTORY_PROPERTY_KEY, factory );
 			if ( extendedIntegrator == null ) {
 				SearchIntegrator searchIntegrator = new SearchIntegratorBuilder()
-						.configuration( new SearchConfigurationFromHibernateCore( metadata, configurationService, classLoaderService ) )
+						.configuration( new SearchConfigurationFromHibernateCore( metadata, configurationService, classLoaderService, sessionService ) )
 						.buildSearchIntegrator();
 				extendedIntegrator = searchIntegrator.unwrap( ExtendedSearchIntegrator.class );
 			}
