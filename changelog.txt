@@ -1,6 +1,19 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.1.1.Final (13-3-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1824] - Hot-restarting a mutable SearchFactory has it "forget" the previously defined FilterDef and Analyzers
+    * [HSEARCH-1825] - NullEncodingTwoWayFieldBridge doesn't set the null marker when used as a FieldBridge
+    * [HSEARCH-1836] - Avoid NPE in NullEncodingTwoWayFieldBridge for non existing fields
+
+** Improvement
+    * [HSEARCH-1831] - Correcting various typos in the documentation
+    * [HSEARCH-1835] - Fix typo in javadoc of @Spatial 
+
+
 Version 5.1.0.Final (3-3-2015)
 ------------------------
 
