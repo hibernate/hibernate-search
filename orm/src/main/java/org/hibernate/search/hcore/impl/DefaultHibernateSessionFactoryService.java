@@ -6,13 +6,7 @@
  */
 package org.hibernate.search.hcore.impl;
 
-import java.util.Properties;
-
 import org.hibernate.SessionFactory;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A Hibernate Search service which allows to request a Hibernate {@code SessionFactory} during bootstrapping.
@@ -20,21 +14,17 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Sanne Grinovero
  */
-public class DefaultHibernateSessionFactoryService implements HibernateSessionFactoryService, Startable {
-	private static final Log log = LoggerFactory.make();
+public class DefaultHibernateSessionFactoryService implements HibernateSessionFactoryService {
 
-	private volatile SessionFactory sessionFactory;
+	private final SessionFactory sessionFactory;
 
-	@Override
-	public void start(Properties properties, BuildContext context) {
-		if ( !properties.containsKey( HibernateSearchSessionFactoryObserver.SESSION_FACTORY_PROPERTY_KEY ) ) {
-			throw log.getNoSessionFactoryInContextException();
-		}
-		sessionFactory = (SessionFactory) properties.get( HibernateSearchSessionFactoryObserver.SESSION_FACTORY_PROPERTY_KEY );
+	DefaultHibernateSessionFactoryService(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 
 	@Override
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
+
 }

@@ -25,6 +25,7 @@ import org.hibernate.search.cfg.spi.SearchConfigurationBase;
 import org.hibernate.search.engine.impl.HibernateStatelessInitializer;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.spi.Service;
+import org.hibernate.search.hcore.impl.HibernateSessionFactoryService;
 import org.hibernate.search.spi.InstanceInitializer;
 
 /**
@@ -42,7 +43,8 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	private ReflectionManager reflectionManager;
 
 	public SearchConfigurationFromHibernateCore(Metadata metadata, ConfigurationService configurationService,
-			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
+			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService,
+			HibernateSessionFactoryService sessionService) {
 		this.metadata = metadata;
 		// hmm, not sure why we throw NullPointerExceptions from these sanity checks
 		// Shouldn't we use AssertionFailure or a log message + SearchException? (HF)
@@ -57,6 +59,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		this.classLoaderService = new DelegatingClassLoaderService( hibernateClassLoaderService );
 		Map<Class<? extends Service>, Object> providedServices = new HashMap<>( 1 );
 		providedServices.put( IdUniquenessResolver.class, new HibernateCoreIdUniquenessResolver( metadata ) );
+		providedServices.put( HibernateSessionFactoryService.class, sessionService );
 		this.providedServices = Collections.unmodifiableMap( providedServices );
 	}
 
@@ -72,7 +75,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 	@Override
 	public String getProperty(String propertyName) {
-		return configurationService.getSettings()
+		return configurationService.getSetting( propertyName, org.hibernate.engine.config.spi.StandardConverters.STRING );
 	}
 
 	@Override
