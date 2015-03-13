@@ -7,15 +7,14 @@
 
 package org.hibernate.search.hcore.impl;
 
+import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
-import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.DuplicationStrategy;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
-import org.hibernate.internal.util.config.ConfigurationHelper;
-import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.search.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -31,15 +30,14 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 public class HibernateSearchIntegrator implements Integrator {
 
 	private static final Log log = LoggerFactory.make();
+
 	public static final String AUTO_REGISTER = "hibernate.search.autoregister_listeners";
 
 	@Override
-	public void integrate(
-			Configuration configuration,
-			SessionFactoryImplementor sessionFactory,
-			SessionFactoryServiceRegistry serviceRegistry) {
+	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
 
-		if ( !hibernateSearchNeedsToBeEnabled( configuration ) ) {
+		if ( ! hibernateSearchNeedsToBeEnabled( configurationService ) ) {
 			return;
 		}
 
@@ -48,7 +46,8 @@ public class HibernateSearchIntegrator implements Integrator {
 
 		ClassLoaderService hibernateClassLoaderService = serviceRegistry.getService( ClassLoaderService.class );
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
-				configuration,
+				metadata,
+				configurationService,
 				fullTextIndexEventListener,
 				hibernateClassLoaderService
 		);
@@ -56,20 +55,11 @@ public class HibernateSearchIntegrator implements Integrator {
 	}
 
 	@Override
-	public void integrate(MetadataImplementor metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-		// todo - HSEARCH-856
-	}
-
-	@Override
 	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 	}
 
-	private boolean hibernateSearchNeedsToBeEnabled(Configuration configuration) {
-		final boolean enableHibernateSearch = ConfigurationHelper.getBoolean(
-				AUTO_REGISTER,
-				configuration.getProperties(),
-				true
-		);
+	private boolean hibernateSearchNeedsToBeEnabled(ConfigurationService configurationService) {
+		final Boolean enableHibernateSearch = configurationService.getSetting( AUTO_REGISTER, org.hibernate.engine.config.spi.StandardConverters.BOOLEAN, true );
 		if ( !enableHibernateSearch ) {
 			log.debug( "Skipping Hibernate Search event listener auto registration" );
 		}
@@ -107,4 +97,5 @@ public class HibernateSearchIntegrator implements Integrator {
 			return Action.KEEP_ORIGINAL;
 		}
 	}
+
 }

@@ -15,6 +15,8 @@ import java.util.Properties;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.boot.Metadata;
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
@@ -32,48 +34,50 @@ import org.hibernate.search.spi.InstanceInitializer;
  */
 public class SearchConfigurationFromHibernateCore extends SearchConfigurationBase implements SearchConfiguration {
 
-	private final org.hibernate.cfg.Configuration cfg;
+	private final ConfigurationService configurationService;
 	private final ClassLoaderService classLoaderService;
 	private final Map<Class<? extends Service>, Object> providedServices;
+	private final Metadata metadata;
+
 	private ReflectionManager reflectionManager;
 
-
-	public SearchConfigurationFromHibernateCore(org.hibernate.cfg.Configuration cfg,
+	public SearchConfigurationFromHibernateCore(Metadata metadata, ConfigurationService configurationService,
 			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
+		this.metadata = metadata;
 		// hmm, not sure why we throw NullPointerExceptions from these sanity checks
 		// Shouldn't we use AssertionFailure or a log message + SearchException? (HF)
-		if ( cfg == null ) {
+		if ( configurationService == null ) {
 			throw new NullPointerException( "Configuration is null" );
 		}
-		this.cfg = cfg;
+		this.configurationService = configurationService;
 
 		if ( hibernateClassLoaderService == null ) {
 			throw new NullPointerException( "ClassLoaderService is null" );
 		}
 		this.classLoaderService = new DelegatingClassLoaderService( hibernateClassLoaderService );
 		Map<Class<? extends Service>, Object> providedServices = new HashMap<>( 1 );
-		providedServices.put( IdUniquenessResolver.class, new HibernateCoreIdUniquenessResolver( cfg ) );
+		providedServices.put( IdUniquenessResolver.class, new HibernateCoreIdUniquenessResolver( metadata ) );
 		this.providedServices = Collections.unmodifiableMap( providedServices );
 	}
 
 	@Override
 	public Iterator<Class<?>> getClassMappings() {
-		return new ClassIterator( cfg.getClassMappings() );
+		return new ClassIterator( metadata.getEntityBindings().iterator() );
 	}
 
 	@Override
-	public Class<?> getClassMapping(String name) {
-		return cfg.getClassMapping( name ).getMappedClass();
+	public Class<?> getClassMapping(String entityName) {
+		return metadata.getEntityBinding( entityName ).getMappedClass();
 	}
 
 	@Override
 	public String getProperty(String propertyName) {
-		return cfg.getProperty( propertyName );
+		return configurationService.getSettings()
 	}
 
 	@Override
 	public Properties getProperties() {
-		return cfg.getProperties();
+		return configurationService.getProperties();
 	}
 
 	@Override
@@ -84,7 +88,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 				//I want to avoid hard link between HAN and Search for such a simple need
 				//reuse the existing reflectionManager one when possible
 				reflectionManager =
-						(ReflectionManager) cfg.getClass().getMethod( "getReflectionManager" ).invoke( cfg );
+						(ReflectionManager) configurationService.getClass().getMethod( "getReflectionManager" ).invoke( configurationService );
 
 			}
 			catch (Exception e) {
@@ -120,10 +124,10 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	}
 
 	private static class ClassIterator implements Iterator<Class<?>> {
-		private Iterator hibernatePersistentClassIterator;
+		private Iterator<PersistentClass> hibernatePersistentClassIterator;
 		private Class<?> future;
 
-		private ClassIterator(Iterator hibernatePersistentClassIterator) {
+		private ClassIterator(Iterator<PersistentClass> hibernatePersistentClassIterator) {
 			this.hibernatePersistentClassIterator = hibernatePersistentClassIterator;
 		}
 
@@ -138,7 +142,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 					future = null;
 					return false;
 				}
-				final PersistentClass pc = (PersistentClass) hibernatePersistentClassIterator.next();
+				final PersistentClass pc = hibernatePersistentClassIterator.next();
 				future = pc.getMappedClass();
 			}
 			while ( future == null );

@@ -9,10 +9,9 @@ package org.hibernate.search.cfg.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-import org.hibernate.cfg.Configuration;
+import org.hibernate.boot.Metadata;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.cfg.spi.IdUniquenessResolver;
 
@@ -23,13 +22,16 @@ import org.hibernate.search.cfg.spi.IdUniquenessResolver;
  * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
  */
 public class HibernateCoreIdUniquenessResolver implements IdUniquenessResolver {
+
 	private final Set<Class<?>> entities;
 
-	public HibernateCoreIdUniquenessResolver(Configuration cfg) {
+	public HibernateCoreIdUniquenessResolver(Metadata metadata) {
 		Set<Class<?>> entities = new HashSet<>();
-		Iterator<PersistentClass> iterator = cfg.getClassMappings();
-		while ( iterator.hasNext() ) {
-			entities.add( iterator.next().getMappedClass() );
+		for ( PersistentClass pc : metadata.getEntityBindings() ) {
+			Class<?> mappedClass = pc.getMappedClass();
+			if ( mappedClass != null ) {
+				entities.add( mappedClass );
+			}
 		}
 		this.entities = Collections.unmodifiableSet( entities );
 	}
