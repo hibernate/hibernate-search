@@ -12,11 +12,15 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
 public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private final TwoWayFieldBridge fieldBridge;
 	private final String nullMarker;
@@ -29,6 +33,11 @@ public class NullEncodingTwoWayFieldBridge implements TwoWayFieldBridge {
 	@Override
 	public Object get(String name, Document document) {
 		final IndexableField field = document.getField( name );
+		if ( field == null ) {
+			//Avoid an NPE if the field isn't defined
+			LOG.loadingNonExistentField( name );
+			return null;
+		}
 		String stringValue = field.stringValue();
 		if ( nullMarker.equals( stringValue ) ) {
 			return null;
