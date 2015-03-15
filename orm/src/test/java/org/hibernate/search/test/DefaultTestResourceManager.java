@@ -74,10 +74,7 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 
 	@Override
 	public void closeSessionFactory() {
-		if ( sessionFactory == null ) {
-			throw new IllegalStateException( "there is no SessionFactory to close" );
-		}
-		else {
+		if ( sessionFactory != null ) {
 			sessionFactory.close();
 			sessionFactory = null;
 		}
