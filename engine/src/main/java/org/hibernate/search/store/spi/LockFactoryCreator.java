@@ -11,7 +11,6 @@ import java.util.Properties;
 
 import org.apache.lucene.store.LockFactory;
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.Startable;
 
 /**
  * A service for obtaining {@link LockFactory}s based on the current configuration.
@@ -20,7 +19,7 @@ import org.hibernate.search.engine.service.spi.Startable;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public interface LockFactoryCreator extends Service, Startable {
+public interface LockFactoryCreator extends Service {
 
 	/**
 	 * Creates a {@link LockFactory} as selected in the configuration for the Directory provider. The "simple" and

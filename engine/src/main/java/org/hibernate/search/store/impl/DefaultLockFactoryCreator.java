@@ -16,6 +16,7 @@ import org.apache.lucene.store.SimpleFSLockFactory;
 import org.apache.lucene.store.SingleInstanceLockFactory;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.service.spi.ServiceManager;
+import org.hibernate.search.engine.service.spi.Startable;
 import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.LockFactoryProvider;
 import org.hibernate.search.store.spi.LockFactoryCreator;
@@ -30,7 +31,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class DefaultLockFactoryCreator implements LockFactoryCreator {
+public class DefaultLockFactoryCreator implements LockFactoryCreator, Startable {
 
 	private static final Log LOG = LoggerFactory.make();
 
