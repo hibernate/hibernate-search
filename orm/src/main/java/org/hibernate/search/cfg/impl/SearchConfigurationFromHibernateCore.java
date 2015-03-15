@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import java.util.Set;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
@@ -39,6 +40,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 	private final ClassLoaderService classLoaderService;
 	private final Map<Class<? extends Service>, Object> providedServices;
 	private final Metadata metadata;
+	private final Properties legacyConfigurationProperties;//For compatibility reasons only. Should be removed? See HSEARCH-1890
 
 	private ReflectionManager reflectionManager;
 
@@ -61,6 +63,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 		providedServices.put( IdUniquenessResolver.class, new HibernateCoreIdUniquenessResolver( metadata ) );
 		providedServices.put( HibernateSessionFactoryService.class, sessionService );
 		this.providedServices = Collections.unmodifiableMap( providedServices );
+		this.legacyConfigurationProperties = extractProperties( configurationService );
 	}
 
 	@Override
@@ -80,7 +83,7 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 
 	@Override
 	public Properties getProperties() {
-		return configurationService.getProperties();
+		return this.legacyConfigurationProperties;
 	}
 
 	@Override
@@ -168,4 +171,17 @@ public class SearchConfigurationFromHibernateCore extends SearchConfigurationBas
 			throw new UnsupportedOperationException( "Cannot modify Hibernate Core metadata" );
 		}
 	}
+
+	private static Properties extractProperties(final ConfigurationService configurationService) {
+		Properties props = new Properties();
+		Set<Map.Entry> entrySet = configurationService.getSettings().entrySet();
+		for ( Map.Entry entry : entrySet ) {
+			final Object key = entry.getKey();
+			if ( key instanceof String ) {
+				props.put( key, entry.getValue() );
+			}
+		}
+		return props;
+	}
+
 }
