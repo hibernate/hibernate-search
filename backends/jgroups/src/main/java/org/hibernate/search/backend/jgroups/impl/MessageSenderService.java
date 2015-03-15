@@ -8,8 +8,6 @@
 package org.hibernate.search.backend.jgroups.impl;
 
 import org.hibernate.search.engine.service.spi.Service;
-import org.hibernate.search.engine.service.spi.Startable;
-import org.hibernate.search.engine.service.spi.Stoppable;
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.View;
@@ -21,7 +19,7 @@ import org.jgroups.View;
  *
  * @author <a href="mailto:ales.justin@jboss.org">Ales Justin</a>
  */
-public interface MessageSenderService extends Service, Startable, Stoppable {
+public interface MessageSenderService extends Service {
 	/**
 	 * Send message.
 	 *
