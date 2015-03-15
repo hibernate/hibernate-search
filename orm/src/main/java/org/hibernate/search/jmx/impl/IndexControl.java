@@ -13,15 +13,18 @@ import javax.naming.InitialContext;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
+import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.service.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.util.impl.JNDIHelper;
+
+import static org.hibernate.engine.config.spi.StandardConverters.STRING;
 
 /**
  * Implementation of the {@code IndexControlMBean} JMX attributes and operations.
@@ -38,10 +41,10 @@ public class IndexControl implements IndexControlMBean {
 	private int numberOfObjectLoadingThreads = 2;
 	private int numberOfFetchingThreads = 4;
 
-	public IndexControl(Properties properties, ServiceManager serviceManager) {
-		this.sessionFactoryJndiName = properties.getProperty( "hibernate.session_factory_name" );
-		this.jndiProperties = JNDIHelper.getJndiProperties( properties, JNDIHelper.HIBERNATE_JNDI_PREFIX );
-		this.serviceManager = serviceManager;
+	public IndexControl(ConfigurationService configurationService, ExtendedSearchIntegrator extendedIntegrator) {
+		this.sessionFactoryJndiName = configurationService.getSetting( "hibernate.session_factory_name", STRING );
+		this.jndiProperties = JNDIHelper.getJndiProperties( extendedIntegrator.getConfigurationProperties(), JNDIHelper.HIBERNATE_JNDI_PREFIX );
+		this.serviceManager = extendedIntegrator.getServiceManager();
 	}
 
 	@Override
