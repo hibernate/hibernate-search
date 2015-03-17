@@ -131,7 +131,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 				}
 				//restore interruption signal:
 				Thread.currentThread().interrupt();
-				throw new SearchException( "Interrupted on batch Indexing; index will be left in unknown state!", e );
+				throw new SearchException( "Interrupted on batch Indexing; index will be left in unknown state!" );
 			}
 		}
 		finally {
