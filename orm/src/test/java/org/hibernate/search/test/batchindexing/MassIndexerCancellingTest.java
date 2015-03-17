@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.test.batchindexing;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
@@ -23,12 +22,11 @@ import org.hibernate.search.batchindexing.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
+import org.hibernate.testing.TestForIssue;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith(BMUnitRunner.class)
+@TestForIssue(jiraKey = "HSEARCH-655")
 public class MassIndexerCancellingTest extends SearchTestBase {
 
 	private static final Log log = LoggerFactory.make();
@@ -41,34 +39,51 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 
 		int threadsToLoadObjects = 2;
 
-		Future task = fullTextSession.createIndexer( Book.class ).threadsToLoadObjects( threadsToLoadObjects ).batchSizeToLoadObjects( 1 )
-				.progressMonitor( monitor ).purgeAllOnStart( true ).optimizeOnFinish( false ).start();
+		Future task = fullTextSession.createIndexer( Book.class )
+				.threadsToLoadObjects( threadsToLoadObjects )
+				.batchSizeToLoadObjects( 1 )
+				.progressMonitor( monitor )
+				.purgeAllOnStart( true )
+				.optimizeOnFinish( false )
+				.start();
 
-		// wait 2s to let indexing job start
-		Thread.sleep( 1000 );
+		// wait a moment to let indexing job start
+		monitor.waitUntilBusyThreads( threadsToLoadObjects );
 
 		// cancel indexing job
 		task.cancel( true );
 
-		// wait 2s to let indexing threads correctly ending
-		Thread.sleep( 1000 );
+		// wait a bit to let indexing threads correctly end
+		monitor.waitUntilBusyThreads( 0 );
 
 		fullTextSession.close();
 
 		// check 2 indexing thread enlisted
 		Assert.assertTrue( monitor.getThreadNumber() == threadsToLoadObjects );
 
+		// verify index is now containing 2 docs
+		verifyIndexIntegrityEventually( 2 );
+
 		// check all indexing thread are interrupted
 		Assert.assertTrue( monitor.massIndexerThreadsAreInterruptedOrDied() );
 
-		// verify index is now containing 2 docs
-		verifyIndexIntegrity( 2 );
+	}
 
+	private void verifyIndexIntegrityEventually(int expectedIndexSize) throws InterruptedException {
+		int attempt = 0;
+		while ( ! verifyIndexIntegrity( expectedIndexSize ) ) {
+			Thread.sleep( 10 );
+			attempt++;
+			if ( attempt == 1000 ) {
+				Assert.fail( "Expected index size still not reached after 10 seconds!" );
+			}
+		}
 	}
 
 	class InnerIndexerProgressMonitor extends SimpleIndexingProgressMonitor {
 
 		public final List<Thread> threads = Collections.synchronizedList( new ArrayList<Thread>() );
+		private final AtomicInteger busyThreads = new AtomicInteger();
 
 		public InnerIndexerProgressMonitor() {
 			super();
@@ -80,12 +95,20 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 			log.debug( "enlist EntityLoader thread [" + Thread.currentThread() + "] and simulate document producer activity" );
 			threads.add( Thread.currentThread() );
 
+			busyThreads.incrementAndGet();
 			while ( true ) {
 				// simulate activity until thread interrupted
 				if ( Thread.currentThread().isInterrupted() ) {
 					log.tracef( "Indexing thread is interrupted : end activity simulation " );
 					break;
 				}
+			}
+			busyThreads.decrementAndGet();
+		}
+
+		void waitUntilBusyThreads(int expectedNumberBusyThreads) {
+			while ( busyThreads.get() != expectedNumberBusyThreads ) {
+				Thread.yield();
 			}
 		}
 
@@ -107,7 +130,7 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 
 	}
 
-	private void verifyIndexIntegrity(int expectedDocs) {
+	private boolean verifyIndexIntegrity(int expectedDocs) {
 		FullTextSession fullTextSession = Search.getFullTextSession( openSession() );
 		try {
 			Transaction transaction = fullTextSession.beginTransaction();
@@ -115,9 +138,9 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 			FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery( q, Book.class );
 
 			int resultSize = fullTextQuery.getResultSize();
-			assertEquals( expectedDocs, resultSize );
 
 			transaction.commit();
+			return expectedDocs == resultSize;
 		}
 		finally {
 			fullTextSession.close();
@@ -157,12 +180,6 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 	@Override
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] { Book.class, Nation.class };
-	}
-
-	@Override
-	protected void configure(org.hibernate.cfg.Configuration cfg) {
-		super.configure( cfg );
-		cfg.setProperty( "hibernate.search.default.indexwriter.infostream", "true" );
 	}
 
 }
