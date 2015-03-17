@@ -7,12 +7,15 @@
 package org.hibernate.search.batchindexing.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.spi.BatchBackend;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
@@ -59,6 +62,8 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	private final String tenantId;
 
+	private final List<Future<?>> tasks = new ArrayList<>();
+
 	public BatchIndexingWorkspace(ExtendedSearchIntegrator extendedIntegrator,
 								SessionFactoryImplementor sessionFactory,
 								Class<?> entityType,
@@ -101,6 +106,10 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	@Override
 	public void runWithErrorHandler() {
+		if ( tasks.size() > 0 ) {
+			throw new AssertionFailure( "BatchIndexingWorkspace instance not expected to be reused - tasks should be empty" );
+		}
+
 		try {
 			final ErrorHandler errorHandler = extendedIntegrator.getErrorHandler();
 			final BatchTransactionalContext transactionalContext = new BatchTransactionalContext( extendedIntegrator, sessionFactory, errorHandler, tenantId );
@@ -114,6 +123,12 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 				log.debugf( "All work for type %s has been produced", indexedType.getName() );
 			}
 			catch (InterruptedException e) {
+				// on thread interruption cancel each pending task - thread executing the task must be interrupted
+				for ( Future<?> task : tasks ) {
+					if ( !task.isDone() ) {
+						task.cancel( true );
+					}
+				}
 				//restore interruption signal:
 				Thread.currentThread().interrupt();
 				throw new SearchException( "Interrupted on batch Indexing; index will be left in unknown state!", e );
@@ -136,7 +151,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
 		try {
-			execIdentifiersLoader.execute( primaryKeyOutputter );
+			tasks.add( execIdentifiersLoader.submit( primaryKeyOutputter ) );
 		}
 		finally {
 			execIdentifiersLoader.shutdown();
@@ -155,13 +170,11 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {
-				execFirstLoader.execute( documentOutputter );
+				tasks.add( execFirstLoader.submit( documentOutputter ) );
 			}
 		}
 		finally {
 			execFirstLoader.shutdown();
 		}
 	}
-
-
 }
