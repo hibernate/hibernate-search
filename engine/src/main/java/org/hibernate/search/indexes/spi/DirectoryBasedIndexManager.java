@@ -14,12 +14,14 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.similarities.Similarity;
+
 import org.hibernate.search.backend.BackendFactory;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.spi.BackendQueueProcessor;
 import org.hibernate.search.backend.spi.LuceneIndexingParameters;
+import org.hibernate.search.cfg.spi.DirectoryProviderService;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -29,7 +31,6 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
 import org.hibernate.search.store.DirectoryProvider;
-import org.hibernate.search.store.impl.DirectoryProviderFactory;
 import org.hibernate.search.store.optimization.OptimizerStrategy;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -79,6 +80,7 @@ public class DirectoryBasedIndexManager implements IndexManager {
 
 	@Override
 	public void initialize(String indexName, Properties properties, Similarity similarity, WorkerBuildContext buildContext) {
+		this.serviceManager = buildContext.getServiceManager();
 		this.indexName = indexName;
 		this.similarity = similarity;
 		this.directoryProvider = createDirectoryProvider( indexName, properties, buildContext );
@@ -87,7 +89,6 @@ public class DirectoryBasedIndexManager implements IndexManager {
 		this.backend = createBackend( indexName, properties, buildContext );
 		this.directoryProvider.start( this );
 		this.readers = createIndexReader( indexName, properties, buildContext );
-		this.serviceManager = buildContext.getServiceManager();
 	}
 
 	@Override
@@ -194,7 +195,13 @@ public class DirectoryBasedIndexManager implements IndexManager {
 	}
 
 	protected DirectoryProvider<?> createDirectoryProvider(String indexName, Properties cfg, WorkerBuildContext buildContext) {
-		return DirectoryProviderFactory.createDirectoryProvider( indexName, cfg, buildContext );
+		try {
+			DirectoryProviderService directoryProviderService = serviceManager.requestService( DirectoryProviderService.class );
+			return directoryProviderService.create( cfg, indexName, buildContext );
+		}
+		finally {
+			serviceManager.releaseService( DirectoryProviderService.class );
+		}
 	}
 
 }
