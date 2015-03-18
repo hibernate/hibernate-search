@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +34,9 @@ import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.AttributeImpl;
 import org.apache.lucene.util.BytesRef;
-
+import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
@@ -83,6 +85,17 @@ public class AvroSerializer implements Serializer {
 		GenericRecord purgeAll = new GenericData.Record( protocol.getType( "PurgeAll" ) );
 		purgeAll.put( "class", classRef );
 		operations.add( purgeAll );
+	}
+
+	@Override
+	public void addDeleteByQuery(String entityClassName, DeletionQuery deletionQuery) {
+		int classRef = getClassReference( entityClassName );
+		GenericRecord deleteByQuery = new GenericData.Record( protocol.getType( "DeleteByQuery" ) );
+		deleteByQuery.put( "class", classRef );
+		deleteByQuery.put( "key", deletionQuery.getQueryKey() );
+		DeleteByQuerySupport.QueryToStringMapper mapper = DeleteByQuerySupport.getQueryToStringMapper( deletionQuery.getQueryKey() );
+		deleteByQuery.put( "query", Arrays.asList( mapper.toString( deletionQuery ) ) );
+		operations.add( deleteByQuery );
 	}
 
 	private int getClassReference(String entityClassName) {
