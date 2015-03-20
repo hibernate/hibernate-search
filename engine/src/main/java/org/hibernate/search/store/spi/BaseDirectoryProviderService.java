@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.store;
+package org.hibernate.search.store.spi;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,11 +13,11 @@ import java.util.Properties;
 import org.hibernate.search.cfg.spi.DirectoryProviderService;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.spi.BuildContext;
+import org.hibernate.search.store.DirectoryProvider;
 import org.hibernate.search.store.impl.FSDirectoryProvider;
 import org.hibernate.search.store.impl.FSMasterDirectoryProvider;
 import org.hibernate.search.store.impl.FSSlaveDirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
-import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.store.impl;
 
-import org.hibernate.search.store.BaseDirectoryProviderService;
 import org.hibernate.search.store.DirectoryProvider;
+import org.hibernate.search.store.spi.BaseDirectoryProviderService;
 
 /**
  * Default {@link org.hibernate.search.store.impl.DefaultDirectoryProviderService}
