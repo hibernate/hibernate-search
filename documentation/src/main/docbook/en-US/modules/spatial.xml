@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Hibernate, Relational Persistence for Idiomatic Java
   ~
@@ -423,7 +422,7 @@ List results = hibQuery.list();</programlisting>
           <para>Call
           <classname>FullTextQuery</classname>.<literal>setSpatialParameters</literal>
           with the latitude, longitude and the name of the spatial field used
-          to build the spatial query. Note that using coordinates different thans
+          to build the spatial query. Note that using coordinates different than
           the center used for the query will have unexpected results.</para>
         </listitem>
       </itemizedlist>
@@ -491,7 +490,7 @@ hibQuery.setSort(distanceSort);</programlisting>
   <section id="spatial-multiplecoordinates">
     <title>Multiple Coordinate pairs</title>
     <para>You can associate multiple pairs of coordinates to the same entity,
-    as long as each pair is uniquelly identified by using a different name. This is achieved
+    as long as each pair is uniquely identified by using a different name. This is achieved
     by stacking multiple <literal>@</literal><classname>Spatial</classname>
     annotations in a <literal>@</literal><classname>Spatials</classname> annotation,
     and specifying the <literal>name</literal> attribute on the
@@ -592,7 +591,7 @@ List results = hibQuery.list();</programlisting>
       <para>The index is divided into n levels labeled from 0 to n-1.</para>
 
       <para>At the level 0 the projected space is the whole Earth. At the
-      level 1 the projected space is devided into 4 rectangles (called boxes
+      level 1 the projected space is divided into 4 rectangles (called boxes
       as in bounding box):</para>
 
       <para>[-pi,-pi/2]-&gt;[0,0], [-pi,0]-&gt;[0,+pi/2],
@@ -629,7 +628,7 @@ List results = hibQuery.list();</programlisting>
       index one field for each level of the quad tree. The field is named: [spatial
       index fields name]_HSSI_[n]. [spatial index fields name] is given either
       by the parameter at class level annotation or derived from the name of
-      the spatial annoted method of he entitiy, HSSI stands for Hibernate
+      the spatial annotated method of the entity, HSSI stands for Hibernate
       Search Spatial Index and n is the level of the quad tree.</para>
 
       <para>We also store the latitude and longitude as a Numeric field under
@@ -716,7 +715,7 @@ List results = hibQuery.list();</programlisting>
         <para>This Query will return all documents in the boxes covering the
         projected bounding box of the search discus. So it is too large and
         needs refining. But we have narrowed the distance calculation problems
-        to a subet of our datas.</para>
+        to a subset of our data.</para>
       </section>
 
       <section>
