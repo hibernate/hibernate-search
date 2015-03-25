@@ -12,7 +12,7 @@
   ~  Lesser General Public License, as published by the Free Software Foundation.
   ~
   ~  This program is distributed in the hope that it will be useful,
-  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~  but WITHOUT ANY WARRANTY; without even the impliead warranty of MERCHANTABILITY
   ~  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
   ~  for more details.
   ~
@@ -284,7 +284,7 @@ finally {
     <important>
         <para>This <classname>ShardIdentifierProvider</classname> is considered
         experimental. We might need to apply some changes to the defined method
-        signatures to accomodate for unforeseen use cases. Please provide
+        signatures to accommodate for unforeseen use cases. Please provide
         feedback if you have ideas, or just to let us know how you're using
         this API.</para>
     </important>
