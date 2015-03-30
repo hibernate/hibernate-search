@@ -24,8 +24,11 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
 
 /**
- * Create deployments for JMS Master/Slave configuration integration tests.
- * Make sure to test for a secured JMS environment.
+ * Create deployments for JMS Master/Slave configuration integration tests. Make sure to test for a secured JMS
+ * environment.
+ * <p>
+ * The deployment won't add all the required dependencies since they can be included using JBoss Modules or libraries in
+ * the archive and it depends by what we want to test
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero

@@ -13,11 +13,14 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.runner.RunWith;
+
 import static org.hibernate.search.test.integration.VersionTestHelper.addDependencyToSearchModule;
 
 /**
- * Execute the tests in {@link SearchNewEntityJmsMasterSlave} using the modules in JBoss AS to add the required
- * dependencies.
+ * Test Hibernate Search JMS configuration (file-system directory provider), deployed on an application server as a WAR
+ * and using the MANIFEST.MF to include the required dependencies via JBoss Modules..
+ * <p>
+ * Executes the test in {@link SearchNewEntityJmsMasterSlave}.
  *
  * @author Davide D'Alto
  * @author Sanne Grinovero
