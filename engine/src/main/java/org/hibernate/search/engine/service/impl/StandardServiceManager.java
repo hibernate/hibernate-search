@@ -8,6 +8,7 @@ package org.hibernate.search.engine.service.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -138,8 +139,10 @@ public class StandardServiceManager implements ServiceManager {
 	}
 
 	private <S extends Service> ServiceWrapper<S> createAndCacheWrapper(Class<S> serviceRole) {
-		ServiceWrapper<S> wrapper;
-		Set<S> services = requestService( ClassLoaderService.class ).loadJavaServices( serviceRole );
+		Set<S> services = new HashSet<>();
+		for ( S service : requestService( ClassLoaderService.class ).loadJavaServices( serviceRole ) ) {
+			services.add( service );
+		}
 
 		if ( services.size() == 0 ) {
 			tryLoadingDefaultService( serviceRole, services );
@@ -151,7 +154,7 @@ public class StandardServiceManager implements ServiceManager {
 			);
 		}
 		S service = services.iterator().next();
-		wrapper = new ServiceWrapper<S>( service, serviceRole, buildContext );
+		ServiceWrapper<S> wrapper = new ServiceWrapper<S>( service, serviceRole, buildContext );
 		@SuppressWarnings("unchecked")
 		ServiceWrapper<S> previousWrapper = (ServiceWrapper<S>) cachedServices.putIfAbsent( serviceRole, wrapper );
 		if ( previousWrapper != null ) {

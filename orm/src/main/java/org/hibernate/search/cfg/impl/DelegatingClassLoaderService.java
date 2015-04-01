@@ -8,7 +8,10 @@ package org.hibernate.search.cfg.impl;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.service.classloading.impl.DefaultClassLoaderService;
@@ -67,33 +70,26 @@ public class DelegatingClassLoaderService implements ClassLoaderService {
 	}
 
 	@Override
-	public <T> LinkedHashSet<T> loadJavaServices(Class<T> serviceContract) {
+	public <T> Iterable<T> loadJavaServices(Class<T> serviceContract) {
 		// when it comes to services, we need to search in both services and the de-duplicate
 		// however, we cannot rely on 'equals' for comparison. Instead compare class names
-		LinkedHashSet<T> servicesFromORMCLassLoader = new LinkedHashSet<T>(
-				hibernateClassLoaderService.loadJavaServices(
-						serviceContract
-				)
-		);
-		LinkedHashSet<T> services = new LinkedHashSet<T>( internalClassLoaderService.loadJavaServices( serviceContract ) );
+		Iterable<T> servicesFromORMCLassLoader = hibernateClassLoaderService.loadJavaServices( serviceContract );
+		Iterable<T> servicesFromLocalClassLoader = internalClassLoaderService.loadJavaServices( serviceContract );
 
-		for ( T serviceInstance : servicesFromORMCLassLoader ) {
-			if ( !contains( services, serviceInstance ) ) {
-				services.add( serviceInstance );
-			}
-		}
+		//LinkedHashMap to maintain order; elements from Hibernate ORM first.
+		Map<String,T> combined = new LinkedHashMap<String,T>();
 
-		return services;
+		addAllServices( servicesFromORMCLassLoader, combined );
+		addAllServices( servicesFromLocalClassLoader, combined );
+
+		return combined.values();
 	}
 
-	private <T> boolean contains(LinkedHashSet<T> services, T serviceInstance) {
+	private <T> void addAllServices(Iterable<T> services, Map<String,T> combined ) {
 		for ( T service : services ) {
-			if ( service.getClass().getName().equals( serviceInstance.getClass().getName() ) ) {
-				return true;
-			}
+			combined.put( service.getClass().getName(), service );
 		}
-		return false;
 	}
-}
 
+}
 
