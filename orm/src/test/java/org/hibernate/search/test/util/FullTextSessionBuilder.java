@@ -15,6 +15,11 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.hibernate.Session;
+import org.hibernate.boot.registry.BootstrapServiceRegistry;
+import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -25,14 +30,12 @@ import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.impl.ImplementationFactory;
-import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
 import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.testing.cache.CachingRegionFactory;
 import org.junit.rules.TestRule;
@@ -136,6 +139,7 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 	 * Closes the SessionFactory.
 	 * Make sure you close all sessions first
 	 */
+	@Override
 	public void close() {
 		if ( sessionFactory == null ) {
 			throw new java.lang.IllegalStateException( "sessionFactory not yet built" );
@@ -155,16 +159,15 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 	 * Builds the sessionFactory as configured so far.
 	 */
 	public FullTextSessionBuilder build() {
-		Configuration hibConfiguration = new Configuration();
+		final Configuration hibConfiguration = buildBaseConfiguration();
+
 		for ( Class<?> annotatedClass : annotatedClasses ) {
 			hibConfiguration.addAnnotatedClass( annotatedClass );
 		}
 		hibConfiguration.getProperties().putAll( cfg );
 
-		ServiceRegistryBuilder registryBuilder = new ServiceRegistryBuilder();
-		registryBuilder.applySettings( hibConfiguration.getProperties() );
+		StandardServiceRegistry serviceRegistry = buildServiceRegistry( cfg );
 
-		final ServiceRegistry serviceRegistry = ServiceRegistryTools.build( registryBuilder );
 		SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) hibConfiguration.buildSessionFactory(
 				serviceRegistry
 		);
@@ -177,6 +180,20 @@ public class FullTextSessionBuilder implements AutoCloseable, TestRule {
 
 		sessionFactory = sessionFactoryImpl;
 		return this;
+	}
+
+	private StandardServiceRegistry buildServiceRegistry(Properties settings) {
+		return new StandardServiceRegistryBuilder().applySettings( settings ).build();
+	}
+
+	private Configuration buildBaseConfiguration() {
+		Configuration configuration = new Configuration();
+		configuration.setProperty( AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, "true" ); //As in ORM testsuite
+		return configuration;
+	}
+
+	private BootstrapServiceRegistry buildBootstrapServiceRegistry() {
+		return new BootstrapServiceRegistryBuilder().build();
 	}
 
 	/**
