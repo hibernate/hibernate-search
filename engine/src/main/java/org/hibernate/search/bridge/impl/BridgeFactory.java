@@ -44,12 +44,13 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author John Griffin
  */
 public final class BridgeFactory {
+
 	private static final Log LOG = LoggerFactory.make();
-	private Set<BridgeProvider> annotationBasedProviders;
-	private Set<BridgeProvider> regularProviders;
+
+	private final Set<BridgeProvider> annotationBasedProviders = new HashSet<>( 5 );
+	private final Set<BridgeProvider> regularProviders = new HashSet<>();
 
 	public BridgeFactory(ServiceManager serviceManager) {
-		annotationBasedProviders = new HashSet<>(5);
 		annotationBasedProviders.add( new CalendarBridgeProvider() );
 		annotationBasedProviders.add( new DateBridgeProvider() );
 		annotationBasedProviders.add( new NumericBridgeProvider() );
@@ -58,13 +59,15 @@ public final class BridgeFactory {
 
 		ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
 		try {
-			regularProviders = classLoaderService.loadJavaServices( BridgeProvider.class );
-			regularProviders.add( new EnumBridgeProvider() );
-			regularProviders.add( new BasicJDKTypesBridgeProvider( serviceManager ) );
+			for ( BridgeProvider provider : classLoaderService.loadJavaServices( BridgeProvider.class ) ) {
+				regularProviders.add( provider );
+			}
 		}
 		finally {
 			serviceManager.releaseService( ClassLoaderService.class );
 		}
+		regularProviders.add( new EnumBridgeProvider() );
+		regularProviders.add( new BasicJDKTypesBridgeProvider( serviceManager ) );
 	}
 
 	/**

@@ -124,8 +124,7 @@ public class IndexManagerFactoryCustomizationTest {
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public <T> LinkedHashSet<T> loadJavaServices(Class<T> serviceContract) {
+		public <T> Iterable<T> loadJavaServices(Class<T> serviceContract) {
 			if ( fakedDiscoveredServices.containsKey( serviceContract ) ) {
 				LinkedHashSet<T> services = new LinkedHashSet<T>( 1 );
 				Class<T> clazz = classForName( fakedDiscoveredServices.get( serviceContract ) );

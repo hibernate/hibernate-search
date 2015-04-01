@@ -8,7 +8,6 @@ package org.hibernate.search.engine.service.classloading.spi;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.LinkedHashSet;
 
 import org.hibernate.search.engine.service.spi.Service;
 
@@ -60,7 +59,7 @@ public interface ClassLoaderService extends Service {
 	 *
 	 * @return The ordered set of discovered services.
 	 */
-	<T> LinkedHashSet<T> loadJavaServices(Class<T> serviceContract);
+	<T> Iterable<T> loadJavaServices(Class<T> serviceContract);
 }
 
 
