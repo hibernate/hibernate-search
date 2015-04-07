@@ -8,11 +8,14 @@ package org.hibernate.search.test.batchindexing;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.h2.Driver;
 import org.hibernate.HibernateException;
@@ -29,22 +32,25 @@ import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionPr
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
-import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.testing.RequiresDialect;
 import org.hibernate.tool.hbm2ddl.ConnectionHelper;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * This is a test class to check that search can be used with ORM in multi-tenancy.
  * <p>
  * The test will create one database for each tenant identifier.
- * The two tenant identifiers are: metamec and geochron.
+ * The two tenant identifiers are "metamec" and "geochron".
+ * <p>
+ * Before running a test the DBs are poulated with some clock instances.
+ * Note that some instances have the same ID reused for different tenants, this is important to test the case
+ * where a hit is found in the search but it's from the wrong tenant.
  *
  * @author Davide D'Alto
  */
@@ -67,8 +73,17 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	 */
 	private static final String GEOCHRON_TID = "geochron";
 
-	private static String[] METAMEC_MODELS = { "Metamec - Model A850", "Metamec - Model 4562" };
-	private static String[] GEOCHRON_MODELS = { "Geochron - Model The Original Kilburg", "Geochron - Model The Boardroom" };
+	private static Clock[] METAMEC_MODELS = {
+		new Clock( 1, "Metamec - Model A850"),
+		new Clock( 2, "Metamec - Model 4562"),
+		new Clock( 5, "Metamec - Model 792")
+		};
+
+	private static Clock[] GEOCHRON_MODELS = {
+		new Clock( 1, "Geochron - Model The Original Kilburg" ),
+		new Clock( 2, "Geochron - Model The Boardroom" ),
+		new Clock( 9, "Geochron - Model Designer Series")
+		};
 
 	@Override
 	protected void configure(Configuration cfg) {
@@ -101,23 +116,23 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	@Test
 	public void shouldOnlyFindMetamecModels() throws Exception {
 		List<Clock> list = searchAll( METAMEC_TID );
-		assertThat( list ).onProperty( "brand" ).containsOnly( METAMEC_MODELS );
+		assertThat( list ).containsOnly( METAMEC_MODELS );
 	}
 
 	@Test
 	public void shouldOnlyFindGeochronModels() throws Exception {
 		List<Clock> list = searchAll( GEOCHRON_TID );
-		assertThat( list ).onProperty( "brand" ).containsOnly( GEOCHRON_MODELS );
+		assertThat( list ).containsOnly( GEOCHRON_MODELS );
 	}
 
 	@Test
-	public void shouldBePossibleToRunAQuery() throws Exception {
+	public void shouldMatchOnlyElementsFromOneTenant() throws Exception {
 		List<Clock> list = searchModel( "model", GEOCHRON_TID );
-		assertThat( list ).onProperty( "brand" ).containsOnly( GEOCHRON_MODELS );
+		assertThat( list ).containsOnly( GEOCHRON_MODELS );
 	}
 
 	@Test
-	public void shouldBeAbleToPurgeTheIndex() {
+	public void shouldBeAbleToPurgeTheIndex() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 
 		List<Clock> list = searchAll( GEOCHRON_TID );
@@ -131,22 +146,30 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
 
 		List<Clock> list = searchAll( GEOCHRON_TID );
-		assertThat( list ).onProperty( "brand" ).containsOnly( GEOCHRON_MODELS );
+		assertThat( list ).containsOnly( GEOCHRON_MODELS );
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1792")
-	@Ignore
-	public void shouldOnlyPurgeTheEntitiesOfTheSelecedTenant() {
+	public void shouldOnlyPurgeTheEntitiesOfTheSelecedTenant() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 
 		List<Clock> list = searchAll( METAMEC_TID );
-		assertThat( list ).onProperty( "brand" ).containsOnly( METAMEC_MODELS );
+		assertThat( list ).containsOnly( METAMEC_MODELS );
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1792")
-	@Ignore
+	public void shouldPurgeOnStartOnlyTheSelectedTenant() throws Exception {
+		// This will run a purgeOnStart
+		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
+
+		List<Clock> metamecList = searchAll( METAMEC_TID );
+		assertThat( metamecList ).containsOnly( METAMEC_MODELS );
+
+		List<Clock> geochronList = searchAll( GEOCHRON_TID );
+		assertThat( geochronList ).containsOnly( GEOCHRON_MODELS );
+	}
+
+	@Test
 	public void shouldOnlyReturnResultsOfTheSpecificTenant() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 		purgeAll( Clock.class, METAMEC_TID );
@@ -157,8 +180,6 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-1792")
-	@Ignore
 	public void shouldSearchOtherTenantsDocuments() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 		purgeAll( Clock.class, METAMEC_TID );
@@ -197,18 +218,20 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	private void rebuildIndexWithMassIndexer(Class<?> entityType, String tenantId) throws Exception {
 		FullTextSession session = Search.getFullTextSession( openSessionWithTenantId( tenantId ) );
 		session.createIndexer( entityType ).purgeAllOnStart( true ).startAndWait();
-		int numDocs = session.getSearchFactory().getIndexReaderAccessor().open( entityType ).numDocs();
+		IndexReader indexReader = session.getSearchFactory().getIndexReaderAccessor().open( entityType );
+		long tenantIdTermFreq = indexReader.totalTermFreq( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
 		session.close();
-		assertThat( numDocs ).isGreaterThan( 0 );
+		assertThat( tenantIdTermFreq ).isGreaterThan( 0 );
 	}
 
-	private void purgeAll(Class<?> entityType, String tenantId) {
+	private void purgeAll(Class<?> entityType, String tenantId) throws IOException {
 		FullTextSession session = Search.getFullTextSession( openSessionWithTenantId( tenantId ) );
 		session.purgeAll( entityType );
 		session.flushToIndexes();
-		int numDocs = session.getSearchFactory().getIndexReaderAccessor().open( entityType ).numDocs();
+		IndexReader indexReader = session.getSearchFactory().getIndexReaderAccessor().open( entityType );
+		long tenantIdTermFreq = indexReader.totalTermFreq( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
 		session.close();
-		assertThat( numDocs ).isEqualTo( 0 );
+		assertThat( tenantIdTermFreq ).isEqualTo( 0 );
 	}
 
 	private Session openSessionWithTenantId(String tenantId) {
@@ -220,10 +243,10 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		return new Class<?>[] { Clock.class };
 	}
 
-	private void persist(Session session, String... models) {
+	private void persist(Session session, Clock... clocks) {
 		session.beginTransaction();
-		for ( int i = 0; i < models.length; i++ ) {
-			session.persist( new Clock( i + 1, models[i] ) );
+		for ( Clock clock : clocks ) {
+			session.persist( clock );
 		}
 		session.getTransaction().commit();
 		session.clear();
