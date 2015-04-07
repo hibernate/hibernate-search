@@ -33,6 +33,11 @@ public interface ProjectionConstants {
 	String ID = "__HSearch_id";
 
 	/**
+	 * The tenant identifier
+	 */
+	String TENANT_ID = "__HSearch_TenantId";
+
+	/**
 	 * Lucene Document id.
 	 * <p/>
 	 * Expert: Lucene document id can change overtime between 2 different IndexReader opening.
