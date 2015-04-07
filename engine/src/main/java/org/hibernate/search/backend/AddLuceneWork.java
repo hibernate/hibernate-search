@@ -23,11 +23,19 @@ public class AddLuceneWork extends LuceneWork {
 	private final Map<String, String> fieldToAnalyzerMap;
 
 	public AddLuceneWork(Serializable id, String idInString, Class<?> entity, Document document) {
-		this( id, idInString, entity, document, null );
+		this( null, id, idInString, entity, document, null );
+	}
+
+	public AddLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document) {
+		this( tenantId, id, idInString, entity, document, null );
 	}
 
 	public AddLuceneWork(Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
-		super( id, idInString, entity, document );
+		this( null, id, idInString, entity, document, fieldToAnalyzerMap );
+	}
+
+	public AddLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
+		super( tenantId, id, idInString, entity, document );
 		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
 	}
 
@@ -43,7 +51,8 @@ public class AddLuceneWork extends LuceneWork {
 
 	@Override
 	public String toString() {
-		return "AddLuceneWork: " + this.getEntityClass().getName() + "#" + this.getIdInString();
+		String tenant = getTenantId() == null ? "" : " [" + getTenantId() + "] ";
+		return "AddLuceneWork" + tenant + ": " + this.getEntityClass().getName() + "#" + this.getIdInString();
 	}
 
 }

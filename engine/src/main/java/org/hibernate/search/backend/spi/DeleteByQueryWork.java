@@ -22,15 +22,20 @@ public class DeleteByQueryWork extends Work {
 
 	private final DeletionQuery deleteByQuery;
 
+	public DeleteByQueryWork(Class<?> entityType, DeletionQuery deletionQuery) {
+		this( null, entityType, deletionQuery );
+	}
+
 	/**
 	 * Creates a DeleteByWork
 	 *
+	 * @param tenantId the tenant identifier
 	 * @param entityType the class to operate on
 	 * @param deleteByQuery the query to delete by
 	 * @throws IllegalArgumentException if a unsupported SerializableQuery is passed
 	 */
-	public DeleteByQueryWork(Class<?> entityType, DeletionQuery deletionQuery) {
-		super( entityType, null, WorkType.DELETE_BY_QUERY );
+	public DeleteByQueryWork(String tenantId, Class<?> entityType, DeletionQuery deletionQuery) {
+		super( tenantId, entityType, null, WorkType.DELETE_BY_QUERY );
 		if ( entityType == null ) {
 			throw new IllegalArgumentException( "entityType must not be null" );
 		}

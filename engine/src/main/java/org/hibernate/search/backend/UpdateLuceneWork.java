@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-
 import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
@@ -27,11 +26,19 @@ public class UpdateLuceneWork extends LuceneWork {
 	private final Map<String, String> fieldToAnalyzerMap;
 
 	public UpdateLuceneWork(Serializable id, String idInString, Class<?> entity, Document document) {
-		this( id, idInString, entity, document, null );
+		this( null, id, idInString, entity, document, null );
+	}
+
+	public UpdateLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document) {
+		this( tenantId, id, idInString, entity, document, null );
 	}
 
 	public UpdateLuceneWork(Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
-		super( id, idInString, entity, document );
+		this( null, id, idInString, entity, document );
+	}
+
+	public UpdateLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document, Map<String, String> fieldToAnalyzerMap) {
+		super( tenantId, id, idInString, entity, document );
 		this.fieldToAnalyzerMap = fieldToAnalyzerMap;
 	}
 
@@ -47,7 +54,8 @@ public class UpdateLuceneWork extends LuceneWork {
 
 	@Override
 	public String toString() {
-		return "UpdateLuceneWork: " + this.getEntityClass().getName() + "#" + this.getIdInString();
+		String tenant = getTenantId() == null ? "" : " [" + getTenantId() + "] ";
+		return "UpdateLuceneWork" + tenant + ": " + this.getEntityClass().getName() + "#" + this.getIdInString();
 	}
 
 }
