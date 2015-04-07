@@ -25,14 +25,14 @@ public class OptimizeLuceneWork extends LuceneWork {
 	 * @param entity
 	 */
 	public OptimizeLuceneWork(Class<?> entity) {
-		super( null, null, entity );
+		super( null, null, null, entity );
 	}
 
 	/**
 	 * Optimizes any index
 	 */
 	private OptimizeLuceneWork() {
-		super( null, null, null );
+		super( null, null, null, null );
 	}
 
 	@Override

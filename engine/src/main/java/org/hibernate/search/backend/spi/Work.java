@@ -20,34 +20,56 @@ public class Work {
 	private final Serializable id;
 	private final WorkType type;
 	private final boolean identifierWasRolledBack;
+	private final String tenantIdentifier;
 
 	public Work(Object entity, Serializable id, WorkType type) {
-		this( entity, null, id, type, false );
+		this( null, entity, null, id, type, false );
 	}
 
 	public Work(Object entity, Serializable id, WorkType type, boolean identifierRollbackEnabled) {
-		this( entity, null, id, type, identifierRollbackEnabled );
+		this( null, entity, null, id, type, identifierRollbackEnabled );
 	}
 
 	public Work(Class<?> entityType, Serializable id, WorkType type) {
-		this( null, entityType, id, type, false );
+		this( null, null, entityType, id, type, false );
 	}
 
 	public Work(Object entity, WorkType type) {
-		this( entity, null, null, type, false );
+		this( null, entity, null, null, type, false );
 	}
 
-	private Work(Object entity, Class<?> entityClass, Serializable id,
+	public Work(String tenantId, Object entity, Serializable id, WorkType type) {
+		this( tenantId, entity, null, id, type, false );
+	}
+
+	public Work(String tenantId, Object entity, Serializable id, WorkType type, boolean identifierRollbackEnabled) {
+		this( tenantId, entity, null, id, type, identifierRollbackEnabled );
+	}
+
+	public Work(String tenantId, Class<?> entityType, Serializable id, WorkType type) {
+		this( tenantId, null, entityType, id, type, false );
+	}
+
+	public Work(String tenantId, Object entity, WorkType type) {
+		this( tenantId, entity, null, null, type, false );
+	}
+
+	private Work(String tenantId, Object entity, Class<?> entityClass, Serializable id,
 			WorkType type, boolean identifierWasRolledBack) {
 		this.entity = entity;
 		this.entityClass = entityClass;
 		this.id = id;
 		this.type = type;
 		this.identifierWasRolledBack = identifierWasRolledBack;
+		this.tenantIdentifier = tenantId;
 	}
 
 	public Class<?> getEntityClass() {
 		return entityClass;
+	}
+
+	public String getTenantIdentifier() {
+		return tenantIdentifier;
 	}
 
 	public Object getEntity() {
@@ -70,6 +92,7 @@ public class Work {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "Work{" );
 		sb.append( "entityClass=" ).append( entityClass );
+		sb.append( ", tenantId=" ).append( tenantIdentifier );
 		sb.append( ", id=" ).append( id );
 		sb.append( ", type=" ).append( type );
 		sb.append( '}' );

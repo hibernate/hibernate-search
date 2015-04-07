@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-
 import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
@@ -31,14 +30,16 @@ public abstract class LuceneWork {
 
 	private final Document document;
 	private final Class<?> entityClass;
+	private final String tenantId;
 	private final Serializable id;
 	private final String idInString;
 
-	public LuceneWork(Serializable id, String idInString, Class<?> entity) {
-		this( id, idInString, entity, null );
+	public LuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity) {
+		this( tenantId, id, idInString, entity, null );
 	}
 
-	public LuceneWork(Serializable id, String idInString, Class<?> entity, Document document) {
+	public LuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity, Document document) {
+		this.tenantId = tenantId;
 		this.id = id;
 		this.idInString = idInString;
 		this.entityClass = entity;
@@ -61,10 +62,13 @@ public abstract class LuceneWork {
 		return idInString;
 	}
 
+	public String getTenantId() {
+		return tenantId;
+	}
+
 	public abstract <T> T getWorkDelegate(WorkVisitor<T> visitor);
 
 	public Map<String, String> getFieldToAnalyzerMap() {
 		return null;
 	}
-
 }

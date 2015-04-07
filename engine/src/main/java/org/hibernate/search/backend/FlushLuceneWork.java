@@ -24,15 +24,15 @@ public class FlushLuceneWork extends LuceneWork {
 	 *
 	 * @param entity the entity type for which to flush the index
 	 */
-	public FlushLuceneWork(Class<?> entity) {
-		super( null, null, entity );
+	public FlushLuceneWork(String tenantId, Class<?> entity) {
+		super( tenantId, null, null, entity );
 	}
 
 	/**
 	 * Flushes all index operations
 	 */
 	private FlushLuceneWork() {
-		super( null, null, null );
+		super( null, null, null, null );
 	}
 
 	@Override
