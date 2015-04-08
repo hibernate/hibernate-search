@@ -14,7 +14,6 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.builtin.NumericFieldBridge;
@@ -22,7 +21,6 @@ import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -70,6 +68,8 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
 		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.MUST );
 
+		addTenantQueryTerm( work.getTenantId(), entityDeletionQuery );
+
 		try {
 			writer.deleteDocuments( entityDeletionQuery );
 		}
@@ -78,6 +78,13 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 			throw new SearchException( message, e );
 		}
 		workspace.notifyWorkApplied( work );
+	}
+
+	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {
+		if ( tenantId != null ) {
+			Term tenantTerm = new Term( ProjectionConstants.TENANT_ID, tenantId );
+			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.MUST );
+		}
 	}
 
 	protected static boolean isIdNumeric(DocumentBuilderIndexedEntity documentBuilder) {

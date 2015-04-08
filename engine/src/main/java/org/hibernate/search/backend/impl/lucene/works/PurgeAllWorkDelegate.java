@@ -8,11 +8,12 @@ package org.hibernate.search.backend.impl.lucene.works;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
-
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -39,15 +40,25 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 	@Override
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		final Class<?> entityType = work.getEntityClass();
-		log.tracef( "purgeAll Lucene index using IndexWriter for type: %s", entityType );
+		final String tenantId = work.getTenantId();
 		try {
-			Term term = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
-			writer.deleteDocuments( term );
+			Term entityTypeTerm = new Term( ProjectionConstants.OBJECT_CLASS, entityType.getName() );
+			if ( tenantId == null ) {
+				log.tracef( "purgeAll Lucene index using IndexWriter for type: %s", entityType );
+				writer.deleteDocuments( entityTypeTerm );
+			}
+			else {
+				log.tracef( "purgeAll Lucene index using IndexWriter for type $1%s and tenant $2%s", entityType, tenantId );
+				Term tenantIdTerm = tenantId == null ? null : new Term( ProjectionConstants.TENANT_ID, tenantId );
+				BooleanQuery deleteDocumentsQuery = new BooleanQuery();
+				deleteDocumentsQuery.add( new TermQuery( entityTypeTerm ), Occur.MUST );
+				deleteDocumentsQuery.add( new TermQuery( tenantIdTerm ), Occur.MUST );
+				writer.deleteDocuments( deleteDocumentsQuery );
+			}
 		}
 		catch (Exception e) {
 			throw new SearchException( "Unable to purge all from Lucene index: " + entityType, e );
 		}
 		workspace.notifyWorkApplied( work );
 	}
-
 }
