@@ -68,6 +68,8 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 		TermQuery classNameQuery = new TermQuery( classNameQueryTerm );
 		entityDeletionQuery.add( classNameQuery, BooleanClause.Occur.MUST );
 
+		addTenantQueryTerm( work.getTenantId(), entityDeletionQuery );
+
 		try {
 			writer.deleteDocuments( entityDeletionQuery );
 		}
@@ -79,4 +81,10 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 
 	}
 
+	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {
+		if ( tenantId != null ) {
+			Term tenantTerm = new Term( ProjectionConstants.TENANT_ID, tenantId );
+			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.MUST );
+		}
+	}
 }
