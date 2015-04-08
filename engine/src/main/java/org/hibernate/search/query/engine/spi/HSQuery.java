@@ -60,6 +60,8 @@ public interface HSQuery extends ProjectionConstants {
 	 */
 	HSQuery luceneQuery(Query query);
 
+	HSQuery tenantIdentifier(String tenantId);
+
 	/**
 	 * Defines the targeted entities. This helps to reduce the number of targeted indexes.
 	 *
