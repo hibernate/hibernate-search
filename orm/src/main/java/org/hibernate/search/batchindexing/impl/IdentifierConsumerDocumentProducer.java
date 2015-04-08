@@ -166,11 +166,20 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 				.add( Restrictions.in( idName, listIds ) );
 		List<?> list = criteria.list();
 		monitor.entitiesLoaded( list.size() );
-		indexAllQueue( session, list, sessionInitializer );
+		indexAllQueue( tenantIdentifier( session ), session, list, sessionInitializer );
 		session.clear();
 	}
 
-	private void indexAllQueue(Session session, List<?> entities, InstanceInitializer sessionInitializer) {
+	private String tenantIdentifier(Session session) {
+		String tenantId = null;
+		if ( session instanceof SessionImplementor ) {
+			SessionImplementor sessionImplementor = (SessionImplementor) session;
+			tenantId = sessionImplementor.getTenantIdentifier();
+		}
+		return tenantId;
+	}
+
+	private void indexAllQueue(String tenantId, Session session, List<?> entities, InstanceInitializer sessionInitializer) {
 		try {
 			ConversionContext contextualBridge = new ContextualExceptionBridgeHelper();
 				if ( entities == null || entities.isEmpty() ) {
@@ -180,7 +189,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 					log.tracef( "received a list of objects to index: %s", entities );
 					for ( Object object : entities ) {
 						try {
-							index( object, session, sessionInitializer, contextualBridge );
+							index( tenantId, object, session, sessionInitializer, contextualBridge );
 							monitor.documentsBuilt( 1 );
 						}
 						catch (InterruptedException ie) {
@@ -204,7 +213,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 	}
 
 	@SuppressWarnings("unchecked")
-	private void index(Object entity, Session session, InstanceInitializer sessionInitializer, ConversionContext conversionContext)
+	private void index(String tenantId, Object entity, Session session, InstanceInitializer sessionInitializer, ConversionContext conversionContext)
 			throws InterruptedException {
 		Serializable id = session.getIdentifier( entity );
 		Class<?> clazz = HibernateHelper.getClass( entity );
@@ -243,6 +252,7 @@ public class IdentifierConsumerDocumentProducer implements SessionAwareRunnable 
 		//depending on the complexity of the object graph going to be indexed it's possible
 		//that we hit the database several times during work construction.
 		AddLuceneWork addWork = docBuilder.createAddWork(
+				tenantId,
 				clazz,
 				entity,
 				id,

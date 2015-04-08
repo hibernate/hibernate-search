@@ -80,7 +80,9 @@ public abstract class AbstractDocumentBuilder {
 		optimizationBlackList.addAll( typeMetadata.getOptimizationBlackList() );
 	}
 
-	public abstract void addWorkToQueue(Class<?> entityClass,
+	public abstract void addWorkToQueue(
+			String tenantIdentifier,
+			Class<?> entityClass,
 			Object entity, Serializable id,
 			boolean delete,
 			boolean add,
@@ -160,11 +162,24 @@ public abstract class AbstractDocumentBuilder {
 	/**
 	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities.
 	 *
+	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, DepthValidator, String)
 	 * @param instance the instance to be indexed
 	 * @param workPlan the current work plan
 	 * @param currentDepth the current {@link org.hibernate.search.engine.spi.DepthValidator} object used to check the graph traversal
 	 */
 	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, DepthValidator currentDepth) {
+		appendContainedInWorkForInstance( instance, workPlan, currentDepth, null );
+	}
+
+	/**
+	 * If we have a work instance we have to check whether the instance to be indexed is contained in any other indexed entities for a tenant.
+	 *
+	 * @see #appendContainedInWorkForInstance(Object, WorkPlan, DepthValidator)
+	 * @param instance the instance to be indexed
+	 * @param workPlan the current work plan
+	 * @param currentDepth the current {@link org.hibernate.search.engine.spi.DepthValidator} object used to check the graph traversal
+	 */
+	public void appendContainedInWorkForInstance(Object instance, WorkPlan workPlan, DepthValidator currentDepth, String tenantIdentifier) {
 		for ( ContainedInMetadata containedInMetadata : typeMetadata.getContainedInMetadata() ) {
 			XMember member = containedInMetadata.getContainedInMember();
 			Object unproxiedInstance = instanceInitializer.unproxy( instance );
@@ -186,7 +201,7 @@ public abstract class AbstractDocumentBuilder {
 				@SuppressWarnings("unchecked")
 				Object[] array = (Object[]) value;
 				for ( Object arrayValue : array ) {
-					processSingleContainedInInstance( workPlan, arrayValue, depth );
+					processSingleContainedInInstance( workPlan, arrayValue, depth, tenantIdentifier );
 				}
 			}
 			else if ( member.isCollection() ) {
@@ -208,12 +223,12 @@ public abstract class AbstractDocumentBuilder {
 				}
 				if ( collection != null ) {
 					for ( Object collectionValue : collection ) {
-						processSingleContainedInInstance( workPlan, collectionValue, depth );
+						processSingleContainedInInstance( workPlan, collectionValue, depth, tenantIdentifier );
 					}
 				}
 			}
 			else {
-				processSingleContainedInInstance( workPlan, value, depth );
+				processSingleContainedInInstance( workPlan, value, depth, tenantIdentifier );
 			}
 		}
 	}
@@ -277,8 +292,8 @@ public abstract class AbstractDocumentBuilder {
 		return collection;
 	}
 
-	private <T> void processSingleContainedInInstance(WorkPlan workplan, T value, DepthValidator depth) {
-		workplan.recurseContainedIn( value, depth );
+	private <T> void processSingleContainedInInstance(WorkPlan workplan, T value, DepthValidator depth, String tenantId) {
+		workplan.recurseContainedIn( value, depth, tenantId );
 	}
 
 	/**

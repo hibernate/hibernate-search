@@ -24,6 +24,7 @@ import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.backend.impl.EventSourceTransactionContext;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
+import org.hibernate.search.backend.spi.Worker;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
@@ -113,7 +114,7 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 	}
 
 	private void createAndPerformWork(Class<?> clazz, Serializable id, WorkType workType) {
-		Work work = new Work( clazz, id, workType );
+		Work work = new Work( sessionImplementor.getTenantIdentifier(), clazz, id, workType );
 		getSearchIntegrator().getWorker().performWork( work, transactionContext );
 	}
 
@@ -140,8 +141,11 @@ final class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Full
 			throw new IllegalArgumentException( msg );
 		}
 		Serializable id = session.getIdentifier( entity );
-		Work work = new Work( entity, id, WorkType.INDEX );
-		extendedIntegrator.getWorker().performWork( work, transactionContext );
+		String tenantIdentifier = getTenantIdentifier();
+
+		Work work = new Work( tenantIdentifier, entity, id, WorkType.INDEX );
+		Worker worker = extendedIntegrator.getWorker();
+		worker.performWork( work, transactionContext );
 
 		//TODO
 		//need to add elements in a queue kept at the Session level

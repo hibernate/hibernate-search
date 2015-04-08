@@ -128,13 +128,13 @@ public class TransactionalWorker implements Worker {
 				log.forceSkipIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			case UPDATE:
-				result = new Work( work.getEntity(), work.getId(), WorkType.UPDATE );
+				result = new Work( work.getTenantIdentifier(), work.getEntity(), work.getId(), WorkType.UPDATE );
 				log.forceUpdateOnIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			case REMOVE:
 				//This works because other Work constructors are never used from WorkType ADD, UPDATE, REMOVE, COLLECTION
 				//TODO should we force isIdentifierRollback to false if the operation is not a delete?
-				result = new Work( work.getEntity(), work.getId(), WorkType.DELETE, work.isIdentifierWasRolledBack() );
+				result = new Work( work.getTenantIdentifier(), work.getEntity(), work.getId(), WorkType.DELETE, work.isIdentifierWasRolledBack() );
 				log.forceRemoveOnIndexOperationViaInterception( entityClass, work.getType() );
 				break;
 			default:

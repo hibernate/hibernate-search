@@ -210,15 +210,16 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	@Override
-	public void addWorkToQueue(Class<?> entityClass, Object entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
+	public void addWorkToQueue(String tenantId, Class<?> entityClass, Object entity, Serializable id, boolean delete, boolean add, List<LuceneWork> queue, ConversionContext contextualBridge) {
 		DocumentFieldMetadata idFieldMetadata = idPropertyMetadata.getFieldMetadata( idFieldName );
 		String idInString = objectToString( getIdBridge(), idFieldMetadata.getName(), id, contextualBridge );
 		if ( delete && !add ) {
-			queue.add( new DeleteLuceneWork( id, idInString, entityClass ) );
+			queue.add( new DeleteLuceneWork( tenantId, id, idInString, entityClass ) );
 		}
 		else if ( add && !delete ) {
 			queue.add(
 					createAddWork(
+							tenantId,
 							entityClass,
 							entity,
 							id,
@@ -231,6 +232,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		else if ( add && delete ) {
 			queue.add(
 					createUpdateWork(
+							tenantId,
 							entityClass,
 							entity,
 							id,
@@ -272,28 +274,28 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return stringValue;
 	}
 
-	public AddLuceneWork createAddWork(Class<?> entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext conversionContext) {
+	public AddLuceneWork createAddWork(String tenantId, Class<?> entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext conversionContext) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext, null );
+		Document doc = getDocument( tenantId, entity, id, fieldToAnalyzerMap, sessionInitializer, conversionContext, null );
 		final AddLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
-			addWork = new AddLuceneWork( id, idInString, entityClass, doc );
+			addWork = new AddLuceneWork( tenantId, id, idInString, entityClass, doc );
 		}
 		else {
-			addWork = new AddLuceneWork( id, idInString, entityClass, doc, fieldToAnalyzerMap );
+			addWork = new AddLuceneWork( tenantId, id, idInString, entityClass, doc, fieldToAnalyzerMap );
 		}
 		return addWork;
 	}
 
-	public UpdateLuceneWork createUpdateWork(Class<?> entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
+	public UpdateLuceneWork createUpdateWork(String tenantId, Class entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
-		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge, null );
+		Document doc = getDocument( tenantId, entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge, null );
 		final UpdateLuceneWork addWork;
 		if ( fieldToAnalyzerMap.isEmpty() ) {
-			addWork = new UpdateLuceneWork( id, idInString, entityClass, doc );
+			addWork = new UpdateLuceneWork( tenantId, id, idInString, entityClass, doc );
 		}
 		else {
-			addWork = new UpdateLuceneWork( id, idInString, entityClass, doc, fieldToAnalyzerMap );
+			addWork = new UpdateLuceneWork( tenantId, id, idInString, entityClass, doc, fieldToAnalyzerMap );
 		}
 		return addWork;
 	}
@@ -311,7 +313,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 *
 	 * @return The Lucene <code>Document</code> for the specified entity.
 	 */
-	public Document getDocument(Object instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer, ConversionContext conversionContext, String[] includedFieldNames) {
+	public Document getDocument(String tenantId, Object instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer, ConversionContext conversionContext, String[] includedFieldNames) {
 		// TODO as it is, includedFieldNames is not generally useful as we don't know if a fieldbridge creates specific fields or not
 		// TODO only used at the moment to filter the id field and the class field
 
@@ -339,6 +341,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 					);
 			doc.add( classField );
 		}
+
+		addTenantIdIfRequired( tenantId, doc );
 
 		// now add the entity id to the document
 		if ( containsFieldName( idFieldName, includedFieldNames ) ) {
@@ -376,6 +380,18 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	 * in case of a top-level field, the product of the document-level boost and the boost(s) of the parent
 	 * embeddable(s) in case of an embedded field
 	 */
+	private void addTenantIdIfRequired(String tenantId, Document doc) {
+		if ( tenantId != null ) {
+			Field tenantIdField = new Field(
+					ProjectionConstants.TENANT_ID,
+					tenantId,
+					Field.Store.YES,
+					Field.Index.NOT_ANALYZED_NO_NORMS,
+					Field.TermVector.NO );
+			doc.add( tenantIdField );
+		}
+	}
+
 	private void buildDocumentFields(Object instance,
 			Document doc,
 			TypeMetadata typeMetadata,

@@ -165,7 +165,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 			Set<Class<?>> targetedClasses = extendedIntegrator.getIndexedTypesPolymorphic( rootEntities );
 			for ( Class<?> clazz : targetedClasses ) {
 				//needs do be in-sync work to make sure we wait for the end of it.
-				backend.doWorkInSync( new PurgeAllLuceneWork( clazz ) );
+				backend.doWorkInSync( new PurgeAllLuceneWork( tenantId, clazz ) );
 			}
 			if ( this.optimizeAfterPurge ) {
 				backend.optimize( targetedClasses );
