@@ -286,7 +286,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return addWork;
 	}
 
-	public UpdateLuceneWork createUpdateWork(Class entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
+	public UpdateLuceneWork createUpdateWork(Class<?> entityClass, Object entity, Serializable id, String idInString, InstanceInitializer sessionInitializer, ConversionContext contextualBridge) {
 		Map<String, String> fieldToAnalyzerMap = new HashMap<String, String>();
 		Document doc = getDocument( entity, id, fieldToAnalyzerMap, sessionInitializer, contextualBridge, null );
 		final UpdateLuceneWork addWork;
@@ -416,10 +416,10 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				previousMember = member;
 				if ( member.isCollection() ) {
 					if ( currentFieldValue instanceof Collection ) {
-						objectInitializer.initializeCollection( (Collection) currentFieldValue );
+						objectInitializer.initializeCollection( (Collection<?>) currentFieldValue );
 					}
 					else if ( currentFieldValue instanceof Map ) {
-						objectInitializer.initializeMap( (Map) currentFieldValue );
+						objectInitializer.initializeMap( (Map<?, ?>) currentFieldValue );
 					}
 				}
 			}
@@ -480,7 +480,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						}
 						break;
 					case COLLECTION:
-						Collection collection = objectInitializer.initializeCollection( (Collection) value );
+						Collection<?> collection = objectInitializer.initializeCollection( (Collection<?>) value );
 						for ( Object collectionValue : collection ) {
 							buildDocumentFields(
 									collectionValue,
@@ -495,7 +495,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						}
 						break;
 					case MAP:
-						Map map = objectInitializer.initializeMap( (Map) value );
+						Map<?, ?> map = objectInitializer.initializeMap( (Map<?, ?>) value );
 						for ( Object collectionValue : map.values() ) {
 							buildDocumentFields(
 									collectionValue,

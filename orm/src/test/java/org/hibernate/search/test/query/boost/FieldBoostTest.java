@@ -12,9 +12,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
@@ -40,8 +38,8 @@ public class FieldBoostTest extends SearchTestBase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "author", TestConstants.standardAnalyzer );
-		QueryParser descParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "description", TestConstants.standardAnalyzer );
+		QueryParser authorParser = new QueryParser( "author", TestConstants.standardAnalyzer );
+		QueryParser descParser = new QueryParser( "description", TestConstants.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
@@ -52,7 +50,7 @@ public class FieldBoostTest extends SearchTestBase {
 
 		org.hibernate.search.FullTextQuery hibQuery =
 				fullTextSession.createFullTextQuery( query, BoostedGetDescriptionLibrary.class );
-		List results = hibQuery.list();
+		List<?> results = hibQuery.list();
 
 		log.debug( hibQuery.explain( 0 ).toString() );
 		log.debug( hibQuery.explain( 1 ).toString() );
@@ -79,8 +77,8 @@ public class FieldBoostTest extends SearchTestBase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "author", TestConstants.standardAnalyzer );
-		QueryParser descParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "description", TestConstants.standardAnalyzer );
+		QueryParser authorParser = new QueryParser( "author", TestConstants.standardAnalyzer );
+		QueryParser descParser = new QueryParser( "description", TestConstants.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
@@ -91,7 +89,7 @@ public class FieldBoostTest extends SearchTestBase {
 
 		org.hibernate.search.FullTextQuery hibQuery =
 				fullTextSession.createFullTextQuery( query, BoostedFieldDescriptionLibrary.class );
-		List results = hibQuery.list();
+		List<?> results = hibQuery.list();
 
 		assertTrue(
 				"incorrect document boost",
@@ -118,8 +116,8 @@ public class FieldBoostTest extends SearchTestBase {
 		fullTextSession.clear();
 		Transaction tx = fullTextSession.beginTransaction();
 
-		QueryParser authorParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "author", TestConstants.standardAnalyzer );
-		QueryParser descParser = new QueryParser( TestConstants.getTargetLuceneVersion(), "description", TestConstants.standardAnalyzer );
+		QueryParser authorParser = new QueryParser( "author", TestConstants.standardAnalyzer );
+		QueryParser descParser = new QueryParser( "description", TestConstants.standardAnalyzer );
 		Query author = authorParser.parse( "Wells" );
 		Query desc = descParser.parse( "martians" );
 
@@ -130,7 +128,7 @@ public class FieldBoostTest extends SearchTestBase {
 
 		org.hibernate.search.FullTextQuery hibQuery =
 				fullTextSession.createFullTextQuery( query, BoostedDescriptionLibrary.class );
-		List results = hibQuery.list();
+		List<?> results = hibQuery.list();
 
 		log.debug( hibQuery.explain( 0 ).toString() );
 		log.debug( hibQuery.explain( 1 ).toString() );
