@@ -51,7 +51,9 @@ public class DocumentBuilderContainedEntity extends AbstractDocumentBuilder {
 	}
 
 	@Override
-	public void addWorkToQueue(Class<?> entityClass,
+	public void addWorkToQueue(
+			String tenantId,
+			Class<?> entityClass,
 			Object entity,
 			Serializable id,
 			boolean delete,

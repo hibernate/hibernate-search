@@ -316,7 +316,7 @@ public class MoreLikeThisBuilder<T> {
 			//TODO should we keep the fieldToAnalyzerMap around to pass to the analyzer?
 			Map<String,String> fieldToAnalyzerMap = new HashMap<String, String>( );
 			//FIXME by calling documentBuilder we don't honor .comparingField("foo").ignoreFieldBridge(): probably not a problem in practice though
-			maybeDocument = documentBuilder.getDocument( input, null, fieldToAnalyzerMap, null, new ContextualExceptionBridgeHelper(), fieldNames );
+			maybeDocument = documentBuilder.getDocument( null, input, null, fieldToAnalyzerMap, null, new ContextualExceptionBridgeHelper(), fieldNames );
 			vectors = null;
 		}
 		else {

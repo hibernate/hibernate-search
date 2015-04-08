@@ -76,7 +76,7 @@ public class WorkPlan {
 	public void addWork(Work work) {
 		approximateWorkQueueSize++;
 		Class<?> entityClass = instanceInitializer.getClassFromWork( work );
-		PerClassWork classWork = getClassWork( entityClass );
+		PerClassWork classWork = getClassWork( work.getTenantIdentifier(), entityClass );
 		classWork.addWork( work );
 	}
 
@@ -100,14 +100,15 @@ public class WorkPlan {
 	}
 
 	/**
+	 * @param tenantId the tenant identifier
 	 * @param entityClass The entity class for which to retrieve the work
 	 *
 	 * @return returns (and creates if needed) the {@code PerClassWork} from the {@link #byClass} map.
 	 */
-	private PerClassWork getClassWork(Class<?> entityClass) {
+	private PerClassWork getClassWork(String tenantId, Class<?> entityClass) {
 		PerClassWork classWork = byClass.get( entityClass );
 		if ( classWork == null ) {
-			classWork = new PerClassWork( entityClass );
+			classWork = new PerClassWork( tenantId, entityClass );
 			byClass.put( entityClass, classWork );
 		}
 		return classWork;
@@ -136,9 +137,9 @@ public class WorkPlan {
 	 *
 	 * @param value the entity to be processed
 	 */
-	public <T> void recurseContainedIn(T value, DepthValidator depth) {
+	public <T> void recurseContainedIn(T value, DepthValidator depth, String tenantId) {
 		Class<T> entityClass = instanceInitializer.getClass( value );
-		PerClassWork classWork = getClassWork( entityClass );
+		PerClassWork classWork = getClassWork( tenantId, entityClass );
 		classWork.recurseContainedIn( value, depth );
 	}
 
@@ -180,6 +181,8 @@ public class WorkPlan {
 		 */
 		private final Class<?> entityClass;
 
+		private final String tenantId;
+
 		/**
 		 * The DocumentBuilder relative to the type being managed
 		 */
@@ -193,10 +196,11 @@ public class WorkPlan {
 		/**
 		 * @param clazz The type of entities being managed by this instance
 		 */
-		PerClassWork(Class<?> clazz) {
+		PerClassWork(String tenantId, Class<?> clazz) {
 			this.entityClass = clazz;
 			this.documentBuilder = getEntityBuilder( extendedIntegrator, clazz );
 			this.containedInOnly = documentBuilder instanceof DocumentBuilderContainedEntity;
+			this.tenantId = tenantId;
 		}
 
 		/**
@@ -264,15 +268,16 @@ public class WorkPlan {
 			final Set<Entry<Serializable, PerEntityWork>> entityInstances = entityById.entrySet();
 			ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
 			if ( purgeAll ) {
-				luceneQueue.add( new PurgeAllLuceneWork( entityClass ) );
+				luceneQueue.add( new PurgeAllLuceneWork( tenantId, entityClass ) );
 			}
 			for ( DeletionQuery delQuery : this.deletionQueries ) {
-				luceneQueue.add( new DeleteByQueryLuceneWork( this.entityClass, delQuery ) );
+				luceneQueue.add( new DeleteByQueryLuceneWork( tenantId, entityClass, delQuery ) );
 			}
 			for ( Entry<Serializable, PerEntityWork> entry : entityInstances ) {
 				Serializable indexingId = entry.getKey();
 				PerEntityWork perEntityWork = entry.getValue();
-				perEntityWork.enqueueLuceneWork( entityClass, indexingId, documentBuilder, luceneQueue, conversionContext );
+				String tenantIdentifier = perEntityWork.getTenantIdentifier();
+				perEntityWork.enqueueLuceneWork( tenantIdentifier, entityClass, indexingId, documentBuilder, luceneQueue, conversionContext );
 			}
 		}
 
@@ -321,7 +326,7 @@ public class WorkPlan {
 							//we are planning an update by default
 							case UPDATE:
 							case APPLY_DEFAULT:
-								entityWork = new PerEntityWork( value );
+								entityWork = new PerEntityWork( tenantId, value );
 								entityById.put( extractedId, entityWork );
 								break;
 							case SKIP:
@@ -329,7 +334,7 @@ public class WorkPlan {
 								break;
 							case REMOVE:
 								log.forceRemoveOnIndexOperationViaInterception( entityClass, WorkType.UPDATE );
-								Work work = new Work(value, extractedId, WorkType.DELETE);
+								Work work = new Work( tenantId, value, extractedId, WorkType.DELETE );
 								entityWork = new PerEntityWork( work );
 								entityById.put( extractedId, entityWork );
 								break;
@@ -354,6 +359,10 @@ public class WorkPlan {
 					entityClass
 			);
 			return indexBindingForEntity != null ? indexBindingForEntity.getEntityIndexingInterceptor() : null;
+		}
+
+		public String getTenantId() {
+			return tenantId;
 		}
 	}
 
@@ -384,18 +393,21 @@ public class WorkPlan {
 		 */
 		private boolean containedInProcessed = false;
 
+		private final String tenantId;
+
 		/**
 		 * Constructor to force an update of the entity even without
 		 * having a specific Work instance for it.
 		 *
 		 * @param entity the instance which needs to be updated in the index
 		 */
-		private PerEntityWork(Object entity) {
+		private PerEntityWork(String tenantId, Object entity) {
 			// for updates only
 			this.entity = entity;
 			this.delete = true;
 			this.add = true;
 			this.containedInProcessed = true;
+			this.tenantId = tenantId;
 		}
 
 		/**
@@ -406,6 +418,7 @@ public class WorkPlan {
 		 */
 		private PerEntityWork(Work work) {
 			entity = work.getEntity();
+			tenantId = work.getTenantIdentifier();
 			WorkType type = work.getType();
 			// sets the initial state:
 			switch ( type ) {
@@ -493,15 +506,16 @@ public class WorkPlan {
 		/**
 		 * Adds the needed LuceneWork to the queue for this entity instance
 		 *
+		 * @param tenantIdentifier the tenant identifier
 		 * @param entityClass the type
 		 * @param indexingId identifier of the instance
 		 * @param entityBuilder the DocumentBuilder for this type
 		 * @param luceneQueue the queue collecting all changes
 		 */
-		public void enqueueLuceneWork(Class entityClass, Serializable indexingId, AbstractDocumentBuilder entityBuilder,
+		public void enqueueLuceneWork(String tenantIdentifier, Class entityClass, Serializable indexingId, AbstractDocumentBuilder entityBuilder,
 				List<LuceneWork> luceneQueue, ConversionContext conversionContext) {
 			if ( add || delete ) {
-				entityBuilder.addWorkToQueue( entityClass, entity, indexingId, delete, add, luceneQueue, conversionContext );
+				entityBuilder.addWorkToQueue( tenantIdentifier, entityClass, entity, indexingId, delete, add, luceneQueue, conversionContext );
 			}
 		}
 
@@ -518,9 +532,13 @@ public class WorkPlan {
 			if ( entity != null && !containedInProcessed ) {
 				containedInProcessed = true;
 				if ( add || delete ) {
-					entityBuilder.appendContainedInWorkForInstance( entity, workplan, null );
+					entityBuilder.appendContainedInWorkForInstance( entity, workplan, null, getTenantIdentifier() );
 				}
 			}
+		}
+
+		public String getTenantIdentifier() {
+			return tenantId;
 		}
 	}
 
