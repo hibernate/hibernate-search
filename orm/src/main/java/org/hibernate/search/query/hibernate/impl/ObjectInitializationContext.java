@@ -51,7 +51,7 @@ public class ObjectInitializationContext {
 		return entityType;
 	}
 
-	public ExtendedSearchIntegrator getExtendedSearchintegrator() {
+	public ExtendedSearchIntegrator getExtendedSearchIntegrator() {
 		return extendedIntegrator;
 	}
 

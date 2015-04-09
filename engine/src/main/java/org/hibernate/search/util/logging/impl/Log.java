@@ -774,4 +774,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 259, value = "Unable to delete all %s matching Query: %s")
 	SearchException unableToDeleteByQuery(Class<?> entityClass, DeletionQuery deletionQuery, @Cause Exception e );
 
+	// Only used in ORM; Defining it here for now until there is a Log interface in hibernate-search-orm
+	@LogMessage(level = Level.WARN)
+	@Message(id = 260, value = "A criteria for loading query results has been specified via "
+			+ "FullTextQuery#setCriteriaQuery(), but query results originate from several id spaces. The given "
+			+ "criteria object can therefore not be be applied.")
+	void givenCriteriaObjectCannotBeApplied();
 }
