@@ -18,7 +18,11 @@ public class DeleteLuceneWork extends LuceneWork {
 	private static final long serialVersionUID = -854604138119230246L;
 
 	public DeleteLuceneWork(Serializable id, String idInString, Class<?> entity) {
-		super( id, idInString, entity );
+		this( null, id, idInString, entity );
+	}
+
+	public DeleteLuceneWork(String tenantId, Serializable id, String idInString, Class<?> entity) {
+		super( tenantId, id, idInString, entity );
 	}
 
 	@Override
@@ -28,7 +32,8 @@ public class DeleteLuceneWork extends LuceneWork {
 
 	@Override
 	public String toString() {
-		return "DeleteLuceneWork: " + this.getEntityClass().getName() + "#" + this.getIdInString();
+		String tenant = getTenantId() == null ? "" : " [" + getTenantId() + "] ";
+		return "DeleteLuceneWork" + tenant + ": " + this.getEntityClass().getName() + "#" + this.getIdInString();
 	}
 
 }

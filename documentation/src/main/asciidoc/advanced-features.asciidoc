@@ -428,3 +428,33 @@ occurrences. In this case your custom implementation of the method `tf(float fre
 ====
 When two entities share the same index they must declare the same Similarity implementation.
 ====
+
+[[section-multi-tenancy]]
+=== Multi-tenancy
+
+Hibernate Search supports multi-tenancy on top of Hibernate ORM, it stores the tenant identifier in
+the document and automatically filters the query results.
+
+You can find more details about multi-tenancy in the
+link:$$http://hibernate.org/orm/documentation/$$[Hibernate ORM documentation].
+
+.Bind the session to a tenant
+====
+[source, JAVA]
+----
+Session session = getSessionFactory()
+                      .withOptions()
+                          .tenantIdentifier( "YOUR_TENANT_ID" )
+                  .openSession();
+
+FullTextSession session = Search.getFullTextSession( session );
+----
+====
+
+The use of a tenant identifier will have the following effects:
+
+1. Every document saved or updated in the index will have an additional field `__HSearch_TenantId`
+   containing the tenant identifier.
+2. Every search will be filtered using the tenant identifier.
+
+Note that not using a tenant will return all the matching results for all the tenants in the index.

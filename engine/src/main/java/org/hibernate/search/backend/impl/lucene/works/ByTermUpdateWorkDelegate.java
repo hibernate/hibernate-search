@@ -12,11 +12,15 @@ import java.util.Map;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -47,6 +51,7 @@ public final class ByTermUpdateWorkDelegate extends UpdateWorkDelegate {
 	@Override
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
 		final Serializable id = work.getId();
+		final String tenantId = work.getTenantId();
 		final Class<?> managedType = work.getEntityClass();
 		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( managedType );
 		try {
@@ -56,7 +61,14 @@ public final class ByTermUpdateWorkDelegate extends UpdateWorkDelegate {
 						managedType,
 						id
 				);
-				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
+				Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
+				BooleanQuery deleteDocumentsQuery = new BooleanQuery();
+				deleteDocumentsQuery.add( exactMatchQuery, Occur.MUST );
+				if ( tenantId != null ) {
+					TermQuery tenantTermQuery = new TermQuery( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
+					deleteDocumentsQuery.add( tenantTermQuery, Occur.MUST );
+				}
+				writer.deleteDocuments( deleteDocumentsQuery );
 				// no need to log the Add operation as we'll log in the delegate
 				this.addDelegate.performWork( work, writer, monitor );
 			}

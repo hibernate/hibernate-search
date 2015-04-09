@@ -19,7 +19,11 @@ public class DeleteByQueryLuceneWork extends LuceneWork {
 	private final DeletionQuery deletionQuery;
 
 	public DeleteByQueryLuceneWork(Class<?> entity, DeletionQuery deletionQuery) {
-		super( null, null, entity );
+		this( null, entity, deletionQuery );
+	}
+
+	public DeleteByQueryLuceneWork(String tenantId, Class<?> entity, DeletionQuery deletionQuery) {
+		super( tenantId, null, null, entity );
 		this.deletionQuery = deletionQuery;
 	}
 

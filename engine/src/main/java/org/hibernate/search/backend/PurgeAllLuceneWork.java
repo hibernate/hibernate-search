@@ -18,7 +18,11 @@ public class PurgeAllLuceneWork extends LuceneWork {
 	private static final long serialVersionUID = 8124091288284011715L;
 
 	public PurgeAllLuceneWork(Class<?> entity) {
-		super( null, null, entity, null );
+		this( null, entity );
+	}
+
+	public PurgeAllLuceneWork(String tenantId, Class<?> entity) {
+		super( tenantId, null, null, entity, null );
 	}
 
 	@Override
@@ -28,7 +32,8 @@ public class PurgeAllLuceneWork extends LuceneWork {
 
 	@Override
 	public String toString() {
-		return "PurgeAllLuceneWork: " + this.getEntityClass().getName();
+		String tenant = getTenantId() == null ? "" : " [" + getTenantId() + "] ";
+		return "PurgeAllLuceneWork" + tenant + ": " + this.getEntityClass().getName();
 	}
 
 }

@@ -112,6 +112,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	 * or {@link #queryDocumentExtractor} is called.
 	 */
 	private Integer resultSize;
+	private String tenantId;
 
 
 	public HSQueryImpl(ExtendedSearchIntegrator extendedIntegrator) {
@@ -128,6 +129,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	public HSQuery setSpatialParameters(Coordinates center, String fieldName) {
 		spatialSearchCenter = center;
 		spatialFieldName = fieldName;
+		return this;
+	}
+
+	@Override
+	public HSQuery tenantIdentifier(String tenantId) {
+		this.tenantId = tenantId;
 		return this;
 	}
 
@@ -361,7 +368,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			);
 		}
 		try {
-			org.apache.lucene.search.Query filteredQuery = filterQueryByClasses( luceneQuery );
+			org.apache.lucene.search.Query filteredQuery = filterQueryByTenantId( filterQueryByClasses( luceneQuery ) );
 			buildFilters();
 			explanation = searcher.explain( filteredQuery, documentId );
 		}
@@ -618,7 +625,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		);
 		final IndexReader compoundReader = MultiReaderFactory.openReader( indexManagers );
 
-		final Query filteredQuery = filterQueryByClasses( luceneQuery );
+		final Query filteredQuery = filterQueryByTenantId( filterQueryByClasses( luceneQuery ) );
 
 		//handle the sort and projection
 		final String[] projection = this.projectedFields;
@@ -905,6 +912,24 @@ public class HSQueryImpl implements HSQuery, Serializable {
 			BooleanQuery filteredQuery = new BooleanQuery();
 			filteredQuery.add( luceneQuery, BooleanClause.Occur.MUST );
 			filteredQuery.add( classFilter, BooleanClause.Occur.MUST );
+			return filteredQuery;
+		}
+	}
+
+	private org.apache.lucene.search.Query filterQueryByTenantId(org.apache.lucene.search.Query luceneQuery) {
+		if ( tenantId == null ) {
+			return luceneQuery;
+		}
+		else {
+			// A query filter is more practical than a manual class filtering post query (esp on scrollable resultsets)
+			// it also probably minimise the memory footprint
+			TermQuery tenantIdFilter = new TermQuery( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
+			// annihilate the scoring impact of TENANT_ID
+			tenantIdFilter.setBoost( 0 );
+
+			BooleanQuery filteredQuery = new BooleanQuery();
+			filteredQuery.add( luceneQuery, BooleanClause.Occur.MUST );
+			filteredQuery.add( tenantIdFilter, BooleanClause.Occur.MUST );
 			return filteredQuery;
 		}
 	}

@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
-
 import org.hibernate.Criteria;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
@@ -24,7 +23,6 @@ import org.hibernate.QueryTimeoutException;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
-
 import org.hibernate.engine.query.spi.ParameterMetadata;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.AbstractQueryImpl;
@@ -87,6 +85,7 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 		hSearchQuery
 				.luceneQuery( query )
 				.timeoutExceptionFactory( exceptionFactory )
+				.tenantIdentifier( session.getTenantIdentifier() )
 				.targetedEntities( Arrays.asList( classes ) );
 	}
 
