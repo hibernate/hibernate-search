@@ -182,7 +182,7 @@ public class DSLTest extends SearchTestBase {
 		Query query = monthQb
 				.keyword()
 					.fuzzy()
-						.withThreshold( .8f )
+						.withEditDistanceUpTo( 1 )
 						.withPrefixLength( 1 )
 					.onField( "mythology" )
 					.matching( "calder" )
@@ -194,7 +194,7 @@ public class DSLTest extends SearchTestBase {
 		query = monthQb
 				.keyword()
 				.fuzzy()
-				.withThreshold( .8f )
+				.withEditDistanceUpTo( 2 )
 				.withPrefixLength( 1 )
 				.onFields( "mythology", "history" )
 				.matching( "showboarding" )
@@ -358,7 +358,7 @@ public class DSLTest extends SearchTestBase {
 		//forgetting to set any condition on the boolean, an exception shall be thrown:
 		BooleanJunction<BooleanJunction> booleanJunction = monthQb.bool();
 		assertTrue( booleanJunction.isEmpty() );
-		Query query = booleanJunction.createQuery();
+		booleanJunction.createQuery();
 		Assert.fail( "should not reach this point" );
 	}
 
