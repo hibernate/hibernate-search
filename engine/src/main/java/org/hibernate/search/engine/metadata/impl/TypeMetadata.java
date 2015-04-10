@@ -267,11 +267,11 @@ public class TypeMetadata {
 
 	public LuceneOptions getFieldLuceneOptions(PropertyMetadata propertyMetadata,
 			DocumentFieldMetadata fieldMetadata,
-			Object value, float documentBoost) {
+			Object value, float inheritedBoost) {
 		return new LuceneOptionsImpl(
 				fieldMetadata,
 				fieldMetadata.getBoost() * propertyMetadata.getDynamicBoostStrategy().defineBoost( value ),
-				documentBoost
+				inheritedBoost
 		);
 	}
 

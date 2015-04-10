@@ -46,14 +46,20 @@ public class LuceneOptionsImpl implements LuceneOptions {
 	private final boolean storeUncompressed;
 	private boolean documentBoostApplied = false; //needs to be applied only once
 	private final float fieldLevelBoost;
-	private final float documentLevelBoost;
+
+	/**
+	 * Boost inherited from the parent structure of the given field: the document-level boost in case of a top-level
+	 * field, the product of the document-level boost and the boost(s) of the parent embeddable(s) in case of an
+	 * embedded field
+	 */
+	private final float inheritedBoost;
 	private final Index indexMode;
 	private final TermVector termVector;
 	private final Store storeType;
 	private final String indexNullAs;
 
-	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float fieldLevelBoost, float documentLevelBoost) {
-		this.documentLevelBoost = documentLevelBoost;
+	public LuceneOptionsImpl(DocumentFieldMetadata fieldMetadata, float fieldLevelBoost, float inheritedBoost) {
+		this.inheritedBoost = inheritedBoost;
 		this.indexMode = fieldMetadata.getIndex();
 		this.termVector = fieldMetadata.getTermVector();
 		this.fieldLevelBoost = fieldLevelBoost;
@@ -137,7 +143,7 @@ public class LuceneOptionsImpl implements LuceneOptions {
 				//FIXME This isn't entirely accurate as in some cases the LuceneOptionsImpl
 				//is being reused for multiple fields: this needs to be significantly different,
 				//potentially dropping the LuceneOptionsImpl usage.
-				field.setBoost( fieldLevelBoost * documentLevelBoost );
+				field.setBoost( fieldLevelBoost * inheritedBoost );
 			}
 			else {
 				field.setBoost( fieldLevelBoost );

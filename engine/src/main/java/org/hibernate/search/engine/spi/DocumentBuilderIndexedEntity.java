@@ -19,17 +19,9 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexableField;
-
-import org.hibernate.search.bridge.builtin.NumericEncodingCalendarBridge;
-import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
-import org.hibernate.search.bridge.builtin.NumericFieldBridge;
-import org.hibernate.search.bridge.builtin.StringEncodingDateBridge;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.engine.ProjectionConstants;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.analyzer.Discriminator;
 import org.hibernate.search.annotations.CacheFromIndex;
 import org.hibernate.search.annotations.ProvidedId;
@@ -43,14 +35,21 @@ import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.StringBridge;
 import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingCalendarBridge;
+import org.hibernate.search.bridge.builtin.NumericEncodingDateBridge;
+import org.hibernate.search.bridge.builtin.NumericFieldBridge;
+import org.hibernate.search.bridge.builtin.StringEncodingDateBridge;
 import org.hibernate.search.bridge.builtin.impl.TwoWayString2FieldBridgeAdaptor;
 import org.hibernate.search.bridge.spi.ConversionContext;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.fieldcache.impl.ClassLoadingStrategySelector;
 import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
@@ -372,6 +371,11 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return doc;
 	}
 
+	/**
+	 * @param inheritedBoost Boost inherited from the parent structure of the given instance: the document-level boost
+	 * in case of a top-level field, the product of the document-level boost and the boost(s) of the parent
+	 * embeddable(s) in case of an embedded field
+	 */
 	private void buildDocumentFields(Object instance,
 			Document doc,
 			TypeMetadata typeMetadata,
@@ -379,7 +383,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 			Set<String> processedFieldNames,
 			ConversionContext conversionContext,
 			InstanceInitializer objectInitializer,
-			final float documentBoost) {
+			final float inheritedBoost) {
 
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
@@ -395,7 +399,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						fieldName,
 						unproxiedInstance,
 						doc,
-						typeMetadata.getClassLuceneOptions( fieldMetadata, documentBoost )
+						typeMetadata.getClassLuceneOptions( fieldMetadata, inheritedBoost )
 				);
 			}
 			finally {
@@ -436,7 +440,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 							fieldName,
 							currentFieldValue,
 							doc,
-							typeMetadata.getFieldLuceneOptions( propertyMetadata, fieldMetadata, currentFieldValue, documentBoost )
+							typeMetadata.getFieldLuceneOptions( propertyMetadata, fieldMetadata, currentFieldValue, inheritedBoost )
 					);
 				}
 			}
@@ -453,10 +457,10 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		// recursively process embedded objects
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
+			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
 			conversionContext.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
 			try {
 				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-				//TODO handle boost at embedded level: already stored in propertiesMedatada.boost
 
 				if ( value == null ) {
 					processEmbeddedNullValue( doc, embeddedTypeMetadata, conversionContext );
@@ -475,7 +479,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									processedFieldNames,
 									conversionContext,
 									objectInitializer,
-									documentBoost
+									embeddedBoost
 							);
 						}
 						break;
@@ -490,7 +494,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									processedFieldNames,
 									conversionContext,
 									objectInitializer,
-									documentBoost
+									embeddedBoost
 							);
 						}
 						break;
@@ -505,7 +509,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 									processedFieldNames,
 									conversionContext,
 									objectInitializer,
-									documentBoost
+									embeddedBoost
 							);
 						}
 						break;
@@ -518,7 +522,7 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 								processedFieldNames,
 								conversionContext,
 								objectInitializer,
-								documentBoost
+								embeddedBoost
 						);
 						break;
 					default:
