@@ -9,8 +9,9 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.util.StringHelper;
 
 /**
- * Map a byte element
+ * Bridge a {@link Byte} to a {@link String}.
  *
+ * @see NumericFieldBridge#BYTE_FIELD_BRIDGE
  * @author Gunanr Morling
  */
 public class ByteBridge extends NumberBridge {

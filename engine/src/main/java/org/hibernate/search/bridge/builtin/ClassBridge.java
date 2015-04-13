@@ -14,7 +14,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 
 /**
- * Convert a Class back and forth
+ * Bridge a {@link Class} to a {@link String}.
  *
  * @author Emmanuel Bernard
  */

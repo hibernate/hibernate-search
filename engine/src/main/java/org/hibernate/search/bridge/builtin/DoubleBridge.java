@@ -9,8 +9,9 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.util.StringHelper;
 
 /**
- * Map a double element
+ * Bridge a {@link Double} to a {@link String}.
  *
+ * @see NumericFieldBridge#DOUBLE_FIELD_BRIDGE
  * @author Emmanuel Bernard
  */
 public class DoubleBridge extends NumberBridge {

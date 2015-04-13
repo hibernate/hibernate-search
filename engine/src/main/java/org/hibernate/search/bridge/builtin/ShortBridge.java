@@ -9,8 +9,9 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.util.StringHelper;
 
 /**
- * Map a short element
+ * Bridge a {@link Short} to a {@link String}.
  *
+ * @see NumericFieldBridge#SHORT_FIELD_BRIDGE
  * @author Emmanuel Bernard
  */
 public class ShortBridge extends NumberBridge {

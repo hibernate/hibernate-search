@@ -9,8 +9,11 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 
 /**
- * Base class for numbers - integer, double, etc.
+ * Base class used to bridge numbers (integer, double, etc.) as strings.
+ * <p>
+ * Note that it is possible to store types as numeric fields using the bridges provided by {@link NumericFieldBridge}.
  *
+ * @see NumericFieldBridge
  * @author Emmanuel Bernard
  */
 public abstract class NumberBridge implements TwoWayStringBridge {
