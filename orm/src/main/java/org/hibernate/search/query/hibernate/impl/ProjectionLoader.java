@@ -104,6 +104,10 @@ public class ProjectionLoader implements Loader {
 			}
 		}
 
+		if ( transformer != null ) {
+			return transformer.transformList( results );
+		}
+
 		return results;
 	}
 
