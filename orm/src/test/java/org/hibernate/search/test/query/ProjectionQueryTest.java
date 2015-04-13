@@ -287,6 +287,44 @@ public class ProjectionQueryTest extends SearchTestBase {
 		s.close();
 	}
 
+
+	@Test
+	public void testTransformListIsCalled() throws Exception {
+		FullTextSession s = Search.getFullTextSession( openSession() );
+		prepEmployeeIndex( s );
+
+		Transaction tx;
+		s.clear();
+		tx = s.beginTransaction();
+		QueryParser parser = new QueryParser( "dept", TestConstants.standardAnalyzer );
+
+		Query query = parser.parse( "dept:ITech" );
+		org.hibernate.search.FullTextQuery hibQuery = s.createFullTextQuery( query, Employee.class );
+		hibQuery.setProjection(
+				"id",
+				"lastname",
+				"dept",
+				FullTextQuery.THIS,
+				FullTextQuery.SCORE,
+				FullTextQuery.DOCUMENT,
+				FullTextQuery.ID
+		);
+		hibQuery.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) );
+
+		final CounterCallsProjectionToMapResultTransformer counters = new CounterCallsProjectionToMapResultTransformer();
+		hibQuery.setResultTransformer( counters );
+
+		List transforms = hibQuery.list();
+		assertEquals( counters.getTransformListCounter(), 1);
+
+		//cleanup
+		for ( Object element : s.createQuery( "from " + Employee.class.getName() ).list() ) {
+			s.delete( element );
+		}
+		tx.commit();
+		s.close();
+	}
+
 	private void checkProjectionFirst(Object[] projection, Session s) {
 		assertEquals( "id incorrect", 1000, projection[0] );
 		assertEquals( "lastname incorrect", "Griffin", projection[1] );
