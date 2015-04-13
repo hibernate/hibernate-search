@@ -7,9 +7,7 @@
 package org.hibernate.search.backend.impl;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,24 +27,19 @@ public final class DeleteByQuerySupport {
 		// Not meant to be invoked
 	}
 
+	private static final int MAPPER_COUNT = 1;
+
 	private static final Lock MAPPERS_LOCK = new ReentrantLock();
 	private static DeletionQueryMapper[] MAPPERS;
 
 	public static DeletionQueryMapper getMapper(int queryKey) {
 		if ( MAPPERS == null ) {
-			//LAZY init, but don't do it more than once
+			// LAZY init, but don't do it more than once
 			MAPPERS_LOCK.lock();
 			try {
 				if ( MAPPERS == null ) {
-					Map<Integer, DeletionQueryMapper> map = new HashMap<>();
-
-					map.put( SingularTermDeletionQuery.QUERY_KEY, new SingularTermDeletionQueryMapper() );
-
-					DeletionQueryMapper[] arr = new DeletionQueryMapper[map.size()];
-					for ( Map.Entry<Integer, DeletionQueryMapper> entry : map.entrySet() ) {
-						arr[entry.getKey()] = entry.getValue();
-					}
-
+					DeletionQueryMapper[] arr = new DeletionQueryMapper[MAPPER_COUNT];
+					arr[SingularTermDeletionQuery.QUERY_KEY] = new SingularTermDeletionQueryMapper();
 					MAPPERS = arr;
 				}
 			}
@@ -62,15 +55,13 @@ public final class DeleteByQuerySupport {
 
 	public static boolean isSupported(Class<? extends DeletionQuery> type) {
 		if ( SUPPORTED_TYPES == null ) {
-			//LAZY init, but don't to it more than once
+			// LAZY init, but don't to it more than once
 			SUPPORTED_TYPES_LOCK.lock();
 			try {
 				if ( SUPPORTED_TYPES == null ) {
-					Map<Integer, Class<? extends DeletionQuery>> map = new HashMap<>();
-
-					map.put( SingularTermDeletionQuery.QUERY_KEY, SingularTermDeletionQuery.class );
-
-					SUPPORTED_TYPES = Collections.unmodifiableSet( new HashSet<>( map.values() ) );
+					Set<Class<? extends DeletionQuery>> set = new HashSet<>();
+					set.add( SingularTermDeletionQuery.class );
+					SUPPORTED_TYPES = Collections.unmodifiableSet( set );
 				}
 			}
 			finally {
