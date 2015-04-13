@@ -11,7 +11,7 @@ package org.hibernate.search.backend;
  *
  * @author Martin Braun
  */
-public final class SingularTermQuery implements DeletionQuery {
+public final class SingularTermDeletionQuery implements DeletionQuery {
 
 	public static final int QUERY_KEY = 0;
 
@@ -19,27 +19,27 @@ public final class SingularTermQuery implements DeletionQuery {
 	private final Object value;
 	private final Type type;
 
-	public SingularTermQuery(String fieldName, String value) {
+	public SingularTermDeletionQuery(String fieldName, String value) {
 		this( fieldName, value, Type.STRING );
 	}
 
-	public SingularTermQuery(String fieldName, int value) {
+	public SingularTermDeletionQuery(String fieldName, int value) {
 		this( fieldName, value, Type.INT );
 	}
 
-	public SingularTermQuery(String fieldName, long value) {
+	public SingularTermDeletionQuery(String fieldName, long value) {
 		this( fieldName, value, Type.LONG );
 	}
 
-	public SingularTermQuery(String fieldName, float value) {
+	public SingularTermDeletionQuery(String fieldName, float value) {
 		this( fieldName, value, Type.FLOAT );
 	}
 
-	public SingularTermQuery(String fieldName, double value) {
+	public SingularTermDeletionQuery(String fieldName, double value) {
 		this( fieldName, value, Type.DOUBLE );
 	}
 
-	public SingularTermQuery(String fieldName, Object value, Type type) {
+	public SingularTermDeletionQuery(String fieldName, Object value, Type type) {
 		this.fieldName = fieldName;
 		this.value = value;
 		this.type = type;
@@ -96,7 +96,7 @@ public final class SingularTermQuery implements DeletionQuery {
 		if ( getClass() != obj.getClass() ) {
 			return false;
 		}
-		SingularTermQuery other = (SingularTermQuery) obj;
+		SingularTermDeletionQuery other = (SingularTermDeletionQuery) obj;
 		if ( fieldName == null ) {
 			if ( other.fieldName != null ) {
 				return false;

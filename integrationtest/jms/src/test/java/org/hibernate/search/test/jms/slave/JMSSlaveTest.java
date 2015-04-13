@@ -23,7 +23,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.backend.SingularTermQuery;
+import org.hibernate.search.backend.SingularTermDeletionQuery;
 import org.hibernate.search.backend.jms.impl.JmsBackendQueueProcessor;
 import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.test.SearchTestBase;
@@ -118,7 +118,7 @@ public class JMSSlaveTest extends SearchTestBase {
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
 			ExtendedSearchIntegrator integrator = this.getExtendedSearchIntegrator();
-			integrator.getWorker().performWork( new DeleteByQueryWork( TShirt.class, new SingularTermQuery( "id", String.valueOf( ts.getId() ) ) ), tc );
+			integrator.getWorker().performWork( new DeleteByQueryWork( TShirt.class, new SingularTermDeletionQuery( "id", String.valueOf( ts.getId() ) ) ), tc );
 			tc.end();
 		}
 		tx.commit();

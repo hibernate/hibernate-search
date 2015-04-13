@@ -20,7 +20,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.backend.DeletionQuery;
-import org.hibernate.search.backend.SingularTermQuery;
+import org.hibernate.search.backend.SingularTermDeletionQuery;
 import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 import org.hibernate.search.backend.spi.DeleteByQueryWork;
 import org.hibernate.search.backend.spi.Work;
@@ -51,20 +51,20 @@ public class DeleteByQueryTest {
 	private List<DeletionQuery> buildQueries() {
 		List<DeletionQuery> l = new ArrayList<>();
 
-		l.add( new SingularTermQuery( "id", "123" ) );
+		l.add( new SingularTermDeletionQuery( "id", "123" ) );
 		l.addAll( this.buildNumQueries() );
 
 		return l;
 	}
 
-	private List<SingularTermQuery> buildNumQueries() {
-		List<SingularTermQuery> l = new ArrayList<>();
+	private List<SingularTermDeletionQuery> buildNumQueries() {
+		List<SingularTermDeletionQuery> l = new ArrayList<>();
 
 		{
-			l.add( new SingularTermQuery( "intField", 1 ) );
-			l.add( new SingularTermQuery( "longField", 1L ) );
-			l.add( new SingularTermQuery( "floatField", 1F ) );
-			l.add( new SingularTermQuery( "doubleField", 1D ) );
+			l.add( new SingularTermDeletionQuery( "intField", 1 ) );
+			l.add( new SingularTermDeletionQuery( "longField", 1L ) );
+			l.add( new SingularTermDeletionQuery( "floatField", 1F ) );
+			l.add( new SingularTermDeletionQuery( "doubleField", 1D ) );
 		}
 
 		return l;
@@ -95,14 +95,14 @@ public class DeleteByQueryTest {
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermQuery( "id", String.valueOf( 5 ) ) ), tc );
+			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "id", String.valueOf( 5 ) ) ), tc );
 			tc.end();
 		}
 		this.assertCount( 1, integrator );
 
 		{
 			TransactionContextForTest tc = new TransactionContextForTest();
-			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermQuery( "id", String.valueOf( 6 ) ) ), tc );
+			worker.performWork( new DeleteByQueryWork( Book.class, new SingularTermDeletionQuery( "id", String.valueOf( 6 ) ) ), tc );
 			tc.end();
 		}
 		this.assertCount( 0, integrator );
@@ -113,7 +113,7 @@ public class DeleteByQueryTest {
 	public void testNumRangeQuery() {
 		ExtendedSearchIntegrator integrator = this.factoryHolder.getSearchFactory();
 
-		List<SingularTermQuery> numQueries = this.buildNumQueries();
+		List<SingularTermDeletionQuery> numQueries = this.buildNumQueries();
 		List<Integer> expectedCount = this.expectedCount();
 		assertEquals( expectedCount.size(), numQueries.size() );
 
@@ -167,8 +167,8 @@ public class DeleteByQueryTest {
 
 	private void testSerializationForQuery(DeletionQuery deletionQuery) {
 		assertTrue( DeleteByQuerySupport.isSupported( deletionQuery.getClass() ) );
-		String[] strRep = DeleteByQuerySupport.getQueryToStringMapper( deletionQuery.getQueryKey() ).toString( deletionQuery );
-		DeletionQuery copy = DeleteByQuerySupport.getStringToQueryMapper( deletionQuery.getQueryKey() ).fromString( strRep );
+		String[] strRep = DeleteByQuerySupport.getMapper( deletionQuery.getQueryKey() ).toString( deletionQuery );
+		DeletionQuery copy = DeleteByQuerySupport.getMapper( deletionQuery.getQueryKey() ).fromString( strRep );
 		assertEquals( deletionQuery, copy );
 	}
 

@@ -6,31 +6,18 @@
  */
 package org.hibernate.search.backend.impl;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.NumericUtils;
 import org.hibernate.search.backend.DeletionQuery;
-import org.hibernate.search.backend.SingularTermQuery;
-import org.hibernate.search.backend.SingularTermQuery.Type;
+import org.hibernate.search.backend.SingularTermDeletionQuery;
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.util.impl.ScopedAnalyzer;
 
 /**
- * This class has means to convert all (by default) supported DeletionQueries back to Lucene Queries and to their
+ * This class provides means to convert all (by default) supported DeletionQueries back to Lucene Queries and to their
  * String[] representation and back.
  *
  * @author Martin Braun
@@ -41,87 +28,22 @@ public final class DeleteByQuerySupport {
 		// Not meant to be invoked
 	}
 
-	private static final ToLuceneQuery[] TO_LUCENE_QUERY_CONVERTER;
+	private static final DeletionQueryMapper[] MAPPERS;
 	static {
 		{
-			Map<Integer, ToLuceneQuery> map = new HashMap<>();
+			Map<Integer, DeletionQueryMapper> map = new HashMap<>();
 
-			map.put( SingularTermQuery.QUERY_KEY, new ToLuceneQuery() {
+			map.put( SingularTermDeletionQuery.QUERY_KEY, new SingularTermDeletionQueryMapper() );
 
-				@Override
-				public Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity) {
-					SingularTermQuery query = (SingularTermQuery) deletionQuery;
-					if ( query.getType() == Type.STRING ) {
-						try {
-							TokenStream tokenStream = analyzerForEntity.tokenStream( query.getFieldName(), (String) query.getValue() );
-							tokenStream.reset();
-							try {
-								BooleanQuery booleanQuery = new BooleanQuery();
-								while ( tokenStream.incrementToken() ) {
-									String value = tokenStream.getAttribute( CharTermAttribute.class ).toString();
-									booleanQuery.add( new TermQuery( new Term( query.getFieldName(), value ) ), Occur.MUST );
-								}
-								return booleanQuery;
-							}
-							finally {
-								tokenStream.close();
-							}
-						}
-						catch (IOException e) {
-							throw new AssertionFailure( "no IOException can occur while using a TokenStream that is generated via String" );
-						}
-					}
-					else {
-						Type type = query.getType();
-						BytesRef valueAsBytes;
-						switch ( type ) {
-							case INT:
-							case FLOAT: {
-								int value;
-								if ( type == Type.FLOAT ) {
-									value = NumericUtils.floatToSortableInt( (Float) query.getValue() );
-								}
-								else {
-									value = (Integer) query.getValue();
-								}
-								BytesRefBuilder builder = new BytesRefBuilder();
-								NumericUtils.intToPrefixCoded( value, 0, builder );
-								valueAsBytes = builder.get();
-								break;
-							}
-							case LONG:
-							case DOUBLE: {
-								long value;
-								if ( type == Type.DOUBLE ) {
-									value = NumericUtils.doubleToSortableLong( (Double) query.getValue() );
-								}
-								else {
-									value = (Long) query.getValue();
-								}
-								BytesRefBuilder builder = new BytesRefBuilder();
-								NumericUtils.longToPrefixCoded( value, 0, builder );
-								valueAsBytes = builder.get();
-								break;
-							}
-							default:
-								throw new AssertionFailure( "has to be a Numeric Type at this point!" );
-						}
-						return new TermQuery( new Term( query.getFieldName(), valueAsBytes ) );
-					}
-
-				}
-
-			} );
-
-			TO_LUCENE_QUERY_CONVERTER = new ToLuceneQuery[map.size()];
-			for ( Map.Entry<Integer, ToLuceneQuery> entry : map.entrySet() ) {
-				TO_LUCENE_QUERY_CONVERTER[entry.getKey()] = entry.getValue();
+			MAPPERS = new DeletionQueryMapper[map.size()];
+			for ( Map.Entry<Integer, DeletionQueryMapper> entry : map.entrySet() ) {
+				MAPPERS[entry.getKey()] = entry.getValue();
 			}
 		}
 	}
 
-	public static ToLuceneQuery getToLuceneQuery(int queryKey) {
-		return TO_LUCENE_QUERY_CONVERTER[queryKey];
+	public static DeletionQueryMapper getMapper(int queryKey) {
+		return MAPPERS[queryKey];
 	}
 
 	private static final Set<Class<? extends DeletionQuery>> SUPPORTED_TYPES;
@@ -129,7 +51,7 @@ public final class DeleteByQuerySupport {
 		{
 			Map<Integer, Class<? extends DeletionQuery>> map = new HashMap<>();
 
-			map.put( SingularTermQuery.QUERY_KEY, SingularTermQuery.class );
+			map.put( SingularTermDeletionQuery.QUERY_KEY, SingularTermDeletionQuery.class );
 
 			SUPPORTED_TYPES = Collections.unmodifiableSet( new HashSet<>( map.values() ) );
 		}
@@ -139,98 +61,15 @@ public final class DeleteByQuerySupport {
 		return SUPPORTED_TYPES.contains( type );
 	}
 
-	private static final StringToQueryMapper[] FROM_STRING;
-	static {
-		{
-			Map<Integer, StringToQueryMapper> map = new HashMap<>();
-
-			map.put( SingularTermQuery.QUERY_KEY, new StringToQueryMapper() {
-
-				@Override
-				public DeletionQuery fromString(String[] string) {
-					if ( string.length != 3 ) {
-						throw new IllegalArgumentException( "for a TermQuery to work there have to be " + "exactly 3 Arguments (type & fieldName & value" );
-					}
-					Type type = Type.valueOf( string[0] );
-					switch ( type ) {
-						case STRING:
-							return new SingularTermQuery( string[1], string[2] );
-						case INT:
-							return new SingularTermQuery( string[1], Integer.parseInt( string[2] ) );
-						case FLOAT:
-							return new SingularTermQuery( string[1], Float.parseFloat( string[2] ) );
-						case LONG:
-							return new SingularTermQuery( string[1], Long.parseLong( string[2] ) );
-						case DOUBLE:
-							return new SingularTermQuery( string[1], Double.parseDouble( string[2] ) );
-						default:
-							throw new AssertionFailure( "wrong Type!" );
-					}
-
-				}
-
-			} );
-
-			FROM_STRING = new StringToQueryMapper[map.size()];
-			for ( Map.Entry<Integer, StringToQueryMapper> entry : map.entrySet() ) {
-				FROM_STRING[entry.getKey()] = entry.getValue();
-			}
-		}
-	}
-
-	public static StringToQueryMapper getStringToQueryMapper(int queryKey) {
-		return FROM_STRING[queryKey];
-	}
-
-	private static final QueryToStringMapper[] TO_STRING;
-	static {
-		{
-			Map<Integer, QueryToStringMapper> map = new HashMap<>();
-
-			map.put( SingularTermQuery.QUERY_KEY, new QueryToStringMapper() {
-
-				@Override
-				public String[] toString(DeletionQuery deletionQuery) {
-					SingularTermQuery query = (SingularTermQuery) deletionQuery;
-					return new String[] { query.getType().toString(), query.getFieldName(), String.valueOf( query.getValue() ) };
-				}
-
-			} );
-
-			TO_STRING = new QueryToStringMapper[map.size()];
-			for ( Map.Entry<Integer, QueryToStringMapper> entry : map.entrySet() ) {
-				TO_STRING[entry.getKey()] = entry.getValue();
-			}
-		}
-	}
-
-	public static QueryToStringMapper getQueryToStringMapper(int queryKey) {
-		return TO_STRING[queryKey];
-	}
-
 	static {
 		// make sure everything is setup correctly
 		Set<Integer> counts = new HashSet<>();
-		counts.add( TO_LUCENE_QUERY_CONVERTER.length );
-		counts.add( TO_STRING.length );
-		counts.add( FROM_STRING.length );
+		counts.add( MAPPERS.length );
 		counts.add( SUPPORTED_TYPES.size() );
 		if ( counts.size() != 1 ) {
 			throw new AssertionFailure( "all Maps/Sets inside this class must have the same "
 					+ "size. Make sure that every QueryType is found in every Map/Set" );
 		}
-	}
-
-	/**
-	 * Interface to map the several <code>DeleteByQuery</code>s to a Lucene query. This is done outside of the
-	 * <code>DeleteByQuery</code> class to not overcomplicate the serialization process
-	 *
-	 * @author Martin Braun
-	 */
-	public interface ToLuceneQuery {
-
-		Query build(DeletionQuery deletionQuery, ScopedAnalyzer analyzerForEntity);
-
 	}
 
 	/*
@@ -245,17 +84,5 @@ public final class DeleteByQuerySupport {
 	 * no use Java Serialization (well Serialization to BASE64 or another String representation is still possible, but
 	 * nvm that) and we still have an _easy_ way of dealing with multiple fields in our different Query Types.
 	 */
-
-	public interface StringToQueryMapper {
-
-		DeletionQuery fromString(String[] string);
-
-	}
-
-	public interface QueryToStringMapper {
-
-		String[] toString(DeletionQuery deletionQuery);
-
-	}
 
 }

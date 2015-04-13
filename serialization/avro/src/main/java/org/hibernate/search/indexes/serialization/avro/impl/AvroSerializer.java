@@ -37,6 +37,7 @@ import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.DeleteByQuerySupport;
+import org.hibernate.search.backend.impl.DeletionQueryMapper;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
@@ -93,7 +94,7 @@ public class AvroSerializer implements Serializer {
 		GenericRecord deleteByQuery = new GenericData.Record( protocol.getType( "DeleteByQuery" ) );
 		deleteByQuery.put( "class", classRef );
 		deleteByQuery.put( "key", deletionQuery.getQueryKey() );
-		DeleteByQuerySupport.QueryToStringMapper mapper = DeleteByQuerySupport.getQueryToStringMapper( deletionQuery.getQueryKey() );
+		DeletionQueryMapper mapper = DeleteByQuerySupport.getMapper( deletionQuery.getQueryKey() );
 		deleteByQuery.put( "query", Arrays.asList( mapper.toString( deletionQuery ) ) );
 		operations.add( deleteByQuery );
 	}
