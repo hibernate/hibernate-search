@@ -9,8 +9,9 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.util.StringHelper;
 
 /**
- * Map a long element
+ * Bridge a {@link Long} to a {@link String}.
  *
+ * @see NumericFieldBridge#LONG_FIELD_BRIDGE
  * @author Emmanuel Bernard
  */
 public class LongBridge extends NumberBridge {

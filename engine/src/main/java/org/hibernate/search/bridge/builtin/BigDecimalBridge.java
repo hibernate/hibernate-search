@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import org.hibernate.search.util.StringHelper;
 
 /**
- * Map a BigDecimal element
+ * Bridge a {@link BigDecimal} to a {@link String}.
  *
  * @author Emmanuel Bernard
  */

@@ -10,7 +10,7 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 
 /**
- * Map a boolean field
+ * Bridge a boolean field to a {@link String}.
  *
  * @author Sylvain Vieujot
  */

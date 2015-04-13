@@ -9,8 +9,9 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.util.StringHelper;
 
 /**
- * Map an integer element
+ * Bridge an {@link Integer} to a {@link String}.
  *
+ * @see NumericFieldBridge#INT_FIELD_BRIDGE
  * @author Emmanuel Bernard
  */
 public class IntegerBridge extends NumberBridge {

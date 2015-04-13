@@ -10,9 +10,8 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.bridge.AppliedOnTypeAwareBridge;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 
-
 /**
- * Map an Enum field
+ * Bridge an {@link Enum} to a {@link String} using  {@link Enum#name()}.
  *
  * @author Sylvain Vieujot
  */
