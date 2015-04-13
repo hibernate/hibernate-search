@@ -14,7 +14,7 @@ import org.hibernate.search.bridge.TwoWayFieldBridge;
 import org.hibernate.search.query.fieldcache.impl.FieldCacheLoadingType;
 
 /**
- * Stateless field bridges for the 4 different Numeric Field types
+ * Stateless field bridges for the conversion of numbers to numeric field values.
  *
  * @author Sanne Grinovero
  * @author Gunnar Morling
@@ -61,24 +61,36 @@ public enum NumericFieldBridge implements FieldBridge, TwoWayFieldBridge {
 			super.applyToLuceneOptions( luceneOptions, name, value.intValue(), document );
 		}
 	},
+	/**
+	 * Persists int properties in int index fields. Takes care of all the required conversion.
+	 */
 	INT_FIELD_BRIDGE {
 		@Override
 		public FieldCacheLoadingType getFieldCacheLoadingType() {
 			return FieldCacheLoadingType.INT;
 		}
 	},
+	/**
+	 * Persists float properties in float index fields. Takes care of all the required conversion.
+	 */
 	FLOAT_FIELD_BRIDGE {
 		@Override
 		public FieldCacheLoadingType getFieldCacheLoadingType() {
 			return FieldCacheLoadingType.FLOAT;
 		}
 	},
+	/**
+	 * Persists double properties in double index fields. Takes care of all the required conversion.
+	 */
 	DOUBLE_FIELD_BRIDGE {
 		@Override
 		public FieldCacheLoadingType getFieldCacheLoadingType() {
 			return FieldCacheLoadingType.DOUBLE;
 		}
 	},
+	/**
+	 * Persists long properties in long index fields. Takes care of all the required conversion.
+	 */
 	LONG_FIELD_BRIDGE {
 		@Override
 		public FieldCacheLoadingType getFieldCacheLoadingType() {

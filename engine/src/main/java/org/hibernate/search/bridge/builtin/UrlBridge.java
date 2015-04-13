@@ -14,7 +14,7 @@ import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.exception.SearchException;
 
 /**
- * Bridge for <code>URL</code>s.
+ * Bridge for a {@link URL} to a {@link String}.
  *
  * @author Emmanuel Bernard
  */
