@@ -99,6 +99,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	@Override
 	@Before
 	public void setUp() throws Exception {
+		ClockMultitenantConnectionProvider.start();
 		super.setUp();
 
 		exportSchema( ClockMultitenantConnectionProvider.GEOCHRON_PROVIDER, getCfg() );
@@ -270,6 +271,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		session = openSessionWithTenantId( GEOCHRON_TID );
 		deleteClocks( session );
 		session.close();
+		ClockMultitenantConnectionProvider.stop();
 	}
 
 	private void deleteClocks(Session session) {
@@ -315,8 +317,8 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 
 	public static class ClockMultitenantConnectionProvider extends AbstractMultiTenantConnectionProvider {
 
-		private static final ConnectionProvider METAMEC_PROVIDER = buildConnectionProvider( METAMEC_TID );
-		private static final ConnectionProvider GEOCHRON_PROVIDER = buildConnectionProvider( GEOCHRON_TID );
+		private static DriverManagerConnectionProviderImpl METAMEC_PROVIDER;
+		private static DriverManagerConnectionProviderImpl GEOCHRON_PROVIDER;
 
 		@Override
 		protected ConnectionProvider getAnyConnectionProvider() {
@@ -347,6 +349,19 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 			props.put( Environment.USER, "sa" );
 			props.put( Environment.PASS, "" );
 			return props;
+		}
+
+		static void stop() {
+			METAMEC_PROVIDER.stop();
+			GEOCHRON_PROVIDER.stop();
+			//Cleanup hacky static variables
+			METAMEC_PROVIDER = null;
+			GEOCHRON_PROVIDER = null;
+		}
+
+		static void start() {
+			METAMEC_PROVIDER = buildConnectionProvider( METAMEC_TID );
+			GEOCHRON_PROVIDER = buildConnectionProvider( GEOCHRON_TID );
 		}
 	}
 
