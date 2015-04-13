@@ -19,6 +19,7 @@ import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.impl.DeleteByQuerySupport;
+import org.hibernate.search.backend.impl.DeletionQueryMapper;
 import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.SearchException;
@@ -57,10 +58,10 @@ class DeleteByQueryWorkExecutor implements LuceneWorkExecutor {
 		BooleanQuery entityDeletionQuery = new BooleanQuery();
 
 		{
-			DeleteByQuerySupport.ToLuceneQuery converter = DeleteByQuerySupport.getToLuceneQuery( query.getQueryKey() );
+			DeletionQueryMapper converter = DeleteByQuerySupport.getMapper( query.getQueryKey() );
 
 			ScopedAnalyzer analyzer = this.workspace.getDocumentBuilder( entityType ).getAnalyzer();
-			Query queryToDelete = converter.build( query, analyzer );
+			Query queryToDelete = converter.toLuceneQuery( query, analyzer );
 
 			entityDeletionQuery.add( queryToDelete, BooleanClause.Occur.MUST );
 		}

@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
@@ -28,9 +29,7 @@ import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.cfg.Environment;
@@ -40,7 +39,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.SingularTermQuery;
+import org.hibernate.search.backend.SingularTermDeletionQuery;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.test.SearchTestBase;
@@ -131,7 +130,7 @@ public class JMSMasterTest extends SearchTestBase {
 			}
 
 			{
-				DeleteByQueryLuceneWork work = new DeleteByQueryLuceneWork( TShirt.class, new SingularTermQuery( "logo", "jboss" ) );
+				DeleteByQueryLuceneWork work = new DeleteByQueryLuceneWork( TShirt.class, new SingularTermDeletionQuery( "logo", "jboss" ) );
 				List<LuceneWork> l = new ArrayList<>();
 				l.add( work );
 				this.registerMessageListener();
