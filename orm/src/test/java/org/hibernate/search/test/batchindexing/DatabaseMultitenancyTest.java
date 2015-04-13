@@ -48,7 +48,7 @@ import org.junit.Test;
  * The test will create one database for each tenant identifier.
  * The two tenant identifiers are "metamec" and "geochron".
  * <p>
- * Before running a test the DBs are poulated with some clock instances.
+ * Before running a test the DBs are populated with some clock instances.
  * Note that some instances have the same ID reused for different tenants, this is important to test the case
  * where a hit is found in the search but it's from the wrong tenant.
  *
@@ -116,18 +116,21 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	@Test
 	public void shouldOnlyFindMetamecModels() throws Exception {
 		List<Clock> list = searchAll( METAMEC_TID );
+		assertThat( list ).isNotEmpty();
 		assertThat( list ).containsOnly( METAMEC_MODELS );
 	}
 
 	@Test
 	public void shouldOnlyFindGeochronModels() throws Exception {
 		List<Clock> list = searchAll( GEOCHRON_TID );
+		assertThat( list ).isNotEmpty();
 		assertThat( list ).containsOnly( GEOCHRON_MODELS );
 	}
 
 	@Test
 	public void shouldMatchOnlyElementsFromOneTenant() throws Exception {
 		List<Clock> list = searchModel( "model", GEOCHRON_TID );
+		assertThat( list ).isNotEmpty();
 		assertThat( list ).containsOnly( GEOCHRON_MODELS );
 	}
 
@@ -135,8 +138,11 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	public void shouldBeAbleToPurgeTheIndex() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 
-		List<Clock> list = searchAll( GEOCHRON_TID );
-		assertThat( list ).isEmpty();
+		List<Clock> listg = searchAll( GEOCHRON_TID );
+		assertThat( listg ).isEmpty();
+		List<Clock> listm = searchAll( METAMEC_TID );
+		assertThat( listm ).isNotEmpty();
+		assertThat( listm ).containsOnly( METAMEC_MODELS );
 	}
 
 	@Test
@@ -145,12 +151,15 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		purgeAll( Clock.class, METAMEC_TID );
 		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
 
-		List<Clock> list = searchAll( GEOCHRON_TID );
-		assertThat( list ).containsOnly( GEOCHRON_MODELS );
+		List<Clock> listg = searchAll( GEOCHRON_TID );
+		assertThat( listg ).isNotEmpty();
+		assertThat( listg ).containsOnly( GEOCHRON_MODELS );
+		List<Clock> listm = searchAll( METAMEC_TID );
+		assertThat( listm ).isEmpty();
 	}
 
 	@Test
-	public void shouldOnlyPurgeTheEntitiesOfTheSelecedTenant() throws Exception {
+	public void shouldOnlyPurgeTheEntitiesOfTheSelectedTenant() throws Exception {
 		purgeAll( Clock.class, GEOCHRON_TID );
 
 		List<Clock> list = searchAll( METAMEC_TID );
