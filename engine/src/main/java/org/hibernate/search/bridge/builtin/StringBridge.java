@@ -9,7 +9,7 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.bridge.TwoWayStringBridge;
 
 /**
- * Map a string element
+ * Bridge a {@link String} to a string.
  *
  * @author Emmanuel Bernard
  */

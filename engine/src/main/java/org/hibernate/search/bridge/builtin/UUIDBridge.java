@@ -10,6 +10,11 @@ import java.util.UUID;
 
 import org.hibernate.search.bridge.TwoWayStringBridge;
 
+/**
+ * Bridge a {@link UUID} to a {@link String}.
+ *
+ * @author Davide D'Alto
+ */
 public class UUIDBridge implements TwoWayStringBridge {
 
 	@Override

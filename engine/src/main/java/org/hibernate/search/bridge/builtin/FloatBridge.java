@@ -9,8 +9,9 @@ package org.hibernate.search.bridge.builtin;
 import org.hibernate.search.util.StringHelper;
 
 /**
- * Map a float element
+ * Bridge a {@link Float} to a {@link String}.
  *
+ * @see NumericFieldBridge#FLOAT_FIELD_BRIDGE
  * @author Emmanuel Bernard
  */
 public class FloatBridge extends NumberBridge {

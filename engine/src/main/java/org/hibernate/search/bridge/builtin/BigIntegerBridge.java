@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import org.hibernate.search.util.StringHelper;
 
 /**
- * Map a <code>BigInteger</code> element.
+ * Bridge a {@link BigInteger} to a {@link String}.
  *
  * @author Emmanuel Bernard
  */
