@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -23,7 +24,8 @@ public class Truck {
 	@GeneratedValue
 	private int id;
 
-	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.YES, indexNullAs = "-1")
+	@Field(index = Index.YES, analyze = Analyze.NO, store = Store.YES, indexNullAs = "-1")
+	@Facet
 	private Integer horsePower;
 
 	public Truck() {

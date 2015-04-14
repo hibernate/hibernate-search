@@ -35,7 +35,7 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 	/**
 	 * Whether a facet value with 0 occurrences
 	 */
-	private boolean includeZeroCounts = true;
+	private boolean includeZeroCounts = false;
 
 	/**
 	 * The maximum number of {@link org.hibernate.search.query.facet.Facet}s to return for this request. A negative value means that all
@@ -82,7 +82,10 @@ public abstract class FacetingRequestImpl implements FacetingRequest {
 		this.maxNumberOfFacets = maxNumberOfFacets;
 	}
 
-	public abstract Class<?> getFieldCacheType();
+	/**
+	 * @return the field value type on which the facets applies. This determines which type of facet query one needs to build.
+	 */
+	public abstract Class<?> getFacetValueType();
 
 	public abstract Facet createFacet(String value, int count);
 

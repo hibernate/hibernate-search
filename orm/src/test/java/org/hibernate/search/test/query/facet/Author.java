@@ -11,7 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 
@@ -19,10 +19,10 @@ import org.hibernate.search.annotations.Fields;
 public class Author {
 	@Id
 	@GeneratedValue
-	@DocumentId
 	private Integer id;
 
 	@Fields({ @Field, @Field(analyze = Analyze.NO, name = "name_untokenized") })
+	@Facet(forField = "name_untokenized")
 	private String name;
 
 

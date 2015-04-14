@@ -1547,26 +1547,54 @@ public class Cd {
     @GeneratedValue
     private int id;
 
-    @Fields( {
-        @Field,
-        @Field(name = "name_un_analyzed", analyze = Analyze.NO)
-    })
+    @Field,
     private String name;
 
     @Field(analyze = Analyze.NO)
+    @Facet
     private int price;
 
-    Field(analyze = Analyze.NO)
+    @Field(analyze = Analyze.NO)
     @DateBridge(resolution = Resolution.YEAR)
+    @Facet
     private Date releaseYear;
 
     @Field(analyze = Analyze.NO)
+    @Facet
     private String label;
 
 
 // setter/getter
 // ...
 ----
+====
+
+In order to facet on a given indexed field, the field needs to be configured with the `@Facet`
+annotation. Also, the field itself cannot be analyzed.
+
+`@Facet` contains a `name` and `forField` parameter. The `name` is arbitrary and used to identify
+the facet. Per default it matches the field name it belongs to. `forField` is relevant in case the
+property is mapped to multiple fields using `@Fields` (see also <<facets-annotation>>). In this case
+`forField` can be used to identify the index field to which it applies. Mirroring `@Fields` there
+also exists a `@Facets` annotation in case multiple fields need to be targeted by faceting.
+
+Last but not least, `@Facet` contains a
+`encoding` parameter. Usually, Hibernate Search automatically selects the encoding:
+
+* String fields are encoded as `FacetEncodingType.STRING`
+* `byte`, `short`, `int`, `long` (including corresponding wrapper types) and `Date`
+as `FacetEncodingType.LONG`
+* and `float` and `double` (including corresponding wrapper types) as FacetEncodingType.DOUBLE`
+
+In some cases it can make sense, however, to explicitly set the encoding.
+<<discrete-faceting-request,Discrete faceting request>>s for example only work for string encoded
+facets. In order to use a discrete facet for numbers the encoding must be explicitly set to
+`FacetEncodingType.STRING`.
+
+[NOTE]
+====
+Pre Hibernate Search 5.2 there was no need to explicitly use a `@Facet` annotation. In 5.2 it became
+necessary in order to use Lucene's native faceting API.
 ====
 
 [[section-creating-faceting-request]]
@@ -1590,9 +1618,8 @@ to apply. An example for a discrete faceting request can be seen in <<example-di
 [source, JAVA]
 ----
 QueryBuilder builder = fullTextSession.getSearchFactory()
-    .buildQueryBuilder()
-        .forEntity(Cd.class)
-            .get();
+    .buildQueryBuilder().forEntity(Cd.class).get();
+
 FacetingRequest labelFacetingRequest = builder.facet()
     .name("labelFacetRequest")
     .onField("label")
@@ -1611,19 +1638,14 @@ this particular field value occurs within the original query results. Parameters
 Parameter `orderedBy` allows to specify in which order the created facets will be returned. The
 default is `FacetSortOrder.COUNT_DESC`, but you can also sort on the field value. Parameter
 `includeZeroCount` determines whether facets with a count of 0 will be included in the result (by
-default they are) and `maxFacetCount` allows to limit the maximum amount of facets returned.
+default they are not) and `maxFacetCount` allows to limit the maximum amount of facets returned.
 
 [NOTE]
 ====
 There are several preconditions an indexed field has to meet in order to categorize (facet) on it:
 
-* The indexed property must be of type `String`, `Date` or of the numeric type int, long, double or
-float (or their respective Java wrapper types).
-
-* For numeric and date values you need to make sure that the values are string encoded by explicitly
-specifying a non numeric field bridge via `@Field.bridge` or `@FieldBridge`. The package `org.
-hibernate.search.bridge.builtin` contains a set of bridges which encode numbers as strings, for
-example `org.hibernate.search.bridge.builtin.IntegerBridge`.
+* The indexed property must be of type `String`, `Date` or of the numeric type byte, shirt, int,
+long, double or float (or their respective Java wrapper types).
 
 * The property has to be indexed with Analyze.NO.
 
@@ -1649,10 +1671,10 @@ private int price;
 
 The creation of a range faceting request is similar. We also start with a name for the request and
 the field to facet on. Then we have to specify ranges for the field values. A range faceting request
-can be seen in <<example-range-faceting>>. There, three different price ranges are specified. below
-and above can only be specified once, but you can specify as many from - to ranges as you want. For
-each range boundary you can also specify via excludeLimit whether it is included into the range or
-not.
+can be seen in <<example-range-faceting>>. There, three different price ranges are specified. `below`
+and `above` can only be specified once, but you can specify as many `from` - `to` ranges as you want.
+For each range boundary you can also specify via `excludeLimit` whether it is included into the range
+or not.
 
 [[example-range-faceting]]
 .Creating a range faceting request
@@ -1677,7 +1699,7 @@ FacetingRequest priceFacetingRequest = builder.facet()
 [[section-sorting-faceting-request]]
 ==== Setting the facet sort order
 
-The result of applying a faceting request is a list of Facet instances as seen in
+The result of applying a faceting request is a list of `Facet` instances as seen in
 <<example-applying-faceting>>. The order within the list is given by the `FacetSortOrder` parameter
 specified via `orderedBy` when creating the faceting request. The default value is
 `FacetSortOrder.COUNT_DESC`, meaning facets are ordered by their count in descending order (highest
@@ -1720,16 +1742,16 @@ List<Facet> facets = facetManager.getFacets("priceFaceting");
 ====
 
 You need to enable the faceting request before you execute the query. You do that via
-facetManager.enableFaceting(<facetName>). You can enable as many faceting requests as you
-like, then you execute the query and retrieve the facet results for a given request via
-facetManager.getFacets(<facetname>). For each request you will get a list of Facet instances.
+`facetManager.enableFaceting(<facetName>)`. You can enable as many faceting requests as you
+like. Then you execute the query and retrieve the facet results for a given request via
+`facetManager.getFacets(<facetname>)`. For each request you will get a list of `Facet` instances.
 Facet requests stay active and get applied to the fulltext query until they are either explicitly
-disabled via disableFaceting(<facetName>) or the query is discarded.
+disabled via `disableFaceting(<facetName>)` or the query is `discarded`.
 
 [[section-interpreting-facet-result]]
 ==== Interpreting a Facet result
 
-Each facet request results in a list of Facet instances. Each instance represents one facet/category
+Each facet request results in a list of `Facet` instances. Each instance represents one facet/category
 value. In the CD example (<<example-discrete-faceting>>) where we want to categorize on the CD
 labels, there would for example be a `Facet` for each of the record labels Universal, Sony and Warner.
 <<example-facet-api>> shows the API of Facet.
@@ -1779,7 +1801,7 @@ public interface Facet {
 
 `getFacetingName()` and `getFieldName()` are returning the facet request name and the targeted document
 field name as specified by the underlying `FacetRequest`. For example "<<example-discrete-faceting>>"
-that would be labelFacetRequest and label respectively.
+that would be `labelFacetRequest` and `label` respectively.
 The interesting information is provided by `getValue()` and `getCount()`.
 The former is the actual facet/category value, for example a concrete record label
 like Universal. The latter returns the count for this value. To stick with the example again, the
@@ -1791,14 +1813,14 @@ facet.
 
 A common use case for faceting is a "drill-down" functionality which allows you to narrow your
 original search by applying a given facet on it. To do this, you can apply any of the returned
-`Facet` instances as additional criteria on your original query via `FacetSelection`. FacetSelections
-are available via the `FacetManager` and allow you to select a facet as query criteria (selectFacets),
-remove a facet restriction (deselectFacets), remove all facet restrictions (clearSelectedFacets) and
-retrieve all currently selected facets (getSelectedFacets). <<example-restricting-query-results>>
+`Facet` instances as additional criteria on your original query via `FacetSelection`. `FacetSelection`
+is available via the `FacetManager` and allow you to select a facet as query criteria (`selectFacets`),
+remove a facet restriction (`deselectFacets`), remove all facet restrictions (`clearSelectedFacets`) and
+retrieve all currently selected facets (`getSelectedFacets`). <<example-restricting-query-results>>
 shows an example.
 
 [[example-restricting-query-results]]
-.Restricting query results via the application of a FacetSelection
+.Restricting query results via the application of a `FacetSelection`
 ====
 [source, JAVA]
 ----
@@ -1828,6 +1850,18 @@ assertTrue(cds.size() == 2);
 ----
 ====
 
+Per default selected facets are combined via  disjunction (OR). In case a field has multiple values,
+like a potential `Cd.artists` association, you can also use  conjunction (AND) for the facet selection.
+
+[[example-using-conjunction-restricting-query-results]]
+.Using conjunction in `FacetSelection`
+====
+[source, JAVA]
+----
+FacetSelection facetSelection = facetManager.getFacetGroup( "artistsFaceting" );
+facetSelection.selectFacets( FacetCombine.AND, facets.get( 0 ), facets.get( 1 ) );
+----
+====
 
 === Optimizing the query process
 

@@ -23,7 +23,7 @@ public class DiscreteFacetRequest extends FacetingRequestImpl {
 	}
 
 	@Override
-	public Class<?> getFieldCacheType() {
+	public Class<?> getFacetValueType() {
 		return String[].class;
 	}
 

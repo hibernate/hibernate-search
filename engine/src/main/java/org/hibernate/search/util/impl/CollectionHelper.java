@@ -67,5 +67,4 @@ public final class CollectionHelper {
 			return Collections.unmodifiableList( new ArrayList<T>( c ) );
 		}
 	}
-
 }

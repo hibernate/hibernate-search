@@ -19,9 +19,12 @@ import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.testing.TestForIssue;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -147,7 +150,6 @@ public class RangeFacetingTest extends AbstractFacetTest {
 
 		List<Facet> facets = query.getFacetManager().getFacets( facetingName );
 		assertFacetCounts( facets, new int[] { 5, 3, 2 } );
-
 	}
 
 	@Test
@@ -187,8 +189,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 
 	}
 
-	// HSEARCH-770
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-770")
 	public void testRangeBelowWithFacetSelection() {
 		final String facetingName = "truckHorsePowerFaceting";
 		FacetingRequest rangeRequest = queryBuilder( Truck.class ).facet()
@@ -205,7 +207,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 		facets = facetManager.getFacets( facetingName ); // Still OK
 		assertFacetCounts( facets, new int[] { 4 } );
 
-		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 0 ) ); //narrow search on facet
+		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 0 ) ); // narrow search on facet
 		facets = facetManager.getFacets( facetingName ); // Exception...
 		assertFacetCounts( facets, new int[] { 4 } );
 	}
@@ -220,6 +222,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
+				.includeZeroCounts( true )
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Fruit.class );
 		FacetManager facetManager = query.getFacetManager();
@@ -281,31 +284,6 @@ public class RangeFacetingTest extends AbstractFacetTest {
 	}
 
 	@Test
-	public void testStringRangeFaceting() {
-		final String facetingName = "albumNameFaceting";
-		final String fieldName = "name_un_analyzed";
-		FacetingRequest rangeRequest = queryBuilder( Cd.class ).facet()
-				.name( facetingName )
-				.onField( fieldName )
-				.range()
-				.below( "S" ).excludeLimit()
-				.from( "S" ).to( "U" )
-				.above( "U" ).excludeLimit()
-				.orderedBy( FacetSortOrder.RANGE_DEFINITION_ORDER )
-				.createFacetingRequest();
-		FullTextQuery query = createMatchAllQuery( Cd.class );
-		FacetManager facetManager = query.getFacetManager();
-		facetManager.enableFaceting( rangeRequest );
-
-		List<Facet> facets = facetManager.getFacets( facetingName );
-		assertFacetCounts( facets, new int[] { 7, 1, 2 } );
-
-		facetManager.getFacetGroup( facetingName ).selectFacets( facets.get( 0 ) );
-		facets = facetManager.getFacets( facetingName );
-		assertFacetCounts( facets, new int[] { 7, 0, 0 } );
-	}
-
-	@Test
 	public void testDateRangeFaceting() throws Exception {
 		final String facetingName = "albumYearFaceting";
 		final String fieldName = "releaseYear";
@@ -345,7 +323,7 @@ public class RangeFacetingTest extends AbstractFacetTest {
 			fail( "Unsupported range faceting type" );
 		}
 		catch (SearchException e) {
-			// success
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000269" ) );
 		}
 	}
 
@@ -361,7 +339,29 @@ public class RangeFacetingTest extends AbstractFacetTest {
 			fail( "Unsupported range faceting type" );
 		}
 		catch (SearchException e) {
-			// success
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000270" ) );
+		}
+	}
+
+	@Test
+	public void testUnsupportedRangeParameterTypeThrowsException() {
+		FacetingRequest rangeRequest = queryBuilder( Fruit.class ).facet()
+				.name( priceRange )
+				.onField( indexFieldName )
+				.range()
+				.from( "0.00" ).to( "1.00" )
+				.createFacetingRequest();
+
+		FullTextQuery query = createMatchAllQuery( Fruit.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( rangeRequest );
+
+		try {
+			query.getFacetManager().getFacets( priceRange );
+			fail( "Trying to so a range query using string as parameter should fail." );
+		}
+		catch (SearchException e) {
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000266" ) );
 		}
 	}
 
@@ -376,8 +376,8 @@ public class RangeFacetingTest extends AbstractFacetTest {
 			Fruit fruit = new Fruit( fruits[i], fruitPrices[i] );
 			session.save( fruit );
 		}
-		for ( int i = 0; i < horsePowers.length; i++ ) {
-			Truck truck = new Truck( horsePowers[i] );
+		for ( Integer horsePower : horsePowers ) {
+			Truck truck = new Truck( horsePower );
 			session.save( truck );
 		}
 		tx.commit();

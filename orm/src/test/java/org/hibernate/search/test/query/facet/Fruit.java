@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -29,6 +30,7 @@ public class Fruit {
 	private String name;
 
 	@Field(analyze = Analyze.NO)
+	@Facet
 	private Double price;
 
 	public Fruit() {
