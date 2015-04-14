@@ -172,7 +172,7 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
-	public void testFuzzyAndWildcardQuery() throws Exception {
+	public void testFuzzyQuery() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();
 		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
 				.buildQueryBuilder().forEntity( Month.class ).get();
@@ -190,8 +190,16 @@ public class DSLTest extends SearchTestBase {
 
 		assertEquals( 1, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		//fuzzy search on multiple fields
-		query = monthQb
+		transaction.commit();
+	}
+
+	@Test
+	public void testFuzzyQueryOnMultipleFields() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb
 				.keyword()
 				.fuzzy()
 				.withEditDistanceUpTo( 2 )
@@ -202,8 +210,16 @@ public class DSLTest extends SearchTestBase {
 
 		assertEquals( 2, fullTextSession.createFullTextQuery( query, Month.class ).getResultSize() );
 
-		//wildcard query
-		query = monthQb
+		transaction.commit();
+	}
+
+	@Test
+	public void testWildcardQuery() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb
 				.keyword()
 					.wildcard()
 					.onField( "mythology" )
