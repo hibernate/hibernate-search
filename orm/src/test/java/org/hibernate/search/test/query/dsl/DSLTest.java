@@ -216,6 +216,27 @@ public class DSLTest extends SearchTestBase {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-1811")
+	public void testWildcardQueryOnMultipleFields() throws Exception {
+		Transaction transaction = fullTextSession.beginTransaction();
+		final QueryBuilder monthQb = fullTextSession.getSearchFactory()
+				.buildQueryBuilder().forEntity( Month.class ).get();
+
+		Query query = monthQb
+				.keyword()
+					.wildcard()
+					.onFields( "mythology", "history" )
+					.matching( "snowbo*" )
+					.createQuery();
+
+		assertThat( fullTextSession.createFullTextQuery( query, Month.class ).list() )
+				.onProperty( "name" )
+				.containsOnly( "February", "March" );
+
+		transaction.commit();
+	}
+
+	@Test
 	@SuppressWarnings("unchecked")
 	public void testQueryCustomization() throws Exception {
 		Transaction transaction = fullTextSession.beginTransaction();

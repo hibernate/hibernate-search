@@ -8,7 +8,6 @@
 package org.hibernate.search.query.dsl.impl;
 
 import org.apache.lucene.search.Filter;
-
 import org.hibernate.search.query.dsl.TermMatchingContext;
 import org.hibernate.search.query.dsl.WildcardContext;
 
@@ -28,7 +27,12 @@ class ConnectedWildcardContext implements WildcardContext {
 
 	@Override
 	public TermMatchingContext onField(String field) {
-		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext);
+		return new ConnectedTermMatchingContext( termContext, field, queryCustomizer, queryContext );
+	}
+
+	@Override
+	public TermMatchingContext onFields(String... fields) {
+		return new ConnectedTermMatchingContext( termContext, fields, queryCustomizer, queryContext );
 	}
 
 	@Override
