@@ -12,6 +12,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Facet;
+import org.hibernate.search.annotations.FacetEncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
@@ -29,12 +31,15 @@ public class Car {
 	private int id;
 
 	@Field(analyze = Analyze.NO)
+	@Facet
 	private String color;
 
-	@Field(store = Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
+	@Facet
 	private String make;
 
 	@Field(analyze = Analyze.NO, bridge = @FieldBridge(impl = IntegerBridge.class))
+	@Facet(encoding = FacetEncodingType.STRING)
 	private int cubicCapacity;
 
 	public Car() {

@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
+
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.bridge.FieldBridge;
@@ -15,10 +20,11 @@ import org.hibernate.search.bridge.FieldBridge;
 import static org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
 
 /**
- * Encapsulating the metadata for a single document field.
+ * Encapsulating the metadata for a single field within a Lucene {@code Document}.
  *
  * @author Hardy Ferentschik
  */
+@SuppressWarnings("deprecation")
 public class DocumentFieldMetadata {
 	private final String fieldName;
 	private final Store store;
@@ -33,6 +39,7 @@ public class DocumentFieldMetadata {
 	private final boolean isNumeric;
 	private final int precisionStep;
 	private final NumericEncodingType numericEncodingType;
+	private final Set<FacetMetadata> facetMetadata;
 
 	private DocumentFieldMetadata(Builder builder) {
 		this.fieldName = builder.fieldName;
@@ -48,17 +55,24 @@ public class DocumentFieldMetadata {
 		this.isNumeric = builder.isNumeric;
 		this.precisionStep = builder.precisionStep;
 		this.numericEncodingType = builder.numericEncodingType;
+		this.facetMetadata = Collections.unmodifiableSet( builder.facetMetadata );
 	}
 
 	public String getName() {
 		return fieldName;
 	}
 
-	public boolean isId() { return isId; }
+	public boolean isId() {
+		return isId;
+	}
 
-	public boolean isIdInEmbedded() { return isIdInEmbedded; }
+	public boolean isIdInEmbedded() {
+		return isIdInEmbedded;
+	}
 
-	public Store getStore() { return store; }
+	public Store getStore() {
+		return store;
+	}
 
 	public Field.Index getIndex() {
 		return index;
@@ -96,6 +110,18 @@ public class DocumentFieldMetadata {
 		return numericEncodingType;
 	}
 
+	public boolean hasFacets() {
+		return !facetMetadata.isEmpty();
+	}
+
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	public Set<FacetMetadata> getFacetMetadata() {
+		return facetMetadata;
+	}
+
 	@Override
 	public String toString() {
 		return "DocumentFieldMetadata{" +
@@ -111,7 +137,8 @@ public class DocumentFieldMetadata {
 				", nullToken='" + nullToken + '\'' +
 				", isNumeric=" + isNumeric +
 				", precisionStep=" + precisionStep +
-				", encodingType=" + numericEncodingType +
+				", numericEncodingType=" + numericEncodingType +
+				", facetMetadata=" + facetMetadata +
 				'}';
 	}
 
@@ -132,6 +159,7 @@ public class DocumentFieldMetadata {
 		private boolean isNumeric;
 		private int precisionStep = NumericField.PRECISION_STEP_DEFAULT;
 		private NumericEncodingType numericEncodingType;
+		private Set<FacetMetadata> facetMetadata;
 
 		public Builder(String fieldName,
 				Store store,
@@ -142,6 +170,7 @@ public class DocumentFieldMetadata {
 			this.store = store;
 			this.index = index;
 			this.termVector = termVector;
+			this.facetMetadata = new HashSet<>( 1 ); // the most common case is a single facet
 		}
 
 		public Builder fieldBridge(FieldBridge fieldBridge) {
@@ -186,6 +215,11 @@ public class DocumentFieldMetadata {
 
 		public Builder numericEncodingType(NumericEncodingType numericEncodingType) {
 			this.numericEncodingType = numericEncodingType;
+			return this;
+		}
+
+		public Builder addFacetMetadata(FacetMetadata facetMetadata) {
+			this.facetMetadata.add( facetMetadata );
 			return this;
 		}
 

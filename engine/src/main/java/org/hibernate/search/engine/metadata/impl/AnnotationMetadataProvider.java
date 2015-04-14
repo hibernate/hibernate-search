@@ -12,6 +12,10 @@ import static org.hibernate.search.engine.impl.AnnotationProcessingHelper.getFie
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,7 +23,9 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
+
 import org.hibernate.annotations.common.reflection.ClassLoadingException;
+
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -36,6 +42,9 @@ import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.ClassBridges;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Facet;
+import org.hibernate.search.annotations.FacetEncodingType;
+import org.hibernate.search.annotations.Facets;
 import org.hibernate.search.annotations.FullTextFilterDef;
 import org.hibernate.search.annotations.FullTextFilterDefs;
 import org.hibernate.search.annotations.Index;
@@ -80,6 +89,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Hardy Ferentschik
  */
+@SuppressWarnings( "deprecation" )
 public class AnnotationMetadataProvider implements MetadataProvider {
 	private static final Log log = LoggerFactory.make();
 	private static final StringBridge NULL_EMBEDDED_STRING_BRIDGE = DefaultStringBridge.INSTANCE;
@@ -529,7 +539,11 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			ConfigContext configContext,
 			XClass clazz) {
 
-		Map<FieldBridge, ClassBridge> classBridgeInstances = configContext.getClassBridgeInstances( reflectionManager.toClass( clazz ) );
+		Map<FieldBridge, ClassBridge> classBridgeInstances = configContext.getClassBridgeInstances(
+				reflectionManager.toClass(
+						clazz
+				)
+		);
 
 		for ( Entry<FieldBridge, ClassBridge> classBridge : classBridgeInstances.entrySet() ) {
 			FieldBridge instance = classBridge.getKey();
@@ -844,17 +858,26 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 
 		org.hibernate.search.annotations.Field fieldAnnotation =
 				member.getAnnotation( org.hibernate.search.annotations.Field.class );
-		NumericField numericFieldAnnotation = member.getAnnotation( NumericField.class );
 		DocumentId idAnn = member.getAnnotation( DocumentId.class );
+
+		NumericField numericFieldAnnotation = member.getAnnotation( NumericField.class );
+		if ( ( fieldAnnotation == null && idAnn == null ) && numericFieldAnnotation != null ) {
+			String className = member.getDeclaringClass().getName();
+			String memberName = member.getName();
+			throw log.numericFieldAnnotationWithoutMatchingField( className, memberName);
+		}
+
 		if ( fieldAnnotation != null ) {
 			if ( isFieldInPath( fieldAnnotation, member, pathsContext, prefix ) || !parseContext.isMaxLevelReached() ) {
 				PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
 						.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
 
+				Set<Facet> facetAnnotations = findMatchingFacetAnnotations( member, fieldAnnotation.name() );
 				bindFieldAnnotation(
 						prefix,
 						fieldAnnotation,
 						numericFieldAnnotation,
+						facetAnnotations,
 						typeMetadataBuilder,
 						propertyMetadataBuilder,
 						configContext,
@@ -864,15 +887,37 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				typeMetadataBuilder.addProperty( propertyMetadataBuilder.build() );
 			}
 		}
-		if ( ( fieldAnnotation == null && idAnn == null ) && numericFieldAnnotation != null ) {
-			throw new SearchException( "@NumericField without a @Field on property '" + member.getName() + "'" );
+	}
+
+	private Set<Facet> findMatchingFacetAnnotations(XMember member, String fieldName) {
+		Facet facetAnnotation = member.getAnnotation( Facet.class );
+		Facets facetsAnnotation = member.getAnnotation( Facets.class );
+
+		if ( facetAnnotation == null && facetsAnnotation == null ) {
+			return Collections.emptySet();
 		}
+
+		Set<Facet> matchingFacetAnnotations = new HashSet<>( 1 );
+
+		if ( facetAnnotation != null && facetAnnotation.forField().equals( fieldName ) ) {
+			matchingFacetAnnotations.add( facetAnnotation );
+		}
+
+		if ( facetsAnnotation != null ) {
+			for ( Facet annotation : facetsAnnotation.value() ) {
+				if ( annotation != null && annotation.forField().equals( fieldName ) ) {
+					matchingFacetAnnotations.add( annotation );
+				}
+			}
+		}
+		return matchingFacetAnnotations;
 	}
 
 	private void bindFieldAnnotation(
 			String prefix,
 			org.hibernate.search.annotations.Field fieldAnnotation,
 			NumericField numericFieldAnnotation,
+			Set<Facet> facetAnnotations,
 			TypeMetadata.Builder typeMetadataBuilder,
 			PropertyMetadata.Builder propertyMetadataBuilder,
 			ConfigContext configContext,
@@ -946,11 +991,57 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					.indexNullAs( nullToken );
 		}
 
+		for ( Facet facetAnnotation : facetAnnotations ) {
+			if ( Analyze.YES.equals( fieldAnnotation.analyze() ) ) {
+				throw log.attemptToFacetOnAnalyzedField( fieldName, member.getDeclaringClass().getName() );
+			}
+			String facetName;
+			if ( facetAnnotation.name().isEmpty() ) {
+				facetName = fieldName; // if not explicitly set the facet name is the same as the field name
+			}
+			else {
+				facetName = prefix + facetAnnotation.name();
+			}
+			FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder( facetName );
+			FacetEncodingType facetEncodingType = determineFacetEncodingType( member, facetAnnotation );
+			facetMetadataBuilder.setFacetEncoding( facetEncodingType );
+			fieldMetadataBuilder.addFacetMetadata( facetMetadataBuilder.build() );
+		}
+
 		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();
 		propertyMetadataBuilder.addDocumentField( fieldMetadata );
 
 		// keep track of collection role names for ORM integration optimization based on collection update events
 		parseContext.collectUnqualifiedCollectionRole( member.getName() );
+	}
+
+	private FacetEncodingType determineFacetEncodingType(XProperty member, Facet facetAnnotation) {
+		FacetEncodingType facetEncodingType = facetAnnotation.encoding();
+		if ( !facetEncodingType.equals( FacetEncodingType.AUTO ) ) {
+			return facetEncodingType; // encoding type explicitly set
+		}
+
+		Class<?> indexedType = reflectionManager.toClass( member.getElementClass() );
+		if ( ReflectionHelper.isIntegerType( indexedType ) ) {
+			facetEncodingType = FacetEncodingType.LONG;
+		}
+		else if ( Date.class.isAssignableFrom( indexedType ) || Calendar.class.isAssignableFrom( indexedType ) ) {
+			facetEncodingType = FacetEncodingType.LONG;
+		}
+		else if ( ReflectionHelper.isFloatingPointType( indexedType ) ) {
+			facetEncodingType = FacetEncodingType.DOUBLE;
+		}
+		else if ( String.class.isAssignableFrom( indexedType ) ) {
+			facetEncodingType = FacetEncodingType.STRING;
+		}
+		else {
+			throw log.unsupportedFieldTypeForFaceting(
+					indexedType.getName(),
+					member.getDeclaringClass().getName(),
+					member.getName()
+			);
+		}
+		return facetEncodingType;
 	}
 
 	private boolean isNumericField(NumericField numericFieldAnnotation, FieldBridge fieldBridge) {
@@ -1165,11 +1256,12 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 				) || !parseContext.isMaxLevelReached() ) {
 					PropertyMetadata.Builder propertyMetadataBuilder = new PropertyMetadata.Builder( member )
 							.dynamicBoostStrategy( AnnotationProcessingHelper.getDynamicBoost( member ) );
-
+					Set<Facet> facetAnnotations = findMatchingFacetAnnotations( member, fieldAnnotation.name() );
 					bindFieldAnnotation(
 							prefix,
 							fieldAnnotation,
 							getNumericExtension( fieldAnnotation, numericFieldsAnnotations ),
+							facetAnnotations,
 							typeMetadataBuilder,
 							propertyMetadataBuilder,
 							configContext,

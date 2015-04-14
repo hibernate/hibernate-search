@@ -91,4 +91,8 @@ public class NumericEncodingDateBridge implements TwoWayFieldBridge, Parameteriz
 		Resolution hibResolution = Resolution.valueOf( resolution.toUpperCase( Locale.ENGLISH ) );
 		this.resolution = DateResolutionUtil.getLuceneResolution( hibResolution );
 	}
+
+	public DateTools.Resolution getResolution() {
+		return resolution;
+	}
 }

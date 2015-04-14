@@ -25,6 +25,7 @@ import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.query.facet.RangeFacet;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
+
 import org.junit.Test;
 
 import static org.hibernate.search.util.impl.CollectionHelper.newArrayList;
@@ -68,7 +69,6 @@ public class WebShopTest extends AbstractFacetTest {
 
 		// let the user select a facet menu
 		FacetMenuItem selectedItem = facetMenuItems.get( SearchService.colorFacetName ).get( 0 );
-		assertEquals( "Wrong facet value", "red", selectedItem.getValue() );
 		assertEquals( "Wrong facet count", 3, selectedItem.getCount() );
 
 		cars = searchService.selectMenuItem( selectedItem );
@@ -78,7 +78,7 @@ public class WebShopTest extends AbstractFacetTest {
 		facetMenuItems = searchService.getMenuItems();
 
 		colorMenuItems = facetMenuItems.get( SearchService.colorFacetName );
-		assertEquals( "Wrong number of menu entries", 4, colorMenuItems.size() );
+		assertEquals( "Wrong number of menu entries", 1, colorMenuItems.size() );
 		FacetMenuItem menuItem = colorMenuItems.get( 0 );
 		assertEquals( "Wrong facet count", 3, menuItem.getCount() );
 		assertTrue( menuItem.isSelected() );
@@ -222,7 +222,7 @@ public class WebShopTest extends AbstractFacetTest {
 			// use the facet to narrow down the query
 			currentFullTextQuery.getFacetManager()
 					.getFacetGroup( item.getFacetingName() )
-					.selectFacets( selectedFacets.toArray( new Facet[] { } ) );
+					.selectFacets( selectedFacets.toArray( new Facet[selectedFacets.size()] ) );
 			List<Car> cars = currentFullTextQuery.list();
 			tx.commit();
 			fullTextSession.close();

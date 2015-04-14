@@ -13,9 +13,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.bridge.spi.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.facet.RangeFacet;
 
 /**
@@ -32,37 +29,22 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 	 */
 	private final int rangeIndex;
 
-	/**
-	 * The document builder.
-	 */
-	private final DocumentBuilderIndexedEntity documentBuilder;
-
-	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index, DocumentBuilderIndexedEntity documentBuilder) {
+	RangeFacetImpl(String facetingName, String fieldName, FacetRange<T> range, int count, int index) {
 		super( facetingName, fieldName, range.getRangeString(), count );
 		this.range = range;
 		this.rangeIndex = index;
-		this.documentBuilder = documentBuilder;
 	}
 
 	@Override
 	public Query getFacetQuery() {
 		Object minOrMax = getNonNullMinOrMax( range );
-		if ( minOrMax instanceof Number ) {
+		if ( minOrMax instanceof Number || minOrMax instanceof Date ) {
 			return createNumericRangeQuery();
 		}
 		else if ( minOrMax instanceof String ) {
 			return createRangeQuery(
 					(String) range.getMin(),
 					(String) range.getMax(),
-					range.isMinIncluded(),
-					range.isMaxIncluded()
-			);
-		}
-		else if ( minOrMax instanceof Date ) {
-			final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
-			return createRangeQuery(
-					documentBuilder.objectToString( getFieldName(), range.getMin(), conversionContext ),
-					documentBuilder.objectToString( getFieldName(), range.getMax(), conversionContext ),
 					range.isMinIncluded(),
 					range.isMaxIncluded()
 			);
@@ -135,12 +117,21 @@ public class RangeFacetImpl<T> extends AbstractFacet implements RangeFacet<T> {
 					range.isMaxIncluded()
 			);
 		}
-
 		else if ( minOrMax instanceof Long ) {
 			query = NumericRangeQuery.newLongRange(
 					getFieldName(),
 					(Long) range.getMin(),
 					(Long) range.getMax(),
+					range.isMinIncluded(),
+					range.isMaxIncluded()
+			);
+		}
+		else if ( minOrMax instanceof Date ) {
+			query = NumericRangeQuery.newLongRange(
+					getFieldName(),
+					range.getMin() == null ? null : ( (Date) range.getMin() ).getTime(),
+					range.getMax() == null ? null : ( (Date) range.getMax() ).getTime(),
+
 					range.isMinIncluded(),
 					range.isMaxIncluded()
 			);

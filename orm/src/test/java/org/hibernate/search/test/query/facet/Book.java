@@ -8,7 +8,6 @@ package org.hibernate.search.test.query.facet;
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -34,9 +33,9 @@ public class Book {
 	@Field
 	private String name;
 
-	@ManyToMany(cascade = CascadeType.REMOVE)
+	@ManyToMany
 	@IndexedEmbedded
-	private Set<Author> authors = new HashSet<Author>();
+	private Set<Author> authors = new HashSet<>();
 
 	public String getName() {
 		return name;

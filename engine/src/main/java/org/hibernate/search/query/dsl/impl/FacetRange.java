@@ -6,13 +6,6 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.Date;
-
-import org.hibernate.search.exception.AssertionFailure;
-import org.hibernate.search.bridge.spi.ConversionContext;
-import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
-
 /**
  * @author Hardy Ferentschik
  */
@@ -30,24 +23,14 @@ public class FacetRange<T> {
 	private final String fieldName;
 	private final Class<?> rangeType;
 
-	private String stringMin;
-	private String stringMax;
-
 	public FacetRange(Class<?> rangeType,
-					T min,
-					T max,
-					boolean includeMin,
-					boolean includeMax,
-					String fieldName,
-					DocumentBuilderIndexedEntity documentBuilder) {
+			T min,
+			T max,
+			boolean includeMin,
+			boolean includeMax,
+			String fieldName) {
 		if ( max == null && min == null ) {
 			throw new IllegalArgumentException( "At least one end of the range has to be specified" );
-		}
-
-		if ( documentBuilder == null ) {
-			throw new AssertionFailure(
-					"null is not a valid document builder"
-			);
 		}
 
 		this.min = min;
@@ -57,12 +40,6 @@ public class FacetRange<T> {
 		this.fieldName = fieldName;
 		this.rangeString = buildRangeString();
 		this.rangeType = rangeType;
-
-		if ( Date.class.equals( rangeType ) ) {
-			final ConversionContext conversionContext = new ContextualExceptionBridgeHelper();
-			stringMin = documentBuilder.objectToString( fieldName, min, conversionContext );
-			stringMax = documentBuilder.objectToString( fieldName, max, conversionContext );
-		}
 	}
 
 	public T getMin() {
@@ -79,25 +56,6 @@ public class FacetRange<T> {
 
 	public boolean isMaxIncluded() {
 		return includeMax;
-	}
-
-	public boolean isInRange(T value) {
-		if ( Number.class.isAssignableFrom( rangeType ) ) {
-			return isInRangeNumber( (Number) value, (Number) min, (Number) max );
-		}
-		else if ( String.class.equals( rangeType ) ) {
-			return isInRangeString( (String) value, (String) min, (String) max );
-		}
-		else if ( Date.class.equals( rangeType ) ) {
-			return isInRangeString(
-					(String) value,
-					stringMin,
-					stringMax
-			);
-		}
-		else {
-			throw new AssertionFailure( "Unexpected value type: " + value.getClass().getName() );
-		}
 	}
 
 	public String getRangeString() {
@@ -128,117 +86,15 @@ public class FacetRange<T> {
 		return builder.toString();
 	}
 
-	private boolean isInRangeString(String value, String min, String max) {
-		// below range
-		if ( min == null ) {
-			if ( isMaxIncluded() ) {
-				return value.compareTo( max ) <= 0;
-			}
-			else {
-				return value.compareTo( max ) < 0;
-			}
-		}
-
-		// above range
-		if ( max == null ) {
-			if ( isMinIncluded() ) {
-				return value.compareTo( min ) >= 0;
-			}
-			else {
-				return value.compareTo( min ) > 0;
-			}
-		}
-
-		// from .. to range
-		int minCheck = min.compareTo( value );
-		if ( isMinIncluded() && minCheck > 0 ) {
-			return false;
-		}
-		else if ( !isMinIncluded() && minCheck >= 0 ) {
-			return false;
-		}
-
-		int maxCheck = value.compareTo( max );
-		if ( isMaxIncluded() && maxCheck > 0 ) {
-			return false;
-		}
-		else if ( !isMaxIncluded() && maxCheck >= 0 ) {
-			return false;
-		}
-		return true;
-	}
-
-	private boolean isInRangeNumber(Number value, Number min, Number max) {
-		// below range
-		if ( min == null ) {
-			if ( isMaxIncluded() ) {
-				return compare( value, max ) <= 0;
-			}
-			else {
-				return compare( value, max ) < 0;
-			}
-		}
-
-		// above range
-		if ( max == null ) {
-			if ( isMinIncluded() ) {
-				return compare( value, min ) >= 0;
-			}
-			else {
-				return compare( value, min ) > 0;
-			}
-		}
-
-		// from .. to range
-		int minCheck = compare( min, value );
-		if ( isMinIncluded() && minCheck > 0 ) {
-			return false;
-		}
-		else if ( !isMinIncluded() && minCheck >= 0 ) {
-			return false;
-		}
-
-		int maxCheck = compare( value, max );
-		if ( isMaxIncluded() && maxCheck > 0 ) {
-			return false;
-		}
-		else if ( !isMaxIncluded() && maxCheck >= 0 ) {
-			return false;
-		}
-		return true;
-	}
-
-	// todo - does this implementation of Number comparison hold?
-	private int compare(Number number1, Number number2) {
-		if ( !number2.getClass().equals( number1.getClass() ) ) {
-			throw new IllegalStateException();
-		}
-
-		if ( number1 instanceof Comparable ) {
-			return ( (Comparable) number1 ).compareTo( number2 );
-		}
-
-		if ( number1.doubleValue() < number2.doubleValue() ) {
-			return -1;
-		}
-		if ( number1.doubleValue() > number2.doubleValue() ) {
-			return 1;
-		}
-		return 0;
-	}
-
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "FacetRange" );
-		sb.append( "{min=" ).append( min );
-		sb.append( ", max=" ).append( max );
-		sb.append( ", includeMin=" ).append( includeMin );
-		sb.append( ", includeMax=" ).append( includeMax );
-		sb.append( ", fieldName='" ).append( fieldName ).append( '\'' );
-		sb.append( ", rangeType=" ).append( rangeType );
-		sb.append( '}' );
-		return sb.toString();
+		return "FacetRange"
+				+ "{min=" + min
+				+ ", max=" + max
+				+ ", includeMin=" + includeMin
+				+ ", includeMax=" + includeMax
+				+ ", fieldName='" + fieldName + '\''
+				+ ", rangeType=" + rangeType + '}';
 	}
 }
 
