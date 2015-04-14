@@ -10,18 +10,26 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
+import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
+ * A {@link IndexWorkVisitor} which applies updates to the underlying Lucene index.
+ * <p>
+ * Implementation note: This {@link IndexWorkVisitor} implementation intentionally does not perform the actual logic
+ * within the individual visit methods themselves but rather returns a delegate class for that purpose. This is to avoid
+ * the need for the allocation of a parameter object with the required input data, instead a method with the required
+ * parameters is exposed on said delegate.
+ *
  * @author Sanne Grinovero
+ * @author Gunnar Morling
  */
-public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
+public class IndexUpdateVisitor implements IndexWorkVisitor<Void, LuceneWorkDelegate> {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -33,7 +41,7 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	private final FlushWorkDelegate flushDelegate;
 	private final DeleteByQueryWorkDelegate deleteByQueryDelegate;
 
-	public LuceneWorkVisitor(Workspace workspace) {
+	public IndexUpdateVisitor(Workspace workspace) {
 		this.addDelegate = new AddWorkDelegate( workspace );
 		if ( workspace.areSingleTermDeletesSafe() ) {
 			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
@@ -59,38 +67,37 @@ public class LuceneWorkVisitor implements WorkVisitor<LuceneWorkDelegate> {
 	}
 
 	@Override
-	public LuceneWorkDelegate getDelegate(AddLuceneWork addLuceneWork) {
+	public LuceneWorkDelegate visitAddWork(AddLuceneWork addLuceneWork, Void p) {
 		return addDelegate;
 	}
 
 	@Override
-	public LuceneWorkDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
+	public LuceneWorkDelegate visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
 		return deleteDelegate;
 	}
 
 	@Override
-	public LuceneWorkDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
+	public LuceneWorkDelegate visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
 		return optimizeDelegate;
 	}
 
 	@Override
-	public LuceneWorkDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
+	public LuceneWorkDelegate visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
 		return purgeAllDelegate;
 	}
 
 	@Override
-	public LuceneWorkDelegate getDelegate(UpdateLuceneWork updateLuceneWork) {
+	public LuceneWorkDelegate visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
 		return updateDelegate;
 	}
 
 	@Override
-	public LuceneWorkDelegate getDelegate(FlushLuceneWork flushLuceneWork) {
+	public LuceneWorkDelegate visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
 		return flushDelegate;
 	}
 
 	@Override
-	public LuceneWorkDelegate getDelegate(DeleteByQueryLuceneWork deleteByQueryLuceneWork) {
-		return this.deleteByQueryDelegate;
+	public LuceneWorkDelegate visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
+		return deleteByQueryDelegate;
 	}
-
 }

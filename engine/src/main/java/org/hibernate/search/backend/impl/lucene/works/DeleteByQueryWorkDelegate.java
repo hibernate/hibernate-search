@@ -31,7 +31,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * Stateless implementation that performs a <code>DeleteByQueryWork</code>.
  *
  * @author Martin Braun
- * @see LuceneWorkVisitor
+ * @see IndexUpdateVisitor
  * @see LuceneWorkDelegate
  */
 class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {

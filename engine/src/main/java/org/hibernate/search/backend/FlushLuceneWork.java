@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend;
 
-import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
  * Used to flush and commit asynchronous and other pending operations on the Indexes.
@@ -36,8 +35,8 @@ public class FlushLuceneWork extends LuceneWork {
 	}
 
 	@Override
-	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
+		return visitor.visitFlushWork( this, p );
 	}
 
 	@Override

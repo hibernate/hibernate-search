@@ -48,7 +48,8 @@ final class LuceneBackendTaskStreamer {
 			}
 			boolean errors = true;
 			try {
-				work.getWorkDelegate( resources.getVisitor() ).performWork( work, indexWriter, monitor );
+				work.acceptIndexWorkVisitor( resources.getWorkVisitor(), null )
+						.performWork( work, indexWriter, monitor );
 				errors = false;
 			}
 			finally {

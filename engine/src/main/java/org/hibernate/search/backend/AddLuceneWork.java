@@ -11,8 +11,6 @@ import java.util.Map;
 
 import org.apache.lucene.document.Document;
 
-import org.hibernate.search.backend.impl.WorkVisitor;
-
 /**
  * @author Emmanuel Bernard
  */
@@ -45,8 +43,8 @@ public class AddLuceneWork extends LuceneWork {
 	}
 
 	@Override
-	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
+		return visitor.visitAddWork( this, p );
 	}
 
 	@Override

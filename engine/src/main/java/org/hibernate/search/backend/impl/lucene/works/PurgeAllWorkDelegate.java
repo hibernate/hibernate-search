@@ -22,7 +22,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
 * Stateless implementation that performs a PurgeAllLuceneWork.
-* @see LuceneWorkVisitor
+* @see IndexUpdateVisitor
 * @see LuceneWorkDelegate
 * @author Emmanuel Bernard
 * @author Hardy Ferentschik
