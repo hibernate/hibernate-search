@@ -31,56 +31,56 @@ import org.hibernate.search.store.IndexShardingStrategy;
  *
  * @author Sanne Grinovero, Martin Braun
  */
-public class StreamingSelectionVisitor implements IndexWorkVisitor<Void, StreamingOperationSelectionDelegate> {
+public class StreamingOperationExecutorSelector implements IndexWorkVisitor<Void, StreamingOperationExecutor> {
 
-	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
-	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
-	private final AllSelectionDelegate allManagersDelegate = new AllSelectionDelegate();
-	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
-	private final DeleteByQuerySelectionDelegate deleteByQueryDelegate = new DeleteByQuerySelectionDelegate();
+	private final AddSelectionExecutor addExecutor = new AddSelectionExecutor();
+	private final DeleteSelectionExecutor deleteExecutor = new DeleteSelectionExecutor();
+	private final AllSelectionExecutor allManagersExecutor = new AllSelectionExecutor();
+	private final PurgeAllSelectionExecutor purgeExecutor = new PurgeAllSelectionExecutor();
+	private final DeleteByQuerySelectionExecutor deleteByQueryExecutor = new DeleteByQuerySelectionExecutor();
 
-	public static final StreamingSelectionVisitor INSTANCE = new StreamingSelectionVisitor();
+	public static final StreamingOperationExecutorSelector INSTANCE = new StreamingOperationExecutorSelector();
 
-	private StreamingSelectionVisitor() {
+	private StreamingOperationExecutorSelector() {
 		// use INSTANCE as this delegator is stateless
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate visitAddWork(AddLuceneWork addLuceneWork, Void p) {
-		return addDelegate;
+	public StreamingOperationExecutor visitAddWork(AddLuceneWork addLuceneWork, Void p) {
+		return addExecutor;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
-		return addDelegate;
+	public StreamingOperationExecutor visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
+		return addExecutor;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
-		return deleteDelegate;
+	public StreamingOperationExecutor visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
+		return deleteExecutor;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
-		return allManagersDelegate;
+	public StreamingOperationExecutor visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
+		return allManagersExecutor;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
-		return purgeDelegate;
+	public StreamingOperationExecutor visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
+		return purgeExecutor;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
-		return allManagersDelegate;
+	public StreamingOperationExecutor visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
+		return allManagersExecutor;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
-		return deleteByQueryDelegate;
+	public StreamingOperationExecutor visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
+		return deleteByQueryExecutor;
 	}
 
-	private static class DeleteByQuerySelectionDelegate implements StreamingOperationSelectionDelegate {
+	private static class DeleteByQuerySelectionExecutor implements StreamingOperationExecutor {
 
 		@Override
 		public void performStreamOperation(LuceneWork work, IndexShardingStrategy shardingStrategy, IndexingMonitor monitor, boolean forceAsync) {
@@ -92,7 +92,7 @@ public class StreamingSelectionVisitor implements IndexWorkVisitor<Void, Streami
 
 	}
 
-	private static class AddSelectionDelegate implements StreamingOperationSelectionDelegate {
+	private static class AddSelectionExecutor implements StreamingOperationExecutor {
 
 		@Override
 		public final void performStreamOperation(LuceneWork work,
@@ -108,7 +108,7 @@ public class StreamingSelectionVisitor implements IndexWorkVisitor<Void, Streami
 
 	}
 
-	private static class DeleteSelectionDelegate implements StreamingOperationSelectionDelegate {
+	private static class DeleteSelectionExecutor implements StreamingOperationExecutor {
 
 		@Override
 		public final void performStreamOperation(LuceneWork work,
@@ -125,7 +125,7 @@ public class StreamingSelectionVisitor implements IndexWorkVisitor<Void, Streami
 
 	}
 
-	private static class AllSelectionDelegate implements StreamingOperationSelectionDelegate {
+	private static class AllSelectionExecutor implements StreamingOperationExecutor {
 
 		@Override
 		public final void performStreamOperation(LuceneWork work,
@@ -138,7 +138,7 @@ public class StreamingSelectionVisitor implements IndexWorkVisitor<Void, Streami
 
 	}
 
-	private static class PurgeAllSelectionDelegate implements StreamingOperationSelectionDelegate {
+	private static class PurgeAllSelectionExecutor implements StreamingOperationExecutor {
 
 		@Override
 		public final void performStreamOperation(LuceneWork work,

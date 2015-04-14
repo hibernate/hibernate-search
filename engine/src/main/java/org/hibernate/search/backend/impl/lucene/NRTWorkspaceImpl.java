@@ -76,9 +76,9 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	private final CommitPolicy commitPolicy = new NRTCommitPolicy( writerHolder );
 
 	/**
-	 * Visits {@code LuceneWork} types to determine the kind of flushing we need to apply on the indexes
+	 * Visits {@code LuceneWork} types and applies the required kind of index flushing
 	 */
-	private final FlushStrategySelector flushStrategySelector = new FlushStrategySelector();
+	private final FlushStrategyExecutor flushStrategySelector = new FlushStrategyExecutor();
 
 	/**
 	 * Set to true when this service is shutdown (not revertible)
@@ -291,52 +291,52 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	 * Visits each kind of {@code LuceneWork} we're processing and applies the correct flushing strategy to create
 	 * consistent index readers.
 	 */
-	private static class FlushStrategySelector implements IndexWorkVisitor<NRTWorkspaceImpl, Void> {
+	private static class FlushStrategyExecutor implements IndexWorkVisitor<NRTWorkspaceImpl, Void> {
 
 		@Override
 		public Void visitAddWork(AddLuceneWork addLuceneWork, NRTWorkspaceImpl p) {
-			FlushStrategyNeed.FLUSH_WRITES.apply( p );
+			FlushStrategy.FLUSH_WRITES.apply( p );
 			return null;
 		}
 
 		@Override
 		public Void visitDeleteWork(DeleteLuceneWork deleteLuceneWork, NRTWorkspaceImpl p) {
-			FlushStrategyNeed.FLUSH_DELETIONS.apply( p );
+			FlushStrategy.FLUSH_DELETIONS.apply( p );
 			return null;
 		}
 
 		@Override
 		public Void visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, NRTWorkspaceImpl p) {
-			FlushStrategyNeed.NONE.apply( p );
+			FlushStrategy.NONE.apply( p );
 			return null;
 		}
 
 		@Override
 		public Void visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, NRTWorkspaceImpl p) {
-			FlushStrategyNeed.FLUSH_DELETIONS.apply( p );
+			FlushStrategy.FLUSH_DELETIONS.apply( p );
 			return null;
 		}
 
 		@Override
 		public Void visitUpdateWork(UpdateLuceneWork updateLuceneWork, NRTWorkspaceImpl p) {
-			FlushStrategyNeed.FLUSH_WRITES_AND_DELETES.apply( p );
+			FlushStrategy.FLUSH_WRITES_AND_DELETES.apply( p );
 			return null;
 		}
 
 		@Override
 		public Void visitFlushWork(FlushLuceneWork flushLuceneWork, NRTWorkspaceImpl p) {
-			FlushStrategyNeed.FLUSH_WRITES_AND_DELETES.apply( p );
+			FlushStrategy.FLUSH_WRITES_AND_DELETES.apply( p );
 			return null;
 		}
 
 		@Override
 		public Void visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, NRTWorkspaceImpl p) {
-			FlushStrategyNeed.FLUSH_DELETIONS.apply( p );
+			FlushStrategy.FLUSH_DELETIONS.apply( p );
 			return null;
 		}
 	}
 
-	private enum FlushStrategyNeed {
+	private enum FlushStrategy {
 		NONE {
 			@Override
 			void apply(final NRTWorkspaceImpl workspace) {

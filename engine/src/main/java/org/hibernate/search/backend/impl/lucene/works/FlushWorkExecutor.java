@@ -19,16 +19,16 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  * @see IndexUpdateVisitor
- * @see LuceneWorkDelegate
+ * @see LuceneWorkExecutor
  * @since 4.1
  */
-class FlushWorkDelegate implements LuceneWorkDelegate {
+class FlushWorkExecutor implements LuceneWorkExecutor {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final Workspace workspace;
 
-	FlushWorkDelegate(Workspace workspace) {
+	FlushWorkExecutor(Workspace workspace) {
 		this.workspace = workspace;
 	}
 

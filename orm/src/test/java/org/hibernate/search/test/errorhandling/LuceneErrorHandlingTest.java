@@ -15,8 +15,8 @@ import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
-import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
+import org.hibernate.search.backend.impl.StreamingOperationExecutorSelector;
+import org.hibernate.search.backend.impl.lucene.works.LuceneWorkExecutor;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
@@ -115,7 +115,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 
 		@Override
 		public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
-			if ( visitor instanceof StreamingSelectionVisitor ) {
+			if ( visitor instanceof StreamingOperationExecutorSelector ) {
 				//during shard-selection visitor this work is applied to
 				//all DirectoryProviders as this extends DeleteLuceneWork
 				return visitor.visitDeleteWork( this, p );
@@ -132,7 +132,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 
 	}
 
-	static class NoOpLuceneWorkDelegate implements LuceneWorkDelegate {
+	static class NoOpLuceneWorkDelegate implements LuceneWorkExecutor {
 
 		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
 		}
@@ -156,7 +156,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 
 		@Override
 		public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
-			if ( visitor instanceof StreamingSelectionVisitor ) {
+			if ( visitor instanceof StreamingOperationExecutorSelector ) {
 				//during shard-selection visitor this work is applied to
 				//all DirectoryProviders as this extends DeleteLuceneWork
 				return visitor.visitDeleteWork( this, p );
@@ -173,7 +173,7 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 
 	}
 
-	static class FailingLuceneWorkDelegate implements LuceneWorkDelegate {
+	static class FailingLuceneWorkDelegate implements LuceneWorkExecutor {
 
 		public void logWorkDone(LuceneWork work, MassIndexerProgressMonitor monitor) {
 		}

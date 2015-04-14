@@ -75,8 +75,8 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			final Class<?> entityType = work.getEntityClass();
 			EntityIndexBinding entityIndexBinding = entityIndexBindings.get( entityType );
 			IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-			work.acceptIndexWorkVisitor( TransactionalSelectionVisitor.INSTANCE, null )
-					.performOperation( work, shardingStrategy, context );
+			TransactionalOperationExecutor executor = work.acceptIndexWorkVisitor( TransactionalOperationExecutorSelector.INSTANCE, null );
+			executor.performOperation( work, shardingStrategy, context );
 		}
 		context.commitOperations( null );
 	}

@@ -22,15 +22,15 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author John Griffin
  * @author Sanne Grinovero
  * @see IndexUpdateVisitor
- * @see LuceneWorkDelegate
+ * @see LuceneWorkExecutor
  */
-class OptimizeWorkDelegate implements LuceneWorkDelegate {
+class OptimizeWorkExecutor implements LuceneWorkExecutor {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final Workspace workspace;
 
-	OptimizeWorkDelegate(Workspace workspace) {
+	OptimizeWorkExecutor(Workspace workspace) {
 		this.workspace = workspace;
 	}
 

@@ -30,13 +30,13 @@ import org.hibernate.search.util.logging.impl.Log;
  * uniqueness of terms across different entity types.
  *
  * @author gustavonalle
- * @see DeleteWorkDelegate
+ * @see DeleteWorkExecutor
  */
-public final class ByTermDeleteWorkDelegate extends DeleteWorkDelegate {
+public final class ByTermDeleteWorkExecutor extends DeleteWorkExecutor {
 
 	private static final Log log = LoggerFactory.make();
 
-	ByTermDeleteWorkDelegate(Workspace workspace) {
+	ByTermDeleteWorkExecutor(Workspace workspace) {
 		super( workspace );
 	}
 

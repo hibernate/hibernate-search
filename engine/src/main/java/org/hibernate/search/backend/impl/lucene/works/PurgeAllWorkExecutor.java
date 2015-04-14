@@ -23,18 +23,18 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 /**
 * Stateless implementation that performs a PurgeAllLuceneWork.
 * @see IndexUpdateVisitor
-* @see LuceneWorkDelegate
+* @see LuceneWorkExecutor
 * @author Emmanuel Bernard
 * @author Hardy Ferentschik
 * @author John Griffin
 * @author Sanne Grinovero
 */
-class PurgeAllWorkDelegate implements LuceneWorkDelegate {
+class PurgeAllWorkExecutor implements LuceneWorkExecutor {
 
 	private static final Log log = LoggerFactory.make();
 	protected final Workspace workspace;
 
-	PurgeAllWorkDelegate(Workspace workspace) {
+	PurgeAllWorkExecutor(Workspace workspace) {
 		this.workspace = workspace;
 	}
 

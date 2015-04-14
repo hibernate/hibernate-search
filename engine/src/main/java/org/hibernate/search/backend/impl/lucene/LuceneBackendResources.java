@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.impl.lucene.works.IndexUpdateVisitor;
-import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
+import org.hibernate.search.backend.impl.lucene.works.LuceneWorkExecutor;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.indexes.impl.PropertiesParseHelper;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
@@ -35,7 +35,7 @@ public final class LuceneBackendResources {
 
 	private static final Log log = LoggerFactory.make();
 
-	private volatile IndexWorkVisitor<Void, LuceneWorkDelegate> workVisitor;
+	private volatile IndexWorkVisitor<Void, LuceneWorkExecutor> workVisitor;
 	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
 	private final int maxQueueLength;
@@ -95,7 +95,7 @@ public final class LuceneBackendResources {
 		return indexName;
 	}
 
-	public IndexWorkVisitor<Void, LuceneWorkDelegate> getWorkVisitor() {
+	public IndexWorkVisitor<Void, LuceneWorkExecutor> getWorkVisitor() {
 		if ( workVisitor == null ) {
 			workVisitor = new IndexUpdateVisitor( workspace );
 		}

@@ -15,7 +15,7 @@ import org.hibernate.search.backend.LuceneWork;
  *
  * @author Sanne Grinovero
  */
-public interface LuceneWorkDelegate {
+public interface LuceneWorkExecutor {
 
 	/**
 	 * Will perform work on an IndexWriter.

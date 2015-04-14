@@ -12,10 +12,7 @@ import java.util.Map;
 
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.BooleanClause.Occur;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
@@ -28,46 +25,40 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This applies the index update operation using the Lucene operation
- * {@link org.apache.lucene.index.IndexWriter#updateDocument}.
- * This is the most efficient way to update the index, but underlying store
- * must guarantee that the term is unique across documents and entity types.
+ * {@link org.apache.lucene.index.IndexWriter#updateDocument(Term, org.apache.lucene.document.Document, org.apache.lucene.analysis.Analyzer)}
  *
- * @author gustavonalle
+ * This is the most efficient way to update the index, but we can apply it only if the Document is uniquely identified
+ * by a single term (so no index sharing across entities or Numeric ids).
+ *
+ * @author Sanne Grinovero <sanne@hibernate.org> (C) 2012 Red Hat Inc.
  */
-public final class ByTermUpdateWorkDelegate extends UpdateWorkDelegate {
+public final class UpdateExtWorkExecutor extends UpdateWorkExecutor {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final AddWorkDelegate addDelegate;
+	private final AddWorkExecutor addDelegate;
+	private final Class<?> managedType;
+	private final DocumentBuilderIndexedEntity builder;
+	private final boolean idIsNumeric;
 	private final Workspace workspace;
 
-	ByTermUpdateWorkDelegate(Workspace workspace, AddWorkDelegate addDelegate) {
+	UpdateExtWorkExecutor(Workspace workspace, AddWorkExecutor addDelegate) {
 		super( null, null );
 		this.workspace = workspace;
 		this.addDelegate = addDelegate;
+		this.managedType = workspace.getEntitiesInIndexManager().iterator().next();
+		this.builder = workspace.getDocumentBuilder( managedType );
+		this.idIsNumeric = DeleteWorkExecutor.isIdNumeric( builder );
 	}
 
 	@Override
 	public void performWork(LuceneWork work, IndexWriter writer, IndexingMonitor monitor) {
+		checkType( work );
 		final Serializable id = work.getId();
-		final String tenantId = work.getTenantId();
-		final Class<?> managedType = work.getEntityClass();
-		DocumentBuilderIndexedEntity builder = workspace.getDocumentBuilder( managedType );
 		try {
-			if ( DeleteWorkDelegate.isIdNumeric( builder ) ) {
-				log.tracef(
-						"Deleting %s#%s by query using an IndexWriter#updateDocument as id is Numeric",
-						managedType,
-						id
-				);
-				Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
-				BooleanQuery deleteDocumentsQuery = new BooleanQuery();
-				deleteDocumentsQuery.add( exactMatchQuery, Occur.MUST );
-				if ( tenantId != null ) {
-					TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
-					deleteDocumentsQuery.add( tenantTermQuery, Occur.MUST );
-				}
-				writer.deleteDocuments( deleteDocumentsQuery );
+			if ( idIsNumeric ) {
+				log.tracef( "Deleting %s#%s by query using an IndexWriter#updateDocument as id is Numeric", managedType, id );
+				writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
 				// no need to log the Add operation as we'll log in the delegate
 				this.addDelegate.performWork( work, writer, monitor );
 			}
@@ -76,7 +67,7 @@ public final class ByTermUpdateWorkDelegate extends UpdateWorkDelegate {
 				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
 				Map<String, String> fieldToAnalyzerMap = work.getFieldToAnalyzerMap();
 				ScopedAnalyzer analyzer = builder.getAnalyzer();
-				analyzer = AddWorkDelegate.updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
+				analyzer = AddWorkExecutor.updateAnalyzerMappings( workspace, analyzer, fieldToAnalyzerMap );
 				writer.updateDocument( idTerm, work.getDocument(), analyzer );
 			}
 			workspace.notifyWorkApplied( work );
@@ -87,6 +78,12 @@ public final class ByTermUpdateWorkDelegate extends UpdateWorkDelegate {
 		}
 		if ( monitor != null ) {
 			monitor.documentsAdded( 1l );
+		}
+	}
+
+	private void checkType(final LuceneWork work) {
+		if ( work.getEntityClass() != managedType ) {
+			throw new AssertionFailure( "Unexpected type: " + work.getEntityClass() + " This workspace expects: " + managedType );
 		}
 	}
 

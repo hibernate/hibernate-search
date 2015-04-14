@@ -15,7 +15,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  *
  * @author Sanne Grinovero
  */
-public interface ContextAwareSelectionDelegate {
+public interface TransactionalOperationExecutor {
 
 	/**
 	 * The LuceneWork must be applied to different indexes.
