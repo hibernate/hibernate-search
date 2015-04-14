@@ -21,7 +21,7 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  * @author John Griffin
  * @author Sanne Grinovero
- * @see LuceneWorkVisitor
+ * @see IndexUpdateVisitor
  * @see LuceneWorkDelegate
  */
 class OptimizeWorkDelegate implements LuceneWorkDelegate {

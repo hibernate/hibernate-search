@@ -10,15 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.Work;
+import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.spi.EntityIndexBinding;
 import org.hibernate.search.store.IndexShardingStrategy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
 /**
  * Batch work until {@link #performWorks} is called.
  * The work is then executed synchronously or asynchronously.
@@ -76,8 +75,8 @@ public class BatchedQueueingProcessor implements QueueingProcessor {
 			final Class<?> entityType = work.getEntityClass();
 			EntityIndexBinding entityIndexBinding = entityIndexBindings.get( entityType );
 			IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
-			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE )
-				.performOperation( work, shardingStrategy, context );
+			work.acceptIndexWorkVisitor( TransactionalSelectionVisitor.INSTANCE, null )
+					.performOperation( work, shardingStrategy, context );
 		}
 		context.commitOperations( null );
 	}

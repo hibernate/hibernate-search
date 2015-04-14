@@ -12,10 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.DeleteLuceneWork;
+import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.impl.StreamingSelectionVisitor;
-import org.hibernate.search.backend.impl.WorkVisitor;
 import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.cfg.Environment;
@@ -114,14 +114,14 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 		}
 
 		@Override
-		public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
+		public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
 			if ( visitor instanceof StreamingSelectionVisitor ) {
 				//during shard-selection visitor this work is applied to
 				//all DirectoryProviders as this extends DeleteLuceneWork
-				return visitor.getDelegate( this );
+				return visitor.visitDeleteWork( this, p );
 			}
 			else {
-				return (T) new NoOpLuceneWorkDelegate();
+				return (R) new NoOpLuceneWorkDelegate();
 			}
 		}
 
@@ -155,14 +155,14 @@ public class LuceneErrorHandlingTest extends SearchTestBase {
 		}
 
 		@Override
-		public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
+		public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
 			if ( visitor instanceof StreamingSelectionVisitor ) {
 				//during shard-selection visitor this work is applied to
 				//all DirectoryProviders as this extends DeleteLuceneWork
-				return visitor.getDelegate( this );
+				return visitor.visitDeleteWork( this, p );
 			}
 			else {
-				return (T) new FailingLuceneWorkDelegate();
+				return (R) new FailingLuceneWorkDelegate();
 			}
 		}
 

@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
  * Represent a unit of work to be applied against the Lucene index.
@@ -66,7 +65,14 @@ public abstract class LuceneWork {
 		return tenantId;
 	}
 
-	public abstract <T> T getWorkDelegate(WorkVisitor<T> visitor);
+	/**
+	 * Accepts the given visitor by dispatching the correct visit method for the specific {@link LuceneWork} sub-type.
+	 *
+	 * @param visitor the visitor to accept
+	 * @param p a visitor-specific context parameter
+	 * @return a visitor-specific return value or {@code null} if this visitor doesn't return a result
+	 */
+	public abstract <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p);
 
 	public Map<String, String> getFieldToAnalyzerMap() {
 		return null;

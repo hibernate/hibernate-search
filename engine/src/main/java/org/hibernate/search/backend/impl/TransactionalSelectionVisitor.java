@@ -10,6 +10,7 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
+import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
@@ -18,14 +19,19 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * This visitor applies the selection logic from the plugged IndexShardingStrategies to
- * transactional operations, so similar to StreamingSelectionVisitor but preparing a
- * context bound list of operations instead of sending all changes directly to the backend.
+ * This visitor applies the selection logic from the plugged IndexShardingStrategies to transactional operations, so
+ * similar to StreamingSelectionVisitor but preparing a context bound list of operations instead of sending all changes
+ * directly to the backend.
+ * <p>
+ * Implementation note: This {@link IndexWorkVisitor} implementation intentionally does not perform the actual logic
+ * within the individual visit methods themselves but rather returns a delegate class for that purpose. This is to avoid
+ * the need for the allocation of a parameter object with the required input data, instead a method with the required
+ * parameters is exposed on said delegate.
  *
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @author Martin Braun
  */
-public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSelectionDelegate> {
+public class TransactionalSelectionVisitor implements IndexWorkVisitor<Void, ContextAwareSelectionDelegate> {
 
 	public static final TransactionalSelectionVisitor INSTANCE = new TransactionalSelectionVisitor();
 
@@ -41,38 +47,38 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
+	public ContextAwareSelectionDelegate visitAddWork(AddLuceneWork addLuceneWork, Void p) {
 		return addDelegate;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
+	public ContextAwareSelectionDelegate visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
 		return addDelegate;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
+	public ContextAwareSelectionDelegate visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
 		return deleteDelegate;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
+	public ContextAwareSelectionDelegate visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
 		return optimizeDelegate;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
+	public ContextAwareSelectionDelegate visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
 		return purgeDelegate;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate getDelegate(FlushLuceneWork flushLuceneWork) {
+	public ContextAwareSelectionDelegate visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
 		return flushDelegate;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate getDelegate(DeleteByQueryLuceneWork deleteByQueryLuceneWork) {
-		return this.deleteByQueryDelegate;
+	public ContextAwareSelectionDelegate visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
+		return deleteByQueryDelegate;
 	}
 
 	private static class AddSelectionDelegate implements ContextAwareSelectionDelegate {
@@ -171,5 +177,4 @@ public class TransactionalSelectionVisitor implements WorkVisitor<ContextAwareSe
 		}
 
 	}
-
 }

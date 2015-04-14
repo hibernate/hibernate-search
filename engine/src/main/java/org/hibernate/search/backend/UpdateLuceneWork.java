@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
  * Carries a Lucene update operation from the engine to the backend
@@ -48,8 +47,8 @@ public class UpdateLuceneWork extends LuceneWork {
 	}
 
 	@Override
-	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
+		return visitor.visitUpdateWork( this, p );
 	}
 
 	@Override

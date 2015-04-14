@@ -15,17 +15,17 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.hibernate.search.backend.impl.CommitPolicy;
-import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
+import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
-import org.hibernate.search.backend.impl.WorkVisitor;
+import org.hibernate.search.backend.impl.CommitPolicy;
+import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
 import org.hibernate.search.indexes.spi.DirectoryBasedReaderProvider;
 import org.hibernate.search.spi.WorkerBuildContext;
@@ -279,7 +279,7 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	@Override
 	public void notifyWorkApplied(LuceneWork work) {
 		incrementModificationCounter();
-		work.getWorkDelegate( flushStrategySelector ).apply( this );
+		work.acceptIndexWorkVisitor( flushStrategySelector, this );
 	}
 
 	@Override
@@ -288,44 +288,51 @@ public class NRTWorkspaceImpl extends AbstractWorkspaceImpl implements Directory
 	}
 
 	/**
-	 * Visits each kind of {@code LuceneWork} we're processing to define which kind
-	 * of flushing strategy we need to apply to create consistent index readers.
+	 * Visits each kind of {@code LuceneWork} we're processing and applies the correct flushing strategy to create
+	 * consistent index readers.
 	 */
-	private static class FlushStrategySelector implements WorkVisitor<FlushStrategyNeed> {
+	private static class FlushStrategySelector implements IndexWorkVisitor<NRTWorkspaceImpl, Void> {
 
 		@Override
-		public FlushStrategyNeed getDelegate(AddLuceneWork addLuceneWork) {
-			return FlushStrategyNeed.FLUSH_WRITES;
+		public Void visitAddWork(AddLuceneWork addLuceneWork, NRTWorkspaceImpl p) {
+			FlushStrategyNeed.FLUSH_WRITES.apply( p );
+			return null;
 		}
 
 		@Override
-		public FlushStrategyNeed getDelegate(DeleteLuceneWork deleteLuceneWork) {
-			return FlushStrategyNeed.FLUSH_DELETIONS;
+		public Void visitDeleteWork(DeleteLuceneWork deleteLuceneWork, NRTWorkspaceImpl p) {
+			FlushStrategyNeed.FLUSH_DELETIONS.apply( p );
+			return null;
 		}
 
 		@Override
-		public FlushStrategyNeed getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
-			return FlushStrategyNeed.NONE;
+		public Void visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, NRTWorkspaceImpl p) {
+			FlushStrategyNeed.NONE.apply( p );
+			return null;
 		}
 
 		@Override
-		public FlushStrategyNeed getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
-			return FlushStrategyNeed.FLUSH_DELETIONS;
+		public Void visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, NRTWorkspaceImpl p) {
+			FlushStrategyNeed.FLUSH_DELETIONS.apply( p );
+			return null;
 		}
 
 		@Override
-		public FlushStrategyNeed getDelegate(UpdateLuceneWork updateLuceneWork) {
-			return FlushStrategyNeed.FLUSH_WRITES_AND_DELETES;
+		public Void visitUpdateWork(UpdateLuceneWork updateLuceneWork, NRTWorkspaceImpl p) {
+			FlushStrategyNeed.FLUSH_WRITES_AND_DELETES.apply( p );
+			return null;
 		}
 
 		@Override
-		public FlushStrategyNeed getDelegate(FlushLuceneWork flushLuceneWork) {
-			return FlushStrategyNeed.FLUSH_WRITES_AND_DELETES;
+		public Void visitFlushWork(FlushLuceneWork flushLuceneWork, NRTWorkspaceImpl p) {
+			FlushStrategyNeed.FLUSH_WRITES_AND_DELETES.apply( p );
+			return null;
 		}
 
 		@Override
-		public FlushStrategyNeed getDelegate(DeleteByQueryLuceneWork deleteByQueryLuceneWork) {
-			return FlushStrategyNeed.FLUSH_DELETIONS;
+		public Void visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, NRTWorkspaceImpl p) {
+			FlushStrategyNeed.FLUSH_DELETIONS.apply( p );
+			return null;
 		}
 	}
 

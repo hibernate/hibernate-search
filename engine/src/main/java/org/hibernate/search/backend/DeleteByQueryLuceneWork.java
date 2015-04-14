@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend;
 
-import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
  * Representation of deleteByQuery(...) from Lucene. Currently not all functionality of Lucene is supported but can be
@@ -32,8 +31,8 @@ public class DeleteByQueryLuceneWork extends LuceneWork {
 	}
 
 	@Override
-	public <T> T getWorkDelegate(WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
+		return visitor.visitDeleteByQueryWork( this, p );
 	}
 
 	@Override

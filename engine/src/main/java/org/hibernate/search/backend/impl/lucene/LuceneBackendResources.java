@@ -6,15 +6,6 @@
  */
 package org.hibernate.search.backend.impl.lucene;
 
-import org.hibernate.search.util.impl.Executors;
-import org.hibernate.search.indexes.impl.PropertiesParseHelper;
-import org.hibernate.search.spi.WorkerBuildContext;
-import org.hibernate.search.backend.impl.lucene.works.LuceneWorkVisitor;
-import org.hibernate.search.exception.ErrorHandler;
-import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.logging.impl.Log;
-
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +13,17 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import org.hibernate.search.backend.IndexWorkVisitor;
+import org.hibernate.search.backend.impl.lucene.works.IndexUpdateVisitor;
+import org.hibernate.search.backend.impl.lucene.works.LuceneWorkDelegate;
+import org.hibernate.search.exception.ErrorHandler;
+import org.hibernate.search.indexes.impl.PropertiesParseHelper;
+import org.hibernate.search.indexes.spi.DirectoryBasedIndexManager;
+import org.hibernate.search.spi.WorkerBuildContext;
+import org.hibernate.search.util.impl.Executors;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Collects all resources needed to apply changes to one index,
@@ -33,7 +35,7 @@ public final class LuceneBackendResources {
 
 	private static final Log log = LoggerFactory.make();
 
-	private volatile LuceneWorkVisitor visitor;
+	private volatile IndexWorkVisitor<Void, LuceneWorkDelegate> workVisitor;
 	private final AbstractWorkspaceImpl workspace;
 	private final ErrorHandler errorHandler;
 	private final int maxQueueLength;
@@ -93,11 +95,11 @@ public final class LuceneBackendResources {
 		return indexName;
 	}
 
-	public LuceneWorkVisitor getVisitor() {
-		if ( visitor == null ) {
-			visitor = new LuceneWorkVisitor( workspace );
+	public IndexWorkVisitor<Void, LuceneWorkDelegate> getWorkVisitor() {
+		if ( workVisitor == null ) {
+			workVisitor = new IndexUpdateVisitor( workspace );
 		}
-		return visitor;
+		return workVisitor;
 	}
 
 	public AbstractWorkspaceImpl getWorkspace() {

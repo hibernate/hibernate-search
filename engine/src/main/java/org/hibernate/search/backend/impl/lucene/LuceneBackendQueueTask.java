@@ -12,9 +12,9 @@ import java.util.concurrent.locks.Lock;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.impl.ErrorContextBuilder;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Apply the operations to Lucene directories.
@@ -108,7 +108,6 @@ final class LuceneBackendQueueTask implements Runnable {
 	}
 
 	static void performWork(final LuceneWork work, final LuceneBackendResources resources, final IndexWriter indexWriter, final IndexingMonitor monitor) {
-		work.getWorkDelegate( resources.getVisitor() ).performWork( work, indexWriter, monitor );
+		work.acceptIndexWorkVisitor( resources.getWorkVisitor(), null ).performWork( work, indexWriter, monitor );
 	}
-
 }

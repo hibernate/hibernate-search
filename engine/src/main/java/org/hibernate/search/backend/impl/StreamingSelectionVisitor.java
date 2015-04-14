@@ -10,6 +10,7 @@ import org.hibernate.search.backend.AddLuceneWork;
 import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
+import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.OptimizeLuceneWork;
@@ -19,14 +20,18 @@ import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.store.IndexShardingStrategy;
 
 /**
- * This visitor applies the selection logic from the plugged IndexShardingStrategies to
- * stream operations, as used by optimize() and batching operations.
- * Using a visitor/selector pattern for different implementations of addAsPayLoadsToQueue
- * depending on the type of LuceneWork.
+ * This visitor applies the selection logic from the plugged IndexShardingStrategies to stream operations, as used by
+ * optimize() and batching operations. Using a visitor/selector pattern for different implementations of
+ * addAsPayLoadsToQueue depending on the type of LuceneWork.
+ * <p>
+ * Implementation note: This {@link IndexWorkVisitor} implementation intentionally does not perform the actual logic
+ * within the individual visit methods themselves but rather returns a delegate class for that purpose. This is to avoid
+ * the need for the allocation of a parameter object with the required input data, instead a method with the required
+ * parameters is exposed on said delegate.
  *
  * @author Sanne Grinovero, Martin Braun
  */
-public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperationSelectionDelegate> {
+public class StreamingSelectionVisitor implements IndexWorkVisitor<Void, StreamingOperationSelectionDelegate> {
 
 	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
 	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
@@ -41,37 +46,38 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate getDelegate(AddLuceneWork addLuceneWork) {
+	public StreamingOperationSelectionDelegate visitAddWork(AddLuceneWork addLuceneWork, Void p) {
 		return addDelegate;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate getDelegate(UpdateLuceneWork addLuceneWork) {
+	public StreamingOperationSelectionDelegate visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
 		return addDelegate;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate getDelegate(DeleteLuceneWork deleteLuceneWork) {
+	public StreamingOperationSelectionDelegate visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
 		return deleteDelegate;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate getDelegate(OptimizeLuceneWork optimizeLuceneWork) {
+	public StreamingOperationSelectionDelegate visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
 		return allManagersDelegate;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate getDelegate(PurgeAllLuceneWork purgeAllLuceneWork) {
+	public StreamingOperationSelectionDelegate visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
 		return purgeDelegate;
 	}
 
 	@Override
-	public StreamingOperationSelectionDelegate getDelegate(FlushLuceneWork flushLuceneWork) {
+	public StreamingOperationSelectionDelegate visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
 		return allManagersDelegate;
 	}
+
 	@Override
-	public StreamingOperationSelectionDelegate getDelegate(DeleteByQueryLuceneWork deleteByQueryLuceneWork) {
-		return this.deleteByQueryDelegate;
+	public StreamingOperationSelectionDelegate visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
+		return deleteByQueryDelegate;
 	}
 
 	private static class DeleteByQuerySelectionDelegate implements StreamingOperationSelectionDelegate {
@@ -146,7 +152,5 @@ public class StreamingSelectionVisitor implements WorkVisitor<StreamingOperation
 				indexManager.performStreamOperation( work, monitor, forceAsync );
 			}
 		}
-
 	}
-
 }

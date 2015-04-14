@@ -8,8 +8,6 @@ package org.hibernate.search.backend;
 
 import java.io.Serializable;
 
-import org.hibernate.search.backend.impl.WorkVisitor;
-
 /**
  * @author Emmanuel Bernard
  */
@@ -26,8 +24,8 @@ public class DeleteLuceneWork extends LuceneWork {
 	}
 
 	@Override
-	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
+		return visitor.visitDeleteWork( this, p );
 	}
 
 	@Override

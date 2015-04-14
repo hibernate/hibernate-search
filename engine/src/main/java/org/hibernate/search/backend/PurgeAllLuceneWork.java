@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend;
 
-import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
  * A unit of work used to purge an entire index.
@@ -26,8 +25,8 @@ public class PurgeAllLuceneWork extends LuceneWork {
 	}
 
 	@Override
-	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
+		return visitor.visitPurgeAllWork( this, p );
 	}
 
 	@Override

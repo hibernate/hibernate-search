@@ -56,12 +56,12 @@ public class DefaultBatchBackend implements BatchBackend {
 		EntityIndexBinding entityIndexBinding = integrator.getIndexBinding( entityType );
 		IndexShardingStrategy shardingStrategy = entityIndexBinding.getSelectionStrategy();
 		if ( forceAsync ) {
-			work.getWorkDelegate( StreamingSelectionVisitor.INSTANCE )
+			work.acceptIndexWorkVisitor( StreamingSelectionVisitor.INSTANCE, null )
 					.performStreamOperation( work, shardingStrategy, progressMonitor, forceAsync );
 		}
 		else {
 			WorkQueuePerIndexSplitter workContext = new WorkQueuePerIndexSplitter();
-			work.getWorkDelegate( TransactionalSelectionVisitor.INSTANCE )
+			work.acceptIndexWorkVisitor( TransactionalSelectionVisitor.INSTANCE, null )
 					.performOperation( work, shardingStrategy, workContext );
 			workContext.commitOperations( progressMonitor ); //FIXME I need a "Force sync" actually for when using PurgeAll before the indexing starts
 		}

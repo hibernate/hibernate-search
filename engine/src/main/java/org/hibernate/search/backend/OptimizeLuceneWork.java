@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend;
 
-import org.hibernate.search.backend.impl.WorkVisitor;
 
 /**
  * A unit of work triggering an optimize operation.
@@ -36,8 +35,8 @@ public class OptimizeLuceneWork extends LuceneWork {
 	}
 
 	@Override
-	public <T> T getWorkDelegate(final WorkVisitor<T> visitor) {
-		return visitor.getDelegate( this );
+	public <P, R> R acceptIndexWorkVisitor(IndexWorkVisitor<P, R> visitor, P p) {
+		return visitor.visitOptimizeWork( this, p );
 	}
 
 	@Override
