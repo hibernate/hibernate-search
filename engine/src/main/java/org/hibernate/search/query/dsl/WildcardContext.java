@@ -16,4 +16,9 @@ public interface WildcardContext extends QueryCustomization<WildcardContext> {
 	 */
 	TermMatchingContext onField(String field);
 
+	/**
+	 * fields / properties the term query is executed on
+	 */
+	TermMatchingContext onFields(String... fields);
+
 }
