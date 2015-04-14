@@ -26,16 +26,16 @@ import org.hibernate.search.util.logging.impl.Log;
  * the index is NOT shared across different entities (which is the default).
  *
  * @author Sanne Grinovero
- * @see DeleteWorkDelegate
+ * @see DeleteWorkExecutor
  */
-public final class DeleteExtWorkDelegate extends DeleteWorkDelegate {
+public final class DeleteExtWorkExecutor extends DeleteWorkExecutor {
 
 	private final Class<?> managedType;
 	private final DocumentBuilderIndexedEntity builder;
 	private static final Log log = LoggerFactory.make();
 	private final boolean idIsNumeric;
 
-	DeleteExtWorkDelegate(Workspace workspace) {
+	DeleteExtWorkExecutor(Workspace workspace) {
 		super( workspace );
 		managedType = workspace.getEntitiesInIndexManager().iterator().next();
 		builder = workspace.getDocumentBuilder( managedType );

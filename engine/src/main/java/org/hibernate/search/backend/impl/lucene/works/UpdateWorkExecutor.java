@@ -14,12 +14,12 @@ import org.hibernate.search.backend.LuceneWork;
 /**
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
-public class UpdateWorkDelegate implements LuceneWorkDelegate {
+public class UpdateWorkExecutor implements LuceneWorkExecutor {
 
-	private final DeleteWorkDelegate deleteDelegate;
-	private final AddWorkDelegate addDelegate;
+	private final DeleteWorkExecutor deleteDelegate;
+	private final AddWorkExecutor addDelegate;
 
-	UpdateWorkDelegate(DeleteWorkDelegate deleteDelegate, AddWorkDelegate addDelegate) {
+	UpdateWorkExecutor(DeleteWorkExecutor deleteDelegate, AddWorkExecutor addDelegate) {
 		this.deleteDelegate = deleteDelegate;
 		this.addDelegate = addDelegate;
 	}

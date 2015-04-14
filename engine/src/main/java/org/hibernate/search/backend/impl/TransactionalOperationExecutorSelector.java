@@ -31,57 +31,57 @@ import org.hibernate.search.store.IndexShardingStrategy;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  * @author Martin Braun
  */
-public class TransactionalSelectionVisitor implements IndexWorkVisitor<Void, ContextAwareSelectionDelegate> {
+public class TransactionalOperationExecutorSelector implements IndexWorkVisitor<Void, TransactionalOperationExecutor> {
 
-	public static final TransactionalSelectionVisitor INSTANCE = new TransactionalSelectionVisitor();
+	public static final TransactionalOperationExecutorSelector INSTANCE = new TransactionalOperationExecutorSelector();
 
-	private final AddSelectionDelegate addDelegate = new AddSelectionDelegate();
-	private final DeleteSelectionDelegate deleteDelegate = new DeleteSelectionDelegate();
-	private final OptimizeSelectionDelegate optimizeDelegate = new OptimizeSelectionDelegate();
-	private final PurgeAllSelectionDelegate purgeDelegate = new PurgeAllSelectionDelegate();
-	private final FlushSelectionDelegate flushDelegate = new FlushSelectionDelegate();
-	private final DeleteByQuerySelectionDelegate deleteByQueryDelegate = new DeleteByQuerySelectionDelegate();
+	private final AddSelectionExecutor addExecutor = new AddSelectionExecutor();
+	private final DeleteSelectionExecutor deleteExecutor = new DeleteSelectionExecutor();
+	private final OptimizeSelectionExecutor optimizeExecutor = new OptimizeSelectionExecutor();
+	private final PurgeAllSelectionExecutor purgeExecutor = new PurgeAllSelectionExecutor();
+	private final FlushSelectionExecutor flushExecutor = new FlushSelectionExecutor();
+	private final DeleteByQuerySelectionExecutor deleteByQueryExecutor = new DeleteByQuerySelectionExecutor();
 
-	private TransactionalSelectionVisitor() {
+	private TransactionalOperationExecutorSelector() {
 		// use INSTANCE as this delegator is stateless
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate visitAddWork(AddLuceneWork addLuceneWork, Void p) {
-		return addDelegate;
+	public TransactionalOperationExecutor visitAddWork(AddLuceneWork addLuceneWork, Void p) {
+		return addExecutor;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
-		return addDelegate;
+	public TransactionalOperationExecutor visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
+		return addExecutor;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
-		return deleteDelegate;
+	public TransactionalOperationExecutor visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
+		return deleteExecutor;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
-		return optimizeDelegate;
+	public TransactionalOperationExecutor visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
+		return optimizeExecutor;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
-		return purgeDelegate;
+	public TransactionalOperationExecutor visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
+		return purgeExecutor;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
-		return flushDelegate;
+	public TransactionalOperationExecutor visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
+		return flushExecutor;
 	}
 
 	@Override
-	public ContextAwareSelectionDelegate visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
-		return deleteByQueryDelegate;
+	public TransactionalOperationExecutor visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
+		return deleteByQueryExecutor;
 	}
 
-	private static class AddSelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class AddSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -97,7 +97,7 @@ public class TransactionalSelectionVisitor implements IndexWorkVisitor<Void, Con
 
 	}
 
-	private static class DeleteSelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class DeleteSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -114,7 +114,7 @@ public class TransactionalSelectionVisitor implements IndexWorkVisitor<Void, Con
 
 	}
 
-	private static class DeleteByQuerySelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class DeleteByQuerySelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -135,7 +135,7 @@ public class TransactionalSelectionVisitor implements IndexWorkVisitor<Void, Con
 	 * In this exceptional case we still delegate to a streaming operation instead:
 	 * no need for transactions as optimizing doesn't affect index-encoded state.
 	 */
-	private static class OptimizeSelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class OptimizeSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -148,7 +148,7 @@ public class TransactionalSelectionVisitor implements IndexWorkVisitor<Void, Con
 
 	}
 
-	private static class FlushSelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class FlushSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,
@@ -161,7 +161,7 @@ public class TransactionalSelectionVisitor implements IndexWorkVisitor<Void, Con
 
 	}
 
-	private static class PurgeAllSelectionDelegate implements ContextAwareSelectionDelegate {
+	private static class PurgeAllSelectionExecutor implements TransactionalOperationExecutor {
 
 		@Override
 		public final void performOperation(LuceneWork work, IndexShardingStrategy shardingStrategy,

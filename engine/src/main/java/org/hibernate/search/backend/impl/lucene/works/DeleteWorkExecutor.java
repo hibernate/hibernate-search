@@ -34,14 +34,14 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author John Griffin
  * @author Sanne Grinovero
  * @see IndexUpdateVisitor
- * @see LuceneWorkDelegate
+ * @see LuceneWorkExecutor
  */
-class DeleteWorkDelegate implements LuceneWorkDelegate {
+class DeleteWorkExecutor implements LuceneWorkExecutor {
 
 	private static final Log log = LoggerFactory.make();
 	protected final Workspace workspace;
 
-	DeleteWorkDelegate(Workspace workspace) {
+	DeleteWorkExecutor(Workspace workspace) {
 		this.workspace = workspace;
 	}
 

@@ -29,75 +29,75 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  * @author Gunnar Morling
  */
-public class IndexUpdateVisitor implements IndexWorkVisitor<Void, LuceneWorkDelegate> {
+public class IndexUpdateVisitor implements IndexWorkVisitor<Void, LuceneWorkExecutor> {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final AddWorkDelegate addDelegate;
-	private final DeleteWorkDelegate deleteDelegate;
-	private final UpdateWorkDelegate updateDelegate;
-	private final OptimizeWorkDelegate optimizeDelegate;
-	private final PurgeAllWorkDelegate purgeAllDelegate;
-	private final FlushWorkDelegate flushDelegate;
-	private final DeleteByQueryWorkDelegate deleteByQueryDelegate;
+	private final AddWorkExecutor addExecutor;
+	private final DeleteWorkExecutor deleteExecutor;
+	private final UpdateWorkExecutor updateExecutor;
+	private final OptimizeWorkExecutor optimizeExecutor;
+	private final PurgeAllWorkExecutor purgeAllExecutor;
+	private final FlushWorkExecutor flushExecutor;
+	private final DeleteByQueryWorkExecutor deleteByQueryExecutor;
 
 	public IndexUpdateVisitor(Workspace workspace) {
-		this.addDelegate = new AddWorkDelegate( workspace );
+		this.addExecutor = new AddWorkExecutor( workspace );
 		if ( workspace.areSingleTermDeletesSafe() ) {
-			this.deleteDelegate = new DeleteExtWorkDelegate( workspace );
-			this.updateDelegate = new UpdateExtWorkDelegate( workspace, addDelegate );
+			this.deleteExecutor = new DeleteExtWorkExecutor( workspace );
+			this.updateExecutor = new UpdateExtWorkExecutor( workspace, addExecutor );
 		}
 		else if ( workspace.isDeleteByTermEnforced() ) {
 			//TODO Cleanup: with upcoming enhancements of the DocumentBuilder we should be able
 			//to extrapolate some constant methods in there, and avoid needing so many different visitors.
 			//The difference with the visitors of the previous block is that these are not coupled to a
 			//specific type, allowing still dynamic discovery et al
-			this.deleteDelegate = new ByTermDeleteWorkDelegate( workspace );
-			this.updateDelegate = new ByTermUpdateWorkDelegate( workspace, addDelegate );
+			this.deleteExecutor = new ByTermDeleteWorkExecutor( workspace );
+			this.updateExecutor = new ByTermUpdateWorkExecutor( workspace, addExecutor );
 		}
 		else {
-			this.deleteDelegate = new DeleteWorkDelegate( workspace );
-			this.updateDelegate = new UpdateWorkDelegate( deleteDelegate, addDelegate );
+			this.deleteExecutor = new DeleteWorkExecutor( workspace );
+			this.updateExecutor = new UpdateWorkExecutor( deleteExecutor, addExecutor );
 			log.singleTermDeleteDisabled( workspace.getIndexName() );
 		}
-		this.purgeAllDelegate = new PurgeAllWorkDelegate( workspace );
-		this.optimizeDelegate = new OptimizeWorkDelegate( workspace );
-		this.flushDelegate = new FlushWorkDelegate( workspace );
-		this.deleteByQueryDelegate = new DeleteByQueryWorkDelegate( workspace );
+		this.purgeAllExecutor = new PurgeAllWorkExecutor( workspace );
+		this.optimizeExecutor = new OptimizeWorkExecutor( workspace );
+		this.flushExecutor = new FlushWorkExecutor( workspace );
+		this.deleteByQueryExecutor = new DeleteByQueryWorkExecutor( workspace );
 	}
 
 	@Override
-	public LuceneWorkDelegate visitAddWork(AddLuceneWork addLuceneWork, Void p) {
-		return addDelegate;
+	public LuceneWorkExecutor visitAddWork(AddLuceneWork addLuceneWork, Void p) {
+		return addExecutor;
 	}
 
 	@Override
-	public LuceneWorkDelegate visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
-		return deleteDelegate;
+	public LuceneWorkExecutor visitDeleteWork(DeleteLuceneWork deleteLuceneWork, Void p) {
+		return deleteExecutor;
 	}
 
 	@Override
-	public LuceneWorkDelegate visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
-		return optimizeDelegate;
+	public LuceneWorkExecutor visitOptimizeWork(OptimizeLuceneWork optimizeLuceneWork, Void p) {
+		return optimizeExecutor;
 	}
 
 	@Override
-	public LuceneWorkDelegate visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
-		return purgeAllDelegate;
+	public LuceneWorkExecutor visitPurgeAllWork(PurgeAllLuceneWork purgeAllLuceneWork, Void p) {
+		return purgeAllExecutor;
 	}
 
 	@Override
-	public LuceneWorkDelegate visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
-		return updateDelegate;
+	public LuceneWorkExecutor visitUpdateWork(UpdateLuceneWork updateLuceneWork, Void p) {
+		return updateExecutor;
 	}
 
 	@Override
-	public LuceneWorkDelegate visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
-		return flushDelegate;
+	public LuceneWorkExecutor visitFlushWork(FlushLuceneWork flushLuceneWork, Void p) {
+		return flushExecutor;
 	}
 
 	@Override
-	public LuceneWorkDelegate visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
-		return deleteByQueryDelegate;
+	public LuceneWorkExecutor visitDeleteByQueryWork(DeleteByQueryLuceneWork deleteByQueryLuceneWork, Void p) {
+		return deleteByQueryExecutor;
 	}
 }

@@ -17,7 +17,7 @@ import org.hibernate.search.store.IndexShardingStrategy;
  *
  * @author Sanne Grinovero
  */
-public interface StreamingOperationSelectionDelegate {
+public interface StreamingOperationExecutor {
 
 	/**
 	 * The LuceneWork must be applied to different indexes.

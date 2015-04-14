@@ -11,6 +11,7 @@ import java.util.concurrent.locks.Lock;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.impl.lucene.works.LuceneWorkExecutor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 
@@ -48,8 +49,8 @@ final class LuceneBackendTaskStreamer {
 			}
 			boolean errors = true;
 			try {
-				work.acceptIndexWorkVisitor( resources.getWorkVisitor(), null )
-						.performWork( work, indexWriter, monitor );
+				LuceneWorkExecutor executor = work.acceptIndexWorkVisitor( resources.getWorkVisitor(), null );
+				executor.performWork( work, indexWriter, monitor );
 				errors = false;
 			}
 			finally {
