@@ -780,4 +780,8 @@ public interface Log extends BasicLogger {
 			+ "FullTextQuery#setCriteriaQuery(), but query results originate from several id spaces. The given "
 			+ "criteria object can therefore not be be applied.")
 	void givenCriteriaObjectCannotBeApplied();
+
+	@Message(id = 261, value = "An unknown DeletionQuery key was specified during de-serialization of a message from another node: %d")
+	SearchException unknownDeletionQueryKeySpecified(int queryKey);
+
 }

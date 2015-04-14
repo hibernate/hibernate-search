@@ -6,8 +6,23 @@
  */
 package org.hibernate.search.backend;
 
+import java.io.IOException;
+
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.BytesRefBuilder;
+import org.apache.lucene.util.NumericUtils;
+import org.hibernate.search.exception.AssertionFailure;
+import org.hibernate.search.util.impl.ScopedAnalyzer;
+
 /**
- * DeleteByQuery equivalent to {@link org.apache.lucene.search.TermQuery} and supports only Strings as values
+ * DeleteByQuery equivalent to {@link org.apache.lucene.search.TermQuery}
  *
  * @author Martin Braun
  */
@@ -65,6 +80,93 @@ public final class SingularTermDeletionQuery implements DeletionQuery {
 	@Override
 	public String toString() {
 		return "SingularTermQuery: +" + fieldName + ":" + value;
+	}
+
+	@Override
+	public Query toLuceneQuery(ScopedAnalyzer analyzerForEntity) {
+		if ( this.getType() == Type.STRING ) {
+			try {
+				TokenStream tokenStream = analyzerForEntity.tokenStream( this.getFieldName(), (String) this.getValue() );
+				tokenStream.reset();
+				try {
+					BooleanQuery booleanQuery = new BooleanQuery();
+					while ( tokenStream.incrementToken() ) {
+						String value = tokenStream.getAttribute( CharTermAttribute.class ).toString();
+						booleanQuery.add( new TermQuery( new Term( this.getFieldName(), value ) ), Occur.MUST );
+					}
+					return booleanQuery;
+				}
+				finally {
+					tokenStream.close();
+				}
+			}
+			catch (IOException e) {
+				throw new AssertionFailure( "no IOException can occur while using a TokenStream that is generated via String" );
+			}
+		}
+		else {
+			Type type = this.getType();
+			BytesRef valueAsBytes;
+			switch ( type ) {
+				case INT:
+				case FLOAT: {
+					int value;
+					if ( type == Type.FLOAT ) {
+						value = NumericUtils.floatToSortableInt( (Float) this.getValue() );
+					}
+					else {
+						value = (Integer) this.getValue();
+					}
+					BytesRefBuilder builder = new BytesRefBuilder();
+					NumericUtils.intToPrefixCoded( value, 0, builder );
+					valueAsBytes = builder.get();
+					break;
+				}
+				case LONG:
+				case DOUBLE: {
+					long value;
+					if ( type == Type.DOUBLE ) {
+						value = NumericUtils.doubleToSortableLong( (Double) this.getValue() );
+					}
+					else {
+						value = (Long) this.getValue();
+					}
+					BytesRefBuilder builder = new BytesRefBuilder();
+					NumericUtils.longToPrefixCoded( value, 0, builder );
+					valueAsBytes = builder.get();
+					break;
+				}
+				default:
+					throw new AssertionFailure( "has to be a Numeric Type at this point!" );
+			}
+			return new TermQuery( new Term( this.getFieldName(), valueAsBytes ) );
+		}
+	}
+
+	@Override
+	public String[] serialize() {
+		return new String[] { this.getType().toString(), this.getFieldName(), String.valueOf( this.getValue() ) };
+	}
+
+	public static SingularTermDeletionQuery fromString(String[] string) {
+		if ( string.length != 3 ) {
+			throw new IllegalArgumentException( "for a TermQuery to work there have to be " + "exactly 3 Arguments (type & fieldName & value" );
+		}
+		Type type = Type.valueOf( string[0] );
+		switch ( type ) {
+			case STRING:
+				return new SingularTermDeletionQuery( string[1], string[2] );
+			case INT:
+				return new SingularTermDeletionQuery( string[1], Integer.parseInt( string[2] ) );
+			case FLOAT:
+				return new SingularTermDeletionQuery( string[1], Float.parseFloat( string[2] ) );
+			case LONG:
+				return new SingularTermDeletionQuery( string[1], Long.parseLong( string[2] ) );
+			case DOUBLE:
+				return new SingularTermDeletionQuery( string[1], Double.parseDouble( string[2] ) );
+			default:
+				throw new AssertionFailure( "wrong Type!" );
+		}
 	}
 
 	/*

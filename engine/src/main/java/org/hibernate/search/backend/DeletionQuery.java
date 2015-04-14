@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.backend;
 
+import org.apache.lucene.search.Query;
+import org.hibernate.search.util.impl.ScopedAnalyzer;
+
 /**
- * interface for Serializable Queries that can be passed safely between VMs (we cannot rely on Lucene's queries here
+ * interface for Serializable Queries that can be used to delete from an index.
+ * These have to be passed safely between VMs (we cannot rely on Lucene's queries here
  * because of that).
  *
  * @author Martin Braun
@@ -15,10 +19,23 @@ package org.hibernate.search.backend;
 public interface DeletionQuery {
 
 	/**
-	 * used to identify the type of query faster (no need for instanceof checks) in the Delegate
-	 *
+	 * used to identify the type of query faster (no need for instanceof checks)
 	 * @return the unique query key
 	 */
 	int getQueryKey();
+
+	/**
+	 * converts this DeletionQuery to a Lucene Query
+	 *
+	 * @param analyzerForEntity the analyzer to be used for this query
+	 */
+	Query toLuceneQuery(ScopedAnalyzer analyzerForEntity);
+
+	/**
+	 * We are serializing to a String array here instead of a byte array since we don't want implementors to use the
+	 * standard Java Serialization API by mistake
+	 * @return a String[] representation of this DeletionQuery
+	 */
+	String[] serialize();
 
 }

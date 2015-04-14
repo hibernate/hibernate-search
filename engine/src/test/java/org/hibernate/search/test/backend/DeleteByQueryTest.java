@@ -167,8 +167,8 @@ public class DeleteByQueryTest {
 
 	private void testSerializationForQuery(DeletionQuery deletionQuery) {
 		assertTrue( DeleteByQuerySupport.isSupported( deletionQuery.getClass() ) );
-		String[] strRep = DeleteByQuerySupport.getMapper( deletionQuery.getQueryKey() ).toString( deletionQuery );
-		DeletionQuery copy = DeleteByQuerySupport.getMapper( deletionQuery.getQueryKey() ).fromString( strRep );
+		String[] strRep = deletionQuery.serialize();
+		DeletionQuery copy = DeleteByQuerySupport.fromString( deletionQuery.getQueryKey(), strRep );
 		assertEquals( deletionQuery, copy );
 	}
 
