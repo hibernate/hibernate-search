@@ -200,6 +200,36 @@ public abstract class ReflectionHelper {
 		return instance;
 	}
 
+	/**
+	 * Checks whether the specified type is a floating point type.
+	 *
+	 * @param type the type to check
+	 * @return {@code true} if the specified type is an floating point type or a wrapper thereof. {@code false} otherwise.
+	 */
+	public static boolean isFloatingPointType(Class<?> type) {
+		return float.class.equals( type )
+				|| Float.class.equals( type )
+				|| double.class.equals( type )
+				|| Double.class.equals( type );
+	}
+
+	/**
+	 * Checks whether the specified type is a integer type.
+	 *
+	 * @param type the type to check
+	 * @return {@code true} if the specified type is an primitive integer type or a wrapper thereof. {@code false} otherwise.
+	 */
+	public static boolean isIntegerType(Class<?> type) {
+		return byte.class.equals( type )
+				|| Byte.class.equals( type )
+				|| short.class.equals( type )
+				|| Short.class.equals( type )
+				|| int.class.equals( type )
+				|| Integer.class.equals( type )
+				|| long.class.equals( type )
+				|| Long.class.equals( type );
+	}
+
 	private static boolean containsSearchAnnotation(Annotation[] annotations) {
 		for ( Annotation annotation : annotations ) {
 			if ( isSearchAnnotation( annotation ) ) {

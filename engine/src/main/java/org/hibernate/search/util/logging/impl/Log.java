@@ -784,4 +784,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 261, value = "An unknown DeletionQuery key was specified during de-serialization of a message from another node: %d")
 	SearchException unknownDeletionQueryKeySpecified(int queryKey);
 
+	@Message(id = 262, value = "@NumericField annotation is used on %1$s#%2$s without a matching @Field annotation")
+	SearchException numericFieldAnnotationWithoutMatchingField(String className, String memberName);
+
+	@Message(id = 263, value = "@Facet annotation is used on %1$s#%2$s without a matching @Field annotation")
+	SearchException facetAnnotationWithoutMatchingField(String className, String memberName);
+
+	@Message(id = 264, value = "@Facet is not supported for type '%1$s'. See %2$s#%3$s")
+	SearchException unsupportedFieldTypeForFaceting(String valueType, String className, String memberName);
 }
