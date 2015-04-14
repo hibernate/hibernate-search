@@ -14,6 +14,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.SingularTermDeletionQuery;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This class provides means to convert all (by default) supported DeletionQueries back to Lucene Queries and to their
@@ -27,27 +29,15 @@ public final class DeleteByQuerySupport {
 		// Not meant to be invoked
 	}
 
-	private static final int MAPPER_COUNT = 1;
+	private static final Log log = LoggerFactory.make();
 
-	private static final Lock MAPPERS_LOCK = new ReentrantLock();
-	private static DeletionQueryMapper[] MAPPERS;
-
-	public static DeletionQueryMapper getMapper(int queryKey) {
-		if ( MAPPERS == null ) {
-			// LAZY init, but don't do it more than once
-			MAPPERS_LOCK.lock();
-			try {
-				if ( MAPPERS == null ) {
-					DeletionQueryMapper[] arr = new DeletionQueryMapper[MAPPER_COUNT];
-					arr[SingularTermDeletionQuery.QUERY_KEY] = new SingularTermDeletionQueryMapper();
-					MAPPERS = arr;
-				}
-			}
-			finally {
-				MAPPERS_LOCK.unlock();
-			}
+	public static DeletionQuery fromString(int queryKey, String[] string) {
+		switch ( queryKey ) {
+			case SingularTermDeletionQuery.QUERY_KEY:
+				return SingularTermDeletionQuery.fromString( string );
+			default:
+				throw log.unknownDeletionQueryKeySpecified( queryKey );
 		}
-		return MAPPERS[queryKey];
 	}
 
 	private static final Lock SUPPORTED_TYPES_LOCK = new ReentrantLock();

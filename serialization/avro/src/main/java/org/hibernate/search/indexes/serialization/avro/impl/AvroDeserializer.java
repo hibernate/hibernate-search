@@ -21,7 +21,6 @@ import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.util.Utf8;
 import org.hibernate.search.backend.impl.DeleteByQuerySupport;
-import org.hibernate.search.backend.impl.DeletionQueryMapper;
 import org.hibernate.search.bridge.spi.ConversionContext;
 import org.hibernate.search.bridge.util.impl.ContextualExceptionBridgeHelper;
 import org.hibernate.search.indexes.serialization.spi.Deserializer;
@@ -86,13 +85,12 @@ public class AvroDeserializer implements Deserializer {
 			else if ( "DeleteByQuery".equals( schema ) ) {
 				String entityClassName = asClass( operation, "class" );
 				int queryKey = asInt( operation, "key" );
-				DeletionQueryMapper mapper = DeleteByQuerySupport.getMapper( queryKey );
 				List<Utf8> stringList = asListOfString( operation, "query" );
 				String[] query = new String[stringList.size()];
 				for ( int i = 0; i < stringList.size(); ++i ) {
 					query[i] = stringList.get( i ).toString();
 				}
-				hydrator.addDeleteByQueryLuceneWork( entityClassName, mapper.fromString( query ) );
+				hydrator.addDeleteByQueryLuceneWork( entityClassName, DeleteByQuerySupport.fromString( queryKey, query ) );
 			}
 			else if ( "Add".equals( schema ) ) {
 				buildLuceneDocument( asGenericRecord( operation, "document" ), hydrator );
