@@ -20,7 +20,6 @@ import org.hibernate.service.ServiceRegistryBuilder;
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMRules;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,16 +32,15 @@ import static org.junit.Assert.fail;
 @RunWith(BMUnitRunner.class)
 public class HibernateSearchSessionFactoryObserverTest {
 
-	//Disabled: see HSEARCH-1600
-	@Test @Ignore
+	@Test
 	@BMRules(rules = {
 			@BMRule(targetClass = "org.hibernate.internal.SessionFactoryImpl",
 					targetMethod = "close",
 					helper = "org.hibernate.search.testsupport.BytemanHelper",
 					action = "countInvocation()",
 					name = "Session close counter"),
-			@BMRule(targetClass = "org.hibernate.search.spi.SearchFactoryBuilder",
-					targetMethod = "buildSearchFactory",
+			@BMRule(targetClass = "org.hibernate.search.spi.SearchIntegratorBuilder",
+					targetMethod = "buildSearchIntegrator",
 					action = "throw new java.lang.RuntimeException(\"Byteman created runtime exception\")",
 					name = "Factory build prohibitor")
 
