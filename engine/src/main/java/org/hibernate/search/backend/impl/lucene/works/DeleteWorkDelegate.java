@@ -82,7 +82,7 @@ class DeleteWorkDelegate implements LuceneWorkDelegate {
 
 	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {
 		if ( tenantId != null ) {
-			Term tenantTerm = new Term( ProjectionConstants.TENANT_ID, tenantId );
+			Term tenantTerm = new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
 			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.MUST );
 		}
 	}

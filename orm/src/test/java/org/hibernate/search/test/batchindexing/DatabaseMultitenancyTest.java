@@ -32,7 +32,7 @@ import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionPr
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.testing.RequiresDialect;
@@ -229,7 +229,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		FullTextSession session = Search.getFullTextSession( openSessionWithTenantId( tenantId ) );
 		session.createIndexer( entityType ).purgeAllOnStart( true ).startAndWait();
 		IndexReader indexReader = session.getSearchFactory().getIndexReaderAccessor().open( entityType );
-		long tenantIdTermFreq = indexReader.totalTermFreq( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
+		long tenantIdTermFreq = indexReader.docFreq( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 		session.close();
 		assertThat( tenantIdTermFreq ).isGreaterThan( 0 );
 	}
@@ -239,7 +239,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		session.purgeAll( entityType );
 		session.flushToIndexes();
 		IndexReader indexReader = session.getSearchFactory().getIndexReaderAccessor().open( entityType );
-		long tenantIdTermFreq = indexReader.totalTermFreq( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
+		long tenantIdTermFreq = indexReader.docFreq( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 		session.close();
 		assertThat( tenantIdTermFreq ).isEqualTo( 0 );
 	}

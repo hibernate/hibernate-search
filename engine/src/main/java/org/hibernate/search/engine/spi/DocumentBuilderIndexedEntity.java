@@ -18,6 +18,8 @@ import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
@@ -68,6 +70,12 @@ import org.hibernate.search.util.logging.impl.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
+
+	/**
+	 * The tenant identifier. This is not a projection constant as we're not storing it.
+	 */
+	public static final String TENANT_ID_FIELDNAME = "__HSearch_TenantId";
+
 	private static final Log log = LoggerFactory.make();
 
 	private static final LuceneOptions NULL_EMBEDDED_MARKER_OPTIONS;
@@ -84,6 +92,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						.build();
 		NULL_EMBEDDED_MARKER_OPTIONS = new LuceneOptionsImpl( fieldMetadata, 1f, 1f );
 	}
+
+	private static final FieldType TENANT_ID_FIELDTYPE = createTenantIdFieldType();
 
 	/**
 	 * Flag indicating whether {@link org.apache.lucene.search.IndexSearcher#doc(int, org.apache.lucene.index.StoredFieldVisitor)}
@@ -383,13 +393,26 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	private void addTenantIdIfRequired(String tenantId, Document doc) {
 		if ( tenantId != null ) {
 			Field tenantIdField = new Field(
-					ProjectionConstants.TENANT_ID,
+					TENANT_ID_FIELDNAME,
 					tenantId,
-					Field.Store.YES,
-					Field.Index.NOT_ANALYZED_NO_NORMS,
-					Field.TermVector.NO );
+					TENANT_ID_FIELDTYPE );
 			doc.add( tenantIdField );
 		}
+	}
+
+	private static FieldType createTenantIdFieldType() {
+		FieldType type = new FieldType();
+		type.setStored( false );
+		type.setIndexed( true );
+		type.setOmitNorms( true );
+		type.setIndexOptions( IndexOptions.DOCS_ONLY );
+		type.setTokenized( false );
+		type.setStoreTermVectorOffsets( false );
+		type.setStoreTermVectorPayloads( false );
+		type.setStoreTermVectorPositions( false );
+		type.setStoreTermVectors( false );
+		type.freeze();
+		return type;
 	}
 
 	private void buildDocumentFields(Object instance,

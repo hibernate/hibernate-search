@@ -20,6 +20,7 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -83,7 +84,7 @@ class DeleteByQueryWorkDelegate implements LuceneWorkDelegate {
 
 	private void addTenantQueryTerm(final String tenantId, BooleanQuery entityDeletionQuery) {
 		if ( tenantId != null ) {
-			Term tenantTerm = new Term( ProjectionConstants.TENANT_ID, tenantId );
+			Term tenantTerm = new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
 			entityDeletionQuery.add( new TermQuery( tenantTerm ), BooleanClause.Occur.MUST );
 		}
 	}

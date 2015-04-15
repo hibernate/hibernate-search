@@ -923,7 +923,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 		else {
 			// A query filter is more practical than a manual class filtering post query (esp on scrollable resultsets)
 			// it also probably minimise the memory footprint
-			TermQuery tenantIdFilter = new TermQuery( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
+			TermQuery tenantIdFilter = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 			// annihilate the scoring impact of TENANT_ID
 			tenantIdFilter.setBoost( 0 );
 

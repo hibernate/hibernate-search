@@ -20,7 +20,6 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.impl.ScopedAnalyzer;
@@ -65,7 +64,7 @@ public final class ByTermUpdateWorkDelegate extends UpdateWorkDelegate {
 				BooleanQuery deleteDocumentsQuery = new BooleanQuery();
 				deleteDocumentsQuery.add( exactMatchQuery, Occur.MUST );
 				if ( tenantId != null ) {
-					TermQuery tenantTermQuery = new TermQuery( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
+					TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
 					deleteDocumentsQuery.add( tenantTermQuery, Occur.MUST );
 				}
 				writer.deleteDocuments( deleteDocumentsQuery );

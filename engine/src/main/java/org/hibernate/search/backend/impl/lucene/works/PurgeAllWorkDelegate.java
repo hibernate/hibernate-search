@@ -12,6 +12,7 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.engine.ProjectionConstants;
+import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.exception.SearchException;
@@ -49,7 +50,7 @@ class PurgeAllWorkDelegate implements LuceneWorkDelegate {
 			}
 			else {
 				log.tracef( "purgeAll Lucene index using IndexWriter for type $1%s and tenant $2%s", entityType, tenantId );
-				Term tenantIdTerm = tenantId == null ? null : new Term( ProjectionConstants.TENANT_ID, tenantId );
+				Term tenantIdTerm = tenantId == null ? null : new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId );
 				BooleanQuery deleteDocumentsQuery = new BooleanQuery();
 				deleteDocumentsQuery.add( new TermQuery( entityTypeTerm ), Occur.MUST );
 				deleteDocumentsQuery.add( new TermQuery( tenantIdTerm ), Occur.MUST );
