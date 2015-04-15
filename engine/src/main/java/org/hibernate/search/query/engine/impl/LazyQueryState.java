@@ -103,6 +103,10 @@ public final class LazyQueryState implements Closeable {
 		searcher.search( rewrittenQuery(), filter, collector );
 	}
 
+	public IndexReader getIndexReader() {
+		return searcher.getIndexReader();
+	}
+
 	@Override
 	public void close() {
 		final IndexReader indexReader = searcher.getIndexReader();

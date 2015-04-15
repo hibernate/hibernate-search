@@ -17,6 +17,7 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetingRequest;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -36,6 +37,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.name( facetName )
 				.onField( indexFieldName )
 				.discrete()
+				.includeZeroCounts( true )
 				.createFacetingRequest();
 
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, Car.class );
@@ -68,6 +70,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.name( ccsFacetName )
 				.onField( ccsFacetFieldName )
 				.discrete()
+				.includeZeroCounts( true )
 				.createFacetingRequest();
 
 		final String colorFacetName = "color";
@@ -76,6 +79,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.name( colorFacetName )
 				.onField( colorFacetFieldName )
 				.discrete()
+				.includeZeroCounts( true )
 				.createFacetingRequest();
 
 		FullTextQuery query = createMatchAllQuery( Car.class );
@@ -127,6 +131,7 @@ public class FacetFilteringTest extends AbstractFacetTest {
 				.from( 1.01 ).to( 1.50 )
 				.from( 1.51 ).to( 3.00 )
 				.from( 4.00 ).to( 5.00 )
+				.includeZeroCounts( true )
 				.createFacetingRequest();
 		FullTextQuery query = createMatchAllQuery( Fruit.class );
 		FacetManager facetManager = query.getFacetManager();

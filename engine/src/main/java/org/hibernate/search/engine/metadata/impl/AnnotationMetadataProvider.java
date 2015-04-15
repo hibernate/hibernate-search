@@ -991,20 +991,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 					.indexNullAs( nullToken );
 		}
 
-		if ( !facetAnnotations.isEmpty() ) {
-			for ( Facet facetAnnotation : facetAnnotations ) {
-				String facetName;
-				if ( facetAnnotation.name().isEmpty() ) {
-					facetName = fieldName; // if not explicitly set the facet name is the same as the field name
-				}
-				else {
-					facetName = prefix + facetAnnotation.name();
-				}
-				FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder( facetName );
-				FacetEncodingType facetEncodingType = determineFacetEncodingType( member, facetAnnotation );
-				facetMetadataBuilder.setFacetEncoding( facetEncodingType );
-				fieldMetadataBuilder.addFacetMetadata( facetMetadataBuilder.build() );
+		for ( Facet facetAnnotation : facetAnnotations ) {
+			String facetName;
+			if ( facetAnnotation.name().isEmpty() ) {
+				facetName = fieldName; // if not explicitly set the facet name is the same as the field name
 			}
+			else {
+				facetName = prefix + facetAnnotation.name();
+			}
+			FacetMetadata.Builder facetMetadataBuilder = new FacetMetadata.Builder( facetName );
+			FacetEncodingType facetEncodingType = determineFacetEncodingType( member, facetAnnotation );
+			facetMetadataBuilder.setFacetEncoding( facetEncodingType );
+			fieldMetadataBuilder.addFacetMetadata( facetMetadataBuilder.build() );
 		}
 
 		DocumentFieldMetadata fieldMetadata = fieldMetadataBuilder.build();

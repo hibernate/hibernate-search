@@ -53,12 +53,28 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
  * A basic integration test that executes Hibernate Search in Apache Karaf using
  * PaxExam (see <a href="https://ops4j1.jira.com/wiki/display/PAXEXAM3/Pax+Exam">online docs</a>).
  *
- * To replicate  this on a Karaf console, type:
+ * If there is a problem with the actual feature configuration, debugging this tests won't help,
+ * since the Karaf container won't even start. In this case it is easiest to start a local Karaf installation:
+ * <pre>
+ * {@code
+ * > ./karaf
+ * }
+ * </pre>
+ *
+ * Then in the Karaf console type:
+ * <pre>
+ * {@code
  * feature:repo-add mvn:org.hibernate/hibernate-search-integrationtest-osgi-features/<version>/xml/features
  * feature:install hibernate-search
+ * }
+ * </pre>
  *
- * You can then verify the bundle with command:
- * list
+ * You can then verify the bundle existence with command:
+ * <pre>
+ * {@code
+ * feature:list
+ * }
+ * </pre>
  *
  * @author Hardy Ferentschik
  */

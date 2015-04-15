@@ -7,14 +7,35 @@
 package org.hibernate.search.query.engine.impl;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.facet.FacetResult;
+import org.apache.lucene.facet.FacetsCollector;
+import org.apache.lucene.facet.LabelAndValue;
+import org.apache.lucene.facet.range.DoubleRange;
+import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
+import org.apache.lucene.facet.range.LongRange;
+import org.apache.lucene.facet.range.LongRangeFacetCounts;
+import org.apache.lucene.facet.sortedset.DefaultSortedSetDocValuesReaderState;
+import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetCounts;
+import org.apache.lucene.facet.sortedset.SortedSetDocValuesReaderState;
+import org.apache.lucene.index.AtomicReader;
+import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.StoredFieldVisitor;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Filter;
@@ -26,18 +47,26 @@ import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Counter;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.query.collector.impl.FacetCollector;
+import org.hibernate.search.query.collector.impl.FacetsCollectorDecorator;
 import org.hibernate.search.query.collector.impl.FieldCacheCollector;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
+import org.hibernate.search.query.dsl.impl.DiscreteFacetRequest;
+import org.hibernate.search.query.dsl.impl.FacetRange;
 import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
+import org.hibernate.search.query.dsl.impl.RangeFacetRequest;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.spatial.Coordinates;
 import org.hibernate.search.spatial.impl.DistanceCollector;
+import org.hibernate.search.util.impl.ReflectionHelper;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A helper class which gives access to the current query and its hits. This class will dynamically
@@ -47,8 +76,17 @@ import org.hibernate.search.spatial.impl.DistanceCollector;
  * @author Sanne Grinovero <sanne@hibernate.org> (C) 2011 Red Hat Inc.
  */
 public class QueryHits {
+	private static final Log log = LoggerFactory.make();
 
 	private static final int DEFAULT_TOP_DOC_RETRIEVAL_SIZE = 100;
+	private static final int DEFAULT_FACET_RETRIEVAL_SIZE = 100;
+	private static final EnumMap<FacetSortOrder, FacetComparator> facetComparators = new EnumMap<>( FacetSortOrder.class );
+
+	static {
+		facetComparators.put( FacetSortOrder.COUNT_ASC, new FacetComparator( FacetSortOrder.COUNT_ASC ) );
+		facetComparators.put( FacetSortOrder.COUNT_DESC, new FacetComparator( FacetSortOrder.COUNT_DESC ) );
+		facetComparators.put( FacetSortOrder.FIELD_VALUE, new FacetComparator( FacetSortOrder.FIELD_VALUE ) );
+	}
 
 	private final LazyQueryState searcher;
 	private final Filter filter;
@@ -59,7 +97,7 @@ public class QueryHits {
 	private int totalHits;
 	private TopDocs topDocs;
 	private Map<String, List<Facet>> facetMap;
-	private List<FacetCollector> facetCollectors;
+	private FacetsCollector facetsCollector;
 	private DistanceCollector distanceCollector = null;
 
 	private final boolean enableFieldCacheOnClassName;
@@ -81,33 +119,42 @@ public class QueryHits {
 	private final TimeoutExceptionFactory timeoutExceptionFactory;
 
 	public QueryHits(LazyQueryState searcher,
-					Filter filter,
-					Sort sort,
-					TimeoutManagerImpl timeoutManager,
-					Map<String, FacetingRequestImpl> facetRequests,
-					boolean enableFieldCacheOnTypes,
-					FieldCacheCollectorFactory idFieldCollector,
-					TimeoutExceptionFactory timeoutExceptionFactory,
-					Coordinates spatialSearchCenter,
-					String spatialFieldName)
+			Filter filter,
+			Sort sort,
+			TimeoutManagerImpl timeoutManager,
+			Map<String, FacetingRequestImpl> facetRequests,
+			boolean enableFieldCacheOnTypes,
+			FieldCacheCollectorFactory idFieldCollector,
+			TimeoutExceptionFactory timeoutExceptionFactory,
+			Coordinates spatialSearchCenter,
+			String spatialFieldName)
 			throws IOException {
 		this(
-				searcher, filter, sort, DEFAULT_TOP_DOC_RETRIEVAL_SIZE, timeoutManager, facetRequests,
-				enableFieldCacheOnTypes, idFieldCollector, timeoutExceptionFactory, spatialSearchCenter, spatialFieldName
+				searcher,
+				filter,
+				sort,
+				DEFAULT_TOP_DOC_RETRIEVAL_SIZE,
+				timeoutManager,
+				facetRequests,
+				enableFieldCacheOnTypes,
+				idFieldCollector,
+				timeoutExceptionFactory,
+				spatialSearchCenter,
+				spatialFieldName
 		);
 	}
 
 	public QueryHits(LazyQueryState searcher,
-					Filter filter,
-					Sort sort,
-					Integer n,
-					TimeoutManagerImpl timeoutManager,
-					Map<String, FacetingRequestImpl> facetRequests,
-					boolean enableFieldCacheOnTypes,
-					FieldCacheCollectorFactory idFieldCollector,
-					TimeoutExceptionFactory timeoutExceptionFactory,
-					Coordinates spatialSearchCenter,
-					String spatialFieldName)
+			Filter filter,
+			Sort sort,
+			Integer n,
+			TimeoutManagerImpl timeoutManager,
+			Map<String, FacetingRequestImpl> facetRequests,
+			boolean enableFieldCacheOnTypes,
+			FieldCacheCollectorFactory idFieldCollector,
+			TimeoutExceptionFactory timeoutExceptionFactory,
+			Coordinates spatialSearchCenter,
+			String spatialFieldName)
 			throws IOException {
 		this.timeoutManager = timeoutManager;
 		this.searcher = searcher;
@@ -129,8 +176,10 @@ public class QueryHits {
 	/**
 	 * This document loading strategy doesn't return anything as it's the responsibility
 	 * of the passed StoredFieldVisitor instance to collect the data it needs.
+	 *
 	 * @param index
 	 * @param fieldVisitor
+	 *
 	 * @throws IOException
 	 */
 	public void visitDocument(int index, StoredFieldVisitor fieldVisitor) throws IOException {
@@ -211,7 +260,7 @@ public class QueryHits {
 			collector = topDocCollector;
 			collector = optionallyEnableFieldCacheOnTypes( collector, totalMaxDocs, maxDocs );
 			collector = optionallyEnableFieldCacheOnIds( collector, totalMaxDocs, maxDocs );
-			collector = optionallyEnableFacetingCollectors( collector );
+			collector = optionallyEnableFacetingCollector( collector );
 			collector = optionallyEnableDistanceCollector( collector, maxDocs );
 		}
 		else {
@@ -238,11 +287,8 @@ public class QueryHits {
 			this.topDocs = topDocCollector.topDocs();
 			this.totalHits = topDocs.totalHits;
 			// if we were collecting facet data we have to update our instance state
-			if ( facetCollectors != null && !facetCollectors.isEmpty() ) {
-				facetMap = new HashMap<String, List<Facet>>();
-				for ( FacetCollector facetCollector : facetCollectors ) {
-					facetMap.put( facetCollector.getFacetName(), facetCollector.getFacetList() );
-				}
+			if ( facetsCollector != null ) {
+				updateFacets();
 			}
 		}
 		else {
@@ -252,19 +298,207 @@ public class QueryHits {
 		timeoutManager.isTimedOut();
 	}
 
-	private Collector optionallyEnableFacetingCollectors(Collector collector) {
+	private void updateFacets() throws IOException {
+		facetMap = new HashMap<>();
+		for ( FacetingRequestImpl facetRequest : facetRequests.values() ) {
+			ArrayList<Facet> facets;
+			if ( facetRequest instanceof DiscreteFacetRequest ) {
+				facets = updateStringFacets( (DiscreteFacetRequest) facetRequest );
+			}
+			else {
+				facets = updateRangeFacets( (RangeFacetRequest) facetRequest );
+			}
+
+			// sort if necessary
+			if ( !facetRequest.getSort().equals( FacetSortOrder.RANGE_DEFINITION_ORDER ) ) {
+				Collections.sort( facets, facetComparators.get( facetRequest.getSort() ) );
+			}
+
+			// trim to the expected size
+			int maxNumberOfExpectedFacets = facetRequest.getMaxNumberOfFacets();
+			if ( maxNumberOfExpectedFacets > 0 && facets.size() > maxNumberOfExpectedFacets ) {
+				facets = new ArrayList<>( facets.subList( 0, facetRequest.getMaxNumberOfFacets() ) );
+			}
+
+			facetMap.put( facetRequest.getFacetingName(), facets );
+		}
+	}
+
+	private ArrayList<Facet> updateRangeFacets(RangeFacetRequest facetRequest) throws IOException {
+		ArrayList<Facet> facets;
+		if ( ReflectionHelper.isIntegerType( facetRequest.getFacetValueType() )
+				|| Date.class.isAssignableFrom( facetRequest.getFacetValueType() ) ) {
+			FacetResult facetResult = getFacetResultForLongRange( facetRequest );
+			facets = new ArrayList<>( facetResult.labelValues.length );
+			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
+				Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
+				facets.add( facet );
+			}
+		}
+		else if ( ReflectionHelper.isFloatingPointType( facetRequest.getFacetValueType() ) ) {
+			FacetResult facetResult = getFacetResultForFloatingPointRange( facetRequest );
+			facets = new ArrayList<>( facetResult.labelValues.length );
+			for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
+				if ( !facetRequest.hasZeroCountsIncluded() && (int) labelAndValue.value == 0 ) {
+					continue;
+				}
+
+				Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
+				facets.add( facet );
+			}
+		}
+		else {
+			throw log.unsupportedFacetRangeParameter( facetRequest.getFacetValueType().getName() );
+		}
+
+		return facets;
+	}
+
+	private FacetResult getFacetResultForFloatingPointRange(RangeFacetRequest facetRequest) throws IOException {
+		List<FacetRange<?>> facetRanges = facetRequest.getFacetRangeList();
+		DoubleRange[] ranges = new DoubleRange[facetRanges.size()];
+
+		int i = 0;
+		for ( FacetRange facetRange : facetRanges ) {
+			ranges[i] = new DoubleRange(
+					facetRange.getRangeString(),
+					facetRange.getMin() == null ? Double.MIN_VALUE : ( (Number) facetRange.getMin() ).doubleValue(),
+					facetRange.isMinIncluded(),
+					facetRange.getMax() == null ? Double.MAX_VALUE : ( (Number) facetRange.getMax() ).doubleValue(),
+					facetRange.isMaxIncluded()
+			);
+			i++;
+		}
+
+		DoubleRangeFacetCounts facetCount = new DoubleRangeFacetCounts(
+				facetRequest.getFieldName(),
+				facetsCollector,
+				ranges
+		);
+		return facetCount.getTopChildren(
+				facetRequest.getMaxNumberOfFacets(),
+				facetRequest.getFieldName()
+		);
+	}
+
+	private FacetResult getFacetResultForLongRange(RangeFacetRequest facetRequest)
+			throws IOException {
+		List<FacetRange<?>> facetRanges = facetRequest.getFacetRangeList();
+		LongRange[] ranges = new LongRange[facetRanges.size()];
+
+		int i = 0;
+		for ( FacetRange facetRange : facetRanges ) {
+			long min;
+			long max;
+
+			if ( ReflectionHelper.isIntegerType( facetRequest.getFacetValueType() ) ) {
+				min = facetRange.getMin() == null ? Long.MIN_VALUE : ( (Number) facetRange.getMin() ).longValue();
+				max = facetRange.getMax() == null ? Long.MAX_VALUE : ( (Number) facetRange.getMax() ).longValue();
+			}
+			else {
+				min = facetRange.getMin() == null ? Long.MIN_VALUE : ( (Date) facetRange.getMin() ).getTime();
+				max = facetRange.getMax() == null ? Long.MAX_VALUE : ( (Date) facetRange.getMax() ).getTime();
+			}
+
+			ranges[i] = new LongRange(
+					facetRange.getRangeString(),
+					min,
+					facetRange.isMinIncluded(),
+					max,
+					facetRange.isMaxIncluded()
+			);
+			i++;
+		}
+
+		LongRangeFacetCounts facetCount = new LongRangeFacetCounts(
+				facetRequest.getFieldName(),
+				facetsCollector,
+				ranges
+		);
+		return facetCount.getTopChildren(
+				facetRequest.getMaxNumberOfFacets(),
+				facetRequest.getFieldName()
+		);
+	}
+
+	private ArrayList<Facet> updateStringFacets(DiscreteFacetRequest facetRequest) throws IOException {
+		SortedSetDocValuesReaderState docValuesReaderState;
+		try {
+			docValuesReaderState = new DefaultSortedSetDocValuesReaderState( searcher.getIndexReader() );
+		}
+		catch (IllegalArgumentException e) {
+			// happens in case there are no facets at all configured for the matching documents
+			throw log.unknownFieldNameForFaceting( facetRequest.getFacetingName(), facetRequest.getFieldName() );
+		}
+		SortedSetDocValuesFacetCounts facetCounts = new SortedSetDocValuesFacetCounts(
+				docValuesReaderState, facetsCollector
+		);
+
+		Set<String> termValues = Collections.emptySet();
+		if ( facetRequest.hasZeroCountsIncluded() ) {
+			termValues = findAllTermsForField( facetRequest.getFieldName(), searcher.getIndexReader() );
+		}
+
+		int maxFacetCount = facetRequest.getMaxNumberOfFacets() < 0 ? DEFAULT_FACET_RETRIEVAL_SIZE : facetRequest.getMaxNumberOfFacets();
+		FacetResult facetResult;
+		try {
+			facetResult = facetCounts.getTopChildren( maxFacetCount, facetRequest.getFieldName() );
+		}
+		catch (IllegalArgumentException e) {
+			// happens in case there are facets in general, but not for this specific field
+			throw log.unknownFieldNameForFaceting( facetRequest.getFacetingName(), facetRequest.getFieldName() );
+		}
+		ArrayList<Facet> facets = new ArrayList<>();
+		for ( LabelAndValue labelAndValue : facetResult.labelValues ) {
+			Facet facet = facetRequest.createFacet( labelAndValue.label, (int) labelAndValue.value );
+			facets.add( facet );
+			termValues.remove( labelAndValue.label );
+		}
+
+		for ( String termValue : termValues ) {
+			Facet facet = facetRequest.createFacet( termValue, 0 );
+			facets.add( 0, facet );
+		}
+		return facets;
+	}
+
+	/**
+	 * Returns a set of all possible indexed values for a given field name.
+	 *
+	 * Per default Lucene's native discrete faceting won't return values where
+	 * the count would be 0 for a given query. To still include these "zero count values"
+	 * we need to go the the index and find all potential values for a field and compare them
+	 * against the values which had a count. This might potentially be expensive, so returning
+	 * zero count values is per default disabled.
+	 *
+	 * @param fieldName the document field name
+	 * @param reader the index reader
+	 * @return a set of all possible indexed values for a given field name
+	 * @throws IOException
+	 */
+	private Set<String> findAllTermsForField(String fieldName, IndexReader reader) throws IOException {
+		Set<String> termValues = new HashSet<>();
+		for ( AtomicReaderContext leaf : reader.leaves() ) {
+			final AtomicReader atomicReader = leaf.reader();
+			Terms terms = atomicReader.terms( fieldName );
+			if ( terms == null ) {
+				continue;
+			}
+			final TermsEnum iterator = terms.iterator( null ); //we have no TermsEnum to reuse
+			BytesRef byteRef;
+			while ( ( byteRef = iterator.next() ) != null ) {
+				termValues.add( byteRef.utf8ToString() );
+			}
+		}
+		return termValues;
+	}
+
+	private Collector optionallyEnableFacetingCollector(Collector collector) {
 		if ( facetRequests == null || facetRequests.isEmpty() ) {
 			return collector;
 		}
-		facetCollectors = new ArrayList<FacetCollector>();
-		Collector nextInChain = collector;
-		for ( FacetingRequestImpl entry : facetRequests.values() ) {
-			FacetCollector facetCollector = new FacetCollector( nextInChain, entry );
-			nextInChain = facetCollector;
-			facetCollectors.add( facetCollector );
-		}
-
-		return facetCollectors.get( facetCollectors.size() - 1 );
+		facetsCollector = new FacetsCollector();
+		return new FacetsCollectorDecorator( facetsCollector, collector );
 	}
 
 	private Collector optionallyEnableDistanceCollector(Collector collector, int maxDocs) {
@@ -303,7 +537,7 @@ public class QueryHits {
 			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
 			if ( timeoutLeft != null ) {
 				Counter counter = timeoutManager.getLuceneTimeoutCounter();
-				maybeTimeLimitingCollector = new TimeLimitingCollector( collector, counter, timeoutLeft);
+				maybeTimeLimitingCollector = new TimeLimitingCollector( collector, counter, timeoutLeft );
 			}
 		}
 		return maybeTimeLimitingCollector;
@@ -354,5 +588,26 @@ public class QueryHits {
 
 	public FieldCacheCollector getIdsCollector() {
 		return idFieldCollector;
+	}
+
+	public static class FacetComparator implements Comparator<Facet>, Serializable {
+		private final FacetSortOrder sortOder;
+
+		public FacetComparator(FacetSortOrder sortOrder) {
+			this.sortOder = sortOrder;
+		}
+
+		@Override
+		public int compare(Facet facet1, Facet facet2) {
+			if ( FacetSortOrder.COUNT_ASC.equals( sortOder ) ) {
+				return facet1.getCount() - facet2.getCount();
+			}
+			else if ( FacetSortOrder.COUNT_DESC.equals( sortOder ) ) {
+				return facet2.getCount() - facet1.getCount();
+			}
+			else {
+				return facet1.getValue().compareTo( facet2.getValue() );
+			}
+		}
 	}
 }
