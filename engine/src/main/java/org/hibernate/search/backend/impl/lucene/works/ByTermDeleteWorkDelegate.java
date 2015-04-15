@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.impl.lucene.works;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.lucene.index.IndexWriter;
@@ -18,7 +19,6 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.IndexingMonitor;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.bridge.util.impl.NumericFieldUtils;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -48,20 +48,12 @@ public final class ByTermDeleteWorkDelegate extends DeleteWorkDelegate {
 		Serializable id = work.getId();
 		log.tracef( "Removing %s#%s by id using an IndexWriter.", managedType, id );
 		try {
-			BooleanQuery termDeleteQuery = new BooleanQuery();
-			if ( tenantId != null ) {
-				TermQuery tenantTermQuery = new TermQuery( new Term( ProjectionConstants.TENANT_ID, tenantId ) );
-				termDeleteQuery.add( tenantTermQuery, Occur.MUST );
-			}
-			if ( isIdNumeric( builder ) ) {
-				Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
-				termDeleteQuery.add( exactMatchQuery, Occur.MUST );
+			if ( tenantId == null ) {
+				deleteWithoutTenant( work, writer, builder, id );
 			}
 			else {
-				Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
-				termDeleteQuery.add( new TermQuery( idTerm ), Occur.MUST );
+				deleteWithTenant( work, writer, tenantId, builder, id );
 			}
-			writer.deleteDocuments( termDeleteQuery );
 			workspace.notifyWorkApplied( work );
 		}
 		catch (Exception e) {
@@ -70,5 +62,30 @@ public final class ByTermDeleteWorkDelegate extends DeleteWorkDelegate {
 		}
 	}
 
+	private void deleteWithTenant(LuceneWork work, IndexWriter writer, final String tenantId, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
+		BooleanQuery termDeleteQuery = new BooleanQuery();
+		TermQuery tenantTermQuery = new TermQuery( new Term( DocumentBuilderIndexedEntity.TENANT_ID_FIELDNAME, tenantId ) );
+		termDeleteQuery.add( tenantTermQuery, Occur.MUST );
+		if ( isIdNumeric( builder ) ) {
+			Query exactMatchQuery = NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id );
+			termDeleteQuery.add( exactMatchQuery, Occur.MUST );
+		}
+		else {
+			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+			termDeleteQuery.add( new TermQuery( idTerm ), Occur.MUST );
+		}
+		writer.deleteDocuments( termDeleteQuery );
+	}
+
+	private void deleteWithoutTenant(LuceneWork work, IndexWriter writer, DocumentBuilderIndexedEntity builder, Serializable id) throws IOException {
+		if ( isIdNumeric( builder ) ) {
+			writer.deleteDocuments( NumericFieldUtils.createExactMatchQuery( builder.getIdKeywordName(), id ) );
+		}
+		else {
+			Term idTerm = new Term( builder.getIdKeywordName(), work.getIdInString() );
+			//The point to this class is to avoid using a Query to perform the delete operation!
+			writer.deleteDocuments( idTerm );
+		}
+	}
 
 }
