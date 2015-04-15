@@ -432,11 +432,23 @@ When two entities share the same index they must declare the same Similarity imp
 [[section-multi-tenancy]]
 === Multi-tenancy
 
+==== What is multi-tenancy?
+
+The term multi-tenancy in general is applied to software development to indicate an architecture in
+which a single running instance of an application simultaneously serves multiple clients (tenants).
+Isolating information (data, customizations, etc) pertaining to the various tenants is a particular
+challenge in these systems.
+This includes the data owned by each tenant stored in the database.
+You will find more details on how to enable multi-tenancy with Hibernate in the
+link:$$http://docs.jboss.org/hibernate/orm/4.3/devguide/en-US/html/ch16.html$$[Hibernate ORM developer's guide].
+
+You can create a tenant-aware `FullTextSession` in the following way:
+
 Hibernate Search supports multi-tenancy on top of Hibernate ORM, it stores the tenant identifier in
 the document and automatically filters the query results.
 
-You can find more details about multi-tenancy in the
-link:$$http://hibernate.org/orm/documentation/$$[Hibernate ORM documentation].
+The `FullTextSession` will be bound to the specific tenant ("client-A" in the example)
+and the mass indexer will only index the entities associated to that tenant identifier.
 
 .Bind the session to a tenant
 ====
@@ -444,7 +456,7 @@ link:$$http://hibernate.org/orm/documentation/$$[Hibernate ORM documentation].
 ----
 Session session = getSessionFactory()
                       .withOptions()
-                          .tenantIdentifier( "YOUR_TENANT_ID" )
+                          .tenantIdentifier( "client-A" )
                   .openSession();
 
 FullTextSession session = Search.getFullTextSession( session );
