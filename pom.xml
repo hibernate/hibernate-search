@@ -30,6 +30,7 @@
         <module>testing</module>
         <module>infinispan</module>
         <module>modules</module>
+        <module>feature-pack</module>
         <module>integrationtest/jms</module>
         <module>integrationtest/narayana</module>
         <module>integrationtest/spring</module>
