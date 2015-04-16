@@ -1,6 +1,38 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.2.0.Beta1 (16-4-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1684] - ResultTransformer ignores transformList on tuples
+    * [HSEARCH-1793] - CriteriaObjectInitializer causes too many object loads in cross hierarchy queries
+    * [HSEARCH-1804] - Boost on IndexedEmbedded properties
+    * [HSEARCH-1811] - Wildcard with multiple fields
+    * [HSEARCH-1824] - Hot-restarting a mutable SearchFactory has it "forget" the previously defined FilterDef and Analyzers
+    * [HSEARCH-1825] - NullEncodingTwoWayFieldBridge doesn't set the null marker when used as a FieldBridge
+    * [HSEARCH-1836] - Avoid NPE in NullEncodingTwoWayFieldBridge for non existing fields
+
+** Improvement
+    * [HSEARCH-655] - Implements the FuturTask.cancel function in the MassIndexer
+    * [HSEARCH-1356] - Refactor WorkVisitor to match more the expectations on a Visitor pattern
+    * [HSEARCH-1762] - Improve javadocs of builtin bridges
+    * [HSEARCH-1831] - Correcting various typos in the documentation
+    * [HSEARCH-1850] - Avoid extending Startable and Stoppable interfaces as part of a Service contract
+
+** New Feature
+    * [HSEARCH-1765] - Add support for deleting by Query
+    * [HSEARCH-1792] - Support multi-tenancy
+    * [HSEARCH-1837] - Allow Integrators to customize default directory providers for shortcuts
+
+** Task
+    * [HSEARCH-1773] - org.hibernate.search.backend.impl.WorkVisitor not exported by engine osgi bundle
+    * [HSEARCH-1835] - Fix typo in javadoc of @Spatial
+    * [HSEARCH-1841] - Refactor DeleteByQuerySupport
+    * [HSEARCH-1843] - Bump hibernate search module slot name to "5.2"
+    * [HSEARCH-1845] - Upgrade to Pax Exam 4.4.0 to improve port allocation during tests
+
+
 Version 5.1.0.Final (3-3-2015)
 ------------------------
 
