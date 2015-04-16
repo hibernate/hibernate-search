@@ -14,6 +14,8 @@ import org.hibernate.search.backend.LuceneWork;
  * Representation of deleteByQuery(...) from Lucene. Currently not all functionality of Lucene is supported but can be
  * added
  *
+ * @hsearch.experimental
+ *
  * @author Martin Braun
  */
 public class DeleteByQueryLuceneWork extends LuceneWork {

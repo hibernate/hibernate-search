@@ -24,6 +24,8 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
 /**
  * DeleteByQuery equivalent to {@link org.apache.lucene.search.TermQuery}
  *
+ * @hsearch.experimental
+ *
  * @author Martin Braun
  */
 public final class SingularTermDeletionQuery implements DeletionQuery {
