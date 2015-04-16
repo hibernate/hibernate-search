@@ -6,12 +6,6 @@
  */
 package org.hibernate.search.backend.impl;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.SingularTermDeletionQuery;
 import org.hibernate.search.util.logging.impl.Log;
@@ -40,25 +34,11 @@ public final class DeleteByQuerySupport {
 		}
 	}
 
-	private static final Lock SUPPORTED_TYPES_LOCK = new ReentrantLock();
-	private static Set<Class<? extends DeletionQuery>> SUPPORTED_TYPES;
-
 	public static boolean isSupported(Class<? extends DeletionQuery> type) {
-		if ( SUPPORTED_TYPES == null ) {
-			// LAZY init, but don't to it more than once
-			SUPPORTED_TYPES_LOCK.lock();
-			try {
-				if ( SUPPORTED_TYPES == null ) {
-					Set<Class<? extends DeletionQuery>> set = new HashSet<>();
-					set.add( SingularTermDeletionQuery.class );
-					SUPPORTED_TYPES = Collections.unmodifiableSet( set );
-				}
-			}
-			finally {
-				SUPPORTED_TYPES_LOCK.unlock();
-			}
+		if ( SingularTermDeletionQuery.class == type ) {
+			return true;
 		}
-		return SUPPORTED_TYPES.contains( type );
+		return false;
 	}
 
 }
