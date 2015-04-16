@@ -1,21 +1,26 @@
 Red Hat, Inc.
 Adam Harris
+Adrian Nistor
 Ales Justin
 Amin Mohammed-Coleman
+Andrej Golovnin
 Andrew Hahn
 Bayo Erinle
 Boris Lublinsky
 Chase Seibert
 Davide D'Alto
+Davide Di Somma
 Dawid Kurzyniec
 Elmer van Chastelet
 Emmanuel Bernard
+Gail Badner
 Gavin King
 Grégoire Rolland
 Guillaume Smet
 Gunnar Morling
 Gustavo Fernandes
 Hardy Ferentschik
+Horia Chiorean
 John Griffin
 Jonathan Halliday
 Julie Ingignoli
@@ -25,19 +30,30 @@ Laurent Almeras
 Lukasz Moren
 Manuel Dominguez
 Marina Vatkina
+Martin Braun
 Mathieu Perez
+Matthew Aynalem
 Mattias Arbin
+Michael J. Simons
 Nabeel Ali Memon
 Navin Surtani
 Nick Vincent
 Nicolas Helleringer
 Oliver Siegmar
+Pedro Ruivo
+Randall Hauch
 Richard Hallier
 Samppa Saarela
 Sanne Grinovero
+Stéphane Gleizes
 Steve Ebersole
 Strong Liu
 Sylvain Vieujot
+Thach Hoang
+Tomas Hradec
 Tom Kuo
 Tom Waterhouse
+Török László
+Yoann Rodière
 Zach Kurey
+
