@@ -13,7 +13,7 @@ import java.io.IOException;
 import org.apache.lucene.index.CorruptIndexException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
-import org.hibernate.search.backend.DeletionQuery;
+import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.cfg.Environment;

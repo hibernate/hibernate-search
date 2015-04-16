@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend;
 
+import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
+
 /**
  * Contract for visitors of {@link LuceneWork} types.
  * <p>

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.impl;
 
-import org.hibernate.search.backend.DeletionQuery;
-import org.hibernate.search.backend.SingularTermDeletionQuery;
+import org.hibernate.search.backend.spi.DeletionQuery;
+import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 

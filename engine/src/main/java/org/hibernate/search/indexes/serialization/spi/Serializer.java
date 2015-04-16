@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.index.IndexableField;
-import org.hibernate.search.backend.DeletionQuery;
 import org.hibernate.search.backend.LuceneWork;
+import org.hibernate.search.backend.spi.DeletionQuery;
 
 /**
  * Contract between Hibernate Search and the Serialization mechanism.
