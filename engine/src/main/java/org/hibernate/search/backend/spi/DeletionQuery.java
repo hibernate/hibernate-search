@@ -14,6 +14,8 @@ import org.hibernate.search.util.impl.ScopedAnalyzer;
  * These have to be passed safely between VMs (we cannot rely on Lucene's queries here
  * because of that).
  *
+ * @hsearch.experimental
+ *
  * @author Martin Braun
  */
 public interface DeletionQuery {

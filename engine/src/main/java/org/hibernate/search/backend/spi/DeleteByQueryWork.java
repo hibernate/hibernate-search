@@ -11,6 +11,8 @@ import org.hibernate.search.backend.impl.DeleteByQuerySupport;
 /**
  * Delete via a serializable query
  *
+ * @hsearch.experimental
+ *
  * @author Martin Braun
  */
 public class DeleteByQueryWork extends Work {
