@@ -7,6 +7,7 @@
 package org.hibernate.search.test.jms.slave;
 
 import java.util.Properties;
+
 import javax.jms.MessageConsumer;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
@@ -16,16 +17,14 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 
 import org.apache.activemq.broker.BrokerService;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
-import org.hibernate.search.backend.SingularTermDeletionQuery;
 import org.hibernate.search.backend.jms.impl.JmsBackendQueueProcessor;
 import org.hibernate.search.backend.spi.DeleteByQueryWork;
+import org.hibernate.search.backend.spi.SingularTermDeletionQuery;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.jms.master.JMSMasterTest;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;

@@ -7,13 +7,13 @@
 package org.hibernate.search.backend.impl.lucene.works;
 
 import org.hibernate.search.backend.AddLuceneWork;
-import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.DeleteLuceneWork;
 import org.hibernate.search.backend.FlushLuceneWork;
 import org.hibernate.search.backend.IndexWorkVisitor;
 import org.hibernate.search.backend.OptimizeLuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
+import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.store.Workspace;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;

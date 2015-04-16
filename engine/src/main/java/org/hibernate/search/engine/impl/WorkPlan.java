@@ -16,11 +16,11 @@ import java.util.Set;
 
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.backend.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.PurgeAllLuceneWork;
-import org.hibernate.search.backend.DeletionQuery;
+import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryWork;
+import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.bridge.spi.ConversionContext;

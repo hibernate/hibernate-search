@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.util.AttributeImpl;
-import org.hibernate.search.backend.DeletionQuery;
+import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.bridge.spi.ConversionContext;
 
 /**
