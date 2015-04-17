@@ -16,9 +16,17 @@ import java.util.List;
  */
 public interface FacetSelection {
 	/**
-	 * @param facets An array of facets which have to be applied as disjunction onto the current query
+	 * @param facets An array of facets which have to be applied as disjunction onto the current query. Facets are combined
+	 * via {@link FacetCombine#OR}.
 	 */
 	void selectFacets(Facet... facets);
+
+	/**
+	 * @param combineBy enum value defining how the different facet should be combined when building a boolean query which
+	 * gets applied onto the current query
+	 * @param facets An array of facets which have to be applied as disjunction onto the current query
+	 */
+	void selectFacets(FacetCombine combineBy, Facet... facets);
 
 	/**
 	 * @return returns an unmodifiable list of the currently selected facets

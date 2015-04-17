@@ -106,5 +106,12 @@ public abstract class AbstractFacetTest extends SearchTestBase {
 		}
 	}
 
+	public void assertFacetValues(List<Facet> facetList, Object[] values) {
+		assertEquals( "Wrong number of facets", values.length, facetList.size() );
+		for ( int i = 0; i < facetList.size(); i++ ) {
+			assertEquals( "Wrong facet value for facet " + i, values[i], facetList.get( i ).getValue() );
+		}
+	}
+
 	public abstract void loadTestData(Session session);
 }
