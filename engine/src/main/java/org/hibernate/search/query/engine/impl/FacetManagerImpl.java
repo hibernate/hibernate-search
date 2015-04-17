@@ -21,6 +21,7 @@ import org.hibernate.search.query.dsl.impl.FacetingRequestImpl;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetCombine;
 import org.hibernate.search.query.facet.FacetSelection;
 import org.hibernate.search.query.facet.FacetingRequest;
 
@@ -152,15 +153,17 @@ public class FacetManagerImpl implements FacetManager {
 	}
 
 	private Query createSelectionGroupQuery(FacetSelectionImpl selection) {
-		BooleanQuery orQuery = new BooleanQuery();
+		BooleanQuery boolQuery = new BooleanQuery();
 		for ( Facet facet : selection.getFacetList() ) {
-			orQuery.add( facet.getFacetQuery(), BooleanClause.Occur.SHOULD );
+			boolQuery.add( facet.getFacetQuery(), selection.getOccurType() );
 		}
-		return orQuery;
+		return boolQuery;
 	}
 
 	class FacetSelectionImpl implements FacetSelection {
 		private final List<Facet> facetList = newArrayList();
+
+		private BooleanClause.Occur occurType = BooleanClause.Occur.SHOULD;
 
 		public List<Facet> getFacetList() {
 			return facetList;
@@ -168,9 +171,22 @@ public class FacetManagerImpl implements FacetManager {
 
 		@Override
 		public void selectFacets(Facet... facets) {
+			selectFacets( FacetCombine.OR, facets );
+		}
+
+		@Override
+		public void selectFacets(FacetCombine combineBy, Facet... facets) {
 			if ( facets == null ) {
 				return;
 			}
+
+			if ( FacetCombine.OR.equals( combineBy ) ) {
+				occurType = BooleanClause.Occur.SHOULD;
+			}
+			else {
+				occurType = BooleanClause.Occur.MUST;
+			}
+
 			facetList.addAll( Arrays.asList( facets ) );
 			queryHasChanged();
 		}
@@ -192,6 +208,10 @@ public class FacetManagerImpl implements FacetManager {
 		public void clearSelectedFacets() {
 			facetList.clear();
 			queryHasChanged();
+		}
+
+		public BooleanClause.Occur getOccurType() {
+			return occurType;
 		}
 	}
 }

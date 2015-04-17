@@ -8,6 +8,7 @@ package org.hibernate.search.test.query.facet;
 
 import java.util.List;
 
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.Session;
@@ -16,7 +17,9 @@ import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetCombine;
 import org.hibernate.search.query.facet.FacetingRequest;
+import org.hibernate.testing.TestForIssue;
 
 import org.junit.Test;
 
@@ -149,6 +152,45 @@ public class FacetFilteringTest extends AbstractFacetTest {
 		assertFacetCounts( newFacetList, new int[] { 2, 0, 0, 0 } );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-812")
+	public void testDiscreteFacetDrillDownWithMultiFacetSelect() throws Exception {
+		final String indexFieldName = "ingredients.name";
+		final String facetName = "ingredientsFacetRequest";
+
+		FacetingRequest request = queryBuilder( Recipe.class ).facet()
+				.name( facetName )
+				.onField( indexFieldName )
+				.discrete()
+				.createFacetingRequest();
+
+		FullTextQuery query = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), Recipe.class );
+		FacetManager facetManager = query.getFacetManager();
+		facetManager.enableFaceting( request );
+
+		assertEquals( "Wrong number of query matches", 3, query.getResultSize() );
+
+		List<Facet> facetList = facetManager.getFacets( facetName );
+		assertFacetCounts( facetList, new int[] { 3, 2, 1, 1, 1 } );
+		assertFacetValues( facetList, new Object[] { "Egg", "Potato", "Milk", "Onion", "Salt" } );
+
+		// use default facet selection via FacetCombine.OR - all should stay the same since there
+		// are eggs in all recipts
+		facetManager.getFacetGroup( facetName ).selectFacets( facetList.get( 0 ), facetList.get( 3 ) );
+		query.list();
+		assertEquals( "Wrong number of query matches", 3, query.getResultSize() );
+		facetList = facetManager.getFacets( facetName );
+		assertFacetCounts( facetList, new int[] { 3, 2, 1, 1, 1 } );
+		assertFacetValues( facetList, new Object[] { "Egg", "Potato", "Milk", "Onion", "Salt" } );
+
+		facetManager.getFacetGroup( facetName ).selectFacets( FacetCombine.AND, facetList.get( 0 ), facetList.get( 3 ) );
+		query.list();
+		assertEquals( "Wrong number of query matches", 1, query.getResultSize() );
+		facetList = facetManager.getFacets( facetName );
+		assertFacetCounts( facetList, new int[] { 1, 1, 1, 1 } );
+		assertFacetValues( facetList, new Object[] { "Egg", "Onion", "Potato", "Salt" } );
+	}
+
 	@Override
 	public void loadTestData(Session session) {
 		Transaction tx = session.beginTransaction();
@@ -170,6 +212,34 @@ public class FacetFilteringTest extends AbstractFacetTest {
 
 		car = new Car( "Ford", "yellow", 2500 );
 		session.save( car );
+
+		Ingredient potato = new Ingredient( "Potato" );
+		session.save( potato );
+
+		Ingredient milk = new Ingredient( "Milk" );
+		session.save( milk );
+
+		Ingredient salt = new Ingredient( "Salt" );
+		session.save( salt );
+
+		Ingredient egg = new Ingredient( "Egg" );
+		session.save( egg );
+
+		Ingredient onion = new Ingredient( "Onion" );
+		session.save( onion );
+
+		Recipe potatoMash = new Recipe( "Potato Mash" );
+		potatoMash.addIngredients( potato, milk, egg );
+		session.save( potatoMash );
+
+		Recipe tortilla = new Recipe( "Tortilla" );
+		tortilla.addIngredients( potato, egg, onion, salt );
+		session.save( tortilla );
+
+		Recipe poachedEgg = new Recipe( "Poached Egg" );
+		poachedEgg.addIngredients( egg );
+		session.save( poachedEgg );
+
 		tx.commit();
 		session.clear();
 	}
@@ -178,7 +248,9 @@ public class FacetFilteringTest extends AbstractFacetTest {
 	protected Class<?>[] getAnnotatedClasses() {
 		return new Class[] {
 				Car.class,
-				Fruit.class
+				Fruit.class,
+				Recipe.class,
+				Ingredient.class
 		};
 	}
 }
