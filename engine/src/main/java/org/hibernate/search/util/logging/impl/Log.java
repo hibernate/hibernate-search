@@ -816,4 +816,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 272, value = "Entity '%1$s' is not an indexed entity. Unable to create faceting request")
 	SearchException attemptToCreateFacetingRequestForUnindexedEntity(String entityName);
+
+	@Message(id = 273, value = "The indexed field '%1$s' in '%2$s' is analyzed and marked for faceting. Only un-analyzed fields can be faceted.")
+	SearchException attemptToFacetOnAnalyzedField(String fieldName, String entityName);
 }

@@ -34,7 +34,7 @@ public class Car {
 	@Facet
 	private String color;
 
-	@Field(store = Store.YES)
+	@Field(analyze = Analyze.NO, store = Store.YES)
 	@Facet
 	private String make;
 

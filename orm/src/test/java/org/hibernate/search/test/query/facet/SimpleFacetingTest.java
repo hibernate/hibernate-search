@@ -276,7 +276,7 @@ public class SimpleFacetingTest extends AbstractFacetTest {
 				.orderedBy( FacetSortOrder.COUNT_ASC )
 				.includeZeroCounts( true )
 				.createFacetingRequest();
-		TermQuery term = new TermQuery( new Term( "make", "honda" ) );
+		TermQuery term = new TermQuery( new Term( "make", "Honda" ) );
 		FullTextQuery query = fullTextSession.createFullTextQuery( term, Car.class );
 		FacetManager facetManager = query.getFacetManager();
 

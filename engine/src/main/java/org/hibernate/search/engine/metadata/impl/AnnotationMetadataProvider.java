@@ -992,6 +992,9 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 		}
 
 		for ( Facet facetAnnotation : facetAnnotations ) {
+			if ( Analyze.YES.equals( fieldAnnotation.analyze() ) ) {
+				throw log.attemptToFacetOnAnalyzedField( fieldName, member.getDeclaringClass().getName() );
+			}
 			String facetName;
 			if ( facetAnnotation.name().isEmpty() ) {
 				facetName = fieldName; // if not explicitly set the facet name is the same as the field name

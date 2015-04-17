@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.FacetEncodingType;
@@ -105,6 +106,17 @@ public class DocumentFieldMetadataTest {
 		}
 	}
 
+	@Test
+	public void testAddingFacetToUnalyzedFieldThrowsException() {
+		try {
+			metadataProvider.getTypeMetadataFor( Snafu.class );
+			fail( "Field targeted for faceting cannot be analyzed" );
+		}
+		catch (SearchException e) {
+			assertTrue( "Unexpected error message: " + e.getMessage(), e.getMessage().startsWith( "HSEARCH000273" ) );
+		}
+	}
+
 	private FacetMetadata getSingleFacetMetadata(Class<?> type, String fieldName) {
 		TypeMetadata typeMetadata = metadataProvider.getTypeMetadataFor( type );
 		DocumentFieldMetadata documentFieldMetadata = typeMetadata.getDocumentFieldMetadataFor( fieldName );
@@ -122,7 +134,7 @@ public class DocumentFieldMetadataTest {
 		@DocumentId
 		private Integer id;
 
-		@Field
+		@Field(analyze = Analyze.NO)
 		@Facet
 		private String name;
 	}
@@ -132,7 +144,7 @@ public class DocumentFieldMetadataTest {
 		@DocumentId
 		private Integer id;
 
-		@Field
+		@Field(analyze = Analyze.NO)
 		@Facet
 		private URI uri;
 	}
@@ -142,7 +154,7 @@ public class DocumentFieldMetadataTest {
 		@DocumentId
 		private Integer id;
 
-		@Field
+		@Field(analyze = Analyze.NO)
 		@Facet
 		private Date date;
 	}
@@ -152,7 +164,7 @@ public class DocumentFieldMetadataTest {
 		@DocumentId
 		private Integer id;
 
-		@Field
+		@Field(analyze = Analyze.NO)
 		@Facet(name = "facet_name")
 		private String name;
 	}
@@ -163,8 +175,8 @@ public class DocumentFieldMetadataTest {
 		private Integer id;
 
 		@Fields({
-				@Field,
-				@Field(name = "facet_value")
+				@Field(analyze = Analyze.NO),
+				@Field(analyze = Analyze.NO, name = "facet_value")
 		})
 		@Facet(forField = "facet_value")
 		private double value;
@@ -176,14 +188,24 @@ public class DocumentFieldMetadataTest {
 		private Integer id;
 
 		@Fields({
-				@Field,
-				@Field(name = "facet_value")
+				@Field(analyze = Analyze.NO),
+				@Field(analyze = Analyze.NO, name = "facet_value")
 		})
 		@Facets({
 				@Facet,
 				@Facet(forField = "facet_value", encoding = FacetEncodingType.STRING)
 		})
 		private double value;
+	}
+
+	@Indexed
+	public class Snafu {
+		@DocumentId
+		private Integer id;
+
+		@Field
+		@Facet
+		private String name;
 	}
 }
 

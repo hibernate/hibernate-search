@@ -24,7 +24,7 @@ public class Truck {
 	@GeneratedValue
 	private int id;
 
-	@Field(index = Index.YES, analyze = Analyze.YES, store = Store.YES, indexNullAs = "-1")
+	@Field(index = Index.YES, analyze = Analyze.NO, store = Store.YES, indexNullAs = "-1")
 	@Facet
 	private Integer horsePower;
 
