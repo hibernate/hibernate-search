@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.query.engine.impl;
 
+import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
+import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInstance;
+import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResults;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -41,12 +45,13 @@ import org.hibernate.search.filter.ShardSensitiveOnlyFilter;
 import org.hibernate.search.filter.StandardFilterKey;
 import org.hibernate.search.filter.impl.CachingWrapperFilter;
 import org.hibernate.search.filter.impl.ChainedFilter;
-import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.filter.impl.DefaultFilterKey;
+import org.hibernate.search.filter.impl.FullTextFilterImpl;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.collector.impl.FieldCacheCollectorFactory;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.GroupingManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
@@ -58,10 +63,6 @@ import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-
-import static org.hibernate.search.util.impl.CollectionHelper.newHashMap;
-import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheInstance;
-import static org.hibernate.search.util.impl.FilterCacheModeTypeHelper.cacheResults;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -103,6 +104,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private Set<String> idFieldNames;
 	private boolean useFieldCacheOnClassTypes = false;
 	private transient FacetManagerImpl facetManager;
+	private transient GroupingManager groupingManager;
 	private transient TimeoutExceptionFactory timeoutExceptionFactory;
 	private Coordinates spatialSearchCenter = null;
 	private String spatialFieldName = null;
@@ -114,10 +116,11 @@ public class HSQueryImpl implements HSQuery, Serializable {
 	private Integer resultSize;
 	private String tenantId;
 
-
 	public HSQueryImpl(ExtendedSearchIntegrator extendedIntegrator) {
 		this.extendedIntegrator = extendedIntegrator;
 		this.timeoutExceptionFactory = extendedIntegrator.getDefaultTimeoutExceptionFactory();
+		this.facetManager = new FacetManagerImpl( this );
+		this.groupingManager = new GroupingManagerImpl( this );
 	}
 
 	@Override
@@ -244,10 +247,12 @@ public class HSQueryImpl implements HSQuery, Serializable {
 
 	@Override
 	public FacetManagerImpl getFacetManager() {
-		if ( facetManager == null ) {
-			facetManager = new FacetManagerImpl( this );
-		}
 		return facetManager;
+	}
+
+	@Override
+	public GroupingManager getGroupingManager() {
+		return groupingManager;
 	}
 
 	@Override
@@ -447,6 +452,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					sort,
 					getTimeoutManagerImpl(),
 					facetManager.getFacetRequests(),
+					groupingManager.getGrouping(),
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory(),
 					this.timeoutExceptionFactory,
@@ -461,6 +467,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					null,
 					0,
 					getTimeoutManagerImpl(),
+					null,
 					null,
 					false,
 					null,
@@ -477,6 +484,7 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					n,
 					getTimeoutManagerImpl(),
 					facetManager.getFacetRequests(),
+					groupingManager.getGrouping(),
 					useFieldCacheOnTypes(),
 					getAppropriateIdFieldCollectorFactory(),
 					this.timeoutExceptionFactory,
@@ -491,6 +499,8 @@ public class HSQueryImpl implements HSQuery, Serializable {
 					.searchExecuted( searcher.describeQuery(), System.nanoTime() - startTime );
 		}
 		facetManager.setFacetResults( queryHits.getFacets() );
+		groupingManager.setGroupingResult( queryHits.getGroupingResult() );
+
 		return queryHits;
 	}
 

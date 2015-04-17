@@ -35,6 +35,7 @@ import org.hibernate.search.query.ObjectLookupMethod;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
 import org.hibernate.search.query.engine.spi.FacetManager;
+import org.hibernate.search.query.engine.spi.GroupingManager;
 import org.hibernate.search.query.engine.spi.HSQuery;
 import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.hibernate.search.query.engine.spi.TimeoutManager;
@@ -325,6 +326,11 @@ public class FullTextQueryImpl extends AbstractQueryImpl implements FullTextQuer
 	@Override
 	public FacetManager getFacetManager() {
 		return hSearchQuery.getFacetManager();
+	}
+
+	@Override
+	public GroupingManager getGroupingManager() {
+		return hSearchQuery.getGroupingManager();
 	}
 
 	@Override

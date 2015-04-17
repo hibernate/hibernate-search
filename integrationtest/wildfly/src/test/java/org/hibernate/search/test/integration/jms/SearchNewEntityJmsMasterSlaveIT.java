@@ -65,6 +65,12 @@ public class SearchNewEntityJmsMasterSlaveIT extends SearchNewEntityJmsMasterSla
 			);
 			libraryFiles.addAll(
 					dependency(
+							"org.apache.lucene:lucene-grouping:" + VersionTestHelper.getDependencyVersionLucene(),
+							false
+					)
+			);
+			libraryFiles.addAll(
+					dependency(
 							"org.hibernate.common:hibernate-commons-annotations:" + VersionTestHelper.getDependencyVersionHibernateCommonsAnnotations(),
 							false
 					)

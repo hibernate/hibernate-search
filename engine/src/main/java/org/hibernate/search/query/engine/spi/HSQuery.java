@@ -159,6 +159,11 @@ public interface HSQuery extends ProjectionConstants {
 	FacetManager getFacetManager();
 
 	/**
+	 * @return the grouping related manager
+	 */
+	GroupingManager getGroupingManager();
+
+	/**
 	 * @return the underlying Lucene query
 	 */
 	Query getLuceneQuery();
