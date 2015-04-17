@@ -55,7 +55,7 @@ public class EmbeddedObjectIdInclusionTest {
 				"There should be only one embedded metadata instance",
 				typeMetadata.getEmbeddedTypeMetadata().size() == 1
 		);
-		EmbeddedTypeMetadata embeddedTypeMetadata = typeMetadata.getEmbeddedTypeMetadata().get( 0 );
+		EmbeddedTypeMetadata embeddedTypeMetadata = typeMetadata.getEmbeddedTypeMetadata().iterator().next();
 		PropertyMetadata propertyMetadata = embeddedTypeMetadata.getPropertyMetadataForProperty( "id" );
 		assertNotNull( "The id property should have been included", propertyMetadata );
 	}
@@ -67,7 +67,7 @@ public class EmbeddedObjectIdInclusionTest {
 				"There should be only one embedded metadata instance",
 				typeMetadata.getEmbeddedTypeMetadata().size() == 1
 		);
-		EmbeddedTypeMetadata embeddedTypeMetadata = typeMetadata.getEmbeddedTypeMetadata().get( 0 );
+		EmbeddedTypeMetadata embeddedTypeMetadata = typeMetadata.getEmbeddedTypeMetadata().iterator().next( );
 		PropertyMetadata propertyMetadata = embeddedTypeMetadata.getPropertyMetadataForProperty( "id" );
 		assertNull( "The id property should not have been included", propertyMetadata );
 	}

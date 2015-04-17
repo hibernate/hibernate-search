@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.engine.spi;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,11 +19,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleDocValuesField;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.facet.FacetsConfig;
+import org.apache.lucene.facet.sortedset.SortedSetDocValuesFacetField;
 import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexableField;
+
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMember;
@@ -48,6 +57,7 @@ import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.LuceneOptionsImpl;
 import org.hibernate.search.engine.metadata.impl.DocumentFieldMetadata;
 import org.hibernate.search.engine.metadata.impl.EmbeddedTypeMetadata;
+import org.hibernate.search.engine.metadata.impl.FacetMetadata;
 import org.hibernate.search.engine.metadata.impl.PropertyMetadata;
 import org.hibernate.search.engine.metadata.impl.TypeMetadata;
 import org.hibernate.search.exception.AssertionFailure;
@@ -311,36 +321,46 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 	}
 
 	/**
-	 * Builds the Lucene <code>Document</code> for a given entity <code>instance</code> and its <code>id</code>.
+	 * Builds the Lucene {@code Document} for a given entity instance and its id.
 	 *
-	 * @param instance The entity for which to build the matching Lucene <code>Document</code>
+	 * @param instance The entity for which to build the matching Lucene {@code Document}
 	 * @param id the entity id.
-	 * @param fieldToAnalyzerMap this maps gets populated while generating the <code>Document</code>.
-	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be <code>null</code>.
-	 * @param objectInitializer used to ensure that all objects are initalized
+	 * @param fieldToAnalyzerMap this maps gets populated while generating the {@code Document}.
+	 * It allows to specify for any document field a named analyzer to use. This parameter cannot be {@code null}.
+	 * @param objectInitializer used to ensure that all objects are initialized
 	 * @param conversionContext a {@link org.hibernate.search.bridge.spi.ConversionContext} object.
 	 * @param includedFieldNames list of field names to consider. Others can be excluded. Null if all fields are considered.
 	 *
-	 * @return The Lucene <code>Document</code> for the specified entity.
+	 * @return The Lucene {@code Document} for the specified entity.
 	 */
-	public Document getDocument(String tenantId, Object instance, Serializable id, Map<String, String> fieldToAnalyzerMap, InstanceInitializer objectInitializer, ConversionContext conversionContext, String[] includedFieldNames) {
-		// TODO as it is, includedFieldNames is not generally useful as we don't know if a fieldbridge creates specific fields or not
+	public Document getDocument(
+			String tenantId,
+			Object instance,
+			Serializable id,
+			Map<String, String> fieldToAnalyzerMap,
+			InstanceInitializer objectInitializer,
+			ConversionContext conversionContext,
+			String[] includedFieldNames) {
+		// TODO as it is, includedFieldNames is not generally useful as we don't know if a field bridge creates specific fields or not
 		// TODO only used at the moment to filter the id field and the class field
 
 		if ( fieldToAnalyzerMap == null ) {
 			throw new IllegalArgumentException( "fieldToAnalyzerMap cannot be null" );
 		}
+
 		//sensible default for outside callers
 		if ( objectInitializer == null ) {
 			objectInitializer = getInstanceInitializer();
 		}
 
 		Document doc = new Document();
-		final Class<?> entityType = objectInitializer.getClass( instance );
-		final float documentLevelBoost = getMetadata().getClassBoost( instance );
+		FacetsConfig facetConfig = new FacetsConfig();
+		Class<?> entityType = objectInitializer.getClass( instance );
+		float documentLevelBoost = getMetadata().getClassBoost( instance );
 
 		// add the class name of the entity to the document
 		if ( containsFieldName( ProjectionConstants.OBJECT_CLASS, includedFieldNames ) ) {
+			@SuppressWarnings( "deprecation" )
 			Field classField =
 					new Field(
 							ProjectionConstants.OBJECT_CLASS,
@@ -371,10 +391,12 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		}
 
 		// finally add all other document fields
-		Set<String> processedFieldNames = new HashSet<String>();
+		Set<String> processedFieldNames = new HashSet<>();
 		buildDocumentFields(
 				instance,
 				doc,
+				facetConfig,
+				false,
 				getMetadata(),
 				fieldToAnalyzerMap,
 				processedFieldNames,
@@ -382,14 +404,17 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 				objectInitializer,
 				documentLevelBoost
 		);
+
+
+		try {
+			doc = facetConfig.build( doc );
+		}
+		catch (IOException e) {
+			throw log.errorDuringFacetingIndexing( e );
+		}
 		return doc;
 	}
 
-	/**
-	 * @param inheritedBoost Boost inherited from the parent structure of the given instance: the document-level boost
-	 * in case of a top-level field, the product of the document-level boost and the boost(s) of the parent
-	 * embeddable(s) in case of an embedded field
-	 */
 	private void addTenantIdIfRequired(String tenantId, Document doc) {
 		if ( tenantId != null ) {
 			Field tenantIdField = new Field(
@@ -415,8 +440,15 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		return type;
 	}
 
+	/**
+	 * @param inheritedBoost Boost inherited from the parent structure of the given instance: the document-level boost
+	 * in case of a top-level field, the product of the document-level boost and the boost(s) of the parent
+	 * embeddable(s) in case of an embedded field
+	 */
 	private void buildDocumentFields(Object instance,
 			Document doc,
+			FacetsConfig facetConfig,
+			boolean multiValuedFacets,
 			TypeMetadata typeMetadata,
 			Map<String, String> fieldToAnalyzerMap,
 			Set<String> processedFieldNames,
@@ -427,80 +459,51 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 		// needed for field access: I cannot work in the proxied version
 		Object unproxiedInstance = unproxy( instance, objectInitializer );
 
-		// process the class bridges
-		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
-			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
-			final String fieldName = fieldMetadata.getName();
-			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
-			conversionContext.pushProperty( fieldName );
-			try {
-				oneWayConversionContext.set(
-						fieldName,
-						unproxiedInstance,
-						doc,
-						typeMetadata.getClassLuceneOptions( fieldMetadata, inheritedBoost )
-				);
-			}
-			finally {
-				conversionContext.popProperty();
-			}
-		}
-
-		// process the indexed fields
-		XMember previousMember = null;
-		Object currentFieldValue = null;
-		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
-			XMember member = propertyMetadata.getPropertyAccessor();
-			if ( previousMember != member ) {
-				currentFieldValue = unproxy(
-						ReflectionHelper.getMemberValue( unproxiedInstance, member ),
-						objectInitializer
-				);
-				previousMember = member;
-				if ( member.isCollection() ) {
-					if ( currentFieldValue instanceof Collection ) {
-						objectInitializer.initializeCollection( (Collection<?>) currentFieldValue );
-					}
-					else if ( currentFieldValue instanceof Map ) {
-						objectInitializer.initializeMap( (Map<?, ?>) currentFieldValue );
-					}
-				}
-			}
-
-			try {
-				conversionContext.pushProperty( propertyMetadata.getPropertyAccessorName() );
-
-				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
-					final FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
-					final String fieldName = fieldMetadata.getName();
-					final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
-
-					oneWayConversionContext.set(
-							fieldName,
-							currentFieldValue,
-							doc,
-							typeMetadata.getFieldLuceneOptions( propertyMetadata, fieldMetadata, currentFieldValue, inheritedBoost )
-					);
-				}
-			}
-			finally {
-				conversionContext.popProperty();
-			}
-		}
+		buildDocumentFieldForClassBridges( doc, typeMetadata, conversionContext, inheritedBoost, unproxiedInstance );
+		buildDocumentFieldsForProperties(
+				doc,
+				facetConfig,
+				multiValuedFacets,
+				typeMetadata,
+				conversionContext,
+				objectInitializer,
+				inheritedBoost,
+				unproxiedInstance
+		);
 
 		// allow analyzer override for the fields added by the class and field bridges
 		allowAnalyzerDiscriminatorOverride(
 				doc, typeMetadata, fieldToAnalyzerMap, processedFieldNames, unproxiedInstance
 		);
 
-		// recursively process embedded objects
+		buildDocumentFieldsForEmbeddedObjects(
+				doc,
+				facetConfig,
+				typeMetadata,
+				fieldToAnalyzerMap,
+				processedFieldNames,
+				conversionContext,
+				objectInitializer,
+				inheritedBoost,
+				unproxiedInstance
+		);
+	}
+
+	private void buildDocumentFieldsForEmbeddedObjects(Document doc,
+			FacetsConfig facetsConfig,
+			TypeMetadata typeMetadata,
+			Map<String, String> fieldToAnalyzerMap,
+			Set<String> processedFieldNames,
+			ConversionContext conversionContext,
+			InstanceInitializer objectInitializer,
+			float inheritedBoost,
+			Object unproxiedInstance) {
 		for ( EmbeddedTypeMetadata embeddedTypeMetadata : typeMetadata.getEmbeddedTypeMetadata() ) {
 			XMember member = embeddedTypeMetadata.getEmbeddedGetter();
 			float embeddedBoost = inheritedBoost * embeddedTypeMetadata.getStaticBoost();
 			conversionContext.pushProperty( embeddedTypeMetadata.getEmbeddedFieldName() );
 			try {
 				Object value = ReflectionHelper.getMemberValue( unproxiedInstance, member );
-
 				if ( value == null ) {
 					processEmbeddedNullValue( doc, embeddedTypeMetadata, conversionContext );
 					continue;
@@ -513,6 +516,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 							buildDocumentFields(
 									arrayValue,
 									doc,
+									facetsConfig,
+									true,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
@@ -528,6 +533,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 							buildDocumentFields(
 									collectionValue,
 									doc,
+									facetsConfig,
+									true,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
@@ -543,6 +550,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 							buildDocumentFields(
 									collectionValue,
 									doc,
+									facetsConfig,
+									true,
 									embeddedTypeMetadata,
 									fieldToAnalyzerMap,
 									processedFieldNames,
@@ -556,6 +565,8 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 						buildDocumentFields(
 								value,
 								doc,
+								facetsConfig,
+								false,
 								embeddedTypeMetadata,
 								fieldToAnalyzerMap,
 								processedFieldNames,
@@ -570,6 +581,166 @@ public class DocumentBuilderIndexedEntity extends AbstractDocumentBuilder {
 										+ embeddedTypeMetadata.getEmbeddedContainer()
 						);
 				}
+			}
+			finally {
+				conversionContext.popProperty();
+			}
+		}
+	}
+
+	private void buildDocumentFieldsForProperties(Document document,
+			FacetsConfig facetsConfig,
+			boolean multiValuedFacet,
+			TypeMetadata typeMetadata,
+			ConversionContext conversionContext,
+			InstanceInitializer objectInitializer,
+			float documentBoost,
+			Object unproxiedInstance) {
+		XMember previousMember = null;
+		Object currentFieldValue = null;
+
+		for ( PropertyMetadata propertyMetadata : typeMetadata.getAllPropertyMetadata() ) {
+			XMember member = propertyMetadata.getPropertyAccessor();
+			if ( previousMember != member ) {
+				currentFieldValue = unproxy(
+						ReflectionHelper.getMemberValue( unproxiedInstance, member ),
+						objectInitializer
+				);
+				previousMember = member;
+				if ( member.isCollection() ) {
+					if ( currentFieldValue instanceof Collection ) {
+						objectInitializer.initializeCollection( (Collection) currentFieldValue );
+					}
+					else if ( currentFieldValue instanceof Map ) {
+						objectInitializer.initializeMap( (Map) currentFieldValue );
+					}
+				}
+			}
+
+			try {
+				conversionContext.pushProperty( propertyMetadata.getPropertyAccessorName() );
+
+				for ( DocumentFieldMetadata fieldMetadata : propertyMetadata.getFieldMetadata() ) {
+					final FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
+					final String fieldName = fieldMetadata.getName();
+					final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext(
+							fieldBridge
+					);
+
+					// handle the default field creation via the bridge
+					oneWayConversionContext.set(
+							fieldName,
+							currentFieldValue,
+							document,
+							typeMetadata.getFieldLuceneOptions(
+									propertyMetadata, fieldMetadata, currentFieldValue, documentBoost
+							)
+					);
+
+					// handle faceting fields
+					if ( fieldMetadata.hasFacets() ) {
+						for ( FacetMetadata facetMetadata : fieldMetadata.getFacetMetadata() ) {
+							if ( multiValuedFacet ) {
+								facetsConfig.setMultiValued( facetMetadata.getFacetName(), true );
+							}
+							addFacetDocValues( document, fieldMetadata, facetMetadata, currentFieldValue );
+						}
+					}
+				}
+			}
+			finally {
+				conversionContext.popProperty();
+			}
+		}
+	}
+
+	private void addFacetDocValues(Document document,
+			DocumentFieldMetadata fieldMetadata,
+			FacetMetadata facetMetadata,
+			Object value) {
+		Field facetField;
+		switch ( facetMetadata.getEncoding() ) {
+			case STRING: {
+				facetField = new SortedSetDocValuesFacetField( facetMetadata.getFacetName(), value.toString() );
+				break;
+			}
+			case LONG: {
+				if ( value instanceof Number ) {
+					facetField = new NumericDocValuesField(
+							facetMetadata.getFacetName(),
+							( (Number) value ).longValue()
+					);
+				}
+				else if ( Date.class.isAssignableFrom( value.getClass() ) ) {
+					Date date = (Date) value;
+					FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
+					// if we have a date and the actual value is not indexed as a numeric value we will run into
+					// problems. Better fail early
+					if ( !( fieldBridge instanceof NumericEncodingDateBridge ) ) {
+						log.numericDateFacetForNonNumericField(
+								facetMetadata.getFacetName(),
+								fieldMetadata.getFieldName()
+						);
+					}
+					NumericEncodingDateBridge dateBridge = (NumericEncodingDateBridge) fieldBridge;
+					long numericDateValue = DateTools.round( date.getTime(), dateBridge.getResolution() );
+
+					facetField = new NumericDocValuesField( facetMetadata.getFacetName(), numericDateValue );
+				}
+				else if ( Calendar.class.isAssignableFrom( value.getClass() ) ) {
+					Calendar calendar = (Calendar) value;
+					facetField = new NumericDocValuesField(
+							facetMetadata.getFacetName(),
+							calendar.getTime().getTime()
+					);
+				}
+				else {
+					throw new AssertionFailure( "Unexpected value type for faceting: " + value.getClass().getName() );
+				}
+				break;
+			}
+			case DOUBLE: {
+				if ( value instanceof Number ) {
+					facetField = new DoubleDocValuesField(
+							facetMetadata.getFacetName(),
+							( (Number) value ).doubleValue()
+					);
+				}
+				else {
+					throw new AssertionFailure( "Unexpected value type for faceting: " + value.getClass().getName() );
+				}
+				break;
+			}
+			case AUTO: {
+				throw new AssertionFailure( "The facet type should have been resolved during bootstrapping" );
+			}
+			default: {
+				throw new AssertionFailure(
+						"Unexpected facet encoding type '"
+								+ facetMetadata.getEncoding()
+								+ "' Has the enum been modified?"
+				);
+			}
+		}
+
+		document.add( facetField );
+	}
+
+	private void buildDocumentFieldForClassBridges(Document doc,
+			TypeMetadata typeMetadata,
+			ConversionContext conversionContext, float documentBoost, Object unproxiedInstance) {
+		for ( DocumentFieldMetadata fieldMetadata : typeMetadata.getClassBridgeMetadata() ) {
+			FieldBridge fieldBridge = fieldMetadata.getFieldBridge();
+			final String fieldName = fieldMetadata.getName();
+			final FieldBridge oneWayConversionContext = conversionContext.oneWayConversionContext( fieldBridge );
+			conversionContext.pushProperty( fieldName );
+			try {
+				oneWayConversionContext.set(
+						fieldName,
+						unproxiedInstance,
+						doc,
+						typeMetadata.getClassLuceneOptions( fieldMetadata, documentBoost )
+				);
 			}
 			finally {
 				conversionContext.popProperty();

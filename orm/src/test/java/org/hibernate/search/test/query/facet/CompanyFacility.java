@@ -9,49 +9,60 @@ package org.hibernate.search.test.query.facet;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
 
 @Entity
-@Indexed
-public class Truck {
+public class CompanyFacility {
 	@Id
 	@GeneratedValue
 	private int id;
 
-	@Field(index = Index.YES, analyze = Analyze.NO, store = Store.YES, indexNullAs = "-1")
+	@Field(analyze = Analyze.NO)
 	@Facet
-	private Integer horsePower;
+	private String country;
 
-	public Truck() {
+	@ManyToOne
+	@ContainedIn
+	private Company company;
+
+	public CompanyFacility() {
 	}
 
-	public Truck(Integer horsePower) {
-		this.horsePower = horsePower;
-	}
+	public CompanyFacility(String country) {
+		this.country = country;
 
+	}
 	public int getId() {
 		return id;
 	}
 
-	public Integer getHorsePower() {
-		return horsePower;
+	public Company getCompany() {
+		return this.company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "Truck" );
-		sb.append( "{id=" ).append( id );
-		sb.append( ", horsePower='" ).append( horsePower );
-		sb.append( '}' );
-		return sb.toString();
+		return "CompanyFacility{" +
+				"id=" + id +
+				", country='" + country + '\'' +
+				'}';
 	}
 }
-
 

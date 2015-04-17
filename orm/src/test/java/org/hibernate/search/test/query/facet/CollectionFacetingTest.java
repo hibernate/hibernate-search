@@ -22,6 +22,7 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.query.facet.FacetSortOrder;
 import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.test.SearchTestBase;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -91,7 +92,8 @@ public class CollectionFacetingTest extends SearchTestBase {
 				.onField( "authors.name_untokenized" )
 				.discrete()
 				.orderedBy( FacetSortOrder.COUNT_DESC )
-				.includeZeroCounts( false ).maxFacetCount( 10 )
+				.includeZeroCounts( false )
+				.maxFacetCount( 10 )
 				.createFacetingRequest();
 
 		List<Facet> facets = fullTextQuery.getFacetManager().enableFaceting( facetReq ).getFacets( "someFacet" );

@@ -13,32 +13,33 @@ import javax.persistence.Id;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Facet;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Fields;
 
 @Entity
-public class Author {
+public class Ingredient {
 	@Id
 	@GeneratedValue
-	private Integer id;
+	private int id;
 
-	@Fields({ @Field, @Field(analyze = Analyze.NO, name = "name_untokenized") })
-	@Facet(forField = "name_untokenized")
-	private String name;
+	@Field(analyze = Analyze.NO)
+	@Facet
+	String name;
 
-
-	public Integer getId() {
-		return id;
+	public Ingredient() {
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public Ingredient(String name) {
+		this.name = name;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	public String toString() {
+		return "Ingredient{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				'}';
 	}
 }

@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.query.dsl.impl;
 
-import java.util.Date;
 import java.util.List;
 
-import org.hibernate.search.engine.spi.DocumentBuilderIndexedEntity;
 import org.hibernate.search.query.facet.Facet;
 
 /**
@@ -17,15 +15,13 @@ import org.hibernate.search.query.facet.Facet;
  */
 public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	private final List<FacetRange<T>> facetRangeList;
-	private final DocumentBuilderIndexedEntity documentBuilder;
 
-	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges, DocumentBuilderIndexedEntity documentBuilder) {
+	RangeFacetRequest(String name, String fieldName, List<FacetRange<T>> facetRanges) {
 		super( name, fieldName );
 		if ( facetRanges == null || facetRanges.isEmpty() ) {
 			throw new IllegalArgumentException( "At least one facet range must be specified" );
 		}
 		this.facetRangeList = facetRanges;
-		this.documentBuilder = documentBuilder;
 	}
 
 	public List<FacetRange<T>> getFacetRangeList() {
@@ -33,27 +29,21 @@ public class RangeFacetRequest<T> extends FacetingRequestImpl {
 	}
 
 	@Override
-	public Class<?> getFieldCacheType() {
+	public Class<?> getFacetValueType() {
 		// safe since we have at least one facet range set
 		Object o = facetRangeList.get( 0 ).getMin();
 		if ( o == null ) {
 			o = facetRangeList.get( 0 ).getMax();
 		}
 
-		if ( o instanceof Date ) { // for date faceting we are using the string field cache
-			return String[].class;
-		}
-		else {
-			return o.getClass();
-		}
+		return o.getClass();
 	}
 
 	@Override
 	public Facet createFacet(String value, int count) {
-		// todo improve implementation. we should not depend on the string value (HF)
 		int facetIndex = findFacetRangeIndex( value );
 		FacetRange<T> range = facetRangeList.get( facetIndex );
-		return new RangeFacetImpl<T>( getFacetingName(), getFieldName(), range, count, facetIndex, documentBuilder );
+		return new RangeFacetImpl<>( getFacetingName(), getFieldName(), range, count, facetIndex );
 	}
 
 	@Override

@@ -784,4 +784,39 @@ public interface Log extends BasicLogger {
 	@Message(id = 261, value = "An unknown DeletionQuery key was specified during de-serialization of a message from another node: %d")
 	SearchException unknownDeletionQueryKeySpecified(int queryKey);
 
+	@Message(id = 262, value = "@NumericField annotation is used on %1$s#%2$s without a matching @Field annotation")
+	SearchException numericFieldAnnotationWithoutMatchingField(String className, String memberName);
+
+	@Message(id = 263, value = "@Facet annotation is used on %1$s#%2$s without a matching @Field annotation")
+	SearchException facetAnnotationWithoutMatchingField(String className, String memberName);
+
+	@Message(id = 264, value = "@Facet is not supported for type '%1$s'. See %2$s#%3$s")
+	SearchException unsupportedFieldTypeForFaceting(String valueType, String className, String memberName);
+
+	@Message(id = 265, value = "Unable to build Lucene Document due to facet indexing error")
+	SearchException errorDuringFacetingIndexing(@Cause Exception e );
+
+	@Message(id = 266, value = "'%s' is not a valid type for a facet range request. Numbers (byte, short, int, long, float, double and their wrappers) as well as dates are supported")
+	SearchException unsupportedFacetRangeParameter(String type);
+
+	@Message(id = 267, value = "Unable to index date facet '%1$s' for field '%2$s', since the matching field is not using a numeric field bridge")
+	SearchException numericDateFacetForNonNumericField(String facetName, String fieldName);
+
+	@Message(id = 268, value = "Facet request '%1$s' tries to facet on  field '%2$s' which either does not exists or is not configured for faceting (via @Facet). Check your configuration.")
+	SearchException unknownFieldNameForFaceting(String facetName, String facetFieldName);
+
+	@Message(id = 269, value = "'%1$s' is not a supported type for a range faceting request parameter. Supported types are: '%2$s'")
+	SearchException unsupportedParameterTypeForRangeFaceting(String facetRangeParameterType, String supportedTypes);
+
+	@Message(id = 270, value = "At least of of the facets ranges in facet request '%1$s' contains neither start nor end value")
+	SearchException noStartOrEndSpecifiedForRangeQuery(String facetRequestName);
+
+	@Message(id = 271, value = "RANGE_DEFINITION_ORDER is not a valid sort order for a discrete faceting request.")
+	SearchException rangeDefinitionOrderRequestedForDiscrteFacetRequest();
+
+	@Message(id = 272, value = "Entity '%1$s' is not an indexed entity. Unable to create faceting request")
+	SearchException attemptToCreateFacetingRequestForUnindexedEntity(String entityName);
+
+	@Message(id = 273, value = "The indexed field '%1$s' in '%2$s' is analyzed and marked for faceting. Only un-analyzed fields can be faceted.")
+	SearchException attemptToFacetOnAnalyzedField(String fieldName, String entityName);
 }
