@@ -114,9 +114,9 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>org.wildfly</groupId>
+            <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
-            <version>${wildflyVersion}</version>
+            <version>1.0.0.Alpha5</version>
             <scope>test</scope>
             <exclusions>
                 <!-- This exclusion is needed to be able to setup the project in Windows:
