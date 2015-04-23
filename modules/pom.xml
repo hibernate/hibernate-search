@@ -26,6 +26,12 @@
         <!-- Needs to match the SLOT being used by Infinispan -->
         <infinispan.integration.slot>${infinispan.module.slot}</infinispan.integration.slot>
 
+        <!--
+          Needs to match the SLOT being used by the Hibernate Search version on which Infinispan depends on
+          This is sometimes essential when Infinispan upgrades major Hibernate Search versions.
+        -->
+        <infinispan.integration.slot.previous>${infinispan.module.slot.previous}</infinispan.integration.slot.previous>
+
         <!-- Needs to match the SLOT being used by Infinispan -->
         <jgroups.integration.slot>${jgroups.module.slot}</jgroups.integration.slot>
 
