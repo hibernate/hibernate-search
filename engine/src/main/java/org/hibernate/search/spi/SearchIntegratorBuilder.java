@@ -34,6 +34,7 @@ import org.hibernate.search.backend.impl.WorkerFactory;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.cfg.SearchMapping;
 import org.hibernate.search.cfg.spi.SearchConfiguration;
+import org.hibernate.search.cfg.spi.impl.ExtendedSearchConfiguration;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.impl.ConfigContext;
 import org.hibernate.search.engine.impl.DefaultTimingSource;
@@ -315,8 +316,15 @@ public class SearchIntegratorBuilder {
 
 		//we process the @Indexed classes last, so we first start all IndexManager(s).
 		final List<XClass> rootIndexedEntities = new LinkedList<XClass>();
-		final org.hibernate.search.engine.metadata.impl.MetadataProvider metadataProvider =
-				new AnnotationMetadataProvider( searchConfiguration.getReflectionManager(), configContext );
+		final org.hibernate.search.engine.metadata.impl.MetadataProvider metadataProvider;
+		if ( !( searchConfiguration instanceof ExtendedSearchConfiguration ) ) {
+			metadataProvider =	new AnnotationMetadataProvider( searchConfiguration.getReflectionManager(), configContext );
+		}
+		else {
+			ExtendedSearchConfiguration extendedConfig = (ExtendedSearchConfiguration) searchConfiguration;
+			metadataProvider =	new AnnotationMetadataProvider( searchConfiguration.getReflectionManager(), configContext,
+					extendedConfig.isEnforceIncludeEmbeddedObjectId() );
+		}
 
 		for ( Map.Entry<XClass, Class<?>> mapping : classMappings.entrySet() ) {
 			XClass mappedXClass = mapping.getKey();

@@ -89,11 +89,18 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 	private final ReflectionManager reflectionManager;
 	private final ConfigContext configContext;
 	private final BridgeFactory bridgeFactory;
+	private final boolean enforceIncludeEmbeddedObjectIds;
 
 	public AnnotationMetadataProvider(ReflectionManager reflectionManager, ConfigContext configContext) {
+		this( reflectionManager, configContext, false );
+	}
+
+	public AnnotationMetadataProvider(ReflectionManager reflectionManager, ConfigContext configContext,
+			boolean enforceIncludeEmbeddedObjectIds) {
 		this.reflectionManager = reflectionManager;
 		this.configContext = configContext;
 		this.bridgeFactory = new BridgeFactory( configContext.getServiceManager() );
+		this.enforceIncludeEmbeddedObjectIds = enforceIncludeEmbeddedObjectIds;
 	}
 
 	@Override
@@ -1309,7 +1316,7 @@ public class AnnotationMetadataProvider implements MetadataProvider {
 			XClass previousClass = parseContext.getCurrentClass();
 			parseContext.setCurrentClass( elementClass );
 			boolean previousIncludeEmbeddedObjectId = parseContext.includeEmbeddedObjectId();
-			parseContext.setIncludeEmbeddedObjectId( indexedEmbeddedAnnotation.includeEmbeddedObjectId() );
+			parseContext.setIncludeEmbeddedObjectId( indexedEmbeddedAnnotation.includeEmbeddedObjectId() || this.enforceIncludeEmbeddedObjectIds );
 			initializeClass(
 					embeddedTypeMetadataBuilder,
 					false,

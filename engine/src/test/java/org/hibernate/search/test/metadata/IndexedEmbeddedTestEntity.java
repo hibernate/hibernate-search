@@ -21,11 +21,14 @@ public class IndexedEmbeddedTestEntity {
 	@Field(analyze = Analyze.NO)
 	private String name;
 
-	@IndexedEmbedded(includePaths = "name")
+	@IndexedEmbedded(includePaths = "name", includeEmbeddedObjectId = false)
 	private IndexedEmbeddedTestEntity indexedEmbeddedWithIncludePath;
 
-	@IndexedEmbedded(depth = 1)
+	@IndexedEmbedded(depth = 1, includeEmbeddedObjectId = false)
 	private IndexedEmbeddedTestEntity indexedEmbeddedWithDepth;
+
+	@IndexedEmbedded(depth = 5, includeEmbeddedObjectId = false)
+	private IndexedEmbedded indexedEmbeddedNonFlat;
 
 	public Long getId() {
 		return id;
@@ -57,6 +60,14 @@ public class IndexedEmbeddedTestEntity {
 
 	public void setIndexedEmbeddedWithDepth(IndexedEmbeddedTestEntity indexedEmbeddedWithDepth) {
 		this.indexedEmbeddedWithDepth = indexedEmbeddedWithDepth;
+	}
+
+	public IndexedEmbedded getIndexedEmbeddedNonFlat() {
+		return indexedEmbeddedNonFlat;
+	}
+
+	public void setIndexedEmbeddedNonFlat(IndexedEmbedded indexedEmbeddedNonFlat) {
+		this.indexedEmbeddedNonFlat = indexedEmbeddedNonFlat;
 	}
 
 }
