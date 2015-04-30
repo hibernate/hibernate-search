@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.test.query.timeout;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.Query;
-
 import org.hibernate.QueryTimeoutException;
 import org.hibernate.Transaction;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -25,11 +29,6 @@ import org.hibernate.testing.SkipForDialect;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
@@ -60,7 +59,7 @@ public class TimeoutTest extends SearchTestBase {
 	public void tearDown() throws Exception {
 		try {
 			Transaction tx = fts.getTransaction();
-			if ( !tx.isActive() ) {
+			if ( tx.getStatus() != TransactionStatus.ACTIVE ) {
 				tx = fts.beginTransaction();
 			}
 			assertEquals( 1000, fts.createQuery( "delete from " + Clock.class.getName() ).executeUpdate() );

@@ -23,7 +23,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.Search;
 import org.hibernate.search.cfg.Environment;
@@ -195,7 +195,7 @@ public abstract class ReaderPerformanceTestCase extends SearchTestBase {
 			finally {
 				count.incrementAndGet();
 				try {
-					if ( tx != null && tx.isActive() ) {
+					if ( tx != null && tx.getStatus() == TransactionStatus.ACTIVE ) {
 						tx.rollback();
 					}
 					if ( s != null && s.isOpen() ) {

@@ -7,24 +7,23 @@
 package org.hibernate.search.backend.impl;
 
 import java.io.Serializable;
+
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
-import javax.transaction.TransactionManager;
-
-import org.hibernate.event.service.spi.EventListenerRegistry;
-import org.hibernate.event.spi.EventType;
-import org.hibernate.search.event.impl.FullTextIndexEventListener;
-import org.hibernate.search.util.logging.impl.Log;
 
 import org.hibernate.HibernateException;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventSource;
+import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.FlushEventListener;
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.backend.TransactionContext;
+import org.hibernate.search.event.impl.FullTextIndexEventListener;
+import org.hibernate.search.exception.SearchException;
+import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
 
@@ -114,14 +113,10 @@ public class EventSourceTransactionContext implements TransactionContext, Serial
 	}
 
 	private boolean isLocalTransaction() {
-		TransactionManager transactionManager = eventSource
+		return !eventSource
 			.getTransactionCoordinator()
-			.getTransactionContext()
-			.getTransactionEnvironment()
-			.getJtaPlatform()
-			//.canRegisterSynchronization() <- TODO explore: possibly a better option?
-			.retrieveTransactionManager();
-		return transactionManager == null;
+			.getTransactionCoordinatorBuilder()
+			.isJta();
 	}
 
 	private <T extends Service> T getService(Class<T> serviceClass) {

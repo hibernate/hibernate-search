@@ -17,6 +17,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
@@ -136,7 +137,7 @@ public class WorkerTestCase extends SearchTestBase {
 			}
 			finally {
 				try {
-					if ( tx != null && tx.isActive() ) {
+					if ( tx != null && tx.getStatus() == TransactionStatus.ACTIVE ) {
 						tx.rollback();
 					}
 					if ( s != null && s.isOpen() ) {

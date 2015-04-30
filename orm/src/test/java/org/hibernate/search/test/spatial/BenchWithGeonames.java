@@ -6,13 +6,20 @@
  */
 package org.hibernate.search.test.spatial;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -24,13 +31,6 @@ import org.hibernate.search.query.facet.FacetingRequest;
 import org.hibernate.search.spatial.impl.Point;
 import org.hibernate.search.spatial.impl.Rectangle;
 import org.hibernate.search.spatial.impl.SpatialQueryBuilderFromCoordinates;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Hibernate Search spatial : Benchmarks with <a href="http://www.geonames.org">GeoNames</a>
@@ -114,7 +114,7 @@ public final class BenchWithGeonames {
 		finally {
 			if ( fullTextSession != null && fullTextSession.isOpen() ) {
 				Transaction transaction = fullTextSession.getTransaction();
-				if ( transaction != null && transaction.isActive() ) {
+				if ( transaction != null && transaction.getStatus() == TransactionStatus.ACTIVE ) {
 					transaction.rollback();
 				}
 				fullTextSession.close();
@@ -315,25 +315,25 @@ public final class BenchWithGeonames {
 			System.out
 					.println(
 							"Mean time with Spatial Hash : " + Double.toString(
-									(double) spatialHashTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
+									spatialHashTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
 							) + " ms. Average number of docs fetched : " + Double.toString( spatialHashDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with Spatial Hash + Distance filter : " + Double.toString(
-									(double) spatialTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
+									spatialTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
 							) + " ms. Average number of docs fetched : " + Double.toString( spatialDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with DoubleRange : " + Double.toString(
-									(double) doubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
+									doubleRangeTotalDuration * Math.pow( 10, -6 ) / (iterations - warmUp)
 							) + " ms. Average number of docs fetched : " + Double.toString( doubleRangeDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 			System.out
 					.println(
 							"Mean time with DoubleRange + Distance filter : " + Double.toString(
-									(double) distanceDoubleRangeTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
+									distanceDoubleRangeTotalDuration * Math.pow( 10, -6 ) / ( iterations - warmUp )
 							) + " ms. Average number of docs fetched : " + Double.toString( distanceDoubleRangeDocsFetched / ((iterations - warmUp) * 1.0d) )
 					);
 
@@ -344,7 +344,7 @@ public final class BenchWithGeonames {
 		finally {
 			if ( fullTextSession != null && fullTextSession.isOpen() ) {
 				Transaction transaction = fullTextSession.getTransaction();
-				if ( transaction != null && transaction.isActive() ) {
+				if ( transaction != null && transaction.getStatus() == TransactionStatus.ACTIVE ) {
 					transaction.rollback();
 				}
 				fullTextSession.close();
@@ -411,7 +411,7 @@ public final class BenchWithGeonames {
 		finally {
 			if ( fullTextSession != null && fullTextSession.isOpen() ) {
 				Transaction transaction = fullTextSession.getTransaction();
-				if ( transaction != null && transaction.isActive() ) {
+				if ( transaction != null && transaction.getStatus() == TransactionStatus.ACTIVE ) {
 					transaction.rollback();
 				}
 				fullTextSession.close();
