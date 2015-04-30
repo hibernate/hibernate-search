@@ -11,13 +11,11 @@ import java.lang.reflect.Proxy;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SharedSessionContract;
-
 import org.hibernate.cfg.Configuration;
 import org.hibernate.context.internal.ThreadLocalSessionContext;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.engine.jdbc.LobCreationContext;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.engine.transaction.spi.TransactionContext;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -31,10 +29,9 @@ import static org.junit.Assert.fail;
  */
 public class SessionTest extends SearchTestBase {
 
-	//EventSource, org.hibernate.Session, TransactionContext, LobCreationContext
-	private static final Class[] SESS_PROXY_INTERFACES = new Class[] {
+	//EventSource, org.hibernate.Session, LobCreationContext
+	private static final Class<?>[] SESS_PROXY_INTERFACES = new Class[] {
 			org.hibernate.Session.class,
-			TransactionContext.class,
 			LobCreationContext.class,
 			EventSource.class,
 			SessionImplementor.class,

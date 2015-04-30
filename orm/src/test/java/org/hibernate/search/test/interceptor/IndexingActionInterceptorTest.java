@@ -6,25 +6,24 @@
  */
 package org.hibernate.search.test.interceptor;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.TermQuery;
-
 import org.hibernate.Transaction;
-
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextSession;
-import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.Search;
+import org.hibernate.search.engine.ProjectionConstants;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Emmanuel Bernard <emmanuel@hibernate.org>
@@ -47,7 +46,7 @@ public class IndexingActionInterceptorTest extends SearchTestBase {
 	@Override
 	@After
 	public void tearDown() throws Exception {
-		if ( !fullTextSession.getTransaction().isActive() ) {
+		if ( fullTextSession.getTransaction().getStatus() != TransactionStatus.ACTIVE ) {
 			Transaction tx = fullTextSession.beginTransaction();
 			blog = (Blog) fullTextSession.get( Blog.class, blog.getId() );
 			fullTextSession.delete( blog );

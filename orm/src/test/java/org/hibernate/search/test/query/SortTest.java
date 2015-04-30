@@ -6,9 +6,14 @@
  */
 package org.hibernate.search.test.query;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -24,9 +29,8 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
 import org.hibernate.Transaction;
-
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -38,10 +42,6 @@ import org.hibernate.search.testsupport.TestConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -71,7 +71,7 @@ public class SortTest extends SearchTestBase {
 	public void tearDown() throws Exception {
 		// check for ongoing transaction which is an indicator that something went wrong
 		// don't call the cleanup methods in this case. Otherwise the original error get swallowed
-		if ( !fullTextSession.getTransaction().isActive() ) {
+		if ( fullTextSession.getTransaction().getStatus() != TransactionStatus.ACTIVE ) {
 			deleteTestBooks();
 			deleteTestNumbers();
 			fullTextSession.close();

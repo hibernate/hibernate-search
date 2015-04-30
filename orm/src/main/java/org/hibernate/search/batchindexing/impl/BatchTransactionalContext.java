@@ -10,10 +10,9 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
-import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.transaction.spi.TransactionFactory;
-import org.hibernate.event.spi.EventSource;
+import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
+import org.hibernate.resource.transaction.TransactionCoordinatorBuilder;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.util.logging.impl.Log;
@@ -33,41 +32,29 @@ public class BatchTransactionalContext {
 	final SessionFactoryImplementor factory;
 	final ErrorHandler errorHandler;
 	final TransactionManager transactionManager;
-	final TransactionFactory<?> transactionFactory;
+	final TransactionCoordinatorBuilder transactionCoordinatorBuilder;
 	final ExtendedSearchIntegrator extendedIntegrator;
 
 	public BatchTransactionalContext(ExtendedSearchIntegrator extendedIntegrator, SessionFactoryImplementor sessionFactory, ErrorHandler errorHandler, String tenantId) {
 		this.extendedIntegrator = extendedIntegrator;
 		this.factory = sessionFactory;
 		this.errorHandler = errorHandler;
-		this.transactionManager = lookupTransactionManager( factory, tenantId );
-		this.transactionFactory = lookupTransactionFactory( factory );
+		this.transactionManager = lookupTransactionManager( factory );
+		this.transactionCoordinatorBuilder = lookupTransactionCoordinatorBuilder( factory );
 	}
 
-	private static TransactionFactory<?> lookupTransactionFactory(SessionFactoryImplementor sessionFactory) {
-		return sessionFactory.getServiceRegistry().getService( TransactionFactory.class );
+	private static TransactionCoordinatorBuilder lookupTransactionCoordinatorBuilder(SessionFactoryImplementor sessionFactory) {
+		return sessionFactory.getServiceRegistry().getService( TransactionCoordinatorBuilder.class );
 	}
 
-	private static TransactionManager lookupTransactionManager(SessionFactoryImplementor sessionFactory, String tenantId) {
-		final Session session = tenantId == null
-				? sessionFactory.openSession()
-				: sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession();
-		try {
-			EventSource eventSource = (EventSource)session;
-			return eventSource
-				.getTransactionCoordinator()
-				.getTransactionContext()
-				.getTransactionEnvironment()
-				.getJtaPlatform()
+	private static TransactionManager lookupTransactionManager(SessionFactoryImplementor sessionFactory) {
+		return sessionFactory.getServiceRegistry()
+				.getService( JtaPlatform.class )
 				.retrieveTransactionManager();
-		}
-		finally {
-			session.close();
-		}
 	}
 
 	boolean wrapInTransaction() {
-		if ( !transactionFactory.compatibleWithJtaSynchronization() ) {
+		if ( !transactionCoordinatorBuilder.isJta() ) {
 			//Today we only require a TransactionManager on JTA based transaction factories
 			log.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );
 			return false;
