@@ -20,7 +20,7 @@
 
         <!-- JGroups and Infinispan 7 integrations -->
         <module name="org.jgroups" optional="true" slot="${jgroups.module.slot}" />
-        <module name="org.hibernate.search.infinispan-storage" slot="${infinispan.integration.slot}" services="import" optional="true" />
+        <module name="org.infinispan.hibernate-search.directory-provider" slot="${infinispan.integration.slot}" services="import" optional="true" />
 
         <!-- optional Avro serialization -->
         <module name="org.hibernate.search.serialization-avro" slot="${hibernate.search.version}" services="import" optional="true" />
