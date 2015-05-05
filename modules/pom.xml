@@ -25,26 +25,12 @@
 
         <!-- Needs to match the SLOT being used by Infinispan -->
         <infinispan.integration.slot>${infinispan.module.slot}</infinispan.integration.slot>
-
-        <!-- Needs to match the SLOT being used by Infinispan -->
-        <jgroups.integration.slot>${jgroups.module.slot}</jgroups.integration.slot>
-
-        <!-- Needs to match the VERSION being used by Infinispan -->
-        <hibernate-search-infinispan.version>${project.version}</hibernate-search-infinispan.version>
-
-        <!-- Needs to match the SLOT being used by Infinispan (if any) -->
-        <jbossmarshalling.integration.slot>main</jbossmarshalling.integration.slot>
-
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-serialization-avro</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-infinispan</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>

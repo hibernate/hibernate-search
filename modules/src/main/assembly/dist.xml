@@ -50,11 +50,6 @@
             <outputDirectory>/org/hibernate/search/serialization-avro/${hibernate.search.version}</outputDirectory>
             <filtered>true</filtered>
         </file>
-        <file>
-            <source>${module.xml.basedir}/search/infinispan-storage/module.xml</source>
-            <outputDirectory>/org/hibernate/search/infinispan-storage/${infinispan.integration.slot}</outputDirectory>
-            <filtered>true</filtered>
-        </file>
     </files>
 
     <dependencySets>
@@ -95,16 +90,6 @@
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-search-backend-jms</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/search/infinispan-storage/${infinispan.integration.slot}</outputDirectory>
-            <useTransitiveFiltering>false</useTransitiveFiltering>
-            <unpack>false</unpack>
-            <includes>
-                <include>org.hibernate:hibernate-search-infinispan</include>
             </includes>
         </dependencySet>
 
