@@ -110,9 +110,7 @@ public interface MassIndexer {
 	/**
 	 * Starts the indexing process in background (asynchronous).
 	 * Can be called only once.
-	 * @return a Future to control task canceling.
-	 * get() will block until completion.
-	 * cancel() is currently not implemented.
+	 * @return a Future to control the indexing task.
 	 */
 	Future<?> start();
 
