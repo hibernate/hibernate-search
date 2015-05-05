@@ -331,7 +331,7 @@ configuration options.
 
 To use the Infinispan directory via Maven, add the following dependencies:
 
-.Maven dependencies for Hibernate Search
+.Maven dependencies for Hibernate Search using Infinispan
 
 ====
 [source, XML]
@@ -339,21 +339,29 @@ To use the Infinispan directory via Maven, add the following dependencies:
 ----
 <dependency>
    <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-search</artifactId>
+   <artifactId>hibernate-search-orm</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
 <dependency>
-   <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-search-infinispan</artifactId>
-   <version>{hibernateSearchVersion}</version>
+   <groupId>org.infinispan</groupId>
+   <artifactId>infinispan-directory-provider</artifactId>
+   <version>{infinispanVersion}</version>
 </dependency>
 ----
 ====
 
-For the non-maven users, add `hibernate-search-infinispan.jar`, `infinispan-lucene-directory.jar`,
-`infinispan-core.jar` and `infinispan-commons.jar` to your application classpath.
-These last three jars are distributed by the
-link:http://infinispan.org/download/[Infinispan project downloads].
+[IMPORTANT]
+====
+This dependency changed in Hibernate Search version 5.2.
+
+Previously the DirectoryProvider was provided by the Hibernate Search project and had Maven coordinates
+'org.hibernate:hibernate-search-infinispan', but the Infinispan team is now maintaining this extension point
+so since this version please use the Maven definition as in the previous example.
+
+The version printed above was the latest compatible at the time of publishing this Hibernate Search version:
+it's possible that more recently improved versions of Infinispan have been published which
+are compatible with this same Hibernate Search version.
+====
 
 ===== Architecture
 
@@ -409,13 +417,13 @@ hibernate.search.infinispan.configuration_resourcename = [infinispan configurati
 ====
 
 If both parameters are defined, JNDI will have priority. If none of these is defined, Hibernate
-Search will use the default Infinispan configuration included in `hibernate-search-infinispan.jar`.
+Search will use the default Infinispan configuration included in `infinispan-directory-provider.jar`.
 This configuration should work fine in most cases but does not store the index in a persistent cache
 store.
 
 As mentioned in <<directory-provider-table>>, each index makes use of three caches, so three
 different caches should be configured as shown in the `default-hibernatesearch-infinispan.xml`
-provided in the `hibernate-search-infinispan.jar`. Several indexes can share the same caches.
+provided in the `infinispan-directory-provider.jar`. Several indexes can share the same caches.
 
 Infinispan relies on JGroups for its networking functionality, so unless you are using Infinispan on
 a single node, an Infinispan configuration file will refer to a JGroups configuration file. This
@@ -434,7 +442,7 @@ configuration.
 
 The file `jgroups-ec2.xml` used in the example above is one of the several JGroups configurations
 included in Infinispan. It is a good starting point to run on Amazon EC2 networks. For more details
-and examples see link:http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_use_one_of_the_pre_configured_jgroups_files[usage of pre-configured JGroups stacks]
+and examples see link:http://infinispan.org/docs/7.2.x/user_guide/user_guide.html#_use_one_of_the_pre_configured_jgroups_files[usage of pre-configured JGroups stacks]
 in the Infinispan configuration guide.
 
 [[configuration-worker]]

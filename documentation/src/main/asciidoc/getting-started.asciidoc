@@ -77,9 +77,9 @@ All you have to add to your pom.xml is:
 </dependency>
 <!-- Infinispan integration: -->
 <dependency>
-   <groupId>org.hibernate</groupId>
-   <artifactId>hibernate-search-infinispan</artifactId>
-   <version>{hibernateSearchVersion}</version>
+   <groupId>org.infinispan</groupId>
+   <artifactId>infinispan-directory-provider</artifactId>
+   <version>{infinispanVersion}</version>
 </dependency>
 ====
 
@@ -88,7 +88,7 @@ if you want to use Hibernate Search in conjunction with JPA.
 
 ==== Manual library management
 
-You can download zip bundles from Sourcefroge containing all needed
+You can download zip bundles from Sourceforge containing all needed
 http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/[Hibernate Search]
 dependencies. This includes - among others - the latest compatible version of Hibernate ORM. However,
 only the essential parts you need to start experimenting with are included. You will probably need

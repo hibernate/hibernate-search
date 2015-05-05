@@ -320,14 +320,14 @@ classname of your service implementation.
 .Service file for the Infinispan CacheManagerService service
 ====
 ----
-/META-INF/services/org.hibernate.search.infinispan.CacheManagerService
+/META-INF/services/org.infinispan.hibernate.search.spi.CacheManagerService
 ----
 ====
 
-.Content of META-INF/services/org.hibernate.search.infinispan.CacheManagerService
+.Content of META-INF/services/org.infinispan.hibernate.search.spi.CacheManagerService
 ====
 ----
-org.hibernate.search.infinispan.DefaultCacheManagerService
+org.infinispan.hibernate.search.impl.DefaultCacheManagerService
 ----
 ====
 
