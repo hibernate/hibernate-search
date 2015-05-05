@@ -1,6 +1,19 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.2.0.Final (6-5-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-1855] - Javadoc on MassIndexer mentioning that cancel is not supported
+
+** Task
+    * [HSEARCH-1600] - Re-enable disabled test HibernateSearchSessionFactoryObserverTest
+    * [HSEARCH-1856] - Missing paragraph separation in the multi-tenancy chapter of reference documentation
+    * [HSEARCH-1858] - Upgrade to Hibernate ORM 4.3.9.Final
+    * [HSEARCH-1863] - Upgrade to Infinispan 7.2.0.Final
+
+
 Version 5.2.0.Beta1 (16-4-2015)
 ------------------------
 
