@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+Version 5.3.0.Beta1 (6-5-2015)
+------------------------
+
+** Bug
+    * [HSEARCH-900] - Faceting with manytoone relationship give wrong faceting count
+
+** Improvement
+    * [HSEARCH-812] - Possibiltiy to set boolean type (SHOULD/MUST) when selecting multiple facets
+    * [HSEARCH-1848] - Replace the Infinispan Directory provider with the one distributed by the Infinispan project
+
+** Task
+    * [HSEARCH-809] - Make use of the new faceting API offered by Lucene
+
+
 Version 5.2.0.Final (6-5-2015)
 ------------------------
 
