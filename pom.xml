@@ -413,8 +413,14 @@
             </dependency>
             <dependency>
                 <groupId>org.infinispan</groupId>
-                <artifactId>infinispan-lucene-directory</artifactId>
+                <artifactId>infinispan-directory-provider</artifactId>
                 <version>${infinispanVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>hibernate-search-engine</artifactId>
+                        <groupId>org.hibernate</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
              <dependency>
                 <groupId>org.hibernate</groupId>
