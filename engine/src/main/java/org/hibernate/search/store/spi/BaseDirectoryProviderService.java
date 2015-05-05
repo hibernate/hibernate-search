@@ -39,7 +39,7 @@ public abstract class BaseDirectoryProviderService implements DirectoryProviderS
 		defaultProviderClasses.put( "filesystem-master", FSMasterDirectoryProvider.class.getName() );
 		defaultProviderClasses.put( "filesystem-slave", FSSlaveDirectoryProvider.class.getName() );
 		defaultProviderClasses.put( "ram", RAMDirectoryProvider.class.getName() );
-		defaultProviderClasses.put( "infinispan", "org.hibernate.search.infinispan.spi.InfinispanDirectoryProvider" );
+		defaultProviderClasses.put( "infinispan", "org.infinispan.hibernate.search.spi.InfinispanDirectoryProvider" );
 	}
 
 	@Override

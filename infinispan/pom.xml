@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-lucene-directory</artifactId>
+            <artifactId>infinispan-directory-provider</artifactId>
         </dependency>
 
         <!-- Test -->
