@@ -27,7 +27,6 @@
         here due to dependency conflicts with specific versions of WildFly
         -->
         <enforcer.skip>true</enforcer.skip>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -178,13 +177,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <systemPropertyVariables>
-                        <hibernate.search.module.slot.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot.version>
-                        <dependency.version.Lucene>${luceneVersion}</dependency.version.Lucene>
-                        <dependency.version.HibernateCommonsAnnotations>${hibernateCommonsAnnotationVersion}</dependency.version.HibernateCommonsAnnotations>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
