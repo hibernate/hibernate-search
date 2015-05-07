@@ -180,7 +180,7 @@
                 </executions>
                 <configuration>
                     <systemPropertyVariables>
-                        <hibernate.search.module.slot.version>${hibernate.search.module.slot}</hibernate.search.module.slot.version>
+                        <hibernate.search.module.slot.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.search.module.slot.version>
                         <dependency.version.Lucene>${luceneVersion}</dependency.version.Lucene>
                         <dependency.version.HibernateCommonsAnnotations>${hibernateCommonsAnnotationVersion}</dependency.version.HibernateCommonsAnnotations>
                     </systemPropertyVariables>
