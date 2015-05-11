@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.engine.metadata.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,8 +62,9 @@ public class PropertyMetadata {
 		return propertyAccessorName;
 	}
 
-	public Set<DocumentFieldMetadata> getFieldMetadata() {
-		return documentFieldMetadataList;
+	// TODO HSEARCH-1867 change return type to set
+	public List<DocumentFieldMetadata> getFieldMetadata() {
+		return new ArrayList<DocumentFieldMetadata>( documentFieldMetadataList );
 	}
 
 	public DocumentFieldMetadata getFieldMetadata(String fieldName) {

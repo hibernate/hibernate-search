@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -213,8 +214,9 @@ public class TypeMetadata {
 		}
 	}
 
-	public Set<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
-		return embeddedTypeMetadata;
+	// TODO HSEARCH-1867 change return type to set
+	public List<EmbeddedTypeMetadata> getEmbeddedTypeMetadata() {
+		return new ArrayList<EmbeddedTypeMetadata>( embeddedTypeMetadata );
 	}
 
 	public Set<ContainedInMetadata> getContainedInMetadata() {
@@ -392,12 +394,12 @@ public class TypeMetadata {
 		private Discriminator discriminator;
 		private XMember discriminatorGetter;
 		private boolean stateInspectionOptimizationsEnabled = true;
-		private Set<PropertyMetadata> propertyMetadataSet = new HashSet<>();
-		private Set<DocumentFieldMetadata> classBridgeFields = new HashSet<DocumentFieldMetadata>();
-		private Set<EmbeddedTypeMetadata> embeddedTypeMetadata = new HashSet<EmbeddedTypeMetadata>();
-		private Set<ContainedInMetadata> containedInMetadata = new HashSet<ContainedInMetadata>();
-		private Set<XClass> optimizationClassList = new HashSet<XClass>();
-		private Set<String> collectionRoles = new TreeSet<String>();
+		private final Set<PropertyMetadata> propertyMetadataSet = new HashSet<>();
+		private final Set<DocumentFieldMetadata> classBridgeFields = new HashSet<DocumentFieldMetadata>();
+		private final Set<EmbeddedTypeMetadata> embeddedTypeMetadata = new HashSet<EmbeddedTypeMetadata>();
+		private final Set<ContainedInMetadata> containedInMetadata = new HashSet<ContainedInMetadata>();
+		private final Set<XClass> optimizationClassList = new HashSet<XClass>();
+		private final Set<String> collectionRoles = new TreeSet<String>();
 		private PropertyMetadata idPropertyMetadata;
 		private XProperty jpaProperty;
 
